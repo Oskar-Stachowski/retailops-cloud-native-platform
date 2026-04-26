@@ -11,6 +11,12 @@ retailops-cloud-native-ai-platform/
 ├── Makefile
 ├── docker-compose.yml
 │
+├── .github/
+│   ├── workflows/
+│       ├── ci.yml
+│       ├── security-scan.yml
+│       └── terraform-check.yml
+│
 ├── docs/
 │   ├── architecture/
 │   │   ├── aws-architecture.md
@@ -117,11 +123,6 @@ retailops-cloud-native-ai-platform/
 │   ├── jenkins/
 │   │   ├── Jenkinsfile
 │   │   └── pipelines/
-│   └── github-actions/
-│       ├── ci.yml
-│       ├── security-scan.yml
-│       └── terraform-check.yml
-│
 ├── tests/
 │   ├── unit/
 │   ├── integration/
