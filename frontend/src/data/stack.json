@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Frontend",
+    "icon": "▣",
+    "status": "Running",
+    "description": "React/Vite frontend shell served locally.",
+    "variant": "green"
+  },
+  {
+    "name": "API",
+    "icon": "</>",
+    "status": "API health ready",
+    "description": "FastAPI exposes the first platform health contract.",
+    "variant": "blue"
+  },
+  {
+    "name": "Database",
+    "icon": "◉",
+    "status": "PostgreSQL configured",
+    "description": "Database service is prepared for future sample retail data.",
+    "variant": "purple"
+  }
+]

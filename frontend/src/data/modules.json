@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Inventory Risk",
+    "icon": "📦",
+    "description": "Identify slow-moving and at-risk inventory to reduce stockouts and overstock.",
+    "status": "Planned",
+    "variant": "green"
+  },
+  {
+    "title": "Alerts",
+    "icon": "🔔",
+    "description": "Surface operational signals for inventory, sales, and data-quality events.",
+    "status": "Planned",
+    "variant": "orange"
+  },
+  {
+    "title": "Product 360",
+    "icon": "👤",
+    "description": "Provide a unified product view across sales, inventory, and category signals.",
+    "status": "Planned",
+    "variant": "blue"
+  },
+  {
+    "title": "Forecasting",
+    "icon": "📈",
+    "description": "Prepare demand forecasting evidence for planning and decision support.",
+    "status": "Planned",
+    "variant": "purple"
+  },
+  {
+    "title": "Anomaly Detection",
+    "icon": "🔍",
+    "description": "Detect unusual demand, pricing, and inventory patterns in retail data.",
+    "status": "Planned",
+    "variant": "red"
+  },
+  {
+    "title": "Platform Health",
+    "icon": "🟢",
+    "description": "Show frontend, API, database, and local environment readiness for delivery checks.",
+    "status": "MVP",
+    "variant": "blue"
+  }
+]
