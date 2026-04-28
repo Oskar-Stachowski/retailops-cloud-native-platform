@@ -1,8 +1,0 @@
-services:
-  api:
-    build:
-      context: .
-    image: retailops-api:0.1.0
-    container_name: retailops-api
-    ports:
-      - "8000:8000"

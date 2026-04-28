@@ -1,13 +1,24 @@
-# Frontend
+# RetailOps Frontend Placeholder
 
-This directory will contain the user-facing web application for the RetailOps Platform.
+This is a minimal static frontend shell for the RetailOps local MVP environment.
 
-The frontend will provide dashboards and operational views for users such as Operations Manager, Inventory Planner, Analyst, Commercial Stakeholder, and Finance / Controlling.
+It is intentionally simple: static HTML/CSS served by Nginx. Its purpose is to prove that the platform can run locally as a full stack with Docker Compose: frontend + API + PostgreSQL.
 
-Planned MVP responsibilities:
-- display dashboard summaries,
-- show product and inventory risk information,
-- present alerts and workflow status,
-- connect to the backend API.
+## Local Docker build
 
-Implementation will be added in later tasks.
+```bash
+docker build -t retailops-frontend:local .
+docker run --rm -p 3000:80 retailops-frontend:local
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+API health link expects the backend to be available at:
+
+```text
+http://localhost:8000/health
+```

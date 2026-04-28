@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RetailOps Platform | Local MVP Environment</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <nav class="topbar" aria-label="Main navigation">
+        <a class="brand" href="#home" aria-label="RetailOps Platform home">
+          <span class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M7 8V6a5 5 0 0 1 10 0v2h1.2A2.8 2.8 0 0 1 21 10.8v7.4a2.8 2.8 0 0 1-2.8 2.8H5.8A2.8 2.8 0 0 1 3 18.2v-7.4A2.8 2.8 0 0 1 5.8 8H7Zm2 0h6V6a3 3 0 0 0-6 0v2Zm3 7.6a2.1 2.1 0 1 0 0-4.2 2.1 2.1 0 0 0 0 4.2Z" />
+            </svg>
+          </span>
+          <span>RetailOps <strong>Platform</strong></span>
+        </a>
+
+        <div class="nav-links" aria-label="Page sections">
+          <a class="active" href="#home">Home</a>
+          <a href="#status">Status</a>
+          <a href="#modules">Modules</a>
+          <a href="#about">About</a>
+        </div>
+
+        <div class="environment-pill" aria-label="Current environment: local">
+          <span class="pulse-dot"></span>
+          Local Environment
+        </div>
+      </nav>
+
+      <section class="hero" id="home">
+        <div class="hero-content">
+          <p class="eyebrow">Docker Compose local stack</p>
+          <h1>RetailOps Platform</h1>
+          <h2>Local MVP Environment</h2>
+          <p class="hero-copy">
+            This local stack runs the frontend, API, and PostgreSQL database using Docker Compose.
+            It is a lightweight foundation for building and testing retail operations capabilities locally.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="http://localhost:8000/health" target="_blank" rel="noreferrer">
+              <span aria-hidden="true">↗</span>
+              Check API Health
+            </a>
+            <span class="hint">Expected endpoint: <code>localhost:8000/health</code></span>
+          </div>
+        </div>
+
+        <div class="retail-illustration" aria-hidden="true">
+          <div class="cloud cloud-left"></div>
+          <div class="cloud cloud-right"></div>
+          <div class="store-card">
+            <div class="awning"></div>
+            <div class="store-body">
+              <div class="window"></div>
+              <div class="door"></div>
+            </div>
+          </div>
+          <div class="cart">🛒</div>
+          <div class="tree tree-left"></div>
+          <div class="tree tree-right"></div>
+        </div>
+      </section>
+
+      <section class="status-grid" id="status" aria-label="Local stack status">
+        <article class="status-card status-card-green">
+          <div class="status-icon" aria-hidden="true">▣</div>
+          <div>
+            <h3>Frontend</h3>
+            <p class="status-line"><span></span>Running</p>
+            <p>The static frontend shell is served locally.</p>
+          </div>
+        </article>
+
+        <article class="status-card status-card-blue">
+          <div class="status-icon" aria-hidden="true">&lt;/&gt;</div>
+          <div>
+            <h3>API</h3>
+            <p class="status-line"><span></span>Available at <code>localhost:8000/health</code></p>
+            <p>The FastAPI backend exposes the first health contract.</p>
+          </div>
+        </article>
+
+        <article class="status-card status-card-purple">
+          <div class="status-icon" aria-hidden="true">◉</div>
+          <div>
+            <h3>Database</h3>
+            <p class="status-line"><span></span>PostgreSQL configured</p>
+            <p>The database service is prepared for sample retail data.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="modules" id="modules">
+        <div class="section-heading">
+          <span class="section-icon" aria-hidden="true">◇</span>
+          <div>
+            <p class="eyebrow">MVP roadmap</p>
+            <h2>Planned Modules</h2>
+          </div>
+        </div>
+
+        <div class="module-grid">
+          <article class="module-card module-green">
+            <div class="module-icon" aria-hidden="true">📦</div>
+            <h3>Inventory Risk</h3>
+            <p>Identify slow-moving and at-risk inventory to reduce stockouts and overstock.</p>
+            <span>Planned</span>
+          </article>
+
+          <article class="module-card module-orange">
+            <div class="module-icon" aria-hidden="true">🔔</div>
+            <h3>Alerts</h3>
+            <p>Surface operational signals for inventory, sales, and data-quality events.</p>
+            <span>Planned</span>
+          </article>
+
+          <article class="module-card module-blue">
+            <div class="module-icon" aria-hidden="true">👤</div>
+            <h3>Product 360</h3>
+            <p>Provide a unified product view across sales, inventory, and category signals.</p>
+            <span>Planned</span>
+          </article>
+
+          <article class="module-card module-purple">
+            <div class="module-icon" aria-hidden="true">📈</div>
+            <h3>Forecasting</h3>
+            <p>Prepare demand forecasting evidence for planning and decision support.</p>
+            <span>Planned</span>
+          </article>
+
+          <article class="module-card module-red">
+            <div class="module-icon" aria-hidden="true">🔍</div>
+            <h3>Anomaly Detection</h3>
+            <p>Detect unusual demand, pricing, and inventory patterns in retail data.</p>
+            <span>Planned</span>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer" id="about">
+        <span>🐳 Running with <strong>Docker Compose</strong></span>
+        <span>Built for local development</span>
+        <span>&lt;/&gt; RetailOps MVP shell</span>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -179,40 +179,72 @@ Contains helper scripts for local development, testing and deployment.
 
 ---
 
-## Local Development
+## 🚀 Local Development
 
-### Prerequisites
+Run the full RetailOps MVP platform locally using Docker Compose.
 
-Before running the project locally, install:
+### 🧱 Architecture
 
-- Docker
-- Docker Compose
-- Python 3.11+
-- Git
-- Make
+The local environment runs a minimal full-stack setup:
 
-### Clone the repository
+```text
+Frontend → API → PostgreSQL
+```
+
+* Frontend: Nginx (static MVP UI)
+* API: FastAPI service
+* Database: PostgreSQL
+
+---
+
+### 📦 Prerequisites
+
+Install the following tools:
+
+* Docker
+* Docker Compose
+* Git
+
+> Python and Make are **not required** for running the app via Docker Compose.
+
+---
+
+### 📥 Clone the repository
 
 ```bash
 git clone https://github.com/your-username/cloud-native-retailops-platform.git
 cd cloud-native-retailops-platform
 ```
 
-### Configure environment variables
+---
+
+### ⚙️ Configure environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-Update `.env` with local configuration values.
+You can optionally adjust ports and database credentials in `.env`.
 
-### Run locally with Docker Compose
+---
+
+### ▶️ Run the full stack
 
 ```bash
 docker compose up --build
 ```
 
-### Health check
+---
+
+### 🌐 Access the services
+
+* Frontend: http://localhost:3000
+* API: http://localhost:8000
+* Health check: http://localhost:8000/health
+
+---
+
+### 🩺 Health check (CLI)
 
 ```bash
 curl http://localhost:8000/health
@@ -222,11 +254,44 @@ Expected response:
 
 ```json
 {
-  "status": "ok"
+  "status": "ok",
+  "service": "retailops-api",
+  "environment": "local"
 }
 ```
 
 ---
+
+### 🛑 Stop the stack
+
+```bash
+docker compose down
+```
+
+---
+
+### 🧪 Useful commands
+
+Check running containers:
+
+```bash
+docker compose ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f
+```
+
+---
+
+### 📌 Notes
+
+* This is a **local-first MVP environment** designed to validate platform behavior without cloud infrastructure.
+* AWS, Kubernetes, and CI/CD integrations are introduced in later stages.
+* The frontend is a **lightweight placeholder UI**, not a full production dashboard.
+
 
 ## CI/CD Pipeline
 
