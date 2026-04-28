@@ -22,6 +22,7 @@ This task does not yet implement full business dashboards. It prepares the UI fo
 | --- | --- | --- |
 | UI framework | React | Component-based frontend development |
 | Build tool | Vite | Fast local development and production build |
+| Routing | React Router | Client-side navigation between dashboard pages |
 | Language | JavaScript | MVP frontend implementation |
 | Styling | CSS | Dashboard shell layout and visual system |
 | Static serving | Nginx | Serves the production `dist/` build in Docker |
@@ -33,11 +34,28 @@ This task does not yet implement full business dashboards. It prepares the UI fo
 frontend/
 ├── public/                 # Static public assets
 ├── src/
+│   ├── assets/             # Frontend images and static assets
+│   ├── components/         # Reusable UI components
+│   │   ├── ApiHealthCard.jsx
+│   │   ├── Hero.jsx
+│   │   ├── ModuleGrid.jsx
+│   │   ├── StackStatus.jsx
+│   │   └── Topbar.jsx
 │   ├── data/               # JSON-driven dashboard content
 │   │   ├── modules.json
 │   │   └── stack.json
+│   ├── pages/              # Application page skeletons
+│   │   ├── Admin.jsx
+│   │   ├── Anomalies.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Forecasts.jsx
+│   │   ├── Products.jsx
+│   │   └── Recommendations.jsx
+│   ├── router/             # React Router configuration
+│   │   └── index.jsx
 │   ├── App.css             # Main dashboard styling
-│   ├── App.jsx             # Main React application shell
+│   ├── App.jsx             # Root application layout
+│   ├── index.css           # Global styles
 │   └── main.jsx            # React entrypoint
 ├── Dockerfile              # Multi-stage React/Vite build served by Nginx
 ├── nginx.conf              # Nginx routing and API proxy configuration
@@ -74,6 +92,21 @@ to the local backend:
 ```text
 http://localhost:8000/health
 ```
+
+## Application routes
+
+The frontend uses React Router to expose the first MVP page skeletons.
+
+| Route | Page | Purpose |
+| --- | --- | --- |
+| `/` | Dashboard | Main MVP shell with platform status and planned modules |
+| `/products` | Products | Placeholder for product catalogue and Product 360 views |
+| `/forecasts` | Forecasts | Placeholder for demand forecasting views |
+| `/anomalies` | Anomalies | Placeholder for anomaly detection and operational signals |
+| `/recommendations` | Recommendations | Placeholder for decision-support recommendations |
+| `/admin` | Admin | Placeholder for platform administration and governance views |
+
+At this stage, these pages are intentionally lightweight. Their purpose is to establish navigation, routing conventions, and future dashboard boundaries before implementing real business logic.
 
 ## API health integration
 
