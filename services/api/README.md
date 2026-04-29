@@ -23,6 +23,7 @@ Open:
 
 ```text
 http://localhost:8000/health
+http://localhost:8000/ready
 http://localhost:8000/docs
 ```
 
@@ -36,7 +37,13 @@ Run API tests:
 pytest
 ```
 
-The test suite currently verifies that the `/health` endpoint returns HTTP `200` and a valid health status.
+The test suite currently verifies:
+
+- `/health` returns HTTP `200` and a valid health status
+- `/ready` returns HTTP `200` when the database is available
+- `/ready` returns HTTP `503` when the database is unavailable
+- controlled API errors follow the standard error response pattern
+- the initial domain models validate core RetailOps data rules
 
 ---
 
@@ -78,6 +85,37 @@ docker compose down
 
 ---
 
+## PostgreSQL local checks
+
+Start only the PostgreSQL service:
+
+```bash
+docker compose up -d db
+```
+
+Check if PostgreSQL is ready:
+```bash
+docker compose exec db pg_isready -U retailops -d retailops
+```
+
+Expected result:
+```bash
+/var/run/postgresql:5432 - accepting connections
+```
+
+Verify the PostgreSQL version:
+```bash
+docker compose exec db psql -U retailops -d retailops -c "select version();"
+```
+
+The local API uses PostgreSQL through DATABASE_URL.
+
+When the API runs inside Docker Compose, the database host is db.
+
+When the API runs directly on your machine, the database host should be localhost.
+
+---
+
 ## Health endpoint
 
 ```text
@@ -93,6 +131,52 @@ Example response:
   "environment": "local"
 }
 ```
+
+---
+
+## Readiness endpoint
+
+```text
+GET /ready
+```
+
+The readiness endpoint checks whether the API is ready to handle requests that depend on PostgreSQL.
+
+When PostgreSQL is available, the endpoint returns:
+
+```text
+HTTP/1.1 200 OK
+```
+
+Example response:
+
+```text
+{
+  "status": "ok",
+  "service": "retailops-api",
+  "environment": "local",
+  "database": "ok"
+}
+```
+
+When PostgreSQL is unavailable, the endpoint returns:
+
+```text
+HTTP/1.1 503 Service Unavailable
+```
+
+Example response:
+
+```text
+{
+  "error": {
+    "code": "database_unavailable",
+    "message": "Database is not available."
+  }
+}
+```
+
+This endpoint is intended for future Kubernetes readiness probes and deployment safety checks.
 
 ---
 

@@ -13,11 +13,13 @@ class RetailOpsBaseModel(BaseModel):
         str_strip_whitespace=True,
     )
 
+
 # Product
 class ProductStatus(str, Enum):
     active = "active"
     discontinued = "discontinued"
     draft = "draft"
+
 
 class Product(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -26,7 +28,7 @@ class Product(RetailOpsBaseModel):
     category: str | None = None
     brand: str | None = None
     status: ProductStatus = ProductStatus.active
-    
+
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -45,10 +47,12 @@ class Currency(str, Enum):
     EUR = "EUR"
     USD = "USD"
 
+
 class Channel(str, Enum):
     online = "online"
     store = "store"
-    marketplace = "marketplace"    
+    marketplace = "marketplace"
+
 
 class Sale(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -59,7 +63,7 @@ class Sale(RetailOpsBaseModel):
     total_amount: Decimal = Field(..., ge=0)
     currency: Currency = Currency.PLN
     channel: Channel | None = None
-    
+
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -69,7 +73,7 @@ class Sale(RetailOpsBaseModel):
         if not (self.sold_at <= self.created_at):
             raise ValueError("Invalid time order")
         return self
-    
+
     @model_validator(mode="after")
     def validate_total_amount(self) -> Self:
         expected_total = (self.quantity * self.unit_price).quantize(
@@ -98,6 +102,7 @@ class UnitOfMeasure(str, Enum):
     m = "m"
     m2 = "m2"
 
+
 class InventorySnapshot(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
     product_id: UUID
@@ -125,9 +130,11 @@ class Role(str, Enum):
     analyst = "analyst"
     admin = "admin"
 
+
 class UserStatus(str, Enum):
     active = "active"
     inactive = "inactive"
+
 
 class User(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -136,7 +143,7 @@ class User(RetailOpsBaseModel):
     role: Role
     team: str | None = None
     status: UserStatus = UserStatus.inactive
-    
+
     created_at: datetime
     updated_at: datetime
 
@@ -154,11 +161,13 @@ class AlertType(str, Enum):
     sales_drop = "sales_drop"
     stale_inventory = "stale_inventory"
 
+
 class Severity(str, Enum):
     low = "low"
     medium = "medium"
     high = "high"
     critical = "critical"
+
 
 class AlertStatus(str, Enum):
     open = "open"
@@ -166,6 +175,7 @@ class AlertStatus(str, Enum):
     in_progress = "in_progress"
     resolved = "resolved"
     dismissed = "dismissed"
+
 
 class Alert(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -186,7 +196,7 @@ class Alert(RetailOpsBaseModel):
         if not (self.created_at <= self.updated_at):
             raise ValueError("Invalid time order")
         return self
-    
+
 
 # WorkflowAction
 class WorkflowActionType(str, Enum):
@@ -198,14 +208,15 @@ class WorkflowActionType(str, Enum):
     REOPEN = "reopen"
     COMMENT = "comment"
 
+
 class WorkflowAction(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
-    
+
     alert_id: UUID
     performed_by_user_id: UUID
-    
+
     action_type: WorkflowActionType
-    
+
     comment: str | None = Field(
         default=None,
         min_length=5,
@@ -215,7 +226,7 @@ class WorkflowAction(RetailOpsBaseModel):
 
     previous_status: AlertStatus = Field(...)
     new_status: AlertStatus = Field(...)
-    
+
     performed_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -235,6 +246,7 @@ class AnomalyType(str, Enum):
     stale_inventory = "stale_inventory"
     pricing_issue = "pricing_issue"
 
+
 class ImpactUnit(str, Enum):
     PLN = "PLN"
     pcs = "pcs"
@@ -243,6 +255,7 @@ class ImpactUnit(str, Enum):
     m = "m"
     m2 = "m2"
     percent = "percent"
+
 
 class Anomaly(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -255,7 +268,7 @@ class Anomaly(RetailOpsBaseModel):
     impact_value: float
     impact_unit: ImpactUnit
     severity: Severity
-    
+
     period_start: datetime
     period_end: datetime
     detected_at: datetime
@@ -275,18 +288,20 @@ class ForecastMethod(str, Enum):
     naive_baseline = "naive_baseline"
     seeded_demo = "seeded_demo"
 
+
 class ForecastStatus(str, Enum):
     generated = "generated"
     evaluated = "evaluated"
     deprecated = "deprecated"
 
+
 class Forecast(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
     product_id: UUID
-    
+
     forecast_period_start: date = Field(...)
     forecast_period_end: date = Field(...)
-    
+
     predicted_quantity: float = Field(..., ge=0)
     unit_of_measure: UnitOfMeasure
 
@@ -309,12 +324,14 @@ class RecommendationType(str, Enum):
     review_price = "review_price"
     investigate_sales_drop = "investigate_sales_drop"
 
+
 class RecommendationStatus(str, Enum):
     proposed = "proposed"
     accepted = "accepted"
     rejected = "rejected"
     expired = "expired"
     implemented = "implemented"
+
 
 class Recommendation(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)

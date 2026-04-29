@@ -15,7 +15,7 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
-      APP_ENV: local
+      APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
     depends_on:
       db:

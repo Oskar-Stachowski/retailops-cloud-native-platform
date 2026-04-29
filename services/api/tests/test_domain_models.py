@@ -46,6 +46,7 @@ def test_sale_rejects_invalid_total_amount():
             created_at=now,
         )
 
+
 def test_inventory_snapshot_rejects_invalid_time_order():
     now = datetime.now(timezone.utc)
 
@@ -60,6 +61,7 @@ def test_inventory_snapshot_rejects_invalid_time_order():
             created_at=now.replace(year=now.year - 1),
         )
 
+
 def test_workflow_action_requires_comment_for_dismiss():
     with pytest.raises(ValidationError):
         WorkflowAction(
@@ -70,6 +72,7 @@ def test_workflow_action_requires_comment_for_dismiss():
             new_status=AlertStatus.dismissed,
             comment=None,
         )
+
 
 def test_forecast_rejects_confidence_level_outside_expected_range():
     today = datetime.now(timezone.utc).date()
@@ -87,6 +90,7 @@ def test_forecast_rejects_confidence_level_outside_expected_range():
             status=ForecastStatus.generated,
             confidence_level=1.5,
         )
+
 
 def test_recommendation_rejects_invalid_expiration_date():
     now = datetime.now(timezone.utc)
