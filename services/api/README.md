@@ -96,6 +96,16 @@ Example response:
 
 ---
 
+## Domain Model
+
+The API contains the first MVP domain model for RetailOps in:
+
+`app/domain/models.py`
+
+The model defines the core retail, analytical and operational workflow entities used by the MVP API layer.
+
+---
+
 ## CI/CD
 
 GitHub Actions pipeline validates this service by:
