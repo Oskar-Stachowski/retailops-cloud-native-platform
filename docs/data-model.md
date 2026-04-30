@@ -94,7 +94,7 @@ Recommended fields:
 | `name` | Human-readable product name. |
 | `category` | Product grouping for dashboard and analytics. |
 | `brand` | Commercial context. |
-| `status` | Product lifecycle status, for example `active`, `inactive`, `discontinued`. |
+| `status` | Product lifecycle status, for example `draft`, `active`, `discontinued`. |
 | `created_at` | Record creation timestamp. |
 | `updated_at` | Record update timestamp. |
 
@@ -313,7 +313,7 @@ Recommended fields:
 | `rationale` | Explanation of why the system recommends this action. |
 | `status` | Recommendation status, for example `proposed`, `accepted`, `rejected`, `expired`, `implemented`. |
 | `generated_at` | When the recommendation was generated. |
-| `expires_at` | Optional expiration timestamp. |
+| `expires_at` | Expiration timestamp. |
 
 Design note:
 

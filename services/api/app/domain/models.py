@@ -16,9 +16,9 @@ class RetailOpsBaseModel(BaseModel):
 
 # Product
 class ProductStatus(str, Enum):
+    draft = "draft"
     active = "active"
     discontinued = "discontinued"
-    draft = "draft"
 
 
 class Product(RetailOpsBaseModel):
@@ -331,6 +331,8 @@ class RecommendationStatus(str, Enum):
     rejected = "rejected"
     expired = "expired"
     implemented = "implemented"
+    review_overstock = "review_overstock"
+    refresh_inventory_data = "refresh_inventory_data"
 
 
 class Recommendation(RetailOpsBaseModel):
