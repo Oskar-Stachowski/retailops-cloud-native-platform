@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "services/api/**"
+      - "data/**"
       - ".github/workflows/api-ci.yml"
   pull_request:
     paths:
       - "services/api/**"
+      - "data/**"
       - ".github/workflows/api-ci.yml"
 
 jobs:
@@ -48,6 +50,10 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+      
+      - name: Generate demo CSV dataset
+        run: python -m data.generator.main
+        working-directory: .
       
       - name: Run database migrations
         run: alembic upgrade head

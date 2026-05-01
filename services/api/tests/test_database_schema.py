@@ -141,7 +141,8 @@ def test_required_database_columns_exist():
 
                 assert required_columns.issubset(actual_columns), (
                     f"Missing columns in {table_name}. "
-                    f"Expected at least {required_columns}, found {actual_columns}"
+                    f"Expected at least {required_columns}, "
+                    f"found {actual_columns}"
                 )
 
 

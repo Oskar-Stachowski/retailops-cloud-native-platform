@@ -149,23 +149,35 @@ def upgrade() -> None:
             server_default="PLN",
         ),
         sa.Column("channel", sa.String(length=30), nullable=True),
+        sa.Column("region", sa.String(length=30), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.text("now()"),
         ),
-        sa.CheckConstraint("quantity > 0", name="ck_sales_quantity_positive"),
-        sa.CheckConstraint("unit_price >= 0", name="ck_sales_unit_price_non_negative"),
-        sa.CheckConstraint("total_amount >= 0", name="ck_sales_total_amount_non_negative"),
+        sa.CheckConstraint(
+            "quantity > 0",
+            name="ck_sales_quantity_positive",
+        ),
+        sa.CheckConstraint(
+            "unit_price >= 0",
+            name="ck_sales_unit_price_non_negative",
+        ),
+        sa.CheckConstraint(
+            "total_amount >= 0",
+            name="ck_sales_total_amount_non_negative",
+        ),
         sa.CheckConstraint(
             "currency IN ('PLN', 'EUR', 'USD')",
             name="ck_sales_currency",
         ),
         sa.CheckConstraint(
-            "channel IS NULL OR channel IN ('online', 'store', 'marketplace')",
+            "channel IS NULL OR channel IN ('online', 'store', 'marketplace', 'wholesale')",
             name="ck_sales_channel",
         ),
+        sa.Column("order_reference", sa.String(length=50), nullable=True),
+
     )
 
     op.create_index(
@@ -281,7 +293,7 @@ def upgrade() -> None:
             name="ck_forecasts_unit_of_measure",
         ),
         sa.CheckConstraint(
-            "method IN ('moving_average', 'naive_baseline', 'seeded_demo')",
+            "method IN ('moving_average', 'naive_baseline', 'seeded_demo', 'retailops-baseline-demand-model')",
             name="ck_forecasts_method",
         ),
         sa.CheckConstraint(
@@ -352,7 +364,7 @@ def upgrade() -> None:
             name="ck_anomalies_metric_name_not_empty",
         ),
         sa.CheckConstraint(
-            "impact_unit IN ('PLN', 'pcs', 'kg', 'l', 'm', 'm2', 'percent')",
+            "impact_unit IN ('PLN', 'pcs', 'kg', 'l', 'm', 'm2', 'percent', 'days')",
             name="ck_anomalies_impact_unit",
         ),
         sa.CheckConstraint(
@@ -624,12 +636,16 @@ def upgrade() -> None:
             server_default=sa.text("gen_random_uuid()"),
         ),
         sa.Column("alert_id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("performed_by_user_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column(
+            "performed_by_user_id",
+            postgresql.UUID(as_uuid=True),
+            nullable=False,
+        ),
         sa.Column("action_type", sa.String(length=50), nullable=False),
         sa.Column("comment", sa.String(length=1000), nullable=True),
         sa.Column("previous_status", sa.String(length=30), nullable=True),
         sa.Column("new_status", sa.String(length=30), nullable=True),
-        sa.Column("performed_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("performed_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -709,54 +725,156 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_index("ix_workflow_actions_performed_at", table_name="workflow_actions")
-    op.drop_index("ix_workflow_actions_action_type", table_name="workflow_actions")
-    op.drop_index("ix_workflow_actions_performed_by_user_id", table_name="workflow_actions")
-    op.drop_index("ix_workflow_actions_alert_id", table_name="workflow_actions")
+    op.drop_index(
+        "ix_workflow_actions_performed_at",
+        table_name="workflow_actions",
+    )
+    op.drop_index(
+        "ix_workflow_actions_action_type",
+        table_name="workflow_actions",
+    )
+    op.drop_index(
+        "ix_workflow_actions_performed_by_user_id",
+        table_name="workflow_actions",
+    )
+    op.drop_index(
+        "ix_workflow_actions_alert_id",
+        table_name="workflow_actions",
+    )
     op.drop_table("workflow_actions")
 
-    op.drop_index("ix_recommendations_generated_at", table_name="recommendations")
-    op.drop_index("ix_recommendations_status", table_name="recommendations")
-    op.drop_index("ix_recommendations_recommendation_type", table_name="recommendations")
-    op.drop_index("ix_recommendations_alert_id", table_name="recommendations")
-    op.drop_index("ix_recommendations_anomaly_id", table_name="recommendations")
-    op.drop_index("ix_recommendations_forecast_id", table_name="recommendations")
-    op.drop_index("ix_recommendations_product_id", table_name="recommendations")
+    op.drop_index(
+        "ix_recommendations_generated_at",
+        table_name="recommendations",
+    )
+    op.drop_index(
+        "ix_recommendations_status",
+        table_name="recommendations",
+    )
+    op.drop_index(
+        "ix_recommendations_recommendation_type",
+        table_name="recommendations",
+    )
+    op.drop_index(
+        "ix_recommendations_alert_id",
+        table_name="recommendations",
+    )
+    op.drop_index(
+        "ix_recommendations_anomaly_id",
+        table_name="recommendations",
+    )
+    op.drop_index(
+        "ix_recommendations_forecast_id",
+        table_name="recommendations",
+    )
+    op.drop_index(
+        "ix_recommendations_product_id",
+        table_name="recommendations",
+    )
     op.drop_table("recommendations")
 
-    op.drop_index("ix_alerts_created_at", table_name="alerts")
-    op.drop_index("ix_alerts_status", table_name="alerts")
-    op.drop_index("ix_alerts_severity", table_name="alerts")
-    op.drop_index("ix_alerts_alert_type", table_name="alerts")
-    op.drop_index("ix_alerts_assigned_to_user_id", table_name="alerts")
-    op.drop_index("ix_alerts_anomaly_id", table_name="alerts")
-    op.drop_index("ix_alerts_product_id", table_name="alerts")
+    op.drop_index(
+        "ix_alerts_created_at",
+        table_name="alerts",
+    )
+    op.drop_index(
+        "ix_alerts_status",
+        table_name="alerts",
+    )
+    op.drop_index(
+        "ix_alerts_severity",
+        table_name="alerts",
+    )
+    op.drop_index(
+        "ix_alerts_alert_type",
+        table_name="alerts",
+    )
+    op.drop_index(
+        "ix_alerts_assigned_to_user_id",
+        table_name="alerts",
+    )
+    op.drop_index(
+        "ix_alerts_anomaly_id",
+        table_name="alerts",
+    )
+    op.drop_index(
+        "ix_alerts_product_id",
+        table_name="alerts",
+    )
     op.drop_table("alerts")
 
-    op.drop_index("ix_anomalies_detected_at", table_name="anomalies")
-    op.drop_index("ix_anomalies_severity", table_name="anomalies")
-    op.drop_index("ix_anomalies_anomaly_type", table_name="anomalies")
-    op.drop_index("ix_anomalies_product_id", table_name="anomalies")
+    op.drop_index(
+        "ix_anomalies_detected_at",
+        table_name="anomalies",
+    )
+    op.drop_index(
+        "ix_anomalies_severity",
+        table_name="anomalies",
+    )
+    op.drop_index(
+        "ix_anomalies_anomaly_type",
+        table_name="anomalies",
+    )
+    op.drop_index(
+        "ix_anomalies_product_id",
+        table_name="anomalies",
+    )
     op.drop_table("anomalies")
 
-    op.drop_index("ix_forecasts_status", table_name="forecasts")
-    op.drop_index("ix_forecasts_generated_at", table_name="forecasts")
-    op.drop_index("ix_forecasts_forecast_period_start", table_name="forecasts")
-    op.drop_index("ix_forecasts_product_id", table_name="forecasts")
+    op.drop_index(
+        "ix_forecasts_status",
+        table_name="forecasts",
+    )
+    op.drop_index(
+        "ix_forecasts_generated_at",
+        table_name="forecasts",
+    )
+    op.drop_index(
+        "ix_forecasts_forecast_period_start",
+        table_name="forecasts",
+    )
+    op.drop_index(
+        "ix_forecasts_product_id",
+        table_name="forecasts",
+    )
     op.drop_table("forecasts")
 
-    op.drop_index("ix_users_status", table_name="users")
-    op.drop_index("ix_users_role", table_name="users")
+    op.drop_index(
+        "ix_users_status",
+        table_name="users",
+    )
+    op.drop_index(
+        "ix_users_role",
+        table_name="users",
+    )
     op.drop_table("users")
 
-    op.drop_index("ix_inventory_snapshots_warehouse_code", table_name="inventory_snapshots")
-    op.drop_index("ix_inventory_snapshots_recorded_at", table_name="inventory_snapshots")
-    op.drop_index("ix_inventory_snapshots_product_id", table_name="inventory_snapshots")
+    op.drop_index(
+        "ix_inventory_snapshots_warehouse_code",
+        table_name="inventory_snapshots",
+    )
+    op.drop_index(
+        "ix_inventory_snapshots_recorded_at",
+        table_name="inventory_snapshots",
+    )
+    op.drop_index(
+        "ix_inventory_snapshots_product_id",
+        table_name="inventory_snapshots",
+    )
     op.drop_table("inventory_snapshots")
 
-    op.drop_index("ix_sales_sold_at", table_name="sales")
-    op.drop_index("ix_sales_product_id", table_name="sales")
+    op.drop_index(
+        "ix_sales_sold_at",
+        table_name="sales",
+    )
+    op.drop_index(
+        "ix_sales_product_id",
+        table_name="sales",
+    )
     op.drop_table("sales")
 
-    op.drop_index("ix_products_category", table_name="products")
+    op.drop_index(
+        "ix_products_category",
+        table_name="products",
+    )
     op.drop_table("products")

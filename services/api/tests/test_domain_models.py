@@ -10,7 +10,11 @@ from app.domain.models import Sale, Currency, Channel
 from app.domain.models import InventorySnapshot, UnitOfMeasure
 from app.domain.models import WorkflowAction, WorkflowActionType, AlertStatus
 from app.domain.models import Forecast, ForecastMethod, ForecastStatus
-from app.domain.models import Recommendation, RecommendationType, RecommendationStatus
+from app.domain.models import (
+    Recommendation,
+    RecommendationType,
+    RecommendationStatus,
+)
 
 
 def test_product_can_be_created_with_valid_data():

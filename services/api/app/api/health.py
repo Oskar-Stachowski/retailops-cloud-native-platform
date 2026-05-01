@@ -28,7 +28,10 @@ class ReadinessResponse(BaseModel):
     response_model=HealthResponse,
     status_code=status.HTTP_200_OK,
     summary="Health check",
-    description="Returns basic service health information for local checks, Docker health checks, CI validation and future Kubernetes probes.",
+    description=(
+        "Returns basic service health information for local checks, "
+        "Docker health checks, CI validation and future Kubernetes probes."
+    ),
 )
 def health_check() -> HealthResponse:
     settings = get_settings()
@@ -45,7 +48,10 @@ def health_check() -> HealthResponse:
     response_model=ReadinessResponse,
     status_code=status.HTTP_200_OK,
     summary="Readiness check",
-    description="Returns service readiness information, including database connectivity.",
+    description=(
+        "Returns service readiness information, "
+        "including database connectivity."
+    ),
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Database is not available",
