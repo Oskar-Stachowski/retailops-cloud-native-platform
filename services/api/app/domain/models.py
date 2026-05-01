@@ -287,6 +287,7 @@ class ForecastMethod(str, Enum):
     moving_average = "moving_average"
     naive_baseline = "naive_baseline"
     seeded_demo = "seeded_demo"
+    retailops_baseline_demand_model = "retailops-baseline-demand-model"
 
 
 class ForecastStatus(str, Enum):

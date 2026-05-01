@@ -60,7 +60,7 @@ INCIDENT_SCENARIOS: list[dict[str, object]] = [
     {
         "sku": "FASHION-JACKET-001",
         "anomaly_type": "sales_spike",
-        "alert_type": "stockout_risk",
+        "alert_type": "stale_inventory",
         "rationale": "stockout_risk",
         "severity": "critical",
         "metric_name": "on_hand_quantity",
@@ -159,11 +159,11 @@ def generate_incident_dataset(
                 "impact_unit": str(scenario["impact_unit"]),
                 "severity": str(scenario["severity"]),
                 "period_start": utc_datetime(
-                    days_offset=-(2*index),
+                    days_offset=-(2 * index),
                     hours_offset=-3,
                 ),
                 "period_end": utc_datetime(
-                    days_offset=-(2*index),
+                    days_offset=-(2 * index),
                     hours_offset=+3,
                 ),
                 "detected_at": utc_datetime(

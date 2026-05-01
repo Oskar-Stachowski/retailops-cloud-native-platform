@@ -20,10 +20,6 @@ def check_database_connection() -> bool:
 
         return result == (1,)
 
-    except psycopg.Error as e:
-        logger.error(
-            "DB connection failed",
-            extra={"db_url": settings.database_url},
-            exc_info=e
-        )
+    except psycopg.Error:
+        logger.exception("DB connection failed")
         return False

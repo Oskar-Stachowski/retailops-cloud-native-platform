@@ -233,7 +233,7 @@ def test_forecasts_have_valid_product_links_and_windows(
             AND f.confidence_level >= 0
             AND f.confidence_level <= 1
             AND f.method <> ''
-            AND f.status IN ('draft', 'generated', 'published', 'archived');
+            AND f.status IN ('generated', 'evaluated', 'deprecated');
         """,
     )[0]
 
@@ -260,10 +260,10 @@ def test_alerts_have_matching_recommendations(database_url: str) -> None:
         LEFT JOIN anomalies an ON an.id = a.anomaly_id
         WHERE an.id IS NULL
             OR a.alert_type NOT IN (
-                'stockout_risk',
                 'stale_inventory',
                 'sales_drop',
-                'price_anomaly'
+                'stockout_risk'
+                'overstock_risk'
             )
             OR a.severity NOT IN ('low', 'medium', 'high', 'critical')
             OR a.status NOT IN (
