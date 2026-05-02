@@ -17,7 +17,7 @@ The RetailOps API is the backend entry point for future platform capabilities su
 - operational alerts,
 - recommendation and ML-driven decision support.
 
-At the current MVP stage, the API exposes only a health endpoint.
+At the current Sprint 3 MVP stage, the API exposes health/readiness endpoints and read-only PostgreSQL-backed dashboard and analytics endpoints.
 
 ---
 
@@ -27,9 +27,26 @@ Current implemented endpoint:
 
 ```text
 GET /health
+GET /ready
 ```
 
-The endpoint is used for:
+Current implemented dashboard endpoints:
+
+```text
+GET /dashboard/summary
+GET /dashboard/sales-trend?days=14
+GET /dashboard/alerts?limit=10
+GET /dashboard/recommendations?limit=10
+```
+
+Current implemented analytics endpoints:
+
+```text
+GET /analytics/products?limit=50
+GET /analytics/inventory-risk?limit=50
+```
+
+The platform endpoints are used for:
 
 - local verification,
 - automated tests,
@@ -38,15 +55,22 @@ The endpoint is used for:
 - future Kubernetes liveness/readiness probes,
 - basic API availability monitoring.
 
+The dashboard and analytics endpoints are used for:
+
+- exposing read-only retail operations data,
+- validating the repository/query layer,
+- supporting the frontend dashboard shell,
+- demonstrating PostgreSQL-backed API reads,
+- providing realistic Sprint 3 portfolio evidence.
+
 Out of scope for this stage:
 
-- product APIs,
-- inventory APIs,
+- write APIs,
 - authentication and authorization,
-- database integration,
 - role-based access control,
 - ML prediction endpoints,
 - event-driven APIs,
+- advanced filtering, sorting and pagination,
 - production deployment.
 
 ---
@@ -202,6 +226,18 @@ Example:
 
 ---
 
+### 4.3 Dashboard and analytics response pattern
+
+Sprint 3 dashboard and analytics endpoints are read-only.
+
+Route handlers should stay thin, service classes should normalize response payloads, and repository classes should own SQL queries and PostgreSQL reads.
+
+List-style endpoints should return stable JSON payloads that are easy for the frontend to consume and easy for tests to validate.
+
+Advanced filtering, sorting, pagination metadata and strict response schemas are intentionally deferred beyond Sprint 3.
+
+---
+
 ## 5. Error response pattern
 
 All controlled API errors should follow one JSON structure.
@@ -310,10 +346,12 @@ health
 Recommended future tags:
 
 ```text
+health
+dashboard
+analytics
 products
 inventory
 alerts
-analytics
 ml
 admin
 ```
@@ -329,6 +367,13 @@ Current minimum tests:
 ```text
 GET /health returns 200
 GET /health returns status = ok
+GET /ready returns database readiness status
+GET /dashboard/summary returns a stable summary payload
+GET /dashboard/sales-trend returns sales trend items
+GET /dashboard/alerts returns alert items
+GET /dashboard/recommendations returns recommendation items
+GET /analytics/products returns product analytics items
+GET /analytics/inventory-risk returns inventory risk items
 Unknown route returns standard error response
 ```
 
