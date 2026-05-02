@@ -446,3 +446,148 @@ Future production observability may add:
 - correlation/request IDs.
 
 These are not required for CS-007, but the current conventions should allow them to be added later.
+
+---
+
+## 11. Sprint 4 API Contract — list/detail/filter/pagination
+
+### 11.1 Purpose
+
+Sprint 4 introduces a minimal stable API contract for resource list and detail endpoints.
+
+The goal is not to implement every future business API. The goal is to make API responses predictable for:
+
+- frontend integration,
+- automated API tests,
+- OpenAPI documentation,
+- CI/CD validation,
+- future observability and API reliability checks.
+
+### 11.2 Implemented Sprint 4 endpoints
+
+```text
+GET /products
+GET /products/{product_id}
+GET /forecasts
+GET /forecasts/{forecast_id}
+```
+
+### 11.3 Standard list response contract
+
+Every list endpoint should return the same top-level structure:
+
+```json
+{
+  "items": [],
+  "pagination": {
+    "limit": 50,
+    "offset": 0,
+    "total": 0
+  }
+}
+```
+
+Rules:
+
+- `items` is always an array.
+- `pagination.limit` is the requested page size.
+- `pagination.offset` is the requested offset.
+- `pagination.total` is the total number of matching records before pagination.
+- Empty result sets return `items: []`, not `null`.
+- The response shape should stay stable even when filters return no rows.
+
+### 11.4 Product list contract
+
+Endpoint:
+
+```text
+GET /products
+```
+
+Supported query parameters:
+
+| Parameter | Purpose | MVP rule |
+|---|---|---|
+| `category` | Filter by product category | Exact case-insensitive match |
+| `status` | Filter by product status | One of domain statuses, e.g. `active` |
+| `search` | Search in SKU, name or category | Case-insensitive contains search |
+| `limit` | Page size | `1..100`, default `50` |
+| `offset` | Page offset | `>= 0`, default `0` |
+| `sort_by` | Sort field | `sku`, `name`, `category`, `status`, `created_at` |
+| `sort_order` | Sort direction | `asc` or `desc` |
+
+Example:
+
+```text
+GET /products?category=Electronics&status=active&search=head&limit=10&offset=0
+```
+
+### 11.5 Product detail contract
+
+Endpoint:
+
+```text
+GET /products/{product_id}
+```
+
+Expected behavior:
+
+- returns one product object when the product exists,
+- returns `404` with the standard error response when the product does not exist.
+
+### 11.6 Forecast list contract
+
+Endpoint:
+
+```text
+GET /forecasts
+```
+
+Supported query parameters:
+
+| Parameter | Purpose | MVP rule |
+|---|---|---|
+| `product_id` | Filter forecasts for one product | UUID |
+| `status` | Filter by forecast status | One of domain statuses, e.g. `generated` |
+| `method` | Filter by forecast method | One of domain methods, e.g. `seeded_demo` |
+| `date_from` | Filter periods starting on or after date | ISO date, `YYYY-MM-DD` |
+| `date_to` | Filter periods ending on or before date | ISO date, `YYYY-MM-DD` |
+| `limit` | Page size | `1..100`, default `50` |
+| `offset` | Page offset | `>= 0`, default `0` |
+| `sort_by` | Sort field | `forecast_period_start`, `forecast_period_end`, `generated_at`, `predicted_quantity`, `confidence_level` |
+| `sort_order` | Sort direction | `asc` or `desc` |
+
+Example:
+
+```text
+GET /forecasts?product_id=<uuid>&status=generated&limit=10&offset=0
+```
+
+### 11.7 Forecast detail contract
+
+Endpoint:
+
+```text
+GET /forecasts/{forecast_id}
+```
+
+Expected behavior:
+
+- returns one forecast object when the forecast exists,
+- returns `404` with the standard error response when the forecast does not exist.
+
+### 11.8 MVP boundary
+
+This Sprint 4 contract intentionally does not implement:
+
+- authentication and RBAC,
+- write endpoints,
+- cursor pagination,
+- advanced sorting across joined tables,
+- nested product 360 responses,
+- frontend integration with all new endpoints,
+- API versioning,
+- generated SDKs,
+- full OpenAPI contract tests.
+
+Those should be added later only when the application has enough endpoint surface and client usage to justify the extra complexity.

@@ -1,0 +1,205 @@
+tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
+.
+├── case-study.md
+├── ci-cd
+│   └── README.md
+├── data
+│   ├── __init__.py
+│   ├── demo
+│   │   ├── alerts.csv
+│   │   ├── anomalies.csv
+│   │   ├── forecasts.csv
+│   │   ├── inventory_snapshots.csv
+│   │   ├── products.csv
+│   │   ├── recommendations.csv
+│   │   ├── sales.csv
+│   │   ├── users.csv
+│   │   └── workflow_actions.csv
+│   ├── generator
+│   │   ├── __init__.py
+│   │   ├── common.py
+│   │   ├── csv_writer.py
+│   │   ├── forecasts.py
+│   │   ├── incidents.py
+│   │   ├── inventory.py
+│   │   ├── main.py
+│   │   ├── products.py
+│   │   ├── sales.py
+│   │   ├── scenarios.py
+│   │   └── users.py
+│   └── README.md
+├── docker-compose.yml
+├── docs
+│   ├── ADR
+│   │   ├── Alembic.md
+│   │   ├── PostgreSQL.md
+│   │   ├── Psycopg.md
+│   │   ├── Pydantic.md
+│   │   └── SQLAlchemy.md
+│   ├── api.md
+│   ├── data-model.md
+│   ├── database_migrations_and_seed_data.md
+│   ├── diagrams
+│   │   ├── 01-system-context-and-outcomes.md
+│   │   ├── 02-user-experience-and-api-layer.md
+│   │   ├── 03-data-and-event-processing-layer.md
+│   │   ├── 04-mlops-intelligence-layer.md
+│   │   ├── 05-aws-and-kubernetes-runtime.md
+│   │   ├── 06-cicd-devsecops-release-flow.md
+│   │   ├── 07-security-and-governance-controls.md
+│   │   ├── 08-observability-reliability-finops.md
+│   │   ├── 09-platform-maturity-roadmap.md
+│   │   ├── 10-cross-layer-dependencies.md
+│   │   ├── 11-retailops-demo-data-flow.md
+│   │   └── 12-repository-service-layer.md
+│   ├── enterprise-scorecard.md
+│   ├── finops.md
+│   ├── Future Improvements
+│   │   ├── cs-013-future-improvements.md
+│   │   └── images
+│   │       └── CS-013-Dashboard-Analytics-Query-Layer.png
+│   ├── repo-structure.txt
+│   ├── user-groups.md
+│   └── workflows.md
+├── frontend
+│   ├── Dockerfile
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── nginx.conf
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── favicon.svg
+│   │   └── icons.svg
+│   ├── README.md
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── assets
+│   │   │   ├── hero.png
+│   │   │   ├── react.svg
+│   │   │   └── vite.svg
+│   │   ├── components
+│   │   │   ├── ApiHealthCard.jsx
+│   │   │   ├── Hero.jsx
+│   │   │   ├── ModuleGrid.jsx
+│   │   │   ├── StackStatus.jsx
+│   │   │   └── Topbar.jsx
+│   │   ├── data
+│   │   │   ├── modules.json
+│   │   │   └── stack.json
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── pages
+│   │   │   ├── Admin.jsx
+│   │   │   ├── Anomalies.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Forecasts.jsx
+│   │   │   ├── Products.jsx
+│   │   │   └── Recommendations.jsx
+│   │   └── router
+│   │       └── index.jsx
+│   └── vite.config.js
+├── GPTimages
+│   ├── Architecture-Layers.png
+│   ├── Architecture.png
+│   ├── AWS-Cloud-Architecture.png
+│   ├── AWS-Well-Architected-Framework.png
+│   ├── Business-Product-Perspective.png
+│   ├── Business-Value-Perspective.png
+│   ├── CI-CD-Pipeline-Delivery-Workflow.png
+│   ├── Data-Flow-Intelligence-Lifecycle.png
+│   ├── Data-Flow.png
+│   ├── Enterprise-Scorecard.png
+│   ├── Executive-Architecture-Summary.png
+│   ├── Future-Growth-Perspective.png
+│   ├── Microservices-Architecture.png
+│   ├── Observability-Operational-Control.png
+│   ├── Project-Evolution.png
+│   ├── Reliability-Scalability-Cost-Control.png
+│   ├── retailops_domain_model_diagram_overview.png
+│   ├── retailops_testing_roadmap_infographic.png
+│   ├── Security-Governance-Architecture.png
+│   ├── User-Groups-Decision-Needs.png
+│   └── Workflow-Operating-Model.png
+├── infra
+│   └── README.md
+├── k8s
+│   └── README.md
+├── LICENSE
+├── ml
+│   └── README.md
+├── observability
+│   └── README.md
+├── README.md
+├── scripts
+│   └── README.md
+├── security
+│   └── README.md
+├── services
+│   ├── api
+│   │   ├── alembic
+│   │   │   ├── env.py
+│   │   │   ├── README
+│   │   │   ├── script.py.mako
+│   │   │   └── versions
+│   │   │       └── 9d505dd3b320_create_initial_retailops_schema.py
+│   │   ├── alembic.ini
+│   │   ├── app
+│   │   │   ├── __init__.py
+│   │   │   ├── api
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── analytics.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── errors.py
+│   │   │   │   └── health.py
+│   │   │   ├── core
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── config.py
+│   │   │   ├── db
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── connection.py
+│   │   │   │   └── introspection.py
+│   │   │   ├── domain
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   └── platform-evolution-backlog.md
+│   │   │   ├── main.py
+│   │   │   ├── repositories
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── analytics_repository.py
+│   │   │   │   ├── dashboard_repository.py
+│   │   │   │   ├── forecast_repository.py
+│   │   │   │   └── product_repository.py
+│   │   │   └── services
+│   │   │       ├── __init__.py
+│   │   │       ├── analytics_service.py
+│   │   │       ├── dashboard_service.py
+│   │   │       ├── forecast_service.py
+│   │   │       ├── product_service.py
+│   │   │       └── serialization.py
+│   │   ├── Dockerfile
+│   │   ├── Makefile
+│   │   ├── pytest.ini
+│   │   ├── README.md
+│   │   ├── requirements.txt
+│   │   ├── scripts
+│   │   │   └── seed_demo_data.py
+│   │   └── tests
+│   │       ├── test_dashboard_endpoints.py
+│   │       ├── test_dashboard_repository.py
+│   │       ├── test_database_schema.py
+│   │       ├── test_domain_models.py
+│   │       ├── test_errors.py
+│   │       ├── test_forecast_repository.py
+│   │       ├── test_forecast_service.py
+│   │       ├── test_health.py
+│   │       ├── test_product_repository.py
+│   │       ├── test_product_service.py
+│   │       ├── test_readiness.py
+│   │       └── test_seed_data.py
+│   └── README.md
+└── tests
+    └── README.md
+
+39 directories, 163 files

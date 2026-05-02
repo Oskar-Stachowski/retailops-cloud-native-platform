@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
+from app.api import analytics, dashboard, forecasts, products
 from app.api.health import router as health_router
 from app.api.errors import register_exception_handlers
-from app.api import analytics, dashboard
 
 app = FastAPI(
     title="RetailOps API",
@@ -17,3 +17,5 @@ register_exception_handlers(app)
 app.include_router(health_router)
 app.include_router(dashboard.router)
 app.include_router(analytics.router)
+app.include_router(products.router)
+app.include_router(forecasts.router)
