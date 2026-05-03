@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ApiBaseModel(BaseModel):
-    """Base API schema with a strict response contract."""
+    """Base API schema with a strict public response contract."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -63,4 +63,65 @@ class ForecastListResponse(ApiBaseModel):
     """Stable list response for Forecast endpoints."""
 
     items: list[ForecastResponse]
+    pagination: PaginationMetadata
+
+
+class InventorySnapshotResponse(ApiBaseModel):
+    """Stable public representation of an inventory snapshot."""
+
+    id: UUID
+    product_id: UUID
+    stock_quantity: int = Field(..., ge=0)
+    unit_of_measure: str
+    warehouse_code: str
+    recorded_at: datetime
+    ingested_at: datetime
+    created_at: datetime
+
+
+class InventorySnapshotListResponse(ApiBaseModel):
+    """Stable list response for inventory snapshot endpoints."""
+
+    items: list[InventorySnapshotResponse]
+    pagination: PaginationMetadata
+
+
+class SaleResponse(ApiBaseModel):
+    """Stable public representation of a sales record."""
+
+    id: UUID
+    product_id: UUID
+    quantity: int = Field(..., gt=0)
+    sold_at: datetime
+    unit_price: float = Field(..., ge=0)
+    total_amount: float = Field(..., ge=0)
+    currency: str
+    channel: str | None = None
+    created_at: datetime
+
+
+class SaleListResponse(ApiBaseModel):
+    """Stable list response for sales endpoints."""
+
+    items: list[SaleResponse]
+    pagination: PaginationMetadata
+
+
+class StockRiskResponse(ApiBaseModel):
+    """Stable public representation of product-level stock risk."""
+
+    product_id: UUID
+    sku: str | None = None
+    name: str | None = None
+    category: str | None = None
+    current_stock: float | None = None
+    forecast_quantity: float | None = None
+    risk_status: str
+    inventory_updated_at: datetime | None = None
+
+
+class StockRiskListResponse(ApiBaseModel):
+    """Stable list response for stock-risk endpoints."""
+
+    items: list[StockRiskResponse]
     pagination: PaginationMetadata

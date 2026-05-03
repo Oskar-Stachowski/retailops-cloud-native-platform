@@ -1,10 +1,18 @@
-# CS-014 Future Improvements — Minimal API Contract for List, Detail, Filter and Pagination
+# CS-014 Future Improvements — Core API Endpoints and Minimal Contract
 
 ## Purpose
 
-This document captures intentionally deferred improvements after the Sprint 4 task: **establish a minimal API contract for list/detail/filter/pagination**.
+This document captures intentionally deferred improvements after Sprint 4 task **CS-014: Expose core API endpoints for products, inventory, sales and stock risk**.
 
-The implemented MVP scope should give RetailOps stable list responses with:
+The implemented MVP scope gives RetailOps stable read APIs for the first operational data flow:
+
+```text
+Product + Sales + Inventory + Forecast
+        -> Stock Risk
+        -> Dashboard / Frontend / Demo Evidence
+```
+
+The main contract rule remains:
 
 ```json
 {
@@ -19,6 +27,11 @@ The implemented MVP scope should give RetailOps stable list responses with:
 
 This is enough for frontend integration, API tests, OpenAPI visibility, and CI/CD confidence without overengineering the API too early.
 
+<p align="center">
+  <img src="images/CS-014-api-roadmap-and-future-improvements-timeline.png" width="90%"/>
+</p>
+<p align="center"><em>Figure: CS-014 Future Improvements — current API scope and roadmap</em></p>
+
 ---
 
 ## Current Scope Boundary
@@ -29,8 +42,13 @@ This is enough for frontend integration, API tests, OpenAPI visibility, and CI/C
 - `GET /products/{product_id}`
 - `GET /forecasts`
 - `GET /forecasts/{forecast_id}`
+- `GET /inventory-snapshots`
+- `GET /inventory-snapshots/{inventory_snapshot_id}`
+- `GET /sales`
+- `GET /sales/{sale_id}`
+- `GET /inventory-risks`
 - stable list response shape: `items` + `pagination`
-- basic filters
+- basic filters for product, forecast, inventory, sales and stock risk reads
 - offset/limit pagination
 - simple whitelisted sorting
 - response models visible in OpenAPI
@@ -40,6 +58,7 @@ This is enough for frontend integration, API tests, OpenAPI visibility, and CI/C
 ### Not included now
 
 - write endpoints
+- order APIs
 - authentication / authorization / RBAC
 - cursor-based pagination
 - API versioning such as `/api/v1`
@@ -47,7 +66,7 @@ This is enough for frontend integration, API tests, OpenAPI visibility, and CI/C
 - strict OpenAPI snapshot testing
 - advanced query language
 - full product 360 aggregate endpoint
-- nested joins for product sales, stock, forecasts, alerts and recommendations
+- workflow actions for alerts/recommendations
 - frontend consumption of all new endpoints
 - observability metrics per endpoint
 - rate limiting
@@ -57,18 +76,38 @@ This is enough for frontend integration, API tests, OpenAPI visibility, and CI/C
 
 ## Recommended Future Implementation Order
 
-### 1. Contract hardening
+### 1. Runtime smoke evidence
+
+After tests pass, capture runtime checks for:
+
+```text
+GET /health
+GET /ready
+GET /products?limit=5&offset=0
+GET /inventory-snapshots?limit=5&offset=0
+GET /sales?limit=5&offset=0
+GET /inventory-risks?limit=5&offset=0
+```
+
+Recommended evidence:
+
+- terminal output,
+- screenshot,
+- short note in PR/commit summary,
+- GitHub Actions green run.
+
+### 2. Contract hardening
 
 Add tests that validate OpenAPI schemas for the key endpoints.
 
 Recommended next checks:
 
-- `/openapi.json` contains `ProductListResponse` and `ForecastListResponse`,
-- list endpoints always expose `items` and `pagination`,
-- validation errors return a safe standard response,
+- `/openapi.json` contains `ProductListResponse`, `InventorySnapshotListResponse`, `SaleListResponse` and `StockRiskListResponse`,
+- every core list endpoint exposes `items` and `pagination`,
+- validation errors return safe responses,
 - unknown route still returns the existing standard error contract.
 
-### 2. Product 360 endpoint
+### 3. Product 360 endpoint
 
 Add a product detail view with related operational context.
 
@@ -84,19 +123,19 @@ Potential response sections:
 - latest inventory snapshot,
 - latest forecast,
 - recent sales summary,
+- stock risk status,
 - active alerts,
 - active recommendations.
 
-This should be implemented only after the basic product and forecast endpoints are stable.
+Implement this only after the base resource endpoints are stable.
 
-### 3. Inventory and alert list endpoints
+### 4. Alerts and recommendations endpoints
 
-Add endpoints for the next business-facing resources.
+Add endpoints for operational work items.
 
 Suggested order:
 
 ```text
-GET /inventory-snapshots
 GET /alerts
 GET /alerts/{alert_id}
 GET /recommendations
@@ -105,30 +144,30 @@ GET /recommendations/{recommendation_id}
 
 Keep the same `items` + `pagination` list response contract.
 
-### 4. Frontend integration
+### 5. Orders decision
 
-Connect the React pages to the new API endpoints.
+Orders are currently treated as a future/context entity, not a Sprint 4 MVP requirement.
+
+Recommended future decision:
+
+- **Option A:** keep order data out of MVP and document it as future scope,
+- **Option B:** add a lightweight `orders` table and API only when fulfillment/order lifecycle scenarios become part of the demo.
+
+For now, do not introduce `orders` only to satisfy naming completeness. That would create model, migration, seed and test work without enough business value in the current Sprint 4 flow.
+
+### 6. Frontend integration
+
+Connect React pages to the new API endpoints.
 
 Suggested flow:
 
 1. Products page consumes `GET /products`.
-2. Forecasts page consumes `GET /forecasts`.
-3. Dashboard cards link to product details.
-4. Basic loading/error/empty states are added.
+2. Sales page or dashboard widget consumes `GET /sales`.
+3. Inventory page or dashboard widget consumes `GET /inventory-snapshots`.
+4. Stock-risk component consumes `GET /inventory-risks`.
+5. Add loading/error/empty states.
 
-### 5. Observability and delivery evidence
-
-Add lightweight API evidence after the endpoints are used by frontend or demo flows.
-
-Possible evidence:
-
-- smoke-test script for `/products` and `/forecasts`,
-- response examples in docs,
-- local demo screenshots,
-- API latency measurement in a simple smoke test,
-- CI log proving tests and Docker image build pass.
-
-### 6. API versioning and compatibility policy
+### 7. API versioning and compatibility policy
 
 Introduce `/api/v1` only when there are enough endpoints or external consumers to justify it.
 
@@ -136,7 +175,7 @@ Before that, document a simple rule:
 
 > Existing response keys should not be renamed or removed without updating tests and documentation.
 
-### 7. Cursor pagination
+### 8. Cursor pagination
 
 Offset pagination is acceptable for MVP/demo data. Cursor pagination can be added later if lists become large or performance-sensitive.
 
@@ -159,44 +198,38 @@ Do not add this before it is needed.
 
 ## ADR-Style Notes
 
-### Decision 1: Offset pagination now, cursor pagination later
+### Decision 1: Resource endpoints now, aggregate Product 360 later
 
-**Option A — Offset pagination now**
+**Chosen for now:** expose simple resource-level read APIs first.
 
-Pros:
+Rationale:
+
+- easier to test,
+- stable for frontend,
+- lower coupling,
+- supports later Product 360 composition.
+
+### Decision 2: `/inventory-risks` as the stock risk endpoint
+
+**Chosen for now:** expose stock risk as `GET /inventory-risks`.
+
+Rationale:
+
+- keeps resource naming plural and noun-based,
+- aligns with API conventions,
+- avoids exposing implementation details such as analytics query names,
+- can later be backed by a materialized view, model output, or cache without changing the public contract.
+
+### Decision 3: Offset pagination now, cursor pagination later
+
+**Chosen for now:** offset pagination.
+
+Rationale:
 
 - simple to implement,
 - easy to test,
-- easy for junior engineers to understand,
-- enough for local MVP and seed data.
-
-Cons:
-
-- less efficient for very large datasets,
-- can become unstable if data changes while a user pages through results.
-
-**Option B — Cursor pagination now**
-
-Pros:
-
-- better for large production datasets,
-- more stable for high-volume changing data.
-
-Cons:
-
-- more complex,
-- premature for Sprint 4,
-- harder to explain and test at the current maturity level.
-
-**Chosen for now:** Offset pagination.
-
----
-
-### Decision 2: Reusable response shape now, full API versioning later
-
-**Chosen for now:** Keep endpoints simple and make the response contract stable through schemas and tests.
-
-API versioning can be added later when RetailOps has more clients, environments, and backward-compatibility needs.
+- enough for local MVP and seed data,
+- avoids premature complexity.
 
 ---
 
@@ -209,7 +242,8 @@ API versioning can be added later when RetailOps has more clients, environments,
 - changing response key names without updating tests,
 - exposing internal database errors to clients,
 - allowing arbitrary `sort_by` values and creating SQL injection risk,
-- expanding endpoint scope faster than tests and documentation.
+- expanding endpoint scope faster than tests and documentation,
+- treating dashboard/analytics endpoints as replacements for stable core resource APIs.
 
 ---
 

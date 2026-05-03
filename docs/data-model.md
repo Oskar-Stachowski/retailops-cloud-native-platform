@@ -121,7 +121,7 @@ Recommended fields:
 | `unit_price` | Unit price at the time of sale. |
 | `total_amount` | Total sales value. Usually `quantity * unit_price`. |
 | `currency` | Currency, for example `PLN`. |
-| `channel` | Sales channel, for example `online`, `store`, `marketplace`. In the MVP, this can be a field rather than a separate entity. |
+| `channel` | Sales channel, for example `online`, `store`, `marketplace`, `wholesale`. In the MVP, this can be a field rather than a separate entity. |
 | `created_at` | Timestamp when the record was created in RetailOps. |
 
 Basic data quality expectations:

@@ -1,36 +1,21 @@
 # RetailOps API Standards
 
-This document defines the initial REST API conventions, OpenAPI documentation rules, and error response pattern for the RetailOps Cloud-Native AI Platform.
+This document defines REST API conventions, OpenAPI documentation rules, and error response patterns for the RetailOps Cloud-Native AI Platform.
 
-The goal of this document is to keep future API development consistent, testable, and easy to integrate with frontend, CI/CD, observability, and security workflows.
-
----
-
-## 1. Purpose
-
-The RetailOps API is the backend entry point for future platform capabilities such as:
-
-- product and category data access,
-- inventory and stock-risk analysis,
-- sales anomaly detection,
-- dashboard summaries,
-- operational alerts,
-- recommendation and ML-driven decision support.
-
-At the current Sprint 3 MVP stage, the API exposes health/readiness endpoints and read-only PostgreSQL-backed dashboard and analytics endpoints.
+The API is the backend entry point for product data, sales signals, inventory snapshots, stock-risk analysis, dashboard summaries, operational alerts and future recommendation workflows.
 
 ---
 
-## 2. Current API scope
+## 1. Current API Scope
 
-Current implemented endpoint:
+### Platform endpoints
 
 ```text
 GET /health
 GET /ready
 ```
 
-Current implemented dashboard endpoints:
+### Dashboard endpoints
 
 ```text
 GET /dashboard/summary
@@ -39,56 +24,44 @@ GET /dashboard/alerts?limit=10
 GET /dashboard/recommendations?limit=10
 ```
 
-Current implemented analytics endpoints:
+### Analytics endpoints
 
 ```text
 GET /analytics/products?limit=50
 GET /analytics/inventory-risk?limit=50
 ```
 
-The platform endpoints are used for:
-
-- local verification,
-- automated tests,
-- Docker health checks,
-- CI validation,
-- future Kubernetes liveness/readiness probes,
-- basic API availability monitoring.
-
-The dashboard and analytics endpoints are used for:
-
-- exposing read-only retail operations data,
-- validating the repository/query layer,
-- supporting the frontend dashboard shell,
-- demonstrating PostgreSQL-backed API reads,
-- providing realistic Sprint 3 portfolio evidence.
-
-Out of scope for this stage:
-
-- write APIs,
-- authentication and authorization,
-- role-based access control,
-- ML prediction endpoints,
-- event-driven APIs,
-- advanced filtering, sorting and pagination,
-- production deployment.
-
----
-
-## 3. REST API conventions
-
-### 3.1 Resource naming
-
-Use lowercase, plural nouns for business resources.
-
-Recommended future examples:
+### Core resource endpoints
 
 ```text
 GET /products
 GET /products/{product_id}
-GET /categories
-GET /alerts
+GET /forecasts
+GET /forecasts/{forecast_id}
+GET /inventory-snapshots
+GET /inventory-snapshots/{inventory_snapshot_id}
+GET /sales
+GET /sales/{sale_id}
 GET /inventory-risks
+```
+
+The core resource endpoints are intended for stable frontend and integration usage. Dashboard and analytics endpoints may remain more presentation-oriented.
+
+---
+
+## 2. REST API Conventions
+
+Use lowercase, plural nouns for business resources.
+
+Recommended examples:
+
+```text
+GET /products
+GET /sales
+GET /inventory-snapshots
+GET /inventory-risks
+GET /alerts
+GET /recommendations
 ```
 
 Avoid verbs in endpoint paths.
@@ -105,19 +78,9 @@ Instead of:
 GET /getAlerts
 ```
 
-Actions that are not simple CRUD should still be modeled clearly and consistently.
-
-Example future option:
-
-```text
-POST /recommendations/pricing
-```
-
 ---
 
-### 3.2 HTTP methods
-
-Use HTTP methods according to their standard meaning:
+## 3. HTTP Methods
 
 | Method | Purpose |
 |---|---|
@@ -127,17 +90,11 @@ Use HTTP methods according to their standard meaning:
 | PATCH | Partially update a resource |
 | DELETE | Delete a resource |
 
-Current MVP endpoint:
-
-```text
-GET /health
-```
+Current CS-014 scope uses read-only `GET` endpoints only.
 
 ---
 
-### 3.3 Status codes
-
-Use predictable HTTP status codes.
+## 4. Status Codes
 
 | Status code | Meaning |
 |---|---|
@@ -152,64 +109,30 @@ Use predictable HTTP status codes.
 | 422 Unprocessable Entity | Validation error |
 | 500 Internal Server Error | Unexpected server error |
 
-For the current `/health` endpoint, the expected status is:
-
-```text
-200 OK
-```
-
 ---
 
-## 4. Response conventions
+## 5. Response Conventions
 
-### 4.1 Health response
+### 5.1 Detail response
 
-The `/health` endpoint should return a stable JSON object.
-
-Example:
-
-```json
-{
-  "status": "ok",
-  "service": "retailops-api",
-  "environment": "local"
-}
-```
-
-This response should not include sensitive infrastructure details, secrets, hostnames, database credentials, cloud account identifiers, or internal network information.
-
----
-
-### 4.2 Future success response pattern
-
-For simple resource reads, future endpoints may return the resource directly.
+Detail endpoints return the resource directly.
 
 Example:
 
 ```json
 {
-  "id": "SKU-001",
-  "name": "Example Product",
-  "category": "Beverages"
+  "id": "85710dbe-1aea-50ac-a155-fb216e12ab97",
+  "sku": "ELEC-HEAD-001",
+  "name": "Wireless Headphones",
+  "category": "Electronics",
+  "brand": "SoundWave",
+  "status": "active"
 }
 ```
 
-For list responses, use a stable top-level key.
+### 5.2 List response
 
-Example:
-
-```json
-{
-  "items": [
-    {
-      "id": "SKU-001",
-      "name": "Example Product"
-    }
-  ]
-}
-```
-
-Future pagination should use explicit metadata.
+All stable resource list endpoints must return a top-level object with `items` and `pagination`.
 
 Example:
 
@@ -224,25 +147,76 @@ Example:
 }
 ```
 
+Do not return a raw JSON array from stable resource list endpoints.
+
+### 5.3 Pagination
+
+Current MVP pagination uses:
+
+```text
+limit
+offset
+total
+```
+
+Current limits:
+
+```text
+limit: 1..100
+offset: >= 0
+```
+
+Cursor pagination is intentionally deferred.
+
 ---
 
-### 4.3 Dashboard and analytics response pattern
+## 6. Current Core Endpoint Examples
 
-Sprint 3 dashboard and analytics endpoints are read-only.
+### Products
 
-Route handlers should stay thin, service classes should normalize response payloads, and repository classes should own SQL queries and PostgreSQL reads.
+```text
+GET /products?limit=5&offset=0
+GET /products?category=Electronics&status=active&search=head&sort_by=sku&sort_order=asc
+GET /products/{product_id}
+```
 
-List-style endpoints should return stable JSON payloads that are easy for the frontend to consume and easy for tests to validate.
+### Forecasts
 
-Advanced filtering, sorting, pagination metadata and strict response schemas are intentionally deferred beyond Sprint 3.
+```text
+GET /forecasts?limit=5&offset=0
+GET /forecasts?product_id={product_id}&status=generated&method=seeded_demo
+GET /forecasts/{forecast_id}
+```
+
+### Inventory snapshots
+
+```text
+GET /inventory-snapshots?limit=5&offset=0
+GET /inventory-snapshots?product_id={product_id}&warehouse_code=WH-001&unit_of_measure=pcs
+GET /inventory-snapshots/{inventory_snapshot_id}
+```
+
+### Sales
+
+```text
+GET /sales?limit=5&offset=0
+GET /sales?product_id={product_id}&channel=online&currency=PLN
+GET /sales/{sale_id}
+```
+
+### Stock risk
+
+```text
+GET /inventory-risks?limit=5&offset=0
+GET /inventory-risks?risk_status=stockout_risk
+GET /inventory-risks?category=Electronics
+```
 
 ---
 
-## 5. Error response pattern
+## 7. Error Response Pattern
 
 All controlled API errors should follow one JSON structure.
-
-Recommended standard:
 
 ```json
 {
@@ -253,9 +227,7 @@ Recommended standard:
 }
 ```
 
-The `code` field should be stable and machine-readable.
-
-The `message` field should be human-readable and safe to expose.
+The `code` field should be stable and machine-readable. The `message` field should be human-readable and safe to expose.
 
 Do not expose:
 
@@ -268,54 +240,7 @@ Do not expose:
 
 ---
 
-### 5.1 Example: 404 Not Found
-
-```json
-{
-  "error": {
-    "code": "not_found",
-    "message": "The requested resource was not found."
-  }
-}
-```
-
----
-
-### 5.2 Example: validation error
-
-Future validation errors should be explicit and safe.
-
-Example:
-
-```json
-{
-  "error": {
-    "code": "validation_error",
-    "message": "Request validation failed."
-  }
-}
-```
-
-Detailed validation fields may be added later if needed, but they should remain consistent and safe for clients.
-
----
-
-### 5.3 Example: internal server error
-
-```json
-{
-  "error": {
-    "code": "internal_server_error",
-    "message": "An unexpected server error occurred."
-  }
-}
-```
-
-Internal details should be logged server-side, not returned to API clients.
-
----
-
-## 6. OpenAPI documentation rules
+## 8. OpenAPI Documentation Rules
 
 FastAPI automatically exposes OpenAPI documentation.
 
@@ -335,46 +260,40 @@ Each endpoint should have:
 - response model where practical,
 - documented response status codes.
 
-For `/health`, OpenAPI should show a concrete response schema, not a generic dictionary with `additionalProp1`.
-
-Recommended endpoint tag:
-
-```text
-health
-```
-
-Recommended future tags:
+Recommended tags:
 
 ```text
 health
 dashboard
 analytics
 products
+forecasts
 inventory
+sales
+stock-risk
 alerts
-ml
+recommendations
 admin
 ```
 
 ---
 
-## 7. Testing expectations
+## 9. Testing Expectations
 
-Each new endpoint should include at least one automated test.
+Each new endpoint should include at least one automated contract test.
 
-Current minimum tests:
+Current minimum API contract tests:
 
 ```text
-GET /health returns 200
-GET /health returns status = ok
-GET /ready returns database readiness status
-GET /dashboard/summary returns a stable summary payload
-GET /dashboard/sales-trend returns sales trend items
-GET /dashboard/alerts returns alert items
-GET /dashboard/recommendations returns recommendation items
-GET /analytics/products returns product analytics items
-GET /analytics/inventory-risk returns inventory risk items
-Unknown route returns standard error response
+GET /products returns items + pagination
+GET /products/{product_id} returns detail or standard 404
+GET /forecasts returns items + pagination
+GET /forecasts/{forecast_id} returns detail or standard 404
+GET /inventory-snapshots returns items + pagination
+GET /inventory-snapshots/{inventory_snapshot_id} returns detail or standard 404
+GET /sales returns items + pagination
+GET /sales/{sale_id} returns detail or standard 404
+GET /inventory-risks returns items + pagination
 ```
 
 Tests should verify:
@@ -394,7 +313,7 @@ The GitHub Actions pipeline should fail if API tests fail.
 
 ---
 
-## 8. CI/CD expectations
+## 10. CI/CD Expectations
 
 The API CI workflow should validate at least:
 
@@ -406,11 +325,9 @@ build Docker image
 
 A failed test or failed Docker build should block the change.
 
-This supports the RetailOps delivery quality goal: every API change should be automatically validated before it is treated as safe to merge or extend.
-
 ---
 
-## 9. Security expectations
+## 11. Security Expectations
 
 The API should follow secure-by-default conventions:
 
@@ -419,17 +336,16 @@ The API should follow secure-by-default conventions:
 - keep error messages safe and minimal,
 - validate request inputs,
 - avoid leaking infrastructure details,
+- whitelist sort fields,
 - prepare future endpoints for authentication and RBAC.
 
-Authentication and RBAC are not implemented in CS-007, but the API conventions should not conflict with future security design.
+Authentication and RBAC are intentionally not implemented in CS-014.
 
 ---
 
-## 10. Observability expectations
+## 12. Observability Expectations
 
-The `/health` endpoint is the first observability-related API contract.
-
-It supports:
+The `/health` and `/ready` endpoints support:
 
 - local smoke checks,
 - Docker health checks,
@@ -445,149 +361,21 @@ Future production observability may add:
 - tracing,
 - correlation/request IDs.
 
-These are not required for CS-007, but the current conventions should allow them to be added later.
+These are not required for CS-014, but the current conventions should allow them to be added later.
 
 ---
 
-## 11. Sprint 4 API Contract — list/detail/filter/pagination
+## 13. MVP Boundary
 
-### 11.1 Purpose
-
-Sprint 4 introduces a minimal stable API contract for resource list and detail endpoints.
-
-The goal is not to implement every future business API. The goal is to make API responses predictable for:
-
-- frontend integration,
-- automated API tests,
-- OpenAPI documentation,
-- CI/CD validation,
-- future observability and API reliability checks.
-
-### 11.2 Implemented Sprint 4 endpoints
-
-```text
-GET /products
-GET /products/{product_id}
-GET /forecasts
-GET /forecasts/{forecast_id}
-```
-
-### 11.3 Standard list response contract
-
-Every list endpoint should return the same top-level structure:
-
-```json
-{
-  "items": [],
-  "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 0
-  }
-}
-```
-
-Rules:
-
-- `items` is always an array.
-- `pagination.limit` is the requested page size.
-- `pagination.offset` is the requested offset.
-- `pagination.total` is the total number of matching records before pagination.
-- Empty result sets return `items: []`, not `null`.
-- The response shape should stay stable even when filters return no rows.
-
-### 11.4 Product list contract
-
-Endpoint:
-
-```text
-GET /products
-```
-
-Supported query parameters:
-
-| Parameter | Purpose | MVP rule |
-|---|---|---|
-| `category` | Filter by product category | Exact case-insensitive match |
-| `status` | Filter by product status | One of domain statuses, e.g. `active` |
-| `search` | Search in SKU, name or category | Case-insensitive contains search |
-| `limit` | Page size | `1..100`, default `50` |
-| `offset` | Page offset | `>= 0`, default `0` |
-| `sort_by` | Sort field | `sku`, `name`, `category`, `status`, `created_at` |
-| `sort_order` | Sort direction | `asc` or `desc` |
-
-Example:
-
-```text
-GET /products?category=Electronics&status=active&search=head&limit=10&offset=0
-```
-
-### 11.5 Product detail contract
-
-Endpoint:
-
-```text
-GET /products/{product_id}
-```
-
-Expected behavior:
-
-- returns one product object when the product exists,
-- returns `404` with the standard error response when the product does not exist.
-
-### 11.6 Forecast list contract
-
-Endpoint:
-
-```text
-GET /forecasts
-```
-
-Supported query parameters:
-
-| Parameter | Purpose | MVP rule |
-|---|---|---|
-| `product_id` | Filter forecasts for one product | UUID |
-| `status` | Filter by forecast status | One of domain statuses, e.g. `generated` |
-| `method` | Filter by forecast method | One of domain methods, e.g. `seeded_demo` |
-| `date_from` | Filter periods starting on or after date | ISO date, `YYYY-MM-DD` |
-| `date_to` | Filter periods ending on or before date | ISO date, `YYYY-MM-DD` |
-| `limit` | Page size | `1..100`, default `50` |
-| `offset` | Page offset | `>= 0`, default `0` |
-| `sort_by` | Sort field | `forecast_period_start`, `forecast_period_end`, `generated_at`, `predicted_quantity`, `confidence_level` |
-| `sort_order` | Sort direction | `asc` or `desc` |
-
-Example:
-
-```text
-GET /forecasts?product_id=<uuid>&status=generated&limit=10&offset=0
-```
-
-### 11.7 Forecast detail contract
-
-Endpoint:
-
-```text
-GET /forecasts/{forecast_id}
-```
-
-Expected behavior:
-
-- returns one forecast object when the forecast exists,
-- returns `404` with the standard error response when the forecast does not exist.
-
-### 11.8 MVP boundary
-
-This Sprint 4 contract intentionally does not implement:
+Current CS-014 scope intentionally does not implement:
 
 - authentication and RBAC,
 - write endpoints,
 - cursor pagination,
-- advanced sorting across joined tables,
+- advanced cross-resource filtering,
 - nested product 360 responses,
-- frontend integration with all new endpoints,
-- API versioning,
 - generated SDKs,
-- full OpenAPI contract tests.
+- full OpenAPI contract testing,
+- production deployment.
 
-Those should be added later only when the application has enough endpoint surface and client usage to justify the extra complexity.
+These capabilities should be added later when the API surface and frontend usage justify the extra complexity.

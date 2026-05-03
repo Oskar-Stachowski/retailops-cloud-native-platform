@@ -52,6 +52,7 @@ class Channel(str, Enum):
     online = "online"
     store = "store"
     marketplace = "marketplace"
+    wholesale = "wholesale"
 
 
 class Sale(RetailOpsBaseModel):
