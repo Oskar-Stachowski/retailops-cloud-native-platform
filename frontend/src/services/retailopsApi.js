@@ -11,6 +11,7 @@ export const ENDPOINTS = {
   dashboardOpenWorkItems: ["/dashboard/open-work-items"],
   dashboardStockRiskSummary: ["/dashboard/stock-risk-summary"],
   products: ["/products"],
+  product360: (productId) => `/products/${productId}/360`,
   forecasts: ["/forecasts"],
   stockRisks: ["/inventory-risks", "/stock-risks", "/inventory-risk"],
   analyticsProducts: ["/analytics/products"],
@@ -220,6 +221,14 @@ export async function getReadinessStatus(options = {}) {
 export async function getProducts(options = {}) {
   const payload = await apiGet(ENDPOINTS.products[0], options);
   return listFromPayload(payload);
+}
+
+export async function getProduct360(productId, options = {}) {
+  if (!productId) {
+    throw new Error("Product id is required to load Product 360.");
+  }
+
+  return apiGet(ENDPOINTS.product360(productId), options);
 }
 
 export async function getForecasts(options = {}) {

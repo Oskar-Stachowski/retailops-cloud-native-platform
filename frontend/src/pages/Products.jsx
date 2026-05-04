@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
@@ -47,6 +48,14 @@ const columns = [
   {
     header: "Updated",
     accessor: (row) => formatDateTime(row.updated_at || row.last_updated_at),
+  },
+  {
+    header: "Product 360",
+    render: (row) => (
+      <Link className="inline-link" to={`/products/${row.id}`}>
+        Open 360
+      </Link>
+    ),
   },
 ];
 
@@ -158,7 +167,7 @@ export default function Products() {
 
       <DataTable
         title="Backend product records"
-        description="This table is intentionally simple for CS-016. Product 360 drill-down belongs to a later task."
+        description="Product rows now link to a Sprint 6 Product 360 drill-down view."
         columns={columns}
         rows={state.products}
         emptyMessage="The backend returned no product records. Run database migrations and seed demo data."

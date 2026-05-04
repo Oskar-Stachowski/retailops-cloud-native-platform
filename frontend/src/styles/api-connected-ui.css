@@ -284,3 +284,20 @@ th {
   font-size: 1.05rem;
   line-height: 1.6;
 }
+.inline-link {
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.inline-link:hover {
+  text-decoration: underline;
+}
+
+.product-360-header {
+  align-items: start;
+}
+
+.product-360-header .status-badge {
+  margin-top: 0.25rem;
+}

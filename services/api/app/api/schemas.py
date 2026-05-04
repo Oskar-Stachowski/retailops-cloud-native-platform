@@ -214,3 +214,109 @@ class DashboardOperationalVisibilityResponse(ApiBaseModel):
     sales_trend: list[DashboardSalesTrendItem]
     open_work_items: list[DashboardWorkItem]
     limits: dict[str, int]
+
+
+class Product360Metrics(ApiBaseModel):
+    """Aggregated product-level counters for Product 360."""
+
+    sales_count: int = Field(..., ge=0)
+    total_units_sold: float = Field(..., ge=0)
+    total_revenue: float = Field(..., ge=0)
+    latest_sale_at: datetime | None = None
+    inventory_snapshot_count: int = Field(..., ge=0)
+    current_stock: float | None = Field(default=None, ge=0)
+    inventory_updated_at: datetime | None = None
+    forecast_count: int = Field(..., ge=0)
+    latest_forecast_quantity: float | None = Field(default=None, ge=0)
+    latest_forecast_period_start: date | None = None
+    latest_forecast_period_end: date | None = None
+    anomaly_count: int = Field(..., ge=0)
+    alert_count: int = Field(..., ge=0)
+    open_alert_count: int = Field(..., ge=0)
+    recommendation_count: int = Field(..., ge=0)
+    open_recommendation_count: int = Field(..., ge=0)
+    workflow_action_count: int = Field(..., ge=0)
+    risk_status: str
+
+
+class Product360Anomaly(ApiBaseModel):
+    """Anomaly row shown inside a Product 360 view."""
+
+    id: UUID
+    product_id: UUID
+    anomaly_type: str
+    metric_name: str
+    actual_value: float
+    expected_value: float
+    deviation_percent: float
+    impact_value: float
+    impact_unit: str
+    severity: str
+    period_start: datetime
+    period_end: datetime
+    detected_at: datetime
+
+
+class Product360Alert(ApiBaseModel):
+    """Operational alert linked to a product."""
+
+    id: UUID
+    product_id: UUID
+    anomaly_id: UUID | None = None
+    assigned_to_user_id: UUID | None = None
+    alert_type: str
+    severity: str
+    status: str
+    title: str
+    recommended_action: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class Product360Recommendation(ApiBaseModel):
+    """Recommended product-level action."""
+
+    id: UUID
+    product_id: UUID
+    forecast_id: UUID | None = None
+    anomaly_id: UUID | None = None
+    alert_id: UUID | None = None
+    recommendation_type: str
+    recommended_action: str
+    rationale: str
+    status: str
+    generated_at: datetime
+    expires_at: datetime | None = None
+    created_at: datetime
+
+
+class Product360WorkflowAction(ApiBaseModel):
+    """Workflow audit event linked through a product alert."""
+
+    id: UUID
+    alert_id: UUID
+    performed_by_user_id: UUID
+    action_type: str
+    comment: str | None = None
+    previous_status: str | None = None
+    new_status: str | None = None
+    performed_at: datetime | None = None
+    created_at: datetime
+    alert_title: str | None = None
+    performed_by_login: str | None = None
+
+
+class Product360Response(ApiBaseModel):
+    """Composite response for GET /products/{product_id}/360."""
+
+    product: ProductResponse
+    metrics: Product360Metrics
+    stock_risk: StockRiskResponse | None = None
+    sales: list[SaleResponse]
+    inventory_snapshots: list[InventorySnapshotResponse]
+    forecasts: list[ForecastResponse]
+    anomalies: list[Product360Anomaly]
+    alerts: list[Product360Alert]
+    recommendations: list[Product360Recommendation]
+    workflow_actions: list[Product360WorkflowAction]
+    limits: dict[str, int]

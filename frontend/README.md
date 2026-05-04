@@ -40,6 +40,18 @@ The dashboard now consumes these backend endpoints when available:
 
 The implementation stays read-only and local-first. It does not introduce authentication, workflow mutations, charting dependencies or cloud infrastructure.
 
+## Sprint 6 — Product 360 and Operational Workflow MVP
+
+Sprint 6 introduces a Product 360 read-only drill-down view.
+
+The frontend Products page now links to a product-level view backed by:
+
+- `GET /products/{product_id}/360`
+
+The Product 360 endpoint aggregates product metadata, sales, inventory snapshots, forecasts, anomalies, alerts, recommendations, workflow actions and stock-risk context.
+
+The implementation is intentionally read-only. Workflow mutations such as approve, reject, assign, comment and escalation remain future scope.
+
 ## Tech stack
 
 | Area | Technology | Purpose |

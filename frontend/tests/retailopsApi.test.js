@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildDashboardSummary,
+  getProduct360,
   listFromKnownKeys,
   listFromPayload,
   normalizeRiskStatus,
@@ -68,4 +69,26 @@ test("buildDashboardSummary derives Sprint 5 operational counters from dashboard
   assert.equal(summary.recommendationCount, 2);
   assert.equal(summary.openWorkItems, 1);
   assert.equal(summary.salesTrendRecords, 1);
+});
+
+test("getProduct360 calls the Product 360 backend endpoint", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(JSON.stringify({ product: { sku: "ELEC-HEAD-001" } }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await getProduct360("abc", { baseUrl: "http://localhost:8000" });
+
+    assert.equal(requestedUrls[0], "http://localhost:8000/products/abc/360");
+    assert.deepEqual(data, { product: { sku: "ELEC-HEAD-001" } });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Products from "../pages/Products.jsx";
+import Product360 from "../pages/Product360.jsx";
 import Forecasts from "../pages/Forecasts.jsx";
 import Anomalies from "../pages/Anomalies.jsx";
 import Recommendations from "../pages/Recommendations.jsx";
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: "products",
         element: <Products />,
+      },
+      {
+        path: "products/:productId",
+        element: <Product360 />,
       },
       {
         path: "forecasts",

@@ -3,7 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.errors import register_exception_handlers
-from app.api import analytics, dashboard, forecasts, inventory, products, sales, stock_risks
+from app.api import (
+    analytics,
+    dashboard,
+    forecasts,
+    inventory,
+    product_360,
+    products,
+    sales,
+    stock_risks,
+)
 
 app = FastAPI(
     title="RetailOps API",
@@ -34,6 +43,7 @@ app.include_router(health_router)
 app.include_router(dashboard.router)
 app.include_router(analytics.router)
 app.include_router(products.router)
+app.include_router(product_360.router)
 app.include_router(forecasts.router)
 app.include_router(inventory.router)
 app.include_router(sales.router)
