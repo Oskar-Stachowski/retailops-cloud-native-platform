@@ -19,22 +19,26 @@ The frontend validates that RetailOps can run as a local full-stack application:
 
 This frontend is still an MVP interface. It proves API integration, routing, local runtime, and dashboard evidence. Advanced UX, authentication, RBAC, workflow actions, charts, filtering, and production observability views are intentionally left for later tasks.
 
-## Current CS-016 scope
+## Sprint 5 — Dashboard and Operations View MVP
 
-CS-016 connects the dashboard UI to real backend APIs and removes local mock business records.
+Sprint 5 extends the frontend dashboard from a basic API integration view into a business-facing operational dashboard.
 
-Implemented in this scope:
+The dashboard now consumes these backend endpoints when available:
 
-| Area | Status | Notes |
-| --- | --- | --- |
-| Dashboard | Connected | Loads summary, product, forecast, health, readiness, and inventory-risk data |
-| Products | Connected | Loads product catalogue from `/products` |
-| Forecasts | Connected | Loads forecast records from `/forecasts` |
-| Admin | Connected | Loads `/health` and `/ready` status |
-| Anomalies | Scope boundary | No fake anomaly rows are rendered until a real backend endpoint exists |
-| Recommendations | Scope boundary | No fake recommendation rows are rendered until a real backend endpoint exists |
+- `GET /dashboard/summary`
+- `GET /dashboard/operational-visibility`
+- `GET /dashboard/sales-trend`
+- `GET /dashboard/alerts`
+- `GET /dashboard/recommendations`
+- `GET /dashboard/open-work-items`
+- `GET /dashboard/stock-risk-summary`
+- `GET /products`
+- `GET /forecasts`
+- `GET /inventory-risks`
+- `GET /health`
+- `GET /ready`
 
-The important engineering decision is that missing backend capabilities should be shown honestly as scope boundaries instead of being hidden behind frontend mocks.
+The implementation stays read-only and local-first. It does not introduce authentication, workflow mutations, charting dependencies or cloud infrastructure.
 
 ## Tech stack
 

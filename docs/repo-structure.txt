@@ -58,10 +58,12 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   ├── cs-013-future-improvements.md
 │   │   ├── cs-014-api-contract-future-improvements.md
 │   │   ├── cs-015-dashboard-summary-future-improvements.md
+│   │   ├── cs-016-dashboard-ui-api-future-improvements.md
 │   │   ├── images
 │   │   │   ├── CS-013-Dashboard-Analytics-Query-Layer.png
 │   │   │   ├── CS-014-api-roadmap-and-future-improvements-timeline.png
-│   │   │   └── CS-015-dashboard-summary-endpoints.png
+│   │   │   ├── CS-015-dashboard-summary-endpoints.png
+│   │   │   └── CS-016-retailops_frontend_integration_roadmap.png
 │   │   └── sprint-4-api-integration-tests-future-improvements.md
 │   ├── repo-structure.txt
 │   ├── user-groups.md
@@ -85,10 +87,18 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   │   ├── react.svg
 │   │   │   └── vite.svg
 │   │   ├── components
-│   │   │   ├── ApiHealthCard.jsx
-│   │   │   ├── Hero.jsx
-│   │   │   ├── ModuleGrid.jsx
-│   │   │   ├── StackStatus.jsx
+│   │   │   ├── DataTable.jsx
+│   │   │   ├── EmptyState.jsx
+│   │   │   ├── ErrorState.jsx
+│   │   │   ├── FeatureBoundary.jsx
+│   │   │   ├── legacy
+│   │   │   │   ├── ApiHealthCard.jsx
+│   │   │   │   ├── Hero.jsx
+│   │   │   │   ├── ModuleGrid.jsx
+│   │   │   │   └── StackStatus.jsx
+│   │   │   ├── LoadingState.jsx
+│   │   │   ├── MetricCard.jsx
+│   │   │   ├── StatusBadge.jsx
 │   │   │   └── Topbar.jsx
 │   │   ├── data
 │   │   │   ├── modules.json
@@ -102,8 +112,16 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   │   ├── Forecasts.jsx
 │   │   │   ├── Products.jsx
 │   │   │   └── Recommendations.jsx
-│   │   └── router
-│   │       └── index.jsx
+│   │   ├── router
+│   │   │   └── index.jsx
+│   │   ├── services
+│   │   │   ├── apiClient.js
+│   │   │   └── retailopsApi.js
+│   │   └── styles
+│   │       └── api-connected-ui.css
+│   ├── tests
+│   │   ├── apiClient.test.js
+│   │   └── retailopsApi.test.js
 │   └── vite.config.js
 ├── GPTimages
 │   ├── Architecture-Layers.png
@@ -226,4 +244,4 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 └── tests
     └── README.md
 
-39 directories, 187 files
+43 directories, 201 files

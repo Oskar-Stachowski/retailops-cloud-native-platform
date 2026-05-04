@@ -21,6 +21,69 @@ function formatDateTime(value) {
   return date.toLocaleString();
 }
 
+function formatNumber(value) {
+  if (value === undefined || value === null || value === "") {
+    return "—";
+  }
+
+  if (Number.isFinite(Number(value))) {
+    return Number(value).toLocaleString();
+  }
+
+  return value;
+}
+
+function firstPresent(row, keys, fallback = "—") {
+  for (const key of keys) {
+    const value = row?.[key];
+
+    if (value !== undefined && value !== null && value !== "") {
+      return value;
+    }
+  }
+
+  return fallback;
+}
+
+function humanizeToken(value, fallback = "—") {
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+
+  return String(value)
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function signalLabel(row) {
+  const explicitLabel = firstPresent(
+    row,
+    ["title", "message", "name", "description", "recommendation", "action"],
+    "",
+  );
+
+  if (explicitLabel) {
+    return explicitLabel;
+  }
+
+  const type = humanizeToken(row.type, "Operational signal");
+  const source = humanizeToken(row.source, "");
+
+  return source ? `${type} (${source})` : type;
+}
+
+function productReference(row) {
+  return firstPresent(row, ["sku", "product_sku", "product_id"]);
+}
+
+function statusWithDefault(row) {
+  if (row.status || row.state) {
+    return firstPresent(row, ["status", "state"]);
+  }
+
+  return row.source === "recommendation" ? "proposed" : "open";
+}
+
 const productColumns = [
   {
     header: "SKU",
@@ -52,7 +115,7 @@ const riskColumns = [
     render: (row) => (
       <StatusBadge
         status={normalizeRiskStatus(
-          row.risk_status || row.stock_risk || row.status,
+          row.risk_status || row.stock_risk || row.inventory_risk || row.status,
         )}
       />
     ),
@@ -60,11 +123,13 @@ const riskColumns = [
   {
     header: "Stock",
     accessor: (row) =>
-      row.stock_qty || row.current_stock || row.quantity_on_hand,
+      formatNumber(
+        row.stock_qty ?? row.current_stock ?? row.quantity_on_hand ?? row.stock,
+      ),
   },
   {
     header: "Reason",
-    accessor: (row) => row.reason || row.explanation || row.notes,
+    accessor: (row) => row.reason || row.explanation || row.notes || "—",
   },
 ];
 
@@ -115,16 +180,167 @@ const forecastColumns = [
   },
 ];
 
+const salesTrendColumns = [
+  {
+    header: "Period",
+    accessor: (row) => firstPresent(row, ["period", "date", "sales_date", "bucket"]),
+  },
+  {
+    header: "Revenue",
+    accessor: (row) => formatNumber(firstPresent(row, ["revenue", "sales_amount", "total_sales"])),
+  },
+  {
+    header: "Units",
+    accessor: (row) => formatNumber(firstPresent(row, ["units", "quantity", "total_quantity"])),
+  },
+  {
+    header: "Orders",
+    accessor: (row) => formatNumber(firstPresent(row, ["orders", "order_count", "sales_count"])),
+  },
+];
+
+const alertColumns = [
+  {
+    header: "Alert",
+    accessor: signalLabel,
+  },
+  {
+    header: "Severity",
+    render: (row) => (
+      <StatusBadge status={firstPresent(row, ["severity", "priority"], "unknown")} />
+    ),
+  },
+  {
+    header: "Status",
+    render: (row) => (
+      <StatusBadge status={statusWithDefault(row)} />
+    ),
+  },
+  {
+    header: "SKU / Product",
+    accessor: productReference,
+  },
+];
+
+const recommendationColumns = [
+  {
+    header: "Recommendation",
+    accessor: signalLabel,
+  },
+  {
+    header: "Impact",
+    accessor: (row) =>
+      firstPresent(
+        row,
+        ["impact", "expected_impact", "business_impact", "priority", "severity"],
+        "Operational follow-up",
+      ),
+  },
+  {
+    header: "Status",
+    render: (row) => (
+      <StatusBadge status={statusWithDefault(row)} />
+    ),
+  },
+  {
+    header: "SKU / Product",
+    accessor: productReference,
+  },
+];
+
+const workItemColumns = [
+  {
+    header: "Work item",
+    accessor: signalLabel,
+  },
+  {
+    header: "Source",
+    accessor: (row) => humanizeToken(row.source, "Operations"),
+  },
+  {
+    header: "Priority",
+    render: (row) => (
+      <StatusBadge status={firstPresent(row, ["priority", "severity"], "normal")} />
+    ),
+  },
+  {
+    header: "Status",
+    render: (row) => (
+      <StatusBadge status={statusWithDefault(row)} />
+    ),
+  },
+];
+
 function SourceCard({ name, source }) {
+  const safeSource = source || {
+    ok: false,
+    label: "unavailable",
+    path: "not configured",
+    message: "Frontend source was not configured.",
+  };
+
   return (
     <article className="source-card">
       <strong>{name}</strong>
-      <StatusBadge status={source.ok ? "connected" : "unavailable"}>
-        {source.label}
+      <StatusBadge status={safeSource.ok ? "connected" : "unavailable"}>
+        {safeSource.label}
       </StatusBadge>
-      <code>{source.path}</code>
-      <p>{source.message}</p>
+      <code>{safeSource.path}</code>
+      <p>{safeSource.message}</p>
     </article>
+  );
+}
+
+function ExecutiveSummary({ summary, operationalVisibility, fetchedAt }) {
+  return (
+    <section className="api-page__section" aria-label="Executive summary">
+      <header className="section-heading">
+        <p className="eyebrow">Sprint 5 executive view</p>
+        <h2>Business decision snapshot</h2>
+        <p>
+          This section translates backend signals into management-friendly
+          indicators: catalog coverage, demand planning, inventory risk and
+          open operational work.
+        </p>
+      </header>
+
+      <section className="metrics-grid">
+        <MetricCard
+          label="Risky products"
+          value={summary.riskyProducts}
+          helper="Products requiring inventory attention"
+          tone={summary.riskyProducts > 0 ? "risk" : "positive"}
+        />
+        <MetricCard
+          label="Open alerts"
+          value={summary.openAlerts}
+          helper="Operational signals from dashboard API"
+          tone={summary.openAlerts > 0 ? "warning" : "positive"}
+        />
+        <MetricCard
+          label="Recommendations"
+          value={summary.recommendationCount}
+          helper="Suggested actions available for review"
+          tone="positive"
+        />
+        <MetricCard
+          label="Open work items"
+          value={summary.openWorkItems}
+          helper="Pending operational backlog"
+          tone={summary.openWorkItems > 0 ? "warning" : "positive"}
+        />
+        <MetricCard
+          label="Sales trend rows"
+          value={summary.salesTrendRecords}
+          helper="Backend trend points loaded"
+        />
+        <MetricCard
+          label="Last refresh"
+          value={formatDateTime(summary.lastRefreshAt || fetchedAt)}
+          helper={operationalVisibility.status || "Live local API evidence"}
+        />
+      </section>
+    </section>
   );
 }
 
@@ -204,6 +420,11 @@ export default function Dashboard() {
     products,
     forecasts,
     stockRisks,
+    salesTrend,
+    alerts,
+    recommendations,
+    openWorkItems,
+    operationalVisibility,
     sourceStatus,
     fetchedAt,
   } = state.data;
@@ -211,12 +432,12 @@ export default function Dashboard() {
   return (
     <main className="api-page">
       <header className="api-page__header">
-        <p className="eyebrow">Live backend integration</p>
+        <p className="eyebrow">Sprint 5 · dashboard and operations view MVP</p>
         <h1>Retail operations dashboard</h1>
         <p>
-          This view is connected to FastAPI endpoints. It uses real backend
-          responses and only derives fallback metrics from live endpoint payloads
-          when the dashboard summary endpoint is not available yet.
+          This view connects the business dashboard to live FastAPI endpoints:
+          KPI summary, sales trend, alerts, recommendations, open work items,
+          stock-risk summary, products and forecasts.
         </p>
       </header>
 
@@ -228,15 +449,9 @@ export default function Dashboard() {
           tone="positive"
         />
         <MetricCard
-          label="Active products"
-          value={summary.activeProducts}
-          helper="Current catalog scope"
-          tone="positive"
-        />
-        <MetricCard
           label="Forecast records"
           value={summary.forecastRecords}
-          helper="Forecast API coverage"
+          helper="Demand planning coverage"
         />
         <MetricCard
           label="Stockout risks"
@@ -253,16 +468,38 @@ export default function Dashboard() {
         <MetricCard
           label="Open alerts"
           value={summary.openAlerts}
-          helper="Workflow placeholder"
+          helper="Operations backlog signal"
+          tone={summary.openAlerts > 0 ? "warning" : "positive"}
+        />
+        <MetricCard
+          label="Recommendations"
+          value={summary.recommendationCount}
+          helper="Action guidance from dashboard API"
+          tone="positive"
         />
       </section>
+
+      <ExecutiveSummary
+        summary={summary}
+        operationalVisibility={operationalVisibility}
+        fetchedAt={fetchedAt}
+      />
 
       <section className="source-grid" aria-label="Backend source status">
         <SourceCard name="Health" source={sourceStatus.health} />
         <SourceCard name="Readiness" source={sourceStatus.readiness} />
+        <SourceCard name="Dashboard summary" source={sourceStatus.dashboardSummary} />
         <SourceCard
-          name="Dashboard summary"
-          source={sourceStatus.dashboardSummary}
+          name="Operational visibility"
+          source={sourceStatus.operationalVisibility}
+        />
+        <SourceCard name="Sales trend" source={sourceStatus.salesTrend} />
+        <SourceCard name="Alerts" source={sourceStatus.alerts} />
+        <SourceCard name="Recommendations" source={sourceStatus.recommendations} />
+        <SourceCard name="Open work items" source={sourceStatus.openWorkItems} />
+        <SourceCard
+          name="Stock-risk summary"
+          source={sourceStatus.stockRiskSummary}
         />
         <SourceCard name="Products" source={sourceStatus.products} />
         <SourceCard name="Forecasts" source={sourceStatus.forecasts} />
@@ -270,14 +507,35 @@ export default function Dashboard() {
       </section>
 
       <DataTable
-        title="Products from backend"
-        description={
-          `Latest frontend refresh: ${formatDateTime(fetchedAt)}. ` +
-          `Backend data refresh: ${formatDateTime(summary.lastRefreshAt)}.`
-        }
-        columns={productColumns}
-        rows={products.slice(0, 8)}
-        emptyMessage="Products endpoint returned no records. Check seed data and /products API response."
+        title="Sales trend"
+        description="Baseline sales trend evidence for management and commercial planning. In future sprints this can become a chart."
+        columns={salesTrendColumns}
+        rows={salesTrend.slice(0, 8)}
+        emptyMessage="Sales trend endpoint returned no records. Check /dashboard/sales-trend."
+      />
+
+      <DataTable
+        title="Operational alerts"
+        description="Alerts summarize signals that may require inventory, operations or commercial action."
+        columns={alertColumns}
+        rows={alerts.slice(0, 8)}
+        emptyMessage="Dashboard alerts endpoint returned no records. No fake alert rows are displayed."
+      />
+
+      <DataTable
+        title="Top recommendations"
+        description="Recommendations show proposed actions before full workflow approval is implemented."
+        columns={recommendationColumns}
+        rows={recommendations.slice(0, 8)}
+        emptyMessage="Dashboard recommendations endpoint returned no records. No local recommendation mocks are displayed."
+      />
+
+      <DataTable
+        title="Open work items"
+        description="Open work items connect decision signals with operational follow-up."
+        columns={workItemColumns}
+        rows={openWorkItems.slice(0, 8)}
+        emptyMessage="Open work items endpoint returned no records. Workflow actions remain future scope."
       />
 
       <DataTable
@@ -290,10 +548,21 @@ export default function Dashboard() {
 
       <DataTable
         title="Forecast records"
-        description="Forecast data supports inventory planning and ML readiness evidence."
+        description={
+          `Latest frontend refresh: ${formatDateTime(fetchedAt)}. ` +
+          `Backend data refresh: ${formatDateTime(summary.lastRefreshAt)}.`
+        }
         columns={forecastColumns}
         rows={forecasts.slice(0, 8)}
         emptyMessage="Forecast endpoint returned no records. Check seed data and /forecasts API response."
+      />
+
+      <DataTable
+        title="Products from backend"
+        description="Product records remain visible as traceability evidence for dashboard metrics."
+        columns={productColumns}
+        rows={products.slice(0, 8)}
+        emptyMessage="Products endpoint returned no records. Check seed data and /products API response."
       />
     </main>
   );

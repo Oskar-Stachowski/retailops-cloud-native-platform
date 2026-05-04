@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildDashboardSummary, listFromPayload, normalizeRiskStatus } from "../src/services/retailopsApi.js";
+import {
+  buildDashboardSummary,
+  listFromKnownKeys,
+  listFromPayload,
+  normalizeRiskStatus,
+} from "../src/services/retailopsApi.js";
 
 test("listFromPayload supports direct array payload", () => {
   assert.deepEqual(listFromPayload([{ id: 1 }]), [{ id: 1 }]);
@@ -10,8 +15,19 @@ test("listFromPayload supports API list response with items key", () => {
   assert.deepEqual(listFromPayload({ items: [{ id: 1 }] }), [{ id: 1 }]);
 });
 
+test("listFromKnownKeys extracts dashboard-specific collections", () => {
+  const payload = {
+    data: {
+      alerts: [{ id: "A1" }],
+    },
+  };
+
+  assert.deepEqual(listFromKnownKeys(payload, ["alerts"]), [{ id: "A1" }]);
+});
+
 test("normalizeRiskStatus converts labels to stable frontend status", () => {
   assert.equal(normalizeRiskStatus("Stockout Risk"), "stockout_risk");
+  assert.equal(normalizeRiskStatus("overstock-risk"), "overstock_risk");
   assert.equal(normalizeRiskStatus(undefined), "unknown");
 });
 
@@ -27,4 +43,29 @@ test("buildDashboardSummary uses backend summary first and live endpoint data as
   assert.equal(summary.forecastRecords, 1);
   assert.equal(summary.stockoutRisks, 2);
   assert.equal(summary.overstockRisks, 1);
+});
+
+test("buildDashboardSummary derives Sprint 5 operational counters from dashboard payloads", () => {
+  const summary = buildDashboardSummary(
+    {},
+    [{ sku: "A" }, { sku: "B" }],
+    [{ product_id: "A" }],
+    [
+      { sku: "A", risk_status: "stockout_risk" },
+      { sku: "B", risk_status: "normal" },
+    ],
+    {
+      alerts: [{ severity: "high" }, { severity: "low" }],
+      recommendations: [{ id: "R1" }, { id: "R2" }],
+      workItems: [{ id: "W1" }],
+      salesTrend: [{ period: "2026-05" }],
+    },
+  );
+
+  assert.equal(summary.riskyProducts, 1);
+  assert.equal(summary.openAlerts, 2);
+  assert.equal(summary.highSeverityAlerts, 1);
+  assert.equal(summary.recommendationCount, 2);
+  assert.equal(summary.openWorkItems, 1);
+  assert.equal(summary.salesTrendRecords, 1);
 });

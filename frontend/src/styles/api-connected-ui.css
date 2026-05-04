@@ -262,3 +262,25 @@ th {
     transform: rotate(360deg);
   }
 }
+
+.api-page__section {
+  margin: 2rem 0;
+}
+
+.section-heading {
+  margin: 0 auto 1.25rem;
+  max-width: 900px;
+  text-align: center;
+}
+
+.section-heading h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  letter-spacing: -0.04em;
+}
+
+.section-heading p {
+  color: #64748b;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
