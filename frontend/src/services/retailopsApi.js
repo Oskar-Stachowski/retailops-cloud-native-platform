@@ -1,6 +1,11 @@
-import { apiGet, apiGetOptional } from "./apiClient.js";
+import { apiGet, apiGetOptional, apiPost } from "./apiClient.js";
 
 export const ENDPOINTS = {
+  demoUsers: ["/users/demo"],
+  currentUser: ["/me"],
+  currentPermissions: ["/me/permissions"],
+  notifications: ["/notifications"],
+  markNotificationRead: (notificationId) => `/notifications/${notificationId}/read`,
   health: ["/health"],
   readiness: ["/ready"],
   dashboardSummary: ["/dashboard/summary", "/dashboard-summary"],
@@ -332,4 +337,57 @@ export async function getDashboardData(options = {}) {
       stockRisks: formatSourceStatus(stockRisks),
     },
   };
+}
+
+
+export function buildUserScopedPath(path, userId) {
+  if (!userId) {
+    return path;
+  }
+
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}user_id=${encodeURIComponent(userId)}`;
+}
+
+export function hasPermission(subject, permission) {
+  const permissions = Array.isArray(subject) ? subject : subject?.permissions || [];
+  return permissions.includes(permission) || permissions.includes("platform:admin");
+}
+
+export async function getDemoUsers(options = {}) {
+  const payload = await apiGet(ENDPOINTS.demoUsers[0], options);
+  return listFromPayload(payload);
+}
+
+export async function getCurrentUser(options = {}) {
+  const payload = await apiGet(
+    buildUserScopedPath(ENDPOINTS.currentUser[0], options.userId),
+    options,
+  );
+
+  return payload?.user || payload;
+}
+
+export async function getCurrentPermissions(options = {}) {
+  const payload = await apiGet(
+    buildUserScopedPath(ENDPOINTS.currentPermissions[0], options.userId),
+    options,
+  );
+
+  return payload?.permissions || [];
+}
+
+export async function getNotifications(options = {}) {
+  return apiGet(
+    buildUserScopedPath(ENDPOINTS.notifications[0], options.userId),
+    options,
+  );
+}
+
+export async function markNotificationRead(notificationId, options = {}) {
+  return apiPost(
+    buildUserScopedPath(ENDPOINTS.markNotificationRead(notificationId), options.userId),
+    {},
+    options,
+  );
 }

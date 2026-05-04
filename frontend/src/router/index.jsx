@@ -1,12 +1,14 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+
 import App from "../App.jsx";
-import Dashboard from "../pages/Dashboard.jsx";
-import Products from "../pages/Products.jsx";
-import Product360 from "../pages/Product360.jsx";
-import Forecasts from "../pages/Forecasts.jsx";
-import Anomalies from "../pages/Anomalies.jsx";
-import Recommendations from "../pages/Recommendations.jsx";
 import Admin from "../pages/Admin.jsx";
+import Anomalies from "../pages/Anomalies.jsx";
+import Dashboard from "../pages/Dashboard.jsx";
+import Forecasts from "../pages/Forecasts.jsx";
+import Product360 from "../pages/Product360.jsx";
+import Products from "../pages/Products.jsx";
+import Profile from "../pages/Profile.jsx";
+import Recommendations from "../pages/Recommendations.jsx";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "admin",
         element: <Admin />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
       {
         path: "*",

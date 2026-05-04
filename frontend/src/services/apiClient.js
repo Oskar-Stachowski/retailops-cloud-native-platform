@@ -115,6 +115,44 @@ export async function apiGet(path, options = {}) {
   return body;
 }
 
+export async function apiPost(path, body = {}, options = {}) {
+  const url = toApiUrl(path, options.baseUrl);
+
+  let response;
+
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+      body: JSON.stringify(body || {}),
+      signal: options.signal,
+    });
+  } catch (error) {
+    throw new ApiError("Backend API is not reachable.", {
+      code: "network_error",
+      path,
+      body: error,
+    });
+  }
+
+  const responseBody = await parseResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiError(getApiErrorMessage(responseBody, response), {
+      status: response.status,
+      code: getApiErrorCode(responseBody, response),
+      path,
+      body: responseBody,
+    });
+  }
+
+  return responseBody;
+}
+
 export async function apiGetOptional(paths, options = {}) {
   const candidatePaths = Array.isArray(paths) ? paths : [paths];
   const errors = [];

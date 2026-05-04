@@ -320,3 +320,70 @@ class Product360Response(ApiBaseModel):
     recommendations: list[Product360Recommendation]
     workflow_actions: list[Product360WorkflowAction]
     limits: dict[str, int]
+
+
+class DemoUserResponse(ApiBaseModel):
+    """Public mock identity used by Sprint 7 role-aware UI."""
+
+    id: str
+    login: str
+    display_name: str
+    email: str
+    role: str
+    team: str
+    business_area: str
+    permissions: list[str]
+
+
+class DemoUserListResponse(ApiBaseModel):
+    """Selectable local users used by the frontend demo switcher."""
+
+    items: list[DemoUserResponse]
+    default_user_id: str
+
+
+class CurrentUserResponse(ApiBaseModel):
+    """Response for GET /me."""
+
+    user: DemoUserResponse
+    auth_mode: str
+    scope_boundary: str
+
+
+class PermissionListResponse(ApiBaseModel):
+    """Response for GET /me/permissions."""
+
+    user_id: str
+    role: str
+    permissions: list[str]
+
+
+class NotificationResponse(ApiBaseModel):
+    """Local mock notification visible to a demo user."""
+
+    id: str
+    title: str
+    message: str
+    category: str
+    severity: str
+    status: str
+    target_role: str
+    action_url: str | None = None
+    created_at: datetime
+    read_at: datetime | None = None
+
+
+class NotificationListResponse(ApiBaseModel):
+    """Response for GET /notifications."""
+
+    items: list[NotificationResponse]
+    unread_count: int = Field(..., ge=0)
+    total_count: int = Field(..., ge=0)
+    user: DemoUserResponse
+
+
+class NotificationReadResponse(ApiBaseModel):
+    """Response for POST /notifications/{notification_id}/read."""
+
+    notification: NotificationResponse
+    unread_count: int = Field(..., ge=0)

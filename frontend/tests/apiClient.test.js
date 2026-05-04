@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ApiError, apiGet, normalizeApiPath, sanitizeBaseUrl, toApiUrl } from "../src/services/apiClient.js";
+import { ApiError, apiGet, apiPost, normalizeApiPath, sanitizeBaseUrl, toApiUrl } from "../src/services/apiClient.js";
 
 test("sanitizeBaseUrl removes trailing slashes", () => {
   assert.equal(sanitizeBaseUrl("http://localhost:8000/"), "http://localhost:8000");
@@ -33,6 +33,29 @@ test("apiGet returns parsed JSON response", async () => {
   }
 });
 
+test("apiGet sends GET request to normalized URL", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return new Response(JSON.stringify({ status: "ok" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await apiGet("/health", { baseUrl: "http://localhost:8000/" });
+
+    assert.deepEqual(data, { status: "ok" });
+    assert.equal(requests[0].url, "http://localhost:8000/health");
+    assert.equal(requests[0].options.method, "GET");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("apiGet throws ApiError for standardized backend error", async () => {
   const originalFetch = globalThis.fetch;
 
@@ -53,6 +76,33 @@ test("apiGet throws ApiError for standardized backend error", async () => {
         return true;
       },
     );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("apiPost sends JSON body and POST method", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return new Response(JSON.stringify({ updated: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await apiPost("/notifications/N1/read", { seen: true }, {
+      baseUrl: "http://localhost:8000",
+    });
+
+    assert.deepEqual(data, { updated: true });
+    assert.equal(requests[0].url, "http://localhost:8000/notifications/N1/read");
+    assert.equal(requests[0].options.method, "POST");
+    assert.equal(requests[0].options.headers["Content-Type"], "application/json");
+    assert.equal(requests[0].options.body, JSON.stringify({ seen: true }));
   } finally {
     globalThis.fetch = originalFetch;
   }

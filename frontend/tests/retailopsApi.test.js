@@ -6,6 +6,11 @@ import {
   listFromKnownKeys,
   listFromPayload,
   normalizeRiskStatus,
+  buildUserScopedPath,
+  getCurrentUser,
+  getNotifications,
+  hasPermission,
+  markNotificationRead,
 } from "../src/services/retailopsApi.js";
 
 test("listFromPayload supports direct array payload", () => {
@@ -88,6 +93,108 @@ test("getProduct360 calls the Product 360 backend endpoint", async () => {
 
     assert.equal(requestedUrls[0], "http://localhost:8000/products/abc/360");
     assert.deepEqual(data, { product: { sku: "ELEC-HEAD-001" } });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("buildUserScopedPath adds selected demo user query parameter", () => {
+  assert.equal(
+    buildUserScopedPath("/me", "inventory-planner"),
+    "/me?user_id=inventory-planner",
+  );
+  assert.equal(
+    buildUserScopedPath("/notifications?limit=5", "ops-manager"),
+    "/notifications?limit=5&user_id=ops-manager",
+  );
+});
+
+test("hasPermission supports explicit permissions and platform admin", () => {
+  assert.equal(hasPermission(["dashboard:read"], "dashboard:read"), true);
+  assert.equal(hasPermission(["platform:admin"], "notifications:write"), true);
+  assert.equal(hasPermission([], "platform:admin"), false);
+});
+
+test("getCurrentUser calls user-scoped /me endpoint", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(
+      JSON.stringify({ user: { id: "ops-manager", role: "operations_manager" } }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const user = await getCurrentUser({
+      baseUrl: "http://localhost:8000",
+      userId: "ops-manager",
+    });
+
+    assert.equal(requestedUrls[0], "http://localhost:8000/me?user_id=ops-manager");
+    assert.deepEqual(user, { id: "ops-manager", role: "operations_manager" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("getNotifications calls user-scoped notifications endpoint", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(JSON.stringify({ items: [], unread_count: 0 }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await getNotifications({
+      baseUrl: "http://localhost:8000",
+      userId: "inventory-planner",
+    });
+
+    assert.equal(
+      requestedUrls[0],
+      "http://localhost:8000/notifications?user_id=inventory-planner",
+    );
+    assert.deepEqual(data, { items: [], unread_count: 0 });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("markNotificationRead calls POST read endpoint", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return new Response(JSON.stringify({ unread_count: 0 }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await markNotificationRead("N1", {
+      baseUrl: "http://localhost:8000",
+      userId: "platform-admin",
+    });
+
+    assert.equal(
+      requests[0].url,
+      "http://localhost:8000/notifications/N1/read?user_id=platform-admin",
+    );
+    assert.equal(requests[0].options.method, "POST");
+    assert.deepEqual(data, { unread_count: 0 });
   } finally {
     globalThis.fetch = originalFetch;
   }

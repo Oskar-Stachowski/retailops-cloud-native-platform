@@ -52,6 +52,38 @@ The Product 360 endpoint aggregates product metadata, sales, inventory snapshots
 
 The implementation is intentionally read-only. Workflow mutations such as approve, reject, assign, comment and escalation remain future scope.
 
+## Sprint 7 — Users, Roles and Notifications
+
+Sprint 7 adds the first DevOps-facing access and operational-awareness layer to RetailOps.
+
+The implementation is intentionally local-first and mock-auth only. It introduces selectable demo users, role-aware frontend boundaries, current-user API contracts and in-app notifications without adding production authentication or external identity providers.
+
+New backend endpoints:
+
+- `GET /users/demo`
+- `GET /me`
+- `GET /me/permissions`
+- `GET /notifications`
+- `POST /notifications/{notification_id}/read`
+
+Frontend additions:
+
+- demo user switcher in the top navigation,
+- notification badge,
+- `/profile` page with current user, permissions and notifications,
+- role-aware Admin access boundary,
+- frontend service tests for user-scoped API calls.
+
+Current scope boundary:
+
+- no real login,
+- no JWT/OIDC/SSO,
+- no persistent notification state,
+- no database-backed users,
+- no workflow approval/rejection mutations yet.
+
+This sprint prepares the platform for future production-grade authentication, RBAC, audit logs and operational workflow write APIs.
+
 ## Tech stack
 
 | Area | Technology | Purpose |
