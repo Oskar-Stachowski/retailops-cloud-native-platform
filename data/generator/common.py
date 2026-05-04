@@ -41,4 +41,4 @@ def confidence(value: int | float | Decimal) -> str:
 
 
 def money(value: int | float | Decimal) -> str:
-    return decimal_str(value, places=4)
+    return decimal_str(value, places=2)

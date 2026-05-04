@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 from data.generator.common import deterministic_uuid, money, utc_datetime
 from data.generator.scenarios import CHANNELS, REGIONS
 
@@ -28,7 +30,7 @@ def generate_sales(products: list[dict[str, str]]) -> list[dict[str, str]]:
     sales: list[dict[str, str]] = []
 
     for product_index, product in enumerate(products):
-        base_price = float(product["base_price"])
+        base_price = Decimal(product["base_price"])
 
         for sale_index in range(2):
             natural_key = f"{product['sku']}-{sale_index + 1}"
@@ -36,19 +38,20 @@ def generate_sales(products: list[dict[str, str]]) -> list[dict[str, str]]:
             region_index = (product_index * 2 + sale_index) % len(REGIONS)
             region = REGIONS[region_index]
             quantity = _quantity_for(product, sale_index)
-            price_multiplier = 0.97 if sale_index == 1 else 1.0
+            price_multiplier = Decimal("0.97") if sale_index == 1 else Decimal("1.00")
             sold_at = utc_datetime(
                 days_offset=-(sale_index + product_index % 3),
                 hours_offset=sale_index * 4,
             )
-            total_amount = quantity * base_price * price_multiplier
+            unit_price = money(base_price * price_multiplier)
+            total_amount = money(Decimal(quantity) * Decimal(str(unit_price)))
 
             sales.append(
                 {
                     "id": deterministic_uuid("sale", natural_key),
                     "product_id": product["id"],
                     "quantity": str(quantity),
-                    "unit_price": money(base_price * price_multiplier),
+                    "unit_price": str(unit_price),
                     "total_amount": str(total_amount),
                     "currency": "PLN",
                     "channel": channel,
