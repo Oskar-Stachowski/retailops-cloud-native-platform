@@ -32,6 +32,10 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Run frontend tests
+        run: npm test
+        working-directory: frontend
+      
       - name: Run frontend lint
         run: npm run lint --if-present
 

@@ -56,8 +56,13 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   ├── finops.md
 │   ├── Future Improvements
 │   │   ├── cs-013-future-improvements.md
-│   │   └── images
-│   │       └── CS-013-Dashboard-Analytics-Query-Layer.png
+│   │   ├── cs-014-api-contract-future-improvements.md
+│   │   ├── cs-015-dashboard-summary-future-improvements.md
+│   │   ├── images
+│   │   │   ├── CS-013-Dashboard-Analytics-Query-Layer.png
+│   │   │   ├── CS-014-api-roadmap-and-future-improvements-timeline.png
+│   │   │   └── CS-015-dashboard-summary-endpoints.png
+│   │   └── sprint-4-api-integration-tests-future-improvements.md
 │   ├── repo-structure.txt
 │   ├── user-groups.md
 │   └── workflows.md
@@ -152,7 +157,13 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   │   │   ├── analytics.py
 │   │   │   │   ├── dashboard.py
 │   │   │   │   ├── errors.py
-│   │   │   │   └── health.py
+│   │   │   │   ├── forecasts.py
+│   │   │   │   ├── health.py
+│   │   │   │   ├── inventory.py
+│   │   │   │   ├── products.py
+│   │   │   │   ├── sales.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── stock_risks.py
 │   │   │   ├── core
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── config.py
@@ -170,14 +181,20 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   │   │   ├── analytics_repository.py
 │   │   │   │   ├── dashboard_repository.py
 │   │   │   │   ├── forecast_repository.py
-│   │   │   │   └── product_repository.py
+│   │   │   │   ├── inventory_repository.py
+│   │   │   │   ├── product_repository.py
+│   │   │   │   ├── sales_repository.py
+│   │   │   │   └── stock_risk_repository.py
 │   │   │   └── services
 │   │   │       ├── __init__.py
 │   │   │       ├── analytics_service.py
 │   │   │       ├── dashboard_service.py
 │   │   │       ├── forecast_service.py
+│   │   │       ├── inventory_service.py
 │   │   │       ├── product_service.py
-│   │   │       └── serialization.py
+│   │   │       ├── sales_service.py
+│   │   │       ├── serialization.py
+│   │   │       └── stock_risk_service.py
 │   │   ├── Dockerfile
 │   │   ├── Makefile
 │   │   ├── pytest.ini
@@ -186,20 +203,27 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   ├── scripts
 │   │   │   └── seed_demo_data.py
 │   │   └── tests
+│   │       ├── test_core_api_integration.py
 │   │       ├── test_dashboard_endpoints.py
 │   │       ├── test_dashboard_repository.py
+│   │       ├── test_dashboard_service.py
 │   │       ├── test_database_schema.py
 │   │       ├── test_domain_models.py
 │   │       ├── test_errors.py
+│   │       ├── test_forecast_api_contract.py
 │   │       ├── test_forecast_repository.py
 │   │       ├── test_forecast_service.py
 │   │       ├── test_health.py
+│   │       ├── test_inventory_api_contract.py
+│   │       ├── test_product_api_contract.py
 │   │       ├── test_product_repository.py
 │   │       ├── test_product_service.py
 │   │       ├── test_readiness.py
-│   │       └── test_seed_data.py
+│   │       ├── test_sales_api_contract.py
+│   │       ├── test_seed_data.py
+│   │       └── test_stock_risk_api_contract.py
 │   └── README.md
 └── tests
     └── README.md
 
-39 directories, 163 files
+39 directories, 187 files

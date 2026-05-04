@@ -1,57 +1,126 @@
-const adminAreas = [
-  {
-    title: "RBAC Readiness",
-    icon: "🔐",
-    status: "Planned",
-    description:
-      "Prepare a future admin area for role-based access control and user permission visibility.",
-  },
-  {
-    title: "Environment Status",
-    icon: "🟢",
-    status: "MVP",
-    description:
-      "Expose local environment readiness and link it with platform delivery checks.",
-  },
-  {
-    title: "Data Contracts",
-    icon: "📄",
-    status: "Planned",
-    description:
-      "Reserve space for API, data model and integration contract evidence.",
-  },
-  {
-    title: "Evidence Gates",
-    icon: "🧱",
-    status: "Planned",
-    description:
-      "Future place for implementation, testing, security and documentation readiness gates.",
-  },
-];
+import { useCallback, useEffect, useState } from "react";
+import ErrorState from "../components/ErrorState";
+import LoadingState from "../components/LoadingState";
+import StatusBadge from "../components/StatusBadge";
+import { getHealthStatus, getReadinessStatus } from "../services/retailopsApi";
+import "../styles/api-connected-ui.css";
 
-function Admin() {
+function PlatformStatusCard({ title, result }) {
   return (
-    <section className="modules" id="admin">
-      <div className="section-heading">
-        <span className="section-icon" aria-hidden="true">⚙</span>
-        <div>
-          <p className="eyebrow">Platform governance</p>
-          <h2>Admin</h2>
-        </div>
-      </div>
+    <article className="source-card">
+      <strong>{title}</strong>
 
-      <div className="module-grid">
-        {adminAreas.map((area) => (
-          <article className="module-card module-purple" key={area.title}>
-            <div className="module-icon" aria-hidden="true">{area.icon}</div>
-            <h3>{area.title}</h3>
-            <p>{area.description}</p>
-            <span>{area.status}</span>
-          </article>
-        ))}
-      </div>
-    </section>
+      <StatusBadge status={result.ok ? "connected" : "unavailable"}>
+        {result.ok ? "connected" : "unavailable"}
+      </StatusBadge>
+
+      <code>{result.path}</code>
+
+      <p>{result.ok ? JSON.stringify(result.data) : result.error?.message}</p>
+    </article>
   );
 }
 
-export default Admin;
+async function fetchPlatformStatus() {
+  const [health, readiness] = await Promise.all([
+    getHealthStatus(),
+    getReadinessStatus(),
+  ]);
+
+  return { health, readiness };
+}
+
+export default function Admin() {
+  const [state, setState] = useState({
+    loading: true,
+    error: null,
+    health: null,
+    readiness: null,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadInitialStatus() {
+      try {
+        const { health, readiness } = await fetchPlatformStatus();
+
+        if (isMounted) {
+          setState({
+            loading: false,
+            error: null,
+            health,
+            readiness,
+          });
+        }
+      } catch (error) {
+        if (isMounted) {
+          setState({
+            loading: false,
+            error,
+            health: null,
+            readiness: null,
+          });
+        }
+      }
+    }
+
+    loadInitialStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleRetry = useCallback(async () => {
+    setState((current) => ({
+      ...current,
+      loading: true,
+      error: null,
+    }));
+
+    try {
+      const { health, readiness } = await fetchPlatformStatus();
+
+      setState({
+        loading: false,
+        error: null,
+        health,
+        readiness,
+      });
+    } catch (error) {
+      setState({
+        loading: false,
+        error,
+        health: null,
+        readiness: null,
+      });
+    }
+  }, []);
+
+  if (state.loading) {
+    return <LoadingState title="Loading platform status" />;
+  }
+
+  if (state.error) {
+    return <ErrorState message={state.error.message} onRetry={handleRetry} />;
+  }
+
+  return (
+    <main className="api-page">
+      <header className="api-page__header">
+        <p className="eyebrow">Platform status</p>
+        <h1>Admin</h1>
+        <p>
+          Admin view uses health and readiness endpoints instead of static
+          placeholder status.
+        </p>
+      </header>
+
+      <section className="source-grid">
+        <PlatformStatusCard title="API health" result={state.health} />
+        <PlatformStatusCard title="API readiness" result={state.readiness} />
+      </section>
+    </main>
+  );
+}

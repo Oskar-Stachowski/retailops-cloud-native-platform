@@ -1,0 +1,264 @@
+.api-page {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.api-page__header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.api-page__header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 1.05;
+}
+
+.api-page__header p {
+  max-width: 78ch;
+  margin: 0;
+  color: #5f6b7a;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card,
+.state-card,
+.table-card,
+.source-card,
+.feature-boundary {
+  border: 1px solid #e5e7eb;
+  border-radius: 1.1rem;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 0.06);
+}
+
+.metric-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+}
+
+.metric-card__label,
+.metric-card__helper {
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.metric-card__value {
+  color: #0f172a;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.metric-card--risk {
+  border-color: #fed7aa;
+}
+
+.metric-card--positive {
+  border-color: #bbf7d0;
+}
+
+.metric-card--warning {
+  border-color: #fde68a;
+}
+
+.state-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.state-card h2,
+.state-card p {
+  margin: 0;
+}
+
+.state-card p {
+  color: #64748b;
+}
+
+.state-card--error {
+  border-color: #fecaca;
+  background: #fff7f7;
+}
+
+.state-card--empty {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.state-card__spinner {
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 3px solid #dbeafe;
+  border-top-color: #2563eb;
+  border-radius: 999px;
+  animation: spin 0.8s linear infinite;
+}
+
+.secondary-button {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+}
+
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.source-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem;
+}
+
+.source-card strong {
+  color: #0f172a;
+}
+
+.source-card code {
+  color: #475569;
+  font-size: 0.8rem;
+  word-break: break-word;
+}
+
+.source-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.24rem 0.55rem;
+  text-transform: capitalize;
+}
+
+.status-badge--connected,
+.status-badge--ok,
+.status-badge--active,
+.status-badge--normal,
+.status-badge--resolved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge--unavailable,
+.status-badge--error,
+.status-badge--stockout_risk,
+.status-badge--high {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge--overstock_risk,
+.status-badge--warning,
+.status-badge--medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.table-card {
+  overflow: hidden;
+}
+
+.table-card__header {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 1rem 0.5rem;
+}
+
+.table-card__header h2,
+.table-card__header p {
+  margin: 0;
+}
+
+.table-card__header p {
+  color: #64748b;
+}
+
+.table-card__scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  border-top: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.feature-boundary {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+}
+
+.feature-boundary h1,
+.feature-boundary p {
+  margin: 0;
+}
+
+.feature-boundary p,
+.feature-boundary__next span {
+  color: #64748b;
+}
+
+.feature-boundary__next {
+  display: grid;
+  gap: 0.25rem;
+  border-radius: 0.9rem;
+  background: #f8fafc;
+  padding: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

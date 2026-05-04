@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.errors import register_exception_handlers
@@ -10,6 +11,21 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/docs",
     openapi_url="/openapi.json",
+)
+
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET"],
+    allow_headers=["*"],
 )
 
 register_exception_handlers(app)
