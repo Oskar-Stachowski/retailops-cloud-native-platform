@@ -1,7 +1,7 @@
 """Shared API response schemas for RetailOps endpoints.
 
-The goal of this module is to make list/detail responses predictable for
-frontend, tests, OpenAPI docs and future clients.
+The goal of this module is to make list/detail and dashboard responses
+predictable for frontend, tests, OpenAPI docs and future clients.
 """
 
 from datetime import date, datetime
@@ -125,3 +125,92 @@ class StockRiskListResponse(ApiBaseModel):
 
     items: list[StockRiskResponse]
     pagination: PaginationMetadata
+
+
+class DashboardSummary(ApiBaseModel):
+    """Top-level operational counters used by the RetailOps dashboard."""
+
+    products_count: int = Field(..., ge=0)
+    sales_count: int = Field(..., ge=0)
+    inventory_snapshots_count: int = Field(..., ge=0)
+    forecasts_count: int = Field(..., ge=0)
+    anomalies_count: int = Field(..., ge=0)
+    recommendations_count: int = Field(..., ge=0)
+    open_anomalies_count: int = Field(..., ge=0)
+    open_recommendations_count: int = Field(..., ge=0)
+    open_work_items_count: int = Field(..., ge=0)
+    last_refresh_at: datetime | None = None
+
+
+class DashboardSummaryResponse(ApiBaseModel):
+    """Response for GET /dashboard/summary."""
+
+    summary: DashboardSummary
+
+
+class DashboardSalesTrendItem(ApiBaseModel):
+    """One point in the dashboard sales trend chart."""
+
+    date: date
+    units_sold: float = Field(..., ge=0)
+    revenue: float = Field(..., ge=0)
+
+
+class DashboardSalesTrendResponse(ApiBaseModel):
+    """Response for GET /dashboard/sales-trend."""
+
+    items: list[DashboardSalesTrendItem]
+    days: int = Field(..., ge=1, le=90)
+
+
+class DashboardWorkItem(ApiBaseModel):
+    """Small operational work item for dashboard widgets."""
+
+    id: str
+    source: str
+    product_id: str | None = None
+    sku: str | None = None
+    type: str | None = None
+    severity: str | None = None
+    priority: str | None = None
+    status: str | None = None
+    title: str | None = None
+    description: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    detected_at: datetime | None = None
+
+
+class DashboardWorkItemsResponse(ApiBaseModel):
+    """Response for open dashboard work item widgets."""
+
+    items: list[DashboardWorkItem]
+    limit: int = Field(..., ge=1, le=100)
+
+
+class DashboardRecommendationResponse(ApiBaseModel):
+    """Response for top dashboard recommendations."""
+
+    items: list[DashboardWorkItem]
+    limit: int = Field(..., ge=1, le=100)
+
+
+class DashboardStockRiskSummary(ApiBaseModel):
+    """Aggregated stock-risk counters for operational visibility."""
+
+    total_risk_items: int = Field(..., ge=0)
+    normal_count: int = Field(..., ge=0)
+    stockout_risk_count: int = Field(..., ge=0)
+    overstock_risk_count: int = Field(..., ge=0)
+    unknown_count: int = Field(..., ge=0)
+
+
+class DashboardOperationalVisibilityResponse(ApiBaseModel):
+    """Composite dashboard response for operations-oriented overview screens."""
+
+    generated_at: datetime
+    summary: DashboardSummary
+    stock_risk_summary: DashboardStockRiskSummary
+    sales_trend: list[DashboardSalesTrendItem]
+    open_work_items: list[DashboardWorkItem]
+    limits: dict[str, int]

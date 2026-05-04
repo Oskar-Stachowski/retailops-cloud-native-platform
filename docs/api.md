@@ -1,6 +1,6 @@
 # RetailOps API Standards
 
-This document defines REST API conventions, OpenAPI documentation rules, and error response patterns for the RetailOps Cloud-Native AI Platform.
+This document defines REST API conventions, OpenAPI documentation rules, response contracts, testing expectations and error response patterns for the RetailOps Cloud-Native AI Platform.
 
 The API is the backend entry point for product data, sales signals, inventory snapshots, stock-risk analysis, dashboard summaries, operational alerts and future recommendation workflows.
 
@@ -19,9 +19,12 @@ GET /ready
 
 ```text
 GET /dashboard/summary
+GET /dashboard/operational-visibility?sales_trend_days=14&work_items_limit=10
 GET /dashboard/sales-trend?days=14
 GET /dashboard/alerts?limit=10
 GET /dashboard/recommendations?limit=10
+GET /dashboard/open-work-items?limit=10
+GET /dashboard/stock-risk-summary
 ```
 
 ### Analytics endpoints
@@ -45,11 +48,144 @@ GET /sales/{sale_id}
 GET /inventory-risks
 ```
 
-The core resource endpoints are intended for stable frontend and integration usage. Dashboard and analytics endpoints may remain more presentation-oriented.
+The core resource endpoints are intended for stable frontend and integration usage. Dashboard and analytics endpoints are more presentation-oriented and may aggregate several tables into frontend-friendly response shapes.
 
 ---
 
-## 2. REST API Conventions
+## 2. CS-015 Dashboard Summary Contract
+
+CS-015 exposes dashboard summary endpoints for operational visibility. The purpose is to give the frontend and demo reviewers one compact API surface for answering:
+
+```text
+What is happening in RetailOps right now?
+```
+
+Dashboard endpoints are intentionally read-only in the current scope.
+
+### 2.1 Dashboard summary
+
+```text
+GET /dashboard/summary
+```
+
+Response shape:
+
+```json
+{
+  "summary": {
+    "products_count": 8,
+    "sales_count": 120,
+    "inventory_snapshots_count": 24,
+    "forecasts_count": 32,
+    "anomalies_count": 5,
+    "recommendations_count": 6,
+    "open_anomalies_count": 2,
+    "open_recommendations_count": 3,
+    "open_work_items_count": 5,
+    "last_refresh_at": "2026-05-02T13:34:23Z"
+  }
+}
+```
+
+### 2.2 Operational visibility overview
+
+```text
+GET /dashboard/operational-visibility?sales_trend_days=14&work_items_limit=10
+```
+
+Response shape:
+
+```json
+{
+  "generated_at": "2026-05-02T13:40:00Z",
+  "summary": {},
+  "stock_risk_summary": {},
+  "sales_trend": [],
+  "open_work_items": [],
+  "limits": {
+    "sales_trend_days": 14,
+    "work_items_limit": 10
+  }
+}
+```
+
+This endpoint is intentionally presentation-oriented. It is not a replacement for stable core resource endpoints such as `/products`, `/sales` or `/inventory-risks`.
+
+### 2.3 Sales trend
+
+```text
+GET /dashboard/sales-trend?days=14
+```
+
+Response shape:
+
+```json
+{
+  "items": [
+    {
+      "date": "2026-05-01",
+      "units_sold": 42.0,
+      "revenue": 4200.5
+    }
+  ],
+  "days": 14
+}
+```
+
+### 2.4 Open work items
+
+```text
+GET /dashboard/open-work-items?limit=10
+```
+
+Response shape:
+
+```json
+{
+  "items": [
+    {
+      "id": "work-item-1",
+      "source": "anomaly",
+      "product_id": "85710dbe-1aea-50ac-a155-fb216e12ab97",
+      "sku": "ELEC-HEAD-001",
+      "type": "sales_drop",
+      "severity": "medium",
+      "priority": null,
+      "status": "open",
+      "title": null,
+      "description": "Sales dropped below expected level.",
+      "created_at": "2026-05-01T10:00:00Z",
+      "updated_at": null,
+      "detected_at": "2026-05-01T09:30:00Z"
+    }
+  ],
+  "limit": 10
+}
+```
+
+Open work items may combine open anomalies, open recommendations and future operational tasks into one dashboard-friendly feed.
+
+### 2.5 Stock-risk summary
+
+```text
+GET /dashboard/stock-risk-summary
+```
+
+Response shape:
+
+```json
+{
+  "total_risk_items": 8,
+  "normal_count": 4,
+  "stockout_risk_count": 2,
+  "overstock_risk_count": 1,
+  "unknown_count": 1
+}
+```
+
+---
+
+## 3. REST API Conventions
 
 Use lowercase, plural nouns for business resources.
 
@@ -78,9 +214,20 @@ Instead of:
 GET /getAlerts
 ```
 
+Dashboard paths may use descriptive nouns when they represent frontend widgets or summaries.
+
+Acceptable examples:
+
+```text
+GET /dashboard/summary
+GET /dashboard/sales-trend
+GET /dashboard/open-work-items
+GET /dashboard/stock-risk-summary
+```
+
 ---
 
-## 3. HTTP Methods
+## 4. HTTP Methods
 
 | Method | Purpose |
 |---|---|
@@ -90,11 +237,11 @@ GET /getAlerts
 | PATCH | Partially update a resource |
 | DELETE | Delete a resource |
 
-Current CS-014 scope uses read-only `GET` endpoints only.
+Current Sprint 4 API scope uses read-only `GET` endpoints only.
 
 ---
 
-## 4. Status Codes
+## 5. Status Codes
 
 | Status code | Meaning |
 |---|---|
@@ -111,9 +258,9 @@ Current CS-014 scope uses read-only `GET` endpoints only.
 
 ---
 
-## 5. Response Conventions
+## 6. Response Conventions
 
-### 5.1 Detail response
+### 6.1 Detail response
 
 Detail endpoints return the resource directly.
 
@@ -130,9 +277,9 @@ Example:
 }
 ```
 
-### 5.2 List response
+### 6.2 List response
 
-All stable resource list endpoints must return a top-level object with `items` and `pagination`.
+All stable resource list endpoints return a top-level `items` key and `pagination` metadata.
 
 Example:
 
@@ -149,7 +296,9 @@ Example:
 
 Do not return a raw JSON array from stable resource list endpoints.
 
-### 5.3 Pagination
+Dashboard endpoints may use widget-specific response shapes when a classic list contract would make the frontend less clear.
+
+### 6.3 Pagination
 
 Current MVP pagination uses:
 
@@ -170,7 +319,7 @@ Cursor pagination is intentionally deferred.
 
 ---
 
-## 6. Current Core Endpoint Examples
+## 7. Current Core Endpoint Examples
 
 ### Products
 
@@ -214,9 +363,9 @@ GET /inventory-risks?category=Electronics
 
 ---
 
-## 7. Error Response Pattern
+## 8. Error Response Pattern
 
-All controlled API errors should follow one JSON structure.
+All controlled API errors should follow one normalized JSON structure.
 
 ```json
 {
@@ -240,25 +389,28 @@ Do not expose:
 
 ---
 
-## 8. OpenAPI Documentation Rules
+## 9. OpenAPI Documentation Rules
 
 FastAPI automatically exposes OpenAPI documentation.
 
 Local URLs:
 
 ```text
-http://localhost:8000/docs
-http://localhost:8000/openapi.json
+GET /docs
+GET /openapi.json
 ```
 
-Each endpoint should have:
+Each public endpoint should define:
 
 - clear path,
 - correct HTTP method,
 - tag,
 - summary,
+- description,
 - response model where practical,
-- documented response status codes.
+- typed query parameters,
+- typed path parameters,
+- documented response status codes where useful.
 
 Recommended tags:
 
@@ -278,7 +430,7 @@ admin
 
 ---
 
-## 9. Testing Expectations
+## 10. Testing Expectations
 
 Each new endpoint should include at least one automated contract test.
 
@@ -294,6 +446,11 @@ GET /inventory-snapshots/{inventory_snapshot_id} returns detail or standard 404
 GET /sales returns items + pagination
 GET /sales/{sale_id} returns detail or standard 404
 GET /inventory-risks returns items + pagination
+GET /dashboard/summary returns summary object
+GET /dashboard/operational-visibility returns summary, stock risk, sales trend and open work items
+GET /dashboard/sales-trend returns items
+GET /dashboard/open-work-items returns items
+GET /dashboard/stock-risk-summary returns stock-risk counters
 ```
 
 Tests should verify:
@@ -301,6 +458,8 @@ Tests should verify:
 - HTTP status code,
 - response JSON shape,
 - key business fields or error fields,
+- pagination metadata for stable resource list endpoints,
+- safe error response structure,
 - absence of unstable assumptions where possible.
 
 Tests should be runnable locally with:
@@ -313,7 +472,7 @@ The GitHub Actions pipeline should fail if API tests fail.
 
 ---
 
-## 10. CI/CD Expectations
+## 11. CI/CD Expectations
 
 The API CI workflow should validate at least:
 
@@ -325,9 +484,19 @@ build Docker image
 
 A failed test or failed Docker build should block the change.
 
+The API CI workflow should run when relevant API, data or workflow files change.
+
+Recommended trigger areas:
+
+```text
+services/api/**
+data/**
+.github/workflows/api-ci.yml
+```
+
 ---
 
-## 11. Security Expectations
+## 12. Security Expectations
 
 The API should follow secure-by-default conventions:
 
@@ -339,11 +508,11 @@ The API should follow secure-by-default conventions:
 - whitelist sort fields,
 - prepare future endpoints for authentication and RBAC.
 
-Authentication and RBAC are intentionally not implemented in CS-014.
+Authentication and RBAC are intentionally not implemented in the current Sprint 4 scope.
 
 ---
 
-## 12. Observability Expectations
+## 13. Observability Expectations
 
 The `/health` and `/ready` endpoints support:
 
@@ -353,29 +522,45 @@ The `/health` and `/ready` endpoints support:
 - future uptime checks,
 - API availability SLI.
 
+Dashboard summary endpoints support operational visibility for demo and frontend use cases.
+
 Future production observability may add:
 
 - request logs,
 - structured logging,
 - metrics endpoint,
 - tracing,
-- correlation/request IDs.
+- correlation/request IDs,
+- OpenTelemetry integration,
+- Prometheus/Grafana dashboards.
 
-These are not required for CS-014, but the current conventions should allow them to be added later.
+These are not required for the current Sprint 4 implementation, but the current conventions should allow them to be added later.
 
 ---
 
-## 13. MVP Boundary
+## 14. Scope Boundary
 
-Current CS-014 scope intentionally does not implement:
+### Included now
 
-- authentication and RBAC,
+- read-only health and readiness endpoints,
+- dashboard summary and operational visibility endpoints,
+- analytics read endpoints,
+- stable core APIs for products, forecasts, inventory snapshots, sales and inventory risks,
+- consistent error responses,
+- OpenAPI response models,
+- pytest contract tests,
+- CI validation for tests and Docker image builds.
+
+### Deferred
+
+- authentication / authorization / RBAC,
 - write endpoints,
+- `/api/v1` versioning,
 - cursor pagination,
-- advanced cross-resource filtering,
-- nested product 360 responses,
+- frontend integration for every dashboard widget,
+- OpenAPI snapshot testing,
+- rate limiting,
+- caching,
+- orders API,
 - generated SDKs,
-- full OpenAPI contract testing,
 - production deployment.
-
-These capabilities should be added later when the API surface and frontend usage justify the extra complexity.

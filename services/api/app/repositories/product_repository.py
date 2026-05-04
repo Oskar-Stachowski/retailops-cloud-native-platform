@@ -74,7 +74,7 @@ class ProductRepository:
 
         if search:
             filters.append(
-                "(" 
+                "("
                 "LOWER(sku) LIKE LOWER(%s) OR "
                 "LOWER(name) LIKE LOWER(%s) OR "
                 "LOWER(COALESCE(category, '')) LIKE LOWER(%s)"
