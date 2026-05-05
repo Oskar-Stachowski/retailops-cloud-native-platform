@@ -15,7 +15,6 @@ Why this file exists:
 
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import pytest
@@ -24,13 +23,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-pytestmark = pytest.mark.skipif(
-    not os.getenv("DATABASE_URL"),
-    reason=(
-        "Integration tests require DATABASE_URL and a migrated/seeded PostgreSQL "
-        "database. Run docker compose, alembic upgrade head and seed_demo_data.py first."
-    ),
-)
+pytestmark = pytest.mark.integration_db
 
 client = TestClient(app)
 ZERO_UUID = "00000000-0000-0000-0000-000000000000"

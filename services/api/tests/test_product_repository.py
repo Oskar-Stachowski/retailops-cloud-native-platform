@@ -2,11 +2,13 @@ import os
 from uuid import UUID
 
 import psycopg
+import pytest
 
 from app.domain.models import Product
 from app.repositories.product_repository import ProductRepository
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+pytestmark = pytest.mark.integration_db
 
 EXISTING_ID = UUID("85710dbe-1aea-50ac-a155-fb216e12ab97")
 NON_EXISTING_ID = UUID("00000000-0000-0000-0000-000000000000")

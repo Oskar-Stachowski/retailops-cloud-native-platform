@@ -10,9 +10,6 @@ import pytest
 
 API_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = API_ROOT.parents[1]
-DEFAULT_DATABASE_URL = (
-    "postgresql://retailops:retailops@localhost:5432/retailops"
-)
 EXPECTED_ROW_COUNTS = {
     "products": 8,
     "users": 4,
@@ -29,9 +26,7 @@ EXPECTED_CSV_FILES = [
 ]
 
 
-@pytest.fixture(scope="module")
-def database_url() -> str:
-    return os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+pytestmark = pytest.mark.integration_db
 
 
 def run_generator() -> None:
@@ -48,6 +43,11 @@ def run_seed(database_url: str) -> None:
     env = os.environ.copy()
     env["DATABASE_URL"] = database_url
     env["RETAILOPS_DEMO_DATA_DIR"] = str(REPO_ROOT / "data" / "demo")
+    env["PYTHONPATH"] = os.pathsep.join(
+        str(path)
+        for path in (API_ROOT, REPO_ROOT, env.get("PYTHONPATH"))
+        if path
+    )
 
     subprocess.run(
         [sys.executable, "scripts/seed_demo_data.py"],

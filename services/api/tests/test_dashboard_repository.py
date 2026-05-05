@@ -1,15 +1,10 @@
-import os
-
 import pytest
 
 from app.repositories.analytics_repository import AnalyticsRepository
 from app.repositories.dashboard_repository import DashboardRepository
 
 
-pytestmark = pytest.mark.skipif(
-    not os.getenv("DATABASE_URL"),
-    reason="DATABASE_URL is required for repository integration smoke tests",
-)
+pytestmark = pytest.mark.integration_db
 
 
 def test_dashboard_repository_reads_summary_from_database():

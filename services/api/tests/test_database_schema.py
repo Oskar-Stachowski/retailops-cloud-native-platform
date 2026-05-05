@@ -1,9 +1,11 @@
 import os
 
 import psycopg
+import pytest
 
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+pytestmark = pytest.mark.integration_db
 
 
 def test_required_database_tables_exist():

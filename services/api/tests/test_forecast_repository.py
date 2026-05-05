@@ -2,11 +2,13 @@ import os
 from uuid import UUID
 
 import psycopg
+import pytest
 
 from app.domain.models import Forecast
 from app.repositories.forecast_repository import ForecastRepository
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+pytestmark = pytest.mark.integration_db
 
 EXISTING_PRODUCT_ID = UUID("85710dbe-1aea-50ac-a155-fb216e12ab97")
 PRODUCT_ID_WITHOUT_FORECAST = UUID("a24a7f85-d830-55e5-90e4-afb122abd0ce")

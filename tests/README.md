@@ -33,11 +33,17 @@ The endpoint is used for:
 
 ## 2. API tests
 
-Run API tests from the backend service directory:
+Run API tests from the repository root:
 
 ```bash
-cd services/api
 pytest
+```
+
+To show explicit skip reasons, including local skips for database-backed
+integration tests when PostgreSQL is not configured, run:
+
+```bash
+pytest -rs
 ```
 
 The current API test suite verifies:
