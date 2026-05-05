@@ -6,7 +6,8 @@ services:
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
   api:
     build:
@@ -18,8 +19,37 @@ services:
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
     depends_on:
+      seed:
+        condition: service_completed_successfully
+
+  migrate:
+    build:
+      context: ./services/api
+    image: retailops-api:0.1.0
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
+    depends_on:
       db:
         condition: service_healthy
+    restart: "no"
+
+  seed:
+    build:
+      context: ./services/api
+    image: retailops-api:0.1.0
+    command: ["python", "scripts/seed_demo_data.py"]
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
+      RETAILOPS_DEMO_DATA_DIR: /workspace/data/demo
+    volumes:
+      - ./data:/workspace/data:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
 
   db:
     image: postgres:16-alpine
