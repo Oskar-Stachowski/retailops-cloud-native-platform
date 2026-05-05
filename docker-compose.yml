@@ -43,6 +43,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
+      PYTHONPATH: /app
       RETAILOPS_DEMO_DATA_DIR: /workspace/data/demo
     volumes:
       - ./data:/workspace/data:ro

@@ -146,11 +146,11 @@ def _candidate_data_dirs() -> list[Path]:
         candidates.append(Path(os.environ["RETAILOPS_DEMO_DATA_DIR"]))
 
     script_path = Path(__file__).resolve()
+    if len(script_path.parents) > 3:
+        candidates.append(script_path.parents[3] / "data" / "demo")
+
     candidates.extend(
         [
-            # Normal local repo layout:
-            # <repo-root>/services/api/scripts/seed_demo_data.py
-            script_path.parents[3] / "data" / "demo",
             # Useful when the API container mounts ./data into /workspace/data.
             Path("/workspace/data/demo"),
             # Useful when the project root is copied into the image.
