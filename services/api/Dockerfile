@@ -1,6 +1,15 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+LABEL org.opencontainers.image.title="RetailOps API"
+LABEL org.opencontainers.image.description="FastAPI backend for the RetailOps local runtime"
+LABEL org.opencontainers.image.version="0.1.0"
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV APP_HOME=/app
+
+WORKDIR ${APP_HOME}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
@@ -8,16 +17,21 @@ RUN apt-get update \
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-COPY alembic ./alembic
-COPY alembic.ini .
-COPY app ./app
-COPY scripts ./scripts
+RUN adduser --disabled-password --gecos "" appuser
+
+COPY --chown=appuser:appuser alembic ./alembic
+COPY --chown=appuser:appuser alembic.ini .
+COPY --chown=appuser:appuser app ./app
+COPY --chown=appuser:appuser scripts ./scripts
+
+USER appuser
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl --fail http://localhost:8000/health || exit 1
+    CMD curl --fail http://localhost:8000/health || exit 1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

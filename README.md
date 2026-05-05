@@ -234,6 +234,41 @@ You can optionally adjust ports and database credentials in `.env`.
 docker compose up --build
 ```
 
+### Docker Compose Local Runtime
+
+The local Docker Compose runtime starts the full RetailOps stack:
+
+```text
+PostgreSQL -> migrations -> demo seed -> FastAPI API -> Nginx-served React frontend
+```
+
+Run the stack in the background:
+
+```bash
+docker compose up --build -d
+```
+
+Verify the runtime:
+
+```bash
+./scripts/compose_smoke.sh
+```
+
+The smoke test checks API health, database readiness, selected DB-backed endpoints, the frontend root page, and the frontend `/api` proxy.
+
+Useful URLs:
+
+* Frontend: http://localhost:3000
+* API: http://localhost:8000
+* API health: http://localhost:8000/health
+* Frontend API proxy: http://localhost:3000/api/health
+
+Stop the stack:
+
+```bash
+docker compose down
+```
+
 ---
 
 ### 🌐 Access the services

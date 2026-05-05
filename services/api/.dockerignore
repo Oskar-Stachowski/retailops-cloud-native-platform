@@ -1,8 +1,36 @@
+# Python cache / bytecode
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# Test and coverage artifacts
 .pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local virtual environments
 .env
+.env.*
 .venv/
 venv/
+env/
+
+# Git / system / editor files
+.git/
+.gitignore
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Tests are not needed in the runtime image
 tests/
 pytest.ini
+
+# Local docs / non-runtime files
+README.md

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 API_BASE_URL="${API_BASE_URL:-http://localhost:8000}"
+FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-http://localhost:3000}"
 MAX_ATTEMPTS="${SMOKE_MAX_ATTEMPTS:-30}"
 SLEEP_SECONDS="${SMOKE_SLEEP_SECONDS:-2}"
 
@@ -66,6 +67,24 @@ wait_for_api() {
   fail "API did not become healthy at ${API_BASE_URL}/health."
 }
 
+wait_for_frontend() {
+  local attempt
+  local frontend_status
+
+  for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    if frontend_status="$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "${FRONTEND_BASE_URL}/")" \
+      && [[ "${frontend_status}" == "200" ]]; then
+      log "Frontend is reachable at ${FRONTEND_BASE_URL}."
+      return 0
+    fi
+
+    log "Waiting for frontend (${attempt}/${MAX_ATTEMPTS})..."
+    sleep "${SLEEP_SECONDS}"
+  done
+
+  fail "Frontend did not become reachable at ${FRONTEND_BASE_URL}/."
+}
+
 check_endpoint() {
   local path="$1"
   local expected_text="$2"
@@ -83,5 +102,28 @@ check_endpoint "/products" '"items"'
 check_endpoint "/forecasts" '"items"'
 check_endpoint "/dashboard/summary" '"summary"'
 check_endpoint "/inventory-risks" '"items"'
+
+wait_for_frontend
+
+log "Checking frontend root..."
+frontend_status="$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "${FRONTEND_BASE_URL}/")"
+
+if [[ "${frontend_status}" != "200" ]]; then
+  fail "Expected frontend root to return HTTP 200, got ${frontend_status}."
+fi
+
+log "Checking frontend API proxy /api/health..."
+proxy_health_status="$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "${FRONTEND_BASE_URL}/api/health")"
+
+if [[ "${proxy_health_status}" != "200" ]]; then
+  fail "Expected frontend API proxy /api/health to return HTTP 200, got ${proxy_health_status}."
+fi
+
+log "Checking frontend API proxy /api/ready..."
+proxy_ready_status="$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "${FRONTEND_BASE_URL}/api/ready")"
+
+if [[ "${proxy_ready_status}" != "200" ]]; then
+  fail "Expected frontend API proxy /api/ready to return HTTP 200, got ${proxy_ready_status}."
+fi
 
 log "Compose smoke test passed."
