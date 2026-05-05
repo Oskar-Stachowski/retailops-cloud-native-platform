@@ -1,10 +1,25 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ApiError, apiGet, apiPost, normalizeApiPath, sanitizeBaseUrl, toApiUrl } from "../src/services/apiClient.js";
+import { ApiError, apiGet, apiPost, getConfiguredApiBaseUrl, normalizeApiPath, sanitizeBaseUrl, toApiUrl } from "../src/services/apiClient.js";
 
 test("sanitizeBaseUrl removes trailing slashes", () => {
   assert.equal(sanitizeBaseUrl("http://localhost:8000/"), "http://localhost:8000");
   assert.equal(sanitizeBaseUrl("http://localhost:8000///"), "http://localhost:8000");
+});
+
+test("getConfiguredApiBaseUrl defaults to same-origin API proxy", () => {
+  const originalValue = globalThis.process?.env?.VITE_API_BASE_URL;
+  delete globalThis.process.env.VITE_API_BASE_URL;
+
+  try {
+    assert.equal(getConfiguredApiBaseUrl(), "/api");
+  } finally {
+    if (originalValue === undefined) {
+      delete globalThis.process.env.VITE_API_BASE_URL;
+    } else {
+      globalThis.process.env.VITE_API_BASE_URL = originalValue;
+    }
+  }
 });
 
 test("normalizeApiPath always returns a path with leading slash", () => {

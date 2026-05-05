@@ -154,23 +154,23 @@ touch .env.local
 Recommended local value:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=/api
 ```
 
-This value tells the browser where the FastAPI backend is available.
+This value sends browser requests through the frontend proxy.
 
 Important notes:
 
 - `VITE_API_BASE_URL` must point to the backend address visible from the browser.
-- In local Vite development, this is usually `http://localhost:8000`.
-- In Docker Compose browser testing, this can also be `http://localhost:8000` because the backend port is published to the host.
+- In local Vite development, `/api` is proxied by Vite to `http://localhost:8000`.
+- In Docker Compose browser testing, `/api` is proxied by Nginx to the `api` service.
 - Restart Vite after changing `.env.local`.
 - Do not commit `.env.local`.
 
 A safe `.env.example` entry is:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=/api
 ```
 
 ## Local development
@@ -440,7 +440,7 @@ This is usually a CORS or frontend base URL problem.
 Check `.env.local`:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=/api
 ```
 
 Then restart Vite:
