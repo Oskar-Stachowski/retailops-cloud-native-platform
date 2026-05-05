@@ -8,6 +8,10 @@ function getCellValue(row, column) {
   return row?.[column.accessor];
 }
 
+function formatCellValue(value) {
+  return value === null || value === undefined || value === "" ? "—" : value;
+}
+
 export default function DataTable({ title, description, columns, rows, emptyMessage }) {
   if (!rows?.length) {
     return <EmptyState title={title || "No records"} message={emptyMessage} />;
@@ -34,7 +38,9 @@ export default function DataTable({ title, description, columns, rows, emptyMess
             {rows.map((row, index) => (
               <tr key={row.id || row.product_id || row.sku || index}>
                 {columns.map((column) => (
-                  <td key={column.key || column.header}>{column.render ? column.render(row) : getCellValue(row, column) || "—"}</td>
+                  <td key={column.key || column.header}>
+                    {formatCellValue(column.render ? column.render(row) : getCellValue(row, column))}
+                  </td>
                 ))}
               </tr>
             ))}
