@@ -2,18 +2,26 @@ SHELL := /bin/bash
 
 API_DIR := services/api
 FRONTEND_DIR := frontend
-DATABASE_URL ?= postgresql://retailops:retailops@localhost:5432/retailops
+
+-include .env
+
+POSTGRES_DB ?= retailops
+POSTGRES_USER ?= retailops
+POSTGRES_PASSWORD ?= retailops
+POSTGRES_PORT ?= 5432
+DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
 
 .PHONY: help \
-	test api-test frontend-test frontend-lint frontend-build \
+	test api-test api-integration-test frontend-test frontend-lint frontend-build \
 	data-generate api-migrate api-seed api-demo-refresh \
 	compose-config compose-up compose-down compose-ps compose-logs compose-smoke compose-rebuild-smoke
 
 help:
 	@printf "RetailOps platform commands\n\n"
 	@printf "Quality gates:\n"
-	@printf "  make test                  Run API and frontend tests\n"
-	@printf "  make api-test              Run API tests\n"
+	@printf "  make test                  Run API unit, API DB integration, and frontend tests\n"
+	@printf "  make api-test              Run API tests that do not require a database\n"
+	@printf "  make api-integration-test  Prepare Compose DB and run API DB integration tests\n"
 	@printf "  make frontend-test         Run frontend tests\n"
 	@printf "  make frontend-lint         Run frontend lint\n"
 	@printf "  make frontend-build        Build frontend production assets\n\n"
@@ -31,10 +39,14 @@ help:
 	@printf "  make compose-smoke         Run smoke checks against running stack\n"
 	@printf "  make compose-rebuild-smoke Build, start, and smoke test local stack\n"
 
-test: api-test frontend-test
+test: api-test api-integration-test frontend-test
 
 api-test:
-	cd $(API_DIR) && PYTHONPATH=. DATABASE_URL=$(DATABASE_URL) pytest
+	cd $(API_DIR) && PYTHONPATH=. pytest -m "not integration_db"
+
+api-integration-test:
+	docker compose up --build -d seed
+	cd $(API_DIR) && PYTHONPATH=. DATABASE_URL=$(DATABASE_URL) REQUIRE_DB_TESTS=1 pytest -m integration_db
 
 frontend-test:
 	cd $(FRONTEND_DIR) && npm test
