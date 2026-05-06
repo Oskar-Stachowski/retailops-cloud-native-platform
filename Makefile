@@ -20,8 +20,14 @@ NPM ?= npm
 
 API_DIR ?= services/api
 FRONTEND_DIR ?= frontend
+INFRA_DIR ?= infra
+INFRA_ENV ?= dev
+INFRA_ENV_DIR ?= $(INFRA_DIR)/environments/$(INFRA_ENV)
 REPORTS_DIR ?= ci-cd/reports
 SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
+IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
+
+TERRAFORM ?= terraform
 
 POSTGRES_DB ?= retailops
 POSTGRES_USER ?= retailops_local
@@ -70,6 +76,13 @@ help:
 	@echo "  make frontend-lint        Run frontend lint"
 	@echo "  make frontend-build       Build frontend"
 	@echo ""
+	@echo "Infrastructure / Terraform:"
+	@echo "  make terraform-fmt        Format Terraform files for the selected environment"
+	@echo "  make terraform-fmt-check  Check Terraform formatting without modifying files"
+	@echo "  make terraform-init       Initialize Terraform locally with backend disabled"
+	@echo "  make terraform-validate   Validate Terraform configuration locally"
+	@echo "  make terraform-check      Run Terraform fmt check, init, and validate"
+	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
 	@echo "  make compose-config       Validate Docker Compose config"
@@ -84,7 +97,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -155,6 +168,35 @@ test: api-test frontend-test
 
 ci-local: compose-config api-test frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
+
+# -------------------------------------------------------------------
+# Infrastructure / Terraform
+# Commit 1 intentionally validates scaffold only:
+# - no terraform apply
+# - no AWS resources
+# - no GitHub Actions infrastructure workflow yet
+# -------------------------------------------------------------------
+
+.PHONY: terraform-fmt terraform-fmt-check terraform-init terraform-validate terraform-check terraform-validate-report
+
+terraform-fmt:
+	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" fmt -recursive
+
+terraform-fmt-check:
+	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" fmt -recursive -check
+
+terraform-init:
+	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" init -backend=false
+
+terraform-validate: terraform-init
+	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" validate
+
+terraform-check: terraform-fmt-check terraform-validate
+	@echo "Terraform local checks passed for $(INFRA_ENV_DIR)."
+
+terraform-validate-report: ensure-reports-dir terraform-init
+	@set -o pipefail; \
+	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" validate -no-color | tee "$(IAC_REPORTS_DIR)/terraform-validate.txt"
 
 # -------------------------------------------------------------------
 # Docker / Compose
@@ -257,12 +299,3 @@ security-image-scan: check-trivy ensure-reports-dir docker-build
 
 security-scan: secret-scan security-fs-scan security-image-scan
 	@echo "Security scans passed."
-
-# -------------------------------------------------------------------
-# Cleanup
-# -------------------------------------------------------------------
-
-.PHONY: clean
-clean:
-	rm -rf "$(REPORTS_DIR)"
-	$(COMPOSE) down -v --remove-orphans || true

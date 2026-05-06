@@ -1,0 +1,27 @@
+# Terraform working directories
+.terraform/
+**/.terraform/
+
+# Terraform state files - never commit state to Git
+*.tfstate
+*.tfstate.*
+
+# Local variable files may contain account-specific or sensitive values
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Local plans and crash logs
+*.tfplan
+*.plan
+crash.log
+crash.*.log
+
+# Local override files
+*_override.tf
+*_override.tf.json
+override.tf
+override.tf.json
+
+# Keep .terraform.lock.hcl committed after terraform init is run intentionally.
+# It improves provider version reproducibility and is not a secret.

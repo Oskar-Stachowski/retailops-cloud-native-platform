@@ -1,0 +1,12 @@
+project_name = "retailops"
+environment  = "dev"
+aws_region   = "eu-central-1"
+owner        = "oskar"
+cost_center  = "portfolio"
+managed_by   = "terraform"
+resource_lifecycle    = "temporary"
+
+additional_tags = {
+  Workload = "platform-foundation"
+  Sprint   = "sprint-10"
+}

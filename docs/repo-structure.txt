@@ -1,17 +1,26 @@
-tree -a -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
+tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"
 .
-├── .env
 ├── .env.example
 ├── .github
 │   └── workflows
 │       ├── api-ci.yml
-│       └── frontend-ci.yml
+│       ├── docker-ci.yml
+│       ├── frontend-ci.yml
+│       └── security-ci.yml
 ├── .gitignore
 ├── .vscode
 │   └── settings.json
 ├── case-study.md
 ├── ci-cd
-│   └── README.md
+│   ├── README.md
+│   └── reports
+│       ├── .gitkeep
+│       ├── docker-compose-ps.txt
+│       └── security
+│           ├── gitleaks.json
+│           ├── trivy-api-image.txt
+│           ├── trivy-frontend-image.txt
+│           └── trivy-fs.txt
 ├── data
 │   ├── __init__.py
 │   ├── demo
@@ -63,6 +72,12 @@ tree -a -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   ├── 11-retailops-demo-data-flow.md
 │   │   └── 12-repository-service-layer.md
 │   ├── enterprise-scorecard.md
+│   ├── evidence
+│   │   ├── Jenkins Stage View.png
+│   │   ├── Jenkins Status and Artifacts.png
+│   │   ├── trivy-api-image.txt
+│   │   ├── trivy-frontend-image.txt
+│   │   └── trivy-fs.txt
 │   ├── finops.md
 │   ├── Future Improvements
 │   │   ├── cs-013-future-improvements.md
@@ -83,7 +98,6 @@ tree -a -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   └── workflows.md
 ├── frontend
 │   ├── .dockerignore
-│   ├── .env.local
 │   ├── .gitignore
 │   ├── Dockerfile
 │   ├── eslint.config.js
@@ -172,6 +186,7 @@ tree -a -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   └── Workflow-Operating-Model.png
 ├── infra
 │   └── README.md
+├── Jenkinsfile
 ├── k8s
 │   └── README.md
 ├── LICENSE
@@ -286,4 +301,4 @@ tree -a -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 └── tests
     └── README.md
 
-50 directories, 236 files
+53 directories, 248 files

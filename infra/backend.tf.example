@@ -1,0 +1,13 @@
+# Example only. Do not rename this file to backend.tf until remote state is intentionally designed.
+# Commit 1 validates Terraform locally with:
+# terraform -chdir=infra/environments/dev init -backend=false
+
+terraform {
+  backend "s3" {
+    bucket         = "REPLACE_WITH_RETAILOPS_TERRAFORM_STATE_BUCKET"
+    key            = "retailops/dev/terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "REPLACE_WITH_RETAILOPS_TERRAFORM_LOCK_TABLE"
+    encrypt        = true
+  }
+}
