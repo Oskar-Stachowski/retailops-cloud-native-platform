@@ -28,16 +28,16 @@ permissions:
   contents: read
   security-events: write
 
-jobs:
-  security:
-    name: Secret, dependency and image scanning
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
+env:
+  REPORT_DIR: ci-cd/reports/security
+  API_IMAGE: retailops-api:security
+  FRONTEND_IMAGE: retailops-frontend:security
 
-    env:
-      API_IMAGE: retailops-api:security
-      FRONTEND_IMAGE: retailops-frontend:security
-      REPORT_DIR: ci-cd/reports/security
+jobs:
+  secret-scan:
+    name: Secret scanning with Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -53,6 +53,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload secret scan evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-secret-scan-evidence
+          path: |
+            gitleaks-results.sarif
+            ci-cd/reports/security/
+          if-no-files-found: ignore
+
+  filesystem-scan:
+    name: Filesystem vulnerability scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare report directory
+        run: mkdir -p "${REPORT_DIR}"
+
       - name: Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
@@ -63,6 +85,26 @@ jobs:
           exit-code: "1"
           format: table
           output: ci-cd/reports/security/trivy-fs.txt
+
+      - name: Upload filesystem scan evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-filesystem-scan-evidence
+          path: ci-cd/reports/security/trivy-fs.txt
+          if-no-files-found: ignore
+
+  python-dependency-audit:
+    name: Python dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare report directory
+        run: mkdir -p "${REPORT_DIR}"
 
       - name: Set up Python for dependency audit
         uses: actions/setup-python@v5
@@ -80,6 +122,26 @@ jobs:
             --format json \
             --output "${REPORT_DIR}/pip-audit.json"
 
+      - name: Upload Python dependency evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-python-dependency-evidence
+          path: ci-cd/reports/security/pip-audit.json
+          if-no-files-found: ignore
+
+  frontend-dependency-audit:
+    name: Frontend dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare report directory
+        run: mkdir -p "${REPORT_DIR}"
+
       - name: Set up Node.js for dependency audit
         uses: actions/setup-node@v5
         with:
@@ -94,10 +156,28 @@ jobs:
           npm ci
           npm audit --audit-level=high --json > "../${REPORT_DIR}/npm-audit.json"
 
-      - name: Build backend and frontend images
-        run: |
-          docker build -t "${API_IMAGE}" services/api
-          docker build -t "${FRONTEND_IMAGE}" frontend
+      - name: Upload frontend dependency evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-frontend-dependency-evidence
+          path: ci-cd/reports/security/npm-audit.json
+          if-no-files-found: ignore
+
+  backend-image-scan:
+    name: Backend image vulnerability scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare report directory
+        run: mkdir -p "${REPORT_DIR}"
+
+      - name: Build backend image
+        run: docker build -t "${API_IMAGE}" services/api
 
       - name: Trivy backend image scan
         uses: aquasecurity/trivy-action@0.35.0
@@ -109,6 +189,29 @@ jobs:
           format: table
           output: ci-cd/reports/security/trivy-api-image.txt
 
+      - name: Upload backend image evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-backend-image-evidence
+          path: ci-cd/reports/security/trivy-api-image.txt
+          if-no-files-found: ignore
+
+  frontend-image-scan:
+    name: Frontend image vulnerability scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare report directory
+        run: mkdir -p "${REPORT_DIR}"
+
+      - name: Build frontend image
+        run: docker build -t "${FRONTEND_IMAGE}" frontend
+
       - name: Trivy frontend image scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
@@ -119,7 +222,53 @@ jobs:
           format: table
           output: ci-cd/reports/security/trivy-frontend-image.txt
 
-      - name: Upload security evidence
+      - name: Upload frontend image evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-frontend-image-evidence
+          path: ci-cd/reports/security/trivy-frontend-image.txt
+          if-no-files-found: ignore
+
+  security-summary:
+    name: Security evidence summary
+    runs-on: ubuntu-latest
+    needs:
+      - secret-scan
+      - filesystem-scan
+      - python-dependency-audit
+      - frontend-dependency-audit
+      - backend-image-scan
+      - frontend-image-scan
+    if: always()
+
+    steps:
+      - name: Download security evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: security-*-evidence
+          path: ci-cd/reports/security
+          merge-multiple: true
+
+      - name: Write security summary
+        run: |
+          {
+            echo "## Security CI summary"
+            echo ""
+            echo "| Check | Result |"
+            echo "|---|---|"
+            echo "| Secret scanning | ${{ needs.secret-scan.result }} |"
+            echo "| Filesystem vulnerability scan | ${{ needs.filesystem-scan.result }} |"
+            echo "| Python dependency audit | ${{ needs.python-dependency-audit.result }} |"
+            echo "| Frontend dependency audit | ${{ needs.frontend-dependency-audit.result }} |"
+            echo "| Backend image scan | ${{ needs.backend-image-scan.result }} |"
+            echo "| Frontend image scan | ${{ needs.frontend-image-scan.result }} |"
+            echo ""
+            echo "Security evidence artifacts were generated during runtime."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload consolidated security evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:

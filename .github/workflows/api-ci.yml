@@ -13,7 +13,8 @@ on:
       - ".github/workflows/api-ci.yml"
 
 jobs:
-  test-and-build-api:
+  api-integration-tests:
+    name: API integration tests
     runs-on: ubuntu-latest
 
     services:
@@ -30,7 +31,7 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-    
+
     env:
       DATABASE_URL: postgresql://retailops:retailops@localhost:5432/retailops
       REQUIRE_DB_TESTS: "1"
@@ -53,19 +54,28 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Generate demo CSV dataset
         run: python -m data.generator.main
         working-directory: .
-      
+
       - name: Run database migrations
         run: alembic upgrade head
-      
+
       - name: Seed demo data
         run: python scripts/seed_demo_data.py
 
       - name: Run API tests
         run: pytest
 
+  api-image-build:
+    name: API Docker image build
+    runs-on: ubuntu-latest
+    needs: api-integration-tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build API Docker image
-        run: docker build -t retailops-api:ci .
+        run: docker build -t retailops-api:ci services/api
