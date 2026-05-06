@@ -10,8 +10,8 @@ SHELL := /bin/bash
 -include .env
 
 COMPOSE ?= docker compose
-PYTHON ?= python
-PIP ?= pip
+PYTHON ?= python3
+PIP ?= $(PYTHON) -m pip
 NPM ?= npm
 
 API_DIR ?= services/api

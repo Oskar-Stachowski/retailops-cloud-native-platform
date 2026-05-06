@@ -28,6 +28,8 @@ pipeline {
     }
 
     environment {
+        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${env.PATH}"
+
         APP_ENV = 'local'
 
         FRONTEND_PORT = '3000'
@@ -38,7 +40,7 @@ pipeline {
         POSTGRES_USER = 'retailops'
         POSTGRES_PASSWORD = 'retailops'
 
-        DATABASE_URL = 'postgresql://retailops:retailops@localhost:5432/retailops'
+        DATABASE_URL = "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}"
 
         API_IMAGE = "retailops-api:${BUILD_NUMBER}"
         FRONTEND_IMAGE = "retailops-frontend:${BUILD_NUMBER}"
@@ -50,6 +52,38 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Agent Toolchain Diagnostics') {
+            steps {
+                sh '''
+                    echo "PATH=$PATH"
+
+                    echo "--- Git ---"
+                    which git || true
+                    git --version || true
+
+                    echo "--- Make ---"
+                    which make || true
+                    make --version || true
+
+                    echo "--- Python ---"
+                    which python3 || true
+                    python3 --version || true
+                    python3 -m pip --version || true
+
+                    echo "--- Node / npm ---"
+                    which node || true
+                    node --version || true
+                    which npm || true
+                    npm --version || true
+
+                    echo "--- Docker ---"
+                    which docker || true
+                    docker --version || true
+                    docker compose version || true
+                '''
             }
         }
 
