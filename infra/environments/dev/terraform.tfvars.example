@@ -64,3 +64,12 @@ ecr_repositories = {
     max_image_count     = 20
   }
 }
+
+# AWS Budget / FinOps baseline
+# Keep notifications disabled in committed examples to avoid storing private email addresses.
+# Add real notification addresses only in local, non-committed terraform.tfvars.
+enable_monthly_budget              = true
+monthly_budget_limit_usd           = 10
+enable_budget_notifications        = false
+budget_notification_email_addresses = []
+

@@ -161,6 +161,37 @@ variable "ecr_repositories" {
     }
   }
 }
+
+variable "enable_monthly_budget" {
+  description = "Enable the monthly AWS Budget guardrail for the dev environment. Keep plan-only until cost assumptions are reviewed."
+  type        = bool
+  default     = true
+}
+
+variable "monthly_budget_limit_usd" {
+  description = "Monthly AWS Budget limit for the dev guardrail, in USD."
+  type        = number
+  default     = 10
+
+  validation {
+    condition     = var.monthly_budget_limit_usd > 0 && var.monthly_budget_limit_usd <= 100
+    error_message = "The dev monthly budget limit should be greater than 0 and no higher than 100 USD."
+  }
+}
+
+variable "enable_budget_notifications" {
+  description = "Enable AWS Budget email notifications. Keep false in committed examples to avoid storing private email addresses."
+  type        = bool
+  default     = false
+}
+
+variable "budget_notification_email_addresses" {
+  description = "Private email addresses for AWS Budget notifications. Do not commit real addresses; use local terraform.tfvars instead."
+  type        = list(string)
+  default     = []
+  sensitive   = true
+}
+
 module "tags" {
   source = "../../modules/tags"
 
@@ -225,6 +256,18 @@ module "ecr" {
   name_prefix  = module.tags.name_prefix
   common_tags  = module.tags.common_tags
   repositories = var.ecr_repositories
+}
+
+module "budget" {
+  source = "../../modules/budget"
+
+  name_prefix = module.tags.name_prefix
+  common_tags = module.tags.common_tags
+
+  enable_budget                = var.enable_monthly_budget
+  monthly_budget_limit_usd     = var.monthly_budget_limit_usd
+  enable_budget_notifications  = var.enable_budget_notifications
+  notification_email_addresses = var.budget_notification_email_addresses
 }
 
 output "vpc_id" {
@@ -307,3 +350,29 @@ output "ecr_lifecycle_policy_max_image_count" {
   description = "Maximum number of images retained by lifecycle policy for each ECR repository."
   value       = module.ecr.lifecycle_policy_max_image_count
 }
+
+output "monthly_budget_name" {
+  description = "Name of the AWS Budget guardrail for the dev environment."
+  value       = module.budget.budget_name
+}
+
+output "monthly_budget_limit_usd" {
+  description = "Configured monthly AWS Budget limit in USD."
+  value       = module.budget.monthly_budget_limit_usd
+}
+
+output "budget_notifications_enabled" {
+  description = "Whether AWS Budget email notifications are enabled."
+  value       = module.budget.notifications_enabled
+}
+
+output "budget_notification_email_count" {
+  description = "Number of configured AWS Budget notification email recipients without exposing addresses."
+  value       = module.budget.notification_email_count
+}
+
+output "budget_private_notification_data_committed" {
+  description = "Safety signal confirming that committed examples do not contain private notification addresses."
+  value       = module.budget.private_notification_data_committed
+}
+
