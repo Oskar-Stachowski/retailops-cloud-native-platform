@@ -1,0 +1,81 @@
+name: Docker Compose CI
+
+on:
+  push:
+    paths:
+      - "docker-compose.yml"
+      - "Makefile"
+      - ".env.example"
+      - "scripts/**"
+      - "services/api/**"
+      - "frontend/**"
+      - "data/**"
+      - ".github/workflows/docker-ci.yml"
+  pull_request:
+    paths:
+      - "docker-compose.yml"
+      - "Makefile"
+      - ".env.example"
+      - "scripts/**"
+      - "services/api/**"
+      - "frontend/**"
+      - "data/**"
+      - ".github/workflows/docker-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  compose-smoke:
+    name: Build full stack and run smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      APP_ENV: local
+
+      FRONTEND_PORT: "3000"
+      API_PORT: "8000"
+      POSTGRES_PORT: "5432"
+
+      POSTGRES_DB: retailops
+      POSTGRES_USER: retailops
+      POSTGRES_PASSWORD: retailops
+
+      DATABASE_URL: postgresql://retailops:retailops@localhost:5432/retailops
+      VITE_API_BASE_URL: /api
+
+      SMOKE_MAX_ATTEMPTS: "45"
+      SMOKE_SLEEP_SECONDS: "2"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show Docker versions
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Make smoke script executable
+        run: chmod +x scripts/compose_smoke.sh
+
+      - name: Validate Docker Compose config
+        run: make compose-config
+
+      - name: Build, start and smoke-test full stack
+        run: make compose-ci
+
+      - name: Upload Compose evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-compose-ci-evidence
+          path: |
+            ci-cd/reports/docker-compose-ps.txt
+            ci-cd/reports/docker-compose-logs.txt
+          if-no-files-found: ignore
+
+      - name: Final cleanup
+        if: always()
+        run: docker compose down -v --remove-orphans || true

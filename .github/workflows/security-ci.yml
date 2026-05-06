@@ -1,0 +1,128 @@
+name: Security CI
+
+on:
+  push:
+    paths:
+      - "services/api/**"
+      - "frontend/**"
+      - "data/**"
+      - "docker-compose.yml"
+      - "Makefile"
+      - ".env.example"
+      - "scripts/**"
+      - "security/**"
+      - ".github/workflows/security-ci.yml"
+  pull_request:
+    paths:
+      - "services/api/**"
+      - "frontend/**"
+      - "data/**"
+      - "docker-compose.yml"
+      - "Makefile"
+      - ".env.example"
+      - "scripts/**"
+      - "security/**"
+      - ".github/workflows/security-ci.yml"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security:
+    name: Secret, dependency and image scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    env:
+      API_IMAGE: retailops-api:security
+      FRONTEND_IMAGE: retailops-frontend:security
+      REPORT_DIR: ci-cd/reports/security
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare report directory
+        run: mkdir -p "${REPORT_DIR}"
+
+      - name: Secret scan with Gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+          output: ci-cd/reports/security/trivy-fs.txt
+
+      - name: Set up Python for dependency audit
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Python dependency audit report
+        continue-on-error: true
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pip-audit
+          pip-audit \
+            -r services/api/requirements.txt \
+            --format json \
+            --output "${REPORT_DIR}/pip-audit.json"
+
+      - name: Set up Node.js for dependency audit
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Frontend dependency audit report
+        continue-on-error: true
+        run: |
+          cd frontend
+          npm ci
+          npm audit --audit-level=high --json > "../${REPORT_DIR}/npm-audit.json"
+
+      - name: Build backend and frontend images
+        run: |
+          docker build -t "${API_IMAGE}" services/api
+          docker build -t "${FRONTEND_IMAGE}" frontend
+
+      - name: Trivy backend image scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: retailops-api:security
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+          output: ci-cd/reports/security/trivy-api-image.txt
+
+      - name: Trivy frontend image scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: retailops-frontend:security
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+          output: ci-cd/reports/security/trivy-frontend-image.txt
+
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-ci-evidence
+          path: ci-cd/reports/security/
+          if-no-files-found: ignore

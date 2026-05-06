@@ -1,0 +1,43 @@
+
+Report Summary
+
+┌──────────────────────────────────────────┬────────┬─────────────────┬─────────┐
+│                  Target                  │  Type  │ Vulnerabilities │ Secrets │
+├──────────────────────────────────────────┼────────┼─────────────────┼─────────┤
+│ retailops-frontend:local (alpine 3.21.3) │ alpine │        6        │    -    │
+└──────────────────────────────────────────┴────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+retailops-frontend:local (alpine 3.21.3)
+========================================
+Total: 6 (CRITICAL: 6)
+
+┌────────────┬────────────────┬──────────┬────────┬───────────────────┬───────────────┬──────────────────────────────────────────────────────────────┐
+│  Library   │ Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version │                            Title                             │
+├────────────┼────────────────┼──────────┼────────┼───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ libcrypto3 │ CVE-2025-15467 │ CRITICAL │ fixed  │ 3.3.3-r0          │ 3.3.6-r0      │ openssl: OpenSSL: Remote code execution or Denial of Service │
+│            │                │          │        │                   │               │ via oversized Initialization...                              │
+│            │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2025-15467                   │
+│            ├────────────────┤          │        │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│            │ CVE-2026-31789 │          │        │                   │ 3.3.7-r0      │ openssl: OpenSSL: Heap buffer overflow on 32-bit systems     │
+│            │                │          │        │                   │               │ from large X.509 certificate...                              │
+│            │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-31789                   │
+├────────────┼────────────────┤          │        │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│ libssl3    │ CVE-2025-15467 │          │        │                   │ 3.3.6-r0      │ openssl: OpenSSL: Remote code execution or Denial of Service │
+│            │                │          │        │                   │               │ via oversized Initialization...                              │
+│            │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2025-15467                   │
+│            ├────────────────┤          │        │                   ├───────────────┼──────────────────────────────────────────────────────────────┤
+│            │ CVE-2026-31789 │          │        │                   │ 3.3.7-r0      │ openssl: OpenSSL: Heap buffer overflow on 32-bit systems     │
+│            │                │          │        │                   │               │ from large X.509 certificate...                              │
+│            │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2026-31789                   │
+├────────────┼────────────────┤          │        ├───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ libxml2    │ CVE-2025-49794 │          │        │ 2.13.4-r5         │ 2.13.9-r0     │ libxml: Heap use after free (UAF) leads to Denial of service │
+│            │                │          │        │                   │               │ (DoS)...                                                     │
+│            │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2025-49794                   │
+│            ├────────────────┤          │        │                   │               ├──────────────────────────────────────────────────────────────┤
+│            │ CVE-2025-49796 │          │        │                   │               │ libxml: Type confusion leads to Denial of service (DoS)      │
+│            │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2025-49796                   │
+└────────────┴────────────────┴──────────┴────────┴───────────────────┴───────────────┴──────────────────────────────────────────────────────────────┘

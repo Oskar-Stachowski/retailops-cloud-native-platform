@@ -1,5 +1,14 @@
-tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
+tree -a -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 .
+├── .env
+├── .env.example
+├── .github
+│   └── workflows
+│       ├── api-ci.yml
+│       └── frontend-ci.yml
+├── .gitignore
+├── .vscode
+│   └── settings.json
 ├── case-study.md
 ├── ci-cd
 │   └── README.md
@@ -32,6 +41,7 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 ├── docs
 │   ├── ADR
 │   │   ├── Alembic.md
+│   │   ├── CICD tooling.md
 │   │   ├── PostgreSQL.md
 │   │   ├── Psycopg.md
 │   │   ├── Pydantic.md
@@ -72,6 +82,9 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   ├── user-groups.md
 │   └── workflows.md
 ├── frontend
+│   ├── .dockerignore
+│   ├── .env.local
+│   ├── .gitignore
 │   ├── Dockerfile
 │   ├── eslint.config.js
 │   ├── index.html
@@ -162,17 +175,21 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 ├── k8s
 │   └── README.md
 ├── LICENSE
+├── Makefile
 ├── ml
 │   └── README.md
 ├── observability
 │   └── README.md
+├── pytest.ini
 ├── README.md
 ├── scripts
+│   ├── compose_smoke.sh
 │   └── README.md
 ├── security
 │   └── README.md
 ├── services
 │   ├── api
+│   │   ├── .dockerignore
 │   │   ├── alembic
 │   │   │   ├── env.py
 │   │   │   ├── README
@@ -241,6 +258,7 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 │   │   ├── scripts
 │   │   │   └── seed_demo_data.py
 │   │   └── tests
+│   │       ├── conftest.py
 │   │       ├── test_core_api_integration.py
 │   │       ├── test_dashboard_endpoints.py
 │   │       ├── test_dashboard_repository.py
@@ -268,4 +286,4 @@ tree -I "node_modules|dist|__pycache__|*.pyc|.pytest_cache|.git|.DS_Store"
 └── tests
     └── README.md
 
-47 directories, 221 files
+50 directories, 236 files
