@@ -1,12 +1,36 @@
-project_name = "retailops"
-environment  = "dev"
-aws_region   = "eu-central-1"
-owner        = "oskar"
-cost_center  = "portfolio"
-managed_by   = "terraform"
-resource_lifecycle    = "temporary"
+project_name       = "retailops"
+environment        = "dev"
+aws_region         = "eu-central-1"
+owner              = "oskar"
+cost_center        = "portfolio"
+managed_by         = "terraform"
+resource_lifecycle = "temporary"
 
 additional_tags = {
   Workload = "platform-foundation"
   Sprint   = "sprint-10"
+}
+
+vpc_cidr_block = "10.20.0.0/16"
+
+public_subnets = {
+  a = {
+    cidr_block        = "10.20.0.0/24"
+    availability_zone = "eu-central-1a"
+  }
+  b = {
+    cidr_block        = "10.20.1.0/24"
+    availability_zone = "eu-central-1b"
+  }
+}
+
+private_subnets = {
+  a = {
+    cidr_block        = "10.20.10.0/24"
+    availability_zone = "eu-central-1a"
+  }
+  b = {
+    cidr_block        = "10.20.11.0/24"
+    availability_zone = "eu-central-1b"
+  }
 }

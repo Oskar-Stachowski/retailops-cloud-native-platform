@@ -2,21 +2,22 @@
 
 This directory contains reusable Terraform modules for the RetailOps Platform.
 
-The project introduces modules gradually and only when the scope, cost impact, security assumptions, and validation path are clear.
-
-Implemented modules:
+Current modules:
 
 - `tags` — shared governance module for standard name prefixes and mandatory AWS tags.
+- `vpc` — baseline AWS networking module for the future dev environment.
 
 Planned future module areas may include:
 
-- networking,
 - IAM,
 - ECR,
 - RDS,
 - EKS,
 - observability,
-- security controls.
+- security controls,
+- budgets and cost monitoring.
+
+Module implementation should remain incremental. Each module should have a clear scope, cost impact, security assumption, and validation path before it is connected to an environment.
 
 Current module policy:
 
