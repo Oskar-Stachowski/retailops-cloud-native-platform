@@ -4,12 +4,12 @@ This directory contains reusable Terraform modules for the RetailOps Platform.
 
 Current modules:
 
-- `tags` — shared governance module for standard name prefixes and mandatory AWS tags.
-- `vpc` — baseline AWS networking module for the future dev environment.
+- `tags` — shared naming and tagging baseline used by future AWS resources.
+- `vpc` — AWS networking baseline with VPC, public/private subnet assumptions, route tables, Internet Gateway, and baseline security groups.
+- `iam` — IAM baseline with a read-only Terraform plan policy and guarded future role patterns for CI/CD.
 
 Planned future module areas may include:
 
-- IAM,
 - ECR,
 - RDS,
 - EKS,

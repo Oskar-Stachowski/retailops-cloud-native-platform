@@ -106,6 +106,42 @@ variable "private_subnets" {
   }
 }
 
+
+variable "enable_github_actions_plan_role" {
+  description = "Enable future GitHub Actions plan-only role when OIDC trust inputs are provided."
+  type        = bool
+  default     = false
+}
+
+variable "github_oidc_provider_arn" {
+  description = "Existing AWS IAM OIDC provider ARN for GitHub Actions. Keep null until intentionally configured."
+  type        = string
+  default     = null
+}
+
+variable "github_repository" {
+  description = "GitHub repository allowed to assume the future GitHub Actions plan role, in owner/repository format."
+  type        = string
+  default     = null
+}
+
+variable "github_branch" {
+  description = "Branch allowed to assume the future GitHub Actions plan role."
+  type        = string
+  default     = "main"
+}
+
+variable "enable_jenkins_plan_role" {
+  description = "Enable future Jenkins plan-only role when trusted AWS principal ARNs are provided."
+  type        = bool
+  default     = false
+}
+
+variable "jenkins_trusted_role_arns" {
+  description = "AWS principal ARNs allowed to assume the future Jenkins plan role."
+  type        = list(string)
+  default     = []
+}
 module "tags" {
   source = "../../modules/tags"
 
@@ -149,6 +185,21 @@ module "vpc" {
   private_subnets = var.private_subnets
 }
 
+module "iam" {
+  source = "../../modules/iam"
+
+  name_prefix = module.tags.name_prefix
+  common_tags = module.tags.common_tags
+
+  enable_github_actions_plan_role = var.enable_github_actions_plan_role
+  github_oidc_provider_arn        = var.github_oidc_provider_arn
+  github_repository               = var.github_repository
+  github_branch                   = var.github_branch
+
+  enable_jenkins_plan_role  = var.enable_jenkins_plan_role
+  jenkins_trusted_role_arns = var.jenkins_trusted_role_arns
+}
+
 output "vpc_id" {
   description = "ID of the dev VPC baseline."
   value       = module.vpc.vpc_id
@@ -177,4 +228,30 @@ output "database_security_group_id" {
 output "nat_gateway_enabled" {
   description = "Confirms that the dev networking baseline does not create NAT Gateway resources."
   value       = module.vpc.nat_gateway_enabled
+}
+
+
+output "iam_terraform_plan_policy_arn" {
+  description = "ARN of the read-only Terraform plan policy for future CI/CD validation."
+  value       = module.iam.terraform_plan_policy_arn
+}
+
+output "github_actions_plan_role_arn" {
+  description = "ARN of the optional GitHub Actions plan role. Null until enabled."
+  value       = module.iam.github_actions_plan_role_arn
+}
+
+output "jenkins_plan_role_arn" {
+  description = "ARN of the optional Jenkins plan role. Null until enabled."
+  value       = module.iam.jenkins_plan_role_arn
+}
+
+output "iam_access_keys_created" {
+  description = "Safety signal confirming that the IAM baseline does not create access keys."
+  value       = module.iam.access_keys_created
+}
+
+output "iam_administrator_access_attached" {
+  description = "Safety signal confirming that the IAM baseline does not attach AdministratorAccess."
+  value       = module.iam.administrator_access_attached
 }

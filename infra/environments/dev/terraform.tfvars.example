@@ -34,3 +34,15 @@ private_subnets = {
     availability_zone = "eu-central-1b"
   }
 }
+
+
+# IAM baseline
+# The Terraform plan policy is created by default. Future CI/CD roles remain disabled
+# until GitHub OIDC or Jenkins trusted AWS principals are intentionally configured.
+enable_github_actions_plan_role = false
+github_oidc_provider_arn        = null
+github_repository               = null
+github_branch                   = "main"
+
+enable_jenkins_plan_role = false
+jenkins_trusted_role_arns = []
