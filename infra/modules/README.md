@@ -1,8 +1,12 @@
 # Terraform Modules
 
-This directory is reserved for reusable Terraform modules.
+This directory contains reusable Terraform modules for the RetailOps Platform.
 
-Commit 1 does not introduce real modules yet. The project first creates a safe foundation structure and validates Terraform locally before adding AWS resources.
+The project introduces modules gradually and only when the scope, cost impact, security assumptions, and validation path are clear.
+
+Implemented modules:
+
+- `tags` — shared governance module for standard name prefixes and mandatory AWS tags.
 
 Planned future module areas may include:
 
@@ -14,4 +18,9 @@ Planned future module areas may include:
 - observability,
 - security controls.
 
-Module implementation should start only when the corresponding AWS resource scope, cost impact, security assumptions, and validation path are clear.
+Current module policy:
+
+- modules should be small and reusable,
+- modules should expose clear inputs and outputs,
+- modules should avoid creating AWS resources before the corresponding commit explicitly introduces them,
+- modules should support local validation with `terraform init -backend=false` and `terraform validate`.

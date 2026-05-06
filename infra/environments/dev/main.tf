@@ -62,25 +62,23 @@ variable "additional_tags" {
   default     = {}
 }
 
-locals {
-  common_tags = merge(
-    {
-      Project     = var.project_name
-      Environment = var.environment
-      Owner       = var.owner
-      ManagedBy   = var.managed_by
-      CostCenter  = var.cost_center
-      Lifecycle   = var.resource_lifecycle
-    },
-    var.additional_tags
-  )
+module "tags" {
+  source = "../../modules/tags"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  owner              = var.owner
+  managed_by         = var.managed_by
+  cost_center        = var.cost_center
+  resource_lifecycle = var.resource_lifecycle
+  additional_tags    = var.additional_tags
 }
 
 provider "aws" {
   region = var.aws_region
 
   default_tags {
-    tags = local.common_tags
+    tags = module.tags.common_tags
   }
 }
 
