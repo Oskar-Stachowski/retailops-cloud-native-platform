@@ -46,3 +46,21 @@ github_branch                   = "main"
 
 enable_jenkins_plan_role = false
 jenkins_trusted_role_arns = []
+
+# ECR baseline
+# Repositories are intended for release and release-candidate images.
+# Short-lived local and CI images can remain local until cloud publishing is enabled.
+ecr_repositories = {
+  api = {
+    repository_suffix   = "api"
+    image_tag_mutability = "IMMUTABLE"
+    scan_on_push        = true
+    max_image_count     = 20
+  }
+  frontend = {
+    repository_suffix   = "frontend"
+    image_tag_mutability = "IMMUTABLE"
+    scan_on_push        = true
+    max_image_count     = 20
+  }
+}

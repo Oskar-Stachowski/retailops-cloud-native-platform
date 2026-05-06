@@ -142,6 +142,25 @@ variable "jenkins_trusted_role_arns" {
   type        = list(string)
   default     = []
 }
+
+variable "ecr_repositories" {
+  description = "ECR repositories for RetailOps container images."
+  type = map(object({
+    repository_suffix    = string
+    image_tag_mutability = optional(string, "IMMUTABLE")
+    scan_on_push         = optional(bool, true)
+    max_image_count      = optional(number, 20)
+  }))
+
+  default = {
+    api = {
+      repository_suffix = "api"
+    }
+    frontend = {
+      repository_suffix = "frontend"
+    }
+  }
+}
 module "tags" {
   source = "../../modules/tags"
 
@@ -200,6 +219,14 @@ module "iam" {
   jenkins_trusted_role_arns = var.jenkins_trusted_role_arns
 }
 
+module "ecr" {
+  source = "../../modules/ecr"
+
+  name_prefix  = module.tags.name_prefix
+  common_tags  = module.tags.common_tags
+  repositories = var.ecr_repositories
+}
+
 output "vpc_id" {
   description = "ID of the dev VPC baseline."
   value       = module.vpc.vpc_id
@@ -254,4 +281,29 @@ output "iam_access_keys_created" {
 output "iam_administrator_access_attached" {
   description = "Safety signal confirming that the IAM baseline does not attach AdministratorAccess."
   value       = module.iam.administrator_access_attached
+}
+
+output "ecr_repository_names" {
+  description = "ECR repository names keyed by component."
+  value       = module.ecr.repository_names
+}
+
+output "ecr_repository_urls" {
+  description = "ECR repository URLs keyed by component."
+  value       = module.ecr.repository_urls
+}
+
+output "ecr_repository_arns" {
+  description = "ECR repository ARNs keyed by component."
+  value       = module.ecr.repository_arns
+}
+
+output "ecr_scan_on_push_enabled" {
+  description = "Scan-on-push setting for each ECR repository."
+  value       = module.ecr.scan_on_push_enabled
+}
+
+output "ecr_lifecycle_policy_max_image_count" {
+  description = "Maximum number of images retained by lifecycle policy for each ECR repository."
+  value       = module.ecr.lifecycle_policy_max_image_count
 }

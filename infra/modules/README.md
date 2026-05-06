@@ -1,27 +1,14 @@
 # Terraform Modules
 
-This directory contains reusable Terraform modules for the RetailOps Platform.
+This directory contains reusable Terraform modules for the RetailOps AWS foundation.
 
 Current modules:
 
-- `tags` — shared naming and tagging baseline used by future AWS resources.
-- `vpc` — AWS networking baseline with VPC, public/private subnet assumptions, route tables, Internet Gateway, and baseline security groups.
-- `iam` — IAM baseline with a read-only Terraform plan policy and guarded future role patterns for CI/CD.
+| Module | Purpose | Current maturity |
+|---|---|---|
+| `tags` | Produces shared naming and tagging outputs for all future AWS resources. | Active governance module |
+| `vpc` | Defines the dev networking baseline: VPC, public/private subnets, route tables, Internet Gateway, and baseline security groups. | Plan-only infrastructure baseline |
+| `iam` | Defines a controlled IAM baseline for future Terraform plan validation and CI/CD trust patterns. | Plan-only security baseline |
+| `ecr` | Defines container image repositories and lifecycle policies for API and frontend images. | Plan-only delivery foundation |
 
-Planned future module areas may include:
-
-- ECR,
-- RDS,
-- EKS,
-- observability,
-- security controls,
-- budgets and cost monitoring.
-
-Module implementation should remain incremental. Each module should have a clear scope, cost impact, security assumption, and validation path before it is connected to an environment.
-
-Current module policy:
-
-- modules should be small and reusable,
-- modules should expose clear inputs and outputs,
-- modules should avoid creating AWS resources before the corresponding commit explicitly introduces them,
-- modules should support local validation with `terraform init -backend=false` and `terraform validate`.
+Module implementation should remain incremental. New modules should be added only when the corresponding AWS resource scope, cost impact, security assumptions, and validation path are clear.
