@@ -10,8 +10,12 @@ SHELL := /bin/bash
 -include .env
 
 COMPOSE ?= docker compose
-PYTHON ?= python3
-PIP ?= $(PYTHON) -m pip
+
+PYTHON ?= python3.11
+API_VENV_DIR ?= $(API_DIR)/.venv
+API_VENV_PYTHON ?= $(API_VENV_DIR)/bin/python
+API_VENV_PIP ?= $(API_VENV_PYTHON) -m pip
+
 NPM ?= npm
 
 API_DIR ?= services/api
@@ -86,11 +90,15 @@ ensure-reports-dir:
 # Dependency installation
 # -------------------------------------------------------------------
 
-.PHONY: install api-install frontend-install
+.PHONY: install api-venv api-install frontend-install
 install: api-install frontend-install
 
-api-install:
-	cd "services/api" && $(PIP) install -r requirements.txt
+api-venv:
+	$(PYTHON) -m venv "$(API_VENV_DIR)"
+	$(API_VENV_PYTHON) -m pip install --upgrade pip
+
+api-install: api-venv
+	$(API_VENV_PIP) install -r "$(API_DIR)/requirements.txt"
 
 frontend-install:
 	cd "$(FRONTEND_DIR)" && "$(NPM)" ci
@@ -101,8 +109,8 @@ frontend-install:
 
 .PHONY: api-test api-integration-test api-migrate api-seed data-generate db-up db-down
 
-api-test:
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" pytest
+api-test: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
 
 db-up:
 	$(COMPOSE) up -d db
@@ -110,17 +118,17 @@ db-up:
 db-down:
 	$(COMPOSE) down -v --remove-orphans
 
-data-generate:
-	$(PYTHON) -m data.generator.main
+data-generate: api-install
+	$(API_VENV_PYTHON) -m data.generator.main
 
-api-migrate:
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" alembic upgrade head
+api-migrate: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head
 
-api-seed:
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" python scripts/seed_demo_data.py
+api-seed: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python scripts/seed_demo_data.py
 
-api-integration-test: db-up data-generate api-migrate api-seed
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 pytest
+api-integration-test: api-install db-up data-generate api-migrate api-seed
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
 
 # -------------------------------------------------------------------
 # Frontend
