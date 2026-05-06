@@ -90,7 +90,7 @@ ensure-reports-dir:
 install: api-install frontend-install
 
 api-install:
-	cd "$(API_DIR)" && "$(PIP)" install -r requirements.txt
+	cd "services/api" && $(PIP) install -r requirements.txt
 
 frontend-install:
 	cd "$(FRONTEND_DIR)" && "$(NPM)" ci
