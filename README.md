@@ -189,11 +189,13 @@ The local environment runs a minimal full-stack setup:
 
 ```text
 Frontend → API → PostgreSQL
+          ↘ Redpanda event broker
 ```
 
 * Frontend: Nginx (static MVP UI)
 * API: FastAPI service
 * Database: PostgreSQL
+* Event broker: Redpanda, Kafka-compatible local broker for Sprint 9 real-time work
 
 ---
 
@@ -240,6 +242,7 @@ The local Docker Compose runtime starts the full RetailOps stack:
 
 ```text
 PostgreSQL -> migrations -> demo seed -> FastAPI API -> Nginx-served React frontend
+Redpanda -> Sprint 9 real-time event topics
 ```
 
 Run the stack in the background:
@@ -262,6 +265,20 @@ Useful URLs:
 * API: http://localhost:8000
 * API health: http://localhost:8000/health
 * Frontend API proxy: http://localhost:3000/api/health
+* Redpanda Kafka API: localhost:19092
+* Redpanda Admin API: http://localhost:19644
+
+Start only the local event broker and create topics:
+
+```bash
+make broker-up
+```
+
+List local event topics:
+
+```bash
+make broker-topics
+```
 
 Stop the stack:
 

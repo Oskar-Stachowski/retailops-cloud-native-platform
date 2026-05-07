@@ -48,12 +48,15 @@ POSTGRES_DB ?= retailops
 POSTGRES_USER ?= retailops_local
 POSTGRES_PASSWORD ?= retailops_local_dev_password
 POSTGRES_PORT ?= 5432
+REDPANDA_KAFKA_PORT ?= 19092
+REDPANDA_ADMIN_PORT ?= 19644
 
 API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
 APP_ENV ?= local
 
 DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
+RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
 
 API_IMAGE ?= retailops-api:local
 FRONTEND_IMAGE ?= retailops-frontend:local
@@ -70,10 +73,13 @@ export POSTGRES_DB
 export POSTGRES_USER
 export POSTGRES_PASSWORD
 export POSTGRES_PORT
+export REDPANDA_KAFKA_PORT
+export REDPANDA_ADMIN_PORT
 export API_PORT
 export FRONTEND_PORT
 export APP_ENV
 export DATABASE_URL
+export RETAILOPS_BROKER_BOOTSTRAP_SERVERS
 
 .PHONY: help
 help:
@@ -110,6 +116,8 @@ help:
 	@echo "  make docker-build         Build backend and frontend images"
 	@echo "  make compose-config       Validate Docker Compose config"
 	@echo "  make compose-up           Start full local stack"
+	@echo "  make broker-up            Start local Redpanda broker and create topics"
+	@echo "  make broker-topics        List local Redpanda topics"
 	@echo "  make compose-smoke        Run local smoke test against running stack"
 	@echo "  make compose-ci           Build, start, smoke-test, log on failure, cleanup"
 	@echo "  make compose-down         Stop and remove local stack"
@@ -327,7 +335,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke compose-rebuild-smoke compose-ci
+.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke compose-rebuild-smoke compose-ci broker-up broker-topics
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -338,6 +346,12 @@ compose-config:
 
 compose-up:
 	$(COMPOSE) up --build -d
+
+broker-up:
+	$(COMPOSE) up -d redpanda redpanda-init
+
+broker-topics:
+	$(COMPOSE) exec redpanda rpk topic list --brokers redpanda:9092
 
 compose-down:
 	$(COMPOSE) down -v --remove-orphans

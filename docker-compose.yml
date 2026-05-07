@@ -18,9 +18,70 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
+      RETAILOPS_BROKER_BOOTSTRAP_SERVERS: ${RETAILOPS_BROKER_BOOTSTRAP_SERVERS:-redpanda:9092}
     depends_on:
       seed:
         condition: service_completed_successfully
+
+  redpanda:
+    image: redpandadata/redpanda:v25.3.6
+    command:
+      - redpanda
+      - start
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr
+      - internal://redpanda:9092,external://localhost:${REDPANDA_KAFKA_PORT:-19092}
+      - --rpc-addr
+      - 0.0.0.0:33145
+      - --advertise-rpc-addr
+      - redpanda:33145
+      - --mode
+      - dev-container
+    ports:
+      - "${REDPANDA_KAFKA_PORT:-19092}:19092"
+      - "${REDPANDA_ADMIN_PORT:-19644}:9644"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -q 'Healthy:.*true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  redpanda-init:
+    image: redpandadata/redpanda:v25.3.6
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        for topic in \
+          retailops.sales.v1 \
+          retailops.inventory.v1 \
+          retailops.pricing.v1 \
+          retailops.intelligence.v1 \
+          retailops.operations.v1 \
+          retailops.dlq.v1
+        do
+          rpk -X brokers=redpanda:9092 topic create "$$topic" \
+            --partitions 3 \
+            --replicas 1 \
+            --if-not-exists
+        done
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    restart: "no"
 
   migrate:
     build:
@@ -70,3 +131,4 @@ services:
 
 volumes:
   postgres_data:
+  redpanda_data:

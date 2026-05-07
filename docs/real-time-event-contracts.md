@@ -55,6 +55,8 @@ Recommended local broker:
 
 - Redpanda for local Docker Compose because it is Kafka-compatible and simpler
   to run in a single-node developer setup.
+- Local setup details are documented in
+  [RetailOps Local Event Broker](local-event-broker.md).
 
 AWS mapping:
 
@@ -553,4 +555,3 @@ This commit is complete when:
 - live business and technical metrics are documented,
 - the implementation direction is clear enough for the next commit,
 - no production code or generated datasets are required.
-
