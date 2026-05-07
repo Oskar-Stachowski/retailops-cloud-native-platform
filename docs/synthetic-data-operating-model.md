@@ -9,6 +9,7 @@ data lake work, observability and MLOps.
 It complements:
 
 - [Synthetic Data Profiles](synthetic-data-profiles.md)
+- [Real-Time Event Contracts](real-time-event-contracts.md)
 - [Data README](../data/README.md)
 - [CI/CD README](../ci-cd/README.md)
 
@@ -188,6 +189,13 @@ Before using generated data for AWS data lake or MLOps evidence:
 - keep generated AWS datasets out of Git,
 - record manifest and quality reports as evidence.
 
+Real-time replay and streaming work should use
+[Real-Time Event Contracts](real-time-event-contracts.md) as the source of
+truth for event envelopes, topic names, event types, DLQ rules and live metrics.
+The synthetic profiles should remain the source of deterministic business
+signals, while event generation should translate those signals into replayable
+JSONL or broker-published events.
+
 For `large`, require these prerequisites first:
 
 - Parquet writer,
@@ -227,4 +235,3 @@ Generator is slow:
 - use `small` for local iteration,
 - reserve `medium` for manual validation,
 - wait for Parquet/chunked writer before using `large`.
-

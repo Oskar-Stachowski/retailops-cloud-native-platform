@@ -298,6 +298,9 @@ Example:
 The synthetic data platform must support both historical batch generation and
 real-time event generation.
 
+Detailed event envelope, topic naming, event type, DLQ and live metrics rules
+are defined in [Real-Time Event Contracts](real-time-event-contracts.md).
+
 Required event types:
 
 - `sale_completed`
