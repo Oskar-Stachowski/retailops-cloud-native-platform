@@ -192,6 +192,31 @@ variable "budget_notification_email_addresses" {
   sensitive   = true
 }
 
+variable "cloudwatch_log_groups" {
+  description = "CloudWatch log groups for the minimal AWS-native logging baseline."
+  type = map(object({
+    name_suffix       = string
+    retention_in_days = optional(number, 7)
+    kms_key_id        = optional(string)
+    skip_destroy      = optional(bool, false)
+  }))
+
+  default = {
+    api = {
+      name_suffix       = "api"
+      retention_in_days = 7
+    }
+    frontend = {
+      name_suffix       = "frontend"
+      retention_in_days = 7
+    }
+    platform = {
+      name_suffix       = "platform"
+      retention_in_days = 7
+    }
+  }
+}
+
 module "tags" {
   source = "../../modules/tags"
 
@@ -268,6 +293,16 @@ module "budget" {
   monthly_budget_limit_usd     = var.monthly_budget_limit_usd
   enable_budget_notifications  = var.enable_budget_notifications
   notification_email_addresses = var.budget_notification_email_addresses
+}
+
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
+
+  project_name = var.project_name
+  environment  = var.environment
+  name_prefix  = module.tags.name_prefix
+  common_tags  = module.tags.common_tags
+  log_groups   = var.cloudwatch_log_groups
 }
 
 output "vpc_id" {
@@ -376,3 +411,28 @@ output "budget_private_notification_data_committed" {
   value       = module.budget.private_notification_data_committed
 }
 
+
+output "cloudwatch_log_group_names" {
+  description = "CloudWatch log group names keyed by component."
+  value       = module.cloudwatch.log_group_names
+}
+
+output "cloudwatch_log_group_arns" {
+  description = "CloudWatch log group ARNs keyed by component."
+  value       = module.cloudwatch.log_group_arns
+}
+
+output "cloudwatch_retention_in_days" {
+  description = "CloudWatch log retention in days keyed by component."
+  value       = module.cloudwatch.retention_in_days
+}
+
+output "cloudwatch_log_group_count" {
+  description = "Number of CloudWatch log groups defined by the baseline module."
+  value       = module.cloudwatch.log_group_count
+}
+
+output "cloudwatch_enterprise_observability_enabled" {
+  description = "Safety signal confirming this is only a logging baseline, not a full enterprise observability stack."
+  value       = module.cloudwatch.enterprise_observability_enabled
+}

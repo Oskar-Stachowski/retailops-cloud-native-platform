@@ -73,3 +73,20 @@ monthly_budget_limit_usd           = 10
 enable_budget_notifications        = false
 budget_notification_email_addresses = []
 
+
+# CloudWatch logging baseline
+# Short retention keeps the dev observability baseline cost-aware.
+cloudwatch_log_groups = {
+  api = {
+    name_suffix       = "api"
+    retention_in_days = 7
+  }
+  frontend = {
+    name_suffix       = "frontend"
+    retention_in_days = 7
+  }
+  platform = {
+    name_suffix       = "platform"
+    retention_in_days = 7
+  }
+}
