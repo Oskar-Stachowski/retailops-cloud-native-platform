@@ -52,6 +52,8 @@ def test_demo_profile_keeps_current_dataset_shape() -> None:
     assert len(tables["users"]) == 4
     assert len(tables["stores"]) == 4
     assert len(tables["warehouses"]) == 4
+    assert len(tables["orders"]) == 16
+    assert len(tables["order_items"]) == 16
     assert len(tables["sales"]) == 16
     assert len(tables["inventory_snapshots"]) == 8
     assert len(tables["forecasts"]) == 6
@@ -80,6 +82,37 @@ def test_demo_profile_generates_store_and_warehouse_dimensions() -> None:
     assert {warehouse["status"] for warehouse in tables["warehouses"]} == {
         "active"
     }
+
+
+def test_demo_profile_generates_orders_and_order_items_from_sales() -> None:
+    tables = build_dataset(DatasetGenerationConfig(profile="demo"))
+
+    sales_by_reference = {
+        sale["order_reference"]: sale for sale in tables["sales"]
+    }
+    orders_by_reference = {
+        order["order_reference"]: order for order in tables["orders"]
+    }
+    order_items_by_order_id = {
+        order_item["order_id"]: order_item
+        for order_item in tables["order_items"]
+    }
+    store_ids = {store["id"] for store in tables["stores"]}
+
+    assert set(orders_by_reference) == set(sales_by_reference)
+
+    for order_reference, order in orders_by_reference.items():
+        sale = sales_by_reference[order_reference]
+        order_item = order_items_by_order_id[order["id"]]
+
+        assert order["store_id"] in store_ids
+        assert order["status"] == "completed"
+        assert order["order_total"] == sale["total_amount"]
+        assert order["currency"] == sale["currency"]
+        assert order["ordered_at"] == sale["sold_at"]
+        assert order_item["product_id"] == sale["product_id"]
+        assert order_item["quantity"] == sale["quantity"]
+        assert order_item["total_amount"] == sale["total_amount"]
 
 
 @pytest.mark.parametrize(
