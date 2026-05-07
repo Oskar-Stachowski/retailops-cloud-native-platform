@@ -50,6 +50,8 @@ def test_demo_profile_keeps_current_dataset_shape() -> None:
 
     assert len(tables["products"]) == 8
     assert len(tables["users"]) == 4
+    assert len(tables["stores"]) == 4
+    assert len(tables["warehouses"]) == 4
     assert len(tables["sales"]) == 16
     assert len(tables["inventory_snapshots"]) == 8
     assert len(tables["forecasts"]) == 6
@@ -57,6 +59,27 @@ def test_demo_profile_keeps_current_dataset_shape() -> None:
     assert len(tables["alerts"]) == 4
     assert len(tables["recommendations"]) == 4
     assert len(tables["workflow_actions"]) == 4
+
+
+def test_demo_profile_generates_store_and_warehouse_dimensions() -> None:
+    tables = build_dataset(DatasetGenerationConfig(profile="demo"))
+
+    store_codes = {store["store_code"] for store in tables["stores"]}
+    warehouse_codes = {
+        warehouse["warehouse_code"] for warehouse in tables["warehouses"]
+    }
+
+    assert store_codes == {
+        "WAW-STORE-01",
+        "GDN-STORE-01",
+        "KRK-STORE-01",
+        "BER-MKT-01",
+    }
+    assert warehouse_codes == {"WAW-01", "GDN-01", "KRK-01", "POZ-01"}
+    assert {store["status"] for store in tables["stores"]} == {"active"}
+    assert {warehouse["status"] for warehouse in tables["warehouses"]} == {
+        "active"
+    }
 
 
 @pytest.mark.parametrize(

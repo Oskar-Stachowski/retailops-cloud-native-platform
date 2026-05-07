@@ -1,0 +1,5 @@
+id,store_code,name,region,country,city,channel,status
+874f0eb8-6087-5e64-bd2f-06ff15acc24d,WAW-STORE-01,RetailOps Warsaw Central,PL-Central,PL,Warsaw,store,active
+59ecec1c-8735-5ba4-8418-1c25aedf147d,GDN-STORE-01,RetailOps Gdansk North,PL-North,PL,Gdansk,store,active
+056c3cf9-d927-53f1-9dcb-06865218b2d2,KRK-STORE-01,RetailOps Krakow South,PL-South,PL,Krakow,store,active
+a3363c7b-79fa-500c-8d13-37f1c4de96e5,BER-MKT-01,RetailOps Berlin Marketplace,DE-East,DE,Berlin,marketplace,active

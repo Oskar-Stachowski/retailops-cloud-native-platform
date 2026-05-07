@@ -20,6 +20,8 @@ The current generator creates deterministic CSV files for:
 
 - products
 - users
+- stores
+- warehouses
 - sales
 - inventory snapshots
 - forecasts
@@ -403,4 +405,3 @@ data/synthetic/
 data/generated/
 data/replay/
 ```
-

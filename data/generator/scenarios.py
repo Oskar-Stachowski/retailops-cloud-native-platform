@@ -102,6 +102,72 @@ USER_BLUEPRINTS: list[dict[str, str]] = [
     },
 ]
 
+STORE_BLUEPRINTS: list[dict[str, str]] = [
+    {
+        "store_code": "WAW-STORE-01",
+        "name": "RetailOps Warsaw Central",
+        "region": "PL-Central",
+        "country": "PL",
+        "city": "Warsaw",
+        "channel": "store",
+    },
+    {
+        "store_code": "GDN-STORE-01",
+        "name": "RetailOps Gdansk North",
+        "region": "PL-North",
+        "country": "PL",
+        "city": "Gdansk",
+        "channel": "store",
+    },
+    {
+        "store_code": "KRK-STORE-01",
+        "name": "RetailOps Krakow South",
+        "region": "PL-South",
+        "country": "PL",
+        "city": "Krakow",
+        "channel": "store",
+    },
+    {
+        "store_code": "BER-MKT-01",
+        "name": "RetailOps Berlin Marketplace",
+        "region": "DE-East",
+        "country": "DE",
+        "city": "Berlin",
+        "channel": "marketplace",
+    },
+]
+
+WAREHOUSE_BLUEPRINTS: list[dict[str, str]] = [
+    {
+        "warehouse_code": "WAW-01",
+        "name": "Warsaw Fulfillment Center",
+        "region": "PL-Central",
+        "country": "PL",
+        "city": "Warsaw",
+    },
+    {
+        "warehouse_code": "GDN-01",
+        "name": "Gdansk Regional Warehouse",
+        "region": "PL-North",
+        "country": "PL",
+        "city": "Gdansk",
+    },
+    {
+        "warehouse_code": "KRK-01",
+        "name": "Krakow Regional Warehouse",
+        "region": "PL-South",
+        "country": "PL",
+        "city": "Krakow",
+    },
+    {
+        "warehouse_code": "POZ-01",
+        "name": "Poznan Overflow Warehouse",
+        "region": "PL-Central",
+        "country": "PL",
+        "city": "Poznan",
+    },
+]
+
 CHANNELS = ["online", "store", "marketplace", "wholesale"]
 REGIONS = ["PL-North", "PL-Central", "PL-South", "DE-East"]
 WAREHOUSES = ["WAW-01", "GDN-01", "KRK-01", "POZ-01"]

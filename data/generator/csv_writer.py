@@ -6,6 +6,25 @@ from pathlib import Path
 TABLE_COLUMNS: dict[str, list[str]] = {
     "products": ["id", "sku", "name", "category", "brand", "status"],
     "users": ["id", "login", "display_name", "role", "team", "status"],
+    "stores": [
+        "id",
+        "store_code",
+        "name",
+        "region",
+        "country",
+        "city",
+        "channel",
+        "status",
+    ],
+    "warehouses": [
+        "id",
+        "warehouse_code",
+        "name",
+        "region",
+        "country",
+        "city",
+        "status",
+    ],
     "sales": [
         "id",
         "product_id",
