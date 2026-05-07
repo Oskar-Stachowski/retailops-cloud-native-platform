@@ -16,6 +16,10 @@ anomalies, alerts, recommendations and workflow actions. The goal is to keep
 business rules in Python and keep SQL seeding limited to loading validated CSV
 files into PostgreSQL.
 
+The current dataset is intentionally small and optimized for local API tests.
+The target strategy for larger generated datasets is documented in
+[RetailOps Synthetic Data Profiles](../docs/synthetic-data-profiles.md).
+
 ## Generate CSV files
 
 From the repository root:
