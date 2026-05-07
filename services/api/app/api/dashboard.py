@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query, status
 
 from app.api.schemas import (
+    DashboardLiveOperationsResponse,
     DashboardOperationalVisibilityResponse,
     DashboardRecommendationResponse,
     DashboardSalesTrendResponse,
@@ -56,6 +57,50 @@ def get_operational_visibility(
     return dashboard_service.get_operational_visibility(
         sales_trend_days=sales_trend_days,
         work_items_limit=work_items_limit,
+    )
+
+
+@router.get(
+    "/live-operations",
+    response_model=DashboardLiveOperationsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get live operations metrics",
+    description=(
+        "Returns real-time dashboard data derived from persisted event stream "
+        "metrics: live sales counters, event freshness, processing status, "
+        "recent stream events, alert-like events and consumer state."
+    ),
+)
+def get_live_operations(
+    window_minutes: Annotated[
+        int,
+        Query(
+            ge=1,
+            le=240,
+            description="Trailing live window used to aggregate metric observations.",
+        ),
+    ] = 15,
+    recent_events_limit: Annotated[
+        int,
+        Query(
+            ge=1,
+            le=100,
+            description="Maximum number of recent stream events to return.",
+        ),
+    ] = 20,
+    alerts_limit: Annotated[
+        int,
+        Query(
+            ge=1,
+            le=100,
+            description="Maximum number of recent alert-like events to return.",
+        ),
+    ] = 10,
+):
+    return dashboard_service.get_live_operations(
+        window_minutes=window_minutes,
+        recent_events_limit=recent_events_limit,
+        alerts_limit=alerts_limit,
     )
 
 

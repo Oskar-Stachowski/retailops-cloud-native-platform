@@ -52,3 +52,17 @@ then the final processed state.
 
 That keeps replay safe and lets the real-time stream be regenerated from the
 synthetic replay files without double counting live metrics.
+
+## API Read Model
+
+`GET /dashboard/live-operations` returns the live dashboard read model backed by
+these tables.
+
+The response includes:
+
+- live sales, returns, stock, anomaly and alert counters for a trailing window,
+- event status counters,
+- latest event freshness,
+- recent stream events,
+- recent alert-like events,
+- persisted consumer state.

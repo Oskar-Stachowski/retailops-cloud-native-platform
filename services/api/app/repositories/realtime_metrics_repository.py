@@ -6,7 +6,8 @@ from typing import Any
 
 from psycopg.rows import dict_row
 
-from app.db.connection import fetch_one, get_connection
+from app.db.connection import fetch_all, fetch_one, get_connection
+from app.db.introspection import table_exists
 
 
 class RealtimeMetricsRepository:
@@ -87,6 +88,125 @@ class RealtimeMetricsRepository:
     def is_event_processed(self, event_id: str) -> bool:
         row = self.get_event_record(event_id)
         return bool(row and row.get("status") == "processed")
+
+    def get_live_metric_totals(self, window_minutes: int) -> list[dict[str, Any]]:
+        if not table_exists("live_metric_observations"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                metric_name,
+                COALESCE(SUM(metric_value), 0)::float AS metric_value,
+                COUNT(*)::int AS observation_count,
+                MAX(observed_at) AS latest_observed_at
+            FROM live_metric_observations
+            WHERE observed_at >= now() - (%s::int * INTERVAL '1 minute')
+            GROUP BY metric_name
+            ORDER BY metric_name ASC;
+            """,
+            (window_minutes,),
+        )
+
+    def get_event_status_counts(self, window_minutes: int) -> list[dict[str, Any]]:
+        if not table_exists("realtime_event_log"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                status,
+                COUNT(*)::int AS event_count
+            FROM realtime_event_log
+            WHERE ingested_at >= now() - (%s::int * INTERVAL '1 minute')
+            GROUP BY status
+            ORDER BY status ASC;
+            """,
+            (window_minutes,),
+        )
+
+    def get_event_freshness(self) -> dict[str, Any] | None:
+        if not table_exists("realtime_event_log"):
+            return None
+
+        return self._fetch_one(
+            """
+            SELECT
+                MAX(ingested_at) AS latest_event_at,
+                EXTRACT(EPOCH FROM (now() - MAX(ingested_at)))::float
+                    AS freshness_seconds
+            FROM realtime_event_log;
+            """,
+        )
+
+    def get_recent_events(self, limit: int) -> list[dict[str, Any]]:
+        if not table_exists("realtime_event_log"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                event_id,
+                event_type,
+                topic,
+                status,
+                occurred_at,
+                ingested_at,
+                processed_at,
+                error_message
+            FROM realtime_event_log
+            ORDER BY ingested_at DESC, occurred_at DESC
+            LIMIT %s;
+            """,
+            (limit,),
+        )
+
+    def get_recent_operational_alerts(self, limit: int) -> list[dict[str, Any]]:
+        if not table_exists("realtime_event_log"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                event_id,
+                event_type,
+                status,
+                occurred_at,
+                ingested_at,
+                payload
+            FROM realtime_event_log
+            WHERE event_type IN ('alert_created', 'anomaly_detected')
+            ORDER BY ingested_at DESC, occurred_at DESC
+            LIMIT %s;
+            """,
+            (limit,),
+        )
+
+    def get_consumer_states(self) -> list[dict[str, Any]]:
+        if not table_exists("realtime_consumer_state"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                consumer_name,
+                running,
+                received_events,
+                processed_events,
+                failed_events,
+                dead_lettered_events,
+                ignored_events,
+                last_event_id,
+                last_event_type,
+                last_error,
+                last_processed_at,
+                started_at,
+                stopped_at,
+                updated_at
+            FROM realtime_consumer_state
+            ORDER BY updated_at DESC, consumer_name ASC;
+            """,
+        )
 
     def record_event_log(
         self,
@@ -171,6 +291,18 @@ class RealtimeMetricsRepository:
                 payload,
             ),
         )
+
+    def _fetch_all(
+        self,
+        query: str,
+        params: tuple[Any, ...] = (),
+    ) -> list[dict[str, Any]]:
+        if self.connection is None:
+            return fetch_all(query, params)
+
+        with self.connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(query, params)
+            return [dict(row) for row in cursor.fetchall()]
 
     def replace_metric_observations(
         self,

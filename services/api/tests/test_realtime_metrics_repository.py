@@ -9,6 +9,7 @@ from app.repositories.realtime_metrics_repository import (
 class FakeCursor:
     def __init__(self, fetchone_result=None) -> None:
         self.fetchone_result = fetchone_result
+        self.fetchall_result = []
         self.executed: list[tuple[str, tuple | None]] = []
         self.executemany_calls: list[tuple[str, list[tuple]]] = []
 
@@ -20,6 +21,9 @@ class FakeCursor:
 
     def fetchone(self):
         return self.fetchone_result
+
+    def fetchall(self):
+        return self.fetchall_result
 
     def __enter__(self):
         return self
@@ -102,3 +106,25 @@ def test_realtime_metrics_repository_persists_event_log_and_state() -> None:
 
     assert state_row == event_row
     assert cursor.executed[-1][0].startswith("INSERT INTO realtime_consumer_state")
+
+
+def test_realtime_metrics_repository_reads_live_metric_totals(monkeypatch) -> None:
+    cursor = FakeCursor()
+    cursor.fetchall_result = [
+        {
+            "metric_name": "live_revenue",
+            "metric_value": 499.4,
+            "observation_count": 12,
+            "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+        }
+    ]
+    repository = RealtimeMetricsRepository(connection=FakeConnection(cursor))
+    monkeypatch.setattr(
+        "app.repositories.realtime_metrics_repository.table_exists",
+        lambda table_name: True,
+    )
+
+    rows = repository.get_live_metric_totals(window_minutes=15)
+
+    assert rows[0]["metric_name"] == "live_revenue"
+    assert cursor.executed[0][1] == (15,)

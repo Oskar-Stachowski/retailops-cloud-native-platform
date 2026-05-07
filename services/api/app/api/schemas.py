@@ -5,6 +5,7 @@ predictable for frontend, tests, OpenAPI docs and future clients.
 """
 
 from datetime import date, datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -213,6 +214,110 @@ class DashboardOperationalVisibilityResponse(ApiBaseModel):
     stock_risk_summary: DashboardStockRiskSummary
     sales_trend: list[DashboardSalesTrendItem]
     open_work_items: list[DashboardWorkItem]
+    limits: dict[str, int]
+
+
+class DashboardLiveMetricValue(ApiBaseModel):
+    """Raw live metric value with observation metadata."""
+
+    value: float
+    observation_count: int = Field(..., ge=0)
+    latest_observed_at: datetime | None = None
+
+
+class DashboardLiveMetrics(ApiBaseModel):
+    """Normalized live operational counters for the selected window."""
+
+    revenue: float = Field(..., ge=0)
+    units_sold: float = Field(..., ge=0)
+    orders_created: float = Field(..., ge=0)
+    sales_events: float = Field(..., ge=0)
+    return_amount: float = Field(..., ge=0)
+    return_units: float = Field(..., ge=0)
+    stock_delta: float
+    stock_events: float = Field(..., ge=0)
+    replenishment_units: float = Field(..., ge=0)
+    anomalies_detected: float = Field(..., ge=0)
+    alerts_created: float = Field(..., ge=0)
+    workflow_actions: float = Field(..., ge=0)
+    raw_metrics: dict[str, DashboardLiveMetricValue]
+
+
+class DashboardLiveEventStatusCounts(ApiBaseModel):
+    """Event processing counters for the selected live window."""
+
+    received: int = Field(..., ge=0)
+    processed: int = Field(..., ge=0)
+    failed_dead_lettered: int = Field(..., ge=0)
+    ignored_duplicate: int = Field(..., ge=0)
+    total: int = Field(..., ge=0)
+
+
+class DashboardLiveFreshness(ApiBaseModel):
+    """Freshness metadata for the real-time event stream."""
+
+    latest_event_at: datetime | None = None
+    freshness_seconds: float | None = Field(default=None, ge=0)
+    is_fresh: bool
+
+
+class DashboardLiveEvent(ApiBaseModel):
+    """Recent processed event shown in live operations views."""
+
+    event_id: str
+    event_type: str | None = None
+    topic: str | None = None
+    status: str | None = None
+    occurred_at: datetime | None = None
+    ingested_at: datetime | None = None
+    processed_at: datetime | None = None
+    error_message: str | None = None
+
+
+class DashboardLiveAlert(ApiBaseModel):
+    """Recent alert-like event from the real-time stream."""
+
+    event_id: str
+    event_type: str | None = None
+    status: str | None = None
+    occurred_at: datetime | None = None
+    ingested_at: datetime | None = None
+    product_id: str | None = None
+    severity: str | None = None
+    title: str | None = None
+    payload: dict[str, Any]
+
+
+class DashboardLiveConsumerState(ApiBaseModel):
+    """Persisted consumer state for live operations monitoring."""
+
+    consumer_name: str
+    running: bool
+    received_events: int = Field(..., ge=0)
+    processed_events: int = Field(..., ge=0)
+    failed_events: int = Field(..., ge=0)
+    dead_lettered_events: int = Field(..., ge=0)
+    ignored_events: int = Field(..., ge=0)
+    last_event_id: str | None = None
+    last_event_type: str | None = None
+    last_error: str | None = None
+    last_processed_at: datetime | None = None
+    started_at: datetime | None = None
+    stopped_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class DashboardLiveOperationsResponse(ApiBaseModel):
+    """Composite live operations response backed by real-time metrics tables."""
+
+    generated_at: datetime
+    window_minutes: int = Field(..., ge=1, le=240)
+    metrics: DashboardLiveMetrics
+    event_status_counts: DashboardLiveEventStatusCounts
+    freshness: DashboardLiveFreshness
+    recent_events: list[DashboardLiveEvent]
+    alerts: list[DashboardLiveAlert]
+    consumer_states: list[DashboardLiveConsumerState]
     limits: dict[str, int]
 
 

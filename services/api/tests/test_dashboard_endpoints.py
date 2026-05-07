@@ -64,6 +64,93 @@ def sample_stock_risk_summary() -> dict:
     }
 
 
+def sample_live_operations() -> dict:
+    return {
+        "generated_at": "2026-05-01T12:00:00+00:00",
+        "window_minutes": 15,
+        "metrics": {
+            "revenue": 499.40,
+            "units_sold": 25,
+            "orders_created": 9,
+            "sales_events": 12,
+            "return_amount": 39.90,
+            "return_units": 1,
+            "stock_delta": -7,
+            "stock_events": 3,
+            "replenishment_units": 50,
+            "anomalies_detected": 1,
+            "alerts_created": 1,
+            "workflow_actions": 2,
+            "raw_metrics": {
+                "live_revenue": {
+                    "value": 499.40,
+                    "observation_count": 12,
+                    "latest_observed_at": "2026-05-01T11:59:00+00:00",
+                }
+            },
+        },
+        "event_status_counts": {
+            "received": 0,
+            "processed": 15,
+            "failed_dead_lettered": 1,
+            "ignored_duplicate": 2,
+            "total": 18,
+        },
+        "freshness": {
+            "latest_event_at": "2026-05-01T11:59:00+00:00",
+            "freshness_seconds": 42,
+            "is_fresh": True,
+        },
+        "recent_events": [
+            {
+                "event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV2",
+                "event_type": "sale_completed",
+                "topic": "retailops.sales.v1",
+                "status": "processed",
+                "occurred_at": "2026-05-01T11:58:59+00:00",
+                "ingested_at": "2026-05-01T11:59:00+00:00",
+                "processed_at": "2026-05-01T11:59:01+00:00",
+                "error_message": None,
+            }
+        ],
+        "alerts": [
+            {
+                "event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV3",
+                "event_type": "alert_created",
+                "status": "processed",
+                "occurred_at": "2026-05-01T11:57:00+00:00",
+                "ingested_at": "2026-05-01T11:57:01+00:00",
+                "product_id": "22222222-2222-2222-2222-222222222222",
+                "severity": "high",
+                "title": "Potential stockout risk",
+                "payload": {"severity": "high"},
+            }
+        ],
+        "consumer_states": [
+            {
+                "consumer_name": "retailops-realtime-consumer",
+                "running": True,
+                "received_events": 18,
+                "processed_events": 15,
+                "failed_events": 1,
+                "dead_lettered_events": 1,
+                "ignored_events": 2,
+                "last_event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV2",
+                "last_event_type": "sale_completed",
+                "last_error": None,
+                "last_processed_at": "2026-05-01T11:59:01+00:00",
+                "started_at": "2026-05-01T11:00:00+00:00",
+                "stopped_at": None,
+                "updated_at": "2026-05-01T11:59:01+00:00",
+            }
+        ],
+        "limits": {
+            "recent_events": 5,
+            "alerts": 3,
+        },
+    }
+
+
 def test_dashboard_summary_endpoint_returns_expected_shape(monkeypatch):
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_summary",
@@ -235,6 +322,49 @@ def test_dashboard_operational_visibility_endpoint_rejects_invalid_params():
     response = client.get(
         "/dashboard/operational-visibility?"
         "sales_trend_days=0&work_items_limit=10"
+    )
+
+    assert response.status_code == 422
+
+
+def test_dashboard_live_operations_endpoint_returns_expected_shape(monkeypatch):
+    monkeypatch.setattr(
+        "app.api.dashboard.dashboard_service.get_live_operations",
+        lambda window_minutes=15, recent_events_limit=20, alerts_limit=10: {
+            **sample_live_operations(),
+            "window_minutes": window_minutes,
+            "limits": {
+                "recent_events": recent_events_limit,
+                "alerts": alerts_limit,
+            },
+        },
+    )
+
+    response = client.get(
+        "/dashboard/live-operations?"
+        "window_minutes=15&recent_events_limit=5&alerts_limit=3"
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["window_minutes"] == 15
+    assert payload["metrics"]["revenue"] == 499.40
+    assert payload["event_status_counts"]["failed_dead_lettered"] == 1
+    assert payload["freshness"]["is_fresh"] is True
+    assert payload["recent_events"][0]["event_type"] == "sale_completed"
+    assert payload["alerts"][0]["severity"] == "high"
+    assert payload["consumer_states"][0]["consumer_name"] == (
+        "retailops-realtime-consumer"
+    )
+    assert payload["limits"]["recent_events"] == 5
+    assert payload["limits"]["alerts"] == 3
+
+
+def test_dashboard_live_operations_endpoint_rejects_invalid_params():
+    response = client.get(
+        "/dashboard/live-operations?"
+        "window_minutes=0&recent_events_limit=20&alerts_limit=10"
     )
 
     assert response.status_code == 422
