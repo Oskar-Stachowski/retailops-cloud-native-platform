@@ -56,6 +56,8 @@ def test_demo_profile_keeps_current_dataset_shape() -> None:
     assert len(tables["order_items"]) == 16
     assert len(tables["price_history"]) == 24
     assert len(tables["promotions"]) == 8
+    assert len(tables["stock_movements"]) == 24
+    assert len(tables["returns"]) == 4
     assert len(tables["sales"]) == 16
     assert len(tables["inventory_snapshots"]) == 8
     assert len(tables["forecasts"]) == 6
@@ -150,6 +152,52 @@ def test_demo_profile_generates_price_history_and_promotions() -> None:
         assert promotion["starts_at"] <= promotion["ends_at"]
         assert promotion["status"] == "active"
         promotion_codes.add(promotion["promotion_code"])
+
+
+def test_demo_profile_generates_stock_movements() -> None:
+    tables = build_dataset(DatasetGenerationConfig(profile="demo"))
+
+    product_ids = {product["id"] for product in tables["products"]}
+    warehouse_ids = {warehouse["id"] for warehouse in tables["warehouses"]}
+    movement_types = {
+        movement["movement_type"] for movement in tables["stock_movements"]
+    }
+
+    assert movement_types == {"initial_stock", "sale"}
+
+    for movement in tables["stock_movements"]:
+        assert movement["product_id"] in product_ids
+        assert movement["warehouse_id"] in warehouse_ids
+        assert movement["warehouse_code"]
+        assert movement["source_reference"]
+        assert movement["occurred_at"]
+        if movement["movement_type"] == "initial_stock":
+            assert int(movement["quantity"]) >= 0
+        if movement["movement_type"] == "sale":
+            assert int(movement["quantity"]) < 0
+
+
+def test_demo_profile_generates_returns_from_order_items() -> None:
+    tables = build_dataset(DatasetGenerationConfig(profile="demo"))
+
+    order_ids = {order["id"] for order in tables["orders"]}
+    order_item_by_id = {
+        order_item["id"]: order_item for order_item in tables["order_items"]
+    }
+    product_ids = {product["id"] for product in tables["products"]}
+
+    for returned_item in tables["returns"]:
+        order_item = order_item_by_id[returned_item["order_item_id"]]
+
+        assert returned_item["order_id"] in order_ids
+        assert returned_item["product_id"] in product_ids
+        assert returned_item["product_id"] == order_item["product_id"]
+        assert int(returned_item["quantity"]) > 0
+        assert int(returned_item["quantity"]) <= int(order_item["quantity"])
+        assert float(returned_item["refund_amount"]) > 0
+        assert returned_item["currency"] == order_item["currency"]
+        assert returned_item["reason"] == "customer_return"
+        assert returned_item["status"] == "received"
 
 
 @pytest.mark.parametrize(

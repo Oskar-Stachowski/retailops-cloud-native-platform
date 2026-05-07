@@ -12,10 +12,10 @@ data/
 ```
 
 The generator creates products, users, stores, warehouses, orders, order items,
-price history, promotions, sales, inventory snapshots, forecasts, anomalies,
-alerts, recommendations and workflow actions. The goal is to keep business
-rules in Python and keep SQL seeding limited to loading validated CSV files into
-PostgreSQL.
+price history, promotions, stock movements, returns, sales, inventory snapshots,
+forecasts, anomalies, alerts, recommendations and workflow actions. The goal is
+to keep business rules in Python and keep SQL seeding limited to loading
+validated CSV files into PostgreSQL.
 
 The current dataset is intentionally small and optimized for local API tests.
 The target strategy for larger generated datasets is documented in

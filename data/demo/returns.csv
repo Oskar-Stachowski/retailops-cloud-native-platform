@@ -1,0 +1,5 @@
+id,order_id,order_item_id,product_id,quantity,refund_amount,currency,reason,status,returned_at
+e9bcf7b2-12db-5550-aabf-482bf53193dc,c5751476-7b8d-54c3-87ae-d8b7c555903c,4c5f547e-d31d-544a-9bd3-acae799e9e95,85710dbe-1aea-50ac-a155-fb216e12ab97,1,299.00,PLN,customer_return,received,2026-05-01T08:00:00+00:00
+a99127d8-a36b-53be-826f-cfe406fdfbeb,2e33d1d0-b4a2-5fb8-913b-949c0d9a9368,a4191980-a2ad-5f0d-b63f-0a894f6a027a,6278ab71-66cf-59be-bde6-8645ae6b310a,3,18.90,PLN,customer_return,received,2026-05-03T13:00:00+00:00
+989a7060-adb3-501e-98b8-a5ecacd6cf7f,8f6863fd-a06e-57bc-9f5d-d069504acb76,586df605-472b-51b7-b42e-686c2e672bce,ad8f3dd1-2dc6-5571-bc9f-f0b6504c8679,4,316.00,PLN,customer_return,received,2026-05-02T18:00:00+00:00
+088c2f94-053f-5831-b3cf-d6bfee232b29,4d14689e-5af8-5d63-b68e-444550a7f407,8351bce7-42f9-5d0a-a4d8-417fa86f47c5,a24a7f85-d830-55e5-90e4-afb122abd0ce,5,339.00,PLN,customer_return,received,2026-05-01T23:00:00+00:00

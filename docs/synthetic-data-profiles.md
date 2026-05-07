@@ -26,6 +26,8 @@ The current generator creates deterministic CSV files for:
 - order items
 - price history
 - promotions
+- stock movements
+- returns
 - sales
 - inventory snapshots
 - forecasts
