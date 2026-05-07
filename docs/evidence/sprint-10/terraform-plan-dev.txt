@@ -1,0 +1,816 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.budget.aws_budgets_budget.monthly_cost[0] will be created
+  + resource "aws_budgets_budget" "monthly_cost" {
+      + account_id        = (known after apply)
+      + arn               = (known after apply)
+      + budget_type       = "COST"
+      + id                = (known after apply)
+      + limit_amount      = "10.00"
+      + limit_unit        = "USD"
+      + name              = "retailops-dev-monthly-cost-guardrail"
+      + name_prefix       = (known after apply)
+      + tags              = {
+          + "Component"   = "finops"
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Guardrail"   = "monthly-budget"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-monthly-cost-guardrail"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + tags_all          = {
+          + "Component"   = "finops"
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Guardrail"   = "monthly-budget"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-monthly-cost-guardrail"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + time_period_end   = "2087-06-15_00:00"
+      + time_period_start = (known after apply)
+      + time_unit         = "MONTHLY"
+
+      + cost_filter (known after apply)
+
+      + cost_types (known after apply)
+    }
+
+  # module.cloudwatch.aws_cloudwatch_log_group.this["api"] will be created
+  + resource "aws_cloudwatch_log_group" "this" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/retailops/dev/api"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags              = {
+          + "Component"     = "api"
+          + "CostCenter"    = "portfolio"
+          + "Environment"   = "dev"
+          + "Lifecycle"     = "temporary"
+          + "ManagedBy"     = "terraform"
+          + "Name"          = "retailops-dev-api-logs"
+          + "Owner"         = "oskar"
+          + "Project"       = "retailops"
+          + "ResourceType"  = "cloudwatch-log-group"
+          + "RetentionDays" = "7"
+          + "Sprint"        = "sprint-10"
+          + "Workload"      = "platform-foundation"
+        }
+      + tags_all          = {
+          + "Component"     = "api"
+          + "CostCenter"    = "portfolio"
+          + "Environment"   = "dev"
+          + "Lifecycle"     = "temporary"
+          + "ManagedBy"     = "terraform"
+          + "Name"          = "retailops-dev-api-logs"
+          + "Owner"         = "oskar"
+          + "Project"       = "retailops"
+          + "ResourceType"  = "cloudwatch-log-group"
+          + "RetentionDays" = "7"
+          + "Sprint"        = "sprint-10"
+          + "Workload"      = "platform-foundation"
+        }
+    }
+
+  # module.cloudwatch.aws_cloudwatch_log_group.this["frontend"] will be created
+  + resource "aws_cloudwatch_log_group" "this" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/retailops/dev/frontend"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags              = {
+          + "Component"     = "frontend"
+          + "CostCenter"    = "portfolio"
+          + "Environment"   = "dev"
+          + "Lifecycle"     = "temporary"
+          + "ManagedBy"     = "terraform"
+          + "Name"          = "retailops-dev-frontend-logs"
+          + "Owner"         = "oskar"
+          + "Project"       = "retailops"
+          + "ResourceType"  = "cloudwatch-log-group"
+          + "RetentionDays" = "7"
+          + "Sprint"        = "sprint-10"
+          + "Workload"      = "platform-foundation"
+        }
+      + tags_all          = {
+          + "Component"     = "frontend"
+          + "CostCenter"    = "portfolio"
+          + "Environment"   = "dev"
+          + "Lifecycle"     = "temporary"
+          + "ManagedBy"     = "terraform"
+          + "Name"          = "retailops-dev-frontend-logs"
+          + "Owner"         = "oskar"
+          + "Project"       = "retailops"
+          + "ResourceType"  = "cloudwatch-log-group"
+          + "RetentionDays" = "7"
+          + "Sprint"        = "sprint-10"
+          + "Workload"      = "platform-foundation"
+        }
+    }
+
+  # module.cloudwatch.aws_cloudwatch_log_group.this["platform"] will be created
+  + resource "aws_cloudwatch_log_group" "this" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/retailops/dev/platform"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags              = {
+          + "Component"     = "platform"
+          + "CostCenter"    = "portfolio"
+          + "Environment"   = "dev"
+          + "Lifecycle"     = "temporary"
+          + "ManagedBy"     = "terraform"
+          + "Name"          = "retailops-dev-platform-logs"
+          + "Owner"         = "oskar"
+          + "Project"       = "retailops"
+          + "ResourceType"  = "cloudwatch-log-group"
+          + "RetentionDays" = "7"
+          + "Sprint"        = "sprint-10"
+          + "Workload"      = "platform-foundation"
+        }
+      + tags_all          = {
+          + "Component"     = "platform"
+          + "CostCenter"    = "portfolio"
+          + "Environment"   = "dev"
+          + "Lifecycle"     = "temporary"
+          + "ManagedBy"     = "terraform"
+          + "Name"          = "retailops-dev-platform-logs"
+          + "Owner"         = "oskar"
+          + "Project"       = "retailops"
+          + "ResourceType"  = "cloudwatch-log-group"
+          + "RetentionDays" = "7"
+          + "Sprint"        = "sprint-10"
+          + "Workload"      = "platform-foundation"
+        }
+    }
+
+  # module.ecr.aws_ecr_lifecycle_policy.this["api"] will be created
+  + resource "aws_ecr_lifecycle_policy" "this" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep only the latest 20 images for cost and storage control."
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber = 20
+                          + countType   = "imageCountMoreThan"
+                          + tagStatus   = "any"
+                        }
+                    },
+                ]
+            }
+        )
+      + registry_id = (known after apply)
+      + repository  = "retailops-dev-api"
+    }
+
+  # module.ecr.aws_ecr_lifecycle_policy.this["frontend"] will be created
+  + resource "aws_ecr_lifecycle_policy" "this" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep only the latest 20 images for cost and storage control."
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber = 20
+                          + countType   = "imageCountMoreThan"
+                          + tagStatus   = "any"
+                        }
+                    },
+                ]
+            }
+        )
+      + registry_id = (known after apply)
+      + repository  = "retailops-dev-frontend"
+    }
+
+  # module.ecr.aws_ecr_repository.this["api"] will be created
+  + resource "aws_ecr_repository" "this" {
+      + arn                  = (known after apply)
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "retailops-dev-api"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "Component"    = "api"
+          + "CostCenter"   = "portfolio"
+          + "Environment"  = "dev"
+          + "Lifecycle"    = "temporary"
+          + "ManagedBy"    = "terraform"
+          + "Name"         = "retailops-dev-api"
+          + "Owner"        = "oskar"
+          + "Project"      = "retailops"
+          + "ResourceType" = "ecr-repository"
+          + "Sprint"       = "sprint-10"
+          + "Workload"     = "platform-foundation"
+        }
+      + tags_all             = {
+          + "Component"    = "api"
+          + "CostCenter"   = "portfolio"
+          + "Environment"  = "dev"
+          + "Lifecycle"    = "temporary"
+          + "ManagedBy"    = "terraform"
+          + "Name"         = "retailops-dev-api"
+          + "Owner"        = "oskar"
+          + "Project"      = "retailops"
+          + "ResourceType" = "ecr-repository"
+          + "Sprint"       = "sprint-10"
+          + "Workload"     = "platform-foundation"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # module.ecr.aws_ecr_repository.this["frontend"] will be created
+  + resource "aws_ecr_repository" "this" {
+      + arn                  = (known after apply)
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "retailops-dev-frontend"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "Component"    = "frontend"
+          + "CostCenter"   = "portfolio"
+          + "Environment"  = "dev"
+          + "Lifecycle"    = "temporary"
+          + "ManagedBy"    = "terraform"
+          + "Name"         = "retailops-dev-frontend"
+          + "Owner"        = "oskar"
+          + "Project"      = "retailops"
+          + "ResourceType" = "ecr-repository"
+          + "Sprint"       = "sprint-10"
+          + "Workload"     = "platform-foundation"
+        }
+      + tags_all             = {
+          + "Component"    = "frontend"
+          + "CostCenter"   = "portfolio"
+          + "Environment"  = "dev"
+          + "Lifecycle"    = "temporary"
+          + "ManagedBy"    = "terraform"
+          + "Name"         = "retailops-dev-frontend"
+          + "Owner"        = "oskar"
+          + "Project"      = "retailops"
+          + "ResourceType" = "ecr-repository"
+          + "Sprint"       = "sprint-10"
+          + "Workload"     = "platform-foundation"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # module.iam.aws_iam_policy.terraform_plan will be created
+  + resource "aws_iam_policy" "terraform_plan" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Read-only IAM policy for future Terraform plan validation in CI/CD. No apply permissions."
+      + id               = (known after apply)
+      + name             = "retailops-dev-iam-terraform-plan-policy"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = [
+                          + "tag:GetTagValues",
+                          + "tag:GetTagKeys",
+                          + "tag:GetResources",
+                          + "sts:GetCallerIdentity",
+                          + "s3:ListBucket",
+                          + "s3:ListAllMyBuckets",
+                          + "s3:GetBucketLocation",
+                          + "rds:ListTagsForResource",
+                          + "rds:Describe*",
+                          + "logs:Describe*",
+                          + "iam:List*",
+                          + "iam:Get*",
+                          + "elasticloadbalancing:Describe*",
+                          + "eks:List*",
+                          + "eks:Describe*",
+                          + "ecr:ListImages",
+                          + "ecr:GetAuthorizationToken",
+                          + "ecr:Describe*",
+                          + "ec2:Describe*",
+                          + "cloudwatch:List*",
+                          + "cloudwatch:Get*",
+                          + "cloudwatch:Describe*",
+                          + "autoscaling:Describe*",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                      + Sid      = "AllowTerraformPlanReadOnlyDiscovery"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags             = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-iam-terraform-plan-policy"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + tags_all         = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-iam-terraform-plan-policy"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+    }
+
+  # module.vpc.aws_internet_gateway.this will be created
+  + resource "aws_internet_gateway" "this" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "retailops-dev-network-igw"
+        }
+      + tags_all = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-igw"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.vpc.aws_route_table.private["a"] will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "retailops-dev-network-private-rt-a"
+        }
+      + tags_all         = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-private-rt-a"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table.private["b"] will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "retailops-dev-network-private-rt-b"
+        }
+      + tags_all         = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-private-rt-b"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table.public will be created
+  + resource "aws_route_table" "public" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + gateway_id                 = (known after apply)
+                # (11 unchanged attributes hidden)
+            },
+        ]
+      + tags             = {
+          + "Name" = "retailops-dev-network-public-rt"
+        }
+      + tags_all         = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-public-rt"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.private["a"] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.private["b"] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.public["a"] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.public["b"] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_security_group.app will be created
+  + resource "aws_security_group" "app" {
+      + arn                    = (known after apply)
+      + description            = "Application baseline security group. No public inbound access."
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "10.20.0.0/16",
+                ]
+              + description      = "Allow internal VPC egress for future application-to-service traffic."
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "retailops-dev-network-app-sg"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "retailops-dev-network-app-sg"
+        }
+      + tags_all               = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-app-sg"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpc.aws_security_group.database will be created
+  + resource "aws_security_group" "database" {
+      + arn                    = (known after apply)
+      + description            = "Database baseline security group. Allows PostgreSQL only from the app security group."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = []
+              + description      = "Allow PostgreSQL from the application security group."
+              + from_port        = 5432
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = (known after apply)
+              + self             = false
+              + to_port          = 5432
+            },
+        ]
+      + name                   = "retailops-dev-network-db-sg"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "retailops-dev-network-db-sg"
+        }
+      + tags_all               = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-db-sg"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.private["a"] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.10.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "retailops-dev-network-private-subnet-a"
+        }
+      + tags_all                                       = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-private-subnet-a"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.private["b"] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.11.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "retailops-dev-network-private-subnet-b"
+        }
+      + tags_all                                       = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-private-subnet-b"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.public["a"] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.0.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "retailops-dev-network-public-subnet-a"
+        }
+      + tags_all                                       = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-public-subnet-a"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.public["b"] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.1.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "retailops-dev-network-public-subnet-b"
+        }
+      + tags_all                                       = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-public-subnet-b"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_vpc.this will be created
+  + resource "aws_vpc" "this" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.20.0.0/16"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "retailops-dev-network-vpc"
+        }
+      + tags_all                             = {
+          + "CostCenter"  = "portfolio"
+          + "Environment" = "dev"
+          + "Lifecycle"   = "temporary"
+          + "ManagedBy"   = "terraform"
+          + "Name"        = "retailops-dev-network-vpc"
+          + "Owner"       = "oskar"
+          + "Project"     = "retailops"
+          + "Sprint"      = "sprint-10"
+          + "Workload"    = "platform-foundation"
+        }
+    }
+
+Plan: 24 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + app_security_group_id                       = (known after apply)
+  + budget_notification_email_count             = 0
+  + budget_notifications_enabled                = false
+  + budget_private_notification_data_committed  = false
+  + cloudwatch_enterprise_observability_enabled = false
+  + cloudwatch_log_group_arns                   = {
+      + api      = (known after apply)
+      + frontend = (known after apply)
+      + platform = (known after apply)
+    }
+  + cloudwatch_log_group_count                  = 3
+  + cloudwatch_log_group_names                  = {
+      + api      = "/retailops/dev/api"
+      + frontend = "/retailops/dev/frontend"
+      + platform = "/retailops/dev/platform"
+    }
+  + cloudwatch_retention_in_days                = {
+      + api      = 7
+      + frontend = 7
+      + platform = 7
+    }
+  + database_security_group_id                  = (known after apply)
+  + ecr_lifecycle_policy_max_image_count        = {
+      + api      = 20
+      + frontend = 20
+    }
+  + ecr_repository_arns                         = {
+      + api      = (known after apply)
+      + frontend = (known after apply)
+    }
+  + ecr_repository_names                        = {
+      + api      = "retailops-dev-api"
+      + frontend = "retailops-dev-frontend"
+    }
+  + ecr_repository_urls                         = {
+      + api      = (known after apply)
+      + frontend = (known after apply)
+    }
+  + ecr_scan_on_push_enabled                    = {
+      + api      = true
+      + frontend = true
+    }
+  + iam_access_keys_created                     = false
+  + iam_administrator_access_attached           = false
+  + iam_terraform_plan_policy_arn               = (known after apply)
+  + monthly_budget_limit_usd                    = 10
+  + monthly_budget_name                         = "retailops-dev-monthly-cost-guardrail"
+  + nat_gateway_enabled                         = false
+  + private_subnet_ids                          = {
+      + a = (known after apply)
+      + b = (known after apply)
+    }
+  + public_subnet_ids                           = {
+      + a = (known after apply)
+      + b = (known after apply)
+    }
+  + vpc_id                                      = (known after apply)
