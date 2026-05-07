@@ -5,6 +5,7 @@ import Admin from "../pages/Admin.jsx";
 import Anomalies from "../pages/Anomalies.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Forecasts from "../pages/Forecasts.jsx";
+import LiveOperations from "../pages/LiveOperations.jsx";
 import Product360 from "../pages/Product360.jsx";
 import Products from "../pages/Products.jsx";
 import Profile from "../pages/Profile.jsx";
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "live-operations",
+        element: <LiveOperations />,
       },
       {
         path: "products",

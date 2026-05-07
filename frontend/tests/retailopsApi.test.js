@@ -2,7 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildDashboardSummary,
+  buildLiveOperationsPath,
   getProduct360,
+  getLiveOperations,
   listFromKnownKeys,
   listFromPayload,
   normalizeRiskStatus,
@@ -74,6 +76,47 @@ test("buildDashboardSummary derives Sprint 5 operational counters from dashboard
   assert.equal(summary.recommendationCount, 2);
   assert.equal(summary.openWorkItems, 1);
   assert.equal(summary.salesTrendRecords, 1);
+});
+
+test("buildLiveOperationsPath builds dashboard live operations query", () => {
+  assert.equal(
+    buildLiveOperationsPath({
+      windowMinutes: 60,
+      recentEventsLimit: 25,
+      alertsLimit: 5,
+    }),
+    "/dashboard/live-operations?window_minutes=60&recent_events_limit=25&alerts_limit=5",
+  );
+});
+
+test("getLiveOperations calls the live operations backend endpoint", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(JSON.stringify({ window_minutes: 15 }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await getLiveOperations({
+      baseUrl: "http://localhost:8000",
+      windowMinutes: 15,
+      recentEventsLimit: 20,
+      alertsLimit: 10,
+    });
+
+    assert.equal(
+      requestedUrls[0],
+      "http://localhost:8000/dashboard/live-operations?window_minutes=15&recent_events_limit=20&alerts_limit=10",
+    );
+    assert.deepEqual(data, { window_minutes: 15 });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("getProduct360 calls the Product 360 backend endpoint", async () => {

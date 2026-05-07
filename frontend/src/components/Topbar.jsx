@@ -19,6 +19,7 @@ const NOTIFICATIONS_CHANGED_EVENT = "retailops:notifications-changed";
 
 const navItems = [
   { label: "Dashboard", to: "/" },
+  { label: "Live Ops", to: "/live-operations" },
   { label: "Products", to: "/products" },
   { label: "Forecasts", to: "/forecasts" },
   { label: "Anomalies", to: "/anomalies" },

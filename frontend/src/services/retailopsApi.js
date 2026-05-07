@@ -15,6 +15,7 @@ export const ENDPOINTS = {
   dashboardRecommendations: ["/dashboard/recommendations"],
   dashboardOpenWorkItems: ["/dashboard/open-work-items"],
   dashboardStockRiskSummary: ["/dashboard/stock-risk-summary"],
+  dashboardLiveOperations: ["/dashboard/live-operations"],
   products: ["/products"],
   product360: (productId) => `/products/${productId}/360`,
   forecasts: ["/forecasts"],
@@ -24,6 +25,20 @@ export const ENDPOINTS = {
   sales: ["/sales"],
   inventorySnapshots: ["/inventory-snapshots"],
 };
+
+export function buildLiveOperationsPath({
+  windowMinutes = 15,
+  recentEventsLimit = 20,
+  alertsLimit = 10,
+} = {}) {
+  const params = new URLSearchParams({
+    window_minutes: String(windowMinutes),
+    recent_events_limit: String(recentEventsLimit),
+    alerts_limit: String(alertsLimit),
+  });
+
+  return `${ENDPOINTS.dashboardLiveOperations[0]}?${params.toString()}`;
+}
 
 export function unwrapPayload(payload) {
   if (!payload) {
@@ -337,6 +352,17 @@ export async function getDashboardData(options = {}) {
       stockRisks: formatSourceStatus(stockRisks),
     },
   };
+}
+
+export async function getLiveOperations(options = {}) {
+  return apiGet(
+    buildLiveOperationsPath({
+      windowMinutes: options.windowMinutes,
+      recentEventsLimit: options.recentEventsLimit,
+      alertsLimit: options.alertsLimit,
+    }),
+    options,
+  );
 }
 
 
