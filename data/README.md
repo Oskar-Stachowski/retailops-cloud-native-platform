@@ -48,8 +48,9 @@ python -m data.generator.main \
   --seed 42
 ```
 
-Only the `demo` profile is implemented today. The `small`, `medium`, and
-`large` profiles are reserved for future generator commits and are documented in
+The `demo` profile writes to `data/demo` by default. The `small`, `medium`, and
+`large` profiles write to `data/synthetic/<profile>` by default and are ignored
+by Git. Their sizing strategy is documented in
 [RetailOps Synthetic Data Profiles](../docs/synthetic-data-profiles.md).
 
 ## Seed the API database

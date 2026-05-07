@@ -60,6 +60,13 @@ quality issues, and event streams.
 | `medium` | Docker/Kubernetes/AWS dev, first MLOps and real-time replay | No | Parquet + JSONL + serving DB subset | Minutes to tens of minutes |
 | `large` | Data lake, performance, cost-controlled advanced platform evidence | No | Parquet on S3 or local object storage | Long-running batch |
 
+The current generator starts with developer-safe CSV defaults for `small`,
+`medium`, and `large`. These defaults are intentionally below the full target
+volumes in this document so that the profiles can be generated locally without
+accidentally creating very large files. Larger profile sizes should be requested
+explicitly with `--days`, `--products`, `--stores`, and `--warehouses`, and
+future Parquet/S3 writers should be used for high-volume runs.
+
 ## 4. Profile Targets
 
 ### 4.1 `demo`

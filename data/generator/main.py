@@ -11,6 +11,10 @@ from data.generator.inventory import generate_inventory_snapshots
 from data.generator.locations import generate_stores, generate_warehouses
 from data.generator.orders import generate_order_items, generate_orders
 from data.generator.pricing import generate_price_history, generate_promotions
+from data.generator.profile_engine import (
+    build_profile_dataset,
+    profile_defaults,
+)
 from data.generator.products import generate_products
 from data.generator.sales import generate_sales
 from data.generator.stock import generate_returns, generate_stock_movements
@@ -73,6 +77,14 @@ def default_output_dir() -> Path:
     return repo_root / "data" / "demo"
 
 
+def default_output_dir_for_profile(profile: str) -> Path:
+    repo_root = Path(__file__).resolve().parents[2]
+    if profile == "demo":
+        return repo_root / "data" / "demo"
+
+    return repo_root / "data" / "synthetic" / profile
+
+
 def validate_generation_config(config: DatasetGenerationConfig) -> None:
     if config.profile not in SUPPORTED_PROFILES:
         supported = ", ".join(SUPPORTED_PROFILES)
@@ -100,27 +112,36 @@ def validate_generation_config(config: DatasetGenerationConfig) -> None:
             + ", ".join(invalid_options)
         )
 
-    if config.profile != "demo":
-        raise NotImplementedError(
-            "Only the 'demo' dataset profile is implemented in this sprint. "
-            "The small, medium and large profiles are documented targets for "
-            "future synthetic data generator commits."
-        )
-
 
 def build_dataset(
     config: DatasetGenerationConfig | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     config = config or DatasetGenerationConfig()
     validate_generation_config(config)
-    return build_demo_dataset()
+    if config.profile == "demo":
+        return build_demo_dataset()
+
+    defaults = profile_defaults(config.profile)
+    days = config.days or defaults.days
+    product_count = config.products or defaults.products
+    store_count = config.stores or defaults.stores
+    warehouse_count = config.warehouses or defaults.warehouses
+
+    return build_profile_dataset(
+        profile=config.profile,
+        days=days,
+        product_count=product_count,
+        store_count=store_count,
+        warehouse_count=warehouse_count,
+    )
 
 
 def generate_demo_dataset(
     output_dir: Path | None = None,
     config: DatasetGenerationConfig | None = None,
 ) -> dict[str, int]:
-    output_dir = output_dir or default_output_dir()
+    config = config or DatasetGenerationConfig()
+    output_dir = output_dir or default_output_dir_for_profile(config.profile)
     tables = build_dataset(config)
     return write_tables(output_dir, tables)
 
@@ -133,10 +154,7 @@ def parse_args() -> argparse.Namespace:
         "--profile",
         choices=SUPPORTED_PROFILES,
         default="demo",
-        help=(
-            "Dataset profile to generate. Only 'demo' is implemented for now; "
-            "the remaining profiles are reserved for future commits."
-        ),
+        help="Dataset profile to generate.",
     )
     parser.add_argument(
         "--days",
@@ -167,7 +185,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=default_output_dir(),
+        default=None,
         help="Directory where CSV files should be written.",
     )
 
@@ -190,11 +208,14 @@ def main() -> None:
     config = config_from_args(args)
 
     counts = generate_demo_dataset(args.output_dir, config)
+    output_dir = args.output_dir or default_output_dir_for_profile(
+        config.profile,
+    )
 
     print(f"RetailOps CSV dataset generated for profile '{config.profile}':")
     for table_name in CSV_WRITE_ORDER:
         print(f"- {table_name}: {counts[table_name]}")
-    print(f"\nOutput directory: {args.output_dir}")
+    print(f"\nOutput directory: {output_dir}")
 
 
 if __name__ == "__main__":

@@ -218,8 +218,31 @@ def test_generation_config_rejects_non_positive_numeric_options(
 
 
 @pytest.mark.parametrize("profile", ["small", "medium", "large"])
-def test_non_demo_profiles_are_reserved_for_future_commits(
+def test_non_demo_profiles_can_generate_scaled_datasets_with_overrides(
     profile: str,
 ) -> None:
-    with pytest.raises(NotImplementedError, match="Only the 'demo'"):
-        validate_generation_config(DatasetGenerationConfig(profile=profile))
+    tables = build_dataset(
+        DatasetGenerationConfig(
+            profile=profile,
+            days=3,
+            products=5,
+            stores=2,
+            warehouses=2,
+        )
+    )
+
+    assert len(tables["products"]) == 5
+    assert len(tables["stores"]) == 2
+    assert len(tables["warehouses"]) == 2
+    assert len(tables["sales"]) == 15
+    assert len(tables["orders"]) == 15
+    assert len(tables["order_items"]) == 15
+    assert len(tables["price_history"]) == 15
+    assert len(tables["promotions"]) == 5
+    assert len(tables["inventory_snapshots"]) == 5
+    assert len(tables["stock_movements"]) == 20
+    assert len(tables["returns"]) == 3
+    assert len(tables["anomalies"]) == 5
+    assert len(tables["alerts"]) == 5
+    assert len(tables["recommendations"]) == 5
+    assert len(tables["workflow_actions"]) == 5

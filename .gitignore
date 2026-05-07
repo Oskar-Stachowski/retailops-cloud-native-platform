@@ -216,6 +216,11 @@ __marimo__/
 ci-cd/reports/*
 !ci-cd/reports/.gitkeep
 
+# Generated synthetic datasets beyond the small committed demo seed.
+data/synthetic/
+data/generated/
+data/replay/
+
 # Terraform local artifacts
 # Keep Terraform-generated local cache, state and plan files out of Git.
 # These files are machine/environment-specific, frequently regenerated,
