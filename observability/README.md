@@ -34,6 +34,7 @@ Key metric families:
 - `retailops_stream_events_total`
 - `retailops_stream_events_by_type_total`
 - `retailops_stream_dlq_events_total`
+- `retailops_stream_latest_event_present`
 - `retailops_stream_event_freshness_seconds`
 - `retailops_stream_processing_latency_seconds_avg`
 - `retailops_stream_processing_latency_seconds_max`
@@ -42,6 +43,23 @@ Key metric families:
 
 Local Prometheus scrape configuration lives in
 [`observability/prometheus.yml`](prometheus.yml).
+
+Alert rules live in:
+
+```text
+observability/prometheus/rules/stream-alerts.yml
+```
+
+Current alert coverage:
+
+- API `/metrics` scrape target down,
+- no stream events ingested,
+- stale stream events,
+- DLQ events increasing,
+- consumer failures increasing,
+- high and critical consumer lag proxy,
+- consumer down or missing,
+- high and critical processing latency.
 
 Run the local API and Prometheus stack with:
 

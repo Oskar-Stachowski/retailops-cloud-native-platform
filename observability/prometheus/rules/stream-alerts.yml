@@ -1,0 +1,124 @@
+groups:
+  - name: retailops-streaming
+    interval: 30s
+    rules:
+      - alert: RetailOpsApiMetricsTargetDown
+        expr: up{job="retailops-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          domain: platform
+          component: api
+        annotations:
+          summary: RetailOps API metrics target is down
+          description: Prometheus cannot scrape the RetailOps API /metrics endpoint.
+
+      - alert: RetailOpsStreamNoEventsIngested
+        expr: retailops_stream_latest_event_present == 0
+        for: 10m
+        labels:
+          severity: warning
+          domain: streaming
+          component: event-log
+        annotations:
+          summary: No stream events have been ingested
+          description: The realtime event log has no ingested events. Replay, producer, or consumer may not be running.
+
+      - alert: RetailOpsStreamEventsStale
+        expr: retailops_stream_latest_event_present == 1 and retailops_stream_event_freshness_seconds > 300
+        for: 5m
+        labels:
+          severity: warning
+          domain: streaming
+          component: event-log
+        annotations:
+          summary: Stream events are stale
+          description: The latest ingested stream event is older than 5 minutes.
+
+      - alert: RetailOpsStreamDeadLetterEventsIncreasing
+        expr: increase(retailops_stream_dlq_events_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          domain: streaming
+          component: dlq
+        annotations:
+          summary: Stream dead-letter events increased
+          description: One or more realtime events were routed to the dead-letter path in the last 5 minutes.
+
+      - alert: RetailOpsStreamConsumerFailuresIncreasing
+        expr: increase(retailops_stream_consumer_failed_events_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: Stream consumer failures increased
+          description: A realtime consumer has recorded failed event processing in the last 5 minutes.
+
+      - alert: RetailOpsStreamConsumerLagHigh
+        expr: retailops_stream_consumer_lag_events > 100
+        for: 5m
+        labels:
+          severity: warning
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: Stream consumer lag is high
+          description: A realtime consumer has more than 100 unprocessed events by the current lag proxy.
+
+      - alert: RetailOpsStreamConsumerLagCritical
+        expr: retailops_stream_consumer_lag_events > 1000
+        for: 2m
+        labels:
+          severity: critical
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: Stream consumer lag is critical
+          description: A realtime consumer has more than 1000 unprocessed events by the current lag proxy.
+
+      - alert: RetailOpsStreamConsumerDown
+        expr: retailops_stream_consumer_running == 0
+        for: 2m
+        labels:
+          severity: critical
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: Stream consumer is not running
+          description: A registered realtime consumer reports running=0.
+
+      - alert: RetailOpsStreamConsumerMissing
+        expr: absent(retailops_stream_consumer_running)
+        for: 10m
+        labels:
+          severity: warning
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: No stream consumer metrics are available
+          description: No realtime consumer state has been exported. The consumer may not have started or persisted state yet.
+
+      - alert: RetailOpsStreamProcessingLatencyHigh
+        expr: retailops_stream_processing_latency_seconds_avg > 5
+        for: 5m
+        labels:
+          severity: warning
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: Stream processing latency is high
+          description: Average realtime event processing latency is above 5 seconds.
+
+      - alert: RetailOpsStreamProcessingLatencyCritical
+        expr: retailops_stream_processing_latency_seconds_max > 30
+        for: 2m
+        labels:
+          severity: critical
+          domain: streaming
+          component: consumer
+        annotations:
+          summary: Stream processing latency is critical
+          description: Maximum realtime event processing latency is above 30 seconds.

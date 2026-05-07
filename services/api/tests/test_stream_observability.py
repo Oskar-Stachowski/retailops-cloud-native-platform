@@ -13,6 +13,7 @@ class FakeRealtimeMetricsRepository:
                 {"event_type": "alert_created", "event_count": 3},
             ],
             "freshness": {
+                "latest_event_at": "2026-05-07T10:00:00Z",
                 "freshness_seconds": 42.5,
             },
             "processing_latency": {
@@ -44,6 +45,7 @@ def test_stream_observability_renders_prometheus_metrics() -> None:
     assert "# HELP retailops_stream_events_total" in output
     assert 'retailops_stream_events_total{status="processed"} 12' in output
     assert "retailops_stream_dlq_events_total 2" in output
+    assert "retailops_stream_latest_event_present 1" in output
     assert (
         'retailops_stream_events_by_type_total{event_type="sale_completed"} 9'
         in output

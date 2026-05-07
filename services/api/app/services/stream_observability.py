@@ -41,6 +41,12 @@ class StreamObservabilityService:
 
         output: list[PrometheusMetric] = [
             PrometheusMetric(
+                name="retailops_stream_latest_event_present",
+                help_text="Whether at least one stream event has been ingested, represented as 1 or 0.",
+                metric_type="gauge",
+                value=1 if freshness.get("latest_event_at") else 0,
+            ),
+            PrometheusMetric(
                 name="retailops_stream_event_freshness_seconds",
                 help_text="Age of the latest ingested stream event in seconds.",
                 metric_type="gauge",
