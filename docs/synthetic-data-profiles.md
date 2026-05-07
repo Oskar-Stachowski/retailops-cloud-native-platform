@@ -453,6 +453,65 @@ Recommended manifest fields:
 }
 ```
 
+The generator writes this manifest as:
+
+```text
+dataset_manifest.json
+```
+
+Manifest responsibilities:
+
+- identify dataset name, profile and schema version
+- record generator version and seed
+- record requested generation parameters
+- expose the generated date range
+- expose row counts by table
+- list generated artifacts
+- declare output formats
+
+The manifest is intentionally lightweight JSON so it can be used by local
+quality checks, CI artifacts, S3 upload jobs and future Athena/Glue registration
+steps.
+
+## 9.1 Quality Report
+
+Every generated profile writes:
+
+```text
+quality_report.json
+```
+
+The quality report is a structural validation artifact. It is different from
+`realism_report.json`: quality checks decide whether the dataset is internally
+consistent, while realism checks decide whether the generated business behavior
+looks plausible.
+
+Current quality checks cover:
+
+- primary key uniqueness,
+- product references from sales, pricing, inventory, forecasts and operational records,
+- store references from orders,
+- warehouse references from inventory and stock movements,
+- order item references to orders and products,
+- return references to orders, order items and products,
+- alert/recommendation/workflow references,
+- positive sales quantities and non-negative money values,
+- non-negative inventory and return values,
+- order total reconciliation against order items,
+- return quantity not exceeding original order item quantity,
+- ordered date windows for prices, promotions, forecasts and anomalies,
+- known controlled data quality statuses.
+
+The report has a top-level `status` field:
+
+```json
+{
+  "status": "passed"
+}
+```
+
+Future CI should fail generated datasets when this status is `failed`.
+
 ## 10. Quality Gates
 
 Each non-demo profile should have data quality checks.

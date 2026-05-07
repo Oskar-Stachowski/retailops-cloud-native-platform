@@ -10,6 +10,8 @@ from data.generator.main import (
     config_from_args,
     validate_generation_config,
 )
+from data.generator.manifest import build_dataset_manifest
+from data.generator.quality import build_quality_report
 from data.generator.realism_report import build_realism_report
 
 
@@ -298,3 +300,73 @@ def test_realism_report_summarizes_synthetic_profile() -> None:
     assert Decimal(metrics["top_20_percent_product_revenue_share"]) > 0
     assert "data_quality_status_counts" in metrics
     assert "demand_class_counts" in metrics
+
+
+def test_dataset_manifest_summarizes_demo_dataset() -> None:
+    config = DatasetGenerationConfig(profile="demo")
+    tables = build_dataset(config)
+    manifest = build_dataset_manifest(config, tables)
+
+    assert manifest["dataset_name"] == "retailops-synthetic"
+    assert manifest["profile"] == "demo"
+    assert manifest["schema_version"] == "1.0"
+    assert manifest["seed"] == 42
+    assert manifest["formats"] == ["csv"]
+    assert manifest["row_counts"]["products"] == 8
+    assert manifest["row_counts"]["sales"] == 16
+    assert "dataset_manifest.json" in manifest["artifacts"]
+    assert "quality_report.json" in manifest["artifacts"]
+    assert "realism_report.json" not in manifest["artifacts"]
+
+
+def test_dataset_manifest_includes_realism_report_for_synthetic_profile() -> None:
+    config = DatasetGenerationConfig(
+        profile="small",
+        days=3,
+        products=5,
+        stores=2,
+        warehouses=2,
+    )
+    tables = build_dataset(config)
+    manifest = build_dataset_manifest(config, tables)
+
+    assert manifest["profile"] == "small"
+    assert manifest["parameters"] == {
+        "days": 3,
+        "products": 5,
+        "stores": 2,
+        "warehouses": 2,
+    }
+    assert manifest["row_counts"]["products"] == 5
+    assert manifest["row_counts"]["orders"] == 15
+    assert "dataset_manifest.json" in manifest["artifacts"]
+    assert "quality_report.json" in manifest["artifacts"]
+    assert "realism_report.json" in manifest["artifacts"]
+    assert manifest["date_start"] <= manifest["date_end"]
+
+
+def test_quality_report_passes_for_demo_dataset() -> None:
+    config = DatasetGenerationConfig(profile="demo")
+    tables = build_dataset(config)
+    report = build_quality_report(config.profile, tables)
+
+    assert report["status"] == "passed"
+    assert report["summary"]["failed"] == 0
+    assert report["row_counts"]["products"] == 8
+
+
+def test_quality_report_passes_for_synthetic_profile() -> None:
+    config = DatasetGenerationConfig(
+        profile="small",
+        days=14,
+        products=20,
+        stores=4,
+        warehouses=3,
+    )
+    tables = build_dataset(config)
+    report = build_quality_report(config.profile, tables)
+
+    assert report["status"] == "passed"
+    assert report["summary"]["failed"] == 0
+    assert report["row_counts"]["orders"] == 280
+    assert report["row_counts"]["sales"] == report["row_counts"]["order_items"]

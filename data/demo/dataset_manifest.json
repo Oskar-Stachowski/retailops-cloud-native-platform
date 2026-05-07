@@ -1,0 +1,59 @@
+{
+  "artifacts": [
+    "products.csv",
+    "users.csv",
+    "stores.csv",
+    "warehouses.csv",
+    "orders.csv",
+    "order_items.csv",
+    "price_history.csv",
+    "promotions.csv",
+    "stock_movements.csv",
+    "returns.csv",
+    "sales.csv",
+    "inventory_snapshots.csv",
+    "forecasts.csv",
+    "anomalies.csv",
+    "alerts.csv",
+    "recommendations.csv",
+    "workflow_actions.csv",
+    "dataset_manifest.json",
+    "quality_report.json"
+  ],
+  "dataset_name": "retailops-synthetic",
+  "date_end": "2026-04-30",
+  "date_start": "2026-04-16",
+  "formats": [
+    "csv"
+  ],
+  "generated_at": "2026-05-07T16:43:02.170574+00:00",
+  "generator_version": "0.1.0",
+  "parameters": {
+    "days": null,
+    "products": null,
+    "stores": null,
+    "warehouses": null
+  },
+  "profile": "demo",
+  "row_counts": {
+    "alerts": 4,
+    "anomalies": 4,
+    "forecasts": 6,
+    "inventory_snapshots": 8,
+    "order_items": 16,
+    "orders": 16,
+    "price_history": 24,
+    "products": 8,
+    "promotions": 8,
+    "recommendations": 4,
+    "returns": 4,
+    "sales": 16,
+    "stock_movements": 24,
+    "stores": 4,
+    "users": 4,
+    "warehouses": 4,
+    "workflow_actions": 4
+  },
+  "schema_version": "1.0",
+  "seed": 42
+}

@@ -9,12 +9,14 @@ from data.generator.forecasts import generate_forecasts
 from data.generator.incidents import generate_incident_dataset
 from data.generator.inventory import generate_inventory_snapshots
 from data.generator.locations import generate_stores, generate_warehouses
+from data.generator.manifest import write_dataset_manifest
 from data.generator.orders import generate_order_items, generate_orders
 from data.generator.pricing import generate_price_history, generate_promotions
 from data.generator.profile_engine import (
     build_profile_dataset,
     profile_defaults,
 )
+from data.generator.quality import write_quality_report
 from data.generator.products import generate_products
 from data.generator.sales import generate_sales
 from data.generator.stock import generate_returns, generate_stock_movements
@@ -146,6 +148,8 @@ def generate_demo_dataset(
     output_dir = output_dir or default_output_dir_for_profile(config.profile)
     tables = build_dataset(config)
     counts = write_tables(output_dir, tables)
+    write_quality_report(output_dir, config.profile, tables)
+    write_dataset_manifest(output_dir, config, tables)
     if config.profile != "demo":
         write_realism_report(output_dir, config.profile, config.seed, tables)
     return counts

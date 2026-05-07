@@ -69,12 +69,24 @@ Synthetic profiles beyond `demo` include a realism layer:
 For non-demo profiles, the generator also writes:
 
 ```text
+dataset_manifest.json
+quality_report.json
 realism_report.json
 ```
 
-The report summarizes row counts and realism checks such as top-product revenue
-share, average order items, promotion uplift, stockout rate, return rate by
-category and data quality status counts.
+`dataset_manifest.json` is written for every profile and captures dataset
+metadata, generator parameters, row counts, date range, output format and
+artifact names.
+
+`quality_report.json` is written for every profile and captures structural data
+quality checks: primary key uniqueness, foreign key consistency, non-negative
+values, order total reconciliation, return quantity limits, ordered date windows
+and known data quality statuses.
+
+`realism_report.json` is written for non-demo profiles. The report summarizes
+row counts and realism checks such as top-product revenue share, average order
+items, promotion uplift, stockout rate, return rate by category and data quality
+status counts.
 
 ## Seed the API database
 

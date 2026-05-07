@@ -1,0 +1,141 @@
+{
+  "checks": [
+    {
+      "details": {
+        "ids": 158,
+        "unique_ids": 158
+      },
+      "name": "primary_keys_are_unique",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "sales": 16
+      },
+      "name": "sales_reference_products",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "orders": 16
+      },
+      "name": "orders_reference_stores",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "order_items": 16
+      },
+      "name": "order_items_reference_orders_and_products",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "price_history": 24,
+        "promotions": 8
+      },
+      "name": "pricing_references_products",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "inventory_snapshots": 8
+      },
+      "name": "inventory_references_products_and_warehouses",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "stock_movements": 24
+      },
+      "name": "stock_movements_reference_products_and_warehouses",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "returns": 4
+      },
+      "name": "returns_reference_orders_order_items_and_products",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "alerts": 4,
+        "anomalies": 4,
+        "forecasts": 6,
+        "recommendations": 4,
+        "workflow_actions": 4
+      },
+      "name": "operational_records_reference_valid_entities",
+      "status": "passed"
+    },
+    {
+      "details": {},
+      "name": "sales_values_are_positive",
+      "status": "passed"
+    },
+    {
+      "details": {},
+      "name": "inventory_and_returns_are_non_negative",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "mismatches": 0
+      },
+      "name": "order_totals_match_order_items",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "invalid_returns": 0
+      },
+      "name": "returns_do_not_exceed_order_item_quantity",
+      "status": "passed"
+    },
+    {
+      "details": {},
+      "name": "date_windows_are_ordered",
+      "status": "passed"
+    },
+    {
+      "details": {
+        "allowed_statuses": [
+          "",
+          "duplicate_candidate",
+          "late_event",
+          "missing_optional_context",
+          "ok"
+        ]
+      },
+      "name": "sales_data_quality_statuses_are_known",
+      "status": "passed"
+    }
+  ],
+  "profile": "demo",
+  "row_counts": {
+    "alerts": 4,
+    "anomalies": 4,
+    "forecasts": 6,
+    "inventory_snapshots": 8,
+    "order_items": 16,
+    "orders": 16,
+    "price_history": 24,
+    "products": 8,
+    "promotions": 8,
+    "recommendations": 4,
+    "returns": 4,
+    "sales": 16,
+    "stock_movements": 24,
+    "stores": 4,
+    "users": 4,
+    "warehouses": 4,
+    "workflow_actions": 4
+  },
+  "status": "passed",
+  "summary": {
+    "checks": 15,
+    "failed": 0,
+    "passed": 15
+  }
+}
