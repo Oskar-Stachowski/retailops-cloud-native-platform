@@ -47,7 +47,7 @@ jobs:
         run: terraform version
 
       - name: Run local IaC scan
-        run: make iac-scan
+        run: make terraform-fmt-check terraform-validate
 
       - name: Upload Terraform validation evidence
         if: always()
