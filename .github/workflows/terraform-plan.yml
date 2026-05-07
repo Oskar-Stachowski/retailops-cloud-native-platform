@@ -65,6 +65,10 @@ jobs:
     needs: terraform-validate
     if: github.event_name == 'workflow_dispatch' && inputs.run_dev_plan == true
 
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -74,6 +78,13 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
+        
+      - name: Configure AWS credentials with GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_PLAN_ROLE_ARN }}
+          aws-region: eu-central-1
+          role-session-name: retailops-terraform-plan
 
       - name: Verify AWS credentials are available without printing account details
         run: aws sts get-caller-identity >/dev/null

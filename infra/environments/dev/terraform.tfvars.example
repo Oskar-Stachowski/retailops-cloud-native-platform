@@ -53,14 +53,10 @@ jenkins_trusted_role_arns = []
 ecr_repositories = {
   api = {
     repository_suffix   = "api"
-    image_tag_mutability = "IMMUTABLE"
-    scan_on_push        = true
     max_image_count     = 20
   }
   frontend = {
     repository_suffix   = "frontend"
-    image_tag_mutability = "IMMUTABLE"
-    scan_on_push        = true
     max_image_count     = 20
   }
 }

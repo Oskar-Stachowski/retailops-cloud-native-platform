@@ -9,12 +9,10 @@ variable "common_tags" {
 }
 
 variable "repositories" {
-  description = "ECR repositories to create for RetailOps container images."
+  description = "ECR repositories to create for RetailOps container images. Security controls enforce immutable tags and scan-on-push."
   type = map(object({
-    repository_suffix    = string
-    image_tag_mutability = optional(string, "IMMUTABLE")
-    scan_on_push         = optional(bool, true)
-    max_image_count      = optional(number, 20)
+    repository_suffix = string
+    max_image_count   = optional(number, 20)
   }))
 
   default = {
@@ -24,13 +22,6 @@ variable "repositories" {
     frontend = {
       repository_suffix = "frontend"
     }
-  }
-
-  validation {
-    condition = alltrue([
-      for repository in var.repositories : contains(["MUTABLE", "IMMUTABLE"], repository.image_tag_mutability)
-    ])
-    error_message = "image_tag_mutability must be either MUTABLE or IMMUTABLE."
   }
 
   validation {

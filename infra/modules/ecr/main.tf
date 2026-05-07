@@ -9,6 +9,7 @@ locals {
 resource "aws_ecr_repository" "this" {
   for_each = local.repositories
 
+  # Security baseline: do not expose these as environment-level toggles.
   name                 = each.value.name
   image_tag_mutability = "IMMUTABLE"
 

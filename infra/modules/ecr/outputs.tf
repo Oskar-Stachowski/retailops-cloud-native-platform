@@ -27,9 +27,10 @@ output "image_tag_mutability" {
 }
 
 output "scan_on_push_enabled" {
-  description = "Scan-on-push setting for each ECR repository."
+  description = "Actual scan-on-push setting for each ECR repository."
   value = {
-    for key, repository in local.repositories : key => repository.scan_on_push
+    for key, repository in aws_ecr_repository.this :
+    key => repository.image_scanning_configuration[0].scan_on_push
   }
 }
 

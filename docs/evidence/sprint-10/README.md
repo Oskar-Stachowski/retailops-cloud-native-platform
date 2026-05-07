@@ -16,33 +16,39 @@ The showcase is intentionally temporary. It proves that the Terraform foundation
 | `aws-cleanup-confirmation.md` | Manual cleanup checklist after destroy. | Yes |
 | `aws-console-vpc.png` | AWS Console screenshot for VPC/networking resources. | Optional but recommended |
 | `aws-console-ecr.png` | AWS Console screenshot for ECR repositories. | Optional but recommended |
-| `aws-console-iam-role.png` | AWS Console screenshot for IAM delivery roles/policies. | Optional but recommended |
+| `aws-console-iam.png` | AWS Console screenshot for IAM delivery policy/role baseline. | Optional but recommended |
 | `aws-console-budget.png` | AWS Console screenshot for budget/cost guardrail. | Optional but recommended |
 | `aws-console-cloudwatch.png` | AWS Console screenshot for CloudWatch log groups. | Optional but recommended |
 
 ## Safety rules
 
-- Do not commit `.terraform/`, `terraform.tfstate`, `terraform.tfstate.backup`, crash logs, local override files, or real secrets.
+- Do not commit `.terraform/`, `terraform.tfstate`, `terraform.tfstate.backup`, binary plan files such as `tfplan`, crash logs, local override files, private `.tfvars` files, or real secrets.
 - Redact AWS account IDs, real ARNs, email addresses, and console URLs if they expose private data.
 - Run `terraform destroy` during the same showcase window unless there is a documented reason not to.
 - Keep the showcase short and controlled. This is evidence, not a permanent environment.
 
 ## Suggested capture flow
 
-```bash
-mkdir -p docs/evidence/sprint-10 ci-cd/reports/iac
+```mermaid
+flowchart TD
+    A[Prepare evidence folder] --> B[Format Terraform]
+    B --> C[Initialize dev environment]
+    C --> D[Validate Terraform config]
+    D --> E[Create temporary binary</br>plan outside the repo]
+    E --> F[Export plan evidence]
+    F --> G[Apply during controlled</br>showcase window]
+    G --> H[Capture Terraform outputs]
+    H --> I[Capture sanitized</br>AWS Console screenshots]
+    I --> J[Destroy showcase resources in the same window]
+    J --> K[Confirm Terraform state</br>is empty after destroy]
+    K --> L[Remove temporary binary plan]
 
-terraform -chdir=infra/environments/dev fmt -recursive
-terraform -chdir=infra/environments/dev init -backend=false -input=false
-terraform -chdir=infra/environments/dev validate -no-color | tee docs/evidence/sprint-10/terraform-validate.txt
-terraform -chdir=infra/environments/dev plan -var-file=terraform.tfvars.example -out=tfplan
-terraform -chdir=infra/environments/dev show -no-color tfplan | tee docs/evidence/sprint-10/terraform-plan-dev.txt
+    D -. evidence .-> D1[terraform-validate.txt]
+    F -. evidence .-> F1[terraform-plan-dev.txt]
+    G -. evidence .-> G1[terraform-apply.txt]
+    I -. evidence .-> I1[AWS Console screenshots]
+    J -. evidence .-> J1[terraform-destroy.txt]
 
-terraform -chdir=infra/environments/dev apply -auto-approve tfplan | tee docs/evidence/sprint-10/terraform-apply.txt
-terraform -chdir=infra/environments/dev output -json | tee docs/evidence/sprint-10/terraform-outputs.json
-
-# Capture AWS Console screenshots here.
-
-terraform -chdir=infra/environments/dev destroy -var-file=terraform.tfvars.example -auto-approve | tee docs/evidence/sprint-10/terraform-destroy.txt
-terraform -chdir=infra/environments/dev state list | tee docs/evidence/sprint-10/terraform-state-after-destroy.txt
+    E -. local only .-> E1["/tmp/retailops-dev.tfplan"]
+    L -. cleanup .-> E1
 ```

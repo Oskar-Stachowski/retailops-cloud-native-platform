@@ -146,10 +146,8 @@ variable "jenkins_trusted_role_arns" {
 variable "ecr_repositories" {
   description = "ECR repositories for RetailOps container images."
   type = map(object({
-    repository_suffix    = string
-    image_tag_mutability = optional(string, "IMMUTABLE")
-    scan_on_push         = optional(bool, true)
-    max_image_count      = optional(number, 20)
+    repository_suffix = string
+    max_image_count   = optional(number, 20)
   }))
 
   default = {
@@ -235,19 +233,6 @@ provider "aws" {
   default_tags {
     tags = module.tags.common_tags
   }
-}
-
-module "foundation" {
-  source = "../.."
-
-  project_name       = var.project_name
-  environment        = var.environment
-  aws_region         = var.aws_region
-  owner              = var.owner
-  cost_center        = var.cost_center
-  managed_by         = var.managed_by
-  resource_lifecycle = var.resource_lifecycle
-  additional_tags    = var.additional_tags
 }
 
 module "vpc" {
