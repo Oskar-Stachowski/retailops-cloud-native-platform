@@ -20,6 +20,8 @@ validated CSV files into PostgreSQL.
 The current dataset is intentionally small and optimized for local API tests.
 The target strategy for larger generated datasets is documented in
 [RetailOps Synthetic Data Profiles](../docs/synthetic-data-profiles.md).
+The day-to-day operating model is documented in
+[RetailOps Synthetic Data Operating Model](../docs/synthetic-data-operating-model.md).
 
 ## Generate CSV files
 

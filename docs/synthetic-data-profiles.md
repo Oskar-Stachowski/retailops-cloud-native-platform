@@ -14,6 +14,9 @@ The goal of the synthetic data strategy is to keep a fast deterministic demo
 dataset while adding larger generated datasets that can exercise the platform
 like a realistic retail operations system.
 
+The operational usage model for these profiles is documented in
+[Synthetic Data Operating Model](synthetic-data-operating-model.md).
+
 ## 2. Current Baseline
 
 The current generator creates deterministic CSV files for:
