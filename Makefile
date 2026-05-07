@@ -25,6 +25,7 @@ FRONTEND_DIR ?= frontend
 REPORTS_DIR ?= ci-cd/reports
 SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
+DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 
 TERRAFORM ?= terraform
 TFLINT ?= tflint
@@ -59,6 +60,12 @@ FRONTEND_IMAGE ?= retailops-frontend:local
 
 SMOKE_SCRIPT ?= ./scripts/compose_smoke.sh
 
+DATA_PROFILE ?= small
+DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
+DATA_QUALITY_REPORT ?= $(DATA_OUTPUT_DIR)/quality_report.json
+DATA_MANIFEST_REPORT ?= $(DATA_OUTPUT_DIR)/dataset_manifest.json
+DATA_REALISM_REPORT ?= $(DATA_OUTPUT_DIR)/realism_report.json
+
 export POSTGRES_DB
 export POSTGRES_USER
 export POSTGRES_PASSWORD
@@ -76,6 +83,7 @@ help:
 	@echo "  make install              Install backend and frontend dependencies"
 	@echo "  make ci-local             Run local preflight without full Compose smoke"
 	@echo "  make test                 Run backend and frontend tests"
+	@echo "  make data-quality         Generate synthetic data and validate quality report"
 	@echo ""
 	@echo "Backend:"
 	@echo "  make api-install          Install backend dependencies"
@@ -113,7 +121,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -136,7 +144,7 @@ frontend-install:
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-test api-integration-test api-migrate api-seed data-generate db-up db-down
+.PHONY: api-test api-integration-test api-migrate api-seed data-generate data-quality db-up db-down
 
 api-test: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
@@ -149,6 +157,14 @@ db-down:
 
 data-generate: api-install
 	$(API_VENV_PYTHON) -m data.generator.main
+
+data-quality: api-install ensure-reports-dir
+	@rm -rf "$(DATA_OUTPUT_DIR)"
+	$(API_VENV_PYTHON) -m data.generator.main --profile "$(DATA_PROFILE)" --output-dir "$(DATA_OUTPUT_DIR)"
+	@$(API_VENV_PYTHON) -c "import json, pathlib, sys; report=json.loads(pathlib.Path('$(DATA_QUALITY_REPORT)').read_text()); print('Data quality status:', report.get('status')); sys.exit(0 if report.get('status') == 'passed' else 1)"
+	@echo "Data quality report: $(DATA_QUALITY_REPORT)"
+	@echo "Dataset manifest: $(DATA_MANIFEST_REPORT)"
+	@if [ -f "$(DATA_REALISM_REPORT)" ]; then echo "Realism report: $(DATA_REALISM_REPORT)"; fi
 
 api-migrate: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head
@@ -182,7 +198,7 @@ frontend-build:
 
 test: api-test frontend-test
 
-ci-local: compose-config api-test frontend-test frontend-lint frontend-build
+ci-local: compose-config data-quality api-test frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
 
 # -------------------------------------------------------------------

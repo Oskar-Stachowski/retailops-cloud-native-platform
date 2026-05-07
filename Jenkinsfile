@@ -21,6 +21,12 @@ pipeline {
         )
 
         choice(
+            name: 'DATA_PROFILE',
+            choices: ['small', 'medium'],
+            description: 'Synthetic data profile used by the data quality gate.'
+        )
+
+        choice(
             name: 'DEPLOY_TARGET',
             choices: ['local-only', 'ecr-disabled', 'terraform-disabled', 'eks-disabled'],
             description: 'Target release stage. Non-local targets are placeholders until later sprints.'
@@ -102,6 +108,12 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'make install'
+            }
+        }
+
+        stage('Data Quality Gate') {
+            steps {
+                sh 'make data-quality DATA_PROFILE="${DATA_PROFILE}"'
             }
         }
 

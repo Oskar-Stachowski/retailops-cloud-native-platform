@@ -1,0 +1,63 @@
+name: Data CI
+
+on:
+  push:
+    paths:
+      - "data/**"
+      - "services/api/tests/test_data_generator_cli.py"
+      - "Makefile"
+      - "ci-cd/README.md"
+      - "docs/synthetic-data-profiles.md"
+      - ".github/workflows/data-ci.yml"
+  pull_request:
+    paths:
+      - "data/**"
+      - "services/api/tests/test_data_generator_cli.py"
+      - "Makefile"
+      - "ci-cd/README.md"
+      - "docs/synthetic-data-profiles.md"
+      - ".github/workflows/data-ci.yml"
+  workflow_dispatch:
+    inputs:
+      data_profile:
+        description: "Synthetic data profile to validate."
+        required: true
+        type: choice
+        default: small
+        options:
+          - small
+          - medium
+
+permissions:
+  contents: read
+
+jobs:
+  data-quality:
+    name: Synthetic data quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      DATA_PROFILE: ${{ inputs.data_profile || 'small' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: services/api/requirements.txt
+
+      - name: Run data quality gate
+        run: make data-quality DATA_PROFILE="${DATA_PROFILE}"
+
+      - name: Upload data quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-quality-${{ env.DATA_PROFILE }}-evidence
+          path: ci-cd/reports/data/**
+          if-no-files-found: error

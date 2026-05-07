@@ -75,6 +75,7 @@ Common commands:
 |---|---|
 | `make install` | Install backend and frontend dependencies |
 | `make ci-local` | Run local code-confidence checks |
+| `make data-quality` | Generate a synthetic dataset and fail if `quality_report.json` is not `passed` |
 | `make compose-ci` | Build and run the full Docker Compose stack, then execute smoke tests |
 | `make security-scan` | Run local secret, filesystem, and image security scans |
 | `make docker-build` | Build backend and frontend Docker images |
@@ -84,9 +85,13 @@ Common commands:
 Recommended local flow before opening a PR:
 
 ```bash
+make data-quality
 make ci-local
 make compose-ci
 ```
+
+`make ci-local` already includes `make data-quality`; running it separately is
+useful when working specifically on the synthetic data generator.
 
 Recommended local flow before closing Sprint 9 or preparing portfolio evidence:
 
@@ -120,6 +125,36 @@ Purpose:
 - Build backend Docker image.
 
 This workflow validates that backend changes remain compatible with the database schema, seed process, and Docker build.
+
+### 4.1a Data CI
+
+File:
+
+```text
+.github/workflows/data-ci.yml
+```
+
+Purpose:
+
+- Generate a synthetic data profile.
+- Run the data quality gate through `make data-quality`.
+- Fail when `quality_report.json` is not `passed`.
+- Upload data evidence as a GitHub Actions artifact.
+
+Default PR/push profile:
+
+```text
+small
+```
+
+Manual dispatch can run:
+
+```text
+small
+medium
+```
+
+`medium` is intentionally manual so normal PR checks stay fast.
 
 ### 4.2 Frontend CI
 
