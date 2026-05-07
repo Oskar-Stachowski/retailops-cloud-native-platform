@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -70,7 +70,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Prepare report directory
         run: mkdir -p "${REPORT_DIR}"
@@ -101,13 +101,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Prepare report directory
         run: mkdir -p "${REPORT_DIR}"
 
       - name: Set up Python for dependency audit
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: pip
@@ -137,13 +137,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Prepare report directory
         run: mkdir -p "${REPORT_DIR}"
 
       - name: Set up Node.js for dependency audit
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
@@ -171,7 +171,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Prepare report directory
         run: mkdir -p "${REPORT_DIR}"
@@ -204,7 +204,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Prepare report directory
         run: mkdir -p "${REPORT_DIR}"
