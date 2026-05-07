@@ -67,6 +67,12 @@ Run the local API and Prometheus stack with:
 make observability-up
 ```
 
+Run the streaming smoke checks against a running Compose stack with:
+
+```bash
+make streaming-smoke
+```
+
 Then open:
 
 ```text

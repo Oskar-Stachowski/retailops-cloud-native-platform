@@ -74,6 +74,12 @@ List topics:
 make broker-topics
 ```
 
+Run the streaming smoke test against an already running local stack:
+
+```bash
+make streaming-smoke
+```
+
 Start the full local stack:
 
 ```bash
@@ -112,7 +118,25 @@ Host tools should use:
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS=localhost:19092
 ```
 
-## 6. AWS Mapping
+## 6. Streaming Smoke Test
+
+`scripts/streaming_smoke.sh` is the Sprint 9 end-to-end guardrail for the
+local real-time foundation. It assumes the Compose stack is already running and
+checks:
+
+- Redpanda topic initialization for all Sprint 9 event topics,
+- API health through `/health`,
+- live operations contract through `/dashboard/live-operations`,
+- stream metrics exposed through `/metrics`,
+- Prometheus target health for the API scrape job,
+- Prometheus loading of stream alert rules.
+
+It does not yet publish events into the broker because the current API consumer
+is a processing skeleton and persistence layer, not a long-running Kafka poller.
+That should become a later streaming E2E test once the consumer loop is wired to
+Redpanda.
+
+## 7. AWS Mapping
 
 | Local capability | AWS direction |
 | --- | --- |

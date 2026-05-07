@@ -63,6 +63,7 @@ API_IMAGE ?= retailops-api:local
 FRONTEND_IMAGE ?= retailops-frontend:local
 
 SMOKE_SCRIPT ?= ./scripts/compose_smoke.sh
+STREAMING_SMOKE_SCRIPT ?= ./scripts/streaming_smoke.sh
 
 DATA_PROFILE ?= small
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
@@ -122,6 +123,7 @@ help:
 	@echo "  make broker-topics        List local Redpanda topics"
 	@echo "  make observability-up     Start API and Prometheus for local metrics"
 	@echo "  make compose-smoke        Run local smoke test against running stack"
+	@echo "  make streaming-smoke      Run streaming smoke test against broker/API/Prometheus"
 	@echo "  make compose-ci           Build, start, smoke-test, log on failure, cleanup"
 	@echo "  make compose-down         Stop and remove local stack"
 	@echo ""
@@ -338,7 +340,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke compose-rebuild-smoke compose-ci broker-up broker-topics observability-up
+.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke compose-rebuild-smoke compose-ci broker-up broker-topics observability-up
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -369,6 +371,10 @@ compose-smoke:
 	chmod +x "$(SMOKE_SCRIPT)"
 	API_BASE_URL="http://localhost:$(API_PORT)" FRONTEND_BASE_URL="http://localhost:$(FRONTEND_PORT)" "$(SMOKE_SCRIPT)"
 
+streaming-smoke:
+	chmod +x "$(STREAMING_SMOKE_SCRIPT)"
+	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" COMPOSE="$(COMPOSE)" "$(STREAMING_SMOKE_SCRIPT)"
+
 compose-rebuild-smoke: compose-ci
 
 compose-ci: ensure-reports-dir
@@ -384,6 +390,11 @@ compose-ci: ensure-reports-dir
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" FRONTEND_BASE_URL="http://localhost:$(FRONTEND_PORT)" "$(SMOKE_SCRIPT)" || status=$$?; \
+	fi; \
+	if [[ $$status -eq 0 ]]; then \
+		echo "[compose-ci] Running streaming smoke tests..."; \
+		chmod +x "$(STREAMING_SMOKE_SCRIPT)"; \
+		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" COMPOSE="$(COMPOSE)" "$(STREAMING_SMOKE_SCRIPT)" || status=$$?; \
 	fi; \
 	$(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
 	if [[ $$status -ne 0 ]]; then \
