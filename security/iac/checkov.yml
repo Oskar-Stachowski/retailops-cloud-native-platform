@@ -1,0 +1,22 @@
+# RetailOps IaC Checkov configuration
+#
+# Sprint 10 policy:
+# - Checkov is report-only / soft-fail at this stage.
+# - Critical blockers are handled separately by grep-based guardrails in CI.
+# - Findings such as missing VPC Flow Logs, custom KMS keys, alarms, dashboards,
+#   or longer log retention are future hardening items, not Sprint 10 blockers.
+
+framework:
+  - terraform
+
+directory:
+  - infra
+
+soft-fail: true
+quiet: false
+compact: false
+download-external-modules: false
+
+# Keep checks visible in the report instead of hiding them.
+# Future sprints may replace this with explicit skip-check / hard-fail policies.
+skip-check: []

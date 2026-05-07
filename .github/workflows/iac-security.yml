@@ -1,0 +1,134 @@
+name: IaC Security CI
+
+on:
+  push:
+    paths:
+      - "infra/**"
+      - "security/iac/**"
+      - ".github/workflows/iac-security.yml"
+  pull_request:
+    paths:
+      - "infra/**"
+      - "security/iac/**"
+      - ".github/workflows/iac-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iac-security-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TERRAFORM_VERSION: "1.9.8"
+  IAC_REPORT_DIR: "ci-cd/reports/iac"
+
+jobs:
+  tflint:
+    name: TFLint IaC quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Set up TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Prepare IaC report directory
+        run: mkdir -p "${IAC_REPORT_DIR}"
+
+      - name: Show tool versions
+        run: |
+          terraform version
+          tflint --version
+
+      - name: Initialize TFLint plugins
+        run: tflint --init --config security/iac/tflint.hcl
+
+      - name: Run TFLint
+        run: |
+          set -o pipefail
+          tflint --recursive \
+            --config security/iac/tflint.hcl \
+            --format compact | tee "${IAC_REPORT_DIR}/tflint.txt"
+
+      - name: Upload TFLint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iac-tflint-report
+          path: ci-cd/reports/iac/tflint.txt
+          if-no-files-found: ignore
+
+  checkov:
+    name: Checkov IaC security report
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Checkov
+        run: python -m pip install --upgrade checkov
+
+      - name: Prepare IaC report directory
+        run: mkdir -p "${IAC_REPORT_DIR}"
+
+      - name: Run critical IaC guardrail checks
+        run: |
+          set -euo pipefail
+          echo "Checking for IAM users, access keys, AdministratorAccess and wildcard IAM actions..."
+          if grep -R -I --include="*.tf" --exclude-dir=".terraform" \
+            -E 'aws_iam_access_key|aws_iam_user|policy_arn[[:space:]]*=[[:space:]]*"arn:aws:iam::aws:policy/AdministratorAccess"|actions[[:space:]]*=[[:space:]]*\[[^]]*"\*"' \
+            infra; then
+            echo "ERROR: Critical IaC guardrail violation found. Review IAM definitions before merging."
+            exit 1
+          fi
+          echo "Critical IaC guardrail checks passed."
+
+      - name: Run Checkov report-only scan
+        run: |
+          set -o pipefail
+          checkov \
+            --config-file security/iac/checkov.yml \
+            --directory infra \
+            --framework terraform \
+            --soft-fail \
+            --output cli | tee "${IAC_REPORT_DIR}/checkov.txt"
+
+      - name: Run Checkov JSON report
+        if: always()
+        run: |
+          checkov \
+            --config-file security/iac/checkov.yml \
+            --directory infra \
+            --framework terraform \
+            --soft-fail \
+            --output json > "${IAC_REPORT_DIR}/checkov.json"
+
+      - name: Upload Checkov reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iac-checkov-reports
+          path: |
+            ci-cd/reports/iac/checkov.txt
+            ci-cd/reports/iac/checkov.json
+          if-no-files-found: ignore
