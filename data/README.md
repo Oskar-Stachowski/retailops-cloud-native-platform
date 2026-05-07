@@ -90,6 +90,45 @@ row counts and realism checks such as top-product revenue share, average order
 items, promotion uplift, stockout rate, return rate by category and data quality
 status counts.
 
+## Generate real-time replay events
+
+Sprint 9 introduces a replayable real-time event generator. It transforms the
+same synthetic profiles into JSONL events that follow
+[RetailOps Real-Time Event Contracts](../docs/real-time-event-contracts.md).
+
+From the repository root:
+
+```bash
+python -m data.generator.realtime --profile demo
+```
+
+This writes:
+
+```text
+data/replay/demo/events.jsonl
+data/replay/demo/event_manifest.json
+```
+
+`data/replay/` is ignored by Git. The generator is deterministic for the same
+profile, generation parameters and seed.
+
+Useful bounded local example:
+
+```bash
+python -m data.generator.realtime \
+  --profile small \
+  --days 7 \
+  --products 20 \
+  --stores 4 \
+  --warehouses 3 \
+  --seed 42 \
+  --max-events 500
+```
+
+Use `--max-events 0` to write all events for the generated profile. Large event
+replays should remain outside Git and should be used only for manual platform
+or observability validation.
+
 ## Seed the API database
 
 From `services/api`:

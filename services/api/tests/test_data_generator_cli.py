@@ -13,6 +13,14 @@ from data.generator.main import (
 from data.generator.manifest import build_dataset_manifest
 from data.generator.quality import build_quality_report
 from data.generator.realism_report import build_realism_report
+from data.generator.realtime import (
+    EVENTS_FILENAME,
+    MANIFEST_FILENAME,
+    RealtimeEventGenerationConfig,
+    build_event_manifest,
+    build_realtime_events,
+    generate_realtime_event_dataset,
+)
 
 
 class Args:
@@ -370,3 +378,122 @@ def test_quality_report_passes_for_synthetic_profile() -> None:
     assert report["summary"]["failed"] == 0
     assert report["row_counts"]["orders"] == 280
     assert report["row_counts"]["sales"] == report["row_counts"]["order_items"]
+
+
+def test_realtime_event_generator_builds_demo_event_envelope() -> None:
+    dataset_config = DatasetGenerationConfig(profile="demo")
+    tables = build_dataset(dataset_config)
+    events = build_realtime_events(
+        tables,
+        RealtimeEventGenerationConfig(
+            dataset=dataset_config,
+            max_events=None,
+        ),
+    )
+
+    event_types = {event["event_type"] for event in events}
+    first_event = events[0]
+
+    assert {
+        "order_created",
+        "sale_completed",
+        "stock_changed",
+        "inventory_snapshot_recorded",
+        "price_changed",
+        "promotion_started",
+        "promotion_ended",
+        "forecast_generated",
+        "anomaly_detected",
+        "alert_created",
+        "workflow_action_performed",
+    }.issubset(event_types)
+    assert first_event["event_id"]
+    assert first_event["schema_version"] == "1.0"
+    assert first_event["source"] == "retailops.synthetic-generator"
+    assert first_event["topic"].startswith("retailops.")
+    assert first_event["occurred_at"] <= first_event["ingested_at"]
+    assert isinstance(first_event["payload"], dict)
+
+
+def test_realtime_event_generator_is_deterministic_for_seed() -> None:
+    dataset_config = DatasetGenerationConfig(
+        profile="small",
+        days=3,
+        products=5,
+        stores=2,
+        warehouses=2,
+        seed=123,
+    )
+    config = RealtimeEventGenerationConfig(
+        dataset=dataset_config,
+        max_events=25,
+    )
+    tables = build_dataset(dataset_config)
+
+    first = build_realtime_events(tables, config)
+    second = build_realtime_events(tables, config)
+
+    assert first == second
+
+
+def test_realtime_event_generator_respects_max_events() -> None:
+    dataset_config = DatasetGenerationConfig(profile="demo")
+    tables = build_dataset(dataset_config)
+
+    events = build_realtime_events(
+        tables,
+        RealtimeEventGenerationConfig(
+            dataset=dataset_config,
+            max_events=7,
+        ),
+    )
+
+    assert len(events) == 7
+
+
+def test_realtime_event_manifest_summarizes_topics_and_types() -> None:
+    dataset_config = DatasetGenerationConfig(profile="demo")
+    tables = build_dataset(dataset_config)
+    config = RealtimeEventGenerationConfig(
+        dataset=dataset_config,
+        max_events=20,
+    )
+    events = build_realtime_events(tables, config)
+    manifest = build_event_manifest(config, events)
+
+    assert manifest["dataset_name"] == "retailops-realtime-events"
+    assert manifest["profile"] == "demo"
+    assert manifest["schema_version"] == "1.0"
+    assert manifest["formats"] == ["jsonl"]
+    assert manifest["event_count"] == 20
+    assert manifest["event_type_counts"]
+    assert manifest["topic_counts"]
+    assert EVENTS_FILENAME in manifest["artifacts"]
+    assert MANIFEST_FILENAME in manifest["artifacts"]
+
+
+def test_realtime_event_generator_writes_jsonl_and_manifest(tmp_path) -> None:
+    dataset_config = DatasetGenerationConfig(
+        profile="small",
+        days=3,
+        products=5,
+        stores=2,
+        warehouses=2,
+        seed=42,
+    )
+    config = RealtimeEventGenerationConfig(
+        dataset=dataset_config,
+        max_events=10,
+    )
+
+    manifest = generate_realtime_event_dataset(tmp_path, config)
+    event_lines = (tmp_path / EVENTS_FILENAME).read_text(
+        encoding="utf-8",
+    ).splitlines()
+    written_manifest = (tmp_path / MANIFEST_FILENAME).read_text(
+        encoding="utf-8",
+    )
+
+    assert manifest["event_count"] == 10
+    assert len(event_lines) == 10
+    assert "\"dataset_name\": \"retailops-realtime-events\"" in written_manifest
