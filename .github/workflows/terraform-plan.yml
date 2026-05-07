@@ -1,0 +1,91 @@
+name: Terraform IaC CI
+
+on:
+  push:
+    paths:
+      - "infra/**"
+      - "Makefile"
+      - ".github/workflows/terraform-plan.yml"
+  pull_request:
+    paths:
+      - "infra/**"
+      - "Makefile"
+      - ".github/workflows/terraform-plan.yml"
+  workflow_dispatch:
+    inputs:
+      run_dev_plan:
+        description: "Run terraform plan for dev. Requires safe AWS credentials configured for this workflow. This workflow never runs terraform apply."
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TERRAFORM_VERSION: "1.9.8"
+
+jobs:
+  terraform-validate:
+    name: Terraform fmt, init and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Show Terraform version
+        run: terraform version
+
+      - name: Run local IaC scan
+        run: make iac-scan
+
+      - name: Upload Terraform validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-validation-evidence
+          path: |
+            ci-cd/reports/iac/terraform-validate.txt
+          if-no-files-found: ignore
+
+  terraform-plan-dev:
+    name: Optional dev Terraform plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: terraform-validate
+    if: github.event_name == 'workflow_dispatch' && inputs.run_dev_plan == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Verify AWS credentials are available without printing account details
+        run: aws sts get-caller-identity >/dev/null
+
+      - name: Create dev Terraform plan report
+        run: make terraform-plan-dev
+
+      - name: Upload Terraform plan evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-dev-plan-evidence
+          path: |
+            ci-cd/reports/iac/terraform-plan-dev.txt
+          if-no-files-found: ignore
