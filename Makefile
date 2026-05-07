@@ -6,6 +6,8 @@
 
 SHELL := /bin/bash
 
+ROOT_DIR ?= $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
 # Local-only convenience. Do not commit real secrets in .env.
 -include .env
 
@@ -25,11 +27,21 @@ SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 
 TERRAFORM ?= terraform
+TFLINT ?= tflint
+CHECKOV ?= checkov
+
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
 TERRAFORM_VAR_FILE ?= terraform.tfvars.example
+
+TFLINT_CONFIG ?= $(ROOT_DIR)/security/iac/tflint.hcl
+CHECKOV_CONFIG ?= $(ROOT_DIR)/security/iac/checkov.yml
+
 TERRAFORM_VALIDATE_REPORT ?= $(IAC_REPORTS_DIR)/terraform-validate.txt
 TERRAFORM_PLAN_REPORT ?= $(IAC_REPORTS_DIR)/terraform-plan-dev.txt
+TFLINT_REPORT ?= $(IAC_REPORTS_DIR)/tflint.txt
+CHECKOV_REPORT ?= $(IAC_REPORTS_DIR)/checkov.txt
+CHECKOV_JSON_REPORT ?= $(IAC_REPORTS_DIR)/checkov.json
 
 POSTGRES_DB ?= retailops
 POSTGRES_USER ?= retailops_local
@@ -82,7 +94,9 @@ help:
 	@echo "  make terraform-fmt        Format Terraform files under infra/"
 	@echo "  make terraform-validate   Initialize Terraform locally and validate dev"
 	@echo "  make terraform-plan-dev   Create a dev Terraform plan report"
-	@echo "  make iac-scan             Run local IaC validation and safety checks"
+	@echo "  make tflint-report        Run TFLint only against infra/ and save report"
+	@echo "  make checkov-scan         Run Checkov report-only IaC scan"
+	@echo "  make iac-scan             Run Terraform validation, guardrails, TFLint and Checkov"
 	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
@@ -175,13 +189,38 @@ ci-local: compose-config api-test frontend-test frontend-lint frontend-build
 # Terraform / Infrastructure as Code
 # These targets are local-first helpers. They validate and collect evidence
 # before Terraform is promoted to GitHub Actions or Jenkins automation.
+# top-level commands --> iac-scan, terraform-plan-dev
 # -------------------------------------------------------------------
 
-.PHONY: check-terraform ensure-iac-reports-dir terraform-fmt terraform-fmt-check terraform-init-local terraform-validate terraform-plan-dev iac-secret-scan iac-scan
+.PHONY: check-terraform check-tflint check-checkov check-tflint-config check-checkov-config ensure-iac-reports-dir terraform-fmt terraform-fmt-check terraform-init-local terraform-validate terraform-plan-dev tflint-init tflint-report iac-critical-guardrails iac-secret-scan checkov-report checkov-json checkov-scan iac-scan
 
 check-terraform:
 	@command -v "$(TERRAFORM)" >/dev/null 2>&1 || { \
 		echo "ERROR: terraform is not installed or not available in PATH."; \
+		exit 1; \
+	}
+
+check-tflint:
+	@command -v "$(TFLINT)" >/dev/null 2>&1 || { \
+		echo "ERROR: tflint is not installed or not available in PATH."; \
+		exit 1; \
+	}
+
+check-checkov:
+	@command -v "$(CHECKOV)" >/dev/null 2>&1 || { \
+		echo "ERROR: checkov is not installed or not available in PATH."; \
+		exit 1; \
+	}
+
+check-tflint-config:
+	@test -f "$(TFLINT_CONFIG)" || { \
+		echo "ERROR: TFLint config not found: $(TFLINT_CONFIG)"; \
+		exit 1; \
+	}
+
+check-checkov-config:
+	@test -f "$(CHECKOV_CONFIG)" || { \
+		echo "ERROR: Checkov config not found: $(CHECKOV_CONFIG)"; \
 		exit 1; \
 	}
 
@@ -207,6 +246,27 @@ terraform-plan-dev: terraform-init-local
 		-var-file="$(TERRAFORM_VAR_FILE)" \
 		-no-color | tee "$(TERRAFORM_PLAN_REPORT)"
 
+tflint-init: check-tflint check-tflint-config
+	$(TFLINT) --init --config "$(TFLINT_CONFIG)"
+
+tflint-report: tflint-init ensure-iac-reports-dir
+	@set -o pipefail; \
+	cd "$(ROOT_DIR)/$(INFRA_DIR)" && \
+	$(TFLINT) --recursive \
+		--config "$(TFLINT_CONFIG)" \
+		--format compact | tee "$(ROOT_DIR)/$(TFLINT_REPORT)"
+
+iac-critical-guardrails: ensure-iac-reports-dir
+	@echo "[iac-critical-guardrails] Checking for IAM users, access keys, AdministratorAccess and wildcard IAM actions..."
+	@if grep -R -I --include="*.tf" --exclude-dir=".terraform" \
+		-E 'aws_iam_access_key|aws_iam_user|policy_arn[[:space:]]*=[[:space:]]*"arn:aws:iam::aws:policy/AdministratorAccess"|actions[[:space:]]*=[[:space:]]*\[[^]]*"\*"' \
+		"$(INFRA_DIR)"; then \
+		echo "ERROR: Critical IaC guardrail violation found. Review IAM definitions before merging."; \
+		exit 1; \
+	else \
+		echo "[iac-critical-guardrails] Critical IaC guardrail checks passed."; \
+	fi
+
 iac-secret-scan: ensure-iac-reports-dir
 	@echo "[iac-secret-scan] Checking Terraform/docs for obvious AWS secrets or real IAM ARNs..."
 	@if grep -R -I \
@@ -224,8 +284,28 @@ iac-secret-scan: ensure-iac-reports-dir
 		echo "[iac-secret-scan] No obvious AWS access keys or real IAM ARNs found."; \
 	fi
 
-iac-scan: terraform-fmt-check terraform-validate iac-secret-scan
-	@echo "IaC scan passed. Use 'make terraform-plan-dev' separately when AWS credentials are available."
+checkov-report: check-checkov check-checkov-config ensure-iac-reports-dir
+	@set -o pipefail; \
+	$(CHECKOV) \
+		--config-file "$(CHECKOV_CONFIG)" \
+		--directory "$(INFRA_DIR)" \
+		--framework terraform \
+		--soft-fail \
+		--output cli | tee "$(CHECKOV_REPORT)"
+
+checkov-json: check-checkov check-checkov-config ensure-iac-reports-dir
+	$(CHECKOV) \
+		--config-file "$(CHECKOV_CONFIG)" \
+		--directory "$(INFRA_DIR)" \
+		--framework terraform \
+		--soft-fail \
+		--output json > "$(CHECKOV_JSON_REPORT)"
+
+checkov-scan: checkov-report checkov-json
+	@echo "Checkov report-only scan completed. Reports saved under $(IAC_REPORTS_DIR)."
+
+iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-secret-scan tflint-report checkov-scan
+	@echo "IaC scan passed. Reports saved under $(IAC_REPORTS_DIR). Use 'make terraform-plan-dev' separately when AWS credentials are available."
 
 # -------------------------------------------------------------------
 # Docker / Compose

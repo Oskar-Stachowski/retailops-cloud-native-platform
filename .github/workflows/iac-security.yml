@@ -54,14 +54,15 @@ jobs:
           tflint --version
 
       - name: Initialize TFLint plugins
-        run: tflint --init --config security/iac/tflint.hcl
+        run: tflint --init --config "${GITHUB_WORKSPACE}/security/iac/tflint.hcl"
 
       - name: Run TFLint
+        working-directory: infra
         run: |
           set -o pipefail
           tflint --recursive \
-            --config security/iac/tflint.hcl \
-            --format compact | tee "${IAC_REPORT_DIR}/tflint.txt"
+            --config "${GITHUB_WORKSPACE}/security/iac/tflint.hcl" \
+            --format compact | tee "${GITHUB_WORKSPACE}/${IAC_REPORT_DIR}/tflint.txt"
 
       - name: Upload TFLint report
         if: always()
