@@ -305,33 +305,3 @@ Follow-up required:
 
 Senior review note:
 ```
-
----
-
-## 13. Common mistakes
-
-Avoid these mistakes:
-
-- running `terraform destroy` in the wrong environment,
-- assuming the plan and the real account are the same thing,
-- forgetting ECR images,
-- leaving NAT Gateway active after a demo,
-- leaving RDS/EKS/OpenSearch/MSK active after testing,
-- committing private notification emails,
-- committing real account IDs,
-- deleting resources that are not managed by this project,
-- failing to collect evidence before cleanup.
-
----
-
-## 14. Senior DevOps review note
-
-A good cleanup runbook protects both cost and confidence.
-
-It proves that the team can:
-
-- create infrastructure intentionally,
-- observe it,
-- explain it,
-- destroy it,
-- and verify that no hidden cost remains.
