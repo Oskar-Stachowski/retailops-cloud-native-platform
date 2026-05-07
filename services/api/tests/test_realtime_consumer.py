@@ -42,9 +42,31 @@ def test_event_envelope_rejects_unknown_event_type() -> None:
 
 
 def test_consumer_processes_known_event_and_updates_state() -> None:
+    class RecordingRepository:
+        def __init__(self) -> None:
+            self.records: list[tuple[str, dict[str, object]]] = []
+            self.processed = False
+
+        def is_event_processed(self, event_id: str) -> bool:
+            return self.processed
+
+        def record_event_log(self, **kwargs):
+            self.records.append(("event_log", kwargs))
+            return kwargs
+
+        def replace_metric_observations(self, **kwargs):
+            self.records.append(("metrics", kwargs))
+            return len(kwargs["observations"])
+
+        def upsert_consumer_state(self, **kwargs):
+            self.records.append(("state", kwargs))
+            return kwargs
+
     observed: list[str] = []
+    repository = RecordingRepository()
     consumer = RealtimeEventConsumer(
         settings=Settings(broker_bootstrap_servers="redpanda:9092"),
+        repository=repository,
         handlers={
             "sale_completed": lambda event: observed.append(str(event["event_id"])),
         },
@@ -59,10 +81,69 @@ def test_consumer_processes_known_event_and_updates_state() -> None:
     assert consumer.state.failed_events == 0
     assert consumer.state.dead_lettered_events == 0
     assert consumer.state.last_event_type == "sale_completed"
+    assert [kind for kind, _ in repository.records] == [
+        "event_log",
+        "metrics",
+        "event_log",
+        "state",
+    ]
+
+
+def test_consumer_ignores_duplicate_processed_events() -> None:
+    class RecordingRepository:
+        def __init__(self) -> None:
+            self.records: list[tuple[str, dict[str, object]]] = []
+
+        def is_event_processed(self, event_id: str) -> bool:
+            return True
+
+        def record_event_log(self, **kwargs):
+            self.records.append(("event_log", kwargs))
+            return kwargs
+
+        def replace_metric_observations(self, **kwargs):
+            self.records.append(("metrics", kwargs))
+            return len(kwargs["observations"])
+
+        def upsert_consumer_state(self, **kwargs):
+            self.records.append(("state", kwargs))
+            return kwargs
+
+    repository = RecordingRepository()
+    consumer = RealtimeEventConsumer(repository=repository)
+
+    result = consumer.process_event(sample_event())
+
+    assert result["status"] == "ignored_duplicate"
+    assert consumer.state.received_events == 1
+    assert consumer.state.ignored_events == 1
+    assert consumer.state.processed_events == 0
+    assert len(repository.records) == 1
+    assert repository.records[0][0] == "state"
 
 
 def test_consumer_records_failed_dead_letter_for_validation_error() -> None:
-    consumer = build_realtime_event_consumer()
+    class RecordingRepository:
+        def __init__(self) -> None:
+            self.records: list[tuple[str, dict[str, object]]] = []
+
+        def is_event_processed(self, event_id: str) -> bool:
+            return False
+
+        def record_event_log(self, **kwargs):
+            self.records.append(("event_log", kwargs))
+            return kwargs
+
+        def replace_metric_observations(self, **kwargs):
+            self.records.append(("metrics", kwargs))
+            return len(kwargs["observations"])
+
+        def upsert_consumer_state(self, **kwargs):
+            self.records.append(("state", kwargs))
+            return kwargs
+
+    repository = RecordingRepository()
+    consumer = build_realtime_event_consumer(repository=repository)
     broken_event = sample_event()
     broken_event.pop("payload")
 
@@ -74,6 +155,8 @@ def test_consumer_records_failed_dead_letter_for_validation_error() -> None:
     assert consumer.state.failed_events == 1
     assert consumer.state.dead_lettered_events == 1
     assert consumer.state.last_error
+    assert repository.records[0][0] == "event_log"
+    assert repository.records[-1][0] == "state"
 
 
 def test_consumer_snapshot_includes_broker_settings() -> None:
@@ -90,4 +173,5 @@ def test_consumer_snapshot_includes_broker_settings() -> None:
     assert snapshot["bootstrap_servers"] == "redpanda:9092"
     assert snapshot["group_id"] == "retailops-consumer"
     assert snapshot["client_id"] == "retailops-api"
+    assert snapshot["consumer_name"] == "retailops-realtime-consumer"
     assert "sale_completed" in snapshot["supported_event_types"]
