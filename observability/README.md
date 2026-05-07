@@ -15,4 +15,42 @@ Sprint 9 real-time observability should follow
 especially the metrics for event production, event consumption, failed events,
 DLQ count, processing latency, event freshness and consumer lag.
 
-Implementation will be added in later tasks.
+## Sprint 9 Stream Metrics
+
+The API exposes Prometheus text metrics at:
+
+```text
+GET /metrics
+```
+
+The current stream-processing metrics are derived from:
+
+- `realtime_event_log`,
+- `live_metric_observations`,
+- `realtime_consumer_state`.
+
+Key metric families:
+
+- `retailops_stream_events_total`
+- `retailops_stream_events_by_type_total`
+- `retailops_stream_dlq_events_total`
+- `retailops_stream_event_freshness_seconds`
+- `retailops_stream_processing_latency_seconds_avg`
+- `retailops_stream_processing_latency_seconds_max`
+- `retailops_stream_consumer_lag_events`
+- `retailops_stream_consumer_*_events_total`
+
+Local Prometheus scrape configuration lives in
+[`observability/prometheus.yml`](prometheus.yml).
+
+Run the local API and Prometheus stack with:
+
+```bash
+make observability-up
+```
+
+Then open:
+
+```text
+http://localhost:9090
+```

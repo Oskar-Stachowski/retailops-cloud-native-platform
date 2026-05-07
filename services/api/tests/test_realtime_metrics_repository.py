@@ -128,3 +128,26 @@ def test_realtime_metrics_repository_reads_live_metric_totals(monkeypatch) -> No
 
     assert rows[0]["metric_name"] == "live_revenue"
     assert cursor.executed[0][1] == (15,)
+
+
+def test_realtime_metrics_repository_reads_stream_processing_metrics(monkeypatch) -> None:
+    cursor = FakeCursor()
+    repository = RealtimeMetricsRepository(connection=FakeConnection(cursor))
+    monkeypatch.setattr(
+        "app.repositories.realtime_metrics_repository.table_exists",
+        lambda table_name: True,
+    )
+
+    metrics = repository.get_stream_processing_metrics()
+
+    assert set(metrics) == {
+        "event_status_counts",
+        "event_type_counts",
+        "freshness",
+        "processing_latency",
+        "consumer_states",
+    }
+    assert any(
+        "FROM realtime_event_log" in query
+        for query, _params in cursor.executed
+    )

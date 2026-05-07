@@ -208,6 +208,63 @@ class RealtimeMetricsRepository:
             """,
         )
 
+    def get_stream_processing_metrics(self) -> dict[str, Any]:
+        return {
+            "event_status_counts": self.get_all_event_status_counts(),
+            "event_type_counts": self.get_all_event_type_counts(),
+            "freshness": self.get_event_freshness() or {},
+            "processing_latency": self.get_processing_latency_summary() or {},
+            "consumer_states": self.get_consumer_states(),
+        }
+
+    def get_all_event_status_counts(self) -> list[dict[str, Any]]:
+        if not table_exists("realtime_event_log"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                status,
+                COUNT(*)::int AS event_count
+            FROM realtime_event_log
+            GROUP BY status
+            ORDER BY status ASC;
+            """
+        )
+
+    def get_all_event_type_counts(self) -> list[dict[str, Any]]:
+        if not table_exists("realtime_event_log"):
+            return []
+
+        return self._fetch_all(
+            """
+            SELECT
+                event_type,
+                COUNT(*)::int AS event_count
+            FROM realtime_event_log
+            GROUP BY event_type
+            ORDER BY event_type ASC;
+            """
+        )
+
+    def get_processing_latency_summary(self) -> dict[str, Any] | None:
+        if not table_exists("realtime_event_log"):
+            return None
+
+        return self._fetch_one(
+            """
+            SELECT
+                COUNT(*)::int AS processed_event_count,
+                AVG(EXTRACT(EPOCH FROM (processed_at - ingested_at)))::float
+                    AS avg_latency_seconds,
+                MAX(EXTRACT(EPOCH FROM (processed_at - ingested_at)))::float
+                    AS max_latency_seconds
+            FROM realtime_event_log
+            WHERE processed_at IS NOT NULL
+              AND ingested_at IS NOT NULL;
+            """
+        )
+
     def record_event_log(
         self,
         *,

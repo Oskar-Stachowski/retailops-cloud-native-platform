@@ -50,6 +50,7 @@ POSTGRES_PASSWORD ?= retailops_local_dev_password
 POSTGRES_PORT ?= 5432
 REDPANDA_KAFKA_PORT ?= 19092
 REDPANDA_ADMIN_PORT ?= 19644
+PROMETHEUS_PORT ?= 9090
 
 API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
@@ -75,6 +76,7 @@ export POSTGRES_PASSWORD
 export POSTGRES_PORT
 export REDPANDA_KAFKA_PORT
 export REDPANDA_ADMIN_PORT
+export PROMETHEUS_PORT
 export API_PORT
 export FRONTEND_PORT
 export APP_ENV
@@ -118,6 +120,7 @@ help:
 	@echo "  make compose-up           Start full local stack"
 	@echo "  make broker-up            Start local Redpanda broker and create topics"
 	@echo "  make broker-topics        List local Redpanda topics"
+	@echo "  make observability-up     Start API and Prometheus for local metrics"
 	@echo "  make compose-smoke        Run local smoke test against running stack"
 	@echo "  make compose-ci           Build, start, smoke-test, log on failure, cleanup"
 	@echo "  make compose-down         Stop and remove local stack"
@@ -335,7 +338,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke compose-rebuild-smoke compose-ci broker-up broker-topics
+.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke compose-rebuild-smoke compose-ci broker-up broker-topics observability-up
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -352,6 +355,9 @@ broker-up:
 
 broker-topics:
 	$(COMPOSE) exec redpanda rpk topic list --brokers redpanda:9092
+
+observability-up:
+	$(COMPOSE) up --build -d db migrate seed api prometheus
 
 compose-down:
 	$(COMPOSE) down -v --remove-orphans

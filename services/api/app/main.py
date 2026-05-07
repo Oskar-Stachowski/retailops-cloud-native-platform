@@ -10,6 +10,7 @@ from app.api import (
     forecasts,
     inventory,
     me,
+    metrics,
     notifications,
     product_360,
     products,
@@ -38,6 +39,7 @@ register_exception_handlers(app)
 app.state.realtime_event_consumer = build_realtime_event_consumer()
 
 app.include_router(health_router)
+app.include_router(metrics.router)
 app.include_router(dashboard.router)
 app.include_router(analytics.router)
 app.include_router(products.router)

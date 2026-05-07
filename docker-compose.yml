@@ -23,6 +23,22 @@ services:
       seed:
         condition: service_completed_successfully
 
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+
   redpanda:
     image: redpandadata/redpanda:v25.3.6
     command:
@@ -132,3 +148,4 @@ services:
 volumes:
   postgres_data:
   redpanda_data:
+  prometheus_data:
