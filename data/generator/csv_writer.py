@@ -4,7 +4,19 @@ import csv
 from pathlib import Path
 
 TABLE_COLUMNS: dict[str, list[str]] = {
-    "products": ["id", "sku", "name", "category", "brand", "status"],
+    "products": [
+        "id",
+        "sku",
+        "name",
+        "category",
+        "brand",
+        "status",
+        "demand_class",
+        "demand_weight",
+        "price_elasticity",
+        "seasonal_pattern",
+        "return_rate",
+    ],
     "users": ["id", "login", "display_name", "role", "team", "status"],
     "stores": [
         "id",
@@ -15,6 +27,8 @@ TABLE_COLUMNS: dict[str, list[str]] = {
         "city",
         "channel",
         "status",
+        "traffic_multiplier",
+        "promo_sensitivity",
     ],
     "warehouses": [
         "id",
@@ -104,6 +118,15 @@ TABLE_COLUMNS: dict[str, list[str]] = {
         "region",
         "sold_at",
         "order_reference",
+        "latent_demand",
+        "observed_sales",
+        "stockout_flag",
+        "promotion_applied",
+        "promotion_uplift",
+        "price_elasticity_effect",
+        "demand_noise",
+        "data_quality_status",
+        "ingested_at",
     ],
     "inventory_snapshots": [
         "id",

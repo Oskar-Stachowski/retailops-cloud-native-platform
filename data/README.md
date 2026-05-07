@@ -53,6 +53,29 @@ The `demo` profile writes to `data/demo` by default. The `small`, `medium`, and
 by Git. Their sizing strategy is documented in
 [RetailOps Synthetic Data Profiles](../docs/synthetic-data-profiles.md).
 
+Synthetic profiles beyond `demo` include a realism layer:
+
+- deterministic randomness controlled by `--seed`,
+- product demand classes and long-tail demand distribution,
+- weekly and seasonal demand patterns,
+- price elasticity and promotion uplift,
+- stockout-limited observed sales with separate latent demand,
+- multi-item baskets,
+- category and channel-specific returns,
+- inventory replenishment-style stock movements,
+- anomalies derived from generated business signals,
+- low-rate controlled data quality statuses.
+
+For non-demo profiles, the generator also writes:
+
+```text
+realism_report.json
+```
+
+The report summarizes row counts and realism checks such as top-product revenue
+share, average order items, promotion uplift, stockout rate, return rate by
+category and data quality status counts.
+
 ## Seed the API database
 
 From `services/api`:

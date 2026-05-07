@@ -67,6 +67,12 @@ accidentally creating very large files. Larger profile sizes should be requested
 explicitly with `--days`, `--products`, `--stores`, and `--warehouses`, and
 future Parquet/S3 writers should be used for high-volume runs.
 
+The non-demo profiles use a realism layer. The goal of this layer is to avoid
+perfectly regular synthetic data and make generated datasets behave closer to a
+real retail or e-commerce business. It is not intended to be a statistically
+complete market simulation, but it should be realistic enough for platform
+testing, dashboards, observability, and first MLOps experiments.
+
 ## 4. Profile Targets
 
 ### 4.1 `demo`
@@ -356,6 +362,71 @@ Recommended metrics:
 - bias
 - data drift score
 - forecast freshness
+
+## 8.1 Realism Layer
+
+The realism layer currently models these behaviors for `small`, `medium`, and
+`large` profiles:
+
+| Behavior | Implementation intent |
+| --- | --- |
+| Deterministic randomness | The same `--seed` and profile inputs produce the same dataset. |
+| Product demand classes | Products are assigned classes such as `hero_product`, `core_product`, `seasonal`, `new_product`, `declining_product`, `clearance_product`, and `long_tail`. |
+| Long-tail distribution | A small set of products generates a large share of revenue. |
+| Weekly seasonality | Weekend and weekday behavior varies by category and channel. |
+| Seasonal patterns | Categories and demand classes receive patterns such as holiday peak, spring/summer peak, stable demand, or weekly sensitivity. |
+| Price elasticity | Demand reacts to generated price changes with category-specific elasticity. |
+| Promotion effects | Promotion periods create uplift, with pre/post-promotion effects. |
+| Stockout modeling | `latent_demand` can be higher than `observed_sales`; `stockout_flag` marks censored demand. |
+| Multi-item baskets | Orders can contain more than one order item, depending on channel. |
+| Returns model | Return probability depends on category and channel. |
+| Inventory cycles | Stock movements include initial stock, sale movements, and replenishment-style movements. |
+| Derived anomalies | Synthetic anomalies are derived from generated product sales signals. |
+| Controlled data quality statuses | Sales rows include low-rate statuses such as `late_event`, `duplicate_candidate`, and `missing_optional_context`. |
+
+Additional fields written for synthetic profile sales:
+
+- `latent_demand`
+- `observed_sales`
+- `stockout_flag`
+- `promotion_applied`
+- `promotion_uplift`
+- `price_elasticity_effect`
+- `demand_noise`
+- `data_quality_status`
+- `ingested_at`
+
+Additional fields written for synthetic profile products:
+
+- `demand_class`
+- `demand_weight`
+- `price_elasticity`
+- `seasonal_pattern`
+- `return_rate`
+
+Generated non-demo profiles also include `realism_report.json`. This report is
+designed to catch unrealistic synthetic data before it is used for charts or ML
+experiments.
+
+Important report metrics:
+
+- `top_20_percent_product_revenue_share`
+- `average_order_items`
+- `promotion_uplift_ratio`
+- `stockout_rate`
+- `return_rate_by_category`
+- `data_quality_status_counts`
+- `demand_class_counts`
+
+Recommended interpretation:
+
+```text
+top 20% product revenue share: should usually be high enough to show long-tail behavior
+average order items: should be above 1 for synthetic profiles
+promotion uplift ratio: should be positive but not perfectly uniform
+stockout rate: should be non-zero for operational realism
+data quality issue counts: should be low but visible
+```
 
 ## 9. Dataset Manifest
 

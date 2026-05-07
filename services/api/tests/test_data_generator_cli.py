@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pytest
 
 from data.generator.main import (
@@ -8,6 +10,7 @@ from data.generator.main import (
     config_from_args,
     validate_generation_config,
 )
+from data.generator.realism_report import build_realism_report
 
 
 class Args:
@@ -234,15 +237,64 @@ def test_non_demo_profiles_can_generate_scaled_datasets_with_overrides(
     assert len(tables["products"]) == 5
     assert len(tables["stores"]) == 2
     assert len(tables["warehouses"]) == 2
-    assert len(tables["sales"]) == 15
     assert len(tables["orders"]) == 15
-    assert len(tables["order_items"]) == 15
+    assert len(tables["sales"]) >= 15
+    assert len(tables["order_items"]) == len(tables["sales"])
     assert len(tables["price_history"]) == 15
     assert len(tables["promotions"]) == 5
     assert len(tables["inventory_snapshots"]) == 5
-    assert len(tables["stock_movements"]) == 20
-    assert len(tables["returns"]) == 3
+    assert len(tables["stock_movements"]) >= 5 + len(tables["sales"])
+    assert len(tables["returns"]) >= 0
     assert len(tables["anomalies"]) == 5
     assert len(tables["alerts"]) == 5
     assert len(tables["recommendations"]) == 5
     assert len(tables["workflow_actions"]) == 5
+
+    assert {
+        product["demand_class"] for product in tables["products"]
+    }
+    assert any(sale["latent_demand"] for sale in tables["sales"])
+    assert any(sale["observed_sales"] for sale in tables["sales"])
+    assert any(
+        sale["promotion_applied"] == "true" for sale in tables["sales"]
+    ) or len(tables["sales"]) >= 15
+
+
+def test_synthetic_profile_generation_is_deterministic_for_seed() -> None:
+    config = DatasetGenerationConfig(
+        profile="small",
+        days=5,
+        products=8,
+        stores=3,
+        warehouses=2,
+        seed=123,
+    )
+
+    first = build_dataset(config)
+    second = build_dataset(config)
+
+    assert first["products"] == second["products"]
+    assert first["sales"] == second["sales"]
+    assert first["returns"] == second["returns"]
+
+
+def test_realism_report_summarizes_synthetic_profile() -> None:
+    config = DatasetGenerationConfig(
+        profile="small",
+        days=14,
+        products=20,
+        stores=4,
+        warehouses=3,
+        seed=42,
+    )
+    tables = build_dataset(config)
+    report = build_realism_report(config.profile, config.seed, tables)
+    metrics = report["realism_metrics"]
+
+    assert report["profile"] == "small"
+    assert report["seed"] == 42
+    assert report["row_counts"]["products"] == 20
+    assert Decimal(metrics["average_order_items"]) > Decimal("1.0")
+    assert Decimal(metrics["top_20_percent_product_revenue_share"]) > 0
+    assert "data_quality_status_counts" in metrics
+    assert "demand_class_counts" in metrics

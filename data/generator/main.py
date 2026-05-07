@@ -19,6 +19,7 @@ from data.generator.products import generate_products
 from data.generator.sales import generate_sales
 from data.generator.stock import generate_returns, generate_stock_movements
 from data.generator.users import generate_users
+from data.generator.realism_report import write_realism_report
 
 
 SUPPORTED_PROFILES = ("demo", "small", "medium", "large")
@@ -133,6 +134,7 @@ def build_dataset(
         product_count=product_count,
         store_count=store_count,
         warehouse_count=warehouse_count,
+        seed=config.seed,
     )
 
 
@@ -143,7 +145,10 @@ def generate_demo_dataset(
     config = config or DatasetGenerationConfig()
     output_dir = output_dir or default_output_dir_for_profile(config.profile)
     tables = build_dataset(config)
-    return write_tables(output_dir, tables)
+    counts = write_tables(output_dir, tables)
+    if config.profile != "demo":
+        write_realism_report(output_dir, config.profile, config.seed, tables)
+    return counts
 
 
 def parse_args() -> argparse.Namespace:
