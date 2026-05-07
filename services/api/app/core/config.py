@@ -1,5 +1,6 @@
 import os
 from functools import lru_cache
+
 from pydantic import BaseModel
 
 
@@ -22,6 +23,9 @@ class Settings(BaseModel):
     app_env: str = "local"
     database_url: str | None = None
     cors_origins: list[str] = DEFAULT_CORS_ORIGINS
+    broker_bootstrap_servers: str | None = None
+    broker_group_id: str = "retailops-api-consumer"
+    broker_client_id: str = "retailops-api"
 
 
 @lru_cache
@@ -30,6 +34,15 @@ def get_settings() -> Settings:
         app_env=os.getenv("APP_ENV", "local"),
         database_url=os.getenv("DATABASE_URL"),
         cors_origins=parse_cors_origins(os.getenv("CORS_ORIGINS")),
+        broker_bootstrap_servers=os.getenv("RETAILOPS_BROKER_BOOTSTRAP_SERVERS"),
+        broker_group_id=os.getenv(
+            "RETAILOPS_BROKER_GROUP_ID",
+            "retailops-api-consumer",
+        ),
+        broker_client_id=os.getenv(
+            "RETAILOPS_BROKER_CLIENT_ID",
+            "retailops-api",
+        ),
     )
 
 

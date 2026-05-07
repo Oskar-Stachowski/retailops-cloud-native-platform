@@ -16,6 +16,7 @@ from app.api import (
     sales,
     stock_risks,
 )
+from app.services.realtime_consumer import build_realtime_event_consumer
 
 app = FastAPI(
     title="RetailOps API",
@@ -34,6 +35,7 @@ app.add_middleware(
 )
 
 register_exception_handlers(app)
+app.state.realtime_event_consumer = build_realtime_event_consumer()
 
 app.include_router(health_router)
 app.include_router(dashboard.router)

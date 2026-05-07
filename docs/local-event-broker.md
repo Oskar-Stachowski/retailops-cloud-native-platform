@@ -100,8 +100,11 @@ The API service receives:
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS=redpanda:9092
 ```
 
-This value is not used by production code yet. It prepares Sprint 9 Commit 4,
-where the API consumer skeleton will be added.
+The API consumer skeleton lives in
+[`services/api/app/services/realtime_consumer.py`](../services/api/app/services/realtime_consumer.py)
+and is attached to `app.state` during application startup. It validates event
+envelopes and dispatches events to placeholder handlers, but it does not yet
+connect to the broker.
 
 Host tools should use:
 
@@ -120,4 +123,3 @@ RETAILOPS_BROKER_BOOTSTRAP_SERVERS=localhost:19092
 
 EventBridge remains a good future option for selected integration events, but
 the local Sprint 9 implementation starts with Kafka-compatible streaming.
-
