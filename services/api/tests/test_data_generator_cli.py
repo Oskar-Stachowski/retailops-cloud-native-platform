@@ -54,6 +54,8 @@ def test_demo_profile_keeps_current_dataset_shape() -> None:
     assert len(tables["warehouses"]) == 4
     assert len(tables["orders"]) == 16
     assert len(tables["order_items"]) == 16
+    assert len(tables["price_history"]) == 24
+    assert len(tables["promotions"]) == 8
     assert len(tables["sales"]) == 16
     assert len(tables["inventory_snapshots"]) == 8
     assert len(tables["forecasts"]) == 6
@@ -113,6 +115,41 @@ def test_demo_profile_generates_orders_and_order_items_from_sales() -> None:
         assert order_item["product_id"] == sale["product_id"]
         assert order_item["quantity"] == sale["quantity"]
         assert order_item["total_amount"] == sale["total_amount"]
+
+
+def test_demo_profile_generates_price_history_and_promotions() -> None:
+    tables = build_dataset(DatasetGenerationConfig(profile="demo"))
+
+    product_ids = {product["id"] for product in tables["products"]}
+    price_history_by_product: dict[str, list[dict[str, str]]] = {
+        product_id: [] for product_id in product_ids
+    }
+
+    for price_point in tables["price_history"]:
+        assert price_point["product_id"] in product_ids
+        assert float(price_point["price"]) > 0
+        assert price_point["currency"] == "PLN"
+        assert price_point["price_type"] in {"regular", "planned"}
+        if price_point["valid_to"]:
+            assert price_point["valid_from"] <= price_point["valid_to"]
+        price_history_by_product[price_point["product_id"]].append(
+            price_point
+        )
+
+    assert {
+        len(product_price_history)
+        for product_price_history in price_history_by_product.values()
+    } == {3}
+
+    promotion_codes = set()
+    for promotion in tables["promotions"]:
+        assert promotion["product_id"] in product_ids
+        assert promotion["promotion_code"] not in promotion_codes
+        assert promotion["promotion_type"] == "discount"
+        assert float(promotion["discount_percent"]) > 0
+        assert promotion["starts_at"] <= promotion["ends_at"]
+        assert promotion["status"] == "active"
+        promotion_codes.add(promotion["promotion_code"])
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,9 @@
+id,promotion_code,product_id,name,promotion_type,discount_percent,starts_at,ends_at,channel,status
+f10ffd0a-d97b-53e9-a389-e6bf0cb43452,PROMO-ELEC-HEAD-001,85710dbe-1aea-50ac-a155-fb216e12ab97,Synthetic promotion for ELEC-HEAD-001,discount,12.00,2026-04-16,2026-05-14,all,active
+f7be4823-bf97-5a4f-b896-4e76051a25dd,PROMO-HOME-FLOOR-001,54981a3d-9a22-5c32-8f6f-4de0c0b16c34,Synthetic promotion for HOME-FLOOR-001,discount,18.00,2026-04-17,2026-05-15,all,active
+da6c9090-b05d-528b-aa8b-501a9706f319,PROMO-DAIRY-MILK-001,6278ab71-66cf-59be-bde6-8645ae6b310a,Synthetic promotion for DAIRY-MILK-001,discount,12.00,2026-04-18,2026-05-16,all,active
+1810daa2-8b5a-5206-8899-7531cad76b90,PROMO-FASHION-JACKET-001,132da6ab-ffa5-5e38-90d3-df417e77e6b8,Synthetic promotion for FASHION-JACKET-001,discount,5.00,2026-04-19,2026-05-17,all,active
+1621c482-db74-5f5d-9e02-9b4dfd827272,PROMO-BEAUTY-CREAM-001,5f4eb46d-79e8-5e61-b357-012ff4220123,Synthetic promotion for BEAUTY-CREAM-001,discount,8.00,2026-04-16,2026-05-14,all,active
+dcc24592-450d-553b-bc59-87b53d21d489,PROMO-SPORT-YOGA-001,ad8f3dd1-2dc6-5571-bc9f-f0b6504c8679,Synthetic promotion for SPORT-YOGA-001,discount,10.00,2026-04-17,2026-05-15,all,active
+f96feca2-a200-5b5a-b3cd-ae487de3e807,PROMO-TOYS-BLOCKS-001,a3b3d013-9476-5dbd-a124-ff6d48873d8a,Synthetic promotion for TOYS-BLOCKS-001,discount,8.00,2026-04-18,2026-05-16,all,active
+d0533b8f-d75f-5191-96c7-9f85a86c5cbf,PROMO-PET-FOOD-001,a24a7f85-d830-55e5-90e4-afb122abd0ce,Synthetic promotion for PET-FOOD-001,discount,10.00,2026-04-19,2026-05-17,all,active

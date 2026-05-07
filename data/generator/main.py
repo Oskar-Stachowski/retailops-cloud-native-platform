@@ -10,6 +10,7 @@ from data.generator.incidents import generate_incident_dataset
 from data.generator.inventory import generate_inventory_snapshots
 from data.generator.locations import generate_stores, generate_warehouses
 from data.generator.orders import generate_order_items, generate_orders
+from data.generator.pricing import generate_price_history, generate_promotions
 from data.generator.products import generate_products
 from data.generator.sales import generate_sales
 from data.generator.users import generate_users
@@ -36,6 +37,8 @@ def build_demo_dataset() -> dict[str, list[dict[str, str]]]:
     sales = generate_sales(products)
     orders = generate_orders(sales, stores)
     order_items = generate_order_items(sales, orders)
+    price_history = generate_price_history(products)
+    promotions = generate_promotions(products)
     inventory_snapshots = generate_inventory_snapshots(products)
     forecasts = generate_forecasts(products)
     incidents = generate_incident_dataset(products, forecasts, users)
@@ -47,6 +50,8 @@ def build_demo_dataset() -> dict[str, list[dict[str, str]]]:
         "warehouses": warehouses,
         "orders": orders,
         "order_items": order_items,
+        "price_history": price_history,
+        "promotions": promotions,
         "sales": sales,
         "inventory_snapshots": inventory_snapshots,
         "forecasts": forecasts,
