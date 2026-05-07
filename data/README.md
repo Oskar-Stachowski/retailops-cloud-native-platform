@@ -34,6 +34,23 @@ This writes CSV files to:
 data/demo/
 ```
 
+The generator also accepts the target synthetic data options that will be used
+by later scalable profiles:
+
+```bash
+python -m data.generator.main \
+  --profile demo \
+  --days 14 \
+  --products 20 \
+  --stores 4 \
+  --warehouses 4 \
+  --seed 42
+```
+
+Only the `demo` profile is implemented today. The `small`, `medium`, and
+`large` profiles are reserved for future generator commits and are documented in
+[RetailOps Synthetic Data Profiles](../docs/synthetic-data-profiles.md).
+
 ## Seed the API database
 
 From `services/api`:

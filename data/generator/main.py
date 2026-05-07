@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 
 from data.generator.csv_writer import CSV_WRITE_ORDER, write_tables
@@ -10,6 +11,19 @@ from data.generator.inventory import generate_inventory_snapshots
 from data.generator.products import generate_products
 from data.generator.sales import generate_sales
 from data.generator.users import generate_users
+
+
+SUPPORTED_PROFILES = ("demo", "small", "medium", "large")
+
+
+@dataclass(frozen=True)
+class DatasetGenerationConfig:
+    profile: str = "demo"
+    days: int | None = None
+    products: int | None = None
+    stores: int | None = None
+    warehouses: int | None = None
+    seed: int = 42
 
 
 def build_demo_dataset() -> dict[str, list[dict[str, str]]]:
@@ -35,15 +49,96 @@ def default_output_dir() -> Path:
     return repo_root / "data" / "demo"
 
 
-def generate_demo_dataset(output_dir: Path | None = None) -> dict[str, int]:
+def validate_generation_config(config: DatasetGenerationConfig) -> None:
+    if config.profile not in SUPPORTED_PROFILES:
+        supported = ", ".join(SUPPORTED_PROFILES)
+        raise ValueError(
+            f"Unsupported dataset profile '{config.profile}'. "
+            f"Supported profiles: {supported}."
+        )
+
+    numeric_options = {
+        "days": config.days,
+        "products": config.products,
+        "stores": config.stores,
+        "warehouses": config.warehouses,
+        "seed": config.seed,
+    }
+    invalid_options = [
+        name
+        for name, value in numeric_options.items()
+        if value is not None and value <= 0
+    ]
+
+    if invalid_options:
+        raise ValueError(
+            "Dataset generation options must be positive integers: "
+            + ", ".join(invalid_options)
+        )
+
+    if config.profile != "demo":
+        raise NotImplementedError(
+            "Only the 'demo' dataset profile is implemented in this sprint. "
+            "The small, medium and large profiles are documented targets for "
+            "future synthetic data generator commits."
+        )
+
+
+def build_dataset(
+    config: DatasetGenerationConfig | None = None,
+) -> dict[str, list[dict[str, str]]]:
+    config = config or DatasetGenerationConfig()
+    validate_generation_config(config)
+    return build_demo_dataset()
+
+
+def generate_demo_dataset(
+    output_dir: Path | None = None,
+    config: DatasetGenerationConfig | None = None,
+) -> dict[str, int]:
     output_dir = output_dir or default_output_dir()
-    tables = build_demo_dataset()
+    tables = build_dataset(config)
     return write_tables(output_dir, tables)
 
 
-def main() -> None:
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate RetailOps demo CSV dataset."
+        description="Generate RetailOps synthetic CSV dataset."
+    )
+    parser.add_argument(
+        "--profile",
+        choices=SUPPORTED_PROFILES,
+        default="demo",
+        help=(
+            "Dataset profile to generate. Only 'demo' is implemented for now; "
+            "the remaining profiles are reserved for future commits."
+        ),
+    )
+    parser.add_argument(
+        "--days",
+        type=int,
+        help="Number of historical business days to generate.",
+    )
+    parser.add_argument(
+        "--products",
+        type=int,
+        help="Number of products to generate.",
+    )
+    parser.add_argument(
+        "--stores",
+        type=int,
+        help="Number of stores or selling locations to generate.",
+    )
+    parser.add_argument(
+        "--warehouses",
+        type=int,
+        help="Number of warehouses to generate.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Deterministic generation seed reserved for scalable profiles.",
     )
     parser.add_argument(
         "--output-dir",
@@ -51,11 +146,28 @@ def main() -> None:
         default=default_output_dir(),
         help="Directory where CSV files should be written.",
     )
-    args = parser.parse_args()
 
-    counts = generate_demo_dataset(args.output_dir)
+    return parser.parse_args()
 
-    print("Demo CSV dataset generated:")
+
+def config_from_args(args: argparse.Namespace) -> DatasetGenerationConfig:
+    return DatasetGenerationConfig(
+        profile=args.profile,
+        days=args.days,
+        products=args.products,
+        stores=args.stores,
+        warehouses=args.warehouses,
+        seed=args.seed,
+    )
+
+
+def main() -> None:
+    args = parse_args()
+    config = config_from_args(args)
+
+    counts = generate_demo_dataset(args.output_dir, config)
+
+    print(f"RetailOps CSV dataset generated for profile '{config.profile}':")
     for table_name in CSV_WRITE_ORDER:
         print(f"- {table_name}: {counts[table_name]}")
     print(f"\nOutput directory: {args.output_dir}")
