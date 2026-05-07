@@ -20,14 +20,16 @@ NPM ?= npm
 
 API_DIR ?= services/api
 FRONTEND_DIR ?= frontend
-INFRA_DIR ?= infra
-INFRA_ENV ?= dev
-INFRA_ENV_DIR ?= $(INFRA_DIR)/environments/$(INFRA_ENV)
 REPORTS_DIR ?= ci-cd/reports
 SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 
 TERRAFORM ?= terraform
+INFRA_DIR ?= infra
+TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
+TERRAFORM_VAR_FILE ?= terraform.tfvars.example
+TERRAFORM_VALIDATE_REPORT ?= $(IAC_REPORTS_DIR)/terraform-validate.txt
+TERRAFORM_PLAN_REPORT ?= $(IAC_REPORTS_DIR)/terraform-plan-dev.txt
 
 POSTGRES_DB ?= retailops
 POSTGRES_USER ?= retailops_local
@@ -76,12 +78,11 @@ help:
 	@echo "  make frontend-lint        Run frontend lint"
 	@echo "  make frontend-build       Build frontend"
 	@echo ""
-	@echo "Infrastructure / Terraform:"
-	@echo "  make terraform-fmt        Format Terraform files for the selected environment"
-	@echo "  make terraform-fmt-check  Check Terraform formatting without modifying files"
-	@echo "  make terraform-init       Initialize Terraform locally with backend disabled"
-	@echo "  make terraform-validate   Validate Terraform configuration locally"
-	@echo "  make terraform-check      Run Terraform fmt check, init, and validate"
+	@echo "Terraform / IaC:"
+	@echo "  make terraform-fmt        Format Terraform files under infra/"
+	@echo "  make terraform-validate   Initialize Terraform locally and validate dev"
+	@echo "  make terraform-plan-dev   Create a dev Terraform plan report"
+	@echo "  make iac-scan             Run local IaC validation and safety checks"
 	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
@@ -94,6 +95,7 @@ help:
 	@echo "Security:"
 	@echo "  make security-scan        Run local secret, filesystem and image scans"
 	@echo ""
+	
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
@@ -170,33 +172,60 @@ ci-local: compose-config api-test frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
 
 # -------------------------------------------------------------------
-# Infrastructure / Terraform
-# Commit 1 intentionally validates scaffold only:
-# - no terraform apply
-# - no AWS resources
-# - no GitHub Actions infrastructure workflow yet
+# Terraform / Infrastructure as Code
+# These targets are local-first helpers. They validate and collect evidence
+# before Terraform is promoted to GitHub Actions or Jenkins automation.
 # -------------------------------------------------------------------
 
-.PHONY: terraform-fmt terraform-fmt-check terraform-init terraform-validate terraform-check terraform-validate-report
+.PHONY: check-terraform ensure-iac-reports-dir terraform-fmt terraform-fmt-check terraform-init-local terraform-validate terraform-plan-dev iac-secret-scan iac-scan
 
-terraform-fmt:
-	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" fmt -recursive
+check-terraform:
+	@command -v "$(TERRAFORM)" >/dev/null 2>&1 || { \
+		echo "ERROR: terraform is not installed or not available in PATH."; \
+		exit 1; \
+	}
 
-terraform-fmt-check:
-	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" fmt -recursive -check
+ensure-iac-reports-dir:
+	@mkdir -p "$(IAC_REPORTS_DIR)"
 
-terraform-init:
-	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" init -backend=false
+terraform-fmt: check-terraform
+	$(TERRAFORM) fmt -recursive "$(INFRA_DIR)"
 
-terraform-validate: terraform-init
-	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" validate
+terraform-fmt-check: check-terraform
+	$(TERRAFORM) fmt -recursive -check -diff "$(INFRA_DIR)"
 
-terraform-check: terraform-fmt-check terraform-validate
-	@echo "Terraform local checks passed for $(INFRA_ENV_DIR)."
+terraform-init-local: check-terraform ensure-iac-reports-dir
+	$(TERRAFORM) -chdir="$(TERRAFORM_DIR)" init -backend=false -input=false
 
-terraform-validate-report: ensure-reports-dir terraform-init
+terraform-validate: terraform-init-local
 	@set -o pipefail; \
-	$(TERRAFORM) -chdir="$(INFRA_ENV_DIR)" validate -no-color | tee "$(IAC_REPORTS_DIR)/terraform-validate.txt"
+	$(TERRAFORM) -chdir="$(TERRAFORM_DIR)" validate -no-color | tee "$(TERRAFORM_VALIDATE_REPORT)"
+
+terraform-plan-dev: terraform-init-local
+	@set -o pipefail; \
+	$(TERRAFORM) -chdir="$(TERRAFORM_DIR)" plan \
+		-var-file="$(TERRAFORM_VAR_FILE)" \
+		-no-color | tee "$(TERRAFORM_PLAN_REPORT)"
+
+iac-secret-scan: ensure-iac-reports-dir
+	@echo "[iac-secret-scan] Checking Terraform/docs for obvious AWS secrets or real IAM ARNs..."
+	@if grep -R -I \
+		--exclude-dir=".terraform" \
+		--exclude=".terraform.lock.hcl" \
+		--exclude="*.png" \
+		--exclude="*.jpg" \
+		--exclude="*.jpeg" \
+		--exclude="*.webp" \
+		-E 'AKIA[0-9A-Z]{16}|arn:aws:iam::[0-9]{12}' \
+		"$(INFRA_DIR)" docs; then \
+		echo "ERROR: potential AWS secret or real IAM ARN found in IaC/docs."; \
+		exit 1; \
+	else \
+		echo "[iac-secret-scan] No obvious AWS access keys or real IAM ARNs found."; \
+	fi
+
+iac-scan: terraform-fmt-check terraform-validate iac-secret-scan
+	@echo "IaC scan passed. Use 'make terraform-plan-dev' separately when AWS credentials are available."
 
 # -------------------------------------------------------------------
 # Docker / Compose
@@ -299,3 +328,12 @@ security-image-scan: check-trivy ensure-reports-dir docker-build
 
 security-scan: secret-scan security-fs-scan security-image-scan
 	@echo "Security scans passed."
+
+# -------------------------------------------------------------------
+# Cleanup
+# -------------------------------------------------------------------
+
+.PHONY: clean
+clean:
+	rm -rf "$(REPORTS_DIR)"
+	$(COMPOSE) down -v --remove-orphans || true

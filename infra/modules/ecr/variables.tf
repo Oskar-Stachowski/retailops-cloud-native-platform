@@ -11,10 +11,10 @@ variable "common_tags" {
 variable "repositories" {
   description = "ECR repositories to create for RetailOps container images."
   type = map(object({
-    repository_suffix   = string
+    repository_suffix    = string
     image_tag_mutability = optional(string, "IMMUTABLE")
-    scan_on_push        = optional(bool, true)
-    max_image_count     = optional(number, 20)
+    scan_on_push         = optional(bool, true)
+    max_image_count      = optional(number, 20)
   }))
 
   default = {
