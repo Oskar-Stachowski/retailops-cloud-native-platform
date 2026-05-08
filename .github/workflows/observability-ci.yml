@@ -56,7 +56,7 @@ jobs:
       - name: Validate Prometheus configuration
         run: |
           docker run --rm \
-            --entrypoint=/bin/promotol \
+            --entrypoint=/bin/promtool \
             -v "${PWD}/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
             prom/prometheus:v3.7.3 \
