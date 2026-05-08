@@ -10,6 +10,9 @@ Planned MVP / target responsibilities:
 - document logging and tracing assumptions,
 - support operational visibility for APIs, infrastructure, data pipelines, and ML components.
 
+Operational troubleshooting steps live in
+[`docs/runbooks/observability-runbook.md`](../docs/runbooks/observability-runbook.md).
+
 Sprint 9 real-time observability should follow
 [`docs/real-time-event-contracts.md`](../docs/real-time-event-contracts.md),
 especially the metrics for event production, event consumption, failed events,
