@@ -9,9 +9,10 @@ from app.services.workflow_service import WorkflowNotFoundError, WorkflowService
 
 
 class FakeWorkflowRepository:
-    def __init__(self, alert=None, recommendation=None):
+    def __init__(self, alert=None, recommendation=None, existing_audit_log=None):
         self.alert = alert
         self.recommendation = recommendation
+        self.existing_audit_log = existing_audit_log
         self.applied_action = None
         self.actor_user_id = uuid4()
 
@@ -23,6 +24,9 @@ class FakeWorkflowRepository:
 
     def resolve_demo_actor_user_id(self, user):
         return self.actor_user_id
+
+    def get_workflow_audit_log(self, **kwargs):
+        return self.existing_audit_log
 
     def apply_alert_workflow_action(self, **kwargs):
         self.applied_action = kwargs
@@ -129,6 +133,69 @@ def test_apply_alert_acknowledge_records_status_transition():
     assert repository.applied_action["new_status"] == "acknowledged"
 
 
+def test_apply_alert_action_replays_existing_idempotent_result():
+    alert = make_alert(status="acknowledged")
+    audit_log = {
+        "id": uuid4(),
+        "entity_type": "alert",
+        "entity_id": alert["id"],
+        "performed_by_user_id": uuid4(),
+        "assigned_to_user_id": None,
+        "action_type": "acknowledge",
+        "comment": None,
+        "previous_status": "open",
+        "new_status": "acknowledged",
+        "idempotency_key": "ack-alert-001",
+        "details": {"workflow_action_id": str(uuid4())},
+        "performed_at": datetime.now(timezone.utc),
+        "created_at": datetime.now(timezone.utc),
+    }
+    repository = FakeWorkflowRepository(alert=alert, existing_audit_log=audit_log)
+    service = WorkflowService(repository=repository)
+
+    result = service.apply_alert_action(
+        alert_id=alert["id"],
+        action="acknowledge",
+        actor=DEMO_USERS["platform-admin"],
+        idempotency_key="ack-alert-001",
+    )
+
+    assert result["status"] == "acknowledged"
+    assert result["workflow_action"]["audit_log_id"] == audit_log["id"]
+    assert result["workflow_action"]["idempotency_key"] == "ack-alert-001"
+    assert repository.applied_action is None
+
+
+def test_apply_alert_action_rejects_idempotency_key_reused_for_different_action():
+    alert = make_alert(status="acknowledged")
+    audit_log = {
+        "id": uuid4(),
+        "entity_type": "alert",
+        "entity_id": alert["id"],
+        "performed_by_user_id": uuid4(),
+        "assigned_to_user_id": None,
+        "action_type": "acknowledge",
+        "comment": None,
+        "previous_status": "open",
+        "new_status": "acknowledged",
+        "idempotency_key": "workflow-key-001",
+        "details": {},
+        "performed_at": datetime.now(timezone.utc),
+        "created_at": datetime.now(timezone.utc),
+    }
+    service = WorkflowService(
+        repository=FakeWorkflowRepository(alert=alert, existing_audit_log=audit_log)
+    )
+
+    with pytest.raises(WorkflowTransitionError):
+        service.apply_alert_action(
+            alert_id=alert["id"],
+            action="resolve",
+            actor=DEMO_USERS["platform-admin"],
+            idempotency_key="workflow-key-001",
+        )
+
+
 def test_apply_alert_assign_moves_open_alert_to_in_progress():
     alert = make_alert(status="open")
     assignee_id = uuid4()
@@ -215,6 +282,42 @@ def test_apply_recommendation_accept_records_decision():
     assert result["workflow_action"]["entity_type"] == "recommendation"
     assert repository.applied_action["previous_status"] == "proposed"
     assert repository.applied_action["new_status"] == "accepted"
+
+
+def test_apply_recommendation_action_replays_existing_idempotent_result():
+    recommendation = make_recommendation(status="accepted")
+    audit_log = {
+        "id": uuid4(),
+        "entity_type": "recommendation",
+        "entity_id": recommendation["id"],
+        "performed_by_user_id": uuid4(),
+        "assigned_to_user_id": None,
+        "action_type": "accept",
+        "comment": None,
+        "previous_status": "proposed",
+        "new_status": "accepted",
+        "idempotency_key": "accept-rec-001",
+        "details": {},
+        "performed_at": datetime.now(timezone.utc),
+        "created_at": datetime.now(timezone.utc),
+    }
+    repository = FakeWorkflowRepository(
+        recommendation=recommendation,
+        existing_audit_log=audit_log,
+    )
+    service = WorkflowService(repository=repository)
+
+    result = service.apply_recommendation_action(
+        recommendation_id=recommendation["id"],
+        action="accept",
+        actor=DEMO_USERS["platform-admin"],
+        idempotency_key="accept-rec-001",
+    )
+
+    assert result["status"] == "accepted"
+    assert result["workflow_action"]["id"] == audit_log["id"]
+    assert result["workflow_action"]["audit_log_id"] == audit_log["id"]
+    assert repository.applied_action is None
 
 
 def test_apply_recommendation_reject_requires_comment():

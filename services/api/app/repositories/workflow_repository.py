@@ -125,6 +125,44 @@ class WorkflowRepository:
 
         return row["id"]
 
+    def get_workflow_audit_log(
+        self,
+        *,
+        entity_type: str,
+        entity_id: UUID,
+        idempotency_key: str,
+    ) -> dict[str, Any] | None:
+        with get_connection() as connection:
+            with connection.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        id,
+                        entity_type,
+                        entity_id,
+                        action_type,
+                        performed_by_user_id,
+                        assigned_to_user_id,
+                        previous_status,
+                        new_status,
+                        comment,
+                        idempotency_key,
+                        source,
+                        details,
+                        performed_at,
+                        created_at
+                    FROM workflow_audit_log
+                    WHERE entity_type = %s
+                      AND entity_id = %s
+                      AND idempotency_key = %s
+                    LIMIT 1;
+                    """,
+                    (entity_type, entity_id, idempotency_key),
+                )
+                row = cursor.fetchone()
+
+        return dict(row) if row else None
+
     def apply_alert_workflow_action(
         self,
         *,
