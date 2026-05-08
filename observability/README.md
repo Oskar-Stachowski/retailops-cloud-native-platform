@@ -83,6 +83,11 @@ observability/prometheus/rules/stream-alerts.yml
 Current alert coverage:
 
 - API `/metrics` scrape target down,
+- Prometheus self-scrape target down,
+- API service info metric missing,
+- database operation metrics missing,
+- database operation errors increasing,
+- high and critical database operation latency,
 - no stream events ingested,
 - stale stream events,
 - DLQ events increasing,

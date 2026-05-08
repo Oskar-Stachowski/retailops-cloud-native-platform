@@ -1,0 +1,69 @@
+groups:
+  - name: retailops-api
+    interval: 30s
+    rules:
+      - alert: RetailOpsPrometheusTargetDown
+        expr: up{job="prometheus"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          domain: platform
+          component: prometheus
+        annotations:
+          summary: Prometheus self-scrape target is down
+          description: Prometheus cannot scrape its own metrics endpoint.
+
+      - alert: RetailOpsApiInfoMissing
+        expr: absent(retailops_api_info{service="retailops-api"})
+        for: 5m
+        labels:
+          severity: warning
+          domain: platform
+          component: api
+        annotations:
+          summary: RetailOps API info metric is missing
+          description: The API /metrics endpoint is reachable but retailops_api_info is not present.
+
+      - alert: RetailOpsDatabaseOperationsMissing
+        expr: absent(retailops_db_operations_total)
+        for: 15m
+        labels:
+          severity: warning
+          domain: platform
+          component: database
+        annotations:
+          summary: Database operation metrics are missing
+          description: No database operation metrics have been exported. DB instrumentation may not be active or DB-backed endpoints may not have run.
+
+      - alert: RetailOpsDatabaseErrorsIncreasing
+        expr: increase(retailops_db_operations_total{status="error"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          domain: platform
+          component: database
+        annotations:
+          summary: Database operation errors increased
+          description: One or more instrumented database operations failed in the last 5 minutes.
+
+      - alert: RetailOpsDatabaseLatencyHigh
+        expr: retailops_db_operation_duration_seconds_max > 1
+        for: 5m
+        labels:
+          severity: warning
+          domain: platform
+          component: database
+        annotations:
+          summary: Database operation latency is high
+          description: Maximum observed database operation duration is above 1 second.
+
+      - alert: RetailOpsDatabaseLatencyCritical
+        expr: retailops_db_operation_duration_seconds_max > 5
+        for: 2m
+        labels:
+          severity: critical
+          domain: platform
+          component: database
+        annotations:
+          summary: Database operation latency is critical
+          description: Maximum observed database operation duration is above 5 seconds.
