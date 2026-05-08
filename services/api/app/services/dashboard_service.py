@@ -76,6 +76,25 @@ class DashboardService:
         stock_risk_summary = self._normalize_stock_risk_summary(
             self.repository.get_stock_risk_summary()
         )
+        sales_trend = self.repository.get_sales_trend(days=safe_days)
+        open_work_items = [
+            self._normalize_work_item(row)
+            for row in self.repository.get_open_work_items(limit=safe_limit)
+        ]
+
+        return make_json_safe(
+            {
+                "generated_at": datetime.now(timezone.utc),
+                "summary": summary,
+                "stock_risk_summary": stock_risk_summary,
+                "sales_trend": sales_trend,
+                "open_work_items": open_work_items,
+                "limits": {
+                    "sales_trend_days": safe_days,
+                    "work_items_limit": safe_limit,
+                },
+            }
+        )
 
     def get_live_operations(
         self,
@@ -124,25 +143,6 @@ class DashboardService:
                 "limits": {
                     "recent_events": safe_recent_events_limit,
                     "alerts": safe_alerts_limit,
-                },
-            }
-        )
-        sales_trend = self.repository.get_sales_trend(days=safe_days)
-        open_work_items = [
-            self._normalize_work_item(row)
-            for row in self.repository.get_open_work_items(limit=safe_limit)
-        ]
-
-        return make_json_safe(
-            {
-                "generated_at": datetime.now(timezone.utc),
-                "summary": summary,
-                "stock_risk_summary": stock_risk_summary,
-                "sales_trend": sales_trend,
-                "open_work_items": open_work_items,
-                "limits": {
-                    "sales_trend_days": safe_days,
-                    "work_items_limit": safe_limit,
                 },
             }
         )

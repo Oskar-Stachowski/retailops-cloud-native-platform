@@ -26,6 +26,7 @@ REPORTS_DIR ?= ci-cd/reports
 SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
+OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
 
 TERRAFORM ?= terraform
 TFLINT ?= tflint
@@ -65,6 +66,8 @@ FRONTEND_IMAGE ?= retailops-frontend:local
 
 SMOKE_SCRIPT ?= ./scripts/compose_smoke.sh
 STREAMING_SMOKE_SCRIPT ?= ./scripts/streaming_smoke.sh
+OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/observability_smoke.sh
+OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/observability_demo_traffic.sh
 
 DATA_PROFILE ?= small
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
@@ -123,7 +126,9 @@ help:
 	@echo "  make compose-up           Start full local stack"
 	@echo "  make broker-up            Start local Redpanda broker and create topics"
 	@echo "  make broker-topics        List local Redpanda topics"
-	@echo "  make observability-up     Start API and Prometheus for local metrics"
+	@echo "  make observability-up     Start API, Prometheus and Grafana for local metrics"
+	@echo "  make observability-smoke  Validate API metrics, Prometheus and Grafana"
+	@echo "  make observability-demo-traffic Generate demo observability traffic and stream metrics"
 	@echo "  make compose-smoke        Run local smoke test against running stack"
 	@echo "  make streaming-smoke      Run streaming smoke test against broker/API/Prometheus"
 	@echo "  make compose-ci           Build, start, smoke-test, log on failure, cleanup"
@@ -136,7 +141,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -342,7 +347,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke compose-rebuild-smoke compose-ci broker-up broker-topics observability-up
+.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics observability-up
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -377,6 +382,14 @@ streaming-smoke:
 	chmod +x "$(STREAMING_SMOKE_SCRIPT)"
 	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" COMPOSE="$(COMPOSE)" "$(STREAMING_SMOKE_SCRIPT)"
 
+observability-smoke: ensure-reports-dir
+	chmod +x "$(OBSERVABILITY_SMOKE_SCRIPT)"
+	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_SMOKE_SCRIPT)"
+
+observability-demo-traffic: ensure-reports-dir
+	chmod +x "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
+	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" COMPOSE="$(COMPOSE)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
+
 compose-rebuild-smoke: compose-ci
 
 compose-ci: ensure-reports-dir
@@ -397,6 +410,11 @@ compose-ci: ensure-reports-dir
 		echo "[compose-ci] Running streaming smoke tests..."; \
 		chmod +x "$(STREAMING_SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" COMPOSE="$(COMPOSE)" "$(STREAMING_SMOKE_SCRIPT)" || status=$$?; \
+	fi; \
+	if [[ $$status -eq 0 ]]; then \
+		echo "[compose-ci] Running observability smoke tests..."; \
+		chmod +x "$(OBSERVABILITY_SMOKE_SCRIPT)"; \
+		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_SMOKE_SCRIPT)" || status=$$?; \
 	fi; \
 	$(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
 	if [[ $$status -ne 0 ]]; then \

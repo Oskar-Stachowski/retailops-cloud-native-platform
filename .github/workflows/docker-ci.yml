@@ -70,6 +70,7 @@ jobs:
           path: |
             ci-cd/reports/docker-compose-ps.txt
             ci-cd/reports/docker-compose-logs.txt
+            ci-cd/reports/observability/
           if-no-files-found: ignore
 
       - name: Final cleanup

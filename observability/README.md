@@ -111,6 +111,20 @@ Run the streaming smoke checks against a running Compose stack with:
 make streaming-smoke
 ```
 
+Run the observability smoke checks and collect API, Prometheus and Grafana
+evidence under `ci-cd/reports/observability` with:
+
+```bash
+make observability-smoke
+```
+
+Generate a local demo scenario with correlated API traffic, live business
+events, duplicate handling and one dead-lettered event with:
+
+```bash
+make observability-demo-traffic
+```
+
 Then open:
 
 ```text
