@@ -5,6 +5,7 @@ from app.api.health import router as health_router
 from app.api.errors import register_exception_handlers
 from app.core.config import settings
 from app.api import (
+    alerts,
     analytics,
     dashboard,
     forecasts,
@@ -41,6 +42,7 @@ app.state.realtime_event_consumer = build_realtime_event_consumer()
 app.include_router(health_router)
 app.include_router(metrics.router)
 app.include_router(dashboard.router)
+app.include_router(alerts.router)
 app.include_router(analytics.router)
 app.include_router(products.router)
 app.include_router(product_360.router)
