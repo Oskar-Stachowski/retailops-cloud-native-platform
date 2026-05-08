@@ -20,6 +20,7 @@ on:
       - "scripts/observability_smoke.sh"
       - "scripts/observability_demo_traffic.sh"
       - ".github/workflows/observability-ci.yml"
+
   pull_request:
     paths:
       - "observability/**"
@@ -39,6 +40,8 @@ on:
       - "scripts/observability_smoke.sh"
       - "scripts/observability_demo_traffic.sh"
       - ".github/workflows/observability-ci.yml"
+
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -60,15 +63,15 @@ jobs:
             -v "${PWD}/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
             prom/prometheus:v3.7.3 \
-            promtool check config /etc/prometheus/prometheus.yml
+            check config /etc/prometheus/prometheus.yml
 
       - name: Validate Prometheus alert rules
         run: |
           docker run --rm \
+            --entrypoint=/bin/sh \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
-            --entrypoint sh \
             prom/prometheus:v3.7.3 \
-            -c 'promtool check rules /etc/prometheus/rules/*.yml'
+            -c '/bin/promtool check rules /etc/prometheus/rules/*.yml'
 
       - name: Set up Python
         uses: actions/setup-python@v6
