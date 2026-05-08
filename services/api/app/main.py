@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.errors import register_exception_handlers
+from app.core.correlation import CorrelationIdMiddleware
 from app.core.config import settings
 from app.api import (
     alerts,
@@ -36,6 +37,7 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+app.add_middleware(CorrelationIdMiddleware)
 
 register_exception_handlers(app)
 app.state.realtime_event_consumer = build_realtime_event_consumer()
