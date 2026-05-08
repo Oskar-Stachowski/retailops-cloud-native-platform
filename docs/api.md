@@ -2,7 +2,9 @@
 
 This document defines REST API conventions, OpenAPI documentation rules, response contracts, testing expectations and error response patterns for the RetailOps Cloud-Native AI Platform.
 
-The API is the backend entry point for product data, sales signals, inventory snapshots, stock-risk analysis, dashboard summaries, operational alerts and future recommendation workflows.
+The API is the backend entry point for product data, sales signals, inventory
+snapshots, stock-risk analysis, dashboard summaries, operational alerts,
+Sprint 9 live operations metrics and future recommendation workflows.
 
 ---
 
@@ -25,6 +27,13 @@ GET /dashboard/alerts?limit=10
 GET /dashboard/recommendations?limit=10
 GET /dashboard/open-work-items?limit=10
 GET /dashboard/stock-risk-summary
+GET /dashboard/live-operations?window_minutes=15&recent_events_limit=20&alerts_limit=10
+```
+
+### Observability endpoints
+
+```text
+GET /metrics
 ```
 
 ### Analytics endpoints
@@ -183,6 +192,47 @@ Response shape:
 }
 ```
 
+### 2.6 Live operations
+
+Sprint 9 adds a live operations read model backed by persisted stream metrics.
+It is still read-only and local-first, but it exposes the real-time foundation
+through the same dashboard API boundary as the earlier operational widgets.
+
+```text
+GET /dashboard/live-operations?window_minutes=15&recent_events_limit=20&alerts_limit=10
+```
+
+Response shape:
+
+```json
+{
+  "generated_at": "2026-05-02T13:40:00Z",
+  "window_minutes": 15,
+  "metrics": {
+    "revenue": 4200.5,
+    "units_sold": 42.0,
+    "sales_events": 8,
+    "alerts_created": 1,
+    "anomalies_detected": 1,
+    "raw_metrics": {}
+  },
+  "event_status_counts": {
+    "total": 10,
+    "processed": 9,
+    "failed_dead_lettered": 0,
+    "ignored_duplicate": 1
+  },
+  "freshness": {
+    "latest_event_at": "2026-05-02T13:39:30Z",
+    "freshness_seconds": 30,
+    "is_fresh": true
+  },
+  "recent_events": [],
+  "recent_alerts": [],
+  "consumer_states": []
+}
+```
+
 ---
 
 ## 3. REST API Conventions
@@ -237,7 +287,9 @@ GET /dashboard/stock-risk-summary
 | PATCH | Partially update a resource |
 | DELETE | Delete a resource |
 
-Current Sprint 4 API scope uses read-only `GET` endpoints only.
+Most current API surfaces remain read-only `GET` endpoints. Sprint 7 added a
+local-only mock notification mutation, `POST /notifications/{notification_id}/read`,
+and Sprint 9 added read-only live operations and Prometheus metrics endpoints.
 
 ---
 
@@ -451,6 +503,11 @@ GET /dashboard/operational-visibility returns summary, stock risk, sales trend a
 GET /dashboard/sales-trend returns items
 GET /dashboard/open-work-items returns items
 GET /dashboard/stock-risk-summary returns stock-risk counters
+GET /dashboard/live-operations returns metrics, event status, freshness and consumer state
+GET /metrics returns Prometheus text exposition
+GET /me and GET /me/permissions return the selected mock identity context
+GET /notifications returns notification items
+POST /notifications/{notification_id}/read returns the updated mock notification state
 ```
 
 Tests should verify:
@@ -508,33 +565,46 @@ The API should follow secure-by-default conventions:
 - whitelist sort fields,
 - prepare future endpoints for authentication and RBAC.
 
-Authentication and RBAC are intentionally not implemented in the current Sprint 4 scope.
+Production authentication and persistent RBAC are intentionally not implemented
+yet. Sprint 7 uses local mock identity and role boundaries to prove the
+contract before adding an external identity provider.
 
 ---
 
 ## 13. Observability Expectations
 
-The `/health` and `/ready` endpoints support:
+The `/health`, `/ready` and `/metrics` endpoints support:
 
 - local smoke checks,
 - Docker health checks,
+- Prometheus scraping,
 - future Kubernetes probes,
 - future uptime checks,
 - API availability SLI.
 
-Dashboard summary endpoints support operational visibility for demo and frontend use cases.
+Dashboard summary and live operations endpoints support operational visibility
+for demo and frontend use cases.
+
+Sprint 9 stream observability currently includes:
+
+- Prometheus text exposition at `GET /metrics`,
+- metrics derived from `realtime_event_log`, `live_metric_observations` and
+  `realtime_consumer_state`,
+- local Prometheus scrape configuration,
+- stream alert rules for freshness, DLQ, consumer failures, lag and latency,
+- `make streaming-smoke` validation.
 
 Future production observability may add:
 
 - request logs,
 - structured logging,
-- metrics endpoint,
 - tracing,
 - correlation/request IDs,
 - OpenTelemetry integration,
-- Prometheus/Grafana dashboards.
+- Grafana dashboards.
 
-These are not required for the current Sprint 4 implementation, but the current conventions should allow them to be added later.
+The current implementation is local-first and table-backed. A long-running
+Kafka poller, production dashboards and distributed tracing remain future work.
 
 ---
 
@@ -544,8 +614,11 @@ These are not required for the current Sprint 4 implementation, but the current 
 
 - read-only health and readiness endpoints,
 - dashboard summary and operational visibility endpoints,
+- Sprint 9 live operations endpoint,
+- Prometheus `/metrics` endpoint for stream processing metrics,
 - analytics read endpoints,
 - stable core APIs for products, forecasts, inventory snapshots, sales and inventory risks,
+- local mock users, permissions and notifications,
 - consistent error responses,
 - OpenAPI response models,
 - pytest contract tests,
@@ -553,11 +626,12 @@ These are not required for the current Sprint 4 implementation, but the current 
 
 ### Deferred
 
-- authentication / authorization / RBAC,
-- write endpoints,
+- production authentication / authorization / RBAC,
+- persistent write workflow endpoints,
 - `/api/v1` versioning,
 - cursor pagination,
-- frontend integration for every dashboard widget,
+- long-running Kafka consumer poller,
+- frontend integration for every future dashboard widget,
 - OpenAPI snapshot testing,
 - rate limiting,
 - caching,

@@ -126,12 +126,12 @@ The platform follows a layered cloud-native architecture:
 
 More details are available in:
 
-- [Case Study](docs/case-study.md)
-- [Architecture Documentation](docs/architecture.md)
+- [Case Study](case-study.md)
+- [Architecture Diagrams](docs/diagrams/01-system-context-and-outcomes.md)
 - [AWS Architecture](docs/aws-architecture.md)
-- [CI/CD Pipeline](docs/cicd.md)
-- [Security & Governance](docs/security.md)
-- [Observability](docs/observability.md)
+- [CI/CD Pipeline](ci-cd/README.md)
+- [Security & Governance](security/README.md)
+- [Observability](observability/README.md)
 
 ---
 
@@ -251,13 +251,23 @@ Run the stack in the background:
 docker compose up --build -d
 ```
 
-Verify the runtime:
+Verify the full runtime:
+
+```bash
+make compose-ci
+```
+
+The Compose CI flow checks API health, database readiness, selected DB-backed
+endpoints, the frontend root page, the frontend `/api` proxy, Redpanda topic
+initialization, `/dashboard/live-operations`, `/metrics`, Prometheus target
+health and Sprint 9 stream alert rules.
+
+For a faster check against an already running stack:
 
 ```bash
 ./scripts/compose_smoke.sh
+make streaming-smoke
 ```
-
-The smoke test checks API health, database readiness, selected DB-backed endpoints, the frontend root page, and the frontend `/api` proxy.
 
 Useful URLs:
 
@@ -489,15 +499,17 @@ The project includes or plans to include:
 
 ## Documentation
 
-The project documentation is split into several files:
+The project documentation is split into several files and directories:
 
-- `docs/case-study.md` — business and executive-level case study
-- `docs/architecture.md` — architecture overview
+- `case-study.md` — business and executive-level case study
+- `docs/diagrams/` — architecture and maturity diagrams
 - `docs/aws-architecture.md` — AWS design and service rationale
-- `docs/cicd.md` — CI/CD pipeline and delivery workflow
-- `docs/security.md` — DevSecOps and governance controls
-- `docs/observability.md` — monitoring, logging, dashboards, and alerting
-- `docs/project-evolution.md` — platform maturity model
+- `ci-cd/README.md` — CI/CD pipeline and delivery workflow
+- `security/README.md` — DevSecOps and governance controls
+- `observability/README.md` — monitoring, metrics and alerting
+- `docs/real-time-event-contracts.md` — Sprint 9 real-time event model
+- `docs/local-event-broker.md` — local Redpanda broker and streaming smoke checks
+- `docs/live-metrics-persistence.md` — persisted live operations read model
 
 ---
 

@@ -102,6 +102,8 @@ make security-scan
 ```
 
 `make security-scan` requires local installations of Trivy and Gitleaks.
+`make compose-ci` runs both the base Compose smoke test and the Sprint 9
+streaming smoke test.
 
 ---
 
@@ -350,6 +352,7 @@ Expected result:
 ```text
 Local CI preflight passed.
 Compose smoke test passed.
+Streaming smoke test passed.
 Security scans passed.
 ```
 
@@ -472,7 +475,7 @@ until the Jenkins agent is prepared.
 Sprint 9 is considered complete when:
 
 - `make ci-local` passes locally.
-- `make compose-ci` passes locally.
+- `make compose-ci` passes locally, including base Compose and streaming smoke checks.
 - `make security-scan` passes locally.
 - API CI passes in GitHub Actions.
 - Frontend CI passes in GitHub Actions.

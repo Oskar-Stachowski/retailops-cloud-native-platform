@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Any
 
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from app.db.connection import fetch_all, fetch_one, get_connection
 from app.db.introspection import table_exists
@@ -345,7 +346,7 @@ class RealtimeMetricsRepository:
                 processed_at,
                 status,
                 error_message,
-                payload,
+                Jsonb(payload),
             ),
         )
 

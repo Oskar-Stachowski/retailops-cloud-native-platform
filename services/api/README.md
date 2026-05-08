@@ -1,7 +1,11 @@
 # RetailOps API Service
 
-Minimal FastAPI service for the RetailOps platform.  
-Provides a basic `/health` endpoint used for testing, monitoring, Docker health checks, and CI/CD validation.
+FastAPI backend for the RetailOps platform.
+
+The service exposes health and readiness checks, PostgreSQL-backed retail
+resources, dashboard read models, mock Sprint 7 identity and notifications, and
+Sprint 9 live operations metrics derived from persisted real-time event
+processing state.
 
 ---
 
@@ -24,6 +28,8 @@ Open:
 ```text
 http://localhost:8000/health
 http://localhost:8000/ready
+http://localhost:8000/dashboard/live-operations
+http://localhost:8000/metrics
 http://localhost:8000/docs
 ```
 
@@ -43,7 +49,53 @@ The test suite currently verifies:
 - `/ready` returns HTTP `200` when the database is available
 - `/ready` returns HTTP `503` when the database is unavailable
 - controlled API errors follow the standard error response pattern
-- the initial domain models validate core RetailOps data rules
+- core resource contracts for products, forecasts, inventory snapshots, sales
+  and stock risk
+- dashboard summary, operational visibility, work item and live operations
+  contracts
+- Product 360 aggregation
+- mock identity, permissions and notifications
+- real-time consumer, persisted metrics and Prometheus metric rendering
+- domain models and database schema expectations
+
+## Current API Surface
+
+Main public endpoints:
+
+```text
+GET /health
+GET /ready
+GET /metrics
+
+GET /dashboard/summary
+GET /dashboard/operational-visibility
+GET /dashboard/sales-trend
+GET /dashboard/alerts
+GET /dashboard/recommendations
+GET /dashboard/open-work-items
+GET /dashboard/stock-risk-summary
+GET /dashboard/live-operations
+
+GET /products
+GET /products/{product_id}
+GET /products/{product_id}/360
+GET /forecasts
+GET /forecasts/{forecast_id}
+GET /inventory-snapshots
+GET /inventory-snapshots/{inventory_snapshot_id}
+GET /sales
+GET /sales/{sale_id}
+GET /inventory-risks
+
+GET /users/demo
+GET /me
+GET /me/permissions
+GET /notifications
+POST /notifications/{notification_id}/read
+```
+
+Detailed conventions are documented in
+[`../../docs/api.md`](../../docs/api.md).
 
 ---
 
@@ -177,6 +229,32 @@ Example response:
 ```
 
 This endpoint is intended for future Kubernetes readiness probes and deployment safety checks.
+
+---
+
+## Sprint 9 live operations
+
+```text
+GET /dashboard/live-operations
+GET /metrics
+```
+
+Sprint 9 persists real-time event processing output in PostgreSQL:
+
+- `realtime_event_log`
+- `live_metric_observations`
+- `realtime_consumer_state`
+
+`/dashboard/live-operations` returns the dashboard read model for recent live
+sales, inventory, alerts, stream freshness, recent events and consumer state.
+
+`/metrics` renders Prometheus text exposition for stream-processing health.
+Local Prometheus and alert rules are documented in
+[`../../observability/README.md`](../../observability/README.md).
+
+The current API consumer validates and processes event envelopes through a
+broker-agnostic service. A long-running Redpanda/Kafka polling loop remains
+future work.
 
 ---
 

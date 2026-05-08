@@ -15,9 +15,13 @@ The frontend validates that RetailOps can run as a local full-stack application:
 - demand forecast data from `/forecasts`
 - stock risk signals from `/inventory-risks`
 - dashboard summary data from `/dashboard/summary`
-- Docker Compose local runtime with frontend, API, and database
+- Sprint 9 live operations data from `/dashboard/live-operations`
+- Docker Compose local runtime with frontend, API, database, Redpanda and Prometheus
 
-This frontend is still an MVP interface. It proves API integration, routing, local runtime, and dashboard evidence. Advanced UX, authentication, RBAC, workflow actions, charts, filtering, and production observability views are intentionally left for later tasks.
+This frontend is still an MVP interface. It proves API integration, routing,
+local runtime, dashboard evidence and the first live operations view. Production
+authentication, persistent workflow actions and cloud observability dashboards
+remain later maturity work.
 
 ## Sprint 5 — Dashboard and Operations View MVP
 
@@ -83,6 +87,31 @@ Current scope boundary:
 - no workflow approval/rejection mutations yet.
 
 This sprint prepares the platform for future production-grade authentication, RBAC, audit logs and operational workflow write APIs.
+
+## Sprint 9 — Live Operations and Stream Health
+
+Sprint 9 adds a real-time operations view backed by persisted event stream
+metrics.
+
+New backend endpoints used by the frontend:
+
+- `GET /dashboard/live-operations`
+- `GET /metrics` for Prometheus scraping, not direct browser UI usage
+
+Frontend additions:
+
+- `/live-operations` page,
+- live operations API client helper,
+- 15-second refresh loop,
+- selectable aggregation window,
+- stream event, alert-like event, metric and consumer-state tables.
+
+Current scope boundary:
+
+- Redpanda topics exist locally, but the API consumer is not yet a long-running
+  broker poller,
+- live operations reads from PostgreSQL-backed stream processing tables,
+- production WebSockets, push updates and Grafana dashboards remain future work.
 
 ## Tech stack
 
@@ -223,6 +252,7 @@ The frontend uses React Router to expose the MVP dashboard routes.
 | `/` | Dashboard | Loads live backend summary, product, forecast, health, readiness, and inventory-risk data |
 | `/products` | Products | Loads product catalogue records from `/products` |
 | `/forecasts` | Forecasts | Loads demand forecast records from `/forecasts` |
+| `/live-operations` | Live Operations | Loads Sprint 9 stream metrics, event freshness, recent events and consumer state from `/dashboard/live-operations` |
 | `/anomalies` | Anomalies | Shows CS-016 scope boundary until a backend `/anomalies` endpoint exists |
 | `/recommendations` | Recommendations | Shows CS-016 scope boundary until recommendation/workflow endpoints exist |
 | `/admin` | Admin | Loads platform health and readiness from `/health` and `/ready` |
@@ -234,6 +264,7 @@ The frontend uses React Router to expose the MVP dashboard routes.
 | `/health` | Dashboard, Admin | Confirms API process is reachable |
 | `/ready` | Dashboard, Admin | Confirms API and database readiness |
 | `/dashboard/summary` | Dashboard | Provides dashboard-level metrics when available |
+| `/dashboard/live-operations` | Live Operations | Provides persisted real-time operations metrics and stream health |
 | `/products` | Dashboard, Products | Provides product catalogue records |
 | `/forecasts` | Dashboard, Forecasts | Provides demand forecast records |
 | `/inventory-risks` | Dashboard | Provides stockout, overstock, normal, or unknown inventory risk signals |
