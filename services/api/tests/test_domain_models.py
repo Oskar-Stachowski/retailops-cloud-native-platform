@@ -143,6 +143,92 @@ def test_recommendation_accept_transition_is_allowed():
     )
 
 
+@pytest.mark.parametrize(
+    ("entity_type", "action", "previous_status", "new_status"),
+    [
+        (
+            WorkflowEntityType.alert,
+            WorkflowActionName.acknowledge,
+            AlertStatus.open,
+            AlertStatus.acknowledged,
+        ),
+        (
+            WorkflowEntityType.alert,
+            WorkflowActionName.resolve,
+            AlertStatus.in_progress,
+            AlertStatus.resolved,
+        ),
+        (
+            WorkflowEntityType.recommendation,
+            WorkflowActionName.accept,
+            RecommendationStatus.proposed,
+            RecommendationStatus.accepted,
+        ),
+        (
+            WorkflowEntityType.recommendation,
+            WorkflowActionName.resolve,
+            RecommendationStatus.accepted,
+            RecommendationStatus.implemented,
+        ),
+    ],
+)
+def test_workflow_transition_matrix_allows_expected_paths(
+    entity_type,
+    action,
+    previous_status,
+    new_status,
+):
+    assert is_workflow_transition_allowed(
+        entity_type=entity_type,
+        action=action,
+        previous_status=previous_status,
+        new_status=new_status,
+    )
+
+
+@pytest.mark.parametrize(
+    ("entity_type", "action", "previous_status", "new_status"),
+    [
+        (
+            WorkflowEntityType.alert,
+            WorkflowActionName.resolve,
+            AlertStatus.open,
+            AlertStatus.resolved,
+        ),
+        (
+            WorkflowEntityType.alert,
+            WorkflowActionName.assign,
+            AlertStatus.resolved,
+            AlertStatus.in_progress,
+        ),
+        (
+            WorkflowEntityType.recommendation,
+            WorkflowActionName.accept,
+            RecommendationStatus.accepted,
+            RecommendationStatus.accepted,
+        ),
+        (
+            WorkflowEntityType.recommendation,
+            WorkflowActionName.resolve,
+            RecommendationStatus.proposed,
+            RecommendationStatus.implemented,
+        ),
+    ],
+)
+def test_workflow_transition_matrix_rejects_invalid_paths(
+    entity_type,
+    action,
+    previous_status,
+    new_status,
+):
+    assert not is_workflow_transition_allowed(
+        entity_type=entity_type,
+        action=action,
+        previous_status=previous_status,
+        new_status=new_status,
+    )
+
+
 def test_recommendation_cannot_move_from_implemented_to_accepted():
     assert not is_workflow_transition_allowed(
         entity_type=WorkflowEntityType.recommendation,

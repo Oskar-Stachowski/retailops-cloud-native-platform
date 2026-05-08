@@ -52,13 +52,30 @@ def test_acknowledge_alert_endpoint_returns_workflow_mutation(monkeypatch):
     assert payload["status"] == "acknowledged"
 
 
+def test_ops_manager_can_perform_alert_workflow_action(monkeypatch):
+    alert_id = uuid4()
+
+    def fake_apply_alert_action(**kwargs):
+        assert kwargs["actor"].id == "ops-manager"
+        return workflow_response(alert_id)
+
+    monkeypatch.setattr(
+        "app.api.alerts.workflow_service.apply_alert_action",
+        fake_apply_alert_action,
+    )
+
+    response = client.post(f"/alerts/{alert_id}/acknowledge?user_id=ops-manager")
+
+    assert response.status_code == 200
+
+
 def test_assign_alert_endpoint_requires_assignee():
     response = client.post(f"/alerts/{uuid4()}/assign", json={})
 
     assert response.status_code == 422
 
 
-def test_alert_workflow_endpoint_requires_write_permission(monkeypatch):
+def test_alert_workflow_endpoint_rejects_viewer_without_write_permission(monkeypatch):
     def fail_if_called(**kwargs):
         raise AssertionError("workflow service should not be called")
 
@@ -69,6 +86,22 @@ def test_alert_workflow_endpoint_requires_write_permission(monkeypatch):
 
     response = client.post(
         f"/alerts/{uuid4()}/acknowledge?user_id=read-only-viewer"
+    )
+
+    assert response.status_code == 403
+
+
+def test_alert_workflow_endpoint_rejects_analyst_without_write_permission(monkeypatch):
+    def fail_if_called(**kwargs):
+        raise AssertionError("workflow service should not be called")
+
+    monkeypatch.setattr(
+        "app.api.alerts.workflow_service.apply_alert_action",
+        fail_if_called,
+    )
+
+    response = client.post(
+        f"/alerts/{uuid4()}/acknowledge?user_id=commercial-analyst"
     )
 
     assert response.status_code == 403

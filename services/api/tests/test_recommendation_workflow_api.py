@@ -54,6 +54,25 @@ def test_accept_recommendation_endpoint_returns_workflow_mutation(monkeypatch):
     assert payload["status"] == "accepted"
 
 
+def test_inventory_planner_can_perform_recommendation_workflow_action(monkeypatch):
+    recommendation_id = uuid4()
+
+    def fake_apply_recommendation_action(**kwargs):
+        assert kwargs["actor"].id == "inventory-planner"
+        return workflow_response(recommendation_id)
+
+    monkeypatch.setattr(
+        "app.api.recommendations.workflow_service.apply_recommendation_action",
+        fake_apply_recommendation_action,
+    )
+
+    response = client.post(
+        f"/recommendations/{recommendation_id}/accept?user_id=inventory-planner"
+    )
+
+    assert response.status_code == 200
+
+
 def test_reject_recommendation_endpoint_passes_comment(monkeypatch):
     recommendation_id = uuid4()
 
@@ -85,7 +104,9 @@ def test_assign_recommendation_endpoint_requires_assignee():
     assert response.status_code == 422
 
 
-def test_recommendation_workflow_endpoint_requires_write_permission(monkeypatch):
+def test_recommendation_workflow_endpoint_rejects_viewer_without_write_permission(
+    monkeypatch,
+):
     def fail_if_called(**kwargs):
         raise AssertionError("workflow service should not be called")
 
@@ -96,6 +117,24 @@ def test_recommendation_workflow_endpoint_requires_write_permission(monkeypatch)
 
     response = client.post(
         f"/recommendations/{uuid4()}/accept?user_id=read-only-viewer"
+    )
+
+    assert response.status_code == 403
+
+
+def test_recommendation_workflow_endpoint_rejects_analyst_without_write_permission(
+    monkeypatch,
+):
+    def fail_if_called(**kwargs):
+        raise AssertionError("workflow service should not be called")
+
+    monkeypatch.setattr(
+        "app.api.recommendations.workflow_service.apply_recommendation_action",
+        fail_if_called,
+    )
+
+    response = client.post(
+        f"/recommendations/{uuid4()}/accept?user_id=commercial-analyst"
     )
 
     assert response.status_code == 403
