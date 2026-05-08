@@ -13,6 +13,8 @@ from typing import Any, Iterator
 import psycopg
 from psycopg.rows import dict_row
 
+from app.db.instrumentation import instrument_database_call
+
 QueryParams = Mapping[str, Any] | Sequence[Any] | None
 
 
@@ -33,8 +35,13 @@ def check_database_connection() -> bool:
     try:
         with psycopg.connect(get_database_url(), connect_timeout=3) as connection:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT 1")
-                result = cursor.fetchone()
+                query = "SELECT 1"
+                result = instrument_database_call(
+                    operation="health_check",
+                    query=query,
+                    callback=lambda: _fetch_health_check(cursor, query),
+                    row_count=lambda row: 1 if row is not None else 0,
+                )
 
         return result is not None and result[0] == 1
 
@@ -53,14 +60,45 @@ def fetch_all(query: Any, params: QueryParams = None) -> list[dict[str, Any]]:
     """Execute a SELECT query and return all rows as plain dictionaries."""
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute(query, params)
-            return [dict(row) for row in cursor.fetchall()]
+            return instrument_database_call(
+                operation="fetch_all",
+                query=query,
+                callback=lambda: _fetch_all(cursor, query, params),
+                row_count=len,
+            )
 
 
 def fetch_one(query: Any, params: QueryParams = None) -> dict[str, Any] | None:
     """Execute a SELECT query and return one row as a plain dictionary."""
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute(query, params)
-            row = cursor.fetchone()
-            return dict(row) if row is not None else None
+            return instrument_database_call(
+                operation="fetch_one",
+                query=query,
+                callback=lambda: _fetch_one(cursor, query, params),
+                row_count=lambda row: 1 if row is not None else 0,
+            )
+
+
+def _fetch_health_check(cursor: Any, query: Any) -> Any:
+    cursor.execute(query)
+    return cursor.fetchone()
+
+
+def _fetch_all(
+    cursor: Any,
+    query: Any,
+    params: QueryParams,
+) -> list[dict[str, Any]]:
+    cursor.execute(query, params)
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def _fetch_one(
+    cursor: Any,
+    query: Any,
+    params: QueryParams,
+) -> dict[str, Any] | None:
+    cursor.execute(query, params)
+    row = cursor.fetchone()
+    return dict(row) if row is not None else None

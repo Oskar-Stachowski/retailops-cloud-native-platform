@@ -2,6 +2,7 @@ from fastapi import APIRouter, status
 from fastapi.responses import PlainTextResponse
 
 from app.core.config import settings
+from app.db.instrumentation import render_database_metrics
 from app.services.stream_observability import StreamObservabilityService
 
 
@@ -38,6 +39,7 @@ def get_metrics() -> PlainTextResponse:
     payload = "\n".join(
         [
             render_api_info_metric(),
+            render_database_metrics(),
             stream_observability_service.render_prometheus_metrics().rstrip(),
             "",
         ]
