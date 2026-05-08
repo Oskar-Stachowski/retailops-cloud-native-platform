@@ -26,6 +26,7 @@ class FakeWorkflowRepository:
 
     def apply_alert_workflow_action(self, **kwargs):
         self.applied_action = kwargs
+        audit_log_id = uuid4()
         return {
             "alert": {
                 "id": kwargs["alert_id"],
@@ -42,16 +43,39 @@ class FakeWorkflowRepository:
                 "performed_at": datetime.now(timezone.utc),
                 "created_at": datetime.now(timezone.utc),
             },
+            "audit_log": {
+                "id": audit_log_id,
+                "entity_type": "alert",
+                "entity_id": kwargs["alert_id"],
+                "performed_by_user_id": kwargs["performed_by_user_id"],
+                "assigned_to_user_id": kwargs["assigned_to_user_id"],
+                "action_type": kwargs["action"],
+                "comment": kwargs["comment"],
+                "previous_status": kwargs["previous_status"],
+                "new_status": kwargs["new_status"],
+                "performed_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(timezone.utc),
+            },
         }
 
     def apply_recommendation_workflow_action(self, **kwargs):
         self.applied_action = kwargs
-        return {
-            "recommendation": {
-                "id": kwargs["recommendation_id"],
-                "status": kwargs["new_status"],
-            },
-            "workflow_action": {
+        audit_log = {
+            "id": uuid4(),
+            "entity_type": "recommendation",
+            "entity_id": kwargs["recommendation_id"],
+            "performed_by_user_id": kwargs["performed_by_user_id"],
+            "assigned_to_user_id": kwargs["assigned_to_user_id"],
+            "action_type": kwargs["action"],
+            "comment": kwargs["comment"],
+            "previous_status": kwargs["previous_status"],
+            "new_status": kwargs["new_status"],
+            "performed_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(timezone.utc),
+        }
+        workflow_action = None
+        if kwargs["alert_id"]:
+            workflow_action = {
                 "id": uuid4(),
                 "alert_id": kwargs["alert_id"],
                 "performed_by_user_id": kwargs["performed_by_user_id"],
@@ -61,7 +85,15 @@ class FakeWorkflowRepository:
                 "new_status": kwargs["new_status"],
                 "performed_at": datetime.now(timezone.utc),
                 "created_at": datetime.now(timezone.utc),
+            }
+
+        return {
+            "recommendation": {
+                "id": kwargs["recommendation_id"],
+                "status": kwargs["new_status"],
             },
+            "workflow_action": workflow_action,
+            "audit_log": audit_log,
         }
 
 
@@ -75,7 +107,7 @@ def make_alert(status="open"):
 def make_recommendation(status="proposed", alert_id=None):
     return {
         "id": uuid4(),
-        "alert_id": alert_id or uuid4(),
+        "alert_id": uuid4() if alert_id is None else alert_id,
         "status": status,
     }
 
@@ -213,16 +245,19 @@ def test_apply_recommendation_resolve_requires_accepted_status():
         )
 
 
-def test_apply_recommendation_action_requires_alert_link_until_audit_log_migration():
+def test_apply_recommendation_action_records_native_audit_without_alert_link():
     recommendation = make_recommendation(status="proposed", alert_id=None)
     recommendation["alert_id"] = None
-    service = WorkflowService(
-        repository=FakeWorkflowRepository(recommendation=recommendation)
+    repository = FakeWorkflowRepository(recommendation=recommendation)
+    service = WorkflowService(repository=repository)
+
+    result = service.apply_recommendation_action(
+        recommendation_id=recommendation["id"],
+        action="accept",
+        actor=DEMO_USERS["platform-admin"],
     )
 
-    with pytest.raises(LookupError):
-        service.apply_recommendation_action(
-            recommendation_id=recommendation["id"],
-            action="accept",
-            actor=DEMO_USERS["platform-admin"],
-        )
+    assert result["status"] == "accepted"
+    assert result["workflow_action"]["entity_type"] == "recommendation"
+    assert result["workflow_action"]["id"] == result["workflow_action"]["audit_log_id"]
+    assert repository.applied_action["alert_id"] is None

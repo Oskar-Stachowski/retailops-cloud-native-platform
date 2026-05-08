@@ -4,6 +4,7 @@ from typing import Any
 from uuid import UUID
 
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from app.auth.roles import DemoUser
 from app.db.connection import get_connection
@@ -134,6 +135,7 @@ class WorkflowRepository:
         performed_by_user_id: UUID,
         assigned_to_user_id: UUID | None = None,
         comment: str | None = None,
+        idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         with get_connection() as connection:
             with connection.cursor(row_factory=dict_row) as cursor:
@@ -198,23 +200,41 @@ class WorkflowRepository:
                     ),
                 )
                 workflow_action = cursor.fetchone()
+                audit_log = self._insert_workflow_audit_log(
+                    cursor,
+                    entity_type="alert",
+                    entity_id=alert_id,
+                    action=action,
+                    previous_status=previous_status,
+                    new_status=new_status,
+                    performed_by_user_id=performed_by_user_id,
+                    assigned_to_user_id=assigned_to_user_id,
+                    comment=comment,
+                    idempotency_key=idempotency_key,
+                    details={
+                        "workflow_action_id": str(workflow_action["id"]),
+                    },
+                )
                 connection.commit()
 
         return {
             "alert": dict(alert),
             "workflow_action": dict(workflow_action),
+            "audit_log": dict(audit_log),
         }
 
     def apply_recommendation_workflow_action(
         self,
         *,
         recommendation_id: UUID,
-        alert_id: UUID,
+        alert_id: UUID | None,
         action: str,
         previous_status: str,
         new_status: str,
         performed_by_user_id: UUID,
+        assigned_to_user_id: UUID | None = None,
         comment: str | None = None,
+        idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         with get_connection() as connection:
             with connection.cursor(row_factory=dict_row) as cursor:
@@ -244,42 +264,128 @@ class WorkflowRepository:
                 if not recommendation:
                     raise LookupError(f"Recommendation {recommendation_id} does not exist.")
 
-                cursor.execute(
-                    """
-                    INSERT INTO workflow_actions (
-                        alert_id,
-                        performed_by_user_id,
-                        action_type,
-                        comment,
-                        previous_status,
-                        new_status,
-                        performed_at
+                workflow_action = None
+                if alert_id:
+                    cursor.execute(
+                        """
+                        INSERT INTO workflow_actions (
+                            alert_id,
+                            performed_by_user_id,
+                            action_type,
+                            comment,
+                            previous_status,
+                            new_status,
+                            performed_at
+                        )
+                        VALUES (%s, %s, %s, %s, %s, %s, now())
+                        RETURNING
+                            id,
+                            alert_id,
+                            performed_by_user_id,
+                            action_type,
+                            comment,
+                            previous_status,
+                            new_status,
+                            performed_at,
+                            created_at;
+                        """,
+                        (
+                            alert_id,
+                            performed_by_user_id,
+                            action,
+                            comment,
+                            previous_status,
+                            new_status,
+                        ),
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, now())
-                    RETURNING
-                        id,
-                        alert_id,
-                        performed_by_user_id,
-                        action_type,
-                        comment,
-                        previous_status,
-                        new_status,
-                        performed_at,
-                        created_at;
-                    """,
-                    (
-                        alert_id,
-                        performed_by_user_id,
-                        action,
-                        comment,
-                        previous_status,
-                        new_status,
-                    ),
+                    workflow_action = cursor.fetchone()
+
+                details = {}
+                if alert_id:
+                    details["alert_id"] = str(alert_id)
+                if workflow_action:
+                    details["workflow_action_id"] = str(workflow_action["id"])
+
+                audit_log = self._insert_workflow_audit_log(
+                    cursor,
+                    entity_type="recommendation",
+                    entity_id=recommendation_id,
+                    action=action,
+                    previous_status=previous_status,
+                    new_status=new_status,
+                    performed_by_user_id=performed_by_user_id,
+                    assigned_to_user_id=assigned_to_user_id,
+                    comment=comment,
+                    idempotency_key=idempotency_key,
+                    details=details,
                 )
-                workflow_action = cursor.fetchone()
                 connection.commit()
 
         return {
             "recommendation": dict(recommendation),
-            "workflow_action": dict(workflow_action),
+            "workflow_action": dict(workflow_action) if workflow_action else None,
+            "audit_log": dict(audit_log),
         }
+
+    def _insert_workflow_audit_log(
+        self,
+        cursor,
+        *,
+        entity_type: str,
+        entity_id: UUID,
+        action: str,
+        previous_status: str,
+        new_status: str,
+        performed_by_user_id: UUID,
+        assigned_to_user_id: UUID | None,
+        comment: str | None,
+        idempotency_key: str | None,
+        details: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        cursor.execute(
+            """
+            INSERT INTO workflow_audit_log (
+                entity_type,
+                entity_id,
+                action_type,
+                performed_by_user_id,
+                assigned_to_user_id,
+                previous_status,
+                new_status,
+                comment,
+                idempotency_key,
+                source,
+                details,
+                performed_at
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'api', %s, now())
+            RETURNING
+                id,
+                entity_type,
+                entity_id,
+                action_type,
+                performed_by_user_id,
+                assigned_to_user_id,
+                previous_status,
+                new_status,
+                comment,
+                idempotency_key,
+                source,
+                details,
+                performed_at,
+                created_at;
+            """,
+            (
+                entity_type,
+                entity_id,
+                action,
+                performed_by_user_id,
+                assigned_to_user_id,
+                previous_status,
+                new_status,
+                comment,
+                idempotency_key,
+                Jsonb(details or {}),
+            ),
+        )
+        return cursor.fetchone()

@@ -562,6 +562,7 @@ class WorkflowActionResponse(ApiBaseModel):
     """Public representation of a persisted workflow decision/audit event."""
 
     id: UUID
+    audit_log_id: UUID | None = None
     entity_type: str
     entity_id: UUID
     action: str

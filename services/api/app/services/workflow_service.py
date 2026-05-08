@@ -64,12 +64,15 @@ class WorkflowService:
             performed_by_user_id=actor_user_id,
             assigned_to_user_id=assigned_to_user_id,
             comment=comment,
+            idempotency_key=idempotency_key,
         )
 
         workflow_action = result["workflow_action"]
+        audit_log = result["audit_log"]
         return {
             "workflow_action": {
                 "id": workflow_action["id"],
+                "audit_log_id": audit_log["id"],
                 "entity_type": "alert",
                 "entity_id": workflow_action["alert_id"],
                 "action": workflow_action["action_type"],
@@ -104,13 +107,6 @@ class WorkflowService:
             )
 
         alert_id = recommendation.get("alert_id")
-        if not alert_id:
-            raise LookupError(
-                "Recommendation workflow actions require an alert_id until the "
-                "Sprint 10 audit log migration supports recommendation-native "
-                "workflow records."
-            )
-
         previous_status = str(recommendation["status"])
         new_status = self._next_recommendation_status(
             action=normalized_action,
@@ -133,13 +129,17 @@ class WorkflowService:
             previous_status=previous_status,
             new_status=new_status,
             performed_by_user_id=actor_user_id,
+            assigned_to_user_id=assigned_to_user_id,
             comment=comment,
+            idempotency_key=idempotency_key,
         )
 
-        workflow_action = result["workflow_action"]
+        audit_log = result["audit_log"]
+        workflow_action = result["workflow_action"] or audit_log
         return {
             "workflow_action": {
                 "id": workflow_action["id"],
+                "audit_log_id": audit_log["id"],
                 "entity_type": "recommendation",
                 "entity_id": result["recommendation"]["id"],
                 "action": workflow_action["action_type"],
