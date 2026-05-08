@@ -58,6 +58,22 @@ def test_assign_alert_endpoint_requires_assignee():
     assert response.status_code == 422
 
 
+def test_alert_workflow_endpoint_requires_write_permission(monkeypatch):
+    def fail_if_called(**kwargs):
+        raise AssertionError("workflow service should not be called")
+
+    monkeypatch.setattr(
+        "app.api.alerts.workflow_service.apply_alert_action",
+        fail_if_called,
+    )
+
+    response = client.post(
+        f"/alerts/{uuid4()}/acknowledge?user_id=read-only-viewer"
+    )
+
+    assert response.status_code == 403
+
+
 def test_assign_alert_endpoint_passes_assignee_to_service(monkeypatch):
     alert_id = uuid4()
     assignee_id = uuid4()

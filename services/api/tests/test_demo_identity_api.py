@@ -40,7 +40,18 @@ def test_non_admin_user_has_no_platform_admin_permission():
 
     assert payload["role"] == "inventory_planner"
     assert "inventory:read" in payload["permissions"]
+    assert "workflow:write" in payload["permissions"]
     assert "platform:admin" not in payload["permissions"]
+
+
+def test_viewer_has_no_workflow_write_permission():
+    response = client.get("/me/permissions?user_id=read-only-viewer")
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["role"] == "viewer"
+    assert "workflow:write" not in payload["permissions"]
 
 
 def test_unknown_demo_user_returns_404():

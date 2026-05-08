@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Body, HTTPException, Query, status
 
 from app.api.schemas import WorkflowMutationRequest, WorkflowMutationResponse
-from app.auth.roles import get_demo_user
+from app.auth.roles import PERMISSION_WORKFLOW_WRITE, get_demo_user, require_permission
 from app.domain.workflow import WorkflowActionName, WorkflowTransitionError
 from app.services.workflow_service import WorkflowNotFoundError, WorkflowService
 
@@ -21,6 +21,7 @@ def _apply_alert_action(
 ) -> dict:
     body = request or WorkflowMutationRequest()
     actor = get_demo_user(user_id)
+    require_permission(actor, PERMISSION_WORKFLOW_WRITE)
 
     try:
         return workflow_service.apply_alert_action(

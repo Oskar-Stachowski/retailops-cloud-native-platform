@@ -85,6 +85,22 @@ def test_assign_recommendation_endpoint_requires_assignee():
     assert response.status_code == 422
 
 
+def test_recommendation_workflow_endpoint_requires_write_permission(monkeypatch):
+    def fail_if_called(**kwargs):
+        raise AssertionError("workflow service should not be called")
+
+    monkeypatch.setattr(
+        "app.api.recommendations.workflow_service.apply_recommendation_action",
+        fail_if_called,
+    )
+
+    response = client.post(
+        f"/recommendations/{uuid4()}/accept?user_id=read-only-viewer"
+    )
+
+    assert response.status_code == 403
+
+
 def test_resolve_recommendation_maps_invalid_transition_to_conflict(monkeypatch):
     from app.domain.workflow import WorkflowTransitionError
 
