@@ -68,6 +68,12 @@ The business operations dashboard lives at:
 observability/grafana/dashboards/retailops-business-operations.json
 ```
 
+The stream processing dashboard lives at:
+
+```text
+observability/grafana/dashboards/retailops-stream-processing.json
+```
+
 Alert rules live in:
 
 ```text

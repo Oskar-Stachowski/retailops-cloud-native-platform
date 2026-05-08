@@ -21,6 +21,12 @@ BUSINESS_DASHBOARD_PATH = (
     / "dashboards"
     / "retailops-business-operations.json"
 )
+STREAM_DASHBOARD_PATH = (
+    OBSERVABILITY_PATH
+    / "grafana"
+    / "dashboards"
+    / "retailops-stream-processing.json"
+)
 
 
 def test_grafana_prometheus_datasource_is_provisioned() -> None:
@@ -121,3 +127,36 @@ def test_retailops_business_operations_dashboard_contains_operational_panels() -
     assert "retailops_stream_consumer_received_events_total or vector(0)" in expressions
     assert "retailops_stream_consumer_processed_events_total or vector(0)" in expressions
     assert "retailops_stream_consumer_failed_events_total or vector(0)" in expressions
+
+
+def test_retailops_stream_processing_dashboard_contains_consumer_panels() -> None:
+    dashboard = json.loads(STREAM_DASHBOARD_PATH.read_text(encoding="utf-8"))
+    panel_titles = {panel["title"] for panel in dashboard["panels"]}
+    expressions = {
+        target["expr"]
+        for panel in dashboard["panels"]
+        for target in panel.get("targets", [])
+    }
+    dashboard_json = json.dumps(dashboard)
+
+    assert dashboard["uid"] == "retailops-stream-processing"
+    assert dashboard["title"] == "RetailOps Stream Processing"
+    assert "retailops-prometheus" in dashboard_json
+    assert "Consumer Running" in panel_titles
+    assert "Consumer Lag" in panel_titles
+    assert "Consumer Failures" in panel_titles
+    assert "DLQ Events" in panel_titles
+    assert "Consumer Throughput" in panel_titles
+    assert "Consumer Error Paths" in panel_titles
+    assert "Processing Latency" in panel_titles
+    assert "Lag Trend" in panel_titles
+    assert "retailops_stream_consumer_running or vector(0)" in expressions
+    assert "retailops_stream_consumer_lag_events or vector(0)" in expressions
+    assert "retailops_stream_consumer_received_events_total or vector(0)" in expressions
+    assert "retailops_stream_consumer_processed_events_total or vector(0)" in expressions
+    assert "retailops_stream_consumer_ignored_events_total or vector(0)" in expressions
+    assert "retailops_stream_consumer_failed_events_total or vector(0)" in expressions
+    assert "retailops_stream_consumer_dlq_events_total or vector(0)" in expressions
+    assert "retailops_stream_dlq_events_total or vector(0)" in expressions
+    assert "retailops_stream_processing_latency_seconds_avg" in expressions
+    assert "retailops_stream_processing_latency_seconds_max" in expressions
