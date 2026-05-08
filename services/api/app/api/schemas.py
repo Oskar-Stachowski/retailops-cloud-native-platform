@@ -8,7 +8,36 @@ from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from app.domain.workflow import (
+    WorkflowActionName,
+    WorkflowEntityType,
+    WorkflowTransitionError,
+    validate_workflow_transition,
+)
+
+
+ALERT_WORKFLOW_ACTIONS = frozenset(
+    {
+        WorkflowActionName.acknowledge,
+        WorkflowActionName.assign,
+        WorkflowActionName.resolve,
+        WorkflowActionName.dismiss,
+        WorkflowActionName.comment,
+    }
+)
+
+RECOMMENDATION_WORKFLOW_ACTIONS = frozenset(
+    {
+        WorkflowActionName.accept,
+        WorkflowActionName.reject,
+        WorkflowActionName.assign,
+        WorkflowActionName.resolve,
+        WorkflowActionName.dismiss,
+        WorkflowActionName.comment,
+    }
+)
 
 
 class ApiBaseModel(BaseModel):
@@ -425,6 +454,132 @@ class Product360Response(ApiBaseModel):
     recommendations: list[Product360Recommendation]
     workflow_actions: list[Product360WorkflowAction]
     limits: dict[str, int]
+
+
+class WorkflowMutationRequest(ApiBaseModel):
+    """Base request body for endpoint-specific workflow mutations."""
+
+    comment: str | None = Field(
+        default=None,
+        min_length=5,
+        max_length=1000,
+        description="Decision comment. Required for reject and dismiss actions.",
+    )
+    assigned_to_user_id: UUID | None = Field(
+        default=None,
+        description="Target user for assign actions.",
+    )
+    idempotency_key: str | None = Field(
+        default=None,
+        min_length=8,
+        max_length=120,
+        description="Optional client-supplied key for safe retries.",
+    )
+
+
+class AlertWorkflowMutationRequest(WorkflowMutationRequest):
+    """Request body for alert workflow action endpoints."""
+
+    action: WorkflowActionName = Field(
+        ...,
+        description="Workflow action requested for an alert.",
+    )
+
+    @model_validator(mode="after")
+    def validate_alert_action_request(self) -> "AlertWorkflowMutationRequest":
+        if self.action not in ALERT_WORKFLOW_ACTIONS:
+            raise ValueError(f"{self.action.value} is not a supported alert action.")
+
+        if self.action == WorkflowActionName.assign and not self.assigned_to_user_id:
+            raise ValueError("assigned_to_user_id is required for assign actions.")
+
+        if self.action == WorkflowActionName.dismiss and not self.comment:
+            raise ValueError("comment is required for dismiss actions.")
+
+        return self
+
+
+class RecommendationWorkflowMutationRequest(WorkflowMutationRequest):
+    """Request body for recommendation decision endpoints."""
+
+    action: WorkflowActionName = Field(
+        ...,
+        description="Workflow action requested for a recommendation.",
+    )
+
+    @model_validator(mode="after")
+    def validate_recommendation_action_request(
+        self,
+    ) -> "RecommendationWorkflowMutationRequest":
+        if self.action not in RECOMMENDATION_WORKFLOW_ACTIONS:
+            raise ValueError(
+                f"{self.action.value} is not a supported recommendation action."
+            )
+
+        if self.action == WorkflowActionName.assign and not self.assigned_to_user_id:
+            raise ValueError("assigned_to_user_id is required for assign actions.")
+
+        if self.action in {
+            WorkflowActionName.reject,
+            WorkflowActionName.dismiss,
+        } and not self.comment:
+            raise ValueError(
+                f"comment is required for {self.action.value} actions."
+            )
+
+        return self
+
+
+class WorkflowActionCreateRequest(WorkflowMutationRequest):
+    """Generic request body for POST /workflow-actions."""
+
+    entity_type: WorkflowEntityType
+    entity_id: UUID
+    action: WorkflowActionName
+    previous_status: str = Field(..., min_length=1, max_length=30)
+    new_status: str = Field(..., min_length=1, max_length=30)
+
+    @model_validator(mode="after")
+    def validate_transition(self) -> "WorkflowActionCreateRequest":
+        if self.action == WorkflowActionName.assign and not self.assigned_to_user_id:
+            raise ValueError("assigned_to_user_id is required for assign actions.")
+
+        try:
+            validate_workflow_transition(
+                entity_type=self.entity_type,
+                action=self.action,
+                previous_status=self.previous_status,
+                new_status=self.new_status,
+                comment=self.comment,
+            )
+        except WorkflowTransitionError as exc:
+            raise ValueError(str(exc)) from exc
+
+        return self
+
+
+class WorkflowActionResponse(ApiBaseModel):
+    """Public representation of a persisted workflow decision/audit event."""
+
+    id: UUID
+    entity_type: str
+    entity_id: UUID
+    action: str
+    previous_status: str
+    new_status: str
+    performed_by_user_id: UUID
+    assigned_to_user_id: UUID | None = None
+    comment: str | None = None
+    performed_at: datetime
+    idempotency_key: str | None = None
+
+
+class WorkflowMutationResponse(ApiBaseModel):
+    """Response returned by workflow mutation endpoints."""
+
+    workflow_action: WorkflowActionResponse
+    status: str
+    message: str
 
 
 class DemoUserResponse(ApiBaseModel):

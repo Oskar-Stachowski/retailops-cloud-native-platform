@@ -56,6 +56,12 @@ ALERT_TRANSITIONS: frozenset[WorkflowTransition] = frozenset(
         ),
         WorkflowTransition(
             WorkflowEntityType.alert,
+            WorkflowActionName.assign,
+            "in_progress",
+            "in_progress",
+        ),
+        WorkflowTransition(
+            WorkflowEntityType.alert,
             WorkflowActionName.escalate,
             "open",
             "in_progress",
@@ -121,6 +127,18 @@ RECOMMENDATION_TRANSITIONS: frozenset[WorkflowTransition] = frozenset(
             WorkflowEntityType.recommendation,
             WorkflowActionName.accept,
             "proposed",
+            "accepted",
+        ),
+        WorkflowTransition(
+            WorkflowEntityType.recommendation,
+            WorkflowActionName.assign,
+            "proposed",
+            "proposed",
+        ),
+        WorkflowTransition(
+            WorkflowEntityType.recommendation,
+            WorkflowActionName.assign,
+            "accepted",
             "accepted",
         ),
         WorkflowTransition(
