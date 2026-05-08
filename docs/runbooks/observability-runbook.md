@@ -106,7 +106,7 @@ Check Grafana dashboards:
 
 ```bash
 curl --silent --show-error \
-  --user admin:retailops \
+  --user "${GRAFANA_ADMIN_USER:-admin}:${GRAFANA_ADMIN_PASSWORD:-retailops}" \
   http://localhost:3001/api/search
 ```
 
@@ -303,7 +303,9 @@ curl --silent --show-error http://localhost:9090/api/v1/targets?state=active \
 curl --silent --show-error http://localhost:9090/api/v1/rules \
   > ci-cd/reports/observability/prometheus-rules.json
 
-curl --silent --show-error --user admin:retailops http://localhost:3001/api/search \
+curl --silent --show-error \
+  --user "${GRAFANA_ADMIN_USER:-admin}:${GRAFANA_ADMIN_PASSWORD:-retailops}" \
+  http://localhost:3001/api/search \
   > ci-cd/reports/observability/grafana-dashboards.json
 ```
 

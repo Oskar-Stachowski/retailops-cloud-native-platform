@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Local Grafana demo credentials documented before the secret-scan allowlist existed."
+commits = ["ff31fb8d945acdb60602d5111e3efbea76d333b4"]
+paths = ['''docs/runbooks/observability-runbook\.md''']
+regexes = ['''admin:retailops''']
