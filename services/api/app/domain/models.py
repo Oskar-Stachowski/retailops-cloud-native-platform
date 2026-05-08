@@ -6,6 +6,12 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.domain.workflow import (
+    WorkflowEntityType,
+    WorkflowTransitionError,
+    validate_workflow_transition,
+)
+
 
 class RetailOpsBaseModel(BaseModel):
     model_config = ConfigDict(
@@ -203,6 +209,8 @@ class Alert(RetailOpsBaseModel):
 class WorkflowActionType(str, Enum):
     ACKNOWLEDGE = "acknowledge"
     ASSIGN = "assign"
+    ACCEPT = "accept"
+    REJECT = "reject"
     ESCALATE = "escalate"
     DISMISS = "dismiss"
     RESOLVE = "resolve"
@@ -222,7 +230,9 @@ class WorkflowAction(RetailOpsBaseModel):
         default=None,
         min_length=5,
         max_length=300,
-        description="Optional decision comment. Required for dismiss actions.",
+        description=(
+            "Optional decision comment. Required for dismiss and reject actions."
+        ),
     )
 
     previous_status: AlertStatus = Field(...)
@@ -234,8 +244,16 @@ class WorkflowAction(RetailOpsBaseModel):
 
     @model_validator(mode="after")
     def validate_action_requirements(self) -> "WorkflowAction":
-        if self.action_type == WorkflowActionType.DISMISS and not self.comment:
-            raise ValueError("Comment is required when dismissing an alert.")
+        try:
+            validate_workflow_transition(
+                entity_type=WorkflowEntityType.alert,
+                action=self.action_type,
+                previous_status=self.previous_status,
+                new_status=self.new_status,
+                comment=self.comment,
+            )
+        except WorkflowTransitionError as exc:
+            raise ValueError(str(exc)) from exc
 
         return self
 

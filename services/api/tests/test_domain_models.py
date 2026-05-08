@@ -15,6 +15,13 @@ from app.domain.models import (
     RecommendationType,
     RecommendationStatus,
 )
+from app.domain.workflow import (
+    WorkflowEntityType,
+    WorkflowActionName,
+    WorkflowTransitionError,
+    is_workflow_transition_allowed,
+    validate_workflow_transition,
+)
 
 
 def test_product_can_be_created_with_valid_data():
@@ -76,6 +83,73 @@ def test_workflow_action_requires_comment_for_dismiss():
             new_status=AlertStatus.dismissed,
             comment=None,
         )
+
+
+def test_workflow_action_accepts_valid_alert_transition():
+    action = WorkflowAction(
+        alert_id=uuid4(),
+        performed_by_user_id=uuid4(),
+        action_type=WorkflowActionType.ACKNOWLEDGE,
+        previous_status=AlertStatus.open,
+        new_status=AlertStatus.acknowledged,
+        comment=None,
+    )
+
+    assert action.previous_status == AlertStatus.open
+    assert action.new_status == AlertStatus.acknowledged
+
+
+def test_workflow_action_rejects_invalid_alert_transition():
+    with pytest.raises(ValidationError):
+        WorkflowAction(
+            alert_id=uuid4(),
+            performed_by_user_id=uuid4(),
+            action_type=WorkflowActionType.ASSIGN,
+            previous_status=AlertStatus.resolved,
+            new_status=AlertStatus.in_progress,
+            comment=None,
+        )
+
+
+def test_comment_action_cannot_change_alert_status():
+    with pytest.raises(ValidationError):
+        WorkflowAction(
+            alert_id=uuid4(),
+            performed_by_user_id=uuid4(),
+            action_type=WorkflowActionType.COMMENT,
+            previous_status=AlertStatus.open,
+            new_status=AlertStatus.acknowledged,
+            comment="Reviewing this alert.",
+        )
+
+
+def test_recommendation_reject_transition_requires_comment():
+    with pytest.raises(WorkflowTransitionError):
+        validate_workflow_transition(
+            entity_type=WorkflowEntityType.recommendation,
+            action=WorkflowActionName.reject,
+            previous_status=RecommendationStatus.proposed,
+            new_status=RecommendationStatus.rejected,
+            comment=None,
+        )
+
+
+def test_recommendation_accept_transition_is_allowed():
+    assert is_workflow_transition_allowed(
+        entity_type=WorkflowEntityType.recommendation,
+        action=WorkflowActionName.accept,
+        previous_status=RecommendationStatus.proposed,
+        new_status=RecommendationStatus.accepted,
+    )
+
+
+def test_recommendation_cannot_move_from_implemented_to_accepted():
+    assert not is_workflow_transition_allowed(
+        entity_type=WorkflowEntityType.recommendation,
+        action=WorkflowActionName.accept,
+        previous_status=RecommendationStatus.implemented,
+        new_status=RecommendationStatus.accepted,
+    )
 
 
 def test_forecast_rejects_confidence_level_outside_expected_range():
