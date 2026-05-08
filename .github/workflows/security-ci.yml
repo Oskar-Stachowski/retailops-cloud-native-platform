@@ -23,6 +23,7 @@ on:
       - "scripts/**"
       - "security/**"
       - ".github/workflows/security-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
