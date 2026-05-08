@@ -99,7 +99,7 @@
       },
       "targets": [
         {
-          "expr": "retailops_stream_events_total",
+          "expr": "retailops_stream_events_total or vector(0)",
           "legendFormat": "{{status}}",
           "refId": "A"
         }
@@ -194,8 +194,8 @@
       },
       "targets": [
         {
-          "expr": "retailops_stream_consumer_lag_events",
-          "legendFormat": "{{consumer_id}}",
+          "expr": "retailops_stream_consumer_lag_events or vector(0)",
+          "legendFormat": "{{consumer}}",
           "refId": "A"
         }
       ],

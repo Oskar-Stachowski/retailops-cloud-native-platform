@@ -50,6 +50,6 @@ def test_retailops_overview_dashboard_contains_core_stream_panels() -> None:
     assert "Processing Latency" in panel_titles
     assert "Consumer Lag" in panel_titles
     assert 'up{job="retailops-api"}' in expressions
-    assert "retailops_stream_events_total" in expressions
+    assert "retailops_stream_events_total or vector(0)" in expressions
     assert "retailops_stream_processing_latency_seconds_avg" in expressions
-    assert "retailops_stream_consumer_lag_events" in expressions
+    assert "retailops_stream_consumer_lag_events or vector(0)" in expressions
