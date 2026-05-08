@@ -618,10 +618,38 @@ th {
   margin-top: 0.25rem;
 }
 
+.product-360-workflow-controls {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.product-360-workflow-access {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: end;
+  min-width: 180px;
+}
+
+.product-360-workflow-access span {
+  color: #64748b;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
 .api-page {
   width: 100%;
   max-width: 1480px;
   margin: 0 auto;
+}
+
+@media (max-width: 760px) {
+  .product-360-workflow-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .product-360-workflow-access {
+    justify-items: start;
+  }
 }
 
 @media (min-width: 1440px) {

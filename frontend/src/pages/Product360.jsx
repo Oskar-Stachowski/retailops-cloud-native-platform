@@ -5,8 +5,28 @@ import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import StatusBadge from "../components/StatusBadge";
-import { getProduct360 } from "../services/retailopsApi";
+import {
+  applyAlertWorkflowAction,
+  applyRecommendationWorkflowAction,
+  getCurrentUser,
+  getProduct360,
+  hasPermission,
+} from "../services/retailopsApi";
+import {
+  getSelectedDemoUserId,
+  subscribeDemoUserChanged,
+} from "../auth/demoUser.js";
 import "../styles/api-connected-ui.css";
+
+const ACTION_LABELS = {
+  accept: "Accept",
+  acknowledge: "Acknowledge",
+  dismiss: "Dismiss",
+  reject: "Reject",
+  resolve: "Resolve",
+};
+
+const COMMENT_REQUIRED_ACTIONS = new Set(["dismiss", "reject"]);
 
 function formatDateTime(value) {
   if (!value) {
@@ -109,16 +129,6 @@ const alertColumns = [
   { header: "Action", accessor: "recommended_action" },
 ];
 
-const recommendationColumns = [
-  { header: "Recommendation", accessor: "recommended_action" },
-  { header: "Type", accessor: (row) => formatTitle(row.recommendation_type) },
-  {
-    header: "Status",
-    render: (row) => <StatusBadge status={row.status}>{row.status}</StatusBadge>,
-  },
-  { header: "Generated", accessor: (row) => formatDateTime(row.generated_at) },
-];
-
 const workflowColumns = [
   { header: "Action", accessor: (row) => formatTitle(row.action_type) },
   { header: "Alert", accessor: (row) => row.alert_title || "—" },
@@ -130,14 +140,63 @@ const workflowColumns = [
   { header: "Performed", accessor: (row) => formatDateTime(row.performed_at) },
 ];
 
+function normalizeStatus(value, fallback) {
+  return String(value || fallback || "open").toLowerCase();
+}
+
+function availableAlertActions(alert) {
+  const status = normalizeStatus(alert.status, "open");
+
+  if (status === "open") {
+    return ["acknowledge", "dismiss"];
+  }
+
+  if (["acknowledged", "in_progress"].includes(status)) {
+    return ["resolve", "dismiss"];
+  }
+
+  return [];
+}
+
+function availableRecommendationActions(recommendation) {
+  const status = normalizeStatus(recommendation.status, "proposed");
+
+  if (status === "proposed") {
+    return ["accept", "reject", "dismiss"];
+  }
+
+  if (status === "accepted") {
+    return ["resolve"];
+  }
+
+  return [];
+}
+
+function buildIdempotencyKey(entityType, entityId, action) {
+  return ["frontend", "product-360", entityType, entityId, action, Date.now()].join(":");
+}
+
+function workflowErrorMessage(error, entityType) {
+  if (error?.status === 404) {
+    return `${formatTitle(entityType)} workflow endpoint or record was not found. Refresh Product 360 and verify the backend is running the current Sprint 10 API.`;
+  }
+
+  return error?.message || "Workflow action failed.";
+}
+
 export default function Product360() {
   const { productId } = useParams();
+  const [selectedUserId, setSelectedUserId] = useState(getSelectedDemoUserId());
   const [state, setState] = useState({
     loading: true,
     error: null,
     data: null,
     productId: null,
+    user: null,
   });
+  const [workflowComment, setWorkflowComment] = useState("");
+  const [activeWorkflowAction, setActiveWorkflowAction] = useState(null);
+  const [workflowNotice, setWorkflowNotice] = useState(null);
 
   const handleRetry = useCallback(async () => {
     setState({
@@ -145,16 +204,21 @@ export default function Product360() {
       error: null,
       data: null,
       productId,
+      user: null,
     });
 
     try {
-      const data = await getProduct360(productId);
+      const [data, user] = await Promise.all([
+        getProduct360(productId),
+        getCurrentUser({ userId: selectedUserId }),
+      ]);
 
       setState({
         loading: false,
         error: null,
         data,
         productId,
+        user,
       });
     } catch (error) {
       setState({
@@ -162,16 +226,35 @@ export default function Product360() {
         error,
         data: null,
         productId,
+        user: null,
       });
     }
-  }, [productId]);
+  }, [productId, selectedUserId]);
+
+  const refreshProduct360 = useCallback(async () => {
+    const [data, user] = await Promise.all([
+      getProduct360(productId),
+      getCurrentUser({ userId: selectedUserId }),
+    ]);
+
+    setState({
+      loading: false,
+      error: null,
+      data,
+      productId,
+      user,
+    });
+  }, [productId, selectedUserId]);
 
   useEffect(() => {
     let isCurrent = true;
 
     async function loadInitialProduct360() {
       try {
-        const data = await getProduct360(productId);
+        const [data, user] = await Promise.all([
+          getProduct360(productId),
+          getCurrentUser({ userId: selectedUserId }),
+        ]);
 
         if (isCurrent) {
           setState({
@@ -179,6 +262,7 @@ export default function Product360() {
             error: null,
             data,
             productId,
+            user,
           });
         }
       } catch (error) {
@@ -188,6 +272,7 @@ export default function Product360() {
             error,
             data: null,
             productId,
+            user: null,
           });
         }
       }
@@ -198,7 +283,57 @@ export default function Product360() {
     return () => {
       isCurrent = false;
     };
-  }, [productId]);
+  }, [productId, selectedUserId]);
+
+  useEffect(() => subscribeDemoUserChanged(setSelectedUserId), []);
+
+  async function handleWorkflowAction(entityType, entity, action) {
+    if (COMMENT_REQUIRED_ACTIONS.has(action) && workflowComment.trim().length < 5) {
+      setWorkflowNotice({
+        tone: "error",
+        message: "Add a decision comment with at least 5 characters.",
+      });
+      return;
+    }
+
+    const body = {
+      idempotency_key: buildIdempotencyKey(entityType, entity.id, action),
+    };
+
+    if (workflowComment.trim()) {
+      body.comment = workflowComment.trim();
+    }
+
+    const actionKey = `${entityType}:${entity.id}:${action}`;
+    setActiveWorkflowAction(actionKey);
+    setWorkflowNotice(null);
+
+    try {
+      if (entityType === "alert") {
+        await applyAlertWorkflowAction(entity.id, action, body, {
+          userId: selectedUserId,
+        });
+      } else {
+        await applyRecommendationWorkflowAction(entity.id, action, body, {
+          userId: selectedUserId,
+        });
+      }
+
+      setWorkflowComment("");
+      setWorkflowNotice({
+        tone: "success",
+        message: `${ACTION_LABELS[action]} recorded for ${formatTitle(entityType)}.`,
+      });
+      await refreshProduct360();
+    } catch (error) {
+      setWorkflowNotice({
+        tone: "error",
+        message: workflowErrorMessage(error, entityType),
+      });
+    } finally {
+      setActiveWorkflowAction(null);
+    }
+  }
 
   const isLoading = state.loading || state.productId !== productId;
 
@@ -215,6 +350,46 @@ export default function Product360() {
   }
 
   const { product, metrics, stock_risk: stockRisk } = state.data;
+  const canWriteWorkflow = hasPermission(state.user, "workflow:write");
+  const recommendationColumns = [
+    { header: "Recommendation", accessor: "recommended_action" },
+    { header: "Type", accessor: (row) => formatTitle(row.recommendation_type) },
+    {
+      header: "Status",
+      render: (row) => <StatusBadge status={row.status}>{row.status}</StatusBadge>,
+    },
+    { header: "Generated", accessor: (row) => formatDateTime(row.generated_at) },
+    {
+      header: "Workflow",
+      render: (row) => (
+        <WorkflowActionButtons
+          actions={availableRecommendationActions(row)}
+          activeAction={activeWorkflowAction}
+          canWriteWorkflow={canWriteWorkflow}
+          entity={row}
+          entityType="recommendation"
+          onAction={handleWorkflowAction}
+        />
+      ),
+    },
+  ];
+
+  const alertWorkflowColumns = [
+    ...alertColumns,
+    {
+      header: "Workflow",
+      render: (row) => (
+        <WorkflowActionButtons
+          actions={availableAlertActions(row)}
+          activeAction={activeWorkflowAction}
+          canWriteWorkflow={canWriteWorkflow}
+          entity={row}
+          entityType="alert"
+          onAction={handleWorkflowAction}
+        />
+      ),
+    },
+  ];
 
   return (
     <main className="api-page product-360-page">
@@ -240,9 +415,34 @@ export default function Product360() {
       <section className="feature-boundary">
         <h2>Operational workflow boundary</h2>
         <p>
-          This Sprint 6 view reads workflow context, but it does not mutate workflow state yet.
-          Approve, reject, assign and comment actions remain future backend write APIs.
+          Product-level alerts and recommendations can now be actioned through
+          Sprint 10 workflow write APIs. Access follows the selected demo user's
+          workflow permissions.
         </p>
+      </section>
+
+      <section className="action-queue-controls product-360-workflow-controls">
+        <label htmlFor="product-workflow-comment">
+          Decision comment
+          <textarea
+            id="product-workflow-comment"
+            value={workflowComment}
+            onChange={(event) => setWorkflowComment(event.target.value)}
+            placeholder="Required for reject and dismiss actions."
+            rows={3}
+          />
+        </label>
+        <div className="product-360-workflow-access">
+          <StatusBadge status={canWriteWorkflow ? "connected" : "warning"}>
+            {canWriteWorkflow ? "workflow write" : "read only"}
+          </StatusBadge>
+          <span>{state.user?.display_name || selectedUserId}</span>
+        </div>
+        {workflowNotice ? (
+          <p className={`action-queue-notice action-queue-notice--${workflowNotice.tone}`}>
+            {workflowNotice.message}
+          </p>
+        ) : null}
       </section>
 
       <DataTable
@@ -295,15 +495,15 @@ export default function Product360() {
 
       <DataTable
         title="Alerts"
-        description="Operational alerts that can later drive workflow actions."
-        columns={alertColumns}
+        description="Operational alerts with Sprint 10 workflow actions."
+        columns={alertWorkflowColumns}
         rows={state.data.alerts}
         emptyMessage="No alerts returned for this product."
       />
 
       <DataTable
         title="Recommendations"
-        description="Proposed actions before full workflow approval is implemented."
+        description="Product-level recommendations with accept, reject, dismiss and resolve actions."
         columns={recommendationColumns}
         rows={state.data.recommendations}
         emptyMessage="No recommendations returned for this product."
@@ -317,5 +517,42 @@ export default function Product360() {
         emptyMessage="No workflow actions returned for this product."
       />
     </main>
+  );
+}
+
+function WorkflowActionButtons({
+  actions,
+  activeAction,
+  canWriteWorkflow,
+  entity,
+  entityType,
+  onAction,
+}) {
+  if (!actions.length) {
+    return <span className="action-queue-unavailable">No action</span>;
+  }
+
+  if (!canWriteWorkflow) {
+    return <span className="action-queue-unavailable">Read-only role</span>;
+  }
+
+  return (
+    <div className="action-button-group">
+      {actions.map((action) => {
+        const actionKey = `${entityType}:${entity.id}:${action}`;
+
+        return (
+          <button
+            className="inline-action"
+            key={action}
+            type="button"
+            onClick={() => onAction(entityType, entity, action)}
+            disabled={activeAction === actionKey}
+          >
+            {activeAction === actionKey ? "Saving" : ACTION_LABELS[action]}
+          </button>
+        );
+      })}
+    </div>
   );
 }
