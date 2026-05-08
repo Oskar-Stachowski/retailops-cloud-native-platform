@@ -1,11 +1,25 @@
 from fastapi import APIRouter, status
 from fastapi.responses import PlainTextResponse
 
+from app.core.config import settings
 from app.services.stream_observability import StreamObservabilityService
 
 
 router = APIRouter(tags=["observability"])
 stream_observability_service = StreamObservabilityService()
+
+
+def render_api_info_metric() -> str:
+    return "\n".join(
+        [
+            "# HELP retailops_api_info RetailOps API service information.",
+            "# TYPE retailops_api_info gauge",
+            (
+                'retailops_api_info{service="retailops-api",'
+                f'environment="{settings.app_env}"}} 1'
+            ),
+        ]
+    )
 
 
 @router.get(
@@ -15,12 +29,21 @@ stream_observability_service = StreamObservabilityService()
     summary="Get Prometheus metrics",
     description=(
         "Returns application metrics in Prometheus text exposition format. "
-        "Sprint 9 includes real-time stream processing metrics derived from "
-        "the persisted event log and consumer state tables."
+        "Sprint 11 exposes API service metadata and Sprint 9 real-time stream "
+        "processing metrics derived from the persisted event log and consumer "
+        "state tables."
     ),
 )
 def get_metrics() -> PlainTextResponse:
+    payload = "\n".join(
+        [
+            render_api_info_metric(),
+            stream_observability_service.render_prometheus_metrics().rstrip(),
+            "",
+        ]
+    )
+
     return PlainTextResponse(
-        stream_observability_service.render_prometheus_metrics(),
+        payload,
         media_type="text/plain; version=0.0.4; charset=utf-8",
     )

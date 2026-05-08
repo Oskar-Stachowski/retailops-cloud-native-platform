@@ -17,5 +17,12 @@ def test_metrics_endpoint_returns_prometheus_text(monkeypatch):
     response = client.get("/metrics")
 
     assert response.status_code == 200
-    assert response.headers["content-type"].startswith("text/plain")
+    assert response.headers["content-type"].startswith(
+        "text/plain; version=0.0.4"
+    )
+    assert "# HELP retailops_api_info RetailOps API service information." in response.text
+    assert (
+        'retailops_api_info{service="retailops-api",environment="local"} 1'
+        in response.text
+    )
     assert 'retailops_stream_events_total{status="processed"} 3' in response.text
