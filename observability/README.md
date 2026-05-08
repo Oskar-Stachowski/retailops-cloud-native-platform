@@ -56,6 +56,12 @@ The starter dashboard lives at:
 observability/grafana/dashboards/retailops-overview.json
 ```
 
+The API dashboard lives at:
+
+```text
+observability/grafana/dashboards/retailops-api.json
+```
+
 Alert rules live in:
 
 ```text
