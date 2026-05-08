@@ -47,6 +47,33 @@ class WorkflowRepository:
 
         return dict(row) if row else None
 
+    def get_recommendation(self, recommendation_id: UUID) -> dict[str, Any] | None:
+        with get_connection() as connection:
+            with connection.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        id,
+                        product_id,
+                        forecast_id,
+                        anomaly_id,
+                        alert_id,
+                        recommendation_type,
+                        recommended_action,
+                        rationale,
+                        status,
+                        generated_at,
+                        expires_at,
+                        created_at
+                    FROM recommendations
+                    WHERE id = %s;
+                    """,
+                    (recommendation_id,),
+                )
+                row = cursor.fetchone()
+
+        return dict(row) if row else None
+
     def resolve_demo_actor_user_id(self, user: DemoUser) -> UUID:
         mapped_role = DEMO_ROLE_TO_DB_ROLE.get(user.role)
 
@@ -175,5 +202,84 @@ class WorkflowRepository:
 
         return {
             "alert": dict(alert),
+            "workflow_action": dict(workflow_action),
+        }
+
+    def apply_recommendation_workflow_action(
+        self,
+        *,
+        recommendation_id: UUID,
+        alert_id: UUID,
+        action: str,
+        previous_status: str,
+        new_status: str,
+        performed_by_user_id: UUID,
+        comment: str | None = None,
+    ) -> dict[str, Any]:
+        with get_connection() as connection:
+            with connection.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(
+                    """
+                    UPDATE recommendations
+                    SET status = %s
+                    WHERE id = %s
+                    RETURNING
+                        id,
+                        product_id,
+                        forecast_id,
+                        anomaly_id,
+                        alert_id,
+                        recommendation_type,
+                        recommended_action,
+                        rationale,
+                        status,
+                        generated_at,
+                        expires_at,
+                        created_at;
+                    """,
+                    (new_status, recommendation_id),
+                )
+                recommendation = cursor.fetchone()
+
+                if not recommendation:
+                    raise LookupError(f"Recommendation {recommendation_id} does not exist.")
+
+                cursor.execute(
+                    """
+                    INSERT INTO workflow_actions (
+                        alert_id,
+                        performed_by_user_id,
+                        action_type,
+                        comment,
+                        previous_status,
+                        new_status,
+                        performed_at
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, now())
+                    RETURNING
+                        id,
+                        alert_id,
+                        performed_by_user_id,
+                        action_type,
+                        comment,
+                        previous_status,
+                        new_status,
+                        performed_at,
+                        created_at;
+                    """,
+                    (
+                        alert_id,
+                        performed_by_user_id,
+                        action,
+                        comment,
+                        previous_status,
+                        new_status,
+                    ),
+                )
+                workflow_action = cursor.fetchone()
+                connection.commit()
+
+        return {
+            "recommendation": dict(recommendation),
             "workflow_action": dict(workflow_action),
         }

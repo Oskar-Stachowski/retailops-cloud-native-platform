@@ -15,6 +15,7 @@ from app.api import (
     notifications,
     product_360,
     products,
+    recommendations,
     sales,
     stock_risks,
 )
@@ -43,6 +44,7 @@ app.include_router(health_router)
 app.include_router(metrics.router)
 app.include_router(dashboard.router)
 app.include_router(alerts.router)
+app.include_router(recommendations.router)
 app.include_router(analytics.router)
 app.include_router(products.router)
 app.include_router(product_360.router)

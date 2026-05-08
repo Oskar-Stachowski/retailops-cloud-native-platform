@@ -85,6 +85,76 @@ class WorkflowService:
             "message": "Alert workflow action recorded.",
         }
 
+    def apply_recommendation_action(
+        self,
+        *,
+        recommendation_id: UUID,
+        action: WorkflowActionName | str,
+        actor: DemoUser,
+        assigned_to_user_id: UUID | None = None,
+        comment: str | None = None,
+        idempotency_key: str | None = None,
+    ) -> dict:
+        normalized_action = WorkflowActionName(action)
+        recommendation = self.repository.get_recommendation(recommendation_id)
+
+        if not recommendation:
+            raise WorkflowNotFoundError(
+                f"Recommendation {recommendation_id} does not exist."
+            )
+
+        alert_id = recommendation.get("alert_id")
+        if not alert_id:
+            raise LookupError(
+                "Recommendation workflow actions require an alert_id until the "
+                "Sprint 10 audit log migration supports recommendation-native "
+                "workflow records."
+            )
+
+        previous_status = str(recommendation["status"])
+        new_status = self._next_recommendation_status(
+            action=normalized_action,
+            previous_status=previous_status,
+        )
+
+        validate_workflow_transition(
+            entity_type=WorkflowEntityType.recommendation,
+            action=normalized_action,
+            previous_status=previous_status,
+            new_status=new_status,
+            comment=comment,
+        )
+
+        actor_user_id = self.repository.resolve_demo_actor_user_id(actor)
+        result = self.repository.apply_recommendation_workflow_action(
+            recommendation_id=recommendation_id,
+            alert_id=alert_id,
+            action=normalized_action.value,
+            previous_status=previous_status,
+            new_status=new_status,
+            performed_by_user_id=actor_user_id,
+            comment=comment,
+        )
+
+        workflow_action = result["workflow_action"]
+        return {
+            "workflow_action": {
+                "id": workflow_action["id"],
+                "entity_type": "recommendation",
+                "entity_id": result["recommendation"]["id"],
+                "action": workflow_action["action_type"],
+                "previous_status": workflow_action["previous_status"],
+                "new_status": workflow_action["new_status"],
+                "performed_by_user_id": workflow_action["performed_by_user_id"],
+                "assigned_to_user_id": assigned_to_user_id,
+                "comment": workflow_action["comment"],
+                "performed_at": workflow_action["performed_at"],
+                "idempotency_key": idempotency_key,
+            },
+            "status": result["recommendation"]["status"],
+            "message": "Recommendation workflow action recorded.",
+        }
+
     def _next_alert_status(
         self,
         *,
@@ -105,3 +175,26 @@ class WorkflowService:
             return previous_status
 
         raise WorkflowTransitionError(f"{action.value} is not supported for alerts.")
+
+    def _next_recommendation_status(
+        self,
+        *,
+        action: WorkflowActionName,
+        previous_status: str,
+    ) -> str:
+        if action == WorkflowActionName.accept:
+            return "accepted"
+        if action == WorkflowActionName.reject:
+            return "rejected"
+        if action == WorkflowActionName.assign:
+            return previous_status
+        if action == WorkflowActionName.resolve:
+            return "implemented"
+        if action == WorkflowActionName.dismiss:
+            return "rejected"
+        if action == WorkflowActionName.comment:
+            return previous_status
+
+        raise WorkflowTransitionError(
+            f"{action.value} is not supported for recommendations."
+        )

@@ -9,13 +9,17 @@ from app.services.workflow_service import WorkflowNotFoundError, WorkflowService
 
 
 class FakeWorkflowRepository:
-    def __init__(self, alert=None):
+    def __init__(self, alert=None, recommendation=None):
         self.alert = alert
+        self.recommendation = recommendation
         self.applied_action = None
         self.actor_user_id = uuid4()
 
     def get_alert(self, alert_id):
         return self.alert
+
+    def get_recommendation(self, recommendation_id):
+        return self.recommendation
 
     def resolve_demo_actor_user_id(self, user):
         return self.actor_user_id
@@ -40,10 +44,38 @@ class FakeWorkflowRepository:
             },
         }
 
+    def apply_recommendation_workflow_action(self, **kwargs):
+        self.applied_action = kwargs
+        return {
+            "recommendation": {
+                "id": kwargs["recommendation_id"],
+                "status": kwargs["new_status"],
+            },
+            "workflow_action": {
+                "id": uuid4(),
+                "alert_id": kwargs["alert_id"],
+                "performed_by_user_id": kwargs["performed_by_user_id"],
+                "action_type": kwargs["action"],
+                "comment": kwargs["comment"],
+                "previous_status": kwargs["previous_status"],
+                "new_status": kwargs["new_status"],
+                "performed_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(timezone.utc),
+            },
+        }
+
 
 def make_alert(status="open"):
     return {
         "id": uuid4(),
+        "status": status,
+    }
+
+
+def make_recommendation(status="proposed", alert_id=None):
+    return {
+        "id": uuid4(),
+        "alert_id": alert_id or uuid4(),
         "status": status,
     }
 
@@ -132,5 +164,65 @@ def test_apply_alert_action_raises_not_found_for_missing_alert():
         service.apply_alert_action(
             alert_id=uuid4(),
             action="acknowledge",
+            actor=DEMO_USERS["platform-admin"],
+        )
+
+
+def test_apply_recommendation_accept_records_decision():
+    recommendation = make_recommendation(status="proposed")
+    repository = FakeWorkflowRepository(recommendation=recommendation)
+    service = WorkflowService(repository=repository)
+
+    result = service.apply_recommendation_action(
+        recommendation_id=recommendation["id"],
+        action="accept",
+        actor=DEMO_USERS["platform-admin"],
+    )
+
+    assert result["status"] == "accepted"
+    assert result["workflow_action"]["entity_type"] == "recommendation"
+    assert repository.applied_action["previous_status"] == "proposed"
+    assert repository.applied_action["new_status"] == "accepted"
+
+
+def test_apply_recommendation_reject_requires_comment():
+    recommendation = make_recommendation(status="proposed")
+    service = WorkflowService(
+        repository=FakeWorkflowRepository(recommendation=recommendation)
+    )
+
+    with pytest.raises(WorkflowTransitionError):
+        service.apply_recommendation_action(
+            recommendation_id=recommendation["id"],
+            action="reject",
+            actor=DEMO_USERS["platform-admin"],
+        )
+
+
+def test_apply_recommendation_resolve_requires_accepted_status():
+    recommendation = make_recommendation(status="proposed")
+    service = WorkflowService(
+        repository=FakeWorkflowRepository(recommendation=recommendation)
+    )
+
+    with pytest.raises(WorkflowTransitionError):
+        service.apply_recommendation_action(
+            recommendation_id=recommendation["id"],
+            action="resolve",
+            actor=DEMO_USERS["platform-admin"],
+        )
+
+
+def test_apply_recommendation_action_requires_alert_link_until_audit_log_migration():
+    recommendation = make_recommendation(status="proposed", alert_id=None)
+    recommendation["alert_id"] = None
+    service = WorkflowService(
+        repository=FakeWorkflowRepository(recommendation=recommendation)
+    )
+
+    with pytest.raises(LookupError):
+        service.apply_recommendation_action(
+            recommendation_id=recommendation["id"],
+            action="accept",
             actor=DEMO_USERS["platform-admin"],
         )
