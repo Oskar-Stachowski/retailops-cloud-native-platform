@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   buildDashboardSummary,
   buildLiveOperationsPath,
+  buildWorkflowMutationPath,
   getProduct360,
   getLiveOperations,
   listFromKnownKeys,
@@ -13,6 +14,8 @@ import {
   getNotifications,
   hasPermission,
   markNotificationRead,
+  applyAlertWorkflowAction,
+  applyRecommendationWorkflowAction,
 } from "../src/services/retailopsApi.js";
 
 test("listFromPayload supports direct array payload", () => {
@@ -152,6 +155,17 @@ test("buildUserScopedPath adds selected demo user query parameter", () => {
   );
 });
 
+test("buildWorkflowMutationPath builds user-scoped workflow write paths", () => {
+  assert.equal(
+    buildWorkflowMutationPath("alert", "A1", "acknowledge", "ops-manager"),
+    "/alerts/A1/acknowledge?user_id=ops-manager",
+  );
+  assert.equal(
+    buildWorkflowMutationPath("recommendation", "R1", "accept", "inventory-planner"),
+    "/recommendations/R1/accept?user_id=inventory-planner",
+  );
+});
+
 test("hasPermission supports explicit permissions and platform admin", () => {
   assert.equal(hasPermission(["dashboard:read"], "dashboard:read"), true);
   assert.equal(hasPermission(["platform:admin"], "notifications:write"), true);
@@ -238,6 +252,70 @@ test("markNotificationRead calls POST read endpoint", async () => {
     );
     assert.equal(requests[0].options.method, "POST");
     assert.deepEqual(data, { unread_count: 0 });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("applyAlertWorkflowAction posts alert workflow mutation", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return new Response(JSON.stringify({ status: "acknowledged" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await applyAlertWorkflowAction(
+      "A1",
+      "acknowledge",
+      { idempotency_key: "frontend-alert-key" },
+      { baseUrl: "http://localhost:8000", userId: "ops-manager" },
+    );
+
+    assert.equal(
+      requests[0].url,
+      "http://localhost:8000/alerts/A1/acknowledge?user_id=ops-manager",
+    );
+    assert.equal(requests[0].options.method, "POST");
+    assert.equal(JSON.parse(requests[0].options.body).idempotency_key, "frontend-alert-key");
+    assert.deepEqual(data, { status: "acknowledged" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("applyRecommendationWorkflowAction posts recommendation workflow mutation", async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return new Response(JSON.stringify({ status: "accepted" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    const data = await applyRecommendationWorkflowAction(
+      "R1",
+      "accept",
+      { idempotency_key: "frontend-rec-key" },
+      { baseUrl: "http://localhost:8000", userId: "inventory-planner" },
+    );
+
+    assert.equal(
+      requests[0].url,
+      "http://localhost:8000/recommendations/R1/accept?user_id=inventory-planner",
+    );
+    assert.equal(requests[0].options.method, "POST");
+    assert.equal(JSON.parse(requests[0].options.body).idempotency_key, "frontend-rec-key");
+    assert.deepEqual(data, { status: "accepted" });
   } finally {
     globalThis.fetch = originalFetch;
   }

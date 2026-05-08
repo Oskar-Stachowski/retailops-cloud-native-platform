@@ -24,6 +24,7 @@ const navItems = [
   { label: "Forecasts", to: "/forecasts" },
   { label: "Anomalies", to: "/anomalies" },
   { label: "Recommendations", to: "/recommendations" },
+  { label: "Action Queue", to: "/action-queue", permission: "workflow:read" },
   { label: "Admin", to: "/admin", permission: "platform:admin" },
   { label: "Profile", to: "/profile" },
 ];

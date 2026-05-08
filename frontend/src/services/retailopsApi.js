@@ -16,6 +16,9 @@ export const ENDPOINTS = {
   dashboardOpenWorkItems: ["/dashboard/open-work-items"],
   dashboardStockRiskSummary: ["/dashboard/stock-risk-summary"],
   dashboardLiveOperations: ["/dashboard/live-operations"],
+  alertWorkflowAction: (alertId, action) => `/alerts/${alertId}/${action}`,
+  recommendationWorkflowAction: (recommendationId, action) =>
+    `/recommendations/${recommendationId}/${action}`,
   products: ["/products"],
   product360: (productId) => `/products/${productId}/360`,
   forecasts: ["/forecasts"],
@@ -375,6 +378,15 @@ export function buildUserScopedPath(path, userId) {
   return `${path}${separator}user_id=${encodeURIComponent(userId)}`;
 }
 
+export function buildWorkflowMutationPath(entityType, entityId, action, userId) {
+  const path =
+    entityType === "recommendation"
+      ? ENDPOINTS.recommendationWorkflowAction(entityId, action)
+      : ENDPOINTS.alertWorkflowAction(entityId, action);
+
+  return buildUserScopedPath(path, userId);
+}
+
 export function hasPermission(subject, permission) {
   const permissions = Array.isArray(subject) ? subject : subject?.permissions || [];
   return permissions.includes(permission) || permissions.includes("platform:admin");
@@ -414,6 +426,32 @@ export async function markNotificationRead(notificationId, options = {}) {
   return apiPost(
     buildUserScopedPath(ENDPOINTS.markNotificationRead(notificationId), options.userId),
     {},
+    options,
+  );
+}
+
+export async function applyAlertWorkflowAction(alertId, action, body = {}, options = {}) {
+  return apiPost(
+    buildWorkflowMutationPath("alert", alertId, action, options.userId),
+    body,
+    options,
+  );
+}
+
+export async function applyRecommendationWorkflowAction(
+  recommendationId,
+  action,
+  body = {},
+  options = {},
+) {
+  return apiPost(
+    buildWorkflowMutationPath(
+      "recommendation",
+      recommendationId,
+      action,
+      options.userId,
+    ),
+    body,
     options,
   );
 }

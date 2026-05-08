@@ -302,47 +302,9 @@ class WorkflowRepository:
                 if not recommendation:
                     raise LookupError(f"Recommendation {recommendation_id} does not exist.")
 
-                workflow_action = None
-                if alert_id:
-                    cursor.execute(
-                        """
-                        INSERT INTO workflow_actions (
-                            alert_id,
-                            performed_by_user_id,
-                            action_type,
-                            comment,
-                            previous_status,
-                            new_status,
-                            performed_at
-                        )
-                        VALUES (%s, %s, %s, %s, %s, %s, now())
-                        RETURNING
-                            id,
-                            alert_id,
-                            performed_by_user_id,
-                            action_type,
-                            comment,
-                            previous_status,
-                            new_status,
-                            performed_at,
-                            created_at;
-                        """,
-                        (
-                            alert_id,
-                            performed_by_user_id,
-                            action,
-                            comment,
-                            previous_status,
-                            new_status,
-                        ),
-                    )
-                    workflow_action = cursor.fetchone()
-
                 details = {}
                 if alert_id:
                     details["alert_id"] = str(alert_id)
-                if workflow_action:
-                    details["workflow_action_id"] = str(workflow_action["id"])
 
                 audit_log = self._insert_workflow_audit_log(
                     cursor,
@@ -361,7 +323,7 @@ class WorkflowRepository:
 
         return {
             "recommendation": dict(recommendation),
-            "workflow_action": dict(workflow_action) if workflow_action else None,
+            "workflow_action": None,
             "audit_log": dict(audit_log),
         }
 

@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import App from "../App.jsx";
+import ActionQueue from "../pages/ActionQueue.jsx";
 import Admin from "../pages/Admin.jsx";
 import Anomalies from "../pages/Anomalies.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "recommendations",
         element: <Recommendations />,
+      },
+      {
+        path: "action-queue",
+        element: <ActionQueue />,
       },
       {
         path: "admin",
