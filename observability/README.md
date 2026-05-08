@@ -44,6 +44,18 @@ Key metric families:
 Local Prometheus scrape configuration lives in
 [`observability/prometheus.yml`](prometheus.yml).
 
+Local Grafana provisioning lives under:
+
+```text
+observability/grafana/provisioning/
+```
+
+The starter dashboard lives at:
+
+```text
+observability/grafana/dashboards/retailops-overview.json
+```
+
 Alert rules live in:
 
 ```text
@@ -77,4 +89,11 @@ Then open:
 
 ```text
 http://localhost:9090
+http://localhost:3001
+```
+
+Default local Grafana credentials:
+
+```text
+admin / retailops
 ```

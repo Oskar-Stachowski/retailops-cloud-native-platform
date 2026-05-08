@@ -40,6 +40,23 @@ services:
       api:
         condition: service_healthy
 
+  grafana:
+    image: grafana/grafana:12.3.0
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-retailops}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana-dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_started
+
   redpanda:
     image: redpandadata/redpanda:v25.3.6
     command:
@@ -150,3 +167,4 @@ volumes:
   postgres_data:
   redpanda_data:
   prometheus_data:
+  grafana_data:

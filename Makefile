@@ -51,6 +51,7 @@ POSTGRES_PORT ?= 5432
 REDPANDA_KAFKA_PORT ?= 19092
 REDPANDA_ADMIN_PORT ?= 19644
 PROMETHEUS_PORT ?= 9090
+GRAFANA_PORT ?= 3001
 
 API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
@@ -78,6 +79,7 @@ export POSTGRES_PORT
 export REDPANDA_KAFKA_PORT
 export REDPANDA_ADMIN_PORT
 export PROMETHEUS_PORT
+export GRAFANA_PORT
 export API_PORT
 export FRONTEND_PORT
 export APP_ENV
@@ -359,7 +361,7 @@ broker-topics:
 	$(COMPOSE) exec redpanda rpk topic list --brokers redpanda:9092
 
 observability-up:
-	$(COMPOSE) up --build -d db migrate seed api prometheus
+	$(COMPOSE) up --build -d db migrate seed api prometheus grafana
 
 compose-down:
 	$(COMPOSE) down -v --remove-orphans
