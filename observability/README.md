@@ -62,6 +62,12 @@ The API dashboard lives at:
 observability/grafana/dashboards/retailops-api.json
 ```
 
+The business operations dashboard lives at:
+
+```text
+observability/grafana/dashboards/retailops-business-operations.json
+```
+
 Alert rules live in:
 
 ```text

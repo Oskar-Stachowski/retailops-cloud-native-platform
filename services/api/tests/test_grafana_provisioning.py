@@ -15,6 +15,12 @@ DASHBOARD_PATH = (
 API_DASHBOARD_PATH = (
     OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-api.json"
 )
+BUSINESS_DASHBOARD_PATH = (
+    OBSERVABILITY_PATH
+    / "grafana"
+    / "dashboards"
+    / "retailops-business-operations.json"
+)
 
 
 def test_grafana_prometheus_datasource_is_provisioned() -> None:
@@ -81,3 +87,37 @@ def test_retailops_api_dashboard_contains_api_and_db_panels() -> None:
     assert "retailops_db_operations_total or vector(0)" in expressions
     assert "retailops_db_operation_duration_seconds_max or vector(0)" in expressions
     assert "retailops_stream_metrics_generated_at_seconds" in expressions
+
+
+def test_retailops_business_operations_dashboard_contains_operational_panels() -> None:
+    dashboard = json.loads(BUSINESS_DASHBOARD_PATH.read_text(encoding="utf-8"))
+    panel_titles = {panel["title"] for panel in dashboard["panels"]}
+    expressions = {
+        target["expr"]
+        for panel in dashboard["panels"]
+        for target in panel.get("targets", [])
+    }
+    dashboard_json = json.dumps(dashboard)
+
+    assert dashboard["uid"] == "retailops-business-operations"
+    assert dashboard["title"] == "RetailOps Business Operations"
+    assert "retailops-prometheus" in dashboard_json
+    assert "Stream Active" in panel_titles
+    assert "Event Freshness" in panel_titles
+    assert "Processed Events" in panel_titles
+    assert "Dead Letter Events" in panel_titles
+    assert "Operational Events by Type" in panel_titles
+    assert "Event Processing Status" in panel_titles
+    assert "Processing Latency" in panel_titles
+    assert "Consumer Throughput" in panel_titles
+    assert "retailops_stream_latest_event_present" in expressions
+    assert "retailops_stream_event_freshness_seconds" in expressions
+    assert "retailops_stream_processed_event_total" in expressions
+    assert "retailops_stream_dlq_events_total or vector(0)" in expressions
+    assert "retailops_stream_events_by_type_total or vector(0)" in expressions
+    assert "retailops_stream_events_total or vector(0)" in expressions
+    assert "retailops_stream_processing_latency_seconds_avg" in expressions
+    assert "retailops_stream_processing_latency_seconds_max" in expressions
+    assert "retailops_stream_consumer_received_events_total or vector(0)" in expressions
+    assert "retailops_stream_consumer_processed_events_total or vector(0)" in expressions
+    assert "retailops_stream_consumer_failed_events_total or vector(0)" in expressions
