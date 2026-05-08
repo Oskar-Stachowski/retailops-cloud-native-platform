@@ -10,6 +10,7 @@ on:
       - "services/api/**"
       - "frontend/**"
       - "data/**"
+      - "observability/**"
       - ".github/workflows/docker-ci.yml"
   pull_request:
     paths:
@@ -20,6 +21,7 @@ on:
       - "services/api/**"
       - "frontend/**"
       - "data/**"
+      - "observability/**"
       - ".github/workflows/docker-ci.yml"
 
 permissions:

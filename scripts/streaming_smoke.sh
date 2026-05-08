@@ -167,11 +167,22 @@ check_metrics_endpoint() {
 }
 
 check_prometheus_targets() {
-  log "Checking Prometheus target health..."
-  request_prometheus "/api/v1/targets?state=active"
-  assert_status "200"
-  assert_body_contains '"job":"retailops-api"'
-  assert_body_contains '"health":"up"'
+  local attempt
+
+  for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    log "Checking Prometheus target health (${attempt}/${MAX_ATTEMPTS})..."
+    request_prometheus "/api/v1/targets?state=active"
+    assert_status "200"
+
+    if [[ "${request_body}" == *'"job":"retailops-api"'* ]] \
+      && [[ "${request_body}" == *'"health":"up"'* ]]; then
+      return 0
+    fi
+
+    sleep "${SLEEP_SECONDS}"
+  done
+
+  fail "Expected Prometheus to report the retailops-api target as up."
 }
 
 check_prometheus_rules() {
