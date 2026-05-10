@@ -216,6 +216,10 @@ __marimo__/
 ci-cd/reports/*
 !ci-cd/reports/.gitkeep
 
+# Local audit and planning reports
+REPOSITORY_AUDIT.md
+SENIOR_LEVEL_UPGRADE_PLAN.md
+
 # Generated synthetic datasets beyond the small committed demo seed.
 data/synthetic/
 data/generated/
