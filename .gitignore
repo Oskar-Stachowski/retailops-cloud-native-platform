@@ -209,3 +209,45 @@ marimo/_lsp/
 __marimo__/
 .DS_Store
 *.pyc
+
+# CI/CD local reports and pipeline artifacts
+ci-cd/reports/*
+!ci-cd/reports/.gitkeep
+
+# Local audit and planning reports
+REPOSITORY_AUDIT.md
+SENIOR_LEVEL_UPGRADE_PLAN.md
+
+# Generated synthetic datasets beyond the small committed demo seed.
+data/synthetic/
+data/generated/
+data/replay/
+
+# Terraform local artifacts
+# Keep Terraform-generated local cache, state and plan files out of Git.
+# These files are machine/environment-specific, frequently regenerated,
+# and may contain infrastructure details or sensitive values.
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+.terraform.tfstate.lock.info
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform local/private variable files
+# Commit only safe example files such as terraform.tfvars.example.
+*.tfvars
+*.tfvars.json
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Keep provider dependency lock files versioned for reproducible Terraform runs.
+!.terraform.lock.hcl
