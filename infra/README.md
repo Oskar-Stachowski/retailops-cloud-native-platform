@@ -41,6 +41,10 @@ infra/
 
 `infra/environments/dev` is the only active environment entry point in Sprint 10. It composes the reusable modules and keeps dev-specific defaults close to the plan command.
 
+Run Terraform through the root `Makefile` targets or with explicit
+`-chdir=infra/environments/dev`. The `infra/` root is not an environment entry
+point.
+
 The dev baseline is cost-aware by design:
 
 - no NAT Gateway,
