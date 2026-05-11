@@ -168,9 +168,10 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # One-shot services intentionally reuse the API image.
+  # Build it first when running migration/seed jobs directly:
+  #   docker compose build api
   migrate:
-    build:
-      context: ./services/api
     image: retailops-api:0.1.0
     command: ["alembic", "upgrade", "head"]
     environment:
@@ -182,8 +183,6 @@ services:
     restart: "no"
 
   seed:
-    build:
-      context: ./services/api
     image: retailops-api:0.1.0
     command: ["python", "scripts/seed_demo_data.py"]
     environment:
