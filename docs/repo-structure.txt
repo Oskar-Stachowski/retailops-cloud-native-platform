@@ -1,14 +1,13 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-11
+# Generated: 2026-05-11T10:05:04Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
-#   tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local" > docs/repo-structure.txt
+#   make docs-repo-structure
 #
 # Note:
 # This file is intentionally static and can become stale in active development.
 # Refresh it during release evidence updates or before publishing portfolio documentation.
-
 
 tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"
 .

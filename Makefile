@@ -489,7 +489,7 @@ clean:
 # repo-structure
 # -------------------------------------------------------------------
 
-.PHONY docs-repo-structure
+.PHONY: docs-repo-structure
 
 docs-repo-structure:
 	@{ \
