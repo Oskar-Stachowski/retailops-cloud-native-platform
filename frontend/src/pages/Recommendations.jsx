@@ -6,7 +6,7 @@ export default function Recommendations() {
     <main className="api-page">
       <FeatureBoundary
         title="Recommendations"
-        currentScope="CS-016 removes local mock recommendations. This page is kept as a navigation placeholder until a real recommendations API is implemented."
+        currentScope="Recommendations are available from dashboard and Product 360 workflows; this route is reserved for a dedicated recommendations queue."
         futureScope="Add /recommendations and workflow-action endpoints, then display real accepted, rejected, escalated and pending recommendations."
       />
     </main>

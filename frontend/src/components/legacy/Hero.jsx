@@ -4,7 +4,7 @@ function Hero({ children }) {
             <div className="hero-content">
                 <p className="eyebrow">React + Vite local stack</p>
                 <h1>RetailOps Platform</h1>
-                <h2>Dashboard MVP Shell</h2>
+                <h2>Operations Dashboard</h2>
                 <p className="hero-copy">
                 This React shell is the first user-facing layer of the RetailOps platform.
                 It prepares the foundation for inventory risk, alerts, forecasting, anomaly detection,
@@ -12,8 +12,8 @@ function Hero({ children }) {
                 </p>
             </div>
 
-            <div className="hero-panel" aria-label="RetailOps MVP summary">
-                <p className="eyebrow">MVP focus</p>
+            <div className="hero-panel" aria-label="RetailOps local platform summary">
+                <p className="eyebrow">Local platform focus</p>
                 <h3>Local full-stack readiness</h3>
                 <ul>
                 <li>Frontend shell</li>

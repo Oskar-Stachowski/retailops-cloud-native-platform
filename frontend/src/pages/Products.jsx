@@ -167,7 +167,7 @@ export default function Products() {
 
       <DataTable
         title="Backend product records"
-        description="Product rows now link to a Sprint 6 Product 360 drill-down view."
+        description="Product rows link to the Product 360 drill-down view."
         columns={columns}
         rows={state.products}
         emptyMessage="The backend returned no product records. Run database migrations and seed demo data."

@@ -38,7 +38,7 @@
     "title": "Platform Health",
     "icon": "🟢",
     "description": "Show frontend, API, database, and local environment readiness for delivery checks.",
-    "status": "MVP",
+    "status": "Available",
     "variant": "blue"
   }
 ]
