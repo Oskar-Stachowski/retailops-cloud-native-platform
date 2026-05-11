@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 from uuid import uuid4
 
@@ -12,15 +13,36 @@ from app.core.logging import correlation_id_context
 
 
 CORRELATION_ID_HEADER = "X-Correlation-ID"
+CORRELATION_ID_PATTERN = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
+
 logger = logging.getLogger("app.request")
+
+
+def generate_correlation_id() -> str:
+    return str(uuid4())
+
+
+def is_valid_correlation_id(correlation_id: str) -> bool:
+    return bool(CORRELATION_ID_PATTERN.fullmatch(correlation_id))
 
 
 def resolve_correlation_id(request: Request) -> str:
     correlation_id = request.headers.get(CORRELATION_ID_HEADER, "").strip()
-    if correlation_id:
+
+    if not correlation_id:
+        return generate_correlation_id()
+
+    if is_valid_correlation_id(correlation_id):
         return correlation_id
 
-    return str(uuid4())
+    logger.warning(
+        "Invalid correlation ID replaced",
+        extra={
+            "correlation_id_replaced": True,
+            "correlation_id_length": len(correlation_id),
+        },
+    )
+    return generate_correlation_id()
 
 
 class CorrelationIdMiddleware(BaseHTTPMiddleware):
