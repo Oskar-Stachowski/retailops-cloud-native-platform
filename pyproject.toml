@@ -2,6 +2,7 @@
 line-length = 100
 target-version = "py311"
 src = ["services/api", "data"]
+force-exclude = true
 
 # Generated migration files are not edited by hand. Lint the migration environment,
 # but do not spend review time on generated Alembic revision bodies.

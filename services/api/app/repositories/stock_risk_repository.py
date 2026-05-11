@@ -115,7 +115,7 @@ class StockRiskRepository:
         sort_column = self.SORT_COLUMNS.get(sort_by, "risk_status")
         direction = "DESC" if sort_order.lower() == "desc" else "ASC"
 
-        query = f"""  # noqa: S608 - query fragments come from fixed repository builders
+        query = f"""
             {self._build_risk_view_query()}
             {where_clause}
             ORDER BY {sort_column} {direction}, sku ASC NULLS LAST

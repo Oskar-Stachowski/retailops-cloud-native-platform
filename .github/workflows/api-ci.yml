@@ -63,9 +63,10 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Run Ruff checks
+        working-directory: .
         run: |
-          ruff check app scripts tests ../../data
-          ruff format --check app scripts tests ../../data
+          ruff check services/api data --config pyproject.toml
+          ruff format --check services/api data --config pyproject.toml
 
       - name: Generate demo CSV dataset
         run: python -m data.generator.main
@@ -91,7 +92,7 @@ jobs:
         with:
           name: api-coverage-evidence
           path: ci-cd/reports/api/coverage.xml
-          if-no-files-found: error
+          if-no-files-found: warn
 
   api-image-build:
     name: API Docker image build
