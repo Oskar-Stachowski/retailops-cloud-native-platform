@@ -484,3 +484,26 @@ security-scan: secret-scan security-fs-scan security-image-scan
 clean:
 	rm -rf "$(REPORTS_DIR)"
 	$(COMPOSE) down -v --remove-orphans || true
+
+# -------------------------------------------------------------------
+# repo-structure
+# -------------------------------------------------------------------
+
+.PHONY docs-repo-structure
+
+docs-repo-structure:
+	@{ \
+		echo "# RetailOps repository structure snapshot"; \
+		echo "#"; \
+		echo "# Generated: $$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
+		echo "# Purpose: Static repository tree snapshot for documentation/release evidence."; \
+		echo "# Refresh command:"; \
+		echo '#   make docs-repo-structure'; \
+		echo "#"; \
+		echo "# Note:"; \
+		echo "# This file is intentionally static and can become stale in active development."; \
+		echo "# Refresh it during release evidence updates or before publishing portfolio documentation."; \
+		echo ""; \
+		echo 'tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"'; \
+		tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"; \
+	} > docs/repo-structure.txt
