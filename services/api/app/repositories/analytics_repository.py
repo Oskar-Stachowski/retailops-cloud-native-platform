@@ -103,15 +103,13 @@ class AnalyticsRepository:
             select_parts.append("NULL::float AS current_stock")
             select_parts.append("NULL::timestamp AS inventory_updated_at")
 
-        query = (
-            f"""
+        query = f"""
             SELECT {', '.join(select_parts)}
             FROM products p
             {' '.join(joins)}
             ORDER BY units_sold DESC, sku ASC NULLS LAST
             LIMIT %s
         """
-        )
         return fetch_all(query, (limit,))
 
     def get_inventory_risk(self, limit: int = 50) -> list[dict[str, Any]]:

@@ -43,8 +43,7 @@ class StreamObservabilityService:
             PrometheusMetric(
                 name="retailops_stream_latest_event_present",
                 help_text=(
-                    "Whether at least one stream event has been ingested, "
-                    "represented as 1 or 0."
+                    "Whether at least one stream event has been ingested, " "represented as 1 or 0."
                 ),
                 metric_type="gauge",
                 value=1 if freshness.get("latest_event_at") else 0,

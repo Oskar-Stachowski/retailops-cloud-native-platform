@@ -207,8 +207,7 @@ def load_csv_rows(
             )
 
         return [
-            {column: normalize_csv_value(row.get(column)) for column in columns}
-            for row in reader
+            {column: normalize_csv_value(row.get(column)) for column in columns} for row in reader
         ]
 
 

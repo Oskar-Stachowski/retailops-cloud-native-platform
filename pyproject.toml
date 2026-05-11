@@ -30,6 +30,12 @@ select = ["ALL"]
       "D203",
       "D213",
 
+      # handled by Ruff formatter; avoiding formatter/linter conflict
+      "COM812",
+
+      # conflicts with Ruff formatter on wrapped string literals
+      "ISC001",
+
       # Formatting/legacy readability decisions handled manually, not as a hard gate.
       "E501",
       "E741",

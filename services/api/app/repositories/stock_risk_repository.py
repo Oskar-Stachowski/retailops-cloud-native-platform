@@ -129,14 +129,12 @@ class StockRiskRepository:
         category: str | None = None,
     ) -> int:
         where_clause, params = self._build_filters(risk_status, category)
-        query = (
-            f"""
+        query = f"""
             SELECT COUNT(*) AS total
             FROM (
                 {self._build_risk_view_query()}
                 {where_clause}
             ) counted_risk_items;
         """
-        )
         row = self._fetch_one(query, tuple(params))
         return int(row["total"]) if row else 0

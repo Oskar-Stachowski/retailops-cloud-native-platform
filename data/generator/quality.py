@@ -250,8 +250,7 @@ def build_quality_report(
         checks,
         "sales_data_quality_statuses_are_known",
         passed=all(
-            sale.get("data_quality_status", "") in ALLOWED_DATA_QUALITY_STATUSES
-            for sale in sales
+            sale.get("data_quality_status", "") in ALLOWED_DATA_QUALITY_STATUSES for sale in sales
         ),
         details={"allowed_statuses": sorted(ALLOWED_DATA_QUALITY_STATUSES)},
     )
