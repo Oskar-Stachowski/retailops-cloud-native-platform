@@ -1,3 +1,13 @@
+# RetailOps local development runtime.
+#
+# This Docker Compose file is intended for local development, portfolio demos,
+# and CI smoke validation only. It intentionally exposes service ports on the
+# host and uses simple default credentials to keep the local setup reproducible.
+#
+# Do not use this file as a production deployment template.
+# Non-local environments must override APP_ENV and inject credentials through
+# a secret manager or protected CI/CD environment variables.
+
 services:
   frontend:
     build:
