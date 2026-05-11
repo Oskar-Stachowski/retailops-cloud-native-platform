@@ -73,6 +73,8 @@ jobs:
         working-directory: .
 
       - name: Run database migrations
+        env:
+          PYTHONPATH: ""
         run: alembic upgrade head
 
       - name: Seed demo data
