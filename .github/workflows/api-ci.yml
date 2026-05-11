@@ -83,9 +83,11 @@ jobs:
       - name: Run API tests
         run: |
           mkdir -p ../../ci-cd/reports/api
+          rm -f .coverage .coverage.*
           pytest \
             --cov=app \
             --cov-report=term-missing \
+            --cov-branch \
             --cov-report=xml:../../ci-cd/reports/api/coverage.xml
 
       - name: Upload API coverage evidence
