@@ -17,7 +17,7 @@ def generate_users() -> list[dict[str, str]]:
                 "role": item["role"],
                 "team": item["team"],
                 "status": "active",
-            }
+            },
         )
 
     return users

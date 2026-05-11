@@ -84,9 +84,7 @@ def test_demo_profile_generates_store_and_warehouse_dimensions() -> None:
     tables = build_dataset(DatasetGenerationConfig(profile="demo"))
 
     store_codes = {store["store_code"] for store in tables["stores"]}
-    warehouse_codes = {
-        warehouse["warehouse_code"] for warehouse in tables["warehouses"]
-    }
+    warehouse_codes = {warehouse["warehouse_code"] for warehouse in tables["warehouses"]}
 
     assert store_codes == {
         "WAW-STORE-01",
@@ -96,23 +94,16 @@ def test_demo_profile_generates_store_and_warehouse_dimensions() -> None:
     }
     assert warehouse_codes == {"WAW-01", "GDN-01", "KRK-01", "POZ-01"}
     assert {store["status"] for store in tables["stores"]} == {"active"}
-    assert {warehouse["status"] for warehouse in tables["warehouses"]} == {
-        "active"
-    }
+    assert {warehouse["status"] for warehouse in tables["warehouses"]} == {"active"}
 
 
 def test_demo_profile_generates_orders_and_order_items_from_sales() -> None:
     tables = build_dataset(DatasetGenerationConfig(profile="demo"))
 
-    sales_by_reference = {
-        sale["order_reference"]: sale for sale in tables["sales"]
-    }
-    orders_by_reference = {
-        order["order_reference"]: order for order in tables["orders"]
-    }
+    sales_by_reference = {sale["order_reference"]: sale for sale in tables["sales"]}
+    orders_by_reference = {order["order_reference"]: order for order in tables["orders"]}
     order_items_by_order_id = {
-        order_item["order_id"]: order_item
-        for order_item in tables["order_items"]
+        order_item["order_id"]: order_item for order_item in tables["order_items"]
     }
     store_ids = {store["id"] for store in tables["stores"]}
 
@@ -147,13 +138,10 @@ def test_demo_profile_generates_price_history_and_promotions() -> None:
         assert price_point["price_type"] in {"regular", "planned"}
         if price_point["valid_to"]:
             assert price_point["valid_from"] <= price_point["valid_to"]
-        price_history_by_product[price_point["product_id"]].append(
-            price_point
-        )
+        price_history_by_product[price_point["product_id"]].append(price_point)
 
     assert {
-        len(product_price_history)
-        for product_price_history in price_history_by_product.values()
+        len(product_price_history) for product_price_history in price_history_by_product.values()
     } == {3}
 
     promotion_codes = set()
@@ -172,9 +160,7 @@ def test_demo_profile_generates_stock_movements() -> None:
 
     product_ids = {product["id"] for product in tables["products"]}
     warehouse_ids = {warehouse["id"] for warehouse in tables["warehouses"]}
-    movement_types = {
-        movement["movement_type"] for movement in tables["stock_movements"]
-    }
+    movement_types = {movement["movement_type"] for movement in tables["stock_movements"]}
 
     assert movement_types == {"initial_stock", "sale"}
 
@@ -194,9 +180,7 @@ def test_demo_profile_generates_returns_from_order_items() -> None:
     tables = build_dataset(DatasetGenerationConfig(profile="demo"))
 
     order_ids = {order["id"] for order in tables["orders"]}
-    order_item_by_id = {
-        order_item["id"]: order_item for order_item in tables["order_items"]
-    }
+    order_item_by_id = {order_item["id"]: order_item for order_item in tables["order_items"]}
     product_ids = {product["id"] for product in tables["products"]}
 
     for returned_item in tables["returns"]:
@@ -241,7 +225,7 @@ def test_non_demo_profiles_can_generate_scaled_datasets_with_overrides(
             products=5,
             stores=2,
             warehouses=2,
-        )
+        ),
     )
 
     assert len(tables["products"]) == 5
@@ -260,14 +244,13 @@ def test_non_demo_profiles_can_generate_scaled_datasets_with_overrides(
     assert len(tables["recommendations"]) == 5
     assert len(tables["workflow_actions"]) == 5
 
-    assert {
-        product["demand_class"] for product in tables["products"]
-    }
+    assert {product["demand_class"] for product in tables["products"]}
     assert any(sale["latent_demand"] for sale in tables["sales"])
     assert any(sale["observed_sales"] for sale in tables["sales"])
-    assert any(
-        sale["promotion_applied"] == "true" for sale in tables["sales"]
-    ) or len(tables["sales"]) >= 15
+    assert (
+        any(sale["promotion_applied"] == "true" for sale in tables["sales"])
+        or len(tables["sales"]) >= 15
+    )
 
 
 def test_synthetic_profile_generation_is_deterministic_for_seed() -> None:
@@ -487,13 +470,17 @@ def test_realtime_event_generator_writes_jsonl_and_manifest(tmp_path) -> None:
     )
 
     manifest = generate_realtime_event_dataset(tmp_path, config)
-    event_lines = (tmp_path / EVENTS_FILENAME).read_text(
-        encoding="utf-8",
-    ).splitlines()
+    event_lines = (
+        (tmp_path / EVENTS_FILENAME)
+        .read_text(
+            encoding="utf-8",
+        )
+        .splitlines()
+    )
     written_manifest = (tmp_path / MANIFEST_FILENAME).read_text(
         encoding="utf-8",
     )
 
     assert manifest["event_count"] == 10
     assert len(event_lines) == 10
-    assert "\"dataset_name\": \"retailops-realtime-events\"" in written_manifest
+    assert '"dataset_name": "retailops-realtime-events"' in written_manifest

@@ -10,15 +10,12 @@ def _store_for_sale(
     matching_stores = [
         store
         for store in stores
-        if store["region"] == sale["region"]
-        and store["channel"] == sale["channel"]
+        if store["region"] == sale["region"] and store["channel"] == sale["channel"]
     ]
     if matching_stores:
         return matching_stores[0]
 
-    region_stores = [
-        store for store in stores if store["region"] == sale["region"]
-    ]
+    region_stores = [store for store in stores if store["region"] == sale["region"]]
     if region_stores:
         return region_stores[0]
 
@@ -46,7 +43,7 @@ def generate_orders(
                 "currency": sale["currency"],
                 "ordered_at": sale["sold_at"],
                 "created_at": sale["sold_at"],
-            }
+            },
         )
 
     return orders
@@ -56,9 +53,7 @@ def generate_order_items(
     sales: list[dict[str, str]],
     orders: list[dict[str, str]],
 ) -> list[dict[str, str]]:
-    order_by_reference = {
-        order["order_reference"]: order for order in orders
-    }
+    order_by_reference = {order["order_reference"]: order for order in orders}
     order_items: list[dict[str, str]] = []
 
     for sale in sales:
@@ -73,7 +68,7 @@ def generate_order_items(
                 "unit_price": sale["unit_price"],
                 "total_amount": sale["total_amount"],
                 "currency": sale["currency"],
-            }
+            },
         )
 
     return order_items

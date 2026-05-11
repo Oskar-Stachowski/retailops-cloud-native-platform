@@ -1,31 +1,39 @@
+from datetime import UTC, datetime
 from decimal import Decimal
-from datetime import datetime, timezone
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
 
-from app.domain.models import Product, ProductStatus
-from app.domain.models import Sale, Currency, Channel
-from app.domain.models import InventorySnapshot, UnitOfMeasure
-from app.domain.models import WorkflowAction, WorkflowActionType, AlertStatus
-from app.domain.models import Forecast, ForecastMethod, ForecastStatus
 from app.domain.models import (
+    AlertStatus,
+    Channel,
+    Currency,
+    Forecast,
+    ForecastMethod,
+    ForecastStatus,
+    InventorySnapshot,
+    Product,
+    ProductStatus,
     Recommendation,
-    RecommendationType,
     RecommendationStatus,
+    RecommendationType,
+    Sale,
+    UnitOfMeasure,
+    WorkflowAction,
+    WorkflowActionType,
 )
 from app.domain.workflow import (
-    WorkflowEntityType,
     WorkflowActionName,
+    WorkflowEntityType,
     WorkflowTransitionError,
     is_workflow_transition_allowed,
     validate_workflow_transition,
 )
 
 
-def test_product_can_be_created_with_valid_data():
-    now = datetime.now(timezone.utc)
+def test_product_can_be_created_with_valid_data() -> None:
+    now = datetime.now(UTC)
 
     product = Product(
         sku="SKU-001",
@@ -42,8 +50,8 @@ def test_product_can_be_created_with_valid_data():
     assert product.status == ProductStatus.active
 
 
-def test_sale_rejects_invalid_total_amount():
-    now = datetime.now(timezone.utc)
+def test_sale_rejects_invalid_total_amount() -> None:
+    now = datetime.now(UTC)
 
     with pytest.raises(ValidationError):
         Sale(
@@ -58,8 +66,8 @@ def test_sale_rejects_invalid_total_amount():
         )
 
 
-def test_inventory_snapshot_rejects_invalid_time_order():
-    now = datetime.now(timezone.utc)
+def test_inventory_snapshot_rejects_invalid_time_order() -> None:
+    now = datetime.now(UTC)
 
     with pytest.raises(ValidationError):
         InventorySnapshot(
@@ -73,7 +81,7 @@ def test_inventory_snapshot_rejects_invalid_time_order():
         )
 
 
-def test_workflow_action_requires_comment_for_dismiss():
+def test_workflow_action_requires_comment_for_dismiss() -> None:
     with pytest.raises(ValidationError):
         WorkflowAction(
             alert_id=uuid4(),
@@ -85,7 +93,7 @@ def test_workflow_action_requires_comment_for_dismiss():
         )
 
 
-def test_workflow_action_accepts_valid_alert_transition():
+def test_workflow_action_accepts_valid_alert_transition() -> None:
     action = WorkflowAction(
         alert_id=uuid4(),
         performed_by_user_id=uuid4(),
@@ -99,7 +107,7 @@ def test_workflow_action_accepts_valid_alert_transition():
     assert action.new_status == AlertStatus.acknowledged
 
 
-def test_workflow_action_rejects_invalid_alert_transition():
+def test_workflow_action_rejects_invalid_alert_transition() -> None:
     with pytest.raises(ValidationError):
         WorkflowAction(
             alert_id=uuid4(),
@@ -111,7 +119,7 @@ def test_workflow_action_rejects_invalid_alert_transition():
         )
 
 
-def test_comment_action_cannot_change_alert_status():
+def test_comment_action_cannot_change_alert_status() -> None:
     with pytest.raises(ValidationError):
         WorkflowAction(
             alert_id=uuid4(),
@@ -123,7 +131,7 @@ def test_comment_action_cannot_change_alert_status():
         )
 
 
-def test_recommendation_reject_transition_requires_comment():
+def test_recommendation_reject_transition_requires_comment() -> None:
     with pytest.raises(WorkflowTransitionError):
         validate_workflow_transition(
             entity_type=WorkflowEntityType.recommendation,
@@ -134,7 +142,7 @@ def test_recommendation_reject_transition_requires_comment():
         )
 
 
-def test_recommendation_accept_transition_is_allowed():
+def test_recommendation_accept_transition_is_allowed() -> None:
     assert is_workflow_transition_allowed(
         entity_type=WorkflowEntityType.recommendation,
         action=WorkflowActionName.accept,
@@ -177,7 +185,7 @@ def test_workflow_transition_matrix_allows_expected_paths(
     action,
     previous_status,
     new_status,
-):
+) -> None:
     assert is_workflow_transition_allowed(
         entity_type=entity_type,
         action=action,
@@ -220,7 +228,7 @@ def test_workflow_transition_matrix_rejects_invalid_paths(
     action,
     previous_status,
     new_status,
-):
+) -> None:
     assert not is_workflow_transition_allowed(
         entity_type=entity_type,
         action=action,
@@ -229,7 +237,7 @@ def test_workflow_transition_matrix_rejects_invalid_paths(
     )
 
 
-def test_recommendation_cannot_move_from_implemented_to_accepted():
+def test_recommendation_cannot_move_from_implemented_to_accepted() -> None:
     assert not is_workflow_transition_allowed(
         entity_type=WorkflowEntityType.recommendation,
         action=WorkflowActionName.accept,
@@ -238,9 +246,9 @@ def test_recommendation_cannot_move_from_implemented_to_accepted():
     )
 
 
-def test_forecast_rejects_confidence_level_outside_expected_range():
-    today = datetime.now(timezone.utc).date()
-    now = datetime.now(timezone.utc)
+def test_forecast_rejects_confidence_level_outside_expected_range() -> None:
+    today = datetime.now(UTC).date()
+    now = datetime.now(UTC)
 
     with pytest.raises(ValidationError):
         Forecast(
@@ -256,8 +264,8 @@ def test_forecast_rejects_confidence_level_outside_expected_range():
         )
 
 
-def test_recommendation_rejects_invalid_expiration_date():
-    now = datetime.now(timezone.utc)
+def test_recommendation_rejects_invalid_expiration_date() -> None:
+    now = datetime.now(UTC)
 
     with pytest.raises(ValidationError):
         Recommendation(

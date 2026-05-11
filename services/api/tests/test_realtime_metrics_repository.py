@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+from typing import Self
 
 from app.repositories.realtime_metrics_repository import (
     RealtimeMetricsRepository,
@@ -13,10 +14,10 @@ class FakeCursor:
         self.executed: list[tuple[str, tuple | None]] = []
         self.executemany_calls: list[tuple[str, list[tuple]]] = []
 
-    def execute(self, query, params=None):
+    def execute(self, query, params=None) -> None:
         self.executed.append((str(query).strip(), params))
 
-    def executemany(self, query, rows):
+    def executemany(self, query, rows) -> None:
         self.executemany_calls.append((str(query).strip(), list(rows)))
 
     def fetchone(self):
@@ -25,10 +26,10 @@ class FakeCursor:
     def fetchall(self):
         return self.fetchall_result
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type, exc, tb) -> bool:
         return False
 
 
@@ -52,11 +53,11 @@ def test_realtime_metrics_repository_persists_event_log_and_state() -> None:
         schema_version="1.0",
         source="retailops.synthetic-generator",
         correlation_id="order-1",
-        occurred_at=datetime(2026, 5, 7, tzinfo=timezone.utc),
-        ingested_at=datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+        occurred_at=datetime(2026, 5, 7, tzinfo=UTC),
+        ingested_at=datetime(2026, 5, 7, 10, tzinfo=UTC),
         payload={"quantity": 3},
         status="processed",
-        processed_at=datetime(2026, 5, 7, 10, 1, tzinfo=timezone.utc),
+        processed_at=datetime(2026, 5, 7, 10, 1, tzinfo=UTC),
     )
 
     assert result == event_row
@@ -70,14 +71,14 @@ def test_realtime_metrics_repository_persists_event_log_and_state() -> None:
                 "metric_value": Decimal("12.50"),
                 "dimension_key": "product_id=product-1",
                 "source_event_type": "sale_completed",
-                "observed_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+                "observed_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
             },
             {
                 "metric_name": "live_units_sold",
                 "metric_value": 3,
                 "dimension_key": "",
                 "source_event_type": "sale_completed",
-                "observed_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+                "observed_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
             },
         ],
     )
@@ -99,8 +100,8 @@ def test_realtime_metrics_repository_persists_event_log_and_state() -> None:
         last_event_id="event-1",
         last_event_type="sale_completed",
         last_error=None,
-        last_processed_at=datetime(2026, 5, 7, 10, 1, tzinfo=timezone.utc),
-        started_at=datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+        last_processed_at=datetime(2026, 5, 7, 10, 1, tzinfo=UTC),
+        started_at=datetime(2026, 5, 7, 10, tzinfo=UTC),
         stopped_at=None,
     )
 
@@ -115,13 +116,13 @@ def test_realtime_metrics_repository_reads_live_metric_totals(monkeypatch) -> No
             "metric_name": "live_revenue",
             "metric_value": 499.4,
             "observation_count": 12,
-            "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
-        }
+            "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
+        },
     ]
     repository = RealtimeMetricsRepository(connection=FakeConnection(cursor))
     monkeypatch.setattr(
         "app.repositories.realtime_metrics_repository.table_exists",
-        lambda table_name: True,
+        lambda _table_name: True,
     )
 
     rows = repository.get_live_metric_totals(window_minutes=15)
@@ -135,7 +136,7 @@ def test_realtime_metrics_repository_reads_stream_processing_metrics(monkeypatch
     repository = RealtimeMetricsRepository(connection=FakeConnection(cursor))
     monkeypatch.setattr(
         "app.repositories.realtime_metrics_repository.table_exists",
-        lambda table_name: True,
+        lambda _table_name: True,
     )
 
     metrics = repository.get_stream_processing_metrics()
@@ -147,7 +148,4 @@ def test_realtime_metrics_repository_reads_stream_processing_metrics(monkeypatch
         "processing_latency",
         "consumer_states",
     }
-    assert any(
-        "FROM realtime_event_log" in query
-        for query, _params in cursor.executed
-    )
+    assert any("FROM realtime_event_log" in query for query, _params in cursor.executed)

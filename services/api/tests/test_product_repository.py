@@ -17,7 +17,7 @@ EXISTING_SKU = "ELEC-HEAD-001"
 NON_EXISTING_SKU = "DOES-NOT-EXIST"
 
 
-def test_product_repository_lists_seeded_products():
+def test_product_repository_lists_seeded_products() -> None:
     assert DATABASE_URL is not None
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -28,7 +28,7 @@ def test_product_repository_lists_seeded_products():
     assert all(isinstance(product, Product) for product in products)
 
 
-def test_product_repository_gets_product_by_id():
+def test_product_repository_gets_product_by_id() -> None:
     assert DATABASE_URL is not None
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -40,7 +40,7 @@ def test_product_repository_gets_product_by_id():
     assert missing_product is None
 
 
-def test_product_repository_gets_product_by_sku():
+def test_product_repository_gets_product_by_sku() -> None:
     assert DATABASE_URL is not None
 
     with psycopg.connect(DATABASE_URL) as conn:

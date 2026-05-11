@@ -23,10 +23,14 @@ NPM ?= npm
 API_DIR ?= services/api
 FRONTEND_DIR ?= frontend
 REPORTS_DIR ?= ci-cd/reports
+API_REPORTS_DIR ?= $(REPORTS_DIR)/api
 SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
+API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
+API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
+API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
 
 TERRAFORM ?= terraform
 TFLINT ?= tflint
@@ -101,8 +105,12 @@ help:
 	@echo ""
 	@echo "Backend:"
 	@echo "  make api-install          Install backend dependencies"
+	@echo "  make api-lint             Run Ruff backend/data checks"
+	@echo "  make api-format-check     Check Ruff formatting"
+	@echo "  make api-coverage         Run backend pytest with coverage gate"
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
+	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
 	@echo "  make api-seed             Seed demo data"
 	@echo ""
@@ -137,17 +145,17 @@ help:
 	@echo "Security:"
 	@echo "  make security-scan        Run local secret, filesystem and image scans"
 	@echo ""
-	
+
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
 # -------------------------------------------------------------------
 
-.PHONY: install api-venv api-install frontend-install
+.PHONY: install api-venv api-install frontend-install pre-commit-install pre-commit-run
 install: api-install frontend-install
 
 api-venv:
@@ -155,19 +163,40 @@ api-venv:
 	$(API_VENV_PYTHON) -m pip install --upgrade pip
 
 api-install: api-venv
-	$(API_VENV_PIP) install -r "$(API_DIR)/requirements.txt"
+	$(API_VENV_PIP) install -r "$(API_DEV_REQUIREMENTS)"
 
 frontend-install:
 	cd "$(FRONTEND_DIR)" && "$(NPM)" ci
+
+pre-commit-install: api-install
+	$(API_VENV_PYTHON) -m pre_commit install
+
+pre-commit-run: api-install
+	$(API_VENV_PYTHON) -m pre_commit run --all-files
 
 # -------------------------------------------------------------------
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-test api-integration-test api-migrate api-seed data-generate data-quality db-up db-down
+.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality db-up db-down
+
+api-lint: api-install
+	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data
+
+api-format: api-install
+	$(API_VENV_PYTHON) -m ruff format "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data
+
+api-format-check: api-install
+	$(API_VENV_PYTHON) -m ruff format --check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data
 
 api-test: api-install
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
+	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
+
+api-coverage: api-install ensure-reports-dir
+	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest \
+		--cov=app \
+		--cov-report=term-missing \
+		--cov-report=xml:"$(ROOT_DIR)/$(API_COVERAGE_XML)"
 
 db-up:
 	$(COMPOSE) up -d db
@@ -218,7 +247,7 @@ frontend-build:
 
 test: api-test frontend-test
 
-ci-local: compose-config data-quality api-test frontend-test frontend-lint frontend-build
+ci-local: compose-config data-quality api-lint api-format-check api-coverage frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
 
 # -------------------------------------------------------------------

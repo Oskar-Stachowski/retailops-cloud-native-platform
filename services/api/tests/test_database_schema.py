@@ -3,12 +3,11 @@ import os
 import psycopg
 import pytest
 
-
 DATABASE_URL = os.getenv("DATABASE_URL")
 pytestmark = pytest.mark.integration_db
 
 
-def test_required_database_tables_exist():
+def test_required_database_tables_exist() -> None:
     assert DATABASE_URL is not None
 
     expected_tables = {
@@ -28,21 +27,20 @@ def test_required_database_tables_exist():
         "alembic_version",
     }
 
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
+    with psycopg.connect(DATABASE_URL) as conn, conn.cursor() as cur:
+        cur.execute(
+            """
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public';
-                """
-            )
-            actual_tables = {row[0] for row in cur.fetchall()}
+                """,
+        )
+        actual_tables = {row[0] for row in cur.fetchall()}
 
     assert expected_tables.issubset(actual_tables)
 
 
-def test_required_database_columns_exist():
+def test_required_database_columns_exist() -> None:
     assert DATABASE_URL is not None
 
     expected_columns = {
@@ -190,34 +188,32 @@ def test_required_database_columns_exist():
         },
     }
 
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            for table_name, required_columns in expected_columns.items():
-                cur.execute(
-                    """
+    with psycopg.connect(DATABASE_URL) as conn, conn.cursor() as cur:
+        for table_name, required_columns in expected_columns.items():
+            cur.execute(
+                """
                     SELECT column_name
                     FROM information_schema.columns
                     WHERE table_schema = 'public'
                       AND table_name = %s;
                     """,
-                    (table_name,),
-                )
+                (table_name,),
+            )
 
-                actual_columns = {row[0] for row in cur.fetchall()}
+            actual_columns = {row[0] for row in cur.fetchall()}
 
-                assert required_columns.issubset(actual_columns), (
-                    f"Missing columns in {table_name}. "
-                    f"Expected at least {required_columns}, "
-                    f"found {actual_columns}"
-                )
+            assert required_columns.issubset(actual_columns), (
+                f"Missing columns in {table_name}. "
+                f"Expected at least {required_columns}, "
+                f"found {actual_columns}"
+            )
 
 
-def test_alembic_version_exists():
+def test_alembic_version_exists() -> None:
     assert DATABASE_URL is not None
 
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM alembic_version;")
-            version_rows = cur.fetchone()[0]
+    with psycopg.connect(DATABASE_URL) as conn, conn.cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM alembic_version;")
+        version_rows = cur.fetchone()[0]
 
     assert version_rows == 1

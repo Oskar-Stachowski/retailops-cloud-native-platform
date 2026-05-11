@@ -17,7 +17,6 @@ from app.domain.workflow import (
     validate_workflow_transition,
 )
 
-
 ALERT_WORKFLOW_ACTIONS = frozenset(
     {
         WorkflowActionName.acknowledge,
@@ -25,7 +24,7 @@ ALERT_WORKFLOW_ACTIONS = frozenset(
         WorkflowActionName.resolve,
         WorkflowActionName.dismiss,
         WorkflowActionName.comment,
-    }
+    },
 )
 
 RECOMMENDATION_WORKFLOW_ACTIONS = frozenset(
@@ -36,7 +35,7 @@ RECOMMENDATION_WORKFLOW_ACTIONS = frozenset(
         WorkflowActionName.resolve,
         WorkflowActionName.dismiss,
         WorkflowActionName.comment,
-    }
+    },
 )
 
 
@@ -488,13 +487,16 @@ class AlertWorkflowMutationRequest(WorkflowMutationRequest):
     @model_validator(mode="after")
     def validate_alert_action_request(self) -> "AlertWorkflowMutationRequest":
         if self.action not in ALERT_WORKFLOW_ACTIONS:
-            raise ValueError(f"{self.action.value} is not a supported alert action.")
+            msg = f"{self.action.value} is not a supported alert action."
+            raise ValueError(msg)
 
         if self.action == WorkflowActionName.assign and not self.assigned_to_user_id:
-            raise ValueError("assigned_to_user_id is required for assign actions.")
+            msg = "assigned_to_user_id is required for assign actions."
+            raise ValueError(msg)
 
         if self.action == WorkflowActionName.dismiss and not self.comment:
-            raise ValueError("comment is required for dismiss actions.")
+            msg = "comment is required for dismiss actions."
+            raise ValueError(msg)
 
         return self
 
@@ -512,20 +514,23 @@ class RecommendationWorkflowMutationRequest(WorkflowMutationRequest):
         self,
     ) -> "RecommendationWorkflowMutationRequest":
         if self.action not in RECOMMENDATION_WORKFLOW_ACTIONS:
-            raise ValueError(
-                f"{self.action.value} is not a supported recommendation action."
-            )
+            msg = f"{self.action.value} is not a supported recommendation action."
+            raise ValueError(msg)
 
         if self.action == WorkflowActionName.assign and not self.assigned_to_user_id:
-            raise ValueError("assigned_to_user_id is required for assign actions.")
+            msg = "assigned_to_user_id is required for assign actions."
+            raise ValueError(msg)
 
-        if self.action in {
-            WorkflowActionName.reject,
-            WorkflowActionName.dismiss,
-        } and not self.comment:
-            raise ValueError(
-                f"comment is required for {self.action.value} actions."
-            )
+        if (
+            self.action
+            in {
+                WorkflowActionName.reject,
+                WorkflowActionName.dismiss,
+            }
+            and not self.comment
+        ):
+            msg = f"comment is required for {self.action.value} actions."
+            raise ValueError(msg)
 
         return self
 
@@ -542,7 +547,8 @@ class WorkflowActionCreateRequest(WorkflowMutationRequest):
     @model_validator(mode="after")
     def validate_transition(self) -> "WorkflowActionCreateRequest":
         if self.action == WorkflowActionName.assign and not self.assigned_to_user_id:
-            raise ValueError("assigned_to_user_id is required for assign actions.")
+            msg = "assigned_to_user_id is required for assign actions."
+            raise ValueError(msg)
 
         try:
             validate_workflow_transition(

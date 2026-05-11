@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 from collections import Counter, defaultdict
 from decimal import Decimal
-from pathlib import Path
 from statistics import mean
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
-def _decimal(value: str | int | float | Decimal) -> Decimal:
+def _decimal(value: str | float | Decimal) -> Decimal:
     return Decimal(str(value or "0"))
 
 
@@ -33,17 +36,11 @@ def _share_top_products(
 
 
 def _average_order_items(order_items: list[dict[str, str]]) -> str:
-    item_count_by_order = Counter(
-        order_item["order_id"] for order_item in order_items
-    )
+    item_count_by_order = Counter(order_item["order_id"] for order_item in order_items)
     if not item_count_by_order:
         return "0.0000"
 
-    return str(
-        Decimal(str(mean(item_count_by_order.values()))).quantize(
-            Decimal("0.0001")
-        )
-    )
+    return str(Decimal(str(mean(item_count_by_order.values()))).quantize(Decimal("0.0001")))
 
 
 def _return_rate_by_category(
@@ -51,28 +48,25 @@ def _return_rate_by_category(
     order_items: list[dict[str, str]],
     returns: list[dict[str, str]],
 ) -> dict[str, str]:
-    product_category = {
-        product["id"]: product["category"] for product in products
-    }
+    product_category = {product["id"]: product["category"] for product in products}
     ordered_by_category: dict[str, int] = defaultdict(int)
     returned_by_category: dict[str, int] = defaultdict(int)
 
     for order_item in order_items:
         ordered_by_category[product_category[order_item["product_id"]]] += int(
-            order_item["quantity"]
+            order_item["quantity"],
         )
 
     for returned_item in returns:
         returned_by_category[product_category[returned_item["product_id"]]] += int(
-            returned_item["quantity"]
+            returned_item["quantity"],
         )
 
     return {
         category: str(
-            (
-                Decimal(returned_by_category[category])
-                / Decimal(ordered_quantity)
-            ).quantize(Decimal("0.0001"))
+            (Decimal(returned_by_category[category]) / Decimal(ordered_quantity)).quantize(
+                Decimal("0.0001"),
+            ),
         )
         for category, ordered_quantity in sorted(ordered_by_category.items())
         if ordered_quantity
@@ -81,23 +75,16 @@ def _return_rate_by_category(
 
 def _promotion_uplift(sales: list[dict[str, str]]) -> str:
     promoted = [
-        int(sale["observed_sales"])
-        for sale in sales
-        if sale.get("promotion_applied") == "true"
+        int(sale["observed_sales"]) for sale in sales if sale.get("promotion_applied") == "true"
     ]
     baseline = [
-        int(sale["observed_sales"])
-        for sale in sales
-        if sale.get("promotion_applied") != "true"
+        int(sale["observed_sales"]) for sale in sales if sale.get("promotion_applied") != "true"
     ]
     if not promoted or not baseline:
         return "0.0000"
 
     return str(
-        (
-            Decimal(str(mean(promoted)))
-            / Decimal(str(mean(baseline)))
-        ).quantize(Decimal("0.0001"))
+        (Decimal(str(mean(promoted))) / Decimal(str(mean(baseline)))).quantize(Decimal("0.0001")),
     )
 
 
@@ -105,14 +92,8 @@ def _stockout_rate(sales: list[dict[str, str]]) -> str:
     if not sales:
         return "0.0000"
 
-    stockout_count = sum(
-        1 for sale in sales if sale.get("stockout_flag") == "true"
-    )
-    return str(
-        (Decimal(stockout_count) / Decimal(len(sales))).quantize(
-            Decimal("0.0001")
-        )
-    )
+    stockout_count = sum(1 for sale in sales if sale.get("stockout_flag") == "true")
+    return str((Decimal(stockout_count) / Decimal(len(sales))).quantize(Decimal("0.0001")))
 
 
 def _data_quality_status_counts(
@@ -120,11 +101,8 @@ def _data_quality_status_counts(
 ) -> dict[str, int]:
     return dict(
         sorted(
-            Counter(
-                sale.get("data_quality_status") or "not_applicable"
-                for sale in sales
-            ).items()
-        )
+            Counter(sale.get("data_quality_status") or "not_applicable" for sale in sales).items(),
+        ),
     )
 
 
@@ -134,21 +112,17 @@ def build_realism_report(
     tables: dict[str, list[dict[str, str]]],
 ) -> dict[str, object]:
     sales = tables["sales"]
-    orders = tables["orders"]
     order_items = tables["order_items"]
     products = tables["products"]
     returns = tables["returns"]
     demand_classes = Counter(
-        product.get("demand_class") or "not_applicable"
-        for product in products
+        product.get("demand_class") or "not_applicable" for product in products
     )
 
     return {
         "profile": profile,
         "seed": seed,
-        "row_counts": {
-            table_name: len(rows) for table_name, rows in sorted(tables.items())
-        },
+        "row_counts": {table_name: len(rows) for table_name, rows in sorted(tables.items())},
         "realism_metrics": {
             "top_20_percent_product_revenue_share": _share_top_products(sales),
             "average_order_items": _average_order_items(order_items),

@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
-from app.main import app
 
+from app.main import app
 
 client = TestClient(app)
 
 
-def test_unknown_route():
+def test_unknown_route() -> None:
     response = client.get("/does-not-exist")
     assert response.status_code == 404
 

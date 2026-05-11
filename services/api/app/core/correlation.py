@@ -3,14 +3,16 @@ from __future__ import annotations
 import logging
 import re
 import time
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
 
 from app.core.logging import correlation_id_context
 
+if TYPE_CHECKING:
+    from starlette.requests import Request
+    from starlette.responses import Response
 
 CORRELATION_ID_HEADER = "X-Correlation-ID"
 CORRELATION_ID_PATTERN = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")

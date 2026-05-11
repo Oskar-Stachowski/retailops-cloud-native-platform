@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import NAMESPACE_URL, uuid5
 
 from psycopg.rows import dict_row
@@ -11,7 +11,7 @@ from app.services.realtime_consumer import RealtimeEventConsumer
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def iso(value: datetime) -> str:
@@ -23,18 +23,17 @@ def stable_event_id(value: str) -> str:
 
 
 def fetch_demo_products(limit: int = 3) -> list[dict]:
-    with get_connection() as connection:
-        with connection.cursor(row_factory=dict_row) as cursor:
-            cursor.execute(
-                """
+    with get_connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
+        cursor.execute(
+            """
                 SELECT id, sku, name, category
                 FROM products
                 ORDER BY sku ASC
                 LIMIT %s;
                 """,
-                (limit,),
-            )
-            return [dict(row) for row in cursor.fetchall()]
+            (limit,),
+        )
+        return [dict(row) for row in cursor.fetchall()]
 
 
 def event(
@@ -88,7 +87,7 @@ def build_events(products: list[dict]) -> list[dict]:
         ingested_delay_seconds=4,
     )
 
-    events = [
+    return [
         event(
             run_id=run_id,
             sequence=0,
@@ -206,13 +205,13 @@ def build_events(products: list[dict]) -> list[dict]:
             "payload": {"reason": "schema_contract_validation_demo"},
         },
     ]
-    return events
 
 
 def main() -> None:
     products = fetch_demo_products()
     if not products:
-        raise RuntimeError("No demo products found. Run migrations and seed first.")
+        msg = "No demo products found. Run migrations and seed first."
+        raise RuntimeError(msg)
 
     consumer = RealtimeEventConsumer(consumer_name="retailops-observability-demo")
     consumer.start()
@@ -223,7 +222,7 @@ def main() -> None:
         status = str(result.get("status", "unknown"))
         status_counts[status] = status_counts.get(status, 0) + 1
 
-    print(
+    print(  # noqa: T201 - CLI output
         json.dumps(
             {
                 "scenario": "flash-demand-and-stock-risk",
@@ -248,7 +247,7 @@ def main() -> None:
             },
             indent=2,
             sort_keys=True,
-        )
+        ),
     )
 
 

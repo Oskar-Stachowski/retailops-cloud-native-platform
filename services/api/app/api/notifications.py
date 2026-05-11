@@ -1,7 +1,7 @@
 """Mock notification endpoints for Sprint 7."""
 
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Query
 
@@ -17,6 +17,7 @@ from app.auth.roles import (
     ROLE_INVENTORY_PLANNER,
     ROLE_OPERATIONS_MANAGER,
     ROLE_PLATFORM_ADMIN,
+    DemoUser,
     get_demo_user,
     has_permission,
     require_permission,
@@ -35,7 +36,7 @@ _DEMO_NOTIFICATIONS: list[dict[str, Any]] = [
         "severity": "high",
         "target_role": ROLE_INVENTORY_PLANNER,
         "action_url": "/products/85710dbe-1aea-50ac-a155-fb216e12ab97",
-        "created_at": datetime(2026, 5, 4, 9, 56, 43, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 5, 4, 9, 56, 43, tzinfo=UTC),
     },
     {
         "id": "workflow-backlog-review",
@@ -45,7 +46,7 @@ _DEMO_NOTIFICATIONS: list[dict[str, Any]] = [
         "severity": "medium",
         "target_role": ROLE_OPERATIONS_MANAGER,
         "action_url": "/",
-        "created_at": datetime(2026, 5, 4, 9, 58, 0, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 5, 4, 9, 58, 0, tzinfo=UTC),
     },
     {
         "id": "admin-readiness-check",
@@ -55,14 +56,13 @@ _DEMO_NOTIFICATIONS: list[dict[str, Any]] = [
         "severity": "info",
         "target_role": ROLE_PLATFORM_ADMIN,
         "action_url": "/admin",
-        "created_at": datetime(2026, 5, 4, 10, 0, 0, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 5, 4, 10, 0, 0, tzinfo=UTC),
     },
 ]
 
 
-def _notification_visible_for_user(user, notification: dict[str, Any]) -> bool:
+def _notification_visible_for_user(user: DemoUser, notification: dict[str, Any]) -> bool:
     """Platform admins can see everything; other users see role-targeted items."""
-
     if has_permission(user, "platform:admin"):
         return True
 
@@ -87,11 +87,11 @@ def _to_response(user_id: str, notification: dict[str, Any]) -> NotificationResp
         target_role=notification["target_role"],
         action_url=notification["action_url"],
         created_at=notification["created_at"],
-        read_at=datetime.now(timezone.utc) if is_read else None,
+        read_at=datetime.now(UTC) if is_read else None,
     )
 
 
-def _visible_notifications_for_user(user) -> list[NotificationResponse]:
+def _visible_notifications_for_user(user: DemoUser) -> list[NotificationResponse]:
     visible = [
         notification
         for notification in _DEMO_NOTIFICATIONS
@@ -101,12 +101,11 @@ def _visible_notifications_for_user(user) -> list[NotificationResponse]:
     return [_to_response(user.id, notification) for notification in visible]
 
 
-@router.get("/notifications", response_model=NotificationListResponse)
+@router.get("/notifications")
 def list_notifications(
-    user_id: str | None = Query(default=None, description="Local demo user id."),
+    user_id: Annotated[str | None, Query(description="Local demo user id.")] = None,
 ) -> NotificationListResponse:
     """Return mock notifications visible to the selected demo user."""
-
     user = get_demo_user(user_id)
     require_permission(user, PERMISSION_NOTIFICATIONS_READ)
 
@@ -123,14 +122,12 @@ def list_notifications(
 
 @router.post(
     "/notifications/{notification_id}/read",
-    response_model=NotificationReadResponse,
 )
 def mark_notification_read(
     notification_id: str,
-    user_id: str | None = Query(default=None, description="Local demo user id."),
+    user_id: Annotated[str | None, Query(description="Local demo user id.")] = None,
 ) -> NotificationReadResponse:
     """Mark a visible mock notification as read for the selected demo user."""
-
     user = get_demo_user(user_id)
     require_permission(user, PERMISSION_NOTIFICATIONS_WRITE)
 

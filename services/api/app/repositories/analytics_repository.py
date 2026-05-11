@@ -4,6 +4,8 @@ The MVP goal is not a full warehouse. The goal is to expose useful aggregated
 reads from PostgreSQL for dashboard and analytical views.
 """
 
+# ruff: noqa: S608
+
 from typing import Any
 
 from app.db.connection import fetch_all
@@ -48,9 +50,7 @@ class AnalyticsRepository:
                 else "COUNT(*)::float"
             )
             revenue_expression = (
-                f"COALESCE(SUM({value_column}), 0)::float"
-                if value_column
-                else "0::float"
+                f"COALESCE(SUM({value_column}), 0)::float" if value_column else "0::float"
             )
             joins.append(
                 f"""
@@ -62,7 +62,7 @@ class AnalyticsRepository:
                     FROM sales
                     GROUP BY product_id
                 ) sales_summary ON sales_summary.product_id = p.id
-                """
+                """,
             )
             select_parts.append("COALESCE(sales_summary.units_sold, 0) AS units_sold")
             select_parts.append("COALESCE(sales_summary.revenue, 0) AS revenue")
@@ -70,7 +70,9 @@ class AnalyticsRepository:
             select_parts.append("0::float AS units_sold")
             select_parts.append("0::float AS revenue")
 
-        if table_exists("inventory_snapshots") and "product_id" in get_columns("inventory_snapshots"):
+        if table_exists("inventory_snapshots") and "product_id" in get_columns(
+            "inventory_snapshots",
+        ):
             stock_column = pick_column(
                 "inventory_snapshots",
                 ["stock_quantity", "quantity_on_hand", "on_hand_quantity", "stock_qty", "quantity"],
@@ -90,11 +92,9 @@ class AnalyticsRepository:
                         FROM inventory_snapshots
                         ORDER BY product_id, {date_column} DESC NULLS LAST
                     ) inventory_latest ON inventory_latest.product_id = p.id
-                    """
+                    """,
                 )
-                select_parts.append(
-                    "COALESCE(inventory_latest.current_stock, 0) AS current_stock"
-                )
+                select_parts.append("COALESCE(inventory_latest.current_stock, 0) AS current_stock")
                 select_parts.append("inventory_latest.inventory_updated_at")
             else:
                 select_parts.append("NULL::float AS current_stock")
@@ -103,13 +103,15 @@ class AnalyticsRepository:
             select_parts.append("NULL::float AS current_stock")
             select_parts.append("NULL::timestamp AS inventory_updated_at")
 
-        query = f"""
+        query = (
+            f"""
             SELECT {', '.join(select_parts)}
             FROM products p
             {' '.join(joins)}
             ORDER BY units_sold DESC, sku ASC NULLS LAST
             LIMIT %s
         """
+        )
         return fetch_all(query, (limit,))
 
     def get_inventory_risk(self, limit: int = 50) -> list[dict[str, Any]]:
@@ -144,7 +146,13 @@ class AnalyticsRepository:
         if "product_id" in forecast_columns:
             forecast_quantity_column = pick_column(
                 "forecasts",
-                ["forecast_quantity", "forecast_qty", "predicted_demand", "predicted_quantity", "quantity"],
+                [
+                    "forecast_quantity",
+                    "forecast_qty",
+                    "predicted_demand",
+                    "predicted_quantity",
+                    "quantity",
+                ],
             )
             forecast_date_column = pick_column(
                 "forecasts",
@@ -188,7 +196,8 @@ class AnalyticsRepository:
                 {forecast_select},
                 CASE
                     WHEN {forecast_value_expression} IS NULL THEN 'unknown'
-                    WHEN latest_inventory.current_stock <= {forecast_value_expression} THEN 'stockout_risk'
+                    WHEN latest_inventory.current_stock <= {forecast_value_expression}
+                        THEN 'stockout_risk'
                     WHEN {forecast_value_expression} > 0
                          AND latest_inventory.current_stock >= ({forecast_value_expression} * 3)
                          THEN 'overstock_risk'

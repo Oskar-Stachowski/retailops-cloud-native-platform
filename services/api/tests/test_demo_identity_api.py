@@ -5,7 +5,7 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_me_returns_default_platform_admin_user():
+def test_me_returns_default_platform_admin_user() -> None:
     response = client.get("/me")
 
     assert response.status_code == 200
@@ -17,7 +17,7 @@ def test_me_returns_default_platform_admin_user():
     assert "platform:admin" in payload["user"]["permissions"]
 
 
-def test_demo_users_are_available_for_frontend_switcher():
+def test_demo_users_are_available_for_frontend_switcher() -> None:
     response = client.get("/users/demo")
 
     assert response.status_code == 200
@@ -32,7 +32,7 @@ def test_demo_users_are_available_for_frontend_switcher():
     }
 
 
-def test_non_admin_user_has_no_platform_admin_permission():
+def test_non_admin_user_has_no_platform_admin_permission() -> None:
     response = client.get("/me/permissions?user_id=inventory-planner")
 
     assert response.status_code == 200
@@ -44,7 +44,7 @@ def test_non_admin_user_has_no_platform_admin_permission():
     assert "platform:admin" not in payload["permissions"]
 
 
-def test_viewer_has_no_workflow_write_permission():
+def test_viewer_has_no_workflow_write_permission() -> None:
     response = client.get("/me/permissions?user_id=read-only-viewer")
 
     assert response.status_code == 200
@@ -54,7 +54,7 @@ def test_viewer_has_no_workflow_write_permission():
     assert "workflow:write" not in payload["permissions"]
 
 
-def test_unknown_demo_user_returns_404():
+def test_unknown_demo_user_returns_404() -> None:
     response = client.get("/me?user_id=unknown-user")
 
     assert response.status_code == 404

@@ -6,7 +6,6 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 from app.api.schemas import Product360Response
 from app.services.product_360_service import product_360_service
 
-
 router = APIRouter(prefix="/products", tags=["product-360"])
 
 
@@ -22,7 +21,7 @@ router = APIRouter(prefix="/products", tags=["product-360"])
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Product was not found.",
-        }
+        },
     },
 )
 def get_product_360(

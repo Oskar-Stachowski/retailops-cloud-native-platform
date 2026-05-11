@@ -4,10 +4,9 @@ import json
 import logging
 import sys
 from contextvars import ContextVar
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from logging.config import dictConfig
 from typing import Any
-
 
 correlation_id_context: ContextVar[str | None] = ContextVar(
     "correlation_id",
@@ -52,7 +51,7 @@ class JsonLogFormatter(logging.Formatter):
         payload: dict[str, Any] = {
             "timestamp": datetime.fromtimestamp(
                 record.created,
-                tz=timezone.utc,
+                tz=UTC,
             ).isoformat(),
             "level": record.levelname,
             "logger": record.name,
@@ -118,5 +117,5 @@ def configure_logging() -> None:
                     "propagate": False,
                 },
             },
-        }
+        },
     )

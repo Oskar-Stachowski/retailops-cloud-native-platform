@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 client = TestClient(app)
 
 
@@ -44,7 +43,7 @@ class FakeInventoryService:
                     "recorded_at": "2026-01-15T10:00:00+00:00",
                     "ingested_at": "2026-01-15T10:05:00+00:00",
                     "created_at": "2026-01-15T10:06:00+00:00",
-                }
+                },
             ],
             "pagination": {
                 "limit": limit,
@@ -69,7 +68,7 @@ class FakeInventoryService:
         }
 
 
-def test_inventory_list_uses_stable_items_and_pagination_contract(monkeypatch):
+def test_inventory_list_uses_stable_items_and_pagination_contract(monkeypatch) -> None:
     monkeypatch.setattr("app.api.inventory.inventory_service", FakeInventoryService())
 
     response = client.get(
@@ -96,7 +95,7 @@ def test_inventory_list_uses_stable_items_and_pagination_contract(monkeypatch):
     assert body["items"][0]["warehouse_code"] == "WH-001"
 
 
-def test_inventory_detail_returns_one_snapshot(monkeypatch):
+def test_inventory_detail_returns_one_snapshot(monkeypatch) -> None:
     monkeypatch.setattr("app.api.inventory.inventory_service", FakeInventoryService())
 
     response = client.get(f"/inventory-snapshots/{INVENTORY_SNAPSHOT_ID}")
@@ -108,17 +107,15 @@ def test_inventory_detail_returns_one_snapshot(monkeypatch):
     assert body["stock_quantity"] == 42
 
 
-def test_inventory_detail_returns_standard_404_error(monkeypatch):
+def test_inventory_detail_returns_standard_404_error(monkeypatch) -> None:
     monkeypatch.setattr("app.api.inventory.inventory_service", FakeInventoryService())
 
-    response = client.get(
-        "/inventory-snapshots/00000000-0000-0000-0000-000000000000"
-    )
+    response = client.get("/inventory-snapshots/00000000-0000-0000-0000-000000000000")
 
     assert response.status_code == 404
     assert response.json() == {
         "error": {
             "code": "not_found",
             "message": "Resource not found",
-        }
+        },
     }

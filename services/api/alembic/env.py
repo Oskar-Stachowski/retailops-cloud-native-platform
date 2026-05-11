@@ -1,10 +1,8 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
 from app.core.config import get_settings
 
 # this is the Alembic Config object, which provides
@@ -16,7 +14,8 @@ def get_database_url() -> str:
     settings = get_settings()
 
     if not settings.database_url:
-        raise RuntimeError("DATABASE_URL is not set")
+        msg = "DATABASE_URL is not set"
+        raise RuntimeError(msg)
 
     database_url = settings.database_url
 
@@ -39,13 +38,10 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
 
@@ -87,9 +83,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

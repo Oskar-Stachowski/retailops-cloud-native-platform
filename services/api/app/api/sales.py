@@ -9,7 +9,6 @@ from app.api.schemas import SaleListResponse, SaleResponse
 from app.domain.models import Channel, Currency
 from app.services.sales_service import SalesService
 
-
 router = APIRouter(prefix="/sales", tags=["sales"])
 sales_service = SalesService()
 
@@ -85,12 +84,10 @@ def list_sales(
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Sale was not found.",
-        }
+        },
     },
 )
-def get_sale(
-    sale_id: Annotated[UUID, Path(description="Sale technical identifier.")]
-) -> dict:
+def get_sale(sale_id: Annotated[UUID, Path(description="Sale technical identifier.")]) -> dict:
     sale = sales_service.get_sale_detail_response(sale_id)
 
     if sale is None:

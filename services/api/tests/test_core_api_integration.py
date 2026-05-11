@@ -5,7 +5,8 @@ real FastAPI app against the configured PostgreSQL database and seeded demo data
 
 Run from services/api after migrations and seed data are available:
 
-    PYTHONPATH=. DATABASE_URL=postgresql://retailops:retailops@localhost:5432/retailops pytest tests/test_core_api_integration.py
+    PYTHONPATH=. DATABASE_URL=postgresql://retailops:retailops@localhost:5432/retailops \
+        pytest tests/test_core_api_integration.py
 
 Why this file exists:
 - Contract tests prove response shape with fake services.
@@ -21,7 +22,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-
 
 pytestmark = pytest.mark.integration_db
 
@@ -292,7 +292,7 @@ def test_core_list_endpoints_reject_invalid_pagination(path: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "path,invalid_sort_by",
+    ("path", "invalid_sort_by"),
     [
         ("/products", "total_amount"),
         ("/forecasts", "sku"),

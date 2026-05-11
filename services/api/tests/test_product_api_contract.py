@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 client = TestClient(app)
 
 
@@ -39,7 +38,7 @@ class FakeProductService:
                     "status": "active",
                     "created_at": "2026-01-01T10:00:00+00:00",
                     "updated_at": "2026-01-01T10:00:00+00:00",
-                }
+                },
             ],
             "pagination": {
                 "limit": limit,
@@ -64,7 +63,7 @@ class FakeProductService:
         }
 
 
-def test_products_list_uses_stable_items_and_pagination_contract(monkeypatch):
+def test_products_list_uses_stable_items_and_pagination_contract(monkeypatch) -> None:
     monkeypatch.setattr("app.api.products.product_service", FakeProductService())
 
     response = client.get(
@@ -89,7 +88,7 @@ def test_products_list_uses_stable_items_and_pagination_contract(monkeypatch):
     assert body["items"][0]["category"] == "Electronics"
 
 
-def test_product_detail_returns_one_product(monkeypatch):
+def test_product_detail_returns_one_product(monkeypatch) -> None:
     monkeypatch.setattr("app.api.products.product_service", FakeProductService())
 
     response = client.get(f"/products/{PRODUCT_ID}")
@@ -101,7 +100,7 @@ def test_product_detail_returns_one_product(monkeypatch):
     assert body["sku"] == "ELEC-HEAD-001"
 
 
-def test_product_detail_returns_standard_404_error(monkeypatch):
+def test_product_detail_returns_standard_404_error(monkeypatch) -> None:
     monkeypatch.setattr("app.api.products.product_service", FakeProductService())
 
     response = client.get("/products/00000000-0000-0000-0000-000000000000")
@@ -111,5 +110,5 @@ def test_product_detail_returns_standard_404_error(monkeypatch):
         "error": {
             "code": "not_found",
             "message": "Resource not found",
-        }
+        },
     }

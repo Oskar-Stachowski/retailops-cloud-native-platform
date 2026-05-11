@@ -47,16 +47,12 @@ def generate_price_history(
                     "currency": "PLN",
                     "valid_from": iso_date(days_offset=valid_from_offset),
                     "valid_to": (
-                        iso_date(days_offset=valid_to_offset)
-                        if valid_to_offset is not None
-                        else ""
+                        iso_date(days_offset=valid_to_offset) if valid_to_offset is not None else ""
                     ),
-                    "price_type": (
-                        "regular" if version != "planned" else "planned"
-                    ),
+                    "price_type": ("regular" if version != "planned" else "planned"),
                     "source": "synthetic_pricing_rules",
                     "created_at": iso_date(days_offset=-(index + 1)),
-                }
+                },
             )
 
     return price_history
@@ -82,7 +78,7 @@ def generate_promotions(
                 "ends_at": iso_date(days_offset=14 + index % 4),
                 "channel": "all",
                 "status": "active",
-            }
+            },
         )
 
     return promotions

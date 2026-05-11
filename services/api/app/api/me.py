@@ -1,5 +1,7 @@
 """Mock identity endpoints for Sprint 7."""
 
+from typing import Annotated
+
 from fastapi import APIRouter, Query
 
 from app.api.schemas import (
@@ -8,14 +10,13 @@ from app.api.schemas import (
     DemoUserResponse,
     PermissionListResponse,
 )
-from app.auth.roles import DEMO_USERS, get_demo_user, get_user_permissions
+from app.auth.roles import DEMO_USERS, DemoUser, get_demo_user, get_user_permissions
 
 router = APIRouter(tags=["identity"])
 
 
-def to_demo_user_response(user) -> DemoUserResponse:
+def to_demo_user_response(user: DemoUser) -> DemoUserResponse:
     """Map an internal demo user to the public API contract."""
-
     return DemoUserResponse(
         id=user.id,
         login=user.login,
@@ -28,20 +29,18 @@ def to_demo_user_response(user) -> DemoUserResponse:
     )
 
 
-@router.get("/users/demo", response_model=DemoUserListResponse)
+@router.get("/users/demo")
 def list_demo_users() -> DemoUserListResponse:
     """List selectable local demo users for the frontend switcher."""
-
     items = [to_demo_user_response(user) for user in DEMO_USERS.values()]
     return DemoUserListResponse(items=items, default_user_id="platform-admin")
 
 
-@router.get("/me", response_model=CurrentUserResponse)
+@router.get("/me")
 def get_current_user(
-    user_id: str | None = Query(default=None, description="Local demo user id."),
+    user_id: Annotated[str | None, Query(description="Local demo user id.")] = None,
 ) -> CurrentUserResponse:
     """Return the currently selected local demo user."""
-
     user = get_demo_user(user_id)
     return CurrentUserResponse(
         user=to_demo_user_response(user),
@@ -53,12 +52,11 @@ def get_current_user(
     )
 
 
-@router.get("/me/permissions", response_model=PermissionListResponse)
+@router.get("/me/permissions")
 def get_current_permissions(
-    user_id: str | None = Query(default=None, description="Local demo user id."),
+    user_id: Annotated[str | None, Query(description="Local demo user id.")] = None,
 ) -> PermissionListResponse:
     """Return permissions assigned to the current local demo user."""
-
     user = get_demo_user(user_id)
     return PermissionListResponse(
         user_id=user.id,

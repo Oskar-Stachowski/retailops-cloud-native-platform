@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 client = TestClient(app)
 
 
@@ -37,7 +36,7 @@ class FakeStockRiskService:
                     "forecast_quantity": 25.0,
                     "risk_status": "stockout_risk",
                     "inventory_updated_at": "2026-01-15T10:00:00+00:00",
-                }
+                },
             ],
             "pagination": {
                 "limit": limit,
@@ -47,7 +46,7 @@ class FakeStockRiskService:
         }
 
 
-def test_inventory_risks_list_uses_stable_items_and_pagination_contract(monkeypatch):
+def test_inventory_risks_list_uses_stable_items_and_pagination_contract(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.stock_risks.stock_risk_service",
         FakeStockRiskService(),

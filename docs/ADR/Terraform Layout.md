@@ -1,7 +1,7 @@
 # ADR-010: Terraform layout for AWS foundation
 
-**Status:** Accepted  
-**Date:** Sprint 10  
+**Status:** Accepted
+**Date:** Sprint 10
 **Scope:** Terraform / AWS foundation / repository structure
 
 ---

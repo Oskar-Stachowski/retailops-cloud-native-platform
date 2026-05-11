@@ -161,7 +161,7 @@ def _candidate_data_dirs() -> list[Path]:
             Path.cwd().parents[1] / "data" / "demo"
             if len(Path.cwd().parents) >= 2
             else Path.cwd() / "data" / "demo",
-        ]
+        ],
     )
 
     return candidates
@@ -172,14 +172,11 @@ def resolve_demo_data_dir() -> Path:
         if candidate.exists() and candidate.is_dir():
             return candidate
 
-    searched = "\n".join(
-        f"- {candidate}" for candidate in _candidate_data_dirs()
-    )
+    searched = "\n".join(f"- {candidate}" for candidate in _candidate_data_dirs())
     raise FileNotFoundError(
         "Could not find demo CSV directory. "
         "Run `python -m data.generator.main` from the repository root first, "
-        "or set RETAILOPS_DEMO_DATA_DIR.\n\nSearched:\n"
-        + searched
+        "or set RETAILOPS_DEMO_DATA_DIR.\n\nSearched:\n" + searched,
     )
 
 
@@ -199,36 +196,25 @@ def load_csv_rows(
         reader = csv.DictReader(file)
 
         if reader.fieldnames is None:
-            raise ValueError(f"CSV file has no header: {csv_path}")
+            msg = f"CSV file has no header: {csv_path}"
+            raise ValueError(msg)
 
         missing_columns = sorted(set(columns) - set(reader.fieldnames))
         if missing_columns:
+            msg = f"CSV file {csv_path} is missing required columns: {', '.join(missing_columns)}"
             raise ValueError(
-                f"CSV file {csv_path} is missing required columns: "
-                f"{', '.join(missing_columns)}"
+                msg,
             )
 
-        rows = []
-        for row in reader:
-            rows.append(
-                {
-                    column: normalize_csv_value(row.get(column))
-                    for column in columns
-                }
-            )
-
-        return rows
+        return [
+            {column: normalize_csv_value(row.get(column)) for column in columns}
+            for row in reader
+        ]
 
 
 def truncate_tables(cur: psycopg.Cursor) -> None:
-    table_identifiers = sql.SQL(", ").join(
-        sql.Identifier(table) for table in TRUNCATE_ORDER
-    )
-    cur.execute(
-        sql.SQL("TRUNCATE TABLE {} RESTART IDENTITY CASCADE;").format(
-            table_identifiers
-        )
-    )
+    table_identifiers = sql.SQL(", ").join(sql.Identifier(table) for table in TRUNCATE_ORDER)
+    cur.execute(sql.SQL("TRUNCATE TABLE {} RESTART IDENTITY CASCADE;").format(table_identifiers))
 
 
 def seed_table_from_csv(
@@ -239,9 +225,8 @@ def seed_table_from_csv(
     csv_path = data_dir / f"{table_config.name}.csv"
 
     if not csv_path.exists():
-        raise FileNotFoundError(
-            f"Missing CSV file for table {table_config.name}: {csv_path}"
-        )
+        msg = f"Missing CSV file for table {table_config.name}: {csv_path}"
+        raise FileNotFoundError(msg)
 
     rows = load_csv_rows(csv_path, table_config.columns)
     if not rows:
@@ -250,9 +235,7 @@ def seed_table_from_csv(
     column_identifiers = sql.SQL(", ").join(
         sql.Identifier(column) for column in table_config.columns
     )
-    placeholders = sql.SQL(", ").join(
-        sql.Placeholder() for _ in table_config.columns
-    )
+    placeholders = sql.SQL(", ").join(sql.Placeholder() for _ in table_config.columns)
 
     query = sql.SQL("INSERT INTO {} ({}) VALUES ({});").format(
         sql.Identifier(table_config.name),
@@ -293,16 +276,17 @@ def main() -> None:
     settings = get_settings()
 
     if not settings.database_url:
-        raise RuntimeError("DATABASE_URL is not configured.")
+        msg = "DATABASE_URL is not configured."
+        raise RuntimeError(msg)
 
     data_dir = resolve_demo_data_dir()
     seed_counts = seed_demo_data(settings.database_url, data_dir)
 
-    print("\nSeed summary:")
+    print("\nSeed summary:")  # noqa: T201 - CLI output
     for table_config in TABLE_CONFIGS:
-        print(f"- {table_config.name}: {seed_counts[table_config.name]}")
-    print(f"\nDemo CSV directory: {data_dir}")
-    print("Demo seed data inserted successfully.")
+        print(f"- {table_config.name}: {seed_counts[table_config.name]}")  # noqa: T201 - CLI output
+    print(f"\nDemo CSV directory: {data_dir}")  # noqa: T201 - CLI output
+    print("Demo seed data inserted successfully.")  # noqa: T201 - CLI output
 
 
 if __name__ == "__main__":

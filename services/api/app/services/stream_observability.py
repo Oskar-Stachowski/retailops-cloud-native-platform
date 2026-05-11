@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
@@ -12,7 +12,7 @@ class PrometheusMetric:
     name: str
     help_text: str
     metric_type: str
-    value: int | float
+    value: float
     labels: dict[str, str] | None = None
 
 
@@ -42,7 +42,10 @@ class StreamObservabilityService:
         output: list[PrometheusMetric] = [
             PrometheusMetric(
                 name="retailops_stream_latest_event_present",
-                help_text="Whether at least one stream event has been ingested, represented as 1 or 0.",
+                help_text=(
+                    "Whether at least one stream event has been ingested, "
+                    "represented as 1 or 0."
+                ),
                 metric_type="gauge",
                 value=1 if freshness.get("latest_event_at") else 0,
             ),
@@ -82,7 +85,7 @@ class StreamObservabilityService:
                     metric_type="counter",
                     value=count,
                     labels={"status": status},
-                )
+                ),
             )
 
             if status == "failed_dead_lettered":
@@ -92,19 +95,19 @@ class StreamObservabilityService:
                         help_text="Total stream events routed to the dead-letter path.",
                         metric_type="counter",
                         value=count,
-                    )
+                    ),
                 )
 
-        for row in event_type_counts:
-            output.append(
-                PrometheusMetric(
-                    name="retailops_stream_events_by_type_total",
-                    help_text="Total stream events by event type.",
-                    metric_type="counter",
-                    value=self._number_or_zero(row.get("event_count")),
-                    labels={"event_type": str(row.get("event_type") or "unknown")},
-                )
+        output.extend(
+            PrometheusMetric(
+                name="retailops_stream_events_by_type_total",
+                help_text="Total stream events by event type.",
+                metric_type="counter",
+                value=self._number_or_zero(row.get("event_count")),
+                labels={"event_type": str(row.get("event_type") or "unknown")},
             )
+            for row in event_type_counts
+        )
 
         for row in consumer_states:
             consumer_name = str(row.get("consumer_name") or "unknown")
@@ -166,7 +169,7 @@ class StreamObservabilityService:
                         value=max(received - processed - ignored - failed, 0),
                         labels=labels,
                     ),
-                ]
+                ],
             )
 
         output.append(
@@ -174,8 +177,8 @@ class StreamObservabilityService:
                 name="retailops_stream_metrics_generated_at_seconds",
                 help_text="Unix timestamp when stream metrics were rendered.",
                 metric_type="gauge",
-                value=datetime.now(timezone.utc).timestamp(),
-            )
+                value=datetime.now(UTC).timestamp(),
+            ),
         )
 
         return output
@@ -193,15 +196,14 @@ class StreamObservabilityService:
             return ""
 
         rendered = ",".join(
-            f'{key}="{self._escape_label_value(value)}"'
-            for key, value in sorted(labels.items())
+            f'{key}="{self._escape_label_value(value)}"' for key, value in sorted(labels.items())
         )
         return f"{{{rendered}}}"
 
     def _escape_label_value(self, value: str) -> str:
         return value.replace("\\", "\\\\").replace("\n", "\\n").replace('"', '\\"')
 
-    def _number_or_zero(self, value: Any) -> float:
+    def _number_or_zero(self, value: object) -> float:
         if value in (None, ""):
             return 0.0
 
@@ -210,7 +212,7 @@ class StreamObservabilityService:
         except (TypeError, ValueError):
             return 0.0
 
-    def _format_number(self, value: int | float) -> str:
+    def _format_number(self, value: float) -> str:
         number = float(value)
         if number.is_integer():
             return str(int(number))

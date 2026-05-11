@@ -1,31 +1,18 @@
 import json
 from pathlib import Path
 
-
 OBSERVABILITY_PATH = Path(__file__).resolve().parents[3] / "observability"
-DATASOURCE_PATH = (
-    OBSERVABILITY_PATH / "grafana" / "provisioning" / "datasources" / "prometheus.yml"
-)
+DATASOURCE_PATH = OBSERVABILITY_PATH / "grafana" / "provisioning" / "datasources" / "prometheus.yml"
 DASHBOARD_PROVIDER_PATH = (
     OBSERVABILITY_PATH / "grafana" / "provisioning" / "dashboards" / "retailops.yml"
 )
-DASHBOARD_PATH = (
-    OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-overview.json"
-)
-API_DASHBOARD_PATH = (
-    OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-api.json"
-)
+DASHBOARD_PATH = OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-overview.json"
+API_DASHBOARD_PATH = OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-api.json"
 BUSINESS_DASHBOARD_PATH = (
-    OBSERVABILITY_PATH
-    / "grafana"
-    / "dashboards"
-    / "retailops-business-operations.json"
+    OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-business-operations.json"
 )
 STREAM_DASHBOARD_PATH = (
-    OBSERVABILITY_PATH
-    / "grafana"
-    / "dashboards"
-    / "retailops-stream-processing.json"
+    OBSERVABILITY_PATH / "grafana" / "dashboards" / "retailops-stream-processing.json"
 )
 
 
@@ -51,9 +38,7 @@ def test_retailops_overview_dashboard_contains_core_stream_panels() -> None:
     dashboard = json.loads(DASHBOARD_PATH.read_text(encoding="utf-8"))
     panel_titles = {panel["title"] for panel in dashboard["panels"]}
     expressions = {
-        target["expr"]
-        for panel in dashboard["panels"]
-        for target in panel.get("targets", [])
+        target["expr"] for panel in dashboard["panels"] for target in panel.get("targets", [])
     }
     dashboard_json = json.dumps(dashboard)
 
@@ -74,9 +59,7 @@ def test_retailops_api_dashboard_contains_api_and_db_panels() -> None:
     dashboard = json.loads(API_DASHBOARD_PATH.read_text(encoding="utf-8"))
     panel_titles = {panel["title"] for panel in dashboard["panels"]}
     expressions = {
-        target["expr"]
-        for panel in dashboard["panels"]
-        for target in panel.get("targets", [])
+        target["expr"] for panel in dashboard["panels"] for target in panel.get("targets", [])
     }
     dashboard_json = json.dumps(dashboard)
 
@@ -99,9 +82,7 @@ def test_retailops_business_operations_dashboard_contains_operational_panels() -
     dashboard = json.loads(BUSINESS_DASHBOARD_PATH.read_text(encoding="utf-8"))
     panel_titles = {panel["title"] for panel in dashboard["panels"]}
     expressions = {
-        target["expr"]
-        for panel in dashboard["panels"]
-        for target in panel.get("targets", [])
+        target["expr"] for panel in dashboard["panels"] for target in panel.get("targets", [])
     }
     dashboard_json = json.dumps(dashboard)
 
@@ -133,9 +114,7 @@ def test_retailops_stream_processing_dashboard_contains_consumer_panels() -> Non
     dashboard = json.loads(STREAM_DASHBOARD_PATH.read_text(encoding="utf-8"))
     panel_titles = {panel["title"] for panel in dashboard["panels"]}
     expressions = {
-        target["expr"]
-        for panel in dashboard["panels"]
-        for target in panel.get("targets", [])
+        target["expr"] for panel in dashboard["panels"] for target in panel.get("targets", [])
     }
     dashboard_json = json.dumps(dashboard)
 

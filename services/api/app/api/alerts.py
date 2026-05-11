@@ -1,3 +1,4 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Body, HTTPException, Query, status
@@ -7,9 +8,11 @@ from app.auth.roles import PERMISSION_WORKFLOW_WRITE, get_demo_user, require_per
 from app.domain.workflow import WorkflowActionName, WorkflowTransitionError
 from app.services.workflow_service import WorkflowNotFoundError, WorkflowService
 
-
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 workflow_service = WorkflowService()
+OptionalWorkflowBody = Annotated[WorkflowMutationRequest | None, Body()]
+RequiredWorkflowBody = Annotated[WorkflowMutationRequest, Body()]
+DemoUserQuery = Annotated[str | None, Query(description="Local demo user id.")]
 
 
 def _apply_alert_action(
@@ -61,9 +64,9 @@ def _apply_alert_action(
 )
 def acknowledge_alert(
     alert_id: UUID,
-    request: WorkflowMutationRequest | None = Body(default=None),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: OptionalWorkflowBody = None,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_alert_action(
         alert_id=alert_id,
         action=WorkflowActionName.acknowledge,
@@ -81,9 +84,9 @@ def acknowledge_alert(
 )
 def assign_alert(
     alert_id: UUID,
-    request: WorkflowMutationRequest = Body(...),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: RequiredWorkflowBody,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     if not request.assigned_to_user_id:
         raise HTTPException(
             status_code=422,
@@ -110,9 +113,9 @@ def assign_alert(
 )
 def resolve_alert(
     alert_id: UUID,
-    request: WorkflowMutationRequest | None = Body(default=None),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: OptionalWorkflowBody = None,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_alert_action(
         alert_id=alert_id,
         action=WorkflowActionName.resolve,
@@ -130,9 +133,9 @@ def resolve_alert(
 )
 def dismiss_alert(
     alert_id: UUID,
-    request: WorkflowMutationRequest = Body(...),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: RequiredWorkflowBody,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_alert_action(
         alert_id=alert_id,
         action=WorkflowActionName.dismiss,
@@ -150,9 +153,9 @@ def dismiss_alert(
 )
 def comment_on_alert(
     alert_id: UUID,
-    request: WorkflowMutationRequest = Body(...),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: RequiredWorkflowBody,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_alert_action(
         alert_id=alert_id,
         action=WorkflowActionName.comment,

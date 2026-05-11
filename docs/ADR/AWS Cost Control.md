@@ -1,7 +1,7 @@
 # ADR-012: AWS cost control baseline
 
-**Status:** Accepted  
-**Date:** Sprint 10  
+**Status:** Accepted
+**Date:** Sprint 10
 **Scope:** FinOps / budgets / cleanup / right-sizing
 
 ---

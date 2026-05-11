@@ -1,7 +1,7 @@
 # ADR-011: AWS networking baseline
 
-**Status:** Accepted  
-**Date:** Sprint 10  
+**Status:** Accepted
+**Date:** Sprint 10
 **Scope:** AWS VPC / subnets / routing / network cost boundary
 
 ---

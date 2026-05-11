@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from data.generator.common import confidence, deterministic_uuid, iso_date
-from data.generator.common import utc_datetime
+from data.generator.common import confidence, deterministic_uuid, iso_date, utc_datetime
 from data.generator.scenarios import UNIT_OF_MEASURE
 
 
@@ -41,8 +40,7 @@ def generate_forecasts(products: list[dict[str, str]]) -> list[dict[str, str]]:
                 "method": "retailops-baseline-demand-model",
                 "status": "generated",
                 "confidence_level": confidence(confidence_score),
-                # "model_version": "0.1.0-demo",
-            }
+            },
         )
 
     return forecasts
@@ -53,10 +51,6 @@ def forecast_by_product_id(
     product_id: str,
 ) -> dict[str, str] | None:
     return next(
-        (
-            forecast
-            for forecast in forecasts
-            if forecast["product_id"] == product_id
-        ),
+        (forecast for forecast in forecasts if forecast["product_id"] == product_id),
         None,
     )

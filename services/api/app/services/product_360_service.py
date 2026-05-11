@@ -79,32 +79,26 @@ class Product360Service:
             "total_units_sold": float(metrics.get("total_units_sold") or 0),
             "total_revenue": float(metrics.get("total_revenue") or 0),
             "latest_sale_at": metrics.get("latest_sale_at"),
-            "inventory_snapshot_count": int(
-                metrics.get("inventory_snapshot_count") or 0
-            ),
+            "inventory_snapshot_count": int(metrics.get("inventory_snapshot_count") or 0),
             "current_stock": self._optional_float(metrics.get("current_stock")),
             "inventory_updated_at": metrics.get("inventory_updated_at"),
             "forecast_count": int(metrics.get("forecast_count") or 0),
             "latest_forecast_quantity": self._optional_float(
-                metrics.get("latest_forecast_quantity")
+                metrics.get("latest_forecast_quantity"),
             ),
-            "latest_forecast_period_start": metrics.get(
-                "latest_forecast_period_start"
-            ),
+            "latest_forecast_period_start": metrics.get("latest_forecast_period_start"),
             "latest_forecast_period_end": metrics.get("latest_forecast_period_end"),
             "anomaly_count": int(metrics.get("anomaly_count") or 0),
             "alert_count": int(metrics.get("alert_count") or 0),
             "open_alert_count": int(metrics.get("open_alert_count") or 0),
             "recommendation_count": int(metrics.get("recommendation_count") or 0),
-            "open_recommendation_count": int(
-                metrics.get("open_recommendation_count") or 0
-            ),
+            "open_recommendation_count": int(metrics.get("open_recommendation_count") or 0),
             "workflow_action_count": int(metrics.get("workflow_action_count") or 0),
             "risk_status": (stock_risk or {}).get("risk_status") or "unknown",
         }
 
     @staticmethod
-    def _optional_float(value: Any) -> float | None:
+    def _optional_float(value: object) -> float | None:
         if value is None:
             return None
         return float(value)

@@ -13,10 +13,12 @@ def _db_unavailable_reason(database_url: str | None) -> str | None:
         return "DATABASE_URL is not set"
 
     try:
-        with psycopg.connect(database_url, connect_timeout=3) as connection:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT 1")
-                cursor.fetchone()
+        with (
+            psycopg.connect(database_url, connect_timeout=3) as connection,
+            connection.cursor() as cursor,
+        ):
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
     except psycopg.Error as exc:
         return f"database is unavailable for DATABASE_URL={database_url!r}: {exc}"
 

@@ -11,7 +11,6 @@ from typing import Final
 
 from fastapi import HTTPException, status
 
-
 ROLE_PLATFORM_ADMIN: Final = "platform_admin"
 ROLE_OPERATIONS_MANAGER: Final = "operations_manager"
 ROLE_INVENTORY_PLANNER: Final = "inventory_planner"
@@ -140,19 +139,16 @@ DEMO_USERS: Final[dict[str, DemoUser]] = {
 
 def get_permissions_for_role(role: str) -> list[str]:
     """Return the explicit permission list assigned to a role."""
-
     return PERMISSIONS_BY_ROLE.get(role, [])
 
 
 def get_user_permissions(user: DemoUser) -> list[str]:
     """Return permissions for a concrete demo user."""
-
     return get_permissions_for_role(user.role)
 
 
 def has_permission(user: DemoUser, permission: str) -> bool:
     """Check whether a demo user has a specific permission."""
-
     return permission in get_user_permissions(user)
 
 
@@ -162,7 +158,6 @@ def get_demo_user(user_id: str | None = None) -> DemoUser:
     The default is the platform admin because this keeps local development
     permissive while still allowing role boundaries to be tested.
     """
-
     resolved_user_id = user_id or DEFAULT_DEMO_USER_ID
 
     try:
@@ -179,7 +174,6 @@ def get_demo_user(user_id: str | None = None) -> DemoUser:
 
 def require_permission(user: DemoUser, permission: str) -> None:
     """Raise 403 if the user does not have the required permission."""
-
     if has_permission(user, permission):
         return
 

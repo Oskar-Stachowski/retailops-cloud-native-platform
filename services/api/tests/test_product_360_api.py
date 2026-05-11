@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi.testclient import TestClient
@@ -6,9 +6,8 @@ from fastapi.testclient import TestClient
 from app.api import product_360
 from app.main import app
 
-
 PRODUCT_ID = UUID("85710dbe-1aea-50ac-a155-fb216e12ab97")
-NOW = datetime(2026, 5, 4, 9, 56, 43, tzinfo=timezone.utc).isoformat()
+NOW = datetime(2026, 5, 4, 9, 56, 43, tzinfo=UTC).isoformat()
 
 
 def _product_360_payload():
@@ -55,7 +54,7 @@ def _product_360_payload():
     }
 
 
-def test_product_360_endpoint_returns_payload(monkeypatch):
+def test_product_360_endpoint_returns_payload(monkeypatch) -> None:
     def fake_get_product_360(product_id, limit=10):
         assert product_id == PRODUCT_ID
         assert limit == 10
@@ -74,11 +73,11 @@ def test_product_360_endpoint_returns_payload(monkeypatch):
     assert response.json()["product"]["sku"] == "ELEC-HEAD-001"
 
 
-def test_product_360_endpoint_returns_404_for_missing_product(monkeypatch):
+def test_product_360_endpoint_returns_404_for_missing_product(monkeypatch) -> None:
     monkeypatch.setattr(
         product_360.product_360_service,
         "get_product_360",
-        lambda product_id, limit=10: None,
+        lambda product_id, limit=10: None,  # noqa: ARG005 - endpoint calls this mock by keyword
     )
 
     client = TestClient(app)

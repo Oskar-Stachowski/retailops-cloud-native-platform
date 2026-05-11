@@ -1,8 +1,8 @@
 # Observability Runbook
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Observability / Reliability / Local Operations  
-**Sprint:** Sprint 11 — Observability Foundation  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** Observability / Reliability / Local Operations
+**Sprint:** Sprint 11 — Observability Foundation
 **Commit:** `docs: add observability runbook`
 
 ---

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
 
 from psycopg.rows import dict_row
@@ -11,7 +11,7 @@ from app.domain.models import InventorySnapshot
 class InventoryRepository:
     """PostgreSQL-backed read repository for inventory snapshot data."""
 
-    SORT_COLUMNS = {
+    SORT_COLUMNS: ClassVar[dict[str, str]] = {
         "recorded_at": "recorded_at",
         "ingested_at": "ingested_at",
         "created_at": "created_at",
@@ -19,7 +19,7 @@ class InventoryRepository:
         "warehouse_code": "warehouse_code",
     }
 
-    def __init__(self, connection=None):
+    def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -123,7 +123,7 @@ class InventoryRepository:
             ORDER BY {sort_column} {direction}, id ASC
             LIMIT %s OFFSET %s;
         """
-        rows = self._fetch_all(query, tuple(params + [limit, offset]))
+        rows = self._fetch_all(query, (*params, limit, offset))
         return [self._map_row_to_inventory_snapshot(row) for row in rows]
 
     def count_inventory_snapshots(
@@ -141,7 +141,7 @@ class InventoryRepository:
             recorded_from=recorded_from,
             recorded_to=recorded_to,
         )
-        query = f"SELECT COUNT(*) AS total FROM inventory_snapshots {where_clause};"
+        query = f"SELECT COUNT(*) AS total FROM inventory_snapshots {where_clause};"  # noqa: S608 - where clause is built from fixed filters
         row = self._fetch_one(query, tuple(params))
         return int(row["total"]) if row else 0
 
