@@ -12,6 +12,9 @@ on:
       - "data/**"
       - ".github/workflows/api-ci.yml"
 
+permissions:
+  contents: read
+
 jobs:
   api-integration-tests:
     name: API integration tests
