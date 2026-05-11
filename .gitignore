@@ -253,3 +253,6 @@ override.tf.json
 
 # Keep provider dependency lock files versioned for reproducible Terraform runs.
 !.terraform.lock.hcl
+
+# Local editor preferences
+.vscode/settings.json
