@@ -4,6 +4,8 @@ import argparse
 from dataclasses import dataclass
 from pathlib import Path
 
+import sys
+
 from data.generator.csv_writer import CSV_WRITE_ORDER, write_tables
 from data.generator.forecasts import generate_forecasts
 from data.generator.incidents import generate_incident_dataset
@@ -116,6 +118,33 @@ def validate_generation_config(config: DatasetGenerationConfig) -> None:
         )
 
 
+def warn_if_demo_ignores_sizing_options(config: DatasetGenerationConfig) -> None:
+    if config.profile != "demo":
+        return
+
+    ignored_options = [
+        name
+        for name, value in {
+            "days": config.days,
+            "products": config.products,
+            "stores": config.stores,
+            "warehouses": config.warehouses,
+        }.items()
+        if value is not None
+    ]
+
+    if not ignored_options:
+        return
+
+    ignored = ", ".join(f"--{name}" for name in ignored_options)
+    print(
+        "Warning: the demo profile is fixed-size. "
+        f"Ignoring sizing option(s): {ignored}. "
+        "Use --profile small, medium, or large for bounded sizing overrides.",
+        file=sys.stderr,
+    )
+
+
 def build_dataset(
     config: DatasetGenerationConfig | None = None,
 ) -> dict[str, list[dict[str, str]]]:
@@ -215,6 +244,7 @@ def config_from_args(args: argparse.Namespace) -> DatasetGenerationConfig:
 def main() -> None:
     args = parse_args()
     config = config_from_args(args)
+    warn_if_demo_ignores_sizing_options(config)
 
     counts = generate_demo_dataset(args.output_dir, config)
     output_dir = args.output_dir or default_output_dir_for_profile(
