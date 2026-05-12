@@ -246,7 +246,7 @@ jobs:
     steps:
       - name: Download security evidence
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: security-*-evidence
           path: ci-cd/reports/security
