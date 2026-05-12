@@ -539,6 +539,7 @@ The project documentation is split into several files and directories:
 - `observability/README.md` — monitoring, metrics and alerting
 - `docs/real-time-event-contracts.md` — real-time event model
 - `docs/local-event-broker.md` — local Redpanda broker, consumer runner and streaming smoke checks
+- `docs/runbooks/local-kubernetes-runbook.md` — local Kubernetes validation and run procedure
 - `docs/live-metrics-persistence.md` — persisted live operations read model
 
 ---

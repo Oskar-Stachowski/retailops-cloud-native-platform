@@ -110,8 +110,11 @@ that expected Deployments, Services, Jobs and Ingresses exist, verifies probe an
 resource coverage for deployed workloads, and writes a local report under
 `ci-cd/reports/k8s/`.
 
-Apply only to a local `kind` or `minikube` cluster until workload manifests and
-smoke tests are added:
+For the full local operating procedure, see
+[`docs/runbooks/local-kubernetes-runbook.md`](../docs/runbooks/local-kubernetes-runbook.md).
+
+Apply only to a local `kind` or `minikube` cluster until production-like
+overlays, rollout policy and cluster evidence are added:
 
 ```bash
 kubectl apply -k k8s/overlays/dev
