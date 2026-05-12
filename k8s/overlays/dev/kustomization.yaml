@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: retailops
+
+resources:
+  - ../../base
+  - database/deployment.yaml
+  - database/service.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/part-of: retailops-platform
+    retailops.io/environment: dev
+
+configMapGenerator:
+  - name: retailops-db-config
+    literals:
+      - POSTGRES_DB=retailops
+      - POSTGRES_USER=retailops
+
+secretGenerator:
+  - name: retailops-runtime-secrets
+    literals:
+      - DATABASE_URL=postgresql://retailops:change-me@postgres:5432/retailops
+      - POSTGRES_PASSWORD=change-me

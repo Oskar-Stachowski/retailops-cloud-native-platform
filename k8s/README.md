@@ -15,11 +15,15 @@ Ingress, jobs, overlays, Helm charts and EKS deployment automation are not
 implemented yet. Current full-stack runtime validation still uses Docker
 Compose.
 
+The dev overlay adds an ephemeral PostgreSQL Deployment and ClusterIP Service
+for local `kind` or `minikube` validation. It uses placeholder credentials only
+and is not a production database pattern.
+
 ## Layout
 
 ```text
 k8s/
-`-- base/
+|-- base/
     |-- api/
     |   |-- deployment.yaml
     |   `-- service.yaml
@@ -32,6 +36,12 @@ k8s/
     |-- namespaces/
     |   `-- retailops.yaml
     `-- kustomization.yaml
+`-- overlays/
+    `-- dev/
+        |-- database/
+        |   |-- deployment.yaml
+        |   `-- service.yaml
+        `-- kustomization.yaml
 ```
 
 The frontend image currently uses the same Nginx config as Docker Compose. Full
@@ -46,11 +56,17 @@ Render the base manifests with Kustomize:
 kubectl kustomize k8s/base
 ```
 
+Render the local dev overlay with PostgreSQL:
+
+```bash
+kubectl kustomize k8s/overlays/dev
+```
+
 Apply only to a local `kind` or `minikube` cluster until workload manifests and
 smoke tests are added:
 
 ```bash
-kubectl apply -k k8s/base
+kubectl apply -k k8s/overlays/dev
 ```
 
 The `secret.example.yaml` file documents required secret keys, but it is not
