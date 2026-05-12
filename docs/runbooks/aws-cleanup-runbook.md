@@ -1,8 +1,8 @@
 # AWS Cleanup Runbook
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** FinOps / AWS Foundation  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** FinOps / AWS Foundation
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
 **Commit:** `docs(finops): add cost assumptions and cleanup strategy`
 
 ---
@@ -278,7 +278,7 @@ After a real AWS experiment:
 
 ## 12. Cleanup evidence template
 
-Use this template in `docs/evidence/sprint-10/` if needed.
+Use this template in `docs/evidence/aws/` if needed.
 
 ```markdown
 # AWS Cleanup Evidence — Sprint 10

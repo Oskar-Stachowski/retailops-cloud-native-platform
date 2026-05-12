@@ -27,7 +27,7 @@ function AdminContent({ statusCards, permissions, user }) {
   return (
     <main className="api-page">
       <section className="api-hero compact">
-        <p className="eyebrow">Sprint 7 · user, roles and notifications</p>
+        <p className="eyebrow">Platform administration</p>
         <h1>Admin</h1>
         <p>
           Admin view now combines platform health, selected demo identity and
@@ -109,7 +109,7 @@ function Admin() {
     return (
       <main className="api-page">
         <section className="api-hero compact">
-          <p className="eyebrow">Sprint 7</p>
+          <p className="eyebrow">Platform administration</p>
           <h1>Loading admin context</h1>
         </section>
       </main>

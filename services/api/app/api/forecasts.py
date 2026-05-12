@@ -9,7 +9,6 @@ from app.api.schemas import ForecastListResponse, ForecastResponse
 from app.domain.models import ForecastMethod, ForecastStatus
 from app.services.forecast_service import ForecastService
 
-
 router = APIRouter(prefix="/forecasts", tags=["forecasts"])
 forecast_service = ForecastService()
 
@@ -86,11 +85,11 @@ def list_forecasts(
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Forecast was not found.",
-        }
+        },
     },
 )
 def get_forecast(
-    forecast_id: Annotated[UUID, Path(description="Forecast technical identifier.")]
+    forecast_id: Annotated[UUID, Path(description="Forecast technical identifier.")],
 ) -> dict:
     forecast = forecast_service.get_forecast_detail_response(forecast_id)
 

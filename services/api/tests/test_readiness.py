@@ -5,7 +5,7 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_ready_endpoint_returns_200_when_database_is_available(monkeypatch):
+def test_ready_endpoint_returns_200_when_database_is_available(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.health.check_database_connection",
         lambda: True,
@@ -22,7 +22,7 @@ def test_ready_endpoint_returns_200_when_database_is_available(monkeypatch):
     assert body["database"] == "ok"
 
 
-def test_ready_endpoint_returns_503_when_database_is_unavailable(monkeypatch):
+def test_ready_endpoint_returns_503_when_database_is_unavailable(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.health.check_database_connection",
         lambda: False,

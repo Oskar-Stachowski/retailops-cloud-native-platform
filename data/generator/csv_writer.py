@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import csv
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 TABLE_COLUMNS: dict[str, list[str]] = {
     "products": [

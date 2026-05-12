@@ -178,7 +178,7 @@ function buildIdempotencyKey(entityType, entityId, action) {
 
 function workflowErrorMessage(error, entityType) {
   if (error?.status === 404) {
-    return `${formatTitle(entityType)} workflow endpoint or record was not found. Refresh Product 360 and verify the backend is running the current Sprint 10 API.`;
+    return `${formatTitle(entityType)} workflow endpoint or record was not found. Refresh Product 360 and verify the backend is running the current workflow API.`;
   }
 
   return error?.message || "Workflow action failed.";
@@ -395,7 +395,7 @@ export default function Product360() {
     <main className="api-page product-360-page">
       <header className="api-page__header product-360-header">
         <Link className="inline-link" to="/products">← Back to products</Link>
-        <p className="eyebrow">Sprint 6 · Product 360</p>
+        <p className="eyebrow">Product 360</p>
         <h1>{product.name}</h1>
         <p>
           SKU {product.sku} · {product.category || "No category"} · {product.brand || "No brand"}
@@ -416,7 +416,7 @@ export default function Product360() {
         <h2>Operational workflow boundary</h2>
         <p>
           Product-level alerts and recommendations can now be actioned through
-          Sprint 10 workflow write APIs. Access follows the selected demo user's
+          workflow write APIs. Access follows the selected demo user's
           workflow permissions.
         </p>
       </section>
@@ -495,7 +495,7 @@ export default function Product360() {
 
       <DataTable
         title="Alerts"
-        description="Operational alerts with Sprint 10 workflow actions."
+        description="Operational alerts with workflow actions."
         columns={alertWorkflowColumns}
         rows={state.data.alerts}
         emptyMessage="No alerts returned for this product."

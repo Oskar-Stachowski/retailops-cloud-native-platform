@@ -8,10 +8,7 @@ from data.generator.common import deterministic_uuid, money, utc_datetime
 def _warehouse_id_by_code(
     warehouses: list[dict[str, str]],
 ) -> dict[str, str]:
-    return {
-        warehouse["warehouse_code"]: warehouse["id"]
-        for warehouse in warehouses
-    }
+    return {warehouse["warehouse_code"]: warehouse["id"] for warehouse in warehouses}
 
 
 def generate_stock_movements(
@@ -22,7 +19,7 @@ def generate_stock_movements(
     warehouse_ids = _warehouse_id_by_code(warehouses)
     stock_movements: list[dict[str, str]] = []
 
-    for index, snapshot in enumerate(inventory_snapshots):
+    for snapshot in inventory_snapshots:
         warehouse_code = snapshot["warehouse_code"]
         natural_key = f"initial-{snapshot['product_id']}-{warehouse_code}"
         stock_movements.append(
@@ -37,7 +34,7 @@ def generate_stock_movements(
                 "source_reference": snapshot["id"],
                 "occurred_at": snapshot["recorded_at"],
                 "created_at": snapshot["created_at"],
-            }
+            },
         )
 
     warehouse_codes = list(warehouse_ids.keys())
@@ -56,7 +53,7 @@ def generate_stock_movements(
                 "source_reference": sale["order_reference"],
                 "occurred_at": sale["sold_at"],
                 "created_at": sale["sold_at"],
-            }
+            },
         )
 
     return stock_movements
@@ -94,7 +91,7 @@ def generate_returns(
                     days_offset=1 + index % 3,
                     hours_offset=index,
                 ),
-            }
+            },
         )
 
     return returns

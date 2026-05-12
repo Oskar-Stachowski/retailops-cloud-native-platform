@@ -9,10 +9,12 @@ from typing import Any
 
 from data.generator.common import deterministic_uuid
 from data.generator.main import (
-    DatasetGenerationConfig,
     SUPPORTED_PROFILES,
+    DatasetGenerationConfig,
     build_dataset,
 )
+
+ISO_DATE_LENGTH = 10
 
 SCHEMA_VERSION = "1.0"
 DEFAULT_SOURCE = "retailops.synthetic-generator"
@@ -53,10 +55,12 @@ def validate_event_generation_config(
     config: RealtimeEventGenerationConfig,
 ) -> None:
     if config.max_events is not None and config.max_events <= 0:
-        raise ValueError("max_events must be a positive integer.")
+        msg = "max_events must be a positive integer."
+        raise ValueError(msg)
 
     if not config.source:
-        raise ValueError("source must not be empty.")
+        msg = "source must not be empty."
+        raise ValueError(msg)
 
 
 def _event_id(seed: int, event_type: str, natural_key: str) -> str:
@@ -66,16 +70,16 @@ def _event_id(seed: int, event_type: str, natural_key: str) -> str:
     )
 
 
-def _scalar(value: Any) -> str:
+def _scalar(value: object) -> str:
     if isinstance(value, tuple):
         return str(value[0]) if value else ""
 
     return str(value)
 
 
-def _parse_datetime(value: Any) -> datetime:
+def _parse_datetime(value: object) -> datetime:
     normalized = _scalar(value).replace("Z", "+00:00")
-    if len(normalized) == 10:
+    if len(normalized) == ISO_DATE_LENGTH:
         normalized = f"{normalized}T00:00:00+00:00"
     return datetime.fromisoformat(normalized)
 
@@ -101,9 +105,7 @@ def _event(
 ) -> dict[str, Any]:
     normalized_occurred_at = _event_time(occurred_at)
     normalized_ingested_at = (
-        _event_time(ingested_at)
-        if ingested_at
-        else _plus_one_second(normalized_occurred_at)
+        _event_time(ingested_at) if ingested_at else _plus_one_second(normalized_occurred_at)
     )
 
     return {
@@ -143,10 +145,9 @@ def _find_order_item_for_sale(
 
     candidates = order_items_by_key.get((order["id"], sale["product_id"]), [])
     for candidate in candidates:
-        if (
-            candidate.get("quantity") == sale.get("quantity")
-            and candidate.get("total_amount") == sale.get("total_amount")
-        ):
+        if candidate.get("quantity") == sale.get("quantity") and candidate.get(
+            "total_amount",
+        ) == sale.get("total_amount"):
             return candidate
 
     return candidates[0] if candidates else {}
@@ -173,13 +174,10 @@ def _build_lookup_context(
     tables: dict[str, list[dict[str, str]]],
 ) -> dict[str, Any]:
     orders_by_id = _by_id(tables["orders"])
-    orders_by_reference = {
-        order["order_reference"]: order for order in tables["orders"]
-    }
+    orders_by_reference = {order["order_reference"]: order for order in tables["orders"]}
     stores_by_id = _by_id(tables["stores"])
     warehouses_by_code = {
-        warehouse["warehouse_code"]: warehouse
-        for warehouse in tables["warehouses"]
+        warehouse["warehouse_code"]: warehouse for warehouse in tables["warehouses"]
     }
     price_history_by_product: dict[str, list[dict[str, str]]] = {}
     for price_point in tables["price_history"]:
@@ -232,7 +230,7 @@ def _order_events(
                     "currency": order["currency"],
                     "status": order["status"],
                 },
-            )
+            ),
         )
 
     return events
@@ -289,14 +287,13 @@ def _sale_events(
                         "observed_sales",
                         sale["quantity"],
                     ),
-                    "stockout_flag": sale.get("stockout_flag", "false")
-                    == "true",
+                    "stockout_flag": sale.get("stockout_flag", "false") == "true",
                     "data_quality_status": sale.get(
                         "data_quality_status",
                         "valid",
                     ),
                 },
-            )
+            ),
         )
 
     return events
@@ -331,7 +328,7 @@ def _return_events(
                     "refund_amount": returned_item["refund_amount"],
                     "reason": returned_item["reason"],
                 },
-            )
+            ),
         )
 
     return events
@@ -366,7 +363,7 @@ def _inventory_events(
                     "unit_of_measure": snapshot["unit_of_measure"],
                     "recorded_at": snapshot["recorded_at"],
                 },
-            )
+            ),
         )
 
     for movement in tables["stock_movements"]:
@@ -405,7 +402,7 @@ def _inventory_events(
                 occurred_at=movement["occurred_at"],
                 ingested_at=movement.get("created_at"),
                 payload=payload,
-            )
+            ),
         )
 
     return events
@@ -440,7 +437,7 @@ def _pricing_events(
                     "effective_from": price_point["valid_from"],
                     "effective_to": price_point["valid_to"],
                 },
-            )
+            ),
         )
 
     for promotion in tables["promotions"]:
@@ -465,7 +462,7 @@ def _pricing_events(
                     "ends_at": promotion["ends_at"],
                     "expected_uplift": "",
                 },
-            )
+            ),
         )
         events.append(
             _event(
@@ -481,7 +478,7 @@ def _pricing_events(
                     "ended_at": promotion["ends_at"],
                     "post_promotion_effect": "",
                 },
-            )
+            ),
         )
 
     return events
@@ -512,7 +509,7 @@ def _intelligence_events(
                     "model_version": forecast["method"],
                     "confidence": forecast["confidence_level"],
                 },
-            )
+            ),
         )
 
     for anomaly in tables["anomalies"]:
@@ -534,7 +531,7 @@ def _intelligence_events(
                     "score": anomaly["deviation_percent"],
                     "description": anomaly["metric_name"],
                 },
-            )
+            ),
         )
 
     return events
@@ -566,7 +563,7 @@ def _operations_events(
                     "title": alert["title"],
                     "recommended_action": alert["recommended_action"],
                 },
-            )
+            ),
         )
 
     for action in tables["workflow_actions"]:
@@ -577,8 +574,7 @@ def _operations_events(
                 event_type="workflow_action_performed",
                 natural_key=action["id"],
                 correlation_id=action["alert_id"],
-                occurred_at=action.get("performed_at")
-                or action["created_at"],
+                occurred_at=action.get("performed_at") or action["created_at"],
                 ingested_at=action.get("created_at"),
                 payload={
                     "workflow_action_id": action["id"],
@@ -589,7 +585,7 @@ def _operations_events(
                     "new_status": action["new_status"],
                     "comment": action["comment"],
                 },
-            )
+            ),
         )
 
     return events
@@ -615,7 +611,7 @@ def build_realtime_events(
             event["occurred_at"],
             event["event_type"],
             event["event_id"],
-        )
+        ),
     )
 
     if config.max_events is not None:
@@ -631,9 +627,7 @@ def build_event_manifest(
     event_type_counts: dict[str, int] = {}
     topic_counts: dict[str, int] = {}
     for event in events:
-        event_type_counts[event["event_type"]] = (
-            event_type_counts.get(event["event_type"], 0) + 1
-        )
+        event_type_counts[event["event_type"]] = event_type_counts.get(event["event_type"], 0) + 1
         topic_counts[event["topic"]] = topic_counts.get(event["topic"], 0) + 1
 
     return {
@@ -693,7 +687,7 @@ def generate_realtime_event_dataset(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate RetailOps replayable real-time events as JSONL."
+        description="Generate RetailOps replayable real-time events as JSONL.",
     )
     parser.add_argument(
         "--profile",
@@ -772,14 +766,13 @@ def main() -> None:
     )
     manifest = generate_realtime_event_dataset(output_dir, config)
 
-    print(
-        "RetailOps real-time event replay generated "
-        f"for profile '{config.dataset.profile}':"
+    print(  # noqa: T201 - CLI output
+        f"RetailOps real-time event replay generated for profile '{config.dataset.profile}':",
     )
-    print(f"- events: {manifest['event_count']}")
+    print(f"- events: {manifest['event_count']}")  # noqa: T201 - CLI output
     for event_type, count in manifest["event_type_counts"].items():
-        print(f"- {event_type}: {count}")
-    print(f"\nOutput directory: {output_dir}")
+        print(f"- {event_type}: {count}")  # noqa: T201 - CLI output
+    print(f"\nOutput directory: {output_dir}")  # noqa: T201 - CLI output
 
 
 if __name__ == "__main__":

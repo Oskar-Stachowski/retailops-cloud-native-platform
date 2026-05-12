@@ -4,12 +4,14 @@ The service keeps FastAPI handlers thin and gives us one place for response
 normalization, small business defaults, and future observability hooks.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.repositories.dashboard_repository import DashboardRepository
 from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
 from app.services.serialization import make_json_safe
+
+LIVE_EVENT_FRESHNESS_SECONDS = 300
 
 
 class DashboardService:
@@ -37,7 +39,7 @@ class DashboardService:
             {
                 "items": [self._normalize_work_item(row) for row in rows],
                 "limit": safe_limit,
-            }
+            },
         )
 
     def get_top_recommendations(self, limit: int = 10) -> dict:
@@ -47,7 +49,7 @@ class DashboardService:
             {
                 "items": [self._normalize_work_item(row) for row in rows],
                 "limit": safe_limit,
-            }
+            },
         )
 
     def get_open_work_items(self, limit: int = 10) -> dict:
@@ -57,7 +59,7 @@ class DashboardService:
             {
                 "items": [self._normalize_work_item(row) for row in rows],
                 "limit": safe_limit,
-            }
+            },
         )
 
     def get_stock_risk_summary(self) -> dict:
@@ -74,7 +76,7 @@ class DashboardService:
 
         summary = self._normalize_summary(self.repository.get_summary())
         stock_risk_summary = self._normalize_stock_risk_summary(
-            self.repository.get_stock_risk_summary()
+            self.repository.get_stock_risk_summary(),
         )
         sales_trend = self.repository.get_sales_trend(days=safe_days)
         open_work_items = [
@@ -84,7 +86,7 @@ class DashboardService:
 
         return make_json_safe(
             {
-                "generated_at": datetime.now(timezone.utc),
+                "generated_at": datetime.now(UTC),
                 "summary": summary,
                 "stock_risk_summary": stock_risk_summary,
                 "sales_trend": sales_trend,
@@ -93,7 +95,7 @@ class DashboardService:
                     "sales_trend_days": safe_days,
                     "work_items_limit": safe_limit,
                 },
-            }
+            },
         )
 
     def get_live_operations(
@@ -106,45 +108,28 @@ class DashboardService:
         safe_recent_events_limit = min(max(recent_events_limit, 1), 100)
         safe_alerts_limit = min(max(alerts_limit, 1), 100)
 
-        metric_rows = self.realtime_repository.get_live_metric_totals(
-            window_minutes=safe_window
-        )
-        status_rows = self.realtime_repository.get_event_status_counts(
-            window_minutes=safe_window
-        )
+        metric_rows = self.realtime_repository.get_live_metric_totals(window_minutes=safe_window)
+        status_rows = self.realtime_repository.get_event_status_counts(window_minutes=safe_window)
         freshness = self.realtime_repository.get_event_freshness() or {}
-        recent_events = self.realtime_repository.get_recent_events(
-            limit=safe_recent_events_limit
-        )
-        alerts = self.realtime_repository.get_recent_operational_alerts(
-            limit=safe_alerts_limit
-        )
+        recent_events = self.realtime_repository.get_recent_events(limit=safe_recent_events_limit)
+        alerts = self.realtime_repository.get_recent_operational_alerts(limit=safe_alerts_limit)
         consumer_states = self.realtime_repository.get_consumer_states()
 
         return make_json_safe(
             {
-                "generated_at": datetime.now(timezone.utc),
+                "generated_at": datetime.now(UTC),
                 "window_minutes": safe_window,
                 "metrics": self._normalize_live_metrics(metric_rows),
-                "event_status_counts": self._normalize_event_status_counts(
-                    status_rows
-                ),
+                "event_status_counts": self._normalize_event_status_counts(status_rows),
                 "freshness": self._normalize_event_freshness(freshness),
-                "recent_events": [
-                    self._normalize_live_event(row) for row in recent_events
-                ],
-                "alerts": [
-                    self._normalize_live_alert(row) for row in alerts
-                ],
-                "consumer_states": [
-                    self._normalize_consumer_state(row)
-                    for row in consumer_states
-                ],
+                "recent_events": [self._normalize_live_event(row) for row in recent_events],
+                "alerts": [self._normalize_live_alert(row) for row in alerts],
+                "consumer_states": [self._normalize_consumer_state(row) for row in consumer_states],
                 "limits": {
                     "recent_events": safe_recent_events_limit,
                     "alerts": safe_alerts_limit,
                 },
-            }
+            },
         )
 
     def _normalize_summary(self, summary: dict[str, Any]) -> dict[str, Any]:
@@ -152,16 +137,12 @@ class DashboardService:
         return {
             "products_count": int(summary.get("products_count", 0)),
             "sales_count": int(summary.get("sales_count", 0)),
-            "inventory_snapshots_count": int(
-                summary.get("inventory_snapshots_count", 0)
-            ),
+            "inventory_snapshots_count": int(summary.get("inventory_snapshots_count", 0)),
             "forecasts_count": int(summary.get("forecasts_count", 0)),
             "anomalies_count": int(summary.get("anomalies_count", 0)),
             "recommendations_count": int(summary.get("recommendations_count", 0)),
             "open_anomalies_count": int(summary.get("open_anomalies_count", 0)),
-            "open_recommendations_count": int(
-                summary.get("open_recommendations_count", 0)
-            ),
+            "open_recommendations_count": int(summary.get("open_recommendations_count", 0)),
             "open_work_items_count": int(summary.get("open_work_items_count", 0)),
             "last_refresh_at": summary.get("last_refresh_at"),
         }
@@ -211,10 +192,7 @@ class DashboardService:
         self,
         rows: list[dict[str, Any]],
     ) -> dict[str, int]:
-        counts = {
-            str(row.get("status")): int(row.get("event_count") or 0)
-            for row in rows
-        }
+        counts = {str(row.get("status")): int(row.get("event_count") or 0) for row in rows}
         return {
             "received": counts.get("received", 0),
             "processed": counts.get("processed", 0),
@@ -232,13 +210,11 @@ class DashboardService:
         return {
             "latest_event_at": latest_event_at,
             "freshness_seconds": (
-                max(float(freshness_seconds), 0.0)
-                if freshness_seconds is not None
-                else None
+                max(float(freshness_seconds), 0.0) if freshness_seconds is not None else None
             ),
             "is_fresh": (
                 freshness_seconds is not None
-                and float(freshness_seconds) <= 300
+                and float(freshness_seconds) <= LIVE_EVENT_FRESHNESS_SECONDS
             ),
         }
 
@@ -277,9 +253,7 @@ class DashboardService:
             "failed_events": int(row.get("failed_events") or 0),
             "dead_lettered_events": int(row.get("dead_lettered_events") or 0),
             "ignored_events": int(row.get("ignored_events") or 0),
-            "last_event_id": (
-                str(row.get("last_event_id")) if row.get("last_event_id") else None
-            ),
+            "last_event_id": (str(row.get("last_event_id")) if row.get("last_event_id") else None),
             "last_event_type": row.get("last_event_type"),
             "last_error": row.get("last_error"),
             "last_processed_at": row.get("last_processed_at"),
@@ -290,15 +264,9 @@ class DashboardService:
 
     def _normalize_work_item(self, row: dict[str, Any]) -> dict[str, Any]:
         work_item_type = (
-            row.get("anomaly_type")
-            or row.get("recommendation_type")
-            or row.get("type")
+            row.get("anomaly_type") or row.get("recommendation_type") or row.get("type")
         )
-        description = (
-            row.get("description")
-            or row.get("message")
-            or row.get("reason")
-        )
+        description = row.get("description") or row.get("message") or row.get("reason")
 
         return {
             "id": str(row.get("id")),

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from data.generator.common import deterministic_uuid, money
-from data.generator.common import utc_datetime
+from data.generator.common import deterministic_uuid, money, utc_datetime
 from data.generator.products import product_by_sku
 from data.generator.users import user_by_role
 
@@ -110,7 +109,7 @@ def _assigned_to_user_id(
 
 def generate_incident_dataset(
     products: list[dict[str, str]],
-    forecasts: list[dict[str, str]],
+    forecasts: list[dict[str, str]],  # noqa: ARG001 - retained for dataset builder interface
     users: list[dict[str, str]],
 ) -> dict[str, list[dict[str, str]]]:
     anomalies: list[dict[str, str]] = []
@@ -120,7 +119,6 @@ def generate_incident_dataset(
 
     for index, scenario in enumerate(INCIDENT_SCENARIOS):
         product = product_by_sku(products, str(scenario["sku"]))
-        # forecast = forecast_by_product_id(forecasts, product["id"])
         actor = user_by_role(users, str(scenario["actor_role"]))
 
         anomaly_id = deterministic_uuid("anomaly", product["sku"])
@@ -146,7 +144,6 @@ def generate_incident_dataset(
             {
                 "id": anomaly_id,
                 "product_id": product["id"],
-                # "forecast_id": forecast["id"] if forecast else "",
                 "anomaly_type": str(scenario["anomaly_type"]),
                 "metric_name": str(scenario["metric_name"]),
                 "actual_value": money(actual_value),
@@ -170,8 +167,7 @@ def generate_incident_dataset(
                     days_offset=-index,
                     hours_offset=-3,
                 ),
-                # "status": "open",
-            }
+            },
         )
 
         alerts.append(
@@ -193,8 +189,7 @@ def generate_incident_dataset(
                     hours_offset=-2,
                 ),
                 "updated_at": utc_datetime(days_offset=+index),
-                # "description": f"Demo scenario for {product['name']}.",
-            }
+            },
         )
 
         recommendations.append(
@@ -205,30 +200,13 @@ def generate_incident_dataset(
                 "anomaly_id": anomaly_id,
                 "alert_id": alert_id,
                 "recommendation_type": str(scenario["recommendation_type"]),
-                "recommended_action": (
-                    f"Review {product['sku']} and take corrective action."
-                ),
+                "recommended_action": (f"Review {product['sku']} and take corrective action."),
                 "rationale": str(scenario["rationale"]),
                 "status": str(recommendation_status),
-                # "priority": str(scenario["severity"]),
-                # "recommended_action": (
-                #     f"Review {product['sku']} and take corrective action."
-                # ),
-                # "expected_impact": (
-                #     "Improve operational response time for the affected "
-                #     "product."
-                # ),
-                # "confidence_score": confidence(0.80 - index * 0.04),
                 "generated_at": recommendation_date,
                 "expires_at": None,
                 "created_at": recommendation_date,
-                # "accepted_at": utc_datetime(
-                #     days_offset=-index,
-                #     hours_offset=1,
-                # )
-                # if recommendation_status == "accepted"
-                # else "",
-            }
+            },
         )
 
         workflow_actions.append(
@@ -245,7 +223,7 @@ def generate_incident_dataset(
                     days_offset=-index,
                     hours_offset=2,
                 ),
-            }
+            },
         )
 
     return {

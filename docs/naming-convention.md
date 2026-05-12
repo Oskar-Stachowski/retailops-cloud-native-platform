@@ -1,8 +1,8 @@
 # RetailOps AWS Naming Convention
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Infrastructure / AWS Foundation  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** Infrastructure / AWS Foundation
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
 **Commit:** `docs(infra): add AWS naming and tagging standards`
 
 ---

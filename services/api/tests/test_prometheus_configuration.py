@@ -1,9 +1,6 @@
 from pathlib import Path
 
-
-PROMETHEUS_CONFIG_PATH = (
-    Path(__file__).resolve().parents[3] / "observability" / "prometheus.yml"
-)
+PROMETHEUS_CONFIG_PATH = Path(__file__).resolve().parents[3] / "observability" / "prometheus.yml"
 
 
 def test_prometheus_config_scrapes_api_metrics_endpoint() -> None:

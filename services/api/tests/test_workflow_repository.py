@@ -1,52 +1,53 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Self
 from uuid import uuid4
 
 from app.repositories.workflow_repository import WorkflowRepository
 
 
 class FakeCursor:
-    def __init__(self, fetchone_results):
+    def __init__(self, fetchone_results) -> None:
         self.fetchone_results = list(fetchone_results)
         self.executed = []
 
-    def execute(self, query, params=None):
+    def execute(self, query, params=None) -> None:
         self.executed.append((str(query), params))
 
     def fetchone(self):
         return self.fetchone_results.pop(0)
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type, exc, tb) -> bool:
         return False
 
 
 class FakeConnection:
-    def __init__(self, cursor):
+    def __init__(self, cursor) -> None:
         self.cursor_obj = cursor
         self.committed = False
 
     def cursor(self, *args, **kwargs):
         return self.cursor_obj
 
-    def commit(self):
+    def commit(self) -> None:
         self.committed = True
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type, exc, tb) -> bool:
         return False
 
 
 def test_recommendation_workflow_action_uses_native_audit_log_when_alert_linked(
     monkeypatch,
-):
+) -> None:
     recommendation_id = uuid4()
     alert_id = uuid4()
     actor_id = uuid4()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     recommendation_row = {
         "id": recommendation_id,
         "product_id": uuid4(),

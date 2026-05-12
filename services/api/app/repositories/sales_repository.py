@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
 
 from psycopg.rows import dict_row
@@ -11,7 +11,7 @@ from app.domain.models import Sale
 class SalesRepository:
     """PostgreSQL-backed read repository for product-level sales data."""
 
-    SORT_COLUMNS = {
+    SORT_COLUMNS: ClassVar[dict[str, str]] = {
         "sold_at": "sold_at",
         "created_at": "created_at",
         "quantity": "quantity",
@@ -20,7 +20,7 @@ class SalesRepository:
         "channel": "channel",
     }
 
-    def __init__(self, connection=None):
+    def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -126,7 +126,7 @@ class SalesRepository:
             ORDER BY {sort_column} {direction}, id ASC
             LIMIT %s OFFSET %s;
         """
-        rows = self._fetch_all(query, tuple(params + [limit, offset]))
+        rows = self._fetch_all(query, (*params, limit, offset))
         return [self._map_row_to_sale(row) for row in rows]
 
     def count_sales(
@@ -144,7 +144,7 @@ class SalesRepository:
             sold_from=sold_from,
             sold_to=sold_to,
         )
-        query = f"SELECT COUNT(*) AS total FROM sales {where_clause};"
+        query = f"SELECT COUNT(*) AS total FROM sales {where_clause};"  # noqa: S608 - where clause is built from fixed filters
         row = self._fetch_one(query, tuple(params))
         return int(row["total"]) if row else 0
 

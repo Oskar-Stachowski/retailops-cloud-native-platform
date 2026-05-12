@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import UUID
 
 from app.domain.models import (
@@ -13,7 +13,6 @@ from app.services.forecast_service import (
     ForecastService,
 )
 
-
 PRODUCT_WITH_FORECAST_ID = UUID("85710dbe-1aea-50ac-a155-fb216e12ab97")
 PRODUCT_WITHOUT_FORECAST_ID = UUID("a24a7f85-d830-55e5-90e4-afb122abd0ce")
 
@@ -26,7 +25,7 @@ def make_test_forecast() -> Forecast:
         forecast_period_end=date(2026, 5, 7),
         predicted_quantity=120.5,
         unit_of_measure=UnitOfMeasure.pcs,
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
         method=ForecastMethod.seeded_demo,
         status=ForecastStatus.generated,
         confidence_level=0.85,
@@ -34,7 +33,7 @@ def make_test_forecast() -> Forecast:
 
 
 class FakeForecastRepository:
-    def __init__(self):
+    def __init__(self) -> None:
         self.forecast = make_test_forecast()
         self.requested_product_id_for_list = None
         self.requested_product_id_for_latest = None
@@ -62,7 +61,7 @@ class FakeForecastRepository:
         return None
 
 
-def test_forecast_service_lists_forecasts_for_product():
+def test_forecast_service_lists_forecasts_for_product() -> None:
     repository = FakeForecastRepository()
     service = ForecastService(repository)
 
@@ -73,7 +72,7 @@ def test_forecast_service_lists_forecasts_for_product():
     assert repository.requested_product_id_for_list == PRODUCT_WITH_FORECAST_ID
 
 
-def test_forecast_service_returns_empty_list_when_product_has_no_forecasts():
+def test_forecast_service_returns_empty_list_when_product_has_no_forecasts() -> None:
     repository = FakeForecastRepository()
     service = ForecastService(repository)
 
@@ -83,7 +82,7 @@ def test_forecast_service_returns_empty_list_when_product_has_no_forecasts():
     assert repository.requested_product_id_for_list == PRODUCT_WITHOUT_FORECAST_ID
 
 
-def test_forecast_service_gets_latest_forecast_for_product():
+def test_forecast_service_gets_latest_forecast_for_product() -> None:
     repository = FakeForecastRepository()
     service = ForecastService(repository)
 
@@ -93,37 +92,29 @@ def test_forecast_service_gets_latest_forecast_for_product():
     assert repository.requested_product_id_for_latest == PRODUCT_WITH_FORECAST_ID
 
 
-def test_forecast_service_returns_none_when_latest_forecast_is_missing():
+def test_forecast_service_returns_none_when_latest_forecast_is_missing() -> None:
     repository = FakeForecastRepository()
     service = ForecastService(repository)
 
-    forecast = service.get_latest_forecast_for_product(
-        PRODUCT_WITHOUT_FORECAST_ID
-    )
+    forecast = service.get_latest_forecast_for_product(PRODUCT_WITHOUT_FORECAST_ID)
 
     assert forecast is None
-    assert repository.requested_product_id_for_latest == (
-        PRODUCT_WITHOUT_FORECAST_ID
-    )
+    assert repository.requested_product_id_for_latest == (PRODUCT_WITHOUT_FORECAST_ID)
 
 
-def test_forecast_service_returns_available_when_forecast_exists():
+def test_forecast_service_returns_available_when_forecast_exists() -> None:
     repository = FakeForecastRepository()
     service = ForecastService(repository)
 
-    availability = service.get_forecast_availability_for_product(
-        PRODUCT_WITH_FORECAST_ID
-    )
+    availability = service.get_forecast_availability_for_product(PRODUCT_WITH_FORECAST_ID)
 
     assert availability == FORECAST_AVAILABLE
 
 
-def test_forecast_service_returns_missing_when_forecast_does_not_exist():
+def test_forecast_service_returns_missing_when_forecast_does_not_exist() -> None:
     repository = FakeForecastRepository()
     service = ForecastService(repository)
 
-    availability = service.get_forecast_availability_for_product(
-        PRODUCT_WITHOUT_FORECAST_ID
-    )
+    availability = service.get_forecast_availability_for_product(PRODUCT_WITHOUT_FORECAST_ID)
 
     assert availability == FORECAST_MISSING

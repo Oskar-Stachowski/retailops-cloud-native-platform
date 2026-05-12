@@ -1,8 +1,8 @@
 # IAM Baseline and Delivery Access Model
 
-**Project:** RetailOps — Cloud-Native AI Platform  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
-**Commit:** 7 — `docs(security): document IAM and delivery access model`  
+**Project:** RetailOps — Cloud-Native AI Platform
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
+**Commit:** 7 — `docs(security): document IAM and delivery access model`
 **Scope:** Documentation / decision / evidence
 
 ---
@@ -98,19 +98,19 @@ The IAM baseline follows the principle of least privilege, but the project treat
 
 Current assumptions:
 
-1. **Terraform plan is not Terraform apply.**  
+1. **Terraform plan is not Terraform apply.**
    Plan requires discovery/read-only permissions. Apply requires create/update/delete permissions and must be handled separately.
 
-2. **Read-only discovery can require broad resource scope.**  
+2. **Read-only discovery can require broad resource scope.**
    Some AWS `Describe`, `List`, and `Get` operations do not support practical resource-level scoping. For those actions, `Resource = "*"` can be acceptable when the policy contains only read-only actions.
 
-3. **No long-lived IAM users or access keys.**  
+3. **No long-lived IAM users or access keys.**
    Delivery systems should use role assumption patterns such as OIDC or controlled role chaining rather than committed or manually managed static credentials.
 
-4. **No `AdministratorAccess` baseline.**  
+4. **No `AdministratorAccess` baseline.**
    Administrator permissions should not be used as a default delivery shortcut.
 
-5. **Apply/deploy access requires a separate decision.**  
+5. **Apply/deploy access requires a separate decision.**
    A future apply role should be reviewed separately because it has a higher blast radius than a plan-only role.
 
 ---

@@ -1,10 +1,10 @@
 # User Groups and Decision Needs
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Business & Product  
-**Phase:** Phase 1 — Foundation / MVP  
-**Primary artifact:** `docs/user-groups.md`  
-**Related artifact:** `docs/workflows.md`  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** Business & Product
+**Phase:** Phase 1 — Foundation / MVP
+**Primary artifact:** `docs/user-groups.md`
+**Related artifact:** `docs/workflows.md`
 
 ---
 

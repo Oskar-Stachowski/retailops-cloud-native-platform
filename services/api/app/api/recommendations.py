@@ -1,3 +1,4 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Body, HTTPException, Query, status
@@ -7,9 +8,11 @@ from app.auth.roles import PERMISSION_WORKFLOW_WRITE, get_demo_user, require_per
 from app.domain.workflow import WorkflowActionName, WorkflowTransitionError
 from app.services.workflow_service import WorkflowNotFoundError, WorkflowService
 
-
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 workflow_service = WorkflowService()
+OptionalWorkflowBody = Annotated[WorkflowMutationRequest | None, Body()]
+RequiredWorkflowBody = Annotated[WorkflowMutationRequest, Body()]
+DemoUserQuery = Annotated[str | None, Query(description="Local demo user id.")]
 
 
 def _apply_recommendation_action(
@@ -61,9 +64,9 @@ def _apply_recommendation_action(
 )
 def accept_recommendation(
     recommendation_id: UUID,
-    request: WorkflowMutationRequest | None = Body(default=None),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: OptionalWorkflowBody = None,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_recommendation_action(
         recommendation_id=recommendation_id,
         action=WorkflowActionName.accept,
@@ -81,9 +84,9 @@ def accept_recommendation(
 )
 def reject_recommendation(
     recommendation_id: UUID,
-    request: WorkflowMutationRequest = Body(...),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: RequiredWorkflowBody,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_recommendation_action(
         recommendation_id=recommendation_id,
         action=WorkflowActionName.reject,
@@ -101,9 +104,9 @@ def reject_recommendation(
 )
 def assign_recommendation(
     recommendation_id: UUID,
-    request: WorkflowMutationRequest = Body(...),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: RequiredWorkflowBody,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     if not request.assigned_to_user_id:
         raise HTTPException(
             status_code=422,
@@ -130,9 +133,9 @@ def assign_recommendation(
 )
 def resolve_recommendation(
     recommendation_id: UUID,
-    request: WorkflowMutationRequest | None = Body(default=None),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: OptionalWorkflowBody = None,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_recommendation_action(
         recommendation_id=recommendation_id,
         action=WorkflowActionName.resolve,
@@ -150,9 +153,9 @@ def resolve_recommendation(
 )
 def dismiss_recommendation(
     recommendation_id: UUID,
-    request: WorkflowMutationRequest = Body(...),
-    user_id: str | None = Query(default=None, description="Local demo user id."),
-):
+    request: RequiredWorkflowBody,
+    user_id: DemoUserQuery = None,
+) -> dict[str, object]:
     return _apply_recommendation_action(
         recommendation_id=recommendation_id,
         action=WorkflowActionName.dismiss,

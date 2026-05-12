@@ -3,11 +3,10 @@ import pytest
 from app.repositories.analytics_repository import AnalyticsRepository
 from app.repositories.dashboard_repository import DashboardRepository
 
-
 pytestmark = pytest.mark.integration_db
 
 
-def test_dashboard_repository_reads_summary_from_database():
+def test_dashboard_repository_reads_summary_from_database() -> None:
     repository = DashboardRepository()
 
     summary = repository.get_summary()
@@ -34,7 +33,7 @@ def test_dashboard_repository_reads_summary_from_database():
     assert isinstance(summary["open_work_items_count"], int)
 
 
-def test_dashboard_repository_reads_sales_trend_from_database():
+def test_dashboard_repository_reads_sales_trend_from_database() -> None:
     repository = DashboardRepository()
 
     trend = repository.get_sales_trend(days=14)
@@ -47,7 +46,7 @@ def test_dashboard_repository_reads_sales_trend_from_database():
         assert "revenue" in trend[0]
 
 
-def test_dashboard_repository_reads_open_alerts_from_database():
+def test_dashboard_repository_reads_open_alerts_from_database() -> None:
     repository = DashboardRepository()
 
     items = repository.get_open_alerts(limit=10)
@@ -60,7 +59,7 @@ def test_dashboard_repository_reads_open_alerts_from_database():
         assert items[0]["source"] == "anomaly"
 
 
-def test_dashboard_repository_reads_top_recommendations_from_database():
+def test_dashboard_repository_reads_top_recommendations_from_database() -> None:
     repository = DashboardRepository()
 
     items = repository.get_top_recommendations(limit=10)
@@ -73,7 +72,7 @@ def test_dashboard_repository_reads_top_recommendations_from_database():
         assert items[0]["source"] == "recommendation"
 
 
-def test_dashboard_repository_reads_open_work_items_from_database():
+def test_dashboard_repository_reads_open_work_items_from_database() -> None:
     repository = DashboardRepository()
 
     items = repository.get_open_work_items(limit=10)
@@ -86,7 +85,7 @@ def test_dashboard_repository_reads_open_work_items_from_database():
         assert items[0]["source"] in {"anomaly", "recommendation"}
 
 
-def test_dashboard_repository_reads_stock_risk_summary_from_database():
+def test_dashboard_repository_reads_stock_risk_summary_from_database() -> None:
     repository = DashboardRepository()
 
     summary = repository.get_stock_risk_summary()
@@ -104,7 +103,7 @@ def test_dashboard_repository_reads_stock_risk_summary_from_database():
     assert isinstance(summary["unknown_count"], int)
 
 
-def test_analytics_repository_reads_inventory_risk_from_database():
+def test_analytics_repository_reads_inventory_risk_from_database() -> None:
     repository = AnalyticsRepository()
 
     items = repository.get_inventory_risk(limit=10)

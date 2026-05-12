@@ -169,7 +169,7 @@ function workflowErrorMessage(error, item) {
   if (error?.status === 404 && item.queueType === "recommendation") {
     return (
       "Recommendation workflow endpoint or record was not found. Restart the " +
-      "FastAPI backend with the Sprint 10 workflow routes and refresh the queue."
+      "FastAPI backend with the current workflow routes and refresh the queue."
     );
   }
 
@@ -349,7 +349,7 @@ export default function ActionQueue() {
     <main className="api-page action-queue-page">
       <header className="api-page__header action-queue-header">
         <div>
-          <p className="eyebrow">Sprint 10 workflow operations</p>
+          <p className="eyebrow">Workflow operations</p>
           <h1>Action queue</h1>
           <p>
             Open alerts and recommendations are grouped into one operator queue
@@ -409,7 +409,7 @@ export default function ActionQueue() {
         <header className="table-card__header">
           <h2>Pending decisions</h2>
           <p>
-            Actions are sent to Sprint 10 workflow write endpoints using the
+            Actions are sent to workflow write endpoints using the
             selected demo user.
           </p>
         </header>

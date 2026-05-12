@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,17 +13,16 @@ from data.generator.locations import generate_stores, generate_warehouses
 from data.generator.manifest import write_dataset_manifest
 from data.generator.orders import generate_order_items, generate_orders
 from data.generator.pricing import generate_price_history, generate_promotions
+from data.generator.products import generate_products
 from data.generator.profile_engine import (
     build_profile_dataset,
     profile_defaults,
 )
 from data.generator.quality import write_quality_report
-from data.generator.products import generate_products
+from data.generator.realism_report import write_realism_report
 from data.generator.sales import generate_sales
 from data.generator.stock import generate_returns, generate_stock_movements
 from data.generator.users import generate_users
-from data.generator.realism_report import write_realism_report
-
 
 SUPPORTED_PROFILES = ("demo", "small", "medium", "large")
 
@@ -91,9 +91,9 @@ def default_output_dir_for_profile(profile: str) -> Path:
 def validate_generation_config(config: DatasetGenerationConfig) -> None:
     if config.profile not in SUPPORTED_PROFILES:
         supported = ", ".join(SUPPORTED_PROFILES)
+        msg = f"Unsupported dataset profile '{config.profile}'. Supported profiles: {supported}."
         raise ValueError(
-            f"Unsupported dataset profile '{config.profile}'. "
-            f"Supported profiles: {supported}."
+            msg,
         )
 
     numeric_options = {
@@ -104,16 +104,40 @@ def validate_generation_config(config: DatasetGenerationConfig) -> None:
         "seed": config.seed,
     }
     invalid_options = [
-        name
-        for name, value in numeric_options.items()
-        if value is not None and value <= 0
+        name for name, value in numeric_options.items() if value is not None and value <= 0
     ]
 
     if invalid_options:
         raise ValueError(
-            "Dataset generation options must be positive integers: "
-            + ", ".join(invalid_options)
+            "Dataset generation options must be positive integers: " + ", ".join(invalid_options),
         )
+
+
+def warn_if_demo_ignores_sizing_options(config: DatasetGenerationConfig) -> None:
+    if config.profile != "demo":
+        return
+
+    ignored_options = [
+        name
+        for name, value in {
+            "days": config.days,
+            "products": config.products,
+            "stores": config.stores,
+            "warehouses": config.warehouses,
+        }.items()
+        if value is not None
+    ]
+
+    if not ignored_options:
+        return
+
+    ignored = ", ".join(f"--{name}" for name in ignored_options)
+    print(  # noqa: T201 - CLI warning output
+        "Warning: the demo profile is fixed-size. "
+        f"Ignoring sizing option(s): {ignored}. "
+        "Use --profile small, medium, or large for bounded sizing overrides.",
+        file=sys.stderr,
+    )
 
 
 def build_dataset(
@@ -156,9 +180,7 @@ def generate_demo_dataset(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Generate RetailOps synthetic CSV dataset."
-    )
+    parser = argparse.ArgumentParser(description="Generate RetailOps synthetic CSV dataset.")
     parser.add_argument(
         "--profile",
         choices=SUPPORTED_PROFILES,
@@ -215,16 +237,17 @@ def config_from_args(args: argparse.Namespace) -> DatasetGenerationConfig:
 def main() -> None:
     args = parse_args()
     config = config_from_args(args)
+    warn_if_demo_ignores_sizing_options(config)
 
     counts = generate_demo_dataset(args.output_dir, config)
     output_dir = args.output_dir or default_output_dir_for_profile(
         config.profile,
     )
 
-    print(f"RetailOps CSV dataset generated for profile '{config.profile}':")
+    print(f"RetailOps CSV dataset generated for profile '{config.profile}':")  # noqa: T201 - CLI output
     for table_name in CSV_WRITE_ORDER:
-        print(f"- {table_name}: {counts[table_name]}")
-    print(f"\nOutput directory: {output_dir}")
+        print(f"- {table_name}: {counts[table_name]}")  # noqa: T201 - CLI output
+    print(f"\nOutput directory: {output_dir}")  # noqa: T201 - CLI output
 
 
 if __name__ == "__main__":

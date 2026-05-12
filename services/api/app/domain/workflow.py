@@ -117,7 +117,7 @@ ALERT_TRANSITIONS: frozenset[WorkflowTransition] = frozenset(
             "dismissed",
             "open",
         ),
-    }
+    },
 )
 
 
@@ -167,13 +167,11 @@ RECOMMENDATION_TRANSITIONS: frozenset[WorkflowTransition] = frozenset(
             "rejected",
             "proposed",
         ),
-    }
+    },
 )
 
 
-WORKFLOW_TRANSITIONS: frozenset[WorkflowTransition] = (
-    ALERT_TRANSITIONS | RECOMMENDATION_TRANSITIONS
-)
+WORKFLOW_TRANSITIONS: frozenset[WorkflowTransition] = ALERT_TRANSITIONS | RECOMMENDATION_TRANSITIONS
 
 COMMENT_ACTIONS = frozenset({WorkflowActionName.comment})
 
@@ -210,9 +208,8 @@ def validate_workflow_transition(
 
     if normalized_action in COMMENT_ACTIONS:
         if normalized_previous_status != normalized_new_status:
-            raise WorkflowTransitionError(
-                "Comment actions must not change workflow status."
-            )
+            msg = "Comment actions must not change workflow status."
+            raise WorkflowTransitionError(msg)
         return None
 
     for transition in get_allowed_transitions(normalized_entity_type):
@@ -222,15 +219,19 @@ def validate_workflow_transition(
             and transition.new_status == normalized_new_status
         ):
             if transition.requires_comment and not comment:
+                msg = f"Comment is required for {normalized_action.value} actions."
                 raise WorkflowTransitionError(
-                    f"Comment is required for {normalized_action.value} actions."
+                    msg,
                 )
             return transition
 
-    raise WorkflowTransitionError(
+    msg = (
         "Workflow transition is not allowed: "
         f"{normalized_entity_type.value} {normalized_action.value} "
         f"{normalized_previous_status} -> {normalized_new_status}."
+    )
+    raise WorkflowTransitionError(
+        msg,
     )
 
 

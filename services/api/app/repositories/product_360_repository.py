@@ -9,7 +9,6 @@ from uuid import UUID
 
 from app.db.connection import fetch_all, fetch_one
 
-
 OPEN_ALERT_STATUSES = ("open", "acknowledged", "in_progress")
 OPEN_RECOMMENDATION_STATUSES = ("proposed", "accepted")
 

@@ -9,7 +9,6 @@ from app.api.schemas import InventorySnapshotListResponse, InventorySnapshotResp
 from app.domain.models import UnitOfMeasure
 from app.services.inventory_service import InventoryService
 
-
 router = APIRouter(prefix="/inventory-snapshots", tags=["inventory"])
 inventory_service = InventoryService()
 
@@ -86,17 +85,17 @@ def list_inventory_snapshots(
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Inventory snapshot was not found.",
-        }
+        },
     },
 )
 def get_inventory_snapshot(
     inventory_snapshot_id: Annotated[
         UUID,
         Path(description="Inventory snapshot technical identifier."),
-    ]
+    ],
 ) -> dict:
     inventory_snapshot = inventory_service.get_inventory_snapshot_detail_response(
-        inventory_snapshot_id
+        inventory_snapshot_id,
     )
 
     if inventory_snapshot is None:

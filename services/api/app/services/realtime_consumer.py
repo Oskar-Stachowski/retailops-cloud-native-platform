@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 
-from app.core.config import Settings, settings as default_settings
+from app.core.config import Settings
+from app.core.config import settings as default_settings
 from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
-
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ SUPPORTED_EVENT_TYPES = frozenset(
         "anomaly_detected",
         "alert_created",
         "workflow_action_performed",
-    }
+    },
 )
 
 REQUIRED_EVENT_FIELDS = (
@@ -74,7 +74,7 @@ class RealtimeEventEnvelope:
     payload: dict[str, Any]
 
     @classmethod
-    def from_dict(cls, event: dict[str, Any]) -> "RealtimeEventEnvelope":
+    def from_dict(cls, event: dict[str, Any]) -> RealtimeEventEnvelope:
         missing = [
             field_name
             for field_name in REQUIRED_EVENT_FIELDS
@@ -82,17 +82,18 @@ class RealtimeEventEnvelope:
         ]
 
         if missing:
-            raise ValueError(
-                f"Missing required event fields: {', '.join(missing)}"
-            )
+            msg = f"Missing required event fields: {', '.join(missing)}"
+            raise ValueError(msg)
 
         event_type = str(event["event_type"])
         if event_type not in SUPPORTED_EVENT_TYPES:
-            raise ValueError(f"Unsupported event type: {event_type}")
+            msg = f"Unsupported event type: {event_type}"
+            raise ValueError(msg)
 
         payload = event["payload"]
         if not isinstance(payload, dict):
-            raise ValueError("payload must be a JSON object")
+            msg = "payload must be a JSON object"
+            raise TypeError(msg)
 
         return cls(
             event_id=str(event["event_id"]),
@@ -133,16 +134,10 @@ class RealtimeConsumerState:
             "last_event_type": self.last_event_type,
             "last_error": self.last_error,
             "last_processed_at": (
-                self.last_processed_at.isoformat()
-                if self.last_processed_at
-                else None
+                self.last_processed_at.isoformat() if self.last_processed_at else None
             ),
-            "started_at": (
-                self.started_at.isoformat() if self.started_at else None
-            ),
-            "stopped_at": (
-                self.stopped_at.isoformat() if self.stopped_at else None
-            ),
+            "started_at": (self.started_at.isoformat() if self.started_at else None),
+            "stopped_at": (self.stopped_at.isoformat() if self.stopped_at else None),
         }
 
 
@@ -152,9 +147,7 @@ def build_default_event_handlers() -> dict[str, EventHandler]:
 
 
 def _noop_handler(event: dict[str, Any]) -> None:
-    logger.debug(
-        "Skipping event type %s for consumer skeleton", event.get("event_type")
-    )
+    logger.debug("Skipping event type %s for consumer skeleton", event.get("event_type"))
 
 
 class RealtimeEventConsumer:
@@ -181,11 +174,11 @@ class RealtimeEventConsumer:
 
     def start(self) -> None:
         self.state.running = True
-        self.state.started_at = datetime.now(timezone.utc)
+        self.state.started_at = datetime.now(UTC)
 
     def stop(self) -> None:
         self.state.running = False
-        self.state.stopped_at = datetime.now(timezone.utc)
+        self.state.stopped_at = datetime.now(UTC)
 
     def register_handler(self, event_type: str, handler: EventHandler) -> None:
         self.handlers[event_type] = handler
@@ -229,7 +222,8 @@ class RealtimeEventConsumer:
             handler = self.handlers.get(envelope.event_type)
 
             if handler is None:
-                raise ValueError(f"No handler registered for {envelope.event_type}")
+                msg = f"No handler registered for {envelope.event_type}"
+                raise ValueError(msg)
 
             handler(event)
             observations = self._build_metric_observations(envelope)
@@ -237,7 +231,7 @@ class RealtimeEventConsumer:
                 event_id=envelope.event_id,
                 observations=observations,
             )
-            processed_at = datetime.now(timezone.utc)
+            processed_at = datetime.now(UTC)
             self.repository.record_event_log(
                 event_id=envelope.event_id,
                 event_type=envelope.event_type,
@@ -292,10 +286,10 @@ class RealtimeEventConsumer:
                     )
                     topic = self._resolve_topic(raw_event_type)
                     occurred_at = self._parse_datetime(
-                        event.get("occurred_at") if isinstance(event, dict) else None
+                        event.get("occurred_at") if isinstance(event, dict) else None,
                     )
                     ingested_at = self._parse_datetime(
-                        event.get("ingested_at") if isinstance(event, dict) else None
+                        event.get("ingested_at") if isinstance(event, dict) else None,
                     )
                     payload = (
                         event.get("payload")
@@ -370,9 +364,7 @@ class RealtimeEventConsumer:
         if event_type == "sale_completed":
             quantity = self._decimal(payload.get("quantity", 0))
             unit_price = self._decimal(payload.get("unit_price", 0))
-            total_amount = self._decimal(
-                payload.get("total_amount", quantity * unit_price)
-            )
+            total_amount = self._decimal(payload.get("total_amount", quantity * unit_price))
             return self._metrics(
                 event_type,
                 observed_at,
@@ -544,17 +536,17 @@ class RealtimeEventConsumer:
 
         return "|".join(parts) if parts else None
 
-    def _parse_datetime(self, value: Any) -> datetime:
+    def _parse_datetime(self, value: object) -> datetime:
         if isinstance(value, datetime):
-            return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+            return value if value.tzinfo else value.replace(tzinfo=UTC)
 
         if value in (None, ""):
-            return datetime.now(timezone.utc)
+            return datetime.now(UTC)
 
         normalized = str(value).replace("Z", "+00:00")
         return datetime.fromisoformat(normalized)
 
-    def _decimal(self, value: Any) -> Decimal:
+    def _decimal(self, value: object) -> Decimal:
         if isinstance(value, Decimal):
             return value
 

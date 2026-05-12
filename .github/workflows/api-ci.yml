@@ -5,12 +5,17 @@ on:
     paths:
       - "services/api/**"
       - "data/**"
+      - "pyproject.toml"
       - ".github/workflows/api-ci.yml"
   pull_request:
     paths:
       - "services/api/**"
       - "data/**"
+      - "pyproject.toml"
       - ".github/workflows/api-ci.yml"
+
+permissions:
+  contents: read
 
 jobs:
   api-integration-tests:
@@ -50,23 +55,48 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-          cache-dependency-path: services/api/requirements.txt
+          cache-dependency-path: |
+            services/api/requirements.txt
+            services/api/requirements-dev.txt
 
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-dev.txt
+
+      - name: Run Ruff checks
+        working-directory: .
+        run: |
+          ruff check services/api data --config pyproject.toml
+          ruff format --check services/api data --config pyproject.toml
 
       - name: Generate demo CSV dataset
         run: python -m data.generator.main
         working-directory: .
 
       - name: Run database migrations
+        env:
+          PYTHONPATH: ""
         run: alembic upgrade head
 
       - name: Seed demo data
         run: python scripts/seed_demo_data.py
 
       - name: Run API tests
-        run: pytest
+        run: |
+          mkdir -p ../../ci-cd/reports/api
+          rm -f .coverage .coverage.*
+          pytest \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-branch \
+            --cov-report=xml:../../ci-cd/reports/api/coverage.xml
+
+      - name: Upload API coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage-evidence
+          path: ci-cd/reports/api/coverage.xml
+          if-no-files-found: warn
 
   api-image-build:
     name: API Docker image build

@@ -1,11 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.health import router as health_router
-from app.api.errors import register_exception_handlers
-from app.core.correlation import CorrelationIdMiddleware
-from app.core.config import settings
-from app.core.logging import configure_logging
 from app.api import (
     alerts,
     analytics,
@@ -21,6 +16,11 @@ from app.api import (
     sales,
     stock_risks,
 )
+from app.api.errors import register_exception_handlers
+from app.api.health import router as health_router
+from app.core.config import settings
+from app.core.correlation import CorrelationIdMiddleware
+from app.core.logging import configure_logging
 from app.services.realtime_consumer import build_realtime_event_consumer
 
 configure_logging()

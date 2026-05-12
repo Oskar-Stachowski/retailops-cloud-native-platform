@@ -11,7 +11,6 @@ from psycopg import sql
 from app.db.connection import fetch_all, fetch_one
 from app.db.introspection import count_rows, get_columns, pick_column, table_exists
 
-
 OPEN_STATUSES = (
     "new",
     "open",
@@ -96,7 +95,7 @@ class DashboardRepository:
             WHERE {date_column} >= CURRENT_DATE - (%s::int * INTERVAL '1 day')
             GROUP BY DATE({date_column})
             ORDER BY DATE({date_column}) ASC
-            """
+            """,
         ).format(
             date_column=sql.Identifier(date_column),
             units_expression=units_expression,
@@ -127,13 +126,8 @@ class DashboardRepository:
         items = self.get_open_alerts(limit=per_source_limit)
         items.extend(self.get_top_recommendations(limit=per_source_limit))
 
-        def sort_key(item: dict[str, Any]) -> Any:
-            return (
-                item.get("created_at")
-                or item.get("updated_at")
-                or item.get("detected_at")
-                or ""
-            )
+        def sort_key(item: dict[str, Any]) -> object:
+            return item.get("created_at") or item.get("updated_at") or item.get("detected_at") or ""
 
         return sorted(items, key=sort_key, reverse=True)[:limit]
 
@@ -199,13 +193,13 @@ class DashboardRepository:
                         FROM forecasts
                         ORDER BY product_id, {forecast_date_column} DESC NULLS LAST
                     )
-                    """
+                    """,
                 ).format(
                     forecast_quantity_column=sql.Identifier(forecast_quantity_column),
                     forecast_date_column=sql.Identifier(forecast_date_column),
                 )
                 forecast_join = sql.SQL(
-                    "LEFT JOIN latest_forecast ON latest_forecast.product_id = p.id"
+                    "LEFT JOIN latest_forecast ON latest_forecast.product_id = p.id",
                 )
                 risk_case = sql.SQL(
                     """
@@ -214,11 +208,13 @@ class DashboardRepository:
                         WHEN latest_inventory.current_stock <= latest_forecast.forecast_quantity
                             THEN 'stockout_risk'
                         WHEN latest_forecast.forecast_quantity > 0
-                             AND latest_inventory.current_stock >= latest_forecast.forecast_quantity * 3
+                             AND latest_inventory.current_stock >= (
+                                 latest_forecast.forecast_quantity * 3
+                             )
                             THEN 'overstock_risk'
                         ELSE 'normal'
                     END
-                    """
+                    """,
                 )
 
         query = sql.SQL(
@@ -241,7 +237,7 @@ class DashboardRepository:
                 {forecast_join}
             ) risk_items
             GROUP BY risk_status
-            """
+            """,
         ).format(
             stock_column=sql.Identifier(stock_column),
             inventory_date_column=sql.Identifier(inventory_date_column),
@@ -276,13 +272,13 @@ class DashboardRepository:
         if not table_exists(table_name) or "status" not in get_columns(table_name):
             return 0
 
-        query = sql.SQL(
-            "SELECT COUNT(*) AS count FROM {} WHERE status = ANY(%s)"
-        ).format(sql.Identifier(table_name))
+        query = sql.SQL("SELECT COUNT(*) AS count FROM {} WHERE status = ANY(%s)").format(
+            sql.Identifier(table_name),
+        )
         row = fetch_one(query, (list(statuses),))
         return int(row["count"]) if row else 0
 
-    def _latest_refresh_timestamp(self) -> Any | None:
+    def _latest_refresh_timestamp(self) -> object | None:
         latest_values = []
         candidates = [
             "updated_at",
@@ -300,7 +296,7 @@ class DashboardRepository:
                 continue
 
             query = sql.SQL(
-                "SELECT MAX({column}) AS latest FROM {table} WHERE {column} IS NOT NULL"
+                "SELECT MAX({column}) AS latest FROM {table} WHERE {column} IS NOT NULL",
             ).format(
                 column=sql.Identifier(column),
                 table=sql.Identifier(table_name),
@@ -368,7 +364,7 @@ class DashboardRepository:
             {status_filter}
             {order_expression}
             LIMIT %s
-            """
+            """,
         ).format(
             columns=sql.SQL(", ").join(sql.Identifier(column) for column in selected_columns),
             table=sql.Identifier(table_name),

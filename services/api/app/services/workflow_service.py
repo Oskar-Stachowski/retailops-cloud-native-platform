@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from app.auth.roles import DemoUser
 from app.domain.workflow import (
     WorkflowActionName,
     WorkflowEntityType,
@@ -11,6 +10,9 @@ from app.domain.workflow import (
     validate_workflow_transition,
 )
 from app.repositories.workflow_repository import WorkflowRepository
+
+if TYPE_CHECKING:
+    from app.auth.roles import DemoUser
 
 
 class WorkflowNotFoundError(LookupError):
@@ -37,7 +39,8 @@ class WorkflowService:
         alert = self.repository.get_alert(alert_id)
 
         if not alert:
-            raise WorkflowNotFoundError(f"Alert {alert_id} does not exist.")
+            msg = f"Alert {alert_id} does not exist."
+            raise WorkflowNotFoundError(msg)
 
         if idempotency_key:
             existing_action = self.repository.get_workflow_audit_log(
@@ -60,16 +63,13 @@ class WorkflowService:
             previous_status=previous_status,
         )
 
-        try:
-            validate_workflow_transition(
-                entity_type=WorkflowEntityType.alert,
-                action=normalized_action,
-                previous_status=previous_status,
-                new_status=new_status,
-                comment=comment,
-            )
-        except WorkflowTransitionError:
-            raise
+        validate_workflow_transition(
+            entity_type=WorkflowEntityType.alert,
+            action=normalized_action,
+            previous_status=previous_status,
+            new_status=new_status,
+            comment=comment,
+        )
 
         actor_user_id = self.repository.resolve_demo_actor_user_id(actor)
         result = self.repository.apply_alert_workflow_action(
@@ -110,9 +110,8 @@ class WorkflowService:
         recommendation = self.repository.get_recommendation(recommendation_id)
 
         if not recommendation:
-            raise WorkflowNotFoundError(
-                f"Recommendation {recommendation_id} does not exist."
-            )
+            msg = f"Recommendation {recommendation_id} does not exist."
+            raise WorkflowNotFoundError(msg)
 
         if idempotency_key:
             existing_action = self.repository.get_workflow_audit_log(
@@ -189,7 +188,8 @@ class WorkflowService:
         if action == WorkflowActionName.comment:
             return previous_status
 
-        raise WorkflowTransitionError(f"{action.value} is not supported for alerts.")
+        msg = f"{action.value} is not supported for alerts."
+        raise WorkflowTransitionError(msg)
 
     def _next_recommendation_status(
         self,
@@ -210,9 +210,8 @@ class WorkflowService:
         if action == WorkflowActionName.comment:
             return previous_status
 
-        raise WorkflowTransitionError(
-            f"{action.value} is not supported for recommendations."
-        )
+        msg = f"{action.value} is not supported for recommendations."
+        raise WorkflowTransitionError(msg)
 
     def _workflow_response_from_audit(
         self,
@@ -224,8 +223,9 @@ class WorkflowService:
         message: str,
     ) -> dict:
         if audit_log["action_type"] != expected_action.value:
+            msg = "Idempotency key is already used for a different workflow action."
             raise WorkflowTransitionError(
-                "Idempotency key is already used for a different workflow action."
+                msg,
             )
 
         return {

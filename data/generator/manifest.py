@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Protocol
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 from data.generator.csv_writer import CSV_WRITE_ORDER
 
@@ -92,7 +94,7 @@ def build_dataset_manifest(
         "schema_version": SCHEMA_VERSION,
         "generator_version": GENERATOR_VERSION,
         "seed": config.seed,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "date_start": date_range["date_start"],
         "date_end": date_range["date_end"],
         "parameters": {
@@ -102,10 +104,7 @@ def build_dataset_manifest(
             "warehouses": config.warehouses,
         },
         "formats": ["csv"],
-        "row_counts": {
-            table_name: len(tables[table_name])
-            for table_name in CSV_WRITE_ORDER
-        },
+        "row_counts": {table_name: len(tables[table_name]) for table_name in CSV_WRITE_ORDER},
         "artifacts": _artifacts_for_profile(config.profile),
     }
 

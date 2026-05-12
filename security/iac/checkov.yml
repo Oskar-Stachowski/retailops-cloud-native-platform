@@ -17,6 +17,11 @@ quiet: false
 compact: false
 download-external-modules: false
 
-# Keep checks visible in the report instead of hiding them.
-# Future sprints may replace this with explicit skip-check / hard-fail policies.
-skip-check: []
+# Accepted exception:
+# CKV_AWS_356 flags wildcard resources on the Terraform plan read-only
+# discovery policy. The policy intentionally grants only Get/List/Describe
+# actions needed by Terraform plan and does not grant create, update, delete,
+# pass-role, or administrator permissions. The Makefile guardrails still block
+# wildcard IAM actions and privileged policy patterns.
+skip-check:
+  - CKV_AWS_356

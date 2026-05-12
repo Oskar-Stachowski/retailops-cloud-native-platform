@@ -17,8 +17,9 @@ on:
       - "services/api/tests/test_structured_logging.py"
       - "services/api/tests/test_correlation_id.py"
       - "services/api/tests/test_stream_observability.py"
-      - "scripts/observability_smoke.sh"
-      - "scripts/observability_demo_traffic.sh"
+      - "services/api/requirements-dev.txt"
+      - "scripts/ci/observability_smoke.sh"
+      - "scripts/dev/observability_demo_traffic.sh"
       - ".github/workflows/observability-ci.yml"
 
   pull_request:
@@ -37,8 +38,9 @@ on:
       - "services/api/tests/test_structured_logging.py"
       - "services/api/tests/test_correlation_id.py"
       - "services/api/tests/test_stream_observability.py"
-      - "scripts/observability_smoke.sh"
-      - "scripts/observability_demo_traffic.sh"
+      - "services/api/requirements-dev.txt"
+      - "scripts/ci/observability_smoke.sh"
+      - "scripts/dev/observability_demo_traffic.sh"
       - ".github/workflows/observability-ci.yml"
 
   workflow_dispatch:
@@ -78,10 +80,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-          cache-dependency-path: services/api/requirements.txt
+          cache-dependency-path: |
+            services/api/requirements.txt
+            services/api/requirements-dev.txt
 
       - name: Install Python dependencies
-        run: pip install -r services/api/requirements.txt
+        run: pip install -r services/api/requirements-dev.txt
 
       - name: Run focused observability tests
         run: |

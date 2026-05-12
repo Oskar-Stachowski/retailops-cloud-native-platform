@@ -6,7 +6,6 @@ from app.api.errors import error_response
 from app.core.config import get_settings
 from app.db.connection import check_database_connection
 
-
 router = APIRouter(tags=["health"])
 
 
@@ -25,7 +24,6 @@ class ReadinessResponse(BaseModel):
 
 @router.get(
     "/health",
-    response_model=HealthResponse,
     status_code=status.HTTP_200_OK,
     summary="Health check",
     description=(
@@ -48,14 +46,11 @@ def health_check() -> HealthResponse:
     response_model=ReadinessResponse,
     status_code=status.HTTP_200_OK,
     summary="Readiness check",
-    description=(
-        "Returns service readiness information, "
-        "including database connectivity."
-    ),
+    description=("Returns service readiness information, including database connectivity."),
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Database is not available",
-        }
+        },
     },
 )
 def readiness_check() -> ReadinessResponse | JSONResponse:

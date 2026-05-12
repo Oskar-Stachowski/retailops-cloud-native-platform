@@ -8,7 +8,6 @@ from app.api.schemas import ProductListResponse, ProductResponse
 from app.domain.models import ProductStatus
 from app.services.product_service import ProductService
 
-
 router = APIRouter(prefix="/products", tags=["products"])
 product_service = ProductService()
 
@@ -70,11 +69,11 @@ def list_products(
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Product was not found.",
-        }
+        },
     },
 )
 def get_product(
-    product_id: Annotated[UUID, Path(description="Product technical identifier.")]
+    product_id: Annotated[UUID, Path(description="Product technical identifier.")],
 ) -> dict:
     product = product_service.get_product_detail_response(product_id)
 

@@ -38,7 +38,7 @@ function ApiHealthCard() {
                     : "API unavailable"}
                 </h3>
             </div>
-        
+
         {apiHealth && (
             <dl className="health-details">
             <div>

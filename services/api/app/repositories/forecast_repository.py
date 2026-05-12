@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
 
 from psycopg.rows import dict_row
@@ -11,7 +11,7 @@ from app.domain.models import Forecast
 class ForecastRepository:
     """PostgreSQL-backed read repository for forecast data."""
 
-    SORT_COLUMNS = {
+    SORT_COLUMNS: ClassVar[dict[str, str]] = {
         "forecast_period_start": "forecast_period_start",
         "forecast_period_end": "forecast_period_end",
         "generated_at": "generated_at",
@@ -19,7 +19,7 @@ class ForecastRepository:
         "confidence_level": "confidence_level",
     }
 
-    def __init__(self, connection=None):
+    def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -127,7 +127,7 @@ class ForecastRepository:
             ORDER BY {sort_column} {direction}, generated_at DESC
             LIMIT %s OFFSET %s;
         """
-        rows = self._fetch_all(query, tuple(params + [limit, offset]))
+        rows = self._fetch_all(query, (*params, limit, offset))
         return [self._map_row_to_forecast(row) for row in rows]
 
     def count_forecasts(
@@ -145,7 +145,7 @@ class ForecastRepository:
             date_from=date_from,
             date_to=date_to,
         )
-        query = f"SELECT COUNT(*) AS total FROM forecasts {where_clause};"
+        query = f"SELECT COUNT(*) AS total FROM forecasts {where_clause};"  # noqa: S608 - where clause is built from fixed filters
         row = self._fetch_one(query, tuple(params))
         return int(row["total"]) if row else 0
 

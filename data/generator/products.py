@@ -20,7 +20,7 @@ def generate_products() -> list[dict[str, str]]:
                 "base_price": str(item["base_price"]),
                 "normal_daily_sales": str(item["normal_daily_sales"]),
                 "scenario": str(item["scenario"]),
-            }
+            },
         )
 
     return products

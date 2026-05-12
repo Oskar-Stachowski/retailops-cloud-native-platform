@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Never
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
 from app.main import app
-
 
 client = TestClient(app)
 
@@ -21,7 +21,7 @@ def workflow_response(recommendation_id, action="accept", status="accepted"):
             "performed_by_user_id": str(uuid4()),
             "assigned_to_user_id": None,
             "comment": None,
-            "performed_at": datetime.now(timezone.utc).isoformat(),
+            "performed_at": datetime.now(UTC).isoformat(),
             "idempotency_key": None,
         },
         "status": status,
@@ -29,7 +29,7 @@ def workflow_response(recommendation_id, action="accept", status="accepted"):
     }
 
 
-def test_accept_recommendation_endpoint_returns_workflow_mutation(monkeypatch):
+def test_accept_recommendation_endpoint_returns_workflow_mutation(monkeypatch) -> None:
     recommendation_id = uuid4()
 
     def fake_apply_recommendation_action(**kwargs):
@@ -43,9 +43,7 @@ def test_accept_recommendation_endpoint_returns_workflow_mutation(monkeypatch):
         fake_apply_recommendation_action,
     )
 
-    response = client.post(
-        f"/recommendations/{recommendation_id}/accept?user_id=platform-admin"
-    )
+    response = client.post(f"/recommendations/{recommendation_id}/accept?user_id=platform-admin")
 
     assert response.status_code == 200
     payload = response.json()
@@ -54,7 +52,7 @@ def test_accept_recommendation_endpoint_returns_workflow_mutation(monkeypatch):
     assert payload["status"] == "accepted"
 
 
-def test_inventory_planner_can_perform_recommendation_workflow_action(monkeypatch):
+def test_inventory_planner_can_perform_recommendation_workflow_action(monkeypatch) -> None:
     recommendation_id = uuid4()
 
     def fake_apply_recommendation_action(**kwargs):
@@ -66,14 +64,12 @@ def test_inventory_planner_can_perform_recommendation_workflow_action(monkeypatc
         fake_apply_recommendation_action,
     )
 
-    response = client.post(
-        f"/recommendations/{recommendation_id}/accept?user_id=inventory-planner"
-    )
+    response = client.post(f"/recommendations/{recommendation_id}/accept?user_id=inventory-planner")
 
     assert response.status_code == 200
 
 
-def test_reject_recommendation_endpoint_passes_comment(monkeypatch):
+def test_reject_recommendation_endpoint_passes_comment(monkeypatch) -> None:
     recommendation_id = uuid4()
 
     def fake_apply_recommendation_action(**kwargs):
@@ -98,7 +94,7 @@ def test_reject_recommendation_endpoint_passes_comment(monkeypatch):
     assert response.json()["workflow_action"]["action"] == "reject"
 
 
-def test_assign_recommendation_endpoint_requires_assignee():
+def test_assign_recommendation_endpoint_requires_assignee() -> None:
     response = client.post(f"/recommendations/{uuid4()}/assign", json={})
 
     assert response.status_code == 422
@@ -106,46 +102,45 @@ def test_assign_recommendation_endpoint_requires_assignee():
 
 def test_recommendation_workflow_endpoint_rejects_viewer_without_write_permission(
     monkeypatch,
-):
-    def fail_if_called(**kwargs):
-        raise AssertionError("workflow service should not be called")
+) -> None:
+    def fail_if_called(**kwargs) -> Never:  # noqa: ARG001 - callback accepts endpoint kwargs
+        msg = "workflow service should not be called"
+        raise AssertionError(msg)
 
     monkeypatch.setattr(
         "app.api.recommendations.workflow_service.apply_recommendation_action",
         fail_if_called,
     )
 
-    response = client.post(
-        f"/recommendations/{uuid4()}/accept?user_id=read-only-viewer"
-    )
+    response = client.post(f"/recommendations/{uuid4()}/accept?user_id=read-only-viewer")
 
     assert response.status_code == 403
 
 
 def test_recommendation_workflow_endpoint_rejects_analyst_without_write_permission(
     monkeypatch,
-):
-    def fail_if_called(**kwargs):
-        raise AssertionError("workflow service should not be called")
+) -> None:
+    def fail_if_called(**kwargs) -> Never:  # noqa: ARG001 - callback accepts endpoint kwargs
+        msg = "workflow service should not be called"
+        raise AssertionError(msg)
 
     monkeypatch.setattr(
         "app.api.recommendations.workflow_service.apply_recommendation_action",
         fail_if_called,
     )
 
-    response = client.post(
-        f"/recommendations/{uuid4()}/accept?user_id=commercial-analyst"
-    )
+    response = client.post(f"/recommendations/{uuid4()}/accept?user_id=commercial-analyst")
 
     assert response.status_code == 403
 
 
-def test_resolve_recommendation_maps_invalid_transition_to_conflict(monkeypatch):
+def test_resolve_recommendation_maps_invalid_transition_to_conflict(monkeypatch) -> None:
     from app.domain.workflow import WorkflowTransitionError
 
-    def fake_apply_recommendation_action(**kwargs):
+    def fake_apply_recommendation_action(**kwargs) -> Never:  # noqa: ARG001 - callback accepts endpoint kwargs
+        msg = "Workflow transition is not allowed: recommendation resolve proposed -> implemented."
         raise WorkflowTransitionError(
-            "Workflow transition is not allowed: recommendation resolve proposed -> implemented."
+            msg,
         )
 
     monkeypatch.setattr(
@@ -158,7 +153,7 @@ def test_resolve_recommendation_maps_invalid_transition_to_conflict(monkeypatch)
     assert response.status_code == 409
 
 
-def test_dismiss_recommendation_endpoint_returns_rejected_status(monkeypatch):
+def test_dismiss_recommendation_endpoint_returns_rejected_status(monkeypatch) -> None:
     recommendation_id = uuid4()
 
     def fake_apply_recommendation_action(**kwargs):

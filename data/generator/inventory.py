@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from data.generator.common import deterministic_uuid, utc_datetime
-from data.generator.scenarios import WAREHOUSES, UNIT_OF_MEASURE
+from data.generator.scenarios import UNIT_OF_MEASURE, WAREHOUSES
 
 
 def _inventory_values(product: dict[str, str]) -> tuple[int, int, int, int]:
@@ -42,30 +42,31 @@ def generate_inventory_snapshots(
         unit_of_measure = UNIT_OF_MEASURE[index % len(UNIT_OF_MEASURE)]
         natural_key = f"{product['sku']}-{warehouse}"
 
-        recorded_at = utc_datetime(hours_offset=-index),
-        ingested_at = utc_datetime(
-            hours_offset=-index,
-            minutes_offset=3,
-        ),
-        created_at = utc_datetime(
-            hours_offset=index,
-            minutes_offset=5,
-        ),
+        recorded_at = (utc_datetime(hours_offset=-index),)
+        ingested_at = (
+            utc_datetime(
+                hours_offset=-index,
+                minutes_offset=3,
+            ),
+        )
+        created_at = (
+            utc_datetime(
+                hours_offset=index,
+                minutes_offset=5,
+            ),
+        )
 
         snapshots.append(
             {
                 "id": deterministic_uuid("inventory_snapshot", natural_key),
                 "product_id": product["id"],
                 "stock_quantity": str(on_hand),
-                # "reversed_quantity": str(reversed),
                 "unit_of_measure": unit_of_measure,
                 "warehouse_code": warehouse,
-                # "reorder_point": str(reorder_point),
-                # "safety_stock_quantity": str(safety_stock),
                 "recorded_at": recorded_at,
                 "ingested_at": ingested_at,
                 "created_at": created_at,
-            }
+            },
         )
 
     return snapshots

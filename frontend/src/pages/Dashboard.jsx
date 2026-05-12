@@ -295,7 +295,7 @@ function ExecutiveSummary({ summary, operationalVisibility, fetchedAt }) {
   return (
     <section className="api-page__section" aria-label="Executive summary">
       <header className="section-heading">
-        <p className="eyebrow">Sprint 5 executive view</p>
+        <p className="eyebrow">Executive view</p>
         <h2>Business decision snapshot</h2>
         <p>
           This section translates backend signals into management-friendly
@@ -432,7 +432,7 @@ export default function Dashboard() {
   return (
     <main className="api-page">
       <header className="api-page__header">
-        <p className="eyebrow">Sprint 5 · dashboard and operations view MVP</p>
+        <p className="eyebrow">Operations view</p>
         <h1>Retail operations dashboard</h1>
         <p>
           This view connects the business dashboard to live FastAPI endpoints:

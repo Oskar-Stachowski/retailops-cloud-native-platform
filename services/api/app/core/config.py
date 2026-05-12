@@ -3,7 +3,6 @@ from functools import lru_cache
 
 from pydantic import BaseModel
 
-
 DEFAULT_CORS_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",

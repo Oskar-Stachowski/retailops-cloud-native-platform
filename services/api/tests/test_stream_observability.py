@@ -30,7 +30,7 @@ class FakeRealtimeMetricsRepository:
                     "failed_events": 2,
                     "dead_lettered_events": 2,
                     "ignored_events": 1,
-                }
+                },
             ],
         }
 
@@ -46,13 +46,9 @@ def test_stream_observability_renders_prometheus_metrics() -> None:
     assert 'retailops_stream_events_total{status="processed"} 12' in output
     assert "retailops_stream_dlq_events_total 2" in output
     assert "retailops_stream_latest_event_present 1" in output
-    assert (
-        'retailops_stream_events_by_type_total{event_type="sale_completed"} 9'
-        in output
-    )
+    assert 'retailops_stream_events_by_type_total{event_type="sale_completed"} 9' in output
     assert "retailops_stream_event_freshness_seconds 42.5" in output
     assert "retailops_stream_processing_latency_seconds_avg 0.25" in output
     assert (
-        'retailops_stream_consumer_lag_events{consumer="retailops-realtime-consumer"} 1'
-        in output
+        'retailops_stream_consumer_lag_events{consumer="retailops-realtime-consumer"} 1' in output
     )

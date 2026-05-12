@@ -5,7 +5,6 @@ from app.core.config import settings
 from app.db.instrumentation import render_database_metrics
 from app.services.stream_observability import StreamObservabilityService
 
-
 router = APIRouter(tags=["observability"])
 stream_observability_service = StreamObservabilityService()
 
@@ -15,11 +14,8 @@ def render_api_info_metric() -> str:
         [
             "# HELP retailops_api_info RetailOps API service information.",
             "# TYPE retailops_api_info gauge",
-            (
-                'retailops_api_info{service="retailops-api",'
-                f'environment="{settings.app_env}"}} 1'
-            ),
-        ]
+            f'retailops_api_info{{service="retailops-api",environment="{settings.app_env}"}} 1',
+        ],
     )
 
 
@@ -42,7 +38,7 @@ def get_metrics() -> PlainTextResponse:
             render_database_metrics(),
             stream_observability_service.render_prometheus_metrics().rstrip(),
             "",
-        ]
+        ],
     )
 
     return PlainTextResponse(

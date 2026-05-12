@@ -257,7 +257,7 @@ export default function LiveOperations() {
     <main className="api-page live-operations-page">
       <header className="api-page__header live-operations-header">
         <div>
-          <p className="eyebrow">Sprint 9 · real-time analysis</p>
+          <p className="eyebrow">Real-time analysis</p>
           <h1>Live operations</h1>
           <p>
             Real-time sales, event processing and stream health from the

@@ -1,8 +1,8 @@
 # Terraform Drift Check Runbook
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Terraform / AWS Foundation / Operations  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** Terraform / AWS Foundation / Operations
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
 **Commit:** `docs(runbook): add Terraform drift and failed plan runbooks`
 
 ---

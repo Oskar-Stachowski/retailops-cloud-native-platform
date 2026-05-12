@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 from app.core.correlation import CORRELATION_ID_HEADER
 from app.main import app
 
-
 client = TestClient(app)
 
 

@@ -1,4 +1,6 @@
-from typing import Any
+# ruff: noqa: S608
+
+from typing import Any, ClassVar
 
 from psycopg.rows import dict_row
 
@@ -8,7 +10,7 @@ from app.db.connection import fetch_all, fetch_one
 class StockRiskRepository:
     """Read repository for product-level inventory/stock risk view."""
 
-    SORT_COLUMNS = {
+    SORT_COLUMNS: ClassVar[dict[str, str]] = {
         "risk_status": "risk_status",
         "sku": "sku",
         "current_stock": "current_stock",
@@ -16,7 +18,7 @@ class StockRiskRepository:
         "inventory_updated_at": "inventory_updated_at",
     }
 
-    def __init__(self, connection=None):
+    def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -66,7 +68,9 @@ class StockRiskRepository:
                         WHEN latest_inventory.current_stock <= latest_forecast.forecast_quantity
                             THEN 'stockout_risk'
                         WHEN latest_forecast.forecast_quantity > 0
-                             AND latest_inventory.current_stock >= (latest_forecast.forecast_quantity * 3)
+                             AND latest_inventory.current_stock >= (
+                                 latest_forecast.forecast_quantity * 3
+                             )
                             THEN 'overstock_risk'
                         ELSE 'normal'
                     END AS risk_status,
@@ -117,7 +121,7 @@ class StockRiskRepository:
             ORDER BY {sort_column} {direction}, sku ASC NULLS LAST
             LIMIT %s OFFSET %s;
         """
-        return self._fetch_all(query, tuple(params + [limit, offset]))
+        return self._fetch_all(query, (*params, limit, offset))
 
     def count_inventory_risks(
         self,
