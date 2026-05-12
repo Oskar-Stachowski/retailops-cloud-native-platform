@@ -5,6 +5,9 @@ namespace: retailops
 
 resources:
   - ../../base
+  - broker/redpanda-deployment.yaml
+  - broker/redpanda-service.yaml
+  - broker/topic-init-job.yaml
   - database/deployment.yaml
   - database/service.yaml
   - jobs/migrate.yaml

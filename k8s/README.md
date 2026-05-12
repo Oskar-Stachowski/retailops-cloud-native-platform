@@ -20,6 +20,10 @@ for local `kind` or `minikube` validation. It uses placeholder credentials only
 and is not a production database pattern. It also includes one-shot Alembic
 migration and demo seed Jobs for local validation.
 
+The same dev overlay also runs a single-node Redpanda broker and a one-shot
+topic initialization Job for the local real-time event topics. This prepares the
+Kubernetes path for a later long-running consumer deployment.
+
 ## Layout
 
 ```text
@@ -39,6 +43,10 @@ k8s/
     `-- kustomization.yaml
 `-- overlays/
     `-- dev/
+        |-- broker/
+        |   |-- redpanda-deployment.yaml
+        |   |-- redpanda-service.yaml
+        |   `-- topic-init-job.yaml
         |-- database/
         |   |-- deployment.yaml
         |   `-- service.yaml
