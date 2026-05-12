@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://retailops.local/schemas/ml/demand_forecast_features.schema.json",
+  "title": "RetailOps Demand Forecast Feature Row",
+  "description": "One daily feature row for demand forecasting at date, product, store and channel grain.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "feature_row_id",
+    "date",
+    "product_id",
+    "store_id",
+    "channel",
+    "units_sold",
+    "sales_revenue",
+    "unit_price",
+    "discount_percent",
+    "promotion_active",
+    "stockout_flag",
+    "inventory_on_hand",
+    "category",
+    "brand",
+    "day_of_week",
+    "is_weekend",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier for the generated feature dataset version."
+    },
+    "feature_row_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic row identifier derived from date, product_id, store_id and channel."
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "product_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "store_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["store", "online", "marketplace", "b2b"]
+    },
+    "units_sold": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Forecast target: observed units sold for the row grain and date."
+    },
+    "latent_units_demand": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional uncensored demand estimate when stockout_flag is true."
+    },
+    "sales_revenue": {
+      "type": "number",
+      "minimum": 0
+    },
+    "unit_price": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "discount_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "promotion_active": {
+      "type": "boolean"
+    },
+    "promotion_type": {
+      "type": "string",
+      "enum": ["none", "percentage_discount", "bundle", "clearance", "seasonal"]
+    },
+    "stockout_flag": {
+      "type": "boolean"
+    },
+    "inventory_on_hand": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "inventory_reserved": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "brand": {
+      "type": "string",
+      "minLength": 1
+    },
+    "product_status": {
+      "type": "string",
+      "enum": ["active", "discontinued", "seasonal", "clearance"]
+    },
+    "day_of_week": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 7,
+      "description": "ISO day of week, Monday=1 and Sunday=7."
+    },
+    "is_weekend": {
+      "type": "boolean"
+    },
+    "week_of_year": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 53
+    },
+    "month": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "data_quality_status": {
+      "type": "string",
+      "enum": ["passed", "warning", "failed"]
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

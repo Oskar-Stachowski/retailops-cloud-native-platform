@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://retailops.local/schemas/ml/demand_forecast_feature_manifest.schema.json",
+  "title": "RetailOps Demand Forecast Feature Dataset Manifest",
+  "description": "Manifest for a generated demand forecasting feature dataset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_id",
+    "dataset_name",
+    "schema_version",
+    "feature_schema",
+    "profile",
+    "grain",
+    "target",
+    "date_start",
+    "date_end",
+    "formats",
+    "row_count",
+    "source_artifacts",
+    "generated_at"
+  ],
+  "properties": {
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dataset_name": {
+      "type": "string",
+      "const": "retailops-demand-forecast-features"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "feature_schema": {
+      "type": "string",
+      "const": "demand_forecast_features.schema.json"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["demo", "small", "medium", "large"]
+    },
+    "grain": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "prefixItems": [
+        { "const": "date" },
+        { "const": "product_id" },
+        { "const": "store_id" },
+        { "const": "channel" }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "target": {
+      "type": "string",
+      "const": "units_sold"
+    },
+    "date_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "date_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "formats": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["csv", "parquet", "jsonl"]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "row_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "quality_report": {
+      "type": "string"
+    },
+    "generator_version": {
+      "type": "string"
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

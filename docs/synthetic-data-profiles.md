@@ -360,6 +360,12 @@ Recommended target:
 units_sold
 ```
 
+The Sprint 12 feature dataset contract is versioned under
+[`ml/contracts`](../ml/contracts/README.md). The first contract fixes the
+forecasting feature grain as `date`, `product_id`, `store_id`, and `channel`,
+with `units_sold` as the target, and defines the row and manifest schemas that a
+future feature-generation job should write.
+
 Recommended metrics:
 
 - MAE

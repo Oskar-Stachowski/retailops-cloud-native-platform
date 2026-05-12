@@ -1,0 +1,25 @@
+{
+  "dataset_id": "retailops-demand-forecast-features-small-20260512-seed42",
+  "dataset_name": "retailops-demand-forecast-features",
+  "schema_version": "1.0",
+  "feature_schema": "demand_forecast_features.schema.json",
+  "profile": "small",
+  "grain": ["date", "product_id", "store_id", "channel"],
+  "target": "units_sold",
+  "date_start": "2025-05-01",
+  "date_end": "2026-04-30",
+  "formats": ["parquet", "csv"],
+  "row_count": 146000,
+  "source_artifacts": [
+    "sales.csv",
+    "products.csv",
+    "stores.csv",
+    "price_history.csv",
+    "promotions.csv",
+    "inventory_snapshots.csv"
+  ],
+  "quality_report": "quality_report.json",
+  "generator_version": "0.1.0",
+  "seed": 42,
+  "generated_at": "2026-05-12T08:00:00Z"
+}
