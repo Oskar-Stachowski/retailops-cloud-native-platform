@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 
 LABEL org.opencontainers.image.title="RetailOps Frontend"
 LABEL org.opencontainers.image.description="React/Vite frontend build stage for the RetailOps local runtime"
