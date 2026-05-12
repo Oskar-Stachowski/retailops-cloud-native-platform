@@ -6,3 +6,5 @@ resources:
   - config/app-config.yaml
   - api/deployment.yaml
   - api/service.yaml
+  - frontend/deployment.yaml
+  - frontend/service.yaml

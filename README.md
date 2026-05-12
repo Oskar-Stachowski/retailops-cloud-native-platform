@@ -30,7 +30,7 @@ This repository intentionally separates implemented components from target archi
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model; continuously running broker consumer is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
-| Kubernetes/EKS | Base manifests started | `k8s/base/`; namespace, shared config and API service manifests only; frontend, ingress and overlays are future work |
+| Kubernetes/EKS | Base manifests started | `k8s/base/`; namespace, shared config, API and frontend service manifests only; ingress and overlays are future work |
 | MLOps/model lifecycle | Designed only | `ml/README.md` and architecture docs; no training/inference pipeline is implemented yet |
 
 ---
@@ -181,7 +181,7 @@ Contains data schemas and samples.
 Contains Infrastructure as Code definitions, mainly Terraform modules and environment configurations.
 
 ### `k8s/`
-Contains the Kubernetes runtime scope. The current base includes namespace, shared configuration and API service manifests; frontend manifests, overlays and Helm charts are not implemented yet.
+Contains the Kubernetes runtime scope. The current base includes namespace, shared configuration, API and frontend service manifests; ingress, overlays and Helm charts are not implemented yet.
 
 ### `observability/`
 Contains monitoring, logging, dashboard and alerting configuration.
@@ -372,7 +372,7 @@ docker compose logs -f
 ### 📌 Notes
 
 * This is a **local-first platform environment** designed to validate application, data, observability, and delivery behavior without running permanent cloud workloads.
-* AWS Terraform foundation and CI/CD automation are implemented; Kubernetes workload deployment remains future scope beyond the initial API base manifests.
+* AWS Terraform foundation and CI/CD automation are implemented; Kubernetes workload deployment remains future scope beyond the initial API/frontend base manifests.
 * The frontend is an operator dashboard for the local platform, not a public production service.
 
 
@@ -424,7 +424,7 @@ The foundation intentionally does not create permanent compute workloads, EKS, R
 
 ## Kubernetes Deployment
 
-Kubernetes is a target runtime design. The repository now includes base manifests for namespace, shared runtime configuration and the API service, not a complete deployment path.
+Kubernetes is a target runtime design. The repository now includes base manifests for namespace, shared runtime configuration, API service and frontend service, not a complete deployment path.
 
 The future Kubernetes scope is designed to support:
 

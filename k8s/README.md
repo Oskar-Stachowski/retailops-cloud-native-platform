@@ -8,11 +8,12 @@ The current implementation contains only the first base manifests:
 - shared application ConfigMap,
 - example Secret template with placeholder values only,
 - API Deployment and ClusterIP Service,
+- frontend Deployment and ClusterIP Service,
 - Kustomize base entrypoint.
 
-Frontend manifests, ingress, jobs, overlays, Helm charts and EKS deployment
-automation are not implemented yet. Current full-stack runtime validation still
-uses Docker Compose.
+Ingress, jobs, overlays, Helm charts and EKS deployment automation are not
+implemented yet. Current full-stack runtime validation still uses Docker
+Compose.
 
 ## Layout
 
@@ -25,10 +26,17 @@ k8s/
     |-- config/
     |   |-- app-config.yaml
     |   `-- secret.example.yaml
+    |-- frontend/
+    |   |-- deployment.yaml
+    |   `-- service.yaml
     |-- namespaces/
     |   `-- retailops.yaml
     `-- kustomization.yaml
 ```
+
+The frontend image currently uses the same Nginx config as Docker Compose. Full
+Kubernetes API routing will be validated when ingress or runtime Nginx config is
+added in a later commit.
 
 ## Validate
 
