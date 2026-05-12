@@ -3,6 +3,7 @@ set -euo pipefail
 
 K8S_BASE_DIR="${K8S_BASE_DIR:-k8s/base}"
 K8S_DEV_OVERLAY_DIR="${K8S_DEV_OVERLAY_DIR:-k8s/overlays/dev}"
+K8S_SECRET_EXAMPLE="${K8S_SECRET_EXAMPLE:-k8s/base/config/secret.example.yaml}"
 K8S_REPORTS_DIR="${K8S_REPORTS_DIR:-ci-cd/reports/k8s}"
 K8S_SMOKE_REPORT="${K8S_SMOKE_REPORT:-${K8S_REPORTS_DIR}/kubernetes-smoke.txt}"
 K8S_SMOKE_DRY_RUN="${K8S_SMOKE_DRY_RUN:-0}"
@@ -31,6 +32,7 @@ write_report_header() {
     printf 'Generated at: %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     printf 'Base path: %s\n' "${K8S_BASE_DIR}"
     printf 'Dev overlay path: %s\n' "${K8S_DEV_OVERLAY_DIR}"
+    printf 'Secret example path: %s\n' "${K8S_SECRET_EXAMPLE}"
     printf 'Dry-run enabled: %s\n' "${K8S_SMOKE_DRY_RUN}"
     printf '\n'
   } >"${K8S_SMOKE_REPORT}"
@@ -55,6 +57,22 @@ parse_rendered_yaml() {
   log "Parsing rendered ${label} YAML..."
   ruby -e 'require "yaml"; YAML.load_stream(File.read(ARGV.fetch(0)))' "${rendered_file}"
   append_report "OK: rendered ${label} YAML parses successfully."
+}
+
+run_kubeconform() {
+  local label="$1"
+  local manifest_path="$2"
+  local output
+
+  log "Validating ${label} with kubeconform..."
+  if ! output="$(kubeconform -strict -summary <"${manifest_path}" 2>&1)"; then
+    append_report "FAIL: kubeconform ${label} validation failed."
+    append_report "${output}"
+    fail "kubeconform ${label} validation failed."
+  fi
+
+  append_report "OK: kubeconform ${label} validation passed."
+  append_report "${output}"
 }
 
 assert_rendered_objects() {
@@ -149,6 +167,7 @@ run_optional_dry_run() {
 }
 
 require_command kubectl
+require_command kubeconform
 require_command ruby
 
 base_render="$(mktemp)"
@@ -159,6 +178,7 @@ write_report_header
 
 render_manifests "${K8S_BASE_DIR}" "${base_render}"
 parse_rendered_yaml "base" "${base_render}"
+run_kubeconform "base" "${base_render}"
 assert_rendered_objects \
   "base" \
   "${base_render}" \
@@ -173,6 +193,7 @@ assert_rendered_objects \
 
 render_manifests "${K8S_DEV_OVERLAY_DIR}" "${dev_render}"
 parse_rendered_yaml "dev overlay" "${dev_render}"
+run_kubeconform "dev overlay" "${dev_render}"
 assert_rendered_objects \
   "dev overlay" \
   "${dev_render}" \
@@ -185,6 +206,7 @@ assert_rendered_objects \
   "Job/retailops-seed-demo-data" \
   "Job/redpanda-topic-init"
 assert_probe_and_resource_coverage "${dev_render}"
+run_kubeconform "secret example" "${K8S_SECRET_EXAMPLE}"
 run_optional_dry_run "${dev_render}"
 
 append_report ""

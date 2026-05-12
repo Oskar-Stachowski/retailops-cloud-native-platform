@@ -23,6 +23,8 @@ Most files under this directory are ignored because they are volatile, local, la
 | `ci-cd/reports/iac/sprint-10-terraform-plan-dev.txt` | Sanitized Terraform plan summary. |
 | `ci-cd/reports/iac/sprint-10-terraform-apply.txt` | Sanitized Terraform apply summary. |
 | `ci-cd/reports/iac/sprint-10-terraform-destroy.txt` | Sanitized Terraform destroy summary. |
+| `ci-cd/reports/k8s/kubernetes-smoke-snapshot.txt` | Kubernetes Kustomize render, kubeconform and smoke validation snapshot. |
+| `ci-cd/reports/k8s/kubernetes-secret-scan-snapshot.txt` | Kubernetes manifest secret scan snapshot. |
 | `ci-cd/reports/security/trivy-fs-snapshot.txt` | Trivy filesystem scan snapshot. |
 | `ci-cd/reports/security/trivy-api-image-snapshot.txt` | Trivy API image scan snapshot. |
 | `ci-cd/reports/security/trivy-frontend-image-snapshot.txt` | Trivy frontend image scan snapshot. |

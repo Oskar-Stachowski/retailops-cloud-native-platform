@@ -1,0 +1,22 @@
+RetailOps Kubernetes smoke validation snapshot
+Generated at: 2026-05-12T18:51:10Z
+
+Commands:
+- make k8s-smoke
+- bash -n scripts/ci/kubernetes_smoke.sh
+
+Results:
+- rendered base YAML parses successfully
+- kubeconform base validation passed
+- Summary: 8 resources found parsing stdin - Valid: 8, Invalid: 0, Errors: 0, Skipped: 0
+- rendered dev overlay YAML parses successfully
+- kubeconform dev overlay validation passed
+- Summary: 19 resources found parsing stdin - Valid: 19, Invalid: 0, Errors: 0, Skipped: 0
+- rendered dev overlay contains expected Deployments, Services, Jobs and Ingresses
+- Deployment containers define resource requests/limits and expected probes
+- kubeconform secret example validation passed
+- Summary: 1 resource found parsing stdin - Valid: 1, Invalid: 0, Errors: 0, Skipped: 0
+
+Notes:
+- Server-side dry-run was not enabled for this snapshot.
+- Raw local report path: ci-cd/reports/k8s/kubernetes-smoke.txt

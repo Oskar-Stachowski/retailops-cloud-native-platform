@@ -57,8 +57,7 @@ k8s/
     |   |-- deployment.yaml
     |   `-- service.yaml
     |-- ingress/
-    |   |-- api-ingress.yaml
-    |   `-- frontend-ingress.yaml
+    |   `-- ingress.yaml
     |-- namespaces/
     |   `-- retailops.yaml
     `-- kustomization.yaml
@@ -106,8 +105,9 @@ make k8s-smoke
 ```
 
 The smoke test renders base and dev manifests, parses the rendered YAML, checks
-that expected Deployments, Services, Jobs and Ingresses exist, verifies probe and
-resource coverage for deployed workloads, and writes a local report under
+them with `kubeconform`, checks that expected Deployments, Services, Jobs and
+Ingresses exist, verifies probe and resource coverage for deployed workloads,
+validates the example Secret manifest, and writes a local report under
 `ci-cd/reports/k8s/`.
 
 For the full local operating procedure, see

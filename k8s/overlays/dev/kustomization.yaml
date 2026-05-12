@@ -14,6 +14,16 @@ resources:
   - jobs/migrate.yaml
   - jobs/seed.yaml
 
+images:
+  - name: retailops-api
+    newTag: 0.1.0
+  - name: retailops-frontend
+    newTag: 0.1.0
+  - name: postgres
+    newTag: 16-alpine
+  - name: redpandadata/redpanda
+    newTag: v25.3.6
+
 generatorOptions:
   disableNameSuffixHash: true
   labels:
