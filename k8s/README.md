@@ -7,17 +7,21 @@ The current implementation contains only the first base manifests:
 - namespace definition for the local-first RetailOps runtime,
 - shared application ConfigMap,
 - example Secret template with placeholder values only,
+- API Deployment and ClusterIP Service,
 - Kustomize base entrypoint.
 
-Application Deployments, Services, ingress, jobs, probes, resource limits,
-overlays, Helm charts and EKS deployment automation are not implemented yet.
-Current full-stack runtime validation still uses Docker Compose.
+Frontend manifests, ingress, jobs, overlays, Helm charts and EKS deployment
+automation are not implemented yet. Current full-stack runtime validation still
+uses Docker Compose.
 
 ## Layout
 
 ```text
 k8s/
 `-- base/
+    |-- api/
+    |   |-- deployment.yaml
+    |   `-- service.yaml
     |-- config/
     |   |-- app-config.yaml
     |   `-- secret.example.yaml
