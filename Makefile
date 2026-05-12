@@ -134,6 +134,7 @@ help:
 	@echo "  make compose-up           Start full local stack"
 	@echo "  make broker-up            Start local Redpanda broker and create topics"
 	@echo "  make broker-topics        List local Redpanda topics"
+	@echo "  make realtime-consumer    Run local long-running realtime consumer"
 	@echo "  make observability-up     Start API, Prometheus and Grafana for local metrics"
 	@echo "  make observability-smoke  Validate API metrics, Prometheus and Grafana"
 	@echo "  make observability-demo-traffic Generate demo observability traffic and stream metrics"
@@ -376,7 +377,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics observability-up
+.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -393,6 +394,9 @@ broker-up:
 
 broker-topics:
 	$(COMPOSE) exec redpanda rpk topic list --brokers redpanda:9092
+
+realtime-consumer:
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_BROKER_BOOTSTRAP_SERVERS="$(RETAILOPS_BROKER_BOOTSTRAP_SERVERS)" .venv/bin/python scripts/run_realtime_consumer.py
 
 observability-up:
 	$(COMPOSE) up --build -d db migrate seed api prometheus grafana

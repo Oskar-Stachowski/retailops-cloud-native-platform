@@ -175,10 +175,13 @@ class RealtimeEventConsumer:
     def start(self) -> None:
         self.state.running = True
         self.state.started_at = datetime.now(UTC)
+        self.state.stopped_at = None
+        self._persist_state()
 
     def stop(self) -> None:
         self.state.running = False
         self.state.stopped_at = datetime.now(UTC)
+        self._persist_state()
 
     def register_handler(self, event_type: str, handler: EventHandler) -> None:
         self.handlers[event_type] = handler

@@ -28,7 +28,7 @@ This repository intentionally separates implemented components from target archi
 | Terraform AWS foundation | Implemented foundation only | `infra/environments/dev`, reusable Terraform modules |
 | Observability | Implemented for local stack | Prometheus, Grafana provisioning, metrics endpoint, smoke tests |
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
-| Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker; continuously running broker consumer is future work |
+| Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer runner; consumer deployment is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
 | Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, migration and seed jobs only; ingress is future work |
 | MLOps/model lifecycle | Designed only | `ml/README.md` and architecture docs; no training/inference pipeline is implemented yet |
@@ -311,6 +311,12 @@ List local event topics:
 make broker-topics
 ```
 
+Run the long-running local realtime consumer against the host-exposed broker:
+
+```bash
+make realtime-consumer
+```
+
 Stop the stack:
 
 ```bash
@@ -532,7 +538,7 @@ The project documentation is split into several files and directories:
 - `security/README.md` — DevSecOps and governance controls
 - `observability/README.md` — monitoring, metrics and alerting
 - `docs/real-time-event-contracts.md` — real-time event model
-- `docs/local-event-broker.md` — local Redpanda broker and streaming smoke checks
+- `docs/local-event-broker.md` — local Redpanda broker, consumer runner and streaming smoke checks
 - `docs/live-metrics-persistence.md` — persisted live operations read model
 
 ---

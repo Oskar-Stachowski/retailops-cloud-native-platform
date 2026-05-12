@@ -10,12 +10,24 @@ DEFAULT_CORS_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
+DEFAULT_BROKER_TOPICS = [
+    "retailops.sales.v1",
+    "retailops.inventory.v1",
+    "retailops.pricing.v1",
+    "retailops.intelligence.v1",
+    "retailops.operations.v1",
+]
+
+
+def parse_csv_values(value: str | None, default: list[str]) -> list[str]:
+    if not value:
+        return list(default)
+
+    return [item.strip() for item in value.split(",") if item.strip()]
+
 
 def parse_cors_origins(value: str | None) -> list[str]:
-    if not value:
-        return DEFAULT_CORS_ORIGINS
-
-    return [origin.strip() for origin in value.split(",") if origin.strip()]
+    return parse_csv_values(value, DEFAULT_CORS_ORIGINS)
 
 
 class Settings(BaseModel):
@@ -25,6 +37,7 @@ class Settings(BaseModel):
     broker_bootstrap_servers: str | None = None
     broker_group_id: str = "retailops-api-consumer"
     broker_client_id: str = "retailops-api"
+    broker_topics: list[str] = DEFAULT_BROKER_TOPICS
 
 
 @lru_cache
@@ -41,6 +54,10 @@ def get_settings() -> Settings:
         broker_client_id=os.getenv(
             "RETAILOPS_BROKER_CLIENT_ID",
             "retailops-api",
+        ),
+        broker_topics=parse_csv_values(
+            os.getenv("RETAILOPS_BROKER_TOPICS"),
+            DEFAULT_BROKER_TOPICS,
         ),
     )
 

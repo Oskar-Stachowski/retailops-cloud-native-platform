@@ -252,9 +252,10 @@ sales, inventory, alerts, stream freshness, recent events and consumer state.
 Local Prometheus and alert rules are documented in
 [`../../observability/README.md`](../../observability/README.md).
 
-The current API consumer validates and processes event envelopes through a
-broker-agnostic service. A long-running Redpanda/Kafka polling loop remains
-future work.
+The API contains a broker-agnostic event processor and a long-running
+Redpanda/Kafka runner in `scripts/run_realtime_consumer.py`. The runner polls
+configured topics, decodes JSON event envelopes, records live metrics and
+commits offsets after each handled message.
 
 ---
 

@@ -106,16 +106,26 @@ The API service receives:
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS=redpanda:9092
 ```
 
-The API consumer skeleton lives in
+The API consumer service lives in
 [`services/api/app/services/realtime_consumer.py`](../services/api/app/services/realtime_consumer.py)
 and is attached to `app.state` during application startup. It validates event
-envelopes and dispatches events to placeholder handlers, but it does not yet
-connect to the broker.
+envelopes, dispatches events to handlers and records live metrics.
+
+The long-running broker runner lives in
+[`services/api/scripts/run_realtime_consumer.py`](../services/api/scripts/run_realtime_consumer.py).
+It uses `confluent-kafka` to poll Redpanda/Kafka topics and pass decoded JSON
+event envelopes into the existing processor.
 
 Host tools should use:
 
 ```text
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS=localhost:19092
+```
+
+Run the local consumer against the host-exposed broker:
+
+```bash
+make realtime-consumer
 ```
 
 ## 6. Streaming Smoke Test
@@ -131,10 +141,9 @@ checks:
 - Prometheus target health for the API scrape job,
 - Prometheus loading of stream alert rules.
 
-It does not yet publish events into the broker because the current API consumer
-is a processing skeleton and persistence layer, not a long-running Kafka poller.
-That should become a later streaming E2E test once the consumer loop is wired to
-Redpanda.
+It does not yet publish events into the broker or assert end-to-end consumed
+events by default. That should become a later streaming E2E test once a producer
+or replay command runs alongside the long-running consumer.
 
 ## 7. AWS Mapping
 
