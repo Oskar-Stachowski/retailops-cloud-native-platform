@@ -1,0 +1,5353 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RetailOps API",
+    "description": "Backend API for the RetailOps cloud-native AI platform.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health check",
+        "description": "Returns basic service health information for local checks, Docker health checks, CI validation and future Kubernetes probes.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readiness check",
+        "description": "Returns service readiness information, including database connectivity.",
+        "operationId": "readiness_check_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database is not available"
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "tags": [
+          "observability"
+        ],
+        "summary": "Get Prometheus metrics",
+        "description": "Returns application metrics in Prometheus text exposition format. Sprint 11 exposes API service metadata and Sprint 9 real-time stream processing metrics derived from the persisted event log and consumer state tables.",
+        "operationId": "get_metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/summary": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get dashboard summary",
+        "description": "Returns compact operational counters for the RetailOps dashboard, including product, sales, inventory, forecast, anomaly and recommendation counts.",
+        "operationId": "get_dashboard_summary_dashboard_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/operational-visibility": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get operational visibility overview",
+        "description": "Returns a compact dashboard-ready payload with summary counters, stock-risk counters, sales trend and open work items. This endpoint is intentionally read-only and presentation-oriented.",
+        "operationId": "get_operational_visibility_dashboard_operational_visibility_get",
+        "parameters": [
+          {
+            "name": "sales_trend_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "description": "Number of days included in the sales trend.",
+              "default": 14,
+              "title": "Sales Trend Days"
+            },
+            "description": "Number of days included in the sales trend."
+          },
+          {
+            "name": "work_items_limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of work items to return.",
+              "default": 10,
+              "title": "Work Items Limit"
+            },
+            "description": "Maximum number of work items to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOperationalVisibilityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/live-operations": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get live operations metrics",
+        "description": "Returns real-time dashboard data derived from persisted event stream metrics: live sales counters, event freshness, processing status, recent stream events, alert-like events and consumer state.",
+        "operationId": "get_live_operations_dashboard_live_operations_get",
+        "parameters": [
+          {
+            "name": "window_minutes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 240,
+              "minimum": 1,
+              "description": "Trailing live window used to aggregate metric observations.",
+              "default": 15,
+              "title": "Window Minutes"
+            },
+            "description": "Trailing live window used to aggregate metric observations."
+          },
+          {
+            "name": "recent_events_limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of recent stream events to return.",
+              "default": 20,
+              "title": "Recent Events Limit"
+            },
+            "description": "Maximum number of recent stream events to return."
+          },
+          {
+            "name": "alerts_limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of recent alert-like events to return.",
+              "default": 10,
+              "title": "Alerts Limit"
+            },
+            "description": "Maximum number of recent alert-like events to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardLiveOperationsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/sales-trend": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get dashboard sales trend",
+        "description": "Returns daily sales units and revenue for dashboard charting.",
+        "operationId": "get_sales_trend_dashboard_sales_trend_get",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "description": "Number of trailing days to aggregate.",
+              "default": 14,
+              "title": "Days"
+            },
+            "description": "Number of trailing days to aggregate."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSalesTrendResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/alerts": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get dashboard alerts",
+        "description": "Returns open anomaly-like items for dashboard visibility. The endpoint keeps the historical /dashboard/alerts contract used after Sprint 3.",
+        "operationId": "get_dashboard_alerts_dashboard_alerts_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of alerts to return.",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Maximum number of alerts to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardWorkItemsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/recommendations": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get dashboard recommendations",
+        "description": "Returns recent recommendation-like items for dashboard decision support.",
+        "operationId": "get_dashboard_recommendations_dashboard_recommendations_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of recommendations to return.",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Maximum number of recommendations to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardRecommendationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/open-work-items": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get open dashboard work items",
+        "description": "Returns a combined operational backlog from anomalies and recommendations. This is useful for a single dashboard widget.",
+        "operationId": "get_open_work_items_dashboard_open_work_items_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Maximum number of work items to return.",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Maximum number of work items to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardWorkItemsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/stock-risk-summary": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get stock-risk summary",
+        "description": "Returns stock-risk counters for operational dashboard cards.",
+        "operationId": "get_stock_risk_summary_dashboard_stock_risk_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStockRiskSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts/{alert_id}/acknowledge": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Acknowledge an alert",
+        "description": "Moves an open alert to acknowledged and records a workflow action.",
+        "operationId": "acknowledge_alert_alerts__alert_id__acknowledge_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkflowMutationRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts/{alert_id}/assign": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Assign an alert",
+        "description": "Assigns an alert, moves it to in_progress and records a workflow action.",
+        "operationId": "assign_alert_alerts__alert_id__assign_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts/{alert_id}/resolve": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Resolve an alert",
+        "description": "Moves an acknowledged or in-progress alert to resolved.",
+        "operationId": "resolve_alert_alerts__alert_id__resolve_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkflowMutationRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts/{alert_id}/dismiss": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Dismiss an alert",
+        "description": "Dismisses an alert. A decision comment is required.",
+        "operationId": "dismiss_alert_alerts__alert_id__dismiss_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts/{alert_id}/comment": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Comment on an alert",
+        "description": "Records a comment without changing the current alert status.",
+        "operationId": "comment_on_alert_alerts__alert_id__comment_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommendations/{recommendation_id}/accept": {
+      "post": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Accept a recommendation",
+        "description": "Moves a proposed recommendation to accepted and records a workflow action.",
+        "operationId": "accept_recommendation_recommendations__recommendation_id__accept_post",
+        "parameters": [
+          {
+            "name": "recommendation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recommendation Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkflowMutationRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommendations/{recommendation_id}/reject": {
+      "post": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Reject a recommendation",
+        "description": "Rejects a proposed recommendation. A decision comment is required.",
+        "operationId": "reject_recommendation_recommendations__recommendation_id__reject_post",
+        "parameters": [
+          {
+            "name": "recommendation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recommendation Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommendations/{recommendation_id}/assign": {
+      "post": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Assign a recommendation",
+        "description": "Assigns a recommendation owner without changing its status.",
+        "operationId": "assign_recommendation_recommendations__recommendation_id__assign_post",
+        "parameters": [
+          {
+            "name": "recommendation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recommendation Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommendations/{recommendation_id}/resolve": {
+      "post": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Resolve a recommendation",
+        "description": "Moves an accepted recommendation to implemented.",
+        "operationId": "resolve_recommendation_recommendations__recommendation_id__resolve_post",
+        "parameters": [
+          {
+            "name": "recommendation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recommendation Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkflowMutationRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommendations/{recommendation_id}/dismiss": {
+      "post": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Dismiss a recommendation",
+        "description": "Dismisses a proposed recommendation. A decision comment is required.",
+        "operationId": "dismiss_recommendation_recommendations__recommendation_id__dismiss_post",
+        "parameters": [
+          {
+            "name": "recommendation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recommendation Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowMutationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analytics/products": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get product-level performance summary",
+        "operationId": "get_product_performance_analytics_products_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Product Performance Analytics Products Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analytics/inventory-risk": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get product inventory risk summary",
+        "operationId": "get_inventory_risk_analytics_inventory_risk_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Inventory Risk Analytics Inventory Risk Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "List products",
+        "description": "Returns products using a stable list response contract with items and pagination metadata. Supports MVP filters and sorting.",
+        "operationId": "list_products_products_get",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by product category.",
+              "title": "Category"
+            },
+            "description": "Filter by product category."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ProductStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by product lifecycle status.",
+              "title": "Status"
+            },
+            "description": "Filter by product lifecycle status."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Search in SKU, name or category.",
+              "title": "Search"
+            },
+            "description": "Search in SKU, name or category."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ProductSortBy",
+              "description": "Sort field.",
+              "default": "sku"
+            },
+            "description": "Sort field."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "description": "Sort direction.",
+              "default": "asc"
+            },
+            "description": "Sort direction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{product_id}": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Get product details",
+        "operationId": "get_product_products__product_id__get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Product technical identifier.",
+              "title": "Product Id"
+            },
+            "description": "Product technical identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product was not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{product_id}/360": {
+      "get": {
+        "tags": [
+          "product-360"
+        ],
+        "summary": "Get Product 360 view",
+        "description": "Returns a read-only product drill-down composed from product, sales, inventory, forecast, anomaly, alert, recommendation and workflow tables.",
+        "operationId": "get_product_360_products__product_id__360_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Product technical identifier.",
+              "title": "Product Id"
+            },
+            "description": "Product technical identifier."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Maximum number of related rows returned per section.",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Maximum number of related rows returned per section."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product360Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product was not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forecasts": {
+      "get": {
+        "tags": [
+          "forecasts"
+        ],
+        "summary": "List forecasts",
+        "description": "Returns forecasts using a stable list response contract with items and pagination metadata. Supports MVP product/status/method/date filters.",
+        "operationId": "list_forecasts_forecasts_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter forecasts for one product.",
+              "title": "Product Id"
+            },
+            "description": "Filter forecasts for one product."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ForecastStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by forecast status.",
+              "title": "Status"
+            },
+            "description": "Filter by forecast status."
+          },
+          {
+            "name": "method",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ForecastMethod"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by forecasting method.",
+              "title": "Method"
+            },
+            "description": "Filter by forecasting method."
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter periods starting on or after this date.",
+              "title": "Date From"
+            },
+            "description": "Filter periods starting on or after this date."
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter periods ending on or before this date.",
+              "title": "Date To"
+            },
+            "description": "Filter periods ending on or before this date."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ForecastSortBy",
+              "description": "Sort field.",
+              "default": "forecast_period_start"
+            },
+            "description": "Sort field."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "description": "Sort direction.",
+              "default": "asc"
+            },
+            "description": "Sort direction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forecasts/{forecast_id}": {
+      "get": {
+        "tags": [
+          "forecasts"
+        ],
+        "summary": "Get forecast details",
+        "operationId": "get_forecast_forecasts__forecast_id__get",
+        "parameters": [
+          {
+            "name": "forecast_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Forecast technical identifier.",
+              "title": "Forecast Id"
+            },
+            "description": "Forecast technical identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Forecast was not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory-snapshots": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "List inventory snapshots",
+        "description": "Returns inventory snapshots using the stable list response contract with items and pagination metadata.",
+        "operationId": "list_inventory_snapshots_inventory_snapshots_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter inventory snapshots for one product.",
+              "title": "Product Id"
+            },
+            "description": "Filter inventory snapshots for one product."
+          },
+          {
+            "name": "warehouse_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by warehouse/location code.",
+              "title": "Warehouse Code"
+            },
+            "description": "Filter by warehouse/location code."
+          },
+          {
+            "name": "unit_of_measure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/UnitOfMeasure"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by inventory unit of measure.",
+              "title": "Unit Of Measure"
+            },
+            "description": "Filter by inventory unit of measure."
+          },
+          {
+            "name": "recorded_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter snapshots recorded at or after this timestamp.",
+              "title": "Recorded From"
+            },
+            "description": "Filter snapshots recorded at or after this timestamp."
+          },
+          {
+            "name": "recorded_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter snapshots recorded at or before this timestamp.",
+              "title": "Recorded To"
+            },
+            "description": "Filter snapshots recorded at or before this timestamp."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/InventorySortBy",
+              "description": "Sort field.",
+              "default": "recorded_at"
+            },
+            "description": "Sort field."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "description": "Sort direction.",
+              "default": "desc"
+            },
+            "description": "Sort direction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventorySnapshotListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory-snapshots/{inventory_snapshot_id}": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Get inventory snapshot details",
+        "operationId": "get_inventory_snapshot_inventory_snapshots__inventory_snapshot_id__get",
+        "parameters": [
+          {
+            "name": "inventory_snapshot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Inventory snapshot technical identifier.",
+              "title": "Inventory Snapshot Id"
+            },
+            "description": "Inventory snapshot technical identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventorySnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inventory snapshot was not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sales": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "List sales records",
+        "description": "Returns product-level sales records using the stable list response contract with items and pagination metadata.",
+        "operationId": "list_sales_sales_get",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sales for one product.",
+              "title": "Product Id"
+            },
+            "description": "Filter sales for one product."
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Channel"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by sales channel.",
+              "title": "Channel"
+            },
+            "description": "Filter by sales channel."
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Currency"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by currency.",
+              "title": "Currency"
+            },
+            "description": "Filter by currency."
+          },
+          {
+            "name": "sold_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sales sold at or after this timestamp.",
+              "title": "Sold From"
+            },
+            "description": "Filter sales sold at or after this timestamp."
+          },
+          {
+            "name": "sold_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sales sold at or before this timestamp.",
+              "title": "Sold To"
+            },
+            "description": "Filter sales sold at or before this timestamp."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SaleSortBy",
+              "description": "Sort field.",
+              "default": "sold_at"
+            },
+            "description": "Sort field."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "description": "Sort direction.",
+              "default": "desc"
+            },
+            "description": "Sort direction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaleListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sales/{sale_id}": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Get sale details",
+        "operationId": "get_sale_sales__sale_id__get",
+        "parameters": [
+          {
+            "name": "sale_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Sale technical identifier.",
+              "title": "Sale Id"
+            },
+            "description": "Sale technical identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaleResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sale was not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory-risks": {
+      "get": {
+        "tags": [
+          "stock-risk"
+        ],
+        "summary": "List product stock risks",
+        "description": "Returns product-level stock risk classification based on latest inventory and forecast signals.",
+        "operationId": "list_inventory_risks_inventory_risks_get",
+        "parameters": [
+          {
+            "name": "risk_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RiskStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by stock risk status.",
+              "title": "Risk Status"
+            },
+            "description": "Filter by stock risk status."
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by product category.",
+              "title": "Category"
+            },
+            "description": "Filter by product category."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/StockRiskSortBy",
+              "description": "Sort field.",
+              "default": "risk_status"
+            },
+            "description": "Sort field."
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "description": "Sort direction.",
+              "default": "asc"
+            },
+            "description": "Sort direction."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockRiskListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/demo": {
+      "get": {
+        "tags": [
+          "identity"
+        ],
+        "summary": "List Demo Users",
+        "description": "List selectable local demo users for the frontend switcher.",
+        "operationId": "list_demo_users_users_demo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoUserListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "identity"
+        ],
+        "summary": "Get Current User",
+        "description": "Return the currently selected local demo user.",
+        "operationId": "get_current_user_me_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/permissions": {
+      "get": {
+        "tags": [
+          "identity"
+        ],
+        "summary": "Get Current Permissions",
+        "description": "Return permissions assigned to the current local demo user.",
+        "operationId": "get_current_permissions_me_permissions_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "List Notifications",
+        "description": "Return mock notifications visible to the selected demo user.",
+        "operationId": "list_notifications_notifications_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/{notification_id}/read": {
+      "post": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Mark Notification Read",
+        "description": "Mark a visible mock notification as read for the selected demo user.",
+        "operationId": "mark_notification_read_notifications__notification_id__read_post",
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Notification Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local demo user id.",
+              "title": "User Id"
+            },
+            "description": "Local demo user id."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationReadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Channel": {
+        "type": "string",
+        "enum": [
+          "online",
+          "store",
+          "marketplace",
+          "wholesale"
+        ],
+        "title": "Channel"
+      },
+      "Currency": {
+        "type": "string",
+        "enum": [
+          "PLN",
+          "EUR",
+          "USD"
+        ],
+        "title": "Currency"
+      },
+      "CurrentUserResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/DemoUserResponse"
+          },
+          "auth_mode": {
+            "type": "string",
+            "title": "Auth Mode"
+          },
+          "scope_boundary": {
+            "type": "string",
+            "title": "Scope Boundary"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "user",
+          "auth_mode",
+          "scope_boundary"
+        ],
+        "title": "CurrentUserResponse",
+        "description": "Response for GET /me."
+      },
+      "DashboardLiveAlert": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "event_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Type"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "occurred_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occurred At"
+          },
+          "ingested_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingested At"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "event_id",
+          "payload"
+        ],
+        "title": "DashboardLiveAlert",
+        "description": "Recent alert-like event from the real-time stream."
+      },
+      "DashboardLiveConsumerState": {
+        "properties": {
+          "consumer_name": {
+            "type": "string",
+            "title": "Consumer Name"
+          },
+          "running": {
+            "type": "boolean",
+            "title": "Running"
+          },
+          "received_events": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Received Events"
+          },
+          "processed_events": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Processed Events"
+          },
+          "failed_events": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Failed Events"
+          },
+          "dead_lettered_events": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Dead Lettered Events"
+          },
+          "ignored_events": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Ignored Events"
+          },
+          "last_event_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Event Id"
+          },
+          "last_event_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Event Type"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "last_processed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Processed At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "stopped_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stopped At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "consumer_name",
+          "running",
+          "received_events",
+          "processed_events",
+          "failed_events",
+          "dead_lettered_events",
+          "ignored_events"
+        ],
+        "title": "DashboardLiveConsumerState",
+        "description": "Persisted consumer state for live operations monitoring."
+      },
+      "DashboardLiveEvent": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "event_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Type"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "occurred_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occurred At"
+          },
+          "ingested_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingested At"
+          },
+          "processed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processed At"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "event_id"
+        ],
+        "title": "DashboardLiveEvent",
+        "description": "Recent processed event shown in live operations views."
+      },
+      "DashboardLiveEventStatusCounts": {
+        "properties": {
+          "received": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Received"
+          },
+          "processed": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Processed"
+          },
+          "failed_dead_lettered": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Failed Dead Lettered"
+          },
+          "ignored_duplicate": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Ignored Duplicate"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "received",
+          "processed",
+          "failed_dead_lettered",
+          "ignored_duplicate",
+          "total"
+        ],
+        "title": "DashboardLiveEventStatusCounts",
+        "description": "Event processing counters for the selected live window."
+      },
+      "DashboardLiveFreshness": {
+        "properties": {
+          "latest_event_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Event At"
+          },
+          "freshness_seconds": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Freshness Seconds"
+          },
+          "is_fresh": {
+            "type": "boolean",
+            "title": "Is Fresh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_fresh"
+        ],
+        "title": "DashboardLiveFreshness",
+        "description": "Freshness metadata for the real-time event stream."
+      },
+      "DashboardLiveMetricValue": {
+        "properties": {
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "observation_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Observation Count"
+          },
+          "latest_observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Observed At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "value",
+          "observation_count"
+        ],
+        "title": "DashboardLiveMetricValue",
+        "description": "Raw live metric value with observation metadata."
+      },
+      "DashboardLiveMetrics": {
+        "properties": {
+          "revenue": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Revenue"
+          },
+          "units_sold": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Units Sold"
+          },
+          "orders_created": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Orders Created"
+          },
+          "sales_events": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Sales Events"
+          },
+          "return_amount": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Return Amount"
+          },
+          "return_units": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Return Units"
+          },
+          "stock_delta": {
+            "type": "number",
+            "title": "Stock Delta"
+          },
+          "stock_events": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Stock Events"
+          },
+          "replenishment_units": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Replenishment Units"
+          },
+          "anomalies_detected": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Anomalies Detected"
+          },
+          "alerts_created": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Alerts Created"
+          },
+          "workflow_actions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Workflow Actions"
+          },
+          "raw_metrics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DashboardLiveMetricValue"
+            },
+            "type": "object",
+            "title": "Raw Metrics"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "revenue",
+          "units_sold",
+          "orders_created",
+          "sales_events",
+          "return_amount",
+          "return_units",
+          "stock_delta",
+          "stock_events",
+          "replenishment_units",
+          "anomalies_detected",
+          "alerts_created",
+          "workflow_actions",
+          "raw_metrics"
+        ],
+        "title": "DashboardLiveMetrics",
+        "description": "Normalized live operational counters for the selected window."
+      },
+      "DashboardLiveOperationsResponse": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "window_minutes": {
+            "type": "integer",
+            "maximum": 240.0,
+            "minimum": 1.0,
+            "title": "Window Minutes"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/DashboardLiveMetrics"
+          },
+          "event_status_counts": {
+            "$ref": "#/components/schemas/DashboardLiveEventStatusCounts"
+          },
+          "freshness": {
+            "$ref": "#/components/schemas/DashboardLiveFreshness"
+          },
+          "recent_events": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardLiveEvent"
+            },
+            "type": "array",
+            "title": "Recent Events"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardLiveAlert"
+            },
+            "type": "array",
+            "title": "Alerts"
+          },
+          "consumer_states": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardLiveConsumerState"
+            },
+            "type": "array",
+            "title": "Consumer States"
+          },
+          "limits": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Limits"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "generated_at",
+          "window_minutes",
+          "metrics",
+          "event_status_counts",
+          "freshness",
+          "recent_events",
+          "alerts",
+          "consumer_states",
+          "limits"
+        ],
+        "title": "DashboardLiveOperationsResponse",
+        "description": "Composite live operations response backed by real-time metrics tables."
+      },
+      "DashboardOperationalVisibilityResponse": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DashboardSummary"
+          },
+          "stock_risk_summary": {
+            "$ref": "#/components/schemas/DashboardStockRiskSummary"
+          },
+          "sales_trend": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardSalesTrendItem"
+            },
+            "type": "array",
+            "title": "Sales Trend"
+          },
+          "open_work_items": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkItem"
+            },
+            "type": "array",
+            "title": "Open Work Items"
+          },
+          "limits": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Limits"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "generated_at",
+          "summary",
+          "stock_risk_summary",
+          "sales_trend",
+          "open_work_items",
+          "limits"
+        ],
+        "title": "DashboardOperationalVisibilityResponse",
+        "description": "Composite dashboard response for operations-oriented overview screens."
+      },
+      "DashboardRecommendationResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "limit"
+        ],
+        "title": "DashboardRecommendationResponse",
+        "description": "Response for top dashboard recommendations."
+      },
+      "DashboardSalesTrendItem": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "units_sold": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Units Sold"
+          },
+          "revenue": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Revenue"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "date",
+          "units_sold",
+          "revenue"
+        ],
+        "title": "DashboardSalesTrendItem",
+        "description": "One point in the dashboard sales trend chart."
+      },
+      "DashboardSalesTrendResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardSalesTrendItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "days": {
+            "type": "integer",
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Days"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "days"
+        ],
+        "title": "DashboardSalesTrendResponse",
+        "description": "Response for GET /dashboard/sales-trend."
+      },
+      "DashboardStockRiskSummary": {
+        "properties": {
+          "total_risk_items": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Risk Items"
+          },
+          "normal_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Normal Count"
+          },
+          "stockout_risk_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Stockout Risk Count"
+          },
+          "overstock_risk_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Overstock Risk Count"
+          },
+          "unknown_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Unknown Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "total_risk_items",
+          "normal_count",
+          "stockout_risk_count",
+          "overstock_risk_count",
+          "unknown_count"
+        ],
+        "title": "DashboardStockRiskSummary",
+        "description": "Aggregated stock-risk counters for operational visibility."
+      },
+      "DashboardSummary": {
+        "properties": {
+          "products_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Products Count"
+          },
+          "sales_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Sales Count"
+          },
+          "inventory_snapshots_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Inventory Snapshots Count"
+          },
+          "forecasts_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Forecasts Count"
+          },
+          "anomalies_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Anomalies Count"
+          },
+          "recommendations_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Recommendations Count"
+          },
+          "open_anomalies_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Open Anomalies Count"
+          },
+          "open_recommendations_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Open Recommendations Count"
+          },
+          "open_work_items_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Open Work Items Count"
+          },
+          "last_refresh_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Refresh At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "products_count",
+          "sales_count",
+          "inventory_snapshots_count",
+          "forecasts_count",
+          "anomalies_count",
+          "recommendations_count",
+          "open_anomalies_count",
+          "open_recommendations_count",
+          "open_work_items_count"
+        ],
+        "title": "DashboardSummary",
+        "description": "Top-level operational counters used by the RetailOps dashboard."
+      },
+      "DashboardSummaryResponse": {
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/DashboardSummary"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "summary"
+        ],
+        "title": "DashboardSummaryResponse",
+        "description": "Response for GET /dashboard/summary."
+      },
+      "DashboardWorkItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          },
+          "sku": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sku"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "detected_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detected At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "source"
+        ],
+        "title": "DashboardWorkItem",
+        "description": "Small operational work item for dashboard widgets."
+      },
+      "DashboardWorkItemsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardWorkItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "limit"
+        ],
+        "title": "DashboardWorkItemsResponse",
+        "description": "Response for open dashboard work item widgets."
+      },
+      "DemoUserListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DemoUserResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "default_user_id": {
+            "type": "string",
+            "title": "Default User Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "default_user_id"
+        ],
+        "title": "DemoUserListResponse",
+        "description": "Selectable local users used by the frontend demo switcher."
+      },
+      "DemoUserResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "login": {
+            "type": "string",
+            "title": "Login"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "team": {
+            "type": "string",
+            "title": "Team"
+          },
+          "business_area": {
+            "type": "string",
+            "title": "Business Area"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "login",
+          "display_name",
+          "email",
+          "role",
+          "team",
+          "business_area",
+          "permissions"
+        ],
+        "title": "DemoUserResponse",
+        "description": "Public mock identity used by Sprint 7 role-aware UI."
+      },
+      "ForecastListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "ForecastListResponse",
+        "description": "Stable list response for Forecast endpoints."
+      },
+      "ForecastMethod": {
+        "type": "string",
+        "enum": [
+          "moving_average",
+          "naive_baseline",
+          "seeded_demo",
+          "retailops-baseline-demand-model"
+        ],
+        "title": "ForecastMethod"
+      },
+      "ForecastResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "forecast_period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Forecast Period Start"
+          },
+          "forecast_period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Forecast Period End"
+          },
+          "predicted_quantity": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Predicted Quantity"
+          },
+          "unit_of_measure": {
+            "type": "string",
+            "title": "Unit Of Measure"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "confidence_level": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence Level"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "forecast_period_start",
+          "forecast_period_end",
+          "predicted_quantity",
+          "unit_of_measure",
+          "generated_at",
+          "method",
+          "status",
+          "confidence_level"
+        ],
+        "title": "ForecastResponse",
+        "description": "Stable public representation of a Forecast."
+      },
+      "ForecastSortBy": {
+        "type": "string",
+        "enum": [
+          "forecast_period_start",
+          "forecast_period_end",
+          "generated_at",
+          "predicted_quantity",
+          "confidence_level"
+        ],
+        "title": "ForecastSortBy"
+      },
+      "ForecastStatus": {
+        "type": "string",
+        "enum": [
+          "generated",
+          "evaluated",
+          "deprecated"
+        ],
+        "title": "ForecastStatus"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "example": "ok"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service",
+            "example": "retailops-api"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment",
+            "example": "local"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "environment"
+        ],
+        "title": "HealthResponse"
+      },
+      "InventorySnapshotListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InventorySnapshotResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "InventorySnapshotListResponse",
+        "description": "Stable list response for inventory snapshot endpoints."
+      },
+      "InventorySnapshotResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "stock_quantity": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Stock Quantity"
+          },
+          "unit_of_measure": {
+            "type": "string",
+            "title": "Unit Of Measure"
+          },
+          "warehouse_code": {
+            "type": "string",
+            "title": "Warehouse Code"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          },
+          "ingested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ingested At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "stock_quantity",
+          "unit_of_measure",
+          "warehouse_code",
+          "recorded_at",
+          "ingested_at",
+          "created_at"
+        ],
+        "title": "InventorySnapshotResponse",
+        "description": "Stable public representation of an inventory snapshot."
+      },
+      "InventorySortBy": {
+        "type": "string",
+        "enum": [
+          "recorded_at",
+          "ingested_at",
+          "created_at",
+          "stock_quantity",
+          "warehouse_code"
+        ],
+        "title": "InventorySortBy"
+      },
+      "NotificationListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "unread_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Unread Count"
+          },
+          "total_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Count"
+          },
+          "user": {
+            "$ref": "#/components/schemas/DemoUserResponse"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "unread_count",
+          "total_count",
+          "user"
+        ],
+        "title": "NotificationListResponse",
+        "description": "Response for GET /notifications."
+      },
+      "NotificationReadResponse": {
+        "properties": {
+          "notification": {
+            "$ref": "#/components/schemas/NotificationResponse"
+          },
+          "unread_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Unread Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "notification",
+          "unread_count"
+        ],
+        "title": "NotificationReadResponse",
+        "description": "Response for POST /notifications/{notification_id}/read."
+      },
+      "NotificationResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "target_role": {
+            "type": "string",
+            "title": "Target Role"
+          },
+          "action_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Url"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "message",
+          "category",
+          "severity",
+          "status",
+          "target_role",
+          "created_at"
+        ],
+        "title": "NotificationResponse",
+        "description": "Local mock notification visible to a demo user."
+      },
+      "PaginationMetadata": {
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Limit",
+            "example": 50
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Offset",
+            "example": 0
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total",
+            "example": 125
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "limit",
+          "offset",
+          "total"
+        ],
+        "title": "PaginationMetadata",
+        "description": "Pagination metadata returned with every list response."
+      },
+      "PermissionListResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "user_id",
+          "role",
+          "permissions"
+        ],
+        "title": "PermissionListResponse",
+        "description": "Response for GET /me/permissions."
+      },
+      "Product360Alert": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "anomaly_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly Id"
+          },
+          "assigned_to_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To User Id"
+          },
+          "alert_type": {
+            "type": "string",
+            "title": "Alert Type"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "recommended_action": {
+            "type": "string",
+            "title": "Recommended Action"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "alert_type",
+          "severity",
+          "status",
+          "title",
+          "recommended_action",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "Product360Alert",
+        "description": "Operational alert linked to a product."
+      },
+      "Product360Anomaly": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "anomaly_type": {
+            "type": "string",
+            "title": "Anomaly Type"
+          },
+          "metric_name": {
+            "type": "string",
+            "title": "Metric Name"
+          },
+          "actual_value": {
+            "type": "number",
+            "title": "Actual Value"
+          },
+          "expected_value": {
+            "type": "number",
+            "title": "Expected Value"
+          },
+          "deviation_percent": {
+            "type": "number",
+            "title": "Deviation Percent"
+          },
+          "impact_value": {
+            "type": "number",
+            "title": "Impact Value"
+          },
+          "impact_unit": {
+            "type": "string",
+            "title": "Impact Unit"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Detected At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "anomaly_type",
+          "metric_name",
+          "actual_value",
+          "expected_value",
+          "deviation_percent",
+          "impact_value",
+          "impact_unit",
+          "severity",
+          "period_start",
+          "period_end",
+          "detected_at"
+        ],
+        "title": "Product360Anomaly",
+        "description": "Anomaly row shown inside a Product 360 view."
+      },
+      "Product360Metrics": {
+        "properties": {
+          "sales_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Sales Count"
+          },
+          "total_units_sold": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Units Sold"
+          },
+          "total_revenue": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Revenue"
+          },
+          "latest_sale_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Sale At"
+          },
+          "inventory_snapshot_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Inventory Snapshot Count"
+          },
+          "current_stock": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stock"
+          },
+          "inventory_updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inventory Updated At"
+          },
+          "forecast_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Forecast Count"
+          },
+          "latest_forecast_quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Forecast Quantity"
+          },
+          "latest_forecast_period_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Forecast Period Start"
+          },
+          "latest_forecast_period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Forecast Period End"
+          },
+          "anomaly_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Anomaly Count"
+          },
+          "alert_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Alert Count"
+          },
+          "open_alert_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Open Alert Count"
+          },
+          "recommendation_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Recommendation Count"
+          },
+          "open_recommendation_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Open Recommendation Count"
+          },
+          "workflow_action_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Workflow Action Count"
+          },
+          "risk_status": {
+            "type": "string",
+            "title": "Risk Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sales_count",
+          "total_units_sold",
+          "total_revenue",
+          "inventory_snapshot_count",
+          "forecast_count",
+          "anomaly_count",
+          "alert_count",
+          "open_alert_count",
+          "recommendation_count",
+          "open_recommendation_count",
+          "workflow_action_count",
+          "risk_status"
+        ],
+        "title": "Product360Metrics",
+        "description": "Aggregated product-level counters for Product 360."
+      },
+      "Product360Recommendation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "forecast_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Id"
+          },
+          "anomaly_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly Id"
+          },
+          "alert_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alert Id"
+          },
+          "recommendation_type": {
+            "type": "string",
+            "title": "Recommendation Type"
+          },
+          "recommended_action": {
+            "type": "string",
+            "title": "Recommended Action"
+          },
+          "rationale": {
+            "type": "string",
+            "title": "Rationale"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "recommendation_type",
+          "recommended_action",
+          "rationale",
+          "status",
+          "generated_at",
+          "created_at"
+        ],
+        "title": "Product360Recommendation",
+        "description": "Recommended product-level action."
+      },
+      "Product360Response": {
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductResponse"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Product360Metrics"
+          },
+          "stock_risk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StockRiskResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sales": {
+            "items": {
+              "$ref": "#/components/schemas/SaleResponse"
+            },
+            "type": "array",
+            "title": "Sales"
+          },
+          "inventory_snapshots": {
+            "items": {
+              "$ref": "#/components/schemas/InventorySnapshotResponse"
+            },
+            "type": "array",
+            "title": "Inventory Snapshots"
+          },
+          "forecasts": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastResponse"
+            },
+            "type": "array",
+            "title": "Forecasts"
+          },
+          "anomalies": {
+            "items": {
+              "$ref": "#/components/schemas/Product360Anomaly"
+            },
+            "type": "array",
+            "title": "Anomalies"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/Product360Alert"
+            },
+            "type": "array",
+            "title": "Alerts"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/Product360Recommendation"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          },
+          "workflow_actions": {
+            "items": {
+              "$ref": "#/components/schemas/Product360WorkflowAction"
+            },
+            "type": "array",
+            "title": "Workflow Actions"
+          },
+          "limits": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Limits"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "product",
+          "metrics",
+          "sales",
+          "inventory_snapshots",
+          "forecasts",
+          "anomalies",
+          "alerts",
+          "recommendations",
+          "workflow_actions",
+          "limits"
+        ],
+        "title": "Product360Response",
+        "description": "Composite response for GET /products/{product_id}/360."
+      },
+      "Product360WorkflowAction": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "alert_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Alert Id"
+          },
+          "performed_by_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Performed By User Id"
+          },
+          "action_type": {
+            "type": "string",
+            "title": "Action Type"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "previous_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Status"
+          },
+          "new_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Status"
+          },
+          "performed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Performed At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "alert_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alert Title"
+          },
+          "performed_by_login": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Performed By Login"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "alert_id",
+          "performed_by_user_id",
+          "action_type",
+          "created_at"
+        ],
+        "title": "Product360WorkflowAction",
+        "description": "Workflow audit event linked through a product alert."
+      },
+      "ProductListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProductResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "ProductListResponse",
+        "description": "Stable list response for Product endpoints."
+      },
+      "ProductResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "sku": {
+            "type": "string",
+            "title": "Sku"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "sku",
+          "name",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ProductResponse",
+        "description": "Stable public representation of a Product."
+      },
+      "ProductSortBy": {
+        "type": "string",
+        "enum": [
+          "sku",
+          "name",
+          "category",
+          "status",
+          "created_at"
+        ],
+        "title": "ProductSortBy"
+      },
+      "ProductStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "discontinued"
+        ],
+        "title": "ProductStatus"
+      },
+      "ReadinessResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "example": "ok"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service",
+            "example": "retailops-api"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment",
+            "example": "local"
+          },
+          "database": {
+            "type": "string",
+            "title": "Database",
+            "example": "ok"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "environment",
+          "database"
+        ],
+        "title": "ReadinessResponse"
+      },
+      "RiskStatus": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "stockout_risk",
+          "overstock_risk",
+          "unknown"
+        ],
+        "title": "RiskStatus"
+      },
+      "SaleListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SaleResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "SaleListResponse",
+        "description": "Stable list response for sales endpoints."
+      },
+      "SaleResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "quantity": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity"
+          },
+          "sold_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sold At"
+          },
+          "unit_price": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Unit Price"
+          },
+          "total_amount": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Amount"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "quantity",
+          "sold_at",
+          "unit_price",
+          "total_amount",
+          "currency",
+          "created_at"
+        ],
+        "title": "SaleResponse",
+        "description": "Stable public representation of a sales record."
+      },
+      "SaleSortBy": {
+        "type": "string",
+        "enum": [
+          "sold_at",
+          "created_at",
+          "quantity",
+          "unit_price",
+          "total_amount",
+          "channel"
+        ],
+        "title": "SaleSortBy"
+      },
+      "SortOrder": {
+        "type": "string",
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "title": "SortOrder"
+      },
+      "StockRiskListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StockRiskResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "StockRiskListResponse",
+        "description": "Stable list response for stock-risk endpoints."
+      },
+      "StockRiskResponse": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "sku": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sku"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "current_stock": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stock"
+          },
+          "forecast_quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Quantity"
+          },
+          "risk_status": {
+            "type": "string",
+            "title": "Risk Status"
+          },
+          "inventory_updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inventory Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "product_id",
+          "risk_status"
+        ],
+        "title": "StockRiskResponse",
+        "description": "Stable public representation of product-level stock risk."
+      },
+      "StockRiskSortBy": {
+        "type": "string",
+        "enum": [
+          "risk_status",
+          "sku",
+          "current_stock",
+          "forecast_quantity",
+          "inventory_updated_at"
+        ],
+        "title": "StockRiskSortBy"
+      },
+      "UnitOfMeasure": {
+        "type": "string",
+        "enum": [
+          "pcs",
+          "kg",
+          "l",
+          "m",
+          "m2"
+        ],
+        "title": "UnitOfMeasure"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WorkflowActionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "audit_log_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audit Log Id"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          },
+          "entity_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Entity Id"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "previous_status": {
+            "type": "string",
+            "title": "Previous Status"
+          },
+          "new_status": {
+            "type": "string",
+            "title": "New Status"
+          },
+          "performed_by_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Performed By User Id"
+          },
+          "assigned_to_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To User Id"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "performed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Performed At"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "entity_type",
+          "entity_id",
+          "action",
+          "previous_status",
+          "new_status",
+          "performed_by_user_id",
+          "performed_at"
+        ],
+        "title": "WorkflowActionResponse",
+        "description": "Public representation of a persisted workflow decision/audit event."
+      },
+      "WorkflowMutationRequest": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "minLength": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment",
+            "description": "Decision comment. Required for reject and dismiss actions."
+          },
+          "assigned_to_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To User Id",
+            "description": "Target user for assign actions."
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key",
+            "description": "Optional client-supplied key for safe retries."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "WorkflowMutationRequest",
+        "description": "Base request body for endpoint-specific workflow mutations."
+      },
+      "WorkflowMutationResponse": {
+        "properties": {
+          "workflow_action": {
+            "$ref": "#/components/schemas/WorkflowActionResponse"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "workflow_action",
+          "status",
+          "message"
+        ],
+        "title": "WorkflowMutationResponse",
+        "description": "Response returned by workflow mutation endpoints."
+      }
+    }
+  }
+}

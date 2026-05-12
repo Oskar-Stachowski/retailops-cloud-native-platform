@@ -8,6 +8,10 @@ Last reviewed: 2026-05-12
 docs/evidence/
 ├── README.md
 ├── index.md
+├── api/
+│   ├── README.md
+│   ├── startup-log.md
+│   └── openapi-snapshot.json
 ├── aws/
 │   ├── README.md
 │   ├── aws-cleanup-confirmation.md
@@ -36,6 +40,7 @@ ci-cd/reports/
 | Folder | Purpose | Commit | Do not commit |
 |---|---|---|---|
 | `docs/evidence/` | Curated reviewer-facing evidence, indexes, cleanup reports, diagrams, screenshots. | Sanitized screenshots, Markdown summaries, evidence maps. | Raw logs, secrets, local cache output, generated datasets. |
+| `docs/evidence/api/` | API startup and OpenAPI schema evidence. | Startup notes and generated OpenAPI snapshots. | Raw server logs with sensitive values or local-only debug dumps. |
 | `docs/evidence/aws/` | Human-readable AWS/Terraform showcase screenshots and cleanup notes. | Sanitized console screenshots and cleanup notes. | Full raw Terraform logs, account IDs, ARNs, console URLs. |
 | `docs/evidence/jenkins/` | Curated Jenkins UI screenshots and notes. | Screenshot evidence with no secrets or private URLs. | Raw Jenkins logs unless sanitized. |
 | `ci-cd/reports/` | Raw or semi-raw generated reports from automation. | README files and explicit sanitized snapshots. | Volatile local logs, coverage XML, generated datasets, raw scanner dumps. |
