@@ -22,7 +22,7 @@ migration and demo seed Jobs for local validation.
 
 The same dev overlay also runs a single-node Redpanda broker and a one-shot
 topic initialization Job for the local real-time event topics. This prepares the
-Kubernetes path for a later long-running consumer deployment.
+Kubernetes path for the long-running real-time consumer Deployment.
 
 ## Layout
 
@@ -47,6 +47,8 @@ k8s/
         |   |-- redpanda-deployment.yaml
         |   |-- redpanda-service.yaml
         |   `-- topic-init-job.yaml
+        |-- consumer/
+        |   `-- deployment.yaml
         |-- database/
         |   |-- deployment.yaml
         |   `-- service.yaml
