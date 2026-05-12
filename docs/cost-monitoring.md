@@ -116,7 +116,7 @@ If a real apply is approved later, record:
 Recommended evidence path:
 
 ```text
-docs/evidence/sprint-10/
+docs/evidence/aws/
 ci-cd/reports/iac/
 ```
 

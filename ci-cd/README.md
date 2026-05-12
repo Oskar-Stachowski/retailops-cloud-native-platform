@@ -6,11 +6,11 @@ RetailOps uses a local-first delivery model. The project proves application, dat
 
 ---
 
-## 1. Current Sprint 9 scope
+## 1. Current delivery evidence scope
 
-Sprint 9 establishes the CI/CD foundation before cloud infrastructure exists.
+The current repository keeps CI/CD evidence local-first, with selected sanitized snapshots committed when they are useful for portfolio review.
 
-Implemented in this sprint:
+Implemented:
 
 - GitHub Actions API CI gate.
 - GitHub Actions frontend CI gate.
@@ -19,6 +19,8 @@ Implemented in this sprint:
 - Root `Makefile` as the shared command layer for local development, GitHub Actions, and Jenkins.
 - Jenkins release-confidence pipeline skeleton.
 - Disabled placeholder stages for future ECR, Terraform, Kubernetes/EKS, and rollback workflows.
+- Sanitized Terraform showcase snapshots under `ci-cd/reports/iac/`.
+- Curated Jenkins screenshots under `docs/evidence/jenkins/`.
 
 Not implemented yet:
 
@@ -30,7 +32,7 @@ Not implemented yet:
 - Production secrets management.
 - Runtime observability stack integration.
 
-The purpose of Sprint 9 is to prove that a change can be tested, built, smoke-tested, scanned, and prepared as a release candidate without pretending that AWS/Kubernetes infrastructure already exists.
+The purpose is to prove that a change can be tested, built, smoke-tested, scanned, and prepared as a release candidate without pretending that AWS/Kubernetes infrastructure already exists.
 
 ---
 
@@ -298,15 +300,16 @@ ci-cd/reports/security/trivy-frontend-image.txt
 ci-cd/reports/jenkins-release-evidence.txt
 ```
 
-These files are runtime artifacts and should generally not be committed.
+These files are runtime artifacts and should generally not be committed. Curated, sanitized snapshots may be committed when they are intentionally named and indexed.
 
-Recommended `.gitignore` rule:
+Current evidence split:
 
-```gitignore
-# CI/CD local reports and pipeline artifacts
-ci-cd/reports/*
-!ci-cd/reports/.gitkeep
-```
+| Location | Purpose | Tracking policy |
+|---|---|---|
+| `docs/evidence/` | Human-readable reviewer evidence, screenshots, curated summaries, indexes. | Tracked when useful and sanitized. |
+| `ci-cd/reports/` | Raw or semi-raw outputs from CI, local tooling, security scanners, Terraform, Docker, Jenkins. | Ignored by default. Tracked only for explicit sanitized snapshots and README/index files. |
+
+See `docs/evidence/gitignore-evidence-policy.md` for the exact policy.
 
 GitHub Actions evidence is stored in the workflow run artifacts section.
 

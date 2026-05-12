@@ -394,6 +394,11 @@ The current delivery workflow automates validation and evidence generation:
 
 Container registry publishing and workload deployment are future promotion steps, not part of the default CI path.
 
+Evidence entry points:
+
+- Curated reviewer evidence: `docs/evidence/index.md`
+- Raw report policy and snapshots: `ci-cd/reports/README.md`
+
 <p align="center">
   <img src="GPTimages/CI-CD-Pipeline-Delivery-Workflow.png" width="90%"/>
 </p>

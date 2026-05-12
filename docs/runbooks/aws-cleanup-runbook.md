@@ -278,7 +278,7 @@ After a real AWS experiment:
 
 ## 12. Cleanup evidence template
 
-Use this template in `docs/evidence/sprint-10/` if needed.
+Use this template in `docs/evidence/aws/` if needed.
 
 ```markdown
 # AWS Cleanup Evidence — Sprint 10

@@ -1,4 +1,4 @@
-# AWS Showcase Cleanup Confirmation — Sprint 10
+# AWS Showcase Cleanup Confirmation - Sprint 10
 
 ## Scope
 
@@ -20,7 +20,7 @@ A short controlled AWS showcase was executed for Sprint 10 Terraform and AWS Fou
 
 Terraform destroy was executed and captured in:
 
-- `docs/evidence/sprint-10/terraform-destroy.txt`
+- `ci-cd/reports/iac/sprint-10-terraform-destroy.txt`
 
 Post-destroy checks:
 
