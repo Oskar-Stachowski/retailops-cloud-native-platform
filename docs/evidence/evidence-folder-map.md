@@ -16,6 +16,9 @@ docs/evidence/
 │   ├── README.md
 │   ├── aws-cleanup-confirmation.md
 │   └── aws-console-*.png
+├── docker/
+│   ├── README.md
+│   └── compose-ci-smoke.md
 ├── jenkins/
 │   ├── README.md
 │   ├── jenkins-stage-view.png
@@ -42,6 +45,7 @@ ci-cd/reports/
 | `docs/evidence/` | Curated reviewer-facing evidence, indexes, cleanup reports, diagrams, screenshots. | Sanitized screenshots, Markdown summaries, evidence maps. | Raw logs, secrets, local cache output, generated datasets. |
 | `docs/evidence/api/` | API startup and OpenAPI schema evidence. | Startup notes and generated OpenAPI snapshots. | Raw server logs with sensitive values or local-only debug dumps. |
 | `docs/evidence/aws/` | Human-readable AWS/Terraform showcase screenshots and cleanup notes. | Sanitized console screenshots and cleanup notes. | Full raw Terraform logs, account IDs, ARNs, console URLs. |
+| `docs/evidence/docker/` | Docker build and Compose smoke evidence. | Sanitized build and smoke summaries. | Full raw Compose logs, large runtime dumps, local-only container state. |
 | `docs/evidence/jenkins/` | Curated Jenkins UI screenshots and notes. | Screenshot evidence with no secrets or private URLs. | Raw Jenkins logs unless sanitized. |
 | `ci-cd/reports/` | Raw or semi-raw generated reports from automation. | README files and explicit sanitized snapshots. | Volatile local logs, coverage XML, generated datasets, raw scanner dumps. |
 | `ci-cd/reports/iac/` | Terraform, Checkov, TFLint, drift, and IaC report outputs. | Sanitized snapshots and report README. | Terraform state, binary plans, `.terraform/`, unsanitized plan/apply logs. |

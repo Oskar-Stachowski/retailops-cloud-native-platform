@@ -11,6 +11,7 @@ It is intentionally separate from `ci-cd/reports/`, which stores raw or semi-raw
 | `docs/evidence/index.md` | Main evidence inventory with proof, project area, audience, and validation notes. | Recruiter and technical reviewer |
 | `docs/evidence/api/` | API startup and OpenAPI schema evidence. | Recruiter and technical reviewer |
 | `docs/evidence/aws/` | Curated AWS/Terraform showcase screenshots and cleanup notes. | Recruiter and technical reviewer |
+| `docs/evidence/docker/` | Docker build and Compose smoke evidence. | Recruiter and technical reviewer |
 | `docs/evidence/jenkins/` | Jenkins UI screenshots and release-confidence evidence notes. | Recruiter and technical reviewer |
 | `docs/evidence/gptimages-index.md` | Inventory of generated architecture images and their usage status. | Maintainer |
 | `docs/evidence/gitignore-evidence-policy.md` | Rules for what evidence should be tracked or ignored. | Maintainer |

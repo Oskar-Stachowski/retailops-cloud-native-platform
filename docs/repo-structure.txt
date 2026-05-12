@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-12T07:34:29Z
+# Generated: 2026-05-12T10:30:22Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -61,12 +61,14 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── 06-devops-aws-observability-security-plan.md
 │   ├── 07-execution-checklists.md
 │   ├── README.md
-│   ├── REPOSITORY_AUDIT.md
 │   ├── SENIOR_LEVEL_UPGRADE_PLAN.md
 │   ├── retailops-production-readiness-audit-summary.md
 │   ├── retailops-production-readiness-checklist-audited.md
 │   ├── retailops-production-readiness-checklist.md
-│   └── sprint-11-observability-coverage.md
+│   ├── sprint-11-observability-coverage.md
+│   ├── zOskar - REPOSITORY_AUDIT.md
+│   ├── zOskar - retailops-production-readiness-checklist-audited.md
+│   └── zOskar - retailops-production-readiness-checklist.md
 ├── Makefile
 ├── README.md
 ├── case-study.md
@@ -244,7 +246,6 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── SQLAlchemy.md
 │   │   ├── Terraform Layout.md
 │   │   └── terraform-plan-readonly-iam-discovery.md
-│   ├── Future Improvements
 │   ├── api.md
 │   ├── aws-architecture.md
 │   ├── aws-service-inventory.md
@@ -269,6 +270,10 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── enterprise-scorecard.md
 │   ├── evidence
 │   │   ├── README.md
+│   │   ├── api
+│   │   │   ├── README.md
+│   │   │   ├── openapi-snapshot.json
+│   │   │   └── startup-log.md
 │   │   ├── aws
 │   │   │   ├── README.md
 │   │   │   ├── aws-cleanup-confirmation.md
@@ -277,6 +282,9 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   ├── aws-console-ecr.png
 │   │   │   ├── aws-console-iam.png
 │   │   │   └── aws-console-vpc.png
+│   │   ├── docker
+│   │   │   ├── README.md
+│   │   │   └── compose-ci-smoke.md
 │   │   ├── evidence-cleanup-report.md
 │   │   ├── evidence-folder-map.md
 │   │   ├── gitignore-evidence-policy.md
@@ -465,10 +473,14 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 ├── pytest.ini
 ├── scripts
 │   ├── README.md
-│   ├── compose_smoke.sh
-│   ├── observability_demo_traffic.sh
-│   ├── observability_smoke.sh
-│   └── streaming_smoke.sh
+│   ├── ci
+│   │   ├── compose_smoke.sh
+│   │   ├── observability_smoke.sh
+│   │   └── streaming_smoke.sh
+│   ├── dev
+│   │   └── observability_demo_traffic.sh
+│   └── evidence
+│       └── .gitkeep
 ├── security
 │   ├── README.md
 │   └── iac
@@ -610,4 +622,4 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 └── tests
     └── README.md
 
-93 directories, 506 files
+97 directories, 514 files
