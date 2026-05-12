@@ -30,7 +30,7 @@ This repository intentionally separates implemented components from target archi
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer deployment; producer/replay E2E is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
-| Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, realtime consumer, migration and seed jobs with probes/resources; ingress is future work |
+| Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, realtime consumer, migration and seed jobs with probes/resources and local nginx ingress |
 | MLOps/model lifecycle | Designed only | `ml/README.md` and architecture docs; no training/inference pipeline is implemented yet |
 
 ---
@@ -181,7 +181,7 @@ Contains data schemas and samples.
 Contains Infrastructure as Code definitions, mainly Terraform modules and environment configurations.
 
 ### `k8s/`
-Contains the Kubernetes runtime scope. The current base includes namespace, shared configuration, API and frontend service manifests, plus a dev overlay for local PostgreSQL, Redpanda, realtime consumer, migrations and seed data; ingress and Helm charts are not implemented yet.
+Contains the Kubernetes runtime scope. The current base includes namespace, shared configuration, API/frontend service manifests and local nginx ingress, plus a dev overlay for local PostgreSQL, Redpanda, realtime consumer, migrations and seed data; Helm charts are not implemented yet.
 
 ### `observability/`
 Contains monitoring, logging, dashboard and alerting configuration.

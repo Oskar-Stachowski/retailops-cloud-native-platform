@@ -9,10 +9,11 @@ The current implementation contains the first base manifests:
 - example Secret template with placeholder values only,
 - API Deployment and ClusterIP Service,
 - frontend Deployment and ClusterIP Service,
+- nginx Ingress manifests for local host-based routing,
 - Kustomize base entrypoint.
 
-Ingress, Helm charts and EKS deployment automation are not implemented yet.
-Current full-stack runtime validation still uses Docker Compose.
+Helm charts and EKS deployment automation are not implemented yet. Current
+full-stack runtime validation still uses Docker Compose.
 
 The dev overlay adds an ephemeral PostgreSQL Deployment and ClusterIP Service
 for local `kind` or `minikube` validation. It uses placeholder credentials only
@@ -34,6 +35,13 @@ Service endpoints when PostgreSQL is unavailable. Current resource values are
 local dev assumptions sized for `kind` or `minikube`; HPA policy should be added
 later against API/frontend CPU or memory metrics after cluster metrics are wired.
 
+The base Ingress assumes an nginx-compatible ingress controller and the local
+host `retailops.local`. Frontend traffic is routed from `/` to
+`retailops-frontend`; API traffic is routed from `/api/...` to `retailops-api`
+with an nginx rewrite so `/api/health` reaches the FastAPI `/health` endpoint.
+TLS and AWS ALB-specific annotations are intentionally out of scope for this
+local-first manifest set.
+
 ## Layout
 
 ```text
@@ -48,6 +56,9 @@ k8s/
     |-- frontend/
     |   |-- deployment.yaml
     |   `-- service.yaml
+    |-- ingress/
+    |   |-- api-ingress.yaml
+    |   `-- frontend-ingress.yaml
     |-- namespaces/
     |   `-- retailops.yaml
     `-- kustomization.yaml
@@ -70,9 +81,9 @@ k8s/
         `-- kustomization.yaml
 ```
 
-The frontend image currently uses the same Nginx config as Docker Compose. Full
-Kubernetes API routing will be validated when ingress or runtime Nginx config is
-added in a later commit.
+The frontend image currently uses the same Nginx config as Docker Compose. The
+Ingress routes `/api/...` directly to the API service, so local Kubernetes API
+traffic does not depend on the frontend container's internal proxy target.
 
 ## Validate
 
@@ -95,6 +106,10 @@ smoke tests are added:
 kubectl apply -k k8s/overlays/dev
 ```
 
+For local ingress testing, enable or install an nginx ingress controller and
+map `retailops.local` to the cluster ingress address. For many local clusters,
+that means adding `127.0.0.1 retailops.local` to `/etc/hosts`.
+
 The `secret.example.yaml` file documents required secret keys, but it is not
 included in the base Kustomize resources. Create real secrets through a local
 override or a secret manager integration in later commits.
@@ -109,7 +124,6 @@ sample data.
 Future Kubernetes work should include:
 
 - environment-specific overlays,
-- ingress strategy,
 - rollout and rollback strategy,
 - workload identity and secret integration,
 - autoscaling policy,

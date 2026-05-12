@@ -8,3 +8,5 @@ resources:
   - api/service.yaml
   - frontend/deployment.yaml
   - frontend/service.yaml
+  - ingress/api-ingress.yaml
+  - ingress/frontend-ingress.yaml
