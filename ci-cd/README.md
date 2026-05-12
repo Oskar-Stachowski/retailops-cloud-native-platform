@@ -191,7 +191,7 @@ Purpose:
 - Validate Docker Compose configuration.
 - Build and start the full local stack.
 - Wait for database, migration, seed, API, and frontend services.
-- Run `scripts/compose_smoke.sh`.
+- Run `scripts/ci/compose_smoke.sh`.
 - Upload Compose evidence as a GitHub Actions artifact.
 - Clean up Compose resources after the run.
 

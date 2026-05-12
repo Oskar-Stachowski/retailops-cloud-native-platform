@@ -20,7 +20,7 @@ This repository intentionally separates implemented components from target archi
 
 | Area | Current status | Evidence |
 |---|---|---|
-| Local application runtime | Implemented | `docker-compose.yml`, `Makefile`, `scripts/compose_smoke.sh` |
+| Local application runtime | Implemented | `docker-compose.yml`, `Makefile`, `scripts/ci/compose_smoke.sh` |
 | Backend API | Implemented | `services/api/`, Alembic migrations, API tests |
 | Frontend operator UI | Implemented | `frontend/src/`, Nginx runtime image, frontend CI |
 | PostgreSQL demo data | Implemented | `data/demo/`, `data/generator/`, seed scripts |
@@ -286,7 +286,7 @@ health and stream alert rules.
 For a faster check against an already running stack:
 
 ```bash
-./scripts/compose_smoke.sh
+./scripts/ci/compose_smoke.sh
 make streaming-smoke
 ```
 

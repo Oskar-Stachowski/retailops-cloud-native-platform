@@ -18,8 +18,8 @@ on:
       - "services/api/tests/test_correlation_id.py"
       - "services/api/tests/test_stream_observability.py"
       - "services/api/requirements-dev.txt"
-      - "scripts/observability_smoke.sh"
-      - "scripts/observability_demo_traffic.sh"
+      - "scripts/ci/observability_smoke.sh"
+      - "scripts/dev/observability_demo_traffic.sh"
       - ".github/workflows/observability-ci.yml"
 
   pull_request:
@@ -39,8 +39,8 @@ on:
       - "services/api/tests/test_correlation_id.py"
       - "services/api/tests/test_stream_observability.py"
       - "services/api/requirements-dev.txt"
-      - "scripts/observability_smoke.sh"
-      - "scripts/observability_demo_traffic.sh"
+      - "scripts/ci/observability_smoke.sh"
+      - "scripts/dev/observability_demo_traffic.sh"
       - ".github/workflows/observability-ci.yml"
 
   workflow_dispatch:

@@ -68,10 +68,10 @@ RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
 API_IMAGE ?= retailops-api:local
 FRONTEND_IMAGE ?= retailops-frontend:local
 
-SMOKE_SCRIPT ?= ./scripts/compose_smoke.sh
-STREAMING_SMOKE_SCRIPT ?= ./scripts/streaming_smoke.sh
-OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/observability_smoke.sh
-OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/observability_demo_traffic.sh
+SMOKE_SCRIPT ?= ./scripts/ci/compose_smoke.sh
+STREAMING_SMOKE_SCRIPT ?= ./scripts/ci/streaming_smoke.sh
+OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/ci/observability_smoke.sh
+OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/dev/observability_demo_traffic.sh
 
 DATA_PROFILE ?= small
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
