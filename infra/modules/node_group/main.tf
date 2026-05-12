@@ -44,14 +44,14 @@ resource "aws_eks_node_group" "this" {
   node_role_arn   = var.node_role_arn
   subnet_ids      = var.subnet_ids
 
-  ami_type        = var.ami_type
-  capacity_type   = var.capacity_type
-  disk_size       = var.disk_size
+  ami_type             = var.ami_type
+  capacity_type        = var.capacity_type
+  disk_size            = var.disk_size
   force_update_version = var.force_update_version
-  instance_types  = var.instance_types
-  labels          = local.node_labels
-  release_version = var.release_version
-  version         = var.kubernetes_version
+  instance_types       = var.instance_types
+  labels               = local.node_labels
+  release_version      = var.release_version
+  version              = var.kubernetes_version
 
   scaling_config {
     desired_size = var.desired_size
