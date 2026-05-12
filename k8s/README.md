@@ -17,7 +17,8 @@ Compose.
 
 The dev overlay adds an ephemeral PostgreSQL Deployment and ClusterIP Service
 for local `kind` or `minikube` validation. It uses placeholder credentials only
-and is not a production database pattern.
+and is not a production database pattern. It also includes one-shot Alembic
+migration and demo seed Jobs for local validation.
 
 ## Layout
 
@@ -41,6 +42,11 @@ k8s/
         |-- database/
         |   |-- deployment.yaml
         |   `-- service.yaml
+        |-- demo-data/
+        |   `-- *.csv
+        |-- jobs/
+        |   |-- migrate.yaml
+        |   `-- seed.yaml
         `-- kustomization.yaml
 ```
 
@@ -72,6 +78,11 @@ kubectl apply -k k8s/overlays/dev
 The `secret.example.yaml` file documents required secret keys, but it is not
 included in the base Kustomize resources. Create real secrets through a local
 override or a secret manager integration in later commits.
+
+The dev seed Job mounts demo CSV files from a generated ConfigMap. The overlay
+keeps a local copy of the required CSV files so `kubectl kustomize` works with
+the default load restrictions and does not require the API image to include
+sample data.
 
 ## Planned Scope
 

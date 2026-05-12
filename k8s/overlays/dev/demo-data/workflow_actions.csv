@@ -1,0 +1,5 @@
+id,alert_id,performed_by_user_id,action_type,comment,previous_status,new_status,performed_at,created_at
+b8528d36-4b9c-5238-85f6-8455917357a7,3b85ed4a-cc68-564d-997b-c2552886268f,89fb7da5-b69e-5f51-b939-5a62abcae0fa,acknowledge,Initial review started.,,open,,2026-04-30T10:00:00+00:00
+4ea0b577-5045-5ba1-b968-920eae39c235,15682616-2c7e-5dce-8b01-177a4d5d3901,c7b0b755-a0da-5e50-aa08-cd8537f2f467,assign,Assigned to inventory planning team.,,acknowledged,,2026-04-29T10:00:00+00:00
+7594d2cd-a56b-5308-bd55-82d1be7b146f,3b51c03d-5c59-545e-a929-a46c986cc9a8,feabce1d-fbac-5fc2-9d83-50ec2c19193c,comment,Marketplace price comparison is being prepared.,,acknowledged,,2026-04-28T10:00:00+00:00
+24f2d31c-c9ab-5ab0-9bf7-1c05414e8514,07997484-6d6b-5503-a51a-43a4a6532897,4fe049b4-e3a5-5feb-bd0a-dff23dded483,accept,Replenishment recommendation accepted.,,open,,2026-04-27T10:00:00+00:00

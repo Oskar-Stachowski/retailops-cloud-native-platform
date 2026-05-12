@@ -1,0 +1,5 @@
+id,warehouse_code,name,region,country,city,status
+9d313388-ffea-59e1-97ed-a5a62225d18f,WAW-01,Warsaw Fulfillment Center,PL-Central,PL,Warsaw,active
+574dc04b-ff6a-5970-a153-830a2d1e42ac,GDN-01,Gdansk Regional Warehouse,PL-North,PL,Gdansk,active
+63bb425f-0177-5699-a08d-1812205886b9,KRK-01,Krakow Regional Warehouse,PL-South,PL,Krakow,active
+5cb17227-5faf-5bc5-acb0-bb8cc51f6f6e,POZ-01,Poznan Overflow Warehouse,PL-Central,PL,Poznan,active

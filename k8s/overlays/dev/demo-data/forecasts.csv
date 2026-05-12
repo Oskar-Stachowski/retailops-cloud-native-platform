@@ -1,0 +1,7 @@
+id,product_id,forecast_period_start,forecast_period_end,predicted_quantity,unit_of_measure,generated_at,method,status,confidence_level
+8e3e907c-27d1-5521-8d59-a908b64536dd,85710dbe-1aea-50ac-a155-fb216e12ab97,2026-05-01,2026-05-07,69,pcs,2026-04-30T06:00:00+00:00,retailops-baseline-demand-model,generated,0.6800
+5ef20c5a-8a2c-5c61-8528-b54725c324a6,54981a3d-9a22-5c32-8f6f-4de0c0b16c34,2026-05-02,2026-05-08,22,kg,2026-04-30T06:00:00+00:00,retailops-baseline-demand-model,generated,0.6300
+3d3545e4-938d-568e-b8fb-065b64535cba,6278ab71-66cf-59be-bde6-8645ae6b310a,2026-05-03,2026-05-09,500,pcs,2026-04-30T06:00:00+00:00,retailops-baseline-demand-model,generated,0.6800
+c1b56354-3f1f-5e54-9c4f-7b553ee8f831,132da6ab-ffa5-5e38-90d3-df417e77e6b8,2026-05-04,2026-05-10,226,kg,2026-04-30T06:00:00+00:00,retailops-baseline-demand-model,generated,0.8200
+eef1358e-ce98-57f6-88a8-6679419f5165,5f4eb46d-79e8-5e61-b357-012ff4220123,2026-05-05,2026-05-11,279,pcs,2026-04-30T06:00:00+00:00,retailops-baseline-demand-model,generated,0.7800
+25439800-6e93-579c-bf71-631996c64334,ad8f3dd1-2dc6-5571-bc9f-f0b6504c8679,2026-05-06,2026-05-12,106,kg,2026-04-30T06:00:00+00:00,retailops-baseline-demand-model,generated,0.7800

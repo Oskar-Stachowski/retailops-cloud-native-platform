@@ -7,6 +7,8 @@ resources:
   - ../../base
   - database/deployment.yaml
   - database/service.yaml
+  - jobs/migrate.yaml
+  - jobs/seed.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -19,6 +21,22 @@ configMapGenerator:
     literals:
       - POSTGRES_DB=retailops
       - POSTGRES_USER=retailops
+  - name: retailops-demo-data
+    files:
+      - demo-data/alerts.csv
+      - demo-data/anomalies.csv
+      - demo-data/forecasts.csv
+      - demo-data/inventory_snapshots.csv
+      - demo-data/order_items.csv
+      - demo-data/orders.csv
+      - demo-data/price_history.csv
+      - demo-data/products.csv
+      - demo-data/promotions.csv
+      - demo-data/recommendations.csv
+      - demo-data/sales.csv
+      - demo-data/users.csv
+      - demo-data/warehouses.csv
+      - demo-data/workflow_actions.csv
 
 secretGenerator:
   - name: retailops-runtime-secrets
