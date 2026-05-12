@@ -1,6 +1,7 @@
 # Scripts
 
-This directory will contain helper scripts for local development, testing, build automation, and deployment support.
+This directory contains helper scripts for local development, testing, build
+automation, and deployment support.
 
 Planned MVP / target responsibilities:
 - support local environment setup,
@@ -9,4 +10,6 @@ Planned MVP / target responsibilities:
 - support local deployment or demo workflows,
 - provide repeatable developer commands.
 
-Implementation will be added in later tasks.
+Current CI helpers include Docker Compose smoke checks, streaming and
+observability checks, and a Kubernetes smoke test that renders and validates the
+local Kustomize manifests.

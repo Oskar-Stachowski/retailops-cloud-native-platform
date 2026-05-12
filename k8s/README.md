@@ -99,6 +99,17 @@ Render the local dev overlay with PostgreSQL:
 kubectl kustomize k8s/overlays/dev
 ```
 
+Run the repeatable local Kubernetes smoke test:
+
+```bash
+make k8s-smoke
+```
+
+The smoke test renders base and dev manifests, parses the rendered YAML, checks
+that expected Deployments, Services, Jobs and Ingresses exist, verifies probe and
+resource coverage for deployed workloads, and writes a local report under
+`ci-cd/reports/k8s/`.
+
 Apply only to a local `kind` or `minikube` cluster until workload manifests and
 smoke tests are added:
 

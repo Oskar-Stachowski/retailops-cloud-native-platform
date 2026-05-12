@@ -72,6 +72,7 @@ SMOKE_SCRIPT ?= ./scripts/ci/compose_smoke.sh
 STREAMING_SMOKE_SCRIPT ?= ./scripts/ci/streaming_smoke.sh
 OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/ci/observability_smoke.sh
 OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/dev/observability_demo_traffic.sh
+KUBERNETES_SMOKE_SCRIPT ?= ./scripts/ci/kubernetes_smoke.sh
 
 DATA_PROFILE ?= small
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
@@ -127,6 +128,7 @@ help:
 	@echo "  make tflint-report        Run TFLint only against infra/ and save report"
 	@echo "  make checkov-scan         Run Checkov report-only IaC scan"
 	@echo "  make iac-scan             Run Terraform validation, guardrails, TFLint and Checkov"
+	@echo "  make k8s-smoke            Render and validate Kubernetes base/dev manifests"
 	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
@@ -150,7 +152,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(REPORTS_DIR)/k8s"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -377,7 +379,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up
+.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -422,6 +424,10 @@ observability-smoke: ensure-reports-dir
 observability-demo-traffic: ensure-reports-dir
 	chmod +x "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
 	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" COMPOSE="$(COMPOSE)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
+
+k8s-smoke: ensure-reports-dir
+	chmod +x "$(KUBERNETES_SMOKE_SCRIPT)"
+	K8S_REPORTS_DIR="$(REPORTS_DIR)/k8s" "$(KUBERNETES_SMOKE_SCRIPT)"
 
 compose-rebuild-smoke: compose-ci
 
