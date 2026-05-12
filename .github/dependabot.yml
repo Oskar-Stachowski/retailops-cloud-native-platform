@@ -1,51 +1,170 @@
 version: 2
+
 updates:
+  # Python backend dependencies.
+  # Safe mode: group minor/patch updates, block major updates.
   - package-ecosystem: "pip"
     directory: "/services/api"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+      day: "monday"
+      time: "07:00"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
     groups:
-      python-dependencies:
+      python-minor-patch:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
+  # Frontend dependencies.
+  # Safe mode: one grouped PR for non-major updates.
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+      day: "monday"
+      time: "07:15"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
     groups:
-      frontend-dependencies:
+      frontend-minor-patch:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
+  # Backend Dockerfile.
+  # Keep Python base image on 3.11 line; Python 3.12+ should be a manual migration.
   - package-ecosystem: "docker"
     directory: "/services/api"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+      day: "monday"
+      time: "07:30"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    ignore:
+      - dependency-name: "python"
+        versions:
+          - ">= 3.12"
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
+  # Frontend Dockerfile.
+  # Keep Node base image on 22 line; Node 23+ should be a manual migration.
   - package-ecosystem: "docker"
     directory: "/frontend"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+      day: "monday"
+      time: "07:45"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    ignore:
+      - dependency-name: "node"
+        versions:
+          - ">= 23"
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
+  # Docker Compose images.
+  # Keep this conservative because Compose touches local runtime and CI smoke tests.
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  # GitHub Actions.
+  # Major action upgrades should be reviewed manually because they can break CI.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+      day: "monday"
+      time: "08:15"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      github-actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
+  # Terraform providers/modules.
+  # Do not scan /infra blindly if root has no Terraform manifest.
+  # Scan only real Terraform directories.
   - package-ecosystem: "terraform"
-    directory: "/infra/environments/dev"
+    directories:
+      - "/infra/environments/dev"
+      - "/infra/modules/budget"
+      - "/infra/modules/cloudwatch"
+      - "/infra/modules/ecr"
+      - "/infra/modules/iam"
+      - "/infra/modules/tags"
+      - "/infra/modules/vpc"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-
-  - package-ecosystem: "terraform"
-    directory: "/infra"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+      day: "monday"
+      time: "08:30"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      terraform-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
