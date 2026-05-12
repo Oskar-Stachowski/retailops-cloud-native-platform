@@ -62,6 +62,15 @@ spec:
             - name: admin
               containerPort: 9644
               protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - rpk cluster health | grep -q 'Healthy:.*true'
+            periodSeconds: 2
+            timeoutSeconds: 5
+            failureThreshold: 60
           readinessProbe:
             exec:
               command:

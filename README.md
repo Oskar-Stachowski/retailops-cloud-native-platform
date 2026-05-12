@@ -30,7 +30,7 @@ This repository intentionally separates implemented components from target archi
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer deployment; producer/replay E2E is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
-| Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, realtime consumer, migration and seed jobs only; ingress is future work |
+| Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, realtime consumer, migration and seed jobs with probes/resources; ingress is future work |
 | MLOps/model lifecycle | Designed only | `ml/README.md` and architecture docs; no training/inference pipeline is implemented yet |
 
 ---

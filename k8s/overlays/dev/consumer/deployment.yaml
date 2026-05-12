@@ -66,6 +66,13 @@ spec:
             capabilities:
               drop:
                 - ALL
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
         - name: wait-for-redpanda-topics
           image: redpandadata/redpanda:v25.3.6
           imagePullPolicy: IfNotPresent
@@ -86,6 +93,13 @@ spec:
               exit 1
           securityContext:
             allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
       containers:
         - name: realtime-consumer
           image: retailops-api:0.1.0
@@ -103,6 +117,47 @@ spec:
             capabilities:
               drop:
                 - ALL
+          startupProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - |
+                  from pathlib import Path
+
+                  cmdline = Path("/proc/1/cmdline").read_bytes().decode("utf-8", "ignore")
+                  raise SystemExit(0 if "run_realtime_consumer.py" in cmdline else 1)
+            periodSeconds: 2
+            timeoutSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - |
+                  from pathlib import Path
+
+                  cmdline = Path("/proc/1/cmdline").read_bytes().decode("utf-8", "ignore")
+                  raise SystemExit(0 if "run_realtime_consumer.py" in cmdline else 1)
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - |
+                  from pathlib import Path
+
+                  cmdline = Path("/proc/1/cmdline").read_bytes().decode("utf-8", "ignore")
+                  raise SystemExit(0 if "run_realtime_consumer.py" in cmdline else 1)
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m

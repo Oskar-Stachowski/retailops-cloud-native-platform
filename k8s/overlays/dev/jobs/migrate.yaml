@@ -42,6 +42,16 @@ spec:
                 name: retailops-runtime-secrets
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
       containers:
         - name: migrate
           image: retailops-api:0.1.0
