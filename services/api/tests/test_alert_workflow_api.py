@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Never
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
 from app.main import app
-
 
 client = TestClient(app)
 
@@ -21,7 +21,7 @@ def workflow_response(alert_id, action="acknowledge", status="acknowledged"):
             "performed_by_user_id": str(uuid4()),
             "assigned_to_user_id": None,
             "comment": None,
-            "performed_at": datetime.now(timezone.utc).isoformat(),
+            "performed_at": datetime.now(UTC).isoformat(),
             "idempotency_key": None,
         },
         "status": status,
@@ -29,7 +29,7 @@ def workflow_response(alert_id, action="acknowledge", status="acknowledged"):
     }
 
 
-def test_acknowledge_alert_endpoint_returns_workflow_mutation(monkeypatch):
+def test_acknowledge_alert_endpoint_returns_workflow_mutation(monkeypatch) -> None:
     alert_id = uuid4()
 
     def fake_apply_alert_action(**kwargs):
@@ -52,7 +52,7 @@ def test_acknowledge_alert_endpoint_returns_workflow_mutation(monkeypatch):
     assert payload["status"] == "acknowledged"
 
 
-def test_ops_manager_can_perform_alert_workflow_action(monkeypatch):
+def test_ops_manager_can_perform_alert_workflow_action(monkeypatch) -> None:
     alert_id = uuid4()
 
     def fake_apply_alert_action(**kwargs):
@@ -69,45 +69,43 @@ def test_ops_manager_can_perform_alert_workflow_action(monkeypatch):
     assert response.status_code == 200
 
 
-def test_assign_alert_endpoint_requires_assignee():
+def test_assign_alert_endpoint_requires_assignee() -> None:
     response = client.post(f"/alerts/{uuid4()}/assign", json={})
 
     assert response.status_code == 422
 
 
-def test_alert_workflow_endpoint_rejects_viewer_without_write_permission(monkeypatch):
-    def fail_if_called(**kwargs):
-        raise AssertionError("workflow service should not be called")
+def test_alert_workflow_endpoint_rejects_viewer_without_write_permission(monkeypatch) -> None:
+    def fail_if_called(**kwargs) -> Never:  # noqa: ARG001 - callback accepts endpoint kwargs
+        msg = "workflow service should not be called"
+        raise AssertionError(msg)
 
     monkeypatch.setattr(
         "app.api.alerts.workflow_service.apply_alert_action",
         fail_if_called,
     )
 
-    response = client.post(
-        f"/alerts/{uuid4()}/acknowledge?user_id=read-only-viewer"
-    )
+    response = client.post(f"/alerts/{uuid4()}/acknowledge?user_id=read-only-viewer")
 
     assert response.status_code == 403
 
 
-def test_alert_workflow_endpoint_rejects_analyst_without_write_permission(monkeypatch):
-    def fail_if_called(**kwargs):
-        raise AssertionError("workflow service should not be called")
+def test_alert_workflow_endpoint_rejects_analyst_without_write_permission(monkeypatch) -> None:
+    def fail_if_called(**kwargs) -> Never:  # noqa: ARG001 - callback accepts endpoint kwargs
+        msg = "workflow service should not be called"
+        raise AssertionError(msg)
 
     monkeypatch.setattr(
         "app.api.alerts.workflow_service.apply_alert_action",
         fail_if_called,
     )
 
-    response = client.post(
-        f"/alerts/{uuid4()}/acknowledge?user_id=commercial-analyst"
-    )
+    response = client.post(f"/alerts/{uuid4()}/acknowledge?user_id=commercial-analyst")
 
     assert response.status_code == 403
 
 
-def test_assign_alert_endpoint_passes_assignee_to_service(monkeypatch):
+def test_assign_alert_endpoint_passes_assignee_to_service(monkeypatch) -> None:
     alert_id = uuid4()
     assignee_id = uuid4()
 
@@ -140,11 +138,12 @@ def test_assign_alert_endpoint_passes_assignee_to_service(monkeypatch):
     assert payload["workflow_action"]["assigned_to_user_id"] == str(assignee_id)
 
 
-def test_dismiss_alert_endpoint_maps_invalid_transition_to_conflict(monkeypatch):
+def test_dismiss_alert_endpoint_maps_invalid_transition_to_conflict(monkeypatch) -> None:
     from app.domain.workflow import WorkflowTransitionError
 
-    def fake_apply_alert_action(**kwargs):
-        raise WorkflowTransitionError("Comment is required for dismiss actions.")
+    def fake_apply_alert_action(**kwargs) -> Never:  # noqa: ARG001 - callback accepts endpoint kwargs
+        msg = "Comment is required for dismiss actions."
+        raise WorkflowTransitionError(msg)
 
     monkeypatch.setattr(
         "app.api.alerts.workflow_service.apply_alert_action",
@@ -159,7 +158,7 @@ def test_dismiss_alert_endpoint_maps_invalid_transition_to_conflict(monkeypatch)
     assert response.status_code == 409
 
 
-def test_comment_alert_endpoint_keeps_status(monkeypatch):
+def test_comment_alert_endpoint_keeps_status(monkeypatch) -> None:
     alert_id = uuid4()
 
     def fake_apply_alert_action(**kwargs):

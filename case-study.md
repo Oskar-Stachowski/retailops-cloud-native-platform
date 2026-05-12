@@ -53,7 +53,7 @@ The platform is justified only if it integrates multiple operational and analyti
 
 ### 🚀 1. Faster Time-to-Market & Operational Agility
 
-**Objective:**  
+**Objective:**
 Enable the organization to deliver changes faster and respond more effectively to business needs.
 
 **Business Impact:**
@@ -61,82 +61,82 @@ Enable the organization to deliver changes faster and respond more effectively t
 - Enable frequent releases (even multiple times per day)
 - Accelerate testing and rollout of new initiatives
 
-**Why it matters:**  
+**Why it matters:**
 Faster response to market and competition → **stronger competitive advantage**
 
 ---
 
 ### ☁️ 2. Scalability Without Operational Overhead
 
-**Objective:**  
+**Objective:**
 Ensure the platform can scale with business growth without proportional increases in operational cost.
 
 **Business Impact:**
-- Automatic scaling based on demand  
-- No need for manual system or team scaling  
-- Stable performance during traffic spikes  
+- Automatic scaling based on demand
+- No need for manual system or team scaling
+- Stable performance during traffic spikes
 
-**Why it matters:**  
+**Why it matters:**
 Growth without cost explosion → **better cost efficiency**
 
 ---
 
 ### 🔁 3. Standardization & Cost Control
 
-**Objective:**  
+**Objective:**
 Standardize environments and deployment processes across the organization.
 
 **Business Impact:**
-- Eliminate errors caused by environment inconsistencies  
-- Enable fast system recovery (e.g., after failure)  
-- Improve control over infrastructure and costs  
+- Eliminate errors caused by environment inconsistencies
+- Enable fast system recovery (e.g., after failure)
+- Improve control over infrastructure and costs
 
-**Why it matters:**  
+**Why it matters:**
 Fewer errors and outages → **lower operational costs and risk**
 
 ---
 
 ### 📊 4. Full Operational Visibility
 
-**Objective:**  
+**Objective:**
 Provide full visibility into system performance and operational processes.
 
 **Business Impact:**
-- Faster detection of issues before they impact customers  
-- Real-time access to operational data  
-- Better decision-making based on reliable insights  
+- Faster detection of issues before they impact customers
+- Real-time access to operational data
+- Better decision-making based on reliable insights
 
-**Why it matters:**  
+**Why it matters:**
 Faster response → fewer losses → **higher service quality**
 
 ---
 
 ### 🔒 5. Risk Reduction & Safer Operations
 
-**Objective:**  
+**Objective:**
 Minimize operational and security risks through automated controls.
 
 **Business Impact:**
-- Automated validation of changes before deployment  
-- Reduced human error  
-- Increased system stability  
+- Automated validation of changes before deployment
+- Reduced human error
+- Increased system stability
 
-**Why it matters:**  
+**Why it matters:**
 Fewer incidents → reduced financial and reputational risk
 
 ---
 
 ### ⚡ 6. Efficient Processing of Business Events
 
-**Objective:**  
+**Objective:**
 Enable fast reaction to critical business events (e.g., sales changes, anomalies, system issues).
 
 **Business Impact:**
-- Near real-time processing of key events  
-- Faster operational decision-making  
-- Improved control over business processes  
+- Near real-time processing of key events
+- Faster operational decision-making
+- Improved control over business processes
 
-**Why it matters:**  
+**Why it matters:**
 Faster reactions → reduced losses → **higher operational efficiency**
 
 
@@ -198,7 +198,7 @@ The section uses two complementary perspectives:
 
 ### 5.1. Maturity Phases
 
-The platform evolves through five maturity phases.  
+The platform evolves through five maturity phases.
 Each phase increases business value, technical maturity, operational reliability, and long-term strategic potential.
 
 | Phase | Name | Main Purpose | Business Meaning |
@@ -236,7 +236,7 @@ The platform matures across four dimensions in parallel.
 
 ### 5.4. Phase 1 — Foundation / MVP
 
-The first phase focuses on proving that the platform solves a real business problem.  
+The first phase focuses on proving that the platform solves a real business problem.
 At this stage, the goal is not to build a complex enterprise platform immediately. The goal is to deliver a focused MVP that gives users better visibility into sales, inventory, demand, and operational risk.
 
 This phase validates the business idea and creates the technical foundation for later cloud-native and MLOps capabilities.
@@ -276,7 +276,7 @@ This phase validates the business idea and creates the technical foundation for 
 
 ### 5.5. Phase 2 — Standardized Platform
 
-The second phase transforms the MVP into a repeatable, maintainable, and production-oriented platform.  
+The second phase transforms the MVP into a repeatable, maintainable, and production-oriented platform.
 The focus shifts from proving the idea to standardizing how the platform is built, deployed, secured, monitored, and operated.
 
 This phase justifies stronger DevOps foundations, infrastructure automation, cloud services, release controls, and platform governance.
@@ -317,7 +317,7 @@ This phase justifies stronger DevOps foundations, infrastructure automation, clo
 
 ### 5.6. Phase 3 — Real-Time Operations
 
-The third phase introduces near-real-time operational intelligence.  
+The third phase introduces near-real-time operational intelligence.
 At this point, the platform moves beyond batch-oriented visibility and begins supporting faster reactions to dynamic retail events.
 
 This phase is important because delayed detection of stockouts, pricing errors, product feed issues, or sudden demand changes can directly affect revenue, customer experience, and operational efficiency.
@@ -357,7 +357,7 @@ This phase is important because delayed detection of stockouts, pricing errors, 
 
 ### 5.7. Phase 4 — Intelligent Optimization
 
-The fourth phase expands the platform from operational visibility and fast reaction into optimization.  
+The fourth phase expands the platform from operational visibility and fast reaction into optimization.
 At this stage, the platform not only detects what is happening, but increasingly supports decisions about what should happen next.
 
 This phase introduces stronger MLOps, model governance, recommendation quality monitoring, and feedback loops between business actions and model performance.
@@ -397,7 +397,7 @@ This phase introduces stronger MLOps, model governance, recommendation quality m
 
 ### 5.8. Phase 5 — Predictive & Autonomous Platform
 
-The fifth phase represents the long-term target state of the platform.  
+The fifth phase represents the long-term target state of the platform.
 It should be treated as a strategic direction rather than the initial implementation scope.
 
 The purpose of this phase is to show how the platform could evolve once its cloud, DevOps, data, observability, reliability, governance, and MLOps foundations are mature.

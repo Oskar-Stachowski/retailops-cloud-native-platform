@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -13,17 +13,17 @@ from app.api.schemas import (
 )
 
 
-def test_alert_assign_request_requires_assignee():
+def test_alert_assign_request_requires_assignee() -> None:
     with pytest.raises(ValidationError):
         AlertWorkflowMutationRequest(action="assign")
 
 
-def test_alert_dismiss_request_requires_comment():
+def test_alert_dismiss_request_requires_comment() -> None:
     with pytest.raises(ValidationError):
         AlertWorkflowMutationRequest(action="dismiss")
 
 
-def test_alert_request_rejects_recommendation_only_action():
+def test_alert_request_rejects_recommendation_only_action() -> None:
     with pytest.raises(ValidationError):
         AlertWorkflowMutationRequest(
             action="accept",
@@ -31,12 +31,12 @@ def test_alert_request_rejects_recommendation_only_action():
         )
 
 
-def test_recommendation_reject_request_requires_comment():
+def test_recommendation_reject_request_requires_comment() -> None:
     with pytest.raises(ValidationError):
         RecommendationWorkflowMutationRequest(action="reject")
 
 
-def test_recommendation_assign_request_accepts_assignee():
+def test_recommendation_assign_request_accepts_assignee() -> None:
     assignee_id = uuid4()
 
     request = RecommendationWorkflowMutationRequest(
@@ -48,7 +48,7 @@ def test_recommendation_assign_request_accepts_assignee():
     assert request.assigned_to_user_id == assignee_id
 
 
-def test_recommendation_request_rejects_alert_only_action():
+def test_recommendation_request_rejects_alert_only_action() -> None:
     with pytest.raises(ValidationError):
         RecommendationWorkflowMutationRequest(
             action="acknowledge",
@@ -56,7 +56,7 @@ def test_recommendation_request_rejects_alert_only_action():
         )
 
 
-def test_generic_workflow_action_create_request_validates_transition():
+def test_generic_workflow_action_create_request_validates_transition() -> None:
     request = WorkflowActionCreateRequest(
         entity_type="alert",
         entity_id=uuid4(),
@@ -69,7 +69,7 @@ def test_generic_workflow_action_create_request_validates_transition():
     assert request.action == "acknowledge"
 
 
-def test_generic_workflow_action_create_request_rejects_invalid_transition():
+def test_generic_workflow_action_create_request_rejects_invalid_transition() -> None:
     with pytest.raises(ValidationError):
         WorkflowActionCreateRequest(
             entity_type="alert",
@@ -80,7 +80,7 @@ def test_generic_workflow_action_create_request_rejects_invalid_transition():
         )
 
 
-def test_generic_recommendation_assign_keeps_status_and_requires_assignee():
+def test_generic_recommendation_assign_keeps_status_and_requires_assignee() -> None:
     assignee_id = uuid4()
 
     request = WorkflowActionCreateRequest(
@@ -95,7 +95,7 @@ def test_generic_recommendation_assign_keeps_status_and_requires_assignee():
     assert request.assigned_to_user_id == assignee_id
 
 
-def test_workflow_mutation_response_shape_is_strict():
+def test_workflow_mutation_response_shape_is_strict() -> None:
     response = WorkflowMutationResponse(
         workflow_action=WorkflowActionResponse(
             id=uuid4(),
@@ -105,7 +105,7 @@ def test_workflow_mutation_response_shape_is_strict():
             previous_status="open",
             new_status="acknowledged",
             performed_by_user_id=uuid4(),
-            performed_at=datetime.now(timezone.utc),
+            performed_at=datetime.now(UTC),
         ),
         status="acknowledged",
         message="Workflow action recorded.",

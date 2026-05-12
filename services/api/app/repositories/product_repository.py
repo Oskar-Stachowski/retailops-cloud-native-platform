@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
 
 from psycopg.rows import dict_row
@@ -16,7 +16,7 @@ class ProductRepository:
     route/service usage.
     """
 
-    SORT_COLUMNS = {
+    SORT_COLUMNS: ClassVar[dict[str, str]] = {
         "sku": "sku",
         "name": "name",
         "category": "category",
@@ -24,7 +24,7 @@ class ProductRepository:
         "created_at": "created_at",
     }
 
-    def __init__(self, connection=None):
+    def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -78,7 +78,7 @@ class ProductRepository:
                 "LOWER(sku) LIKE LOWER(%s) OR "
                 "LOWER(name) LIKE LOWER(%s) OR "
                 "LOWER(COALESCE(category, '')) LIKE LOWER(%s)"
-                ")"
+                ")",
             )
             pattern = f"%{search.strip()}%"
             params.extend([pattern, pattern, pattern])
@@ -117,7 +117,7 @@ class ProductRepository:
             ORDER BY {sort_column} {direction}, sku ASC
             LIMIT %s OFFSET %s;
         """
-        rows = self._fetch_all(query, tuple(params + [limit, offset]))
+        rows = self._fetch_all(query, (*params, limit, offset))
         return [self._map_row_to_product(row) for row in rows]
 
     def count_products(
@@ -127,7 +127,7 @@ class ProductRepository:
         search: str | None = None,
     ) -> int:
         where_clause, params = self._build_filters(category, status, search)
-        query = f"SELECT COUNT(*) AS total FROM products {where_clause};"
+        query = f"SELECT COUNT(*) AS total FROM products {where_clause};"  # noqa: S608 - where clause is built from fixed filters
         row = self._fetch_one(query, tuple(params))
         return int(row["total"]) if row else 0
 

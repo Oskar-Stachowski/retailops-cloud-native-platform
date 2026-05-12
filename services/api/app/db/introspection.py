@@ -54,8 +54,6 @@ def count_rows(table_name: str) -> int:
     if not table_exists(table_name):
         return 0
 
-    query = sql.SQL("SELECT COUNT(*) AS count FROM {}").format(
-        sql.Identifier(table_name)
-    )
+    query = sql.SQL("SELECT COUNT(*) AS count FROM {}").format(sql.Identifier(table_name))
     row = fetch_one(query)
     return int(row["count"]) if row else 0

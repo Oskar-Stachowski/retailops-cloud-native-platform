@@ -1,7 +1,7 @@
 # ADR-013: IAM delivery access model
 
-**Status:** Accepted  
-**Date:** Sprint 10  
+**Status:** Accepted
+**Date:** Sprint 10
 **Scope:** IAM / CI/CD trust boundaries / Terraform plan access
 
 ---

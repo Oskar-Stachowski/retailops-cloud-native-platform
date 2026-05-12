@@ -79,7 +79,7 @@ function Profile() {
     return (
       <main className="api-page">
         <section className="api-hero compact">
-          <p className="eyebrow">Sprint 7</p>
+          <p className="eyebrow">User profile</p>
           <h1>Loading profile</h1>
         </section>
       </main>
@@ -89,7 +89,7 @@ function Profile() {
   return (
     <main className="api-page">
       <section className="api-hero compact">
-        <p className="eyebrow">Sprint 7 · local mock identity</p>
+        <p className="eyebrow">Local demo identity</p>
         <h1>{state.user.display_name}</h1>
         <p>{state.user.email}</p>
       </section>

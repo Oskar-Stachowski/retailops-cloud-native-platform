@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from app.domain.models import Product
@@ -6,7 +6,7 @@ from app.services.product_service import ProductService
 
 
 def make_test_product() -> Product:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     return Product(
         id=UUID("85710dbe-1aea-50ac-a155-fb216e12ab97"),
@@ -21,7 +21,7 @@ def make_test_product() -> Product:
 
 
 class FakeProductRepository:
-    def __init__(self):
+    def __init__(self) -> None:
         self.requested_sku = None
         self.product = make_test_product()
 
@@ -40,7 +40,7 @@ class FakeProductRepository:
         return None
 
 
-def test_product_service_lists_products():
+def test_product_service_lists_products() -> None:
     repository = FakeProductRepository()
     service = ProductService(repository)
 
@@ -50,7 +50,7 @@ def test_product_service_lists_products():
     assert all(isinstance(product, Product) for product in products)
 
 
-def test_product_service_normalizes_sku_before_lookup():
+def test_product_service_normalizes_sku_before_lookup() -> None:
     repository = FakeProductRepository()
     service = ProductService(repository)
 
@@ -60,7 +60,7 @@ def test_product_service_normalizes_sku_before_lookup():
     assert repository.requested_sku == "ELEC-HEAD-001"
 
 
-def test_product_service_returns_none_for_empty_sku():
+def test_product_service_returns_none_for_empty_sku() -> None:
     repository = FakeProductRepository()
     service = ProductService(repository)
 

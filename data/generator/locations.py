@@ -19,7 +19,7 @@ def generate_stores() -> list[dict[str, str]]:
                 "city": str(item["city"]),
                 "channel": str(item["channel"]),
                 "status": "active",
-            }
+            },
         )
 
     return stores
@@ -39,7 +39,7 @@ def generate_warehouses() -> list[dict[str, str]]:
                 "country": str(item["country"]),
                 "city": str(item["city"]),
                 "status": "active",
-            }
+            },
         )
 
     return warehouses

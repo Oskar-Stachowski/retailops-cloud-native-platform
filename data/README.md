@@ -37,12 +37,24 @@ This writes CSV files to:
 data/demo/
 ```
 
-The generator also accepts the target synthetic data options that will be used
-by later scalable profiles:
+The `demo` profile is intentionally fixed-size. It is optimized for local API
+tests, repeatable seed data, and a fast reviewer experience. For this profile,
+the generator always writes the same small deterministic dataset to `data/demo`.
+
+The sizing flags `--days`, `--products`, `--stores`, and `--warehouses` are
+reserved for scalable synthetic profiles and do not change the `demo` dataset.
+Use `demo` when you want the canonical local dataset:
+
+```bash
+python -m data.generator.main --profile demo
+```
+
+Use `small`, `medium`, or `large` when you want bounded synthetic data generation
+with sizing overrides:
 
 ```bash
 python -m data.generator.main \
-  --profile demo \
+  --profile small \
   --days 14 \
   --products 20 \
   --stores 4 \

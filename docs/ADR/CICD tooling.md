@@ -1,6 +1,6 @@
 # CI/CD Tooling Split — GitHub Actions and Jenkins
 
-> Status: Draft / Target maturity ADR  
+> Status: Draft / Target maturity ADR
 > This document describes the intended CI/CD tooling split. Jenkins, ECR, Terraform, EKS and MLOps stages are target-maturity capabilities until implemented and validated.
 
 ## 1. Executive summary

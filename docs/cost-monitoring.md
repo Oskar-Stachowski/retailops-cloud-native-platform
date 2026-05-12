@@ -1,8 +1,8 @@
 # RetailOps Cost Monitoring
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** FinOps / AWS Foundation  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** FinOps / AWS Foundation
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
 **Commit:** `docs(finops): add cost assumptions and cleanup strategy`
 
 ---
@@ -116,7 +116,7 @@ If a real apply is approved later, record:
 Recommended evidence path:
 
 ```text
-docs/evidence/sprint-10/
+docs/evidence/aws/
 ci-cd/reports/iac/
 ```
 

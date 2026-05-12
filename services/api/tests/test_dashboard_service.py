@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 client = TestClient(app)
 
 
@@ -86,7 +85,7 @@ def sample_live_operations() -> dict:
                     "value": 499.40,
                     "observation_count": 12,
                     "latest_observed_at": "2026-05-01T11:59:00+00:00",
-                }
+                },
             },
         },
         "event_status_counts": {
@@ -111,7 +110,7 @@ def sample_live_operations() -> dict:
                 "ingested_at": "2026-05-01T11:59:00+00:00",
                 "processed_at": "2026-05-01T11:59:01+00:00",
                 "error_message": None,
-            }
+            },
         ],
         "alerts": [
             {
@@ -124,7 +123,7 @@ def sample_live_operations() -> dict:
                 "severity": "high",
                 "title": "Potential stockout risk",
                 "payload": {"severity": "high"},
-            }
+            },
         ],
         "consumer_states": [
             {
@@ -142,7 +141,7 @@ def sample_live_operations() -> dict:
                 "started_at": "2026-05-01T11:00:00+00:00",
                 "stopped_at": None,
                 "updated_at": "2026-05-01T11:59:01+00:00",
-            }
+            },
         ],
         "limits": {
             "recent_events": 5,
@@ -151,7 +150,7 @@ def sample_live_operations() -> dict:
     }
 
 
-def test_dashboard_summary_endpoint_returns_expected_shape(monkeypatch):
+def test_dashboard_summary_endpoint_returns_expected_shape(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_summary",
         lambda: {"summary": sample_summary()},
@@ -170,7 +169,7 @@ def test_dashboard_summary_endpoint_returns_expected_shape(monkeypatch):
     assert payload["summary"]["last_refresh_at"] == "2026-05-01T10:00:00Z"
 
 
-def test_dashboard_sales_trend_endpoint_returns_items(monkeypatch):
+def test_dashboard_sales_trend_endpoint_returns_items(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_sales_trend",
         lambda days=14: {
@@ -191,13 +190,13 @@ def test_dashboard_sales_trend_endpoint_returns_items(monkeypatch):
     assert payload["items"][0]["revenue"] == 199.90
 
 
-def test_dashboard_sales_trend_endpoint_rejects_invalid_days():
+def test_dashboard_sales_trend_endpoint_rejects_invalid_days() -> None:
     response = client.get("/dashboard/sales-trend?days=0")
 
     assert response.status_code == 422
 
 
-def test_dashboard_alerts_endpoint_returns_items(monkeypatch):
+def test_dashboard_alerts_endpoint_returns_items(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_open_alerts",
         lambda limit=10: {
@@ -217,13 +216,13 @@ def test_dashboard_alerts_endpoint_returns_items(monkeypatch):
     assert payload["items"][0]["status"] == "open"
 
 
-def test_dashboard_alerts_endpoint_rejects_invalid_limit():
+def test_dashboard_alerts_endpoint_rejects_invalid_limit() -> None:
     response = client.get("/dashboard/alerts?limit=101")
 
     assert response.status_code == 422
 
 
-def test_dashboard_recommendations_endpoint_returns_items(monkeypatch):
+def test_dashboard_recommendations_endpoint_returns_items(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_top_recommendations",
         lambda limit=10: {
@@ -242,7 +241,7 @@ def test_dashboard_recommendations_endpoint_returns_items(monkeypatch):
     assert payload["items"][0]["source"] == "recommendation"
 
 
-def test_dashboard_open_work_items_endpoint_returns_items(monkeypatch):
+def test_dashboard_open_work_items_endpoint_returns_items(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_open_work_items",
         lambda limit=10: {
@@ -264,7 +263,7 @@ def test_dashboard_open_work_items_endpoint_returns_items(monkeypatch):
     assert payload["items"][0]["source"] in {"anomaly", "recommendation"}
 
 
-def test_dashboard_stock_risk_summary_endpoint_returns_expected_shape(monkeypatch):
+def test_dashboard_stock_risk_summary_endpoint_returns_expected_shape(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_stock_risk_summary",
         lambda: sample_stock_risk_summary(),
@@ -282,7 +281,7 @@ def test_dashboard_stock_risk_summary_endpoint_returns_expected_shape(monkeypatc
     assert payload["unknown_count"] == 0
 
 
-def test_dashboard_operational_visibility_endpoint_returns_expected_shape(monkeypatch):
+def test_dashboard_operational_visibility_endpoint_returns_expected_shape(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_operational_visibility",
         lambda sales_trend_days=14, work_items_limit=10: {
@@ -302,8 +301,7 @@ def test_dashboard_operational_visibility_endpoint_returns_expected_shape(monkey
     )
 
     response = client.get(
-        "/dashboard/operational-visibility?"
-        "sales_trend_days=7&work_items_limit=2"
+        "/dashboard/operational-visibility?sales_trend_days=7&work_items_limit=2",
     )
 
     assert response.status_code == 200
@@ -318,16 +316,15 @@ def test_dashboard_operational_visibility_endpoint_returns_expected_shape(monkey
     assert payload["limits"]["work_items_limit"] == 2
 
 
-def test_dashboard_operational_visibility_endpoint_rejects_invalid_params():
+def test_dashboard_operational_visibility_endpoint_rejects_invalid_params() -> None:
     response = client.get(
-        "/dashboard/operational-visibility?"
-        "sales_trend_days=0&work_items_limit=10"
+        "/dashboard/operational-visibility?sales_trend_days=0&work_items_limit=10",
     )
 
     assert response.status_code == 422
 
 
-def test_dashboard_live_operations_endpoint_returns_expected_shape(monkeypatch):
+def test_dashboard_live_operations_endpoint_returns_expected_shape(monkeypatch) -> None:
     monkeypatch.setattr(
         "app.api.dashboard.dashboard_service.get_live_operations",
         lambda window_minutes=15, recent_events_limit=20, alerts_limit=10: {
@@ -341,8 +338,7 @@ def test_dashboard_live_operations_endpoint_returns_expected_shape(monkeypatch):
     )
 
     response = client.get(
-        "/dashboard/live-operations?"
-        "window_minutes=15&recent_events_limit=5&alerts_limit=3"
+        "/dashboard/live-operations?window_minutes=15&recent_events_limit=5&alerts_limit=3",
     )
 
     assert response.status_code == 200
@@ -354,17 +350,14 @@ def test_dashboard_live_operations_endpoint_returns_expected_shape(monkeypatch):
     assert payload["freshness"]["is_fresh"] is True
     assert payload["recent_events"][0]["event_type"] == "sale_completed"
     assert payload["alerts"][0]["severity"] == "high"
-    assert payload["consumer_states"][0]["consumer_name"] == (
-        "retailops-realtime-consumer"
-    )
+    assert payload["consumer_states"][0]["consumer_name"] == ("retailops-realtime-consumer")
     assert payload["limits"]["recent_events"] == 5
     assert payload["limits"]["alerts"] == 3
 
 
-def test_dashboard_live_operations_endpoint_rejects_invalid_params():
+def test_dashboard_live_operations_endpoint_rejects_invalid_params() -> None:
     response = client.get(
-        "/dashboard/live-operations?"
-        "window_minutes=0&recent_events_limit=20&alerts_limit=10"
+        "/dashboard/live-operations?window_minutes=0&recent_events_limit=20&alerts_limit=10",
     )
 
     assert response.status_code == 422

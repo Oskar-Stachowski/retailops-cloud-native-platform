@@ -1,3 +1,5 @@
+import pytest
+
 from app.core.config import Settings
 from app.services.realtime_consumer import (
     RealtimeEventConsumer,
@@ -33,12 +35,8 @@ def test_event_envelope_validates_required_fields() -> None:
 def test_event_envelope_rejects_unknown_event_type() -> None:
     event = sample_event(event_type="unknown_event")
 
-    try:
+    with pytest.raises(ValueError, match="Unsupported event type"):
         RealtimeEventEnvelope.from_dict(event)
-    except ValueError as exc:
-        assert "Unsupported event type" in str(exc)
-    else:
-        raise AssertionError("expected ValueError")
 
 
 def test_consumer_processes_known_event_and_updates_state() -> None:

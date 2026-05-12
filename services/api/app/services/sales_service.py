@@ -9,7 +9,7 @@ from app.services.serialization import make_json_safe
 class SalesService:
     """Application service for product-level sales reads."""
 
-    def __init__(self, sales_repository: SalesRepository | None = None):
+    def __init__(self, sales_repository: SalesRepository | None = None) -> None:
         self.sales_repository = sales_repository or SalesRepository()
 
     def list_sales(

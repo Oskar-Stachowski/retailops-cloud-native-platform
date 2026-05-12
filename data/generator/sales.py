@@ -57,10 +57,8 @@ def generate_sales(products: list[dict[str, str]]) -> list[dict[str, str]]:
                     "channel": channel,
                     "region": region,
                     "sold_at": sold_at,
-                    "order_reference": (
-                        f"ORD-{product['sku']}-{sale_index + 1:03d}"
-                    ),
-                }
+                    "order_reference": (f"ORD-{product['sku']}-{sale_index + 1:03d}"),
+                },
             )
 
     return sales

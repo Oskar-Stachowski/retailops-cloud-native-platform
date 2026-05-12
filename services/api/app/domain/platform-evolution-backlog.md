@@ -1,7 +1,7 @@
 # RetailOps Domain Model — Future Improvements
 
-> This document collects advanced improvements that are intentionally **out of scope for the current Sprint 3 domain-model task**.  
-> The current goal is to keep the MVP model understandable, testable and aligned with the first RetailOps flow:  
+> This document collects advanced improvements that are intentionally **out of scope for the current Sprint 3 domain-model task**.
+> The current goal is to keep the MVP model understandable, testable and aligned with the first RetailOps flow:
 > `Product + Sale + InventorySnapshot -> Forecast / Anomaly -> Alert -> Recommendation -> WorkflowAction -> User decision`.
 
 ---

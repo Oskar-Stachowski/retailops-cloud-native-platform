@@ -21,18 +21,17 @@ EXPECTED_ROW_COUNTS = {
     "recommendations": 4,
     "workflow_actions": 4,
 }
-EXPECTED_CSV_FILES = [
-    f"{table_name}.csv" for table_name in EXPECTED_ROW_COUNTS
-]
+EXPECTED_CSV_FILES = [f"{table_name}.csv" for table_name in EXPECTED_ROW_COUNTS]
 
 
 pytestmark = pytest.mark.integration_db
 
 
 def run_generator() -> None:
-    subprocess.run(
+    subprocess.run(  # noqa: S603 - command uses fixed Python executable arguments
         [sys.executable, "-m", "data.generator.main"],
         cwd=REPO_ROOT,
+        shell=False,
         check=True,
         text=True,
         capture_output=True,
@@ -44,15 +43,14 @@ def run_seed(database_url: str) -> None:
     env["DATABASE_URL"] = database_url
     env["RETAILOPS_DEMO_DATA_DIR"] = str(REPO_ROOT / "data" / "demo")
     env["PYTHONPATH"] = os.pathsep.join(
-        str(path)
-        for path in (API_ROOT, REPO_ROOT, env.get("PYTHONPATH"))
-        if path
+        str(path) for path in (API_ROOT, REPO_ROOT, env.get("PYTHONPATH")) if path
     )
 
-    subprocess.run(
+    subprocess.run(  # noqa: S603 - command uses fixed Python executable arguments
         [sys.executable, "scripts/seed_demo_data.py"],
         cwd=API_ROOT,
         env=env,
+        shell=False,
         check=True,
         text=True,
         capture_output=True,
@@ -66,17 +64,15 @@ def prepared_demo_dataset(database_url: str) -> None:
 
 
 def fetch_one(database_url: str, query: str, params: tuple = ()):
-    with psycopg.connect(database_url) as conn:
-        with conn.cursor() as cur:
-            cur.execute(query, params)
-            return cur.fetchone()
+    with psycopg.connect(database_url) as conn, conn.cursor() as cur:
+        cur.execute(query, params)
+        return cur.fetchone()
 
 
 def fetch_all(database_url: str, query: str, params: tuple = ()):
-    with psycopg.connect(database_url) as conn:
-        with conn.cursor() as cur:
-            cur.execute(query, params)
-            return cur.fetchall()
+    with psycopg.connect(database_url) as conn, conn.cursor() as cur:
+        cur.execute(query, params)
+        return cur.fetchall()
 
 
 def test_generator_produces_expected_csv_files() -> None:
@@ -93,7 +89,7 @@ def test_seed_script_is_idempotent(database_url: str) -> None:
     first_counts = {
         table_name: fetch_one(
             database_url,
-            f"SELECT COUNT(*) FROM {table_name};",
+            f"SELECT COUNT(*) FROM {table_name};",  # noqa: S608 - table names are fixed
         )[0]
         for table_name in EXPECTED_ROW_COUNTS
     }
@@ -102,7 +98,7 @@ def test_seed_script_is_idempotent(database_url: str) -> None:
     second_counts = {
         table_name: fetch_one(
             database_url,
-            f"SELECT COUNT(*) FROM {table_name};",
+            f"SELECT COUNT(*) FROM {table_name};",  # noqa: S608 - table names are fixed
         )[0]
         for table_name in EXPECTED_ROW_COUNTS
     }
@@ -115,7 +111,7 @@ def test_demo_seed_data_has_expected_row_counts(database_url: str) -> None:
     for table_name, expected_count in EXPECTED_ROW_COUNTS.items():
         actual_count = fetch_one(
             database_url,
-            f"SELECT COUNT(*) FROM {table_name};",
+            f"SELECT COUNT(*) FROM {table_name};",  # noqa: S608 - table names are fixed
         )[0]
         assert actual_count == expected_count, table_name
 
@@ -198,25 +194,6 @@ def test_inventory_snapshots_are_valid(database_url: str) -> None:
     )[0]
 
     assert invalid_inventory_rows == 0
-
-
-# def test_inventory_snapshots_are_valid(database_url: str) -> None:
-#     invalid_inventory_rows = fetch_one(
-#         database_url,
-#         """
-#         SELECT COUNT(*)
-#         FROM inventory_snapshots i
-#         JOIN products p ON p.id = i.product_id
-#         WHERE i.on_hand_quantity < 0
-#             OR i.reserved_quantity < 0
-#             OR i.reserved_quantity > i.on_hand_quantity
-#             OR i.reorder_point < 0
-#             OR i.safety_stock_quantity < 0
-#             OR i.warehouse_code = '';
-#         """,
-#     )[0]
-
-#     assert invalid_inventory_rows == 0
 
 
 def test_forecasts_have_valid_product_links_and_windows(

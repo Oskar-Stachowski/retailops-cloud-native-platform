@@ -6,7 +6,6 @@ from fastapi import APIRouter, Query, status
 from app.api.schemas import StockRiskListResponse
 from app.services.stock_risk_service import StockRiskService
 
-
 router = APIRouter(prefix="/inventory-risks", tags=["stock-risk"])
 stock_risk_service = StockRiskService()
 

@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 client = TestClient(app)
 
 
@@ -46,7 +45,7 @@ class FakeForecastService:
                     "method": "seeded_demo",
                     "status": "generated",
                     "confidence_level": 0.8,
-                }
+                },
             ],
             "pagination": {
                 "limit": limit,
@@ -73,7 +72,7 @@ class FakeForecastService:
         }
 
 
-def test_forecasts_list_uses_stable_items_and_pagination_contract(monkeypatch):
+def test_forecasts_list_uses_stable_items_and_pagination_contract(monkeypatch) -> None:
     monkeypatch.setattr("app.api.forecasts.forecast_service", FakeForecastService())
 
     response = client.get(
@@ -100,7 +99,7 @@ def test_forecasts_list_uses_stable_items_and_pagination_contract(monkeypatch):
     assert body["items"][0]["product_id"] == PRODUCT_ID
 
 
-def test_forecast_detail_returns_one_forecast(monkeypatch):
+def test_forecast_detail_returns_one_forecast(monkeypatch) -> None:
     monkeypatch.setattr("app.api.forecasts.forecast_service", FakeForecastService())
 
     response = client.get(f"/forecasts/{FORECAST_ID}")
@@ -112,7 +111,7 @@ def test_forecast_detail_returns_one_forecast(monkeypatch):
     assert body["method"] == "seeded_demo"
 
 
-def test_forecast_detail_returns_standard_404_error(monkeypatch):
+def test_forecast_detail_returns_standard_404_error(monkeypatch) -> None:
     monkeypatch.setattr("app.api.forecasts.forecast_service", FakeForecastService())
 
     response = client.get("/forecasts/00000000-0000-0000-0000-000000000000")
@@ -122,5 +121,5 @@ def test_forecast_detail_returns_standard_404_error(monkeypatch):
         "error": {
             "code": "not_found",
             "message": "Resource not found",
-        }
+        },
     }

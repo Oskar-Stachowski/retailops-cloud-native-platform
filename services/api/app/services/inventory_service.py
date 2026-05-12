@@ -9,7 +9,7 @@ from app.services.serialization import make_json_safe
 class InventoryService:
     """Application service for inventory snapshot reads."""
 
-    def __init__(self, inventory_repository: InventoryRepository | None = None):
+    def __init__(self, inventory_repository: InventoryRepository | None = None) -> None:
         self.inventory_repository = inventory_repository or InventoryRepository()
 
     def list_inventory_snapshots(
@@ -40,9 +40,7 @@ class InventoryService:
         self,
         inventory_snapshot_id: UUID,
     ) -> InventorySnapshot | None:
-        return self.inventory_repository.get_inventory_snapshot_by_id(
-            inventory_snapshot_id
-        )
+        return self.inventory_repository.get_inventory_snapshot_by_id(inventory_snapshot_id)
 
     def list_inventory_snapshots_response(
         self,

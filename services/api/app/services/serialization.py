@@ -3,13 +3,12 @@
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any
 from uuid import UUID
 
 
-def make_json_safe(value: Any) -> Any:
+def make_json_safe(value: object) -> object:
     """Convert DB/domain-native Python values into JSON-friendly structures."""
-    if isinstance(value, (datetime, date)):
+    if isinstance(value, datetime | date):
         return value.isoformat()
 
     if isinstance(value, Decimal):

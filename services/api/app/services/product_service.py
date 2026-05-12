@@ -13,7 +13,7 @@ class ProductService:
     response shapes.
     """
 
-    def __init__(self, product_repository: ProductRepository | None = None):
+    def __init__(self, product_repository: ProductRepository | None = None) -> None:
         self.product_repository = product_repository or ProductRepository()
 
     def list_products(self) -> list[Product]:
@@ -56,10 +56,7 @@ class ProductService:
         )
 
         return {
-            "items": [
-                make_json_safe(product.model_dump())
-                for product in products
-            ],
+            "items": [make_json_safe(product.model_dump()) for product in products],
             "pagination": {
                 "limit": limit,
                 "offset": offset,

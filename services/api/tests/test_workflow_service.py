@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -9,7 +9,7 @@ from app.services.workflow_service import WorkflowNotFoundError, WorkflowService
 
 
 class FakeWorkflowRepository:
-    def __init__(self, alert=None, recommendation=None, existing_audit_log=None):
+    def __init__(self, alert=None, recommendation=None, existing_audit_log=None) -> None:
         self.alert = alert
         self.recommendation = recommendation
         self.existing_audit_log = existing_audit_log
@@ -44,8 +44,8 @@ class FakeWorkflowRepository:
                 "comment": kwargs["comment"],
                 "previous_status": kwargs["previous_status"],
                 "new_status": kwargs["new_status"],
-                "performed_at": datetime.now(timezone.utc),
-                "created_at": datetime.now(timezone.utc),
+                "performed_at": datetime.now(UTC),
+                "created_at": datetime.now(UTC),
             },
             "audit_log": {
                 "id": audit_log_id,
@@ -57,8 +57,8 @@ class FakeWorkflowRepository:
                 "comment": kwargs["comment"],
                 "previous_status": kwargs["previous_status"],
                 "new_status": kwargs["new_status"],
-                "performed_at": datetime.now(timezone.utc),
-                "created_at": datetime.now(timezone.utc),
+                "performed_at": datetime.now(UTC),
+                "created_at": datetime.now(UTC),
             },
         }
 
@@ -74,8 +74,8 @@ class FakeWorkflowRepository:
             "comment": kwargs["comment"],
             "previous_status": kwargs["previous_status"],
             "new_status": kwargs["new_status"],
-            "performed_at": datetime.now(timezone.utc),
-            "created_at": datetime.now(timezone.utc),
+            "performed_at": datetime.now(UTC),
+            "created_at": datetime.now(UTC),
         }
         workflow_action = None
         if kwargs["alert_id"]:
@@ -87,8 +87,8 @@ class FakeWorkflowRepository:
                 "comment": kwargs["comment"],
                 "previous_status": kwargs["previous_status"],
                 "new_status": kwargs["new_status"],
-                "performed_at": datetime.now(timezone.utc),
-                "created_at": datetime.now(timezone.utc),
+                "performed_at": datetime.now(UTC),
+                "created_at": datetime.now(UTC),
             }
 
         return {
@@ -116,7 +116,7 @@ def make_recommendation(status="proposed", alert_id=None):
     }
 
 
-def test_apply_alert_acknowledge_records_status_transition():
+def test_apply_alert_acknowledge_records_status_transition() -> None:
     alert = make_alert(status="open")
     repository = FakeWorkflowRepository(alert=alert)
     service = WorkflowService(repository=repository)
@@ -133,7 +133,7 @@ def test_apply_alert_acknowledge_records_status_transition():
     assert repository.applied_action["new_status"] == "acknowledged"
 
 
-def test_apply_alert_action_replays_existing_idempotent_result():
+def test_apply_alert_action_replays_existing_idempotent_result() -> None:
     alert = make_alert(status="acknowledged")
     audit_log = {
         "id": uuid4(),
@@ -147,8 +147,8 @@ def test_apply_alert_action_replays_existing_idempotent_result():
         "new_status": "acknowledged",
         "idempotency_key": "ack-alert-001",
         "details": {"workflow_action_id": str(uuid4())},
-        "performed_at": datetime.now(timezone.utc),
-        "created_at": datetime.now(timezone.utc),
+        "performed_at": datetime.now(UTC),
+        "created_at": datetime.now(UTC),
     }
     repository = FakeWorkflowRepository(alert=alert, existing_audit_log=audit_log)
     service = WorkflowService(repository=repository)
@@ -166,7 +166,7 @@ def test_apply_alert_action_replays_existing_idempotent_result():
     assert repository.applied_action is None
 
 
-def test_apply_alert_action_rejects_idempotency_key_reused_for_different_action():
+def test_apply_alert_action_rejects_idempotency_key_reused_for_different_action() -> None:
     alert = make_alert(status="acknowledged")
     audit_log = {
         "id": uuid4(),
@@ -180,11 +180,11 @@ def test_apply_alert_action_rejects_idempotency_key_reused_for_different_action(
         "new_status": "acknowledged",
         "idempotency_key": "workflow-key-001",
         "details": {},
-        "performed_at": datetime.now(timezone.utc),
-        "created_at": datetime.now(timezone.utc),
+        "performed_at": datetime.now(UTC),
+        "created_at": datetime.now(UTC),
     }
     service = WorkflowService(
-        repository=FakeWorkflowRepository(alert=alert, existing_audit_log=audit_log)
+        repository=FakeWorkflowRepository(alert=alert, existing_audit_log=audit_log),
     )
 
     with pytest.raises(WorkflowTransitionError):
@@ -196,7 +196,7 @@ def test_apply_alert_action_rejects_idempotency_key_reused_for_different_action(
         )
 
 
-def test_apply_alert_assign_moves_open_alert_to_in_progress():
+def test_apply_alert_assign_moves_open_alert_to_in_progress() -> None:
     alert = make_alert(status="open")
     assignee_id = uuid4()
     repository = FakeWorkflowRepository(alert=alert)
@@ -215,7 +215,7 @@ def test_apply_alert_assign_moves_open_alert_to_in_progress():
     assert repository.applied_action["assigned_to_user_id"] == assignee_id
 
 
-def test_apply_alert_resolve_rejects_open_alert():
+def test_apply_alert_resolve_rejects_open_alert() -> None:
     alert = make_alert(status="open")
     service = WorkflowService(repository=FakeWorkflowRepository(alert=alert))
 
@@ -227,7 +227,7 @@ def test_apply_alert_resolve_rejects_open_alert():
         )
 
 
-def test_apply_alert_dismiss_requires_comment():
+def test_apply_alert_dismiss_requires_comment() -> None:
     alert = make_alert(status="acknowledged")
     service = WorkflowService(repository=FakeWorkflowRepository(alert=alert))
 
@@ -239,7 +239,7 @@ def test_apply_alert_dismiss_requires_comment():
         )
 
 
-def test_apply_alert_comment_keeps_existing_status():
+def test_apply_alert_comment_keeps_existing_status() -> None:
     alert = make_alert(status="in_progress")
     repository = FakeWorkflowRepository(alert=alert)
     service = WorkflowService(repository=repository)
@@ -256,7 +256,7 @@ def test_apply_alert_comment_keeps_existing_status():
     assert repository.applied_action["new_status"] == "in_progress"
 
 
-def test_apply_alert_action_raises_not_found_for_missing_alert():
+def test_apply_alert_action_raises_not_found_for_missing_alert() -> None:
     service = WorkflowService(repository=FakeWorkflowRepository(alert=None))
 
     with pytest.raises(WorkflowNotFoundError):
@@ -267,7 +267,7 @@ def test_apply_alert_action_raises_not_found_for_missing_alert():
         )
 
 
-def test_apply_recommendation_accept_records_decision():
+def test_apply_recommendation_accept_records_decision() -> None:
     recommendation = make_recommendation(status="proposed")
     repository = FakeWorkflowRepository(recommendation=recommendation)
     service = WorkflowService(repository=repository)
@@ -284,7 +284,7 @@ def test_apply_recommendation_accept_records_decision():
     assert repository.applied_action["new_status"] == "accepted"
 
 
-def test_apply_recommendation_action_replays_existing_idempotent_result():
+def test_apply_recommendation_action_replays_existing_idempotent_result() -> None:
     recommendation = make_recommendation(status="accepted")
     audit_log = {
         "id": uuid4(),
@@ -298,8 +298,8 @@ def test_apply_recommendation_action_replays_existing_idempotent_result():
         "new_status": "accepted",
         "idempotency_key": "accept-rec-001",
         "details": {},
-        "performed_at": datetime.now(timezone.utc),
-        "created_at": datetime.now(timezone.utc),
+        "performed_at": datetime.now(UTC),
+        "created_at": datetime.now(UTC),
     }
     repository = FakeWorkflowRepository(
         recommendation=recommendation,
@@ -320,11 +320,9 @@ def test_apply_recommendation_action_replays_existing_idempotent_result():
     assert repository.applied_action is None
 
 
-def test_apply_recommendation_reject_requires_comment():
+def test_apply_recommendation_reject_requires_comment() -> None:
     recommendation = make_recommendation(status="proposed")
-    service = WorkflowService(
-        repository=FakeWorkflowRepository(recommendation=recommendation)
-    )
+    service = WorkflowService(repository=FakeWorkflowRepository(recommendation=recommendation))
 
     with pytest.raises(WorkflowTransitionError):
         service.apply_recommendation_action(
@@ -334,11 +332,9 @@ def test_apply_recommendation_reject_requires_comment():
         )
 
 
-def test_apply_recommendation_resolve_requires_accepted_status():
+def test_apply_recommendation_resolve_requires_accepted_status() -> None:
     recommendation = make_recommendation(status="proposed")
-    service = WorkflowService(
-        repository=FakeWorkflowRepository(recommendation=recommendation)
-    )
+    service = WorkflowService(repository=FakeWorkflowRepository(recommendation=recommendation))
 
     with pytest.raises(WorkflowTransitionError):
         service.apply_recommendation_action(
@@ -348,7 +344,7 @@ def test_apply_recommendation_resolve_requires_accepted_status():
         )
 
 
-def test_apply_recommendation_action_records_native_audit_without_alert_link():
+def test_apply_recommendation_action_records_native_audit_without_alert_link() -> None:
     recommendation = make_recommendation(status="proposed", alert_id=None)
     recommendation["alert_id"] = None
     repository = FakeWorkflowRepository(recommendation=recommendation)

@@ -1,8 +1,8 @@
-from datetime import datetime, timezone, date
+from datetime import UTC, date, datetime
+from decimal import ROUND_HALF_UP, Decimal
 from enum import Enum
-from uuid import UUID, uuid4
-from decimal import Decimal, ROUND_HALF_UP
 from typing import Self
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -35,15 +35,14 @@ class Product(RetailOpsBaseModel):
     brand: str | None = None
     status: ProductStatus = ProductStatus.active
 
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.created_at <= self.updated_at):
-            raise ValueError("Invalid time order")
+            msg = "Invalid time order"
+            raise ValueError(msg)
         return self
 
 
@@ -71,14 +70,13 @@ class Sale(RetailOpsBaseModel):
     currency: Currency = Currency.PLN
     channel: Channel | None = None
 
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.sold_at <= self.created_at):
-            raise ValueError("Invalid time order")
+            msg = "Invalid time order"
+            raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
@@ -93,9 +91,12 @@ class Sale(RetailOpsBaseModel):
         )
 
         if actual_total != expected_total:
-            raise ValueError(
+            msg = (
                 f"total_amount must equal quantity * unit_price. "
                 f"Expected {expected_total}, got {self.total_amount}."
+            )
+            raise ValueError(
+                msg,
             )
 
         return self
@@ -105,7 +106,7 @@ class Sale(RetailOpsBaseModel):
 class UnitOfMeasure(str, Enum):
     pcs = "pcs"
     kg = "kg"
-    l = "l"
+    liter = "l"
     m = "m"
     m2 = "m2"
 
@@ -122,11 +123,13 @@ class InventorySnapshot(RetailOpsBaseModel):
     created_at: datetime = Field(...)
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.recorded_at <= self.ingested_at <= self.created_at):
-            raise ValueError("Invalid time order")
-        if self.created_at > datetime.now(timezone.utc):
-            raise ValueError("Date cannot be in the future")
+            msg = "Invalid time order"
+            raise ValueError(msg)
+        if self.created_at > datetime.now(UTC):
+            msg = "Date cannot be in the future"
+            raise ValueError(msg)
         return self
 
 
@@ -155,9 +158,10 @@ class User(RetailOpsBaseModel):
     updated_at: datetime
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.created_at <= self.updated_at):
-            raise ValueError("Invalid time order")
+            msg = "Invalid time order"
+            raise ValueError(msg)
         return self
 
 
@@ -199,9 +203,10 @@ class Alert(RetailOpsBaseModel):
     updated_at: datetime
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.created_at <= self.updated_at):
-            raise ValueError("Invalid time order")
+            msg = "Invalid time order"
+            raise ValueError(msg)
         return self
 
 
@@ -230,17 +235,13 @@ class WorkflowAction(RetailOpsBaseModel):
         default=None,
         min_length=5,
         max_length=300,
-        description=(
-            "Optional decision comment. Required for dismiss and reject actions."
-        ),
+        description=("Optional decision comment. Required for dismiss and reject actions."),
     )
 
     previous_status: AlertStatus = Field(...)
     new_status: AlertStatus = Field(...)
 
-    performed_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    performed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     @model_validator(mode="after")
     def validate_action_requirements(self) -> "WorkflowAction":
@@ -270,7 +271,7 @@ class ImpactUnit(str, Enum):
     PLN = "PLN"
     pcs = "pcs"
     kg = "kg"
-    l = "l"
+    liter = "l"
     m = "m"
     m2 = "m2"
     percent = "percent"
@@ -293,11 +294,13 @@ class Anomaly(RetailOpsBaseModel):
     detected_at: datetime
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.period_start <= self.period_end):
-            raise ValueError("Invalid time order")
-        if self.detected_at > datetime.now(timezone.utc):
-            raise ValueError("Date cannot be in the future")
+            msg = "Invalid time order"
+            raise ValueError(msg)
+        if self.detected_at > datetime.now(UTC):
+            msg = "Date cannot be in the future"
+            raise ValueError(msg)
         return self
 
 
@@ -332,9 +335,10 @@ class Forecast(RetailOpsBaseModel):
     confidence_level: float = Field(..., ge=0, le=1)
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.forecast_period_start <= self.forecast_period_end):
-            raise ValueError("Invalid time order")
+            msg = "Invalid time order"
+            raise ValueError(msg)
         return self
 
 
@@ -370,7 +374,8 @@ class Recommendation(RetailOpsBaseModel):
     expires_at: datetime
 
     @model_validator(mode="after")
-    def validate_dates(self):
+    def validate_dates(self) -> Self:
         if not (self.generated_at <= self.expires_at):
-            raise ValueError("Invalid time order")
+            msg = "Invalid time order"
+            raise ValueError(msg)
         return self

@@ -14,7 +14,7 @@ EXISTING_PRODUCT_ID = UUID("85710dbe-1aea-50ac-a155-fb216e12ab97")
 PRODUCT_ID_WITHOUT_FORECAST = UUID("a24a7f85-d830-55e5-90e4-afb122abd0ce")
 
 
-def test_forecast_repository_lists_forecasts_for_product():
+def test_forecast_repository_lists_forecasts_for_product() -> None:
     assert DATABASE_URL is not None
 
     with psycopg.connect(DATABASE_URL) as conn:
@@ -27,7 +27,7 @@ def test_forecast_repository_lists_forecasts_for_product():
     assert missing_forecasts == []
 
 
-def test_forecast_repository_gets_latest_forecast_for_product():
+def test_forecast_repository_gets_latest_forecast_for_product() -> None:
     assert DATABASE_URL is not None
 
     with psycopg.connect(DATABASE_URL) as conn:

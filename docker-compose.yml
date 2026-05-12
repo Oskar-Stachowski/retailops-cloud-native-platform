@@ -1,3 +1,28 @@
+# RetailOps local development runtime.
+#
+# This Docker Compose file is intended for local development, portfolio demos,
+# and CI smoke validation only. It intentionally exposes service ports on the
+# host and uses simple default credentials to keep the local setup reproducible.
+#
+# Do not use this file as a production deployment template.
+# Non-local environments must override APP_ENV and inject credentials through
+# a secret manager or protected CI/CD environment variables.
+
+# Local-only host port exposure
+# -----------------------------
+# The services below publish ports to the host so a reviewer can run and inspect
+# the full platform locally: frontend, API, PostgreSQL, Redpanda, Prometheus,
+# and Grafana.
+#
+# This is not a production networking model.
+#
+# In a production-style deployment:
+# - only the public frontend/API entry point should be reachable from the internet,
+# - PostgreSQL must stay in private subnets with no public host port,
+# - Redpanda/Kafka must stay private to application services,
+# - Prometheus and Grafana must be private, VPN-protected, or identity-protected,
+# - credentials and admin passwords must come from a secret manager.
+
 services:
   frontend:
     build:
@@ -143,9 +168,10 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # One-shot services intentionally reuse the API image.
+  # Build it first when running migration/seed jobs directly:
+  #   docker compose build api
   migrate:
-    build:
-      context: ./services/api
     image: retailops-api:0.1.0
     command: ["alembic", "upgrade", "head"]
     environment:
@@ -157,8 +183,6 @@ services:
     restart: "no"
 
   seed:
-    build:
-      context: ./services/api
     image: retailops-api:0.1.0
     command: ["python", "scripts/seed_demo_data.py"]
     environment:

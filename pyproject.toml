@@ -1,0 +1,103 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["services/api", "data"]
+force-exclude = true
+
+# Generated migration files are not edited by hand. Lint the migration environment,
+# but do not spend review time on generated Alembic revision bodies.
+#
+# The main Ruff gate currently focuses on production/runtime code. The test suite
+# is excluded from this ALL-mode gate for now because the current report is
+# dominated by pytest-specific noise: assert statements, literal expected values,
+# fixture arguments and test docstrings.
+extend-exclude = [
+  "services/api/alembic/versions",
+  "services/api/tests",
+]
+
+[tool.ruff.lint]
+# Project policy: run Ruff in broad audit mode for the checked codebase.
+# Ruff itself is pinned in requirements, so this configuration is intentionally
+# tied to the currently pinned Ruff version instead of floating rule behavior.
+select = ["ALL"]
+
+# We intentionally have not cleaned every possible Ruff finding.
+# The ignored rules below are either high-noise for this portfolio project or
+# would encourage mechanical churn instead of meaningful quality improvement.
+  ignore = [
+      # Ruff/pydocstyle incompatible pairs. Keep the non-conflicting defaults.
+      "D203",
+      "D213",
+
+      # handled by Ruff formatter; avoiding formatter/linter conflict
+      "COM812",
+
+      # conflicts with Ruff formatter on wrapped string literals
+      "ISC001",
+
+      # Formatting/legacy readability decisions handled manually, not as a hard gate.
+      "E501",
+      "E741",
+
+      # Broad docstring rules created mostly generic docstring churn across FastAPI
+      # routes, Pydantic models, data generators, packages and magic methods.
+      # Public documentation should be added where it explains behavior, contracts
+      # or operational decisions — not just to satisfy a counter.
+      "D100",
+      "D101",
+      "D102",
+      "D103",
+      "D104",
+      "D105",
+      "D107",
+
+      # Several functions intentionally expose explicit filters, query parameters
+      # or repository/service arguments. Refactor these with request/filter objects
+      # only when it improves the API shape; do not hide intent just to reduce arity.
+      "PLR0913",
+
+      # The remaining PERF401 cases build verbose event payloads. List comprehensions
+      # would be shorter, but less readable. Keep obvious/simple cases fixable in code.
+      "PERF401",
+
+      # The remaining PLR2004 findings are small structural literals in demo/support scripts:
+      # product indexes and path parent-depth guards. Extracting constants such as
+      # TERTIARY_PRODUCT_INDEX or MIN_PARENT_DEPTH would add naming noise without making
+      # the code meaningfully clearer.
+      "PLR2004",
+
+      # Some functions intentionally use early returns to keep branching readable.
+      # Refactor only when a helper function or clearer domain split improves the code,
+      # not just to satisfy a return-count threshold.
+      "PLR0911",
+
+      # The remaining complexity finding should be handled as a focused refactor.
+      # Do not mechanically split the function unless the new structure is easier
+      # to test, name and understand.
+      "C901",
+
+      # These exception-flow suggestions are valid, but low priority. Apply them
+      # only when they make the happy path and error path clearer.
+      "TRY300",
+      "TRY301",
+  ]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "data"]
+
+[tool.coverage.run]
+branch = true
+source = ["services/api/app"]
+omit = [
+  "services/api/tests/*",
+  "services/api/alembic/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 70
+
+[tool.coverage.xml]
+output = "ci-cd/reports/api/coverage.xml"

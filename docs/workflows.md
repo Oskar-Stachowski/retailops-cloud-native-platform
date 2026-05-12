@@ -1,8 +1,8 @@
 # RetailOps Workflows
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Business & Product  
-**Phase:** Phase 1 — Foundation / MVP  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** Business & Product
+**Phase:** Phase 1 — Foundation / MVP
 **Related source artifact:** `docs/user-groups.md`
 
 ---
@@ -254,11 +254,11 @@ Signal → workflow item → user decision → action status → evidence → bu
 
 ## WF-001 — Daily operational alert triage
 
-**Primary actor:** Operations Manager  
-**Supporting actors:** Inventory Planner, Analyst, Commercial Stakeholder, DevOps Team  
-**Decision need:** Which operational risks require action today?  
-**Maturity:** MVP, later enhanced by event-driven architecture  
-**Related user group:** Operations Manager  
+**Primary actor:** Operations Manager
+**Supporting actors:** Inventory Planner, Analyst, Commercial Stakeholder, DevOps Team
+**Decision need:** Which operational risks require action today?
+**Maturity:** MVP, later enhanced by event-driven architecture
+**Related user group:** Operations Manager
 **Related decision need:** DN-001
 
 ### 7.1.1. Business purpose
@@ -376,11 +376,11 @@ Validate that:
 
 ## WF-002 — Inventory risk and replenishment review
 
-**Primary actor:** Inventory Planner / Supply Chain  
-**Supporting actors:** Operations Manager, Commercial Stakeholder, Finance, Data / ML Team  
-**Decision need:** Which products require replenishment, escalation, monitoring, or dismissal?  
-**Maturity:** MVP, later enhanced by forecasting and optimization  
-**Related user group:** Inventory Planner / Supply Chain  
+**Primary actor:** Inventory Planner / Supply Chain
+**Supporting actors:** Operations Manager, Commercial Stakeholder, Finance, Data / ML Team
+**Decision need:** Which products require replenishment, escalation, monitoring, or dismissal?
+**Maturity:** MVP, later enhanced by forecasting and optimization
+**Related user group:** Inventory Planner / Supply Chain
 **Related decision need:** DN-002
 
 ### 7.2.1. Business purpose
@@ -494,11 +494,11 @@ Validate that:
 
 ## WF-003 — Business anomaly investigation
 
-**Primary actor:** Analyst  
-**Supporting actors:** Operations Manager, Commercial Stakeholder, Inventory Planner, Data / ML Team  
-**Decision need:** Why did a metric change, and does it require action?  
-**Maturity:** MVP with sample anomalies, later enhanced by event-driven anomaly detection  
-**Related user group:** Analyst  
+**Primary actor:** Analyst
+**Supporting actors:** Operations Manager, Commercial Stakeholder, Inventory Planner, Data / ML Team
+**Decision need:** Why did a metric change, and does it require action?
+**Maturity:** MVP with sample anomalies, later enhanced by event-driven anomaly detection
+**Related user group:** Analyst
 **Related decision need:** DN-003
 
 ### 7.3.1. Business purpose
@@ -612,11 +612,11 @@ Validate that:
 
 ## WF-004 — Commercial product and pricing review
 
-**Primary actor:** Category / Commercial Stakeholder  
-**Supporting actors:** Analyst, Inventory Planner, Finance, Operations Manager  
-**Decision need:** Which product, pricing, campaign, or category action is needed?  
-**Maturity:** MVP with basic product/category visibility, later enhanced by pricing and campaign optimization  
-**Related user group:** Category / Commercial Stakeholder  
+**Primary actor:** Category / Commercial Stakeholder
+**Supporting actors:** Analyst, Inventory Planner, Finance, Operations Manager
+**Decision need:** Which product, pricing, campaign, or category action is needed?
+**Maturity:** MVP with basic product/category visibility, later enhanced by pricing and campaign optimization
+**Related user group:** Category / Commercial Stakeholder
 **Related decision need:** DN-004
 
 ### 7.4.1. Business purpose
@@ -726,11 +726,11 @@ Validate that:
 
 ## WF-005 — Financial impact and planning review
 
-**Primary actor:** Finance / Controlling  
-**Supporting actors:** Operations Manager, Inventory Planner, Commercial Stakeholder, Management  
-**Decision need:** What is the financial impact of stock, demand, operational, and platform maturity risks?  
-**Maturity:** MVP with KPI and risk visibility, later enhanced by scenario simulation and FinOps  
-**Related user group:** Finance / Controlling  
+**Primary actor:** Finance / Controlling
+**Supporting actors:** Operations Manager, Inventory Planner, Commercial Stakeholder, Management
+**Decision need:** What is the financial impact of stock, demand, operational, and platform maturity risks?
+**Maturity:** MVP with KPI and risk visibility, later enhanced by scenario simulation and FinOps
+**Related user group:** Finance / Controlling
 **Related decision need:** DN-005
 
 ### 7.5.1. Business purpose
@@ -838,11 +838,11 @@ Validate that:
 
 ## WF-006 — Model evaluation, promotion, and retraining review
 
-**Primary actor:** Data / ML Team  
-**Supporting actors:** DevOps Team, Analyst, Operations Manager, Inventory Planner, Product Owner  
-**Decision need:** Is the model or analytical output reliable enough to use, deploy, monitor, or retrain?  
-**Maturity:** Target maturity, with MVP placeholders  
-**Related user group:** Data / ML Team  
+**Primary actor:** Data / ML Team
+**Supporting actors:** DevOps Team, Analyst, Operations Manager, Inventory Planner, Product Owner
+**Decision need:** Is the model or analytical output reliable enough to use, deploy, monitor, or retrain?
+**Maturity:** Target maturity, with MVP placeholders
+**Related user group:** Data / ML Team
 **Related decision need:** DN-006
 
 ### 7.6.1. Business purpose
@@ -959,11 +959,11 @@ Validate that:
 
 ## WF-007 — Release, deployment, and platform health control
 
-**Primary actor:** Platform / DevOps Team  
-**Supporting actors:** Data / ML Team, Security, Product Owner, Developers  
-**Decision need:** Is the platform safe, healthy, secure, and ready to release?  
-**Maturity:** MVP foundation, stronger in Phase 2 and beyond  
-**Related user group:** Platform / DevOps Team  
+**Primary actor:** Platform / DevOps Team
+**Supporting actors:** Data / ML Team, Security, Product Owner, Developers
+**Decision need:** Is the platform safe, healthy, secure, and ready to release?
+**Maturity:** MVP foundation, stronger in Phase 2 and beyond
+**Related user group:** Platform / DevOps Team
 **Related decision need:** DN-007
 
 ### 7.7.1. Business purpose

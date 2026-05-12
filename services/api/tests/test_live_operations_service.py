@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.services.dashboard_service import DashboardService
 
@@ -14,13 +14,13 @@ class FakeRealtimeRepository:
                 "metric_name": "live_revenue",
                 "metric_value": 499.40,
                 "observation_count": 12,
-                "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+                "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
             },
             {
                 "metric_name": "live_stock_delta",
                 "metric_value": -7,
                 "observation_count": 3,
-                "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+                "latest_observed_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
             },
         ]
 
@@ -32,7 +32,7 @@ class FakeRealtimeRepository:
 
     def get_event_freshness(self):
         return {
-            "latest_event_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
+            "latest_event_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
             "freshness_seconds": 42,
         }
 
@@ -43,11 +43,11 @@ class FakeRealtimeRepository:
                 "event_type": "sale_completed",
                 "topic": "retailops.sales.v1",
                 "status": "processed",
-                "occurred_at": datetime(2026, 5, 7, 9, 59, tzinfo=timezone.utc),
-                "ingested_at": datetime(2026, 5, 7, 10, tzinfo=timezone.utc),
-                "processed_at": datetime(2026, 5, 7, 10, 0, 1, tzinfo=timezone.utc),
+                "occurred_at": datetime(2026, 5, 7, 9, 59, tzinfo=UTC),
+                "ingested_at": datetime(2026, 5, 7, 10, tzinfo=UTC),
+                "processed_at": datetime(2026, 5, 7, 10, 0, 1, tzinfo=UTC),
                 "error_message": None,
-            }
+            },
         ]
 
     def get_recent_operational_alerts(self, limit: int):
@@ -56,14 +56,14 @@ class FakeRealtimeRepository:
                 "event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV3",
                 "event_type": "alert_created",
                 "status": "processed",
-                "occurred_at": datetime(2026, 5, 7, 9, 58, tzinfo=timezone.utc),
-                "ingested_at": datetime(2026, 5, 7, 9, 58, 1, tzinfo=timezone.utc),
+                "occurred_at": datetime(2026, 5, 7, 9, 58, tzinfo=UTC),
+                "ingested_at": datetime(2026, 5, 7, 9, 58, 1, tzinfo=UTC),
                 "payload": {
                     "product_id": "product-1",
                     "severity": "high",
                     "title": "Potential stockout risk",
                 },
-            }
+            },
         ]
 
     def get_consumer_states(self):
@@ -79,17 +79,15 @@ class FakeRealtimeRepository:
                 "last_event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV2",
                 "last_event_type": "sale_completed",
                 "last_error": None,
-                "last_processed_at": datetime(
-                    2026, 5, 7, 10, 0, 1, tzinfo=timezone.utc
-                ),
-                "started_at": datetime(2026, 5, 7, 9, tzinfo=timezone.utc),
+                "last_processed_at": datetime(2026, 5, 7, 10, 0, 1, tzinfo=UTC),
+                "started_at": datetime(2026, 5, 7, 9, tzinfo=UTC),
                 "stopped_at": None,
-                "updated_at": datetime(2026, 5, 7, 10, 0, 1, tzinfo=timezone.utc),
-            }
+                "updated_at": datetime(2026, 5, 7, 10, 0, 1, tzinfo=UTC),
+            },
         ]
 
 
-def test_dashboard_service_builds_live_operations_read_model():
+def test_dashboard_service_builds_live_operations_read_model() -> None:
     service = DashboardService(
         repository=EmptyDashboardRepository(),
         realtime_repository=FakeRealtimeRepository(),

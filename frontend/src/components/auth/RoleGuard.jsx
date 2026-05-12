@@ -14,7 +14,7 @@ function RoleGuard({ user, requiredPermission, allowedRoles = [], children }) {
 
   return (
     <section className="access-boundary-card" aria-label="Access boundary">
-      <p className="eyebrow">Sprint 7 access boundary</p>
+      <p className="eyebrow">Access boundary</p>
       <h2>Role-aware access boundary</h2>
       <p>
         This screen is intentionally protected by a local mock permission check.

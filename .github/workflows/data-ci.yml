@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "data/**"
+      - "services/api/requirements-dev.txt"
       - "services/api/tests/test_data_generator_cli.py"
       - "Makefile"
       - "ci-cd/README.md"
@@ -12,6 +13,7 @@ on:
   pull_request:
     paths:
       - "data/**"
+      - "services/api/requirements-dev.txt"
       - "services/api/tests/test_data_generator_cli.py"
       - "Makefile"
       - "ci-cd/README.md"
@@ -49,7 +51,9 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-          cache-dependency-path: services/api/requirements.txt
+          cache-dependency-path: |
+            services/api/requirements.txt
+            services/api/requirements-dev.txt
 
       - name: Run data quality gate
         run: make data-quality DATA_PROFILE="${DATA_PROFILE}"

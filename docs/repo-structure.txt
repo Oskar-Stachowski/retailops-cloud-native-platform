@@ -1,37 +1,173 @@
+# RetailOps repository structure snapshot
+#
+# Generated: 2026-05-12T10:30:22Z
+# Purpose: Static repository tree snapshot for documentation/release evidence.
+# Refresh command:
+#   make docs-repo-structure
+#
+# Note:
+# This file is intentionally static and can become stale in active development.
+# Refresh it during release evidence updates or before publishing portfolio documentation.
+
 tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"
 .
 ├── .env.example
 ├── .github
+│   ├── dependabot.yml
 │   └── workflows
 │       ├── api-ci.yml
+│       ├── data-ci.yml
 │       ├── docker-ci.yml
 │       ├── frontend-ci.yml
-│       └── security-ci.yml
+│       ├── iac-security.yml
+│       ├── observability-ci.yml
+│       ├── security-ci.yml
+│       └── terraform-plan.yml
 ├── .gitignore
+├── .gitleaks.toml
+├── .pre-commit-config.yaml
 ├── .vscode
 │   └── settings.json
+├── GPTimages
+│   ├── AWS-Cloud-Architecture.png
+│   ├── AWS-Well-Architected-Framework.png
+│   ├── Architecture-Layers.png
+│   ├── Architecture.png
+│   ├── Business-Product-Perspective.png
+│   ├── Business-Value-Perspective.png
+│   ├── CI-CD-Pipeline-Delivery-Workflow.png
+│   ├── Data-Flow-Intelligence-Lifecycle.png
+│   ├── Data-Flow.png
+│   ├── Enterprise-Scorecard.png
+│   ├── Executive-Architecture-Summary.png
+│   ├── Future-Growth-Perspective.png
+│   ├── Microservices-Architecture.png
+│   ├── Observability-Operational-Control.png
+│   ├── Project-Evolution.png
+│   ├── Reliability-Scalability-Cost-Control.png
+│   ├── Security-Governance-Architecture.png
+│   ├── User-Groups-Decision-Needs.png
+│   ├── Workflow-Operating-Model.png
+│   ├── retailops_domain_model_diagram_overview.png
+│   └── retailops_testing_roadmap_infographic.png
+├── Jenkinsfile
+├── LICENSE
+├── LOCAL_ADVANCED_ROADMAP
+│   ├── 01-sprint-roadmap.md
+│   ├── 02-task-backlog.md
+│   ├── 03-commit-plan.md
+│   ├── 04-architecture-diagrams.md
+│   ├── 05-data-realtime-mlops-plan.md
+│   ├── 06-devops-aws-observability-security-plan.md
+│   ├── 07-execution-checklists.md
+│   ├── README.md
+│   ├── SENIOR_LEVEL_UPGRADE_PLAN.md
+│   ├── retailops-production-readiness-audit-summary.md
+│   ├── retailops-production-readiness-checklist-audited.md
+│   ├── retailops-production-readiness-checklist.md
+│   ├── sprint-11-observability-coverage.md
+│   ├── zOskar - REPOSITORY_AUDIT.md
+│   ├── zOskar - retailops-production-readiness-checklist-audited.md
+│   └── zOskar - retailops-production-readiness-checklist.md
+├── Makefile
+├── README.md
 ├── case-study.md
 ├── ci-cd
 │   ├── README.md
 │   └── reports
 │       ├── .gitkeep
+│       ├── README.md
+│       ├── api
+│       │   └── coverage.xml
+│       ├── data
+│       │   └── generated
+│       │       └── small
+│       │           ├── alerts.csv
+│       │           ├── anomalies.csv
+│       │           ├── dataset_manifest.json
+│       │           ├── forecasts.csv
+│       │           ├── inventory_snapshots.csv
+│       │           ├── order_items.csv
+│       │           ├── orders.csv
+│       │           ├── price_history.csv
+│       │           ├── products.csv
+│       │           ├── promotions.csv
+│       │           ├── quality_report.json
+│       │           ├── realism_report.json
+│       │           ├── recommendations.csv
+│       │           ├── returns.csv
+│       │           ├── sales.csv
+│       │           ├── stock_movements.csv
+│       │           ├── stores.csv
+│       │           ├── users.csv
+│       │           ├── warehouses.csv
+│       │           └── workflow_actions.csv
+│       ├── docker-compose-logs.txt
 │       ├── docker-compose-ps.txt
+│       ├── iac
+│       │   ├── .gitkeep
+│       │   ├── README.md
+│       │   ├── checkov.json
+│       │   ├── checkov.txt
+│       │   ├── sprint-10-terraform-apply.txt
+│       │   ├── sprint-10-terraform-destroy.txt
+│       │   ├── sprint-10-terraform-plan-dev.txt
+│       │   ├── sprint-10-terraform-validate.txt
+│       │   ├── terraform-plan-commit11.txt
+│       │   ├── terraform-plan-commit6.txt
+│       │   ├── terraform-plan-commit8.txt
+│       │   ├── terraform-plan-commit9.txt
+│       │   ├── terraform-plan-dev.txt
+│       │   ├── terraform-plan-vpc-readable.md
+│       │   ├── terraform-validate.txt
+│       │   └── tflint.txt
+│       ├── observability
+│       │   ├── api-metrics-after-demo.txt
+│       │   ├── api-metrics.txt
+│       │   ├── grafana-dashboards.json
+│       │   ├── grafana-prometheus-datasource.json
+│       │   ├── observability-demo-events-errors.log
+│       │   ├── observability-demo-events.json
+│       │   ├── prometheus-db-operations-query.json
+│       │   ├── prometheus-dlq-events-query.json
+│       │   ├── prometheus-rules.json
+│       │   ├── prometheus-stream-events-query.json
+│       │   └── prometheus-targets.json
+│       ├── ruff
+│       │   ├── ruff-all-full.txt
+│       │   ├── ruff-all-report.txt
+│       │   └── ruff-commands.txt
 │       └── security
+│           ├── README.md
 │           ├── gitleaks.json
+│           ├── trivy-api-image-snapshot.txt
 │           ├── trivy-api-image.txt
+│           ├── trivy-frontend-image-snapshot.txt
 │           ├── trivy-frontend-image.txt
+│           ├── trivy-fs-snapshot.txt
 │           └── trivy-fs.txt
 ├── data
+│   ├── README.md
 │   ├── __init__.py
 │   ├── demo
 │   │   ├── alerts.csv
 │   │   ├── anomalies.csv
+│   │   ├── dataset_manifest.json
 │   │   ├── forecasts.csv
 │   │   ├── inventory_snapshots.csv
+│   │   ├── order_items.csv
+│   │   ├── orders.csv
+│   │   ├── price_history.csv
 │   │   ├── products.csv
+│   │   ├── promotions.csv
+│   │   ├── quality_report.json
 │   │   ├── recommendations.csv
+│   │   ├── returns.csv
 │   │   ├── sales.csv
+│   │   ├── stock_movements.csv
+│   │   ├── stores.csv
 │   │   ├── users.csv
+│   │   ├── warehouses.csv
 │   │   └── workflow_actions.csv
 │   ├── generator
 │   │   ├── __init__.py
@@ -40,22 +176,81 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── forecasts.py
 │   │   ├── incidents.py
 │   │   ├── inventory.py
+│   │   ├── locations.py
 │   │   ├── main.py
+│   │   ├── manifest.py
+│   │   ├── orders.py
+│   │   ├── pricing.py
 │   │   ├── products.py
+│   │   ├── profile_engine.py
+│   │   ├── quality.py
+│   │   ├── realism_report.py
+│   │   ├── realtime.py
 │   │   ├── sales.py
 │   │   ├── scenarios.py
+│   │   ├── stock.py
 │   │   └── users.py
-│   └── README.md
+│   └── synthetic
+│       ├── medium
+│       │   ├── alerts.csv
+│       │   ├── anomalies.csv
+│       │   ├── forecasts.csv
+│       │   ├── inventory_snapshots.csv
+│       │   ├── order_items.csv
+│       │   ├── orders.csv
+│       │   ├── price_history.csv
+│       │   ├── products.csv
+│       │   ├── promotions.csv
+│       │   ├── realism_report.json
+│       │   ├── recommendations.csv
+│       │   ├── returns.csv
+│       │   ├── sales.csv
+│       │   ├── stock_movements.csv
+│       │   ├── stores.csv
+│       │   ├── users.csv
+│       │   ├── warehouses.csv
+│       │   └── workflow_actions.csv
+│       └── small
+│           ├── README.md
+│           ├── alerts.csv
+│           ├── anomalies.csv
+│           ├── dataset_manifest.json
+│           ├── forecasts.csv
+│           ├── inventory_snapshots.csv
+│           ├── order_items.csv
+│           ├── orders.csv
+│           ├── price_history.csv
+│           ├── products.csv
+│           ├── promotions.csv
+│           ├── quality_report.json
+│           ├── realism_report.json
+│           ├── recommendations.csv
+│           ├── returns.csv
+│           ├── sales.csv
+│           ├── stock_movements.csv
+│           ├── stores.csv
+│           ├── users.csv
+│           ├── warehouses.csv
+│           └── workflow_actions.csv
 ├── docker-compose.yml
 ├── docs
 │   ├── ADR
+│   │   ├── AWS Cost Control.md
+│   │   ├── AWS Networking Baseline.md
 │   │   ├── Alembic.md
 │   │   ├── CICD tooling.md
+│   │   ├── IAM delivery access.md
 │   │   ├── PostgreSQL.md
 │   │   ├── Psycopg.md
 │   │   ├── Pydantic.md
-│   │   └── SQLAlchemy.md
+│   │   ├── SQLAlchemy.md
+│   │   ├── Terraform Layout.md
+│   │   └── terraform-plan-readonly-iam-discovery.md
 │   ├── api.md
+│   ├── aws-architecture.md
+│   ├── aws-service-inventory.md
+│   ├── cost-assumptions.md
+│   ├── cost-monitoring.md
 │   ├── data-model.md
 │   ├── database_migrations_and_seed_data.md
 │   ├── diagrams
@@ -70,36 +265,62 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── 09-platform-maturity-roadmap.md
 │   │   ├── 10-cross-layer-dependencies.md
 │   │   ├── 11-retailops-demo-data-flow.md
-│   │   └── 12-repository-service-layer.md
+│   │   ├── 12-repository-service-layer.md
+│   │   └── 13-aws-foundation.md
 │   ├── enterprise-scorecard.md
 │   ├── evidence
-│   │   ├── Jenkins Stage View.png
-│   │   ├── Jenkins Status and Artifacts.png
-│   │   ├── trivy-api-image.txt
-│   │   ├── trivy-frontend-image.txt
-│   │   └── trivy-fs.txt
+│   │   ├── README.md
+│   │   ├── api
+│   │   │   ├── README.md
+│   │   │   ├── openapi-snapshot.json
+│   │   │   └── startup-log.md
+│   │   ├── aws
+│   │   │   ├── README.md
+│   │   │   ├── aws-cleanup-confirmation.md
+│   │   │   ├── aws-console-budget.png
+│   │   │   ├── aws-console-cloudwatch.png
+│   │   │   ├── aws-console-ecr.png
+│   │   │   ├── aws-console-iam.png
+│   │   │   └── aws-console-vpc.png
+│   │   ├── docker
+│   │   │   ├── README.md
+│   │   │   └── compose-ci-smoke.md
+│   │   ├── evidence-cleanup-report.md
+│   │   ├── evidence-folder-map.md
+│   │   ├── gitignore-evidence-policy.md
+│   │   ├── gptimages-index.md
+│   │   ├── index.md
+│   │   └── jenkins
+│   │       ├── README.md
+│   │       ├── jenkins-stage-view.png
+│   │       └── jenkins-status-and-artifacts.png
 │   ├── finops.md
-│   ├── Future Improvements
-│   │   ├── cs-013-future-improvements.md
-│   │   ├── cs-014-api-contract-future-improvements.md
-│   │   ├── cs-015-dashboard-summary-future-improvements.md
-│   │   ├── cs-016-dashboard-ui-api-future-improvements.md
-│   │   ├── images
-│   │   │   ├── CS-013-Dashboard-Analytics-Query-Layer.png
-│   │   │   ├── CS-014-api-roadmap-and-future-improvements-timeline.png
-│   │   │   ├── CS-015-dashboard-summary-endpoints.png
-│   │   │   └── CS-016-retailops_frontend_integration_roadmap.png
-│   │   ├── sprint-4-api-integration-tests-future-improvements.md
-│   │   ├── sprint-5-dashboard-operations-future-improvements.md
-│   │   ├── sprint-6-product-360-future-improvements.md
-│   │   └── sprint-7-users-roles-notifications-future-improvements.md
+│   ├── iam-baseline.md
+│   ├── live-metrics-persistence.md
+│   ├── local-event-broker.md
+│   ├── naming-convention.md
+│   ├── networking-baseline.md
+│   ├── real-time-event-contracts.md
 │   ├── repo-structure.txt
+│   ├── right-sizing-lifecycle.md
+│   ├── roadmap
+│   │   └── future-improvements
+│   │       └── README.md
+│   ├── runbooks
+│   │   ├── aws-cleanup-runbook.md
+│   │   ├── observability-runbook.md
+│   │   ├── terraform-drift-check.md
+│   │   └── terraform-failed-plan.md
+│   ├── synthetic-data-operating-model.md
+│   ├── synthetic-data-profiles.md
+│   ├── tagging-strategy.md
 │   ├── user-groups.md
 │   └── workflows.md
 ├── frontend
 │   ├── .dockerignore
 │   ├── .gitignore
 │   ├── Dockerfile
+│   ├── README.md
 │   ├── eslint.config.js
 │   ├── index.html
 │   ├── nginx.conf
@@ -108,7 +329,6 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── public
 │   │   ├── favicon.svg
 │   │   └── icons.svg
-│   ├── README.md
 │   ├── src
 │   │   ├── App.css
 │   │   ├── App.jsx
@@ -119,34 +339,36 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── auth
 │   │   │   └── demoUser.js
 │   │   ├── components
-│   │   │   ├── auth
-│   │   │   │   ├── RoleGuard.jsx
-│   │   │   │   └── UserSwitcher.jsx
 │   │   │   ├── DataTable.jsx
 │   │   │   ├── EmptyState.jsx
 │   │   │   ├── ErrorState.jsx
 │   │   │   ├── FeatureBoundary.jsx
+│   │   │   ├── LoadingState.jsx
+│   │   │   ├── MetricCard.jsx
+│   │   │   ├── StatusBadge.jsx
+│   │   │   ├── Topbar.jsx
+│   │   │   ├── auth
+│   │   │   │   ├── RoleGuard.jsx
+│   │   │   │   └── UserSwitcher.jsx
 │   │   │   ├── legacy
 │   │   │   │   ├── ApiHealthCard.jsx
 │   │   │   │   ├── Hero.jsx
 │   │   │   │   ├── ModuleGrid.jsx
 │   │   │   │   └── StackStatus.jsx
-│   │   │   ├── LoadingState.jsx
-│   │   │   ├── MetricCard.jsx
-│   │   │   ├── notifications
-│   │   │   │   └── NotificationBell.jsx
-│   │   │   ├── StatusBadge.jsx
-│   │   │   └── Topbar.jsx
+│   │   │   └── notifications
+│   │   │       └── NotificationBell.jsx
 │   │   ├── data
 │   │   │   ├── modules.json
 │   │   │   └── stack.json
 │   │   ├── index.css
 │   │   ├── main.jsx
 │   │   ├── pages
+│   │   │   ├── ActionQueue.jsx
 │   │   │   ├── Admin.jsx
 │   │   │   ├── Anomalies.jsx
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── Forecasts.jsx
+│   │   │   ├── LiveOperations.jsx
 │   │   │   ├── Product360.jsx
 │   │   │   ├── Products.jsx
 │   │   │   ├── Profile.jsx
@@ -162,143 +384,242 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── apiClient.test.js
 │   │   └── retailopsApi.test.js
 │   └── vite.config.js
-├── GPTimages
-│   ├── Architecture-Layers.png
-│   ├── Architecture.png
-│   ├── AWS-Cloud-Architecture.png
-│   ├── AWS-Well-Architected-Framework.png
-│   ├── Business-Product-Perspective.png
-│   ├── Business-Value-Perspective.png
-│   ├── CI-CD-Pipeline-Delivery-Workflow.png
-│   ├── Data-Flow-Intelligence-Lifecycle.png
-│   ├── Data-Flow.png
-│   ├── Enterprise-Scorecard.png
-│   ├── Executive-Architecture-Summary.png
-│   ├── Future-Growth-Perspective.png
-│   ├── Microservices-Architecture.png
-│   ├── Observability-Operational-Control.png
-│   ├── Project-Evolution.png
-│   ├── Reliability-Scalability-Cost-Control.png
-│   ├── retailops_domain_model_diagram_overview.png
-│   ├── retailops_testing_roadmap_infographic.png
-│   ├── Security-Governance-Architecture.png
-│   ├── User-Groups-Decision-Needs.png
-│   └── Workflow-Operating-Model.png
 ├── infra
-│   └── README.md
-├── Jenkinsfile
+│   ├── .gitignore
+│   ├── README.md
+│   ├── backend.tf.example
+│   ├── environments
+│   │   └── dev
+│   │       ├── .terraform
+│   │       │   ├── modules
+│   │       │   │   └── modules.json
+│   │       │   └── providers
+│   │       │       └── registry.terraform.io
+│   │       │           └── hashicorp
+│   │       │               └── aws
+│   │       │                   └── 5.100.0
+│   │       │                       └── darwin_arm64
+│   │       │                           ├── LICENSE.txt
+│   │       │                           └── terraform-provider-aws_v5.100.0_x5
+│   │       ├── .terraform.lock.hcl
+│   │       ├── main.tf
+│   │       └── terraform.tfvars.example
+│   ├── locals.tf
+│   ├── modules
+│   │   ├── README.md
+│   │   ├── budget
+│   │   │   ├── README.md
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── variables.tf
+│   │   │   └── versions.tf
+│   │   ├── cloudwatch
+│   │   │   ├── README.md
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── variables.tf
+│   │   │   └── versions.tf
+│   │   ├── ecr
+│   │   │   ├── README.md
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── variables.tf
+│   │   │   └── versions.tf
+│   │   ├── iam
+│   │   │   ├── README.md
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── variables.tf
+│   │   │   └── versions.tf
+│   │   ├── tags
+│   │   │   ├── README.md
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── variables.tf
+│   │   │   └── versions.tf
+│   │   └── vpc
+│   │       ├── README.md
+│   │       ├── main.tf
+│   │       ├── outputs.tf
+│   │       ├── variables.tf
+│   │       └── versions.tf
+│   ├── outputs.tf
+│   ├── providers.tf
+│   ├── variables.tf
+│   └── versions.tf
 ├── k8s
 │   └── README.md
-├── LICENSE
-├── Makefile
 ├── ml
 │   └── README.md
 ├── observability
-│   └── README.md
+│   ├── README.md
+│   ├── grafana
+│   │   ├── dashboards
+│   │   │   ├── retailops-api.json
+│   │   │   ├── retailops-business-operations.json
+│   │   │   ├── retailops-overview.json
+│   │   │   └── retailops-stream-processing.json
+│   │   └── provisioning
+│   │       ├── dashboards
+│   │       │   └── retailops.yml
+│   │       └── datasources
+│   │           └── prometheus.yml
+│   ├── prometheus
+│   │   └── rules
+│   │       ├── api-alerts.yml
+│   │       └── stream-alerts.yml
+│   └── prometheus.yml
+├── pyproject.toml
 ├── pytest.ini
-├── README.md
 ├── scripts
-│   ├── compose_smoke.sh
-│   └── README.md
+│   ├── README.md
+│   ├── ci
+│   │   ├── compose_smoke.sh
+│   │   ├── observability_smoke.sh
+│   │   └── streaming_smoke.sh
+│   ├── dev
+│   │   └── observability_demo_traffic.sh
+│   └── evidence
+│       └── .gitkeep
 ├── security
-│   └── README.md
+│   ├── README.md
+│   └── iac
+│       ├── checkov.yml
+│       └── tflint.hcl
 ├── services
-│   ├── api
-│   │   ├── .dockerignore
-│   │   ├── alembic
-│   │   │   ├── env.py
-│   │   │   ├── README
-│   │   │   ├── script.py.mako
-│   │   │   └── versions
-│   │   │       └── 9d505dd3b320_create_initial_retailops_schema.py
-│   │   ├── alembic.ini
-│   │   ├── app
-│   │   │   ├── __init__.py
-│   │   │   ├── api
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── analytics.py
-│   │   │   │   ├── dashboard.py
-│   │   │   │   ├── errors.py
-│   │   │   │   ├── forecasts.py
-│   │   │   │   ├── health.py
-│   │   │   │   ├── inventory.py
-│   │   │   │   ├── me.py
-│   │   │   │   ├── notifications.py
-│   │   │   │   ├── product_360.py
-│   │   │   │   ├── products.py
-│   │   │   │   ├── sales.py
-│   │   │   │   ├── schemas.py
-│   │   │   │   └── stock_risks.py
-│   │   │   ├── auth
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── roles.py
-│   │   │   ├── core
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── config.py
-│   │   │   ├── db
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── connection.py
-│   │   │   │   └── introspection.py
-│   │   │   ├── domain
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── models.py
-│   │   │   │   └── platform-evolution-backlog.md
-│   │   │   ├── main.py
-│   │   │   ├── repositories
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── analytics_repository.py
-│   │   │   │   ├── dashboard_repository.py
-│   │   │   │   ├── forecast_repository.py
-│   │   │   │   ├── inventory_repository.py
-│   │   │   │   ├── product_360_repository.py
-│   │   │   │   ├── product_repository.py
-│   │   │   │   ├── sales_repository.py
-│   │   │   │   └── stock_risk_repository.py
-│   │   │   └── services
-│   │   │       ├── __init__.py
-│   │   │       ├── analytics_service.py
-│   │   │       ├── dashboard_service.py
-│   │   │       ├── forecast_service.py
-│   │   │       ├── inventory_service.py
-│   │   │       ├── product_360_service.py
-│   │   │       ├── product_service.py
-│   │   │       ├── sales_service.py
-│   │   │       ├── serialization.py
-│   │   │       └── stock_risk_service.py
-│   │   ├── Dockerfile
-│   │   ├── Makefile
-│   │   ├── pytest.ini
-│   │   ├── README.md
-│   │   ├── requirements.txt
-│   │   ├── scripts
-│   │   │   └── seed_demo_data.py
-│   │   └── tests
-│   │       ├── conftest.py
-│   │       ├── test_core_api_integration.py
-│   │       ├── test_dashboard_endpoints.py
-│   │       ├── test_dashboard_repository.py
-│   │       ├── test_dashboard_service.py
-│   │       ├── test_database_schema.py
-│   │       ├── test_demo_identity_api.py
-│   │       ├── test_domain_models.py
-│   │       ├── test_errors.py
-│   │       ├── test_forecast_api_contract.py
-│   │       ├── test_forecast_repository.py
-│   │       ├── test_forecast_service.py
-│   │       ├── test_health.py
-│   │       ├── test_inventory_api_contract.py
-│   │       ├── test_notifications_api.py
-│   │       ├── test_product_360_api.py
-│   │       ├── test_product_360_service.py
-│   │       ├── test_product_api_contract.py
-│   │       ├── test_product_repository.py
-│   │       ├── test_product_service.py
-│   │       ├── test_readiness.py
-│   │       ├── test_sales_api_contract.py
-│   │       ├── test_seed_data.py
-│   │       └── test_stock_risk_api_contract.py
-│   └── README.md
+│   ├── README.md
+│   └── api
+│       ├── .coverage
+│       ├── .dockerignore
+│       ├── Dockerfile
+│       ├── Makefile
+│       ├── README.md
+│       ├── alembic
+│       │   ├── README
+│       │   ├── __init__.py
+│       │   ├── env.py
+│       │   ├── script.py.mako
+│       │   └── versions
+│       │       ├── 1df5d2a8c9e7_add_realtime_metrics_tables.py
+│       │       ├── 7c4d9a2e1b6f_add_workflow_audit_log.py
+│       │       ├── 8d6f3b1a4c20_add_workflow_audit_idempotency_constraint.py
+│       │       └── 9d505dd3b320_create_initial_retailops_schema.py
+│       ├── alembic.ini
+│       ├── app
+│       │   ├── __init__.py
+│       │   ├── api
+│       │   │   ├── __init__.py
+│       │   │   ├── alerts.py
+│       │   │   ├── analytics.py
+│       │   │   ├── dashboard.py
+│       │   │   ├── errors.py
+│       │   │   ├── forecasts.py
+│       │   │   ├── health.py
+│       │   │   ├── inventory.py
+│       │   │   ├── me.py
+│       │   │   ├── metrics.py
+│       │   │   ├── notifications.py
+│       │   │   ├── product_360.py
+│       │   │   ├── products.py
+│       │   │   ├── recommendations.py
+│       │   │   ├── sales.py
+│       │   │   ├── schemas.py
+│       │   │   └── stock_risks.py
+│       │   ├── auth
+│       │   │   ├── __init__.py
+│       │   │   └── roles.py
+│       │   ├── core
+│       │   │   ├── __init__.py
+│       │   │   ├── config.py
+│       │   │   ├── correlation.py
+│       │   │   └── logging.py
+│       │   ├── db
+│       │   │   ├── __init__.py
+│       │   │   ├── connection.py
+│       │   │   ├── instrumentation.py
+│       │   │   └── introspection.py
+│       │   ├── domain
+│       │   │   ├── __init__.py
+│       │   │   ├── models.py
+│       │   │   ├── platform-evolution-backlog.md
+│       │   │   └── workflow.py
+│       │   ├── main.py
+│       │   ├── repositories
+│       │   │   ├── __init__.py
+│       │   │   ├── analytics_repository.py
+│       │   │   ├── dashboard_repository.py
+│       │   │   ├── forecast_repository.py
+│       │   │   ├── inventory_repository.py
+│       │   │   ├── product_360_repository.py
+│       │   │   ├── product_repository.py
+│       │   │   ├── realtime_metrics_repository.py
+│       │   │   ├── sales_repository.py
+│       │   │   ├── stock_risk_repository.py
+│       │   │   └── workflow_repository.py
+│       │   └── services
+│       │       ├── __init__.py
+│       │       ├── analytics_service.py
+│       │       ├── dashboard_service.py
+│       │       ├── forecast_service.py
+│       │       ├── inventory_service.py
+│       │       ├── product_360_service.py
+│       │       ├── product_service.py
+│       │       ├── realtime_consumer.py
+│       │       ├── sales_service.py
+│       │       ├── serialization.py
+│       │       ├── stock_risk_service.py
+│       │       ├── stream_observability.py
+│       │       └── workflow_service.py
+│       ├── pytest.ini
+│       ├── requirements-dev.txt
+│       ├── requirements.txt
+│       ├── scripts
+│       │   ├── __init__.py
+│       │   ├── generate_observability_demo_events.py
+│       │   └── seed_demo_data.py
+│       └── tests
+│           ├── conftest.py
+│           ├── test_alert_workflow_api.py
+│           ├── test_core_api_integration.py
+│           ├── test_correlation_id.py
+│           ├── test_dashboard_endpoints.py
+│           ├── test_dashboard_repository.py
+│           ├── test_dashboard_service.py
+│           ├── test_data_generator_cli.py
+│           ├── test_database_instrumentation.py
+│           ├── test_database_schema.py
+│           ├── test_demo_identity_api.py
+│           ├── test_domain_models.py
+│           ├── test_errors.py
+│           ├── test_forecast_api_contract.py
+│           ├── test_forecast_repository.py
+│           ├── test_forecast_service.py
+│           ├── test_grafana_provisioning.py
+│           ├── test_health.py
+│           ├── test_inventory_api_contract.py
+│           ├── test_live_operations_service.py
+│           ├── test_metrics_endpoint.py
+│           ├── test_notifications_api.py
+│           ├── test_product_360_api.py
+│           ├── test_product_360_service.py
+│           ├── test_product_api_contract.py
+│           ├── test_product_repository.py
+│           ├── test_product_service.py
+│           ├── test_prometheus_alert_rules.py
+│           ├── test_prometheus_configuration.py
+│           ├── test_readiness.py
+│           ├── test_realtime_consumer.py
+│           ├── test_realtime_metrics_repository.py
+│           ├── test_recommendation_workflow_api.py
+│           ├── test_sales_api_contract.py
+│           ├── test_seed_data.py
+│           ├── test_stock_risk_api_contract.py
+│           ├── test_stream_observability.py
+│           ├── test_structured_logging.py
+│           ├── test_workflow_api_schemas.py
+│           ├── test_workflow_repository.py
+│           └── test_workflow_service.py
 └── tests
     └── README.md
 
-53 directories, 248 files
+97 directories, 514 files

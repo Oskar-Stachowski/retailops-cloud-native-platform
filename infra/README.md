@@ -41,6 +41,10 @@ infra/
 
 `infra/environments/dev` is the only active environment entry point in Sprint 10. It composes the reusable modules and keeps dev-specific defaults close to the plan command.
 
+Run Terraform through the root `Makefile` targets or with explicit
+`-chdir=infra/environments/dev`. The `infra/` root is not an environment entry
+point.
+
 The dev baseline is cost-aware by design:
 
 - no NAT Gateway,
@@ -142,10 +146,11 @@ The Terraform plan IAM policy intentionally uses broad read/list/describe discov
 Sprint 10 showcase evidence is stored under:
 
 ```text
-docs/evidence/sprint-10/
+docs/evidence/aws/
+ci-cd/reports/iac/
 ```
 
-That folder contains validation output, plan/apply/destroy evidence, sanitized console screenshots, Terraform outputs, and cleanup confirmation. Evidence should prove the baseline can be created and destroyed cleanly without leaving cost-generating resources behind.
+`docs/evidence/aws/` contains curated screenshots and cleanup notes. `ci-cd/reports/iac/` contains tracked sanitized Terraform command snapshots. Together they should prove the baseline can be created and destroyed cleanly without leaving cost-generating resources behind.
 
 ## Future improvements
 

@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 RULES_PATH = (
     Path(__file__).resolve().parents[3]
     / "observability"

@@ -186,9 +186,9 @@ cython_debug/
 .abstra/
 
 # Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore
 #  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#  and can be added to the global gitignore or merged into this file. However, if you prefer,
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
@@ -213,8 +213,40 @@ __marimo__/
 *.pyc
 
 # CI/CD local reports and pipeline artifacts
-ci-cd/reports/*
+#
+# Default policy:
+# - volatile local reports stay ignored,
+# - curated evidence snapshots can be tracked when intentionally named
+#   `*-snapshot.*`, `sprint-*-*.txt`, or documented with README/index files,
+# - large generated datasets, logs and coverage outputs stay ignored.
+ci-cd/reports/**
+!ci-cd/reports/
+!ci-cd/reports/**/
 !ci-cd/reports/.gitkeep
+!ci-cd/reports/**/README.md
+!ci-cd/reports/**/*.evidence.md
+!ci-cd/reports/**/*-snapshot.txt
+!ci-cd/reports/**/*-snapshot.json
+!ci-cd/reports/iac/sprint-*-terraform-*.txt
+ci-cd/reports/api/
+ci-cd/reports/data/generated/
+ci-cd/reports/observability/
+ci-cd/reports/ruff/
+ci-cd/reports/**/.gitkeep
+ci-cd/reports/**/*.log
+ci-cd/reports/docker-compose-logs.txt
+ci-cd/reports/iac/checkov.*
+ci-cd/reports/iac/terraform-plan-*.txt
+ci-cd/reports/iac/terraform-validate.txt
+ci-cd/reports/iac/tflint.txt
+ci-cd/reports/security/gitleaks.json
+ci-cd/reports/security/trivy-api-image.txt
+ci-cd/reports/security/trivy-frontend-image.txt
+ci-cd/reports/security/trivy-fs.txt
+
+# Local audit and planning reports
+REPOSITORY_AUDIT.md
+SENIOR_LEVEL_UPGRADE_PLAN.md
 
 # Local audit and planning reports
 REPOSITORY_AUDIT.md
@@ -253,3 +285,6 @@ override.tf.json
 
 # Keep provider dependency lock files versioned for reproducible Terraform runs.
 !.terraform.lock.hcl
+
+# Local editor preferences
+.vscode/settings.json

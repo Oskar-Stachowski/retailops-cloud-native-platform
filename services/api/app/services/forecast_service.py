@@ -5,7 +5,6 @@ from app.domain.models import Forecast
 from app.repositories.forecast_repository import ForecastRepository
 from app.services.serialization import make_json_safe
 
-
 FORECAST_AVAILABLE = "available"
 FORECAST_MISSING = "missing"
 
@@ -13,7 +12,7 @@ FORECAST_MISSING = "missing"
 class ForecastService:
     """Application service for forecast reads."""
 
-    def __init__(self, forecast_repository: ForecastRepository | None = None):
+    def __init__(self, forecast_repository: ForecastRepository | None = None) -> None:
         self.forecast_repository = forecast_repository or ForecastRepository()
 
     def list_forecasts_for_product(self, product_id: UUID) -> list[Forecast]:
@@ -23,9 +22,7 @@ class ForecastService:
         return self.forecast_repository.get_latest_forecast_for_product(product_id)
 
     def get_forecast_availability_for_product(self, product_id: UUID) -> str:
-        latest_forecast = (
-            self.forecast_repository.get_latest_forecast_for_product(product_id)
-        )
+        latest_forecast = self.forecast_repository.get_latest_forecast_for_product(product_id)
 
         if latest_forecast is None:
             return FORECAST_MISSING
@@ -64,10 +61,7 @@ class ForecastService:
         )
 
         return {
-            "items": [
-                make_json_safe(forecast.model_dump())
-                for forecast in forecasts
-            ],
+            "items": [make_json_safe(forecast.model_dump()) for forecast in forecasts],
             "pagination": {
                 "limit": limit,
                 "offset": offset,

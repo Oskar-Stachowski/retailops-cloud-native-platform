@@ -1,8 +1,8 @@
 # AWS Service Inventory — Sprint 10 Foundation
 
-**Project:** RetailOps Cloud-Native Platform  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
-**Commit:** `docs(aws): add AWS service inventory and foundation architecture`  
+**Project:** RetailOps Cloud-Native Platform
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
+**Commit:** `docs(aws): add AWS service inventory and foundation architecture`
 **Scope:** Documentation / architecture / evidence
 
 ---

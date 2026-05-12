@@ -5,7 +5,7 @@ from app.services.serialization import make_json_safe
 class StockRiskService:
     """Application service for product-level stock risk reads."""
 
-    def __init__(self, stock_risk_repository: StockRiskRepository | None = None):
+    def __init__(self, stock_risk_repository: StockRiskRepository | None = None) -> None:
         self.stock_risk_repository = stock_risk_repository or StockRiskRepository()
 
     def list_inventory_risks_response(
@@ -38,5 +38,5 @@ class StockRiskService:
                     "offset": offset,
                     "total": total,
                 },
-            }
+            },
         )

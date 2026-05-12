@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import logging
+import time
 from collections import defaultdict
 from dataclasses import dataclass
-import logging
 from threading import Lock
-import time
-from typing import Any, Callable, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger("app.db")
 T = TypeVar("T")
@@ -25,7 +27,7 @@ _stats: dict[tuple[str, str, str], DatabaseOperationStats] = defaultdict(
 _stats_lock = Lock()
 
 
-def classify_statement(query: Any) -> str:
+def classify_statement(query: object) -> str:
     text = str(query).strip()
     if not text:
         return "unknown"
@@ -70,7 +72,7 @@ def observe_database_operation(
 def instrument_database_call(
     *,
     operation: str,
-    query: Any,
+    query: object,
     callback: Callable[[], T],
     row_count: Callable[[T], int | None] | None = None,
 ) -> T:
@@ -103,7 +105,8 @@ def render_database_metrics() -> str:
         snapshot = list(_stats.items())
 
     lines = [
-        "# HELP retailops_db_operations_total Total database operations by operation, statement type and status.",
+        "# HELP retailops_db_operations_total "
+        "Total database operations by operation, statement type and status.",
         "# TYPE retailops_db_operations_total counter",
     ]
     for labels, stats in snapshot:
@@ -111,35 +114,37 @@ def render_database_metrics() -> str:
         lines.append(
             "retailops_db_operations_total"
             f'{{operation="{operation}",statement_type="{statement_type}",status="{status}"}} '
-            f"{stats.count}"
+            f"{stats.count}",
         )
 
     lines.extend(
         [
-            "# HELP retailops_db_operation_duration_seconds_sum Cumulative database operation duration in seconds.",
+            "# HELP retailops_db_operation_duration_seconds_sum "
+            "Cumulative database operation duration in seconds.",
             "# TYPE retailops_db_operation_duration_seconds_sum counter",
-        ]
+        ],
     )
     for labels, stats in snapshot:
         operation, statement_type, status = labels
         lines.append(
             "retailops_db_operation_duration_seconds_sum"
             f'{{operation="{operation}",statement_type="{statement_type}",status="{status}"}} '
-            f"{stats.duration_seconds_sum:.6f}"
+            f"{stats.duration_seconds_sum:.6f}",
         )
 
     lines.extend(
         [
-            "# HELP retailops_db_operation_duration_seconds_max Maximum observed database operation duration in seconds.",
+            "# HELP retailops_db_operation_duration_seconds_max "
+            "Maximum observed database operation duration in seconds.",
             "# TYPE retailops_db_operation_duration_seconds_max gauge",
-        ]
+        ],
     )
     for labels, stats in snapshot:
         operation, statement_type, status = labels
         lines.append(
             "retailops_db_operation_duration_seconds_max"
             f'{{operation="{operation}",statement_type="{statement_type}",status="{status}"}} '
-            f"{stats.duration_seconds_max:.6f}"
+            f"{stats.duration_seconds_max:.6f}",
         )
 
     return "\n".join(lines)

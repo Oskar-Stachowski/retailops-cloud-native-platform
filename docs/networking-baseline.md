@@ -1,8 +1,8 @@
 # AWS Networking Baseline
 
-**Project:** Cloud-Native RetailOps Platform  
-**Sprint:** Sprint 10 — Terraform and AWS Foundation  
-**Commit scope:** `docs(infra): document AWS networking baseline`  
+**Project:** Cloud-Native RetailOps Platform
+**Sprint:** Sprint 10 — Terraform and AWS Foundation
+**Commit scope:** `docs(infra): document AWS networking baseline`
 **Related Terraform module:** `infra/modules/vpc/`
 
 ---

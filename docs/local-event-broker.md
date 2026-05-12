@@ -120,7 +120,7 @@ RETAILOPS_BROKER_BOOTSTRAP_SERVERS=localhost:19092
 
 ## 6. Streaming Smoke Test
 
-`scripts/streaming_smoke.sh` is the Sprint 9 end-to-end guardrail for the
+`scripts/ci/streaming_smoke.sh` is the Sprint 9 end-to-end guardrail for the
 local real-time foundation. It assumes the Compose stack is already running and
 checks:
 

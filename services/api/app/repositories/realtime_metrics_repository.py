@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
@@ -14,7 +16,7 @@ from app.db.introspection import table_exists
 class RealtimeMetricsRepository:
     """Persistence layer for real-time event processing state and metrics."""
 
-    def __init__(self, connection=None) -> None:
+    def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
 
     def _fetch_one(
@@ -36,9 +38,8 @@ class RealtimeMetricsRepository:
         params: tuple[Any, ...] = (),
     ) -> None:
         if self.connection is None:
-            with get_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(query, params)
+            with get_connection() as connection, connection.cursor() as cursor:
+                cursor.execute(query, params)
             return
 
         with self.connection.cursor() as cursor:
@@ -53,9 +54,8 @@ class RealtimeMetricsRepository:
             return
 
         if self.connection is None:
-            with get_connection() as connection:
-                with connection.cursor() as cursor:
-                    cursor.executemany(query, rows)
+            with get_connection() as connection, connection.cursor() as cursor:
+                cursor.executemany(query, rows)
             return
 
         with self.connection.cursor() as cursor:
@@ -230,7 +230,7 @@ class RealtimeMetricsRepository:
             FROM realtime_event_log
             GROUP BY status
             ORDER BY status ASC;
-            """
+            """,
         )
 
     def get_all_event_type_counts(self) -> list[dict[str, Any]]:
@@ -245,7 +245,7 @@ class RealtimeMetricsRepository:
             FROM realtime_event_log
             GROUP BY event_type
             ORDER BY event_type ASC;
-            """
+            """,
         )
 
     def get_processing_latency_summary(self) -> dict[str, Any] | None:
@@ -263,7 +263,7 @@ class RealtimeMetricsRepository:
             FROM realtime_event_log
             WHERE processed_at IS NOT NULL
               AND ingested_at IS NOT NULL;
-            """
+            """,
         )
 
     def record_event_log(
@@ -376,18 +376,17 @@ class RealtimeMetricsRepository:
             (event_id,),
         )
 
-        rows: list[tuple[Any, ...]] = []
-        for observation in observations:
-            rows.append(
-                (
-                    event_id,
-                    observation["metric_name"],
-                    self._normalize_metric_value(observation["metric_value"]),
-                    observation.get("dimension_key") or "",
-                    observation["source_event_type"],
-                    observation["observed_at"],
-                )
+        rows: list[tuple[Any, ...]] = [
+            (
+                event_id,
+                observation["metric_name"],
+                self._normalize_metric_value(observation["metric_value"]),
+                observation.get("dimension_key") or "",
+                observation["source_event_type"],
+                observation["observed_at"],
             )
+            for observation in observations
+        ]
 
         self._executemany(
             """
@@ -493,7 +492,7 @@ class RealtimeMetricsRepository:
             ),
         )
 
-    def _normalize_metric_value(self, value: Any) -> Decimal:
+    def _normalize_metric_value(self, value: object) -> Decimal:
         if isinstance(value, Decimal):
             return value
 

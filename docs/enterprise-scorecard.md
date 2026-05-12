@@ -1,8 +1,8 @@
 # RetailOps Enterprise Scorecard
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Business & Product / Platform Governance  
-**Phase:** Phase 1 — Foundation / MVP  
+**Project:** Cloud-Native RetailOps Platform
+**Workstream:** Business & Product / Platform Governance
+**Phase:** Phase 1 — Foundation / MVP
 
 ---
 
@@ -52,7 +52,7 @@ Each indicator can be reported with a simple status:
 
 ### 2.3. Target policy
 
-Targets in this document are **portfolio assumptions**, not contractual enterprise SLAs.  
+Targets in this document are **portfolio assumptions**, not contractual enterprise SLAs.
 They should be treated as starting points and adjusted after a baseline is collected.
 
 ---

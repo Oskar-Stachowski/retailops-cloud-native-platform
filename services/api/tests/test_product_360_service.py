@@ -1,11 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from app.services.product_360_service import Product360Service
 
-
 PRODUCT_ID = UUID("85710dbe-1aea-50ac-a155-fb216e12ab97")
-NOW = datetime(2026, 5, 4, 9, 56, 43, tzinfo=timezone.utc)
+NOW = datetime(2026, 5, 4, 9, 56, 43, tzinfo=UTC)
 
 
 class FakeProduct:
@@ -23,7 +22,7 @@ class FakeProduct:
 
 
 class FakeProductRepository:
-    def __init__(self, product):
+    def __init__(self, product) -> None:
         self.product = product
 
     def get_product_by_id(self, product_id):
@@ -88,7 +87,7 @@ class FakeProduct360Repository:
         return []
 
 
-def test_get_product_360_returns_composite_response():
+def test_get_product_360_returns_composite_response() -> None:
     service = Product360Service(
         product_repository=FakeProductRepository(FakeProduct()),
         product_360_repository=FakeProduct360Repository(),
@@ -103,7 +102,7 @@ def test_get_product_360_returns_composite_response():
     assert response["limits"] == {"related_items": 5}
 
 
-def test_get_product_360_returns_none_when_product_missing():
+def test_get_product_360_returns_none_when_product_missing() -> None:
     service = Product360Service(
         product_repository=FakeProductRepository(None),
         product_360_repository=FakeProduct360Repository(),
