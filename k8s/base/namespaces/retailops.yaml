@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: retailops
+  labels:
+    app.kubernetes.io/name: retailops
+    app.kubernetes.io/part-of: retailops-platform
+    app.kubernetes.io/managed-by: kustomize
+    retailops.io/environment: local
+  annotations:
+    retailops.io/runtime-scope: "local-kind-or-minikube-first"
+    retailops.io/aws-apply-policy: "no-aws-resources-created-by-base-manifests"
