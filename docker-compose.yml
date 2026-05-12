@@ -80,7 +80,7 @@ services:
       start_period: 10s
 
   grafana:
-    image: grafana/grafana:12.3.0
+    image: grafana/grafana:12.4.3
     ports:
       - "${GRAFANA_PORT:-3001}:3000"
     environment:
