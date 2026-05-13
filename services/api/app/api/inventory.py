@@ -99,6 +99,9 @@ def get_inventory_snapshot(
     )
 
     if inventory_snapshot is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Resource not found",
+)
 
     return inventory_snapshot

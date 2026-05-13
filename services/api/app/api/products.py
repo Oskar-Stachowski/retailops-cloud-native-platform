@@ -78,6 +78,9 @@ def get_product(
     product = product_service.get_product_detail_response(product_id)
 
     if product is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Resource not found",
+)
 
     return product

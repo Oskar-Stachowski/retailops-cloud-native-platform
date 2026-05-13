@@ -91,6 +91,9 @@ def get_sale(sale_id: Annotated[UUID, Path(description="Sale technical identifie
     sale = sales_service.get_sale_detail_response(sale_id)
 
     if sale is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Resource not found",
+)
 
     return sale
