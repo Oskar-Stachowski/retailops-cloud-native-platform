@@ -11,6 +11,8 @@ from app.domain.models import (
     Currency,
     Forecast,
     ForecastMethod,
+    ForecastRun,
+    ForecastRunStatus,
     ForecastStatus,
     InventorySnapshot,
     Product,
@@ -261,6 +263,62 @@ def test_forecast_rejects_confidence_level_outside_expected_range() -> None:
             method=ForecastMethod.naive_baseline,
             status=ForecastStatus.generated,
             confidence_level=1.5,
+        )
+
+
+def test_forecast_run_accepts_model_lineage_and_metrics() -> None:
+    now = datetime.now(UTC)
+
+    forecast_run = ForecastRun(
+        run_key="baseline:v1:dataset-1",
+        model_name="retailops-demand-baseline-moving-average",
+        model_version="baseline-moving-average-v1",
+        model_type="moving_average_baseline",
+        status=ForecastRunStatus.candidate,
+        profile="small",
+        seed=42,
+        feature_dataset_name="retailops-demand-forecast-features",
+        feature_dataset_id="dataset-1",
+        feature_grain=["date", "product_id", "store_id", "channel"],
+        target="units_sold",
+        window_days=28,
+        horizon_days=7,
+        holdout_days=7,
+        feature_row_count=100,
+        forecast_row_count=70,
+        evaluated_rows=30,
+        skipped_rows=2,
+        metrics={"mae": "2.0000"},
+        artifacts={"model_manifest": "model_manifest.json"},
+        started_at=now,
+        completed_at=now,
+    )
+
+    assert forecast_run.status == ForecastRunStatus.candidate
+    assert forecast_run.metrics["mae"] == "2.0000"
+
+
+def test_forecast_run_rejects_invalid_time_order() -> None:
+    now = datetime.now(UTC)
+
+    with pytest.raises(ValidationError):
+        ForecastRun(
+            run_key="baseline:v1:dataset-1",
+            model_name="retailops-demand-baseline-moving-average",
+            model_version="baseline-moving-average-v1",
+            model_type="moving_average_baseline",
+            profile="small",
+            seed=42,
+            feature_dataset_name="retailops-demand-forecast-features",
+            feature_dataset_id="dataset-1",
+            feature_grain=["date", "product_id", "store_id", "channel"],
+            target="units_sold",
+            window_days=28,
+            horizon_days=7,
+            feature_row_count=100,
+            forecast_row_count=70,
+            started_at=now,
+            completed_at=now.replace(year=now.year - 1),
         )
 
 

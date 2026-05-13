@@ -5,6 +5,7 @@ from app.api import (
     alerts,
     analytics,
     dashboard,
+    forecast_runs,
     forecasts,
     inventory,
     me,
@@ -54,6 +55,7 @@ app.include_router(analytics.router)
 app.include_router(products.router)
 app.include_router(product_360.router)
 app.include_router(forecasts.router)
+app.include_router(forecast_runs.router)
 app.include_router(inventory.router)
 app.include_router(sales.router)
 app.include_router(stock_risks.router)

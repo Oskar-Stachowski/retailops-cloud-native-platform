@@ -342,6 +342,58 @@ class Forecast(RetailOpsBaseModel):
         return self
 
 
+class ForecastRunStatus(str, Enum):
+    experimental = "experimental"
+    candidate = "candidate"
+    approved = "approved"
+    rejected = "rejected"
+    retraining_required = "retraining_required"
+    failed = "failed"
+
+
+class ForecastRun(RetailOpsBaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    run_key: str = Field(..., min_length=1, max_length=200)
+    model_name: str = Field(..., min_length=1, max_length=120)
+    model_version: str = Field(..., min_length=1, max_length=120)
+    model_type: str = Field(..., min_length=1, max_length=80)
+    status: ForecastRunStatus = ForecastRunStatus.experimental
+    profile: str = Field(..., min_length=1, max_length=40)
+    seed: int
+
+    feature_dataset_name: str = Field(..., min_length=1, max_length=160)
+    feature_dataset_id: str = Field(..., min_length=1, max_length=240)
+    feature_grain: list[str] = Field(default_factory=list)
+    target: str = Field(..., min_length=1, max_length=80)
+
+    window_days: int = Field(..., gt=0)
+    horizon_days: int = Field(..., gt=0)
+    holdout_days: int | None = Field(default=None, gt=0)
+
+    feature_row_count: int = Field(..., ge=0)
+    forecast_row_count: int = Field(..., ge=0)
+    evaluated_rows: int | None = Field(default=None, ge=0)
+    skipped_rows: int | None = Field(default=None, ge=0)
+
+    metrics: dict[str, object] = Field(default_factory=dict)
+    artifacts: dict[str, object] = Field(default_factory=dict)
+
+    started_at: datetime
+    completed_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    @model_validator(mode="after")
+    def validate_dates(self) -> Self:
+        if self.started_at > self.completed_at:
+            msg = "Invalid time order"
+            raise ValueError(msg)
+        if self.created_at > self.updated_at:
+            msg = "Invalid time order"
+            raise ValueError(msg)
+        return self
+
+
 # Recommendation
 class RecommendationType(str, Enum):
     replenish_stock = "replenish_stock"

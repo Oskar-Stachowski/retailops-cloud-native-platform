@@ -95,6 +95,48 @@ class ForecastListResponse(ApiBaseModel):
     pagination: PaginationMetadata
 
 
+class ForecastRunRequest(ApiBaseModel):
+    """Request body for persisting forecast model run metadata."""
+
+    run_key: str = Field(..., min_length=1, max_length=200)
+    model_name: str = Field(..., min_length=1, max_length=120)
+    model_version: str = Field(..., min_length=1, max_length=120)
+    model_type: str = Field(..., min_length=1, max_length=80)
+    status: str
+    profile: str = Field(..., min_length=1, max_length=40)
+    seed: int
+    feature_dataset_name: str = Field(..., min_length=1, max_length=160)
+    feature_dataset_id: str = Field(..., min_length=1, max_length=240)
+    feature_grain: list[str]
+    target: str = Field(..., min_length=1, max_length=80)
+    window_days: int = Field(..., gt=0)
+    horizon_days: int = Field(..., gt=0)
+    holdout_days: int | None = Field(default=None, gt=0)
+    feature_row_count: int = Field(..., ge=0)
+    forecast_row_count: int = Field(..., ge=0)
+    evaluated_rows: int | None = Field(default=None, ge=0)
+    skipped_rows: int | None = Field(default=None, ge=0)
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    artifacts: dict[str, Any] = Field(default_factory=dict)
+    started_at: datetime
+    completed_at: datetime
+
+
+class ForecastRunResponse(ForecastRunRequest):
+    """Stable public representation of a forecast run."""
+
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+class ForecastRunListResponse(ApiBaseModel):
+    """Stable list response for forecast run endpoints."""
+
+    items: list[ForecastRunResponse]
+    pagination: PaginationMetadata
+
+
 class InventorySnapshotResponse(ApiBaseModel):
     """Stable public representation of an inventory snapshot."""
 
