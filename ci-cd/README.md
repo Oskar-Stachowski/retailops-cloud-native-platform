@@ -79,6 +79,8 @@ Common commands:
 |---|---|
 | `make install` | Install backend and frontend dependencies |
 | `make ci-local` | Run local code-confidence checks |
+| `make api-type-check` | Run mypy against the curated typed backend modules |
+| `make api-security-lint` | Generate a report-only Bandit scan for backend application and script code |
 | `make data-quality` | Generate a synthetic dataset and fail if `quality_report.json` is not `passed` |
 | `make compose-ci` | Build and run the full Docker Compose stack, then execute smoke tests |
 | `make security-scan` | Run local secret, filesystem, and image security scans |
@@ -125,6 +127,7 @@ Purpose:
 
 - Start PostgreSQL service.
 - Generate demo CSV data.
+- Run Ruff and mypy as gates, plus a report-only Bandit backend security scan.
 - Run Alembic migrations.
 - Seed demo data.
 - Run backend tests.

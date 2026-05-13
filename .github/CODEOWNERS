@@ -1,0 +1,8 @@
+# Default code review owner for this portfolio repository.
+* @Oskar-Stachowski
+
+# Domain-specific ownership hints for future expansion.
+/services/api/ @Oskar-Stachowski
+/frontend/ @Oskar-Stachowski
+/infra/ @Oskar-Stachowski
+/docs/ @Oskar-Stachowski

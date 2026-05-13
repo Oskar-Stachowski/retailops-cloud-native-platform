@@ -31,10 +31,13 @@ OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
+API_BANDIT_REPORT ?= $(SECURITY_REPORTS_DIR)/bandit-api.txt
 
 TERRAFORM ?= terraform
 TFLINT ?= tflint
 CHECKOV ?= checkov
+MYPY ?= mypy
+BANDIT ?= bandit
 
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
@@ -153,6 +156,8 @@ help:
 	@echo "  make api-install          Install backend dependencies"
 	@echo "  make api-lint             Run Ruff backend/data checks"
 	@echo "  make api-format-check     Check Ruff formatting"
+	@echo "  make api-type-check       Run mypy against the curated typed backend modules"
+	@echo "  make api-security-lint    Generate a report-only Bandit scan for backend application and script code"
 	@echo "  make api-coverage         Run backend pytest with coverage gate"
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
@@ -226,7 +231,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down
+.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -236,6 +241,12 @@ api-format: api-install
 
 api-format-check: api-install
 	$(API_VENV_PYTHON) -m ruff format --check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
+
+api-type-check: api-install
+	$(API_VENV_PYTHON) -m $(MYPY) --config-file "$(ROOT_DIR)/pyproject.toml"
+
+api-security-lint: api-install ensure-reports-dir
+	$(API_VENV_PYTHON) -m $(BANDIT) --exit-zero -q -r "$(API_DIR)/app" "$(API_DIR)/scripts" -f txt -o "$(ROOT_DIR)/$(API_BANDIT_REPORT)"
 
 api-test: api-install
 	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
@@ -339,7 +350,7 @@ frontend-build:
 
 test: api-test frontend-test
 
-ci-local: compose-config data-quality api-lint api-format-check api-coverage frontend-test frontend-lint frontend-build
+ci-local: compose-config data-quality api-lint api-format-check api-type-check api-security-lint api-coverage frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
 
 # -------------------------------------------------------------------

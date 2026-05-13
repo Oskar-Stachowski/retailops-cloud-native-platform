@@ -62,11 +62,14 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements-dev.txt
 
-      - name: Run Ruff checks
+      - name: Run backend static quality gates
         working-directory: .
         run: |
           ruff check services/api data --config pyproject.toml
           ruff format --check services/api data --config pyproject.toml
+          mypy --config-file pyproject.toml
+          mkdir -p ci-cd/reports/security
+          bandit --exit-zero -q -r services/api/app services/api/scripts -f txt -o ci-cd/reports/security/bandit-api.txt
 
       - name: Generate demo CSV dataset
         run: python -m data.generator.main
@@ -96,6 +99,14 @@ jobs:
         with:
           name: api-coverage-evidence
           path: ci-cd/reports/api/coverage.xml
+          if-no-files-found: warn
+
+      - name: Upload API security lint evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-bandit-evidence
+          path: ci-cd/reports/security/bandit-api.txt
           if-no-files-found: warn
 
   api-image-build:
