@@ -1,28 +1,38 @@
 # ML
 
-Machine learning and MLOps are future platform scope for RetailOps.
+Machine learning and MLOps in RetailOps are implemented as a local-first
+forecasting lifecycle foundation. The current scope includes deterministic
+feature generation, a moving-average baseline model, evaluation, local metadata
+registry artifacts, batch inference outputs, model performance metrics, and
+feature drift checks.
 
-There is no implemented training pipeline, inference service, model registry, drift monitor, retraining workflow, or model deployment automation in this directory yet. Current forecasting, stock-risk, anomaly, and recommendation views are based on deterministic demo data and application-level analytics, not an operated ML lifecycle.
+This is not a production model serving platform. There is no managed feature
+store, cloud model registry, automated retraining scheduler, online inference
+service, model approval workflow, or production deployment automation yet.
 
-## Planned Scope
+## Scope
 
-Future MLOps work should include:
+Current local lifecycle assets include:
 
 - a versioned demand forecasting feature dataset contract,
-- baseline demand forecasting experiments,
-- inventory risk scoring model evaluation,
-- anomaly detection experiments,
-- model metrics and validation reports,
-- model versioning and promotion workflow,
-- drift monitoring design,
-- retraining workflow,
-- documentation of model assumptions and limitations.
+- deterministic demand feature generation,
+- baseline demand forecasting,
+- model evaluation and validation reports,
+- local model metadata registry artifacts,
+- batch inference artifacts,
+- model performance metrics,
+- demand feature drift checks,
+- documentation of lifecycle assumptions and limitations.
 
-Do not treat this directory as an implemented MLOps platform until those assets exist and are validated by tests or CI evidence.
+Future work includes managed feature storage, production serving, automated
+promotion, retraining, cloud registry integration, and approval workflows.
+
+See [RetailOps MLOps Lifecycle](../docs/mlops-lifecycle.md) for the operating
+model.
 
 ## Contracts
 
-Sprint 12 starts with a dataset contract and a local feature-generation job:
+Sprint 12 includes a dataset contract and local MLOps jobs:
 
 - [Demand forecast feature dataset contract](contracts/README.md)
 - `contracts/demand_forecast_features.schema.json`
@@ -36,8 +46,8 @@ Sprint 12 starts with a dataset contract and a local feature-generation job:
 - `python -m ml.drift.demand_feature_drift --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
-`store_id`, and `channel`, with `units_sold` as the target. Model training,
-inference writes, and drift monitoring remain future commits.
+`store_id`, and `channel`, with `units_sold` as the target. Production model
+serving, automated promotion, and retraining remain future work.
 
 The demand feature job writes `features.csv` and `feature_manifest.json` under
 `data/synthetic/<profile>/features/demand_forecast/` by default. Generated

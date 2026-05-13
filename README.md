@@ -31,7 +31,7 @@ This repository intentionally separates implemented components from target archi
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer deployment; producer/replay E2E is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
 | Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`, `scripts/ci/kubernetes_smoke.sh`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, realtime consumer, migration and seed jobs with probes/resources and local nginx ingress |
-| MLOps/model lifecycle | Designed only | `ml/README.md` and architecture docs; no training/inference pipeline is implemented yet |
+| MLOps/model lifecycle | Local foundation implemented | `ml/`, [MLOps Lifecycle](docs/mlops-lifecycle.md), feature contract, baseline model, evaluation, metadata, batch inference, metrics and drift checks; no production model serving yet |
 
 ---
 
@@ -120,10 +120,8 @@ The platform is designed around the following capabilities:
 ### Designed / Future Platform Areas
 
 - Kubernetes / EKS deployment
-- ML lifecycle design
-- Model versioning concept
-- Drift monitoring concept
-- Retraining workflow concept
+- Production ML serving and retraining workflow
+- Cloud model registry and approval workflow
 - AWS Secrets Manager or SSM Parameter Store for cloud runtime secrets
 - Runtime threat detection
 - Centralized log platform such as OpenSearch or Loki
@@ -153,6 +151,7 @@ More details are available in:
 - [CI/CD Pipeline](ci-cd/README.md)
 - [Security & Governance](security/README.md)
 - [Observability](observability/README.md)
+- [MLOps Lifecycle](docs/mlops-lifecycle.md)
 
 ---
 
@@ -172,7 +171,9 @@ Contains backend microservices responsible for platform business capabilities.
 Contains the user-facing web application.
 
 ### `ml/`
-Contains the future MLOps scope and model lifecycle assumptions. Training, inference, experiments and model lifecycle components are not implemented yet.
+Contains the local-first MLOps lifecycle foundation: demand forecasting feature
+contracts, baseline model, evaluation, metadata, batch inference, model metrics
+and drift checks. Production model serving is future work.
 
 ### `data/`
 Contains data schemas and samples.
@@ -511,11 +512,11 @@ Cloud runtime secret management and runtime threat detection are future hardenin
 
 ### Phase 4 — MLOps Foundation
 
-- Forecasting model lifecycle
-- Model versioning
-- Model monitoring
-- Retraining workflow
-- Drift detection concept
+- Local forecasting lifecycle
+- Baseline model versioning and metadata
+- Model performance metrics
+- Demand feature drift checks
+- Future retraining and production serving workflow
 
 ### Phase 5 — Enterprise Optimization
 
@@ -564,7 +565,7 @@ This project demonstrates practical skills across the full DevOps lifecycle:
 - Kubernetes target design
 - Observability
 - Security automation
-- Documented MLOps roadmap
+- Local MLOps lifecycle documentation
 - Production-readiness thinking
 
 It is designed to show not only technical knowledge, but also the ability to connect engineering decisions with business outcomes such as faster delivery, lower operational risk, better scalability, and improved decision-making.
