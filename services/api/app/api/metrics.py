@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status
 from fastapi.responses import PlainTextResponse
+from prometheus_client import CollectorRegistry, Gauge, generate_latest
 
 from app.core.config import settings
 from app.db.instrumentation import render_database_metrics
@@ -10,13 +11,15 @@ stream_observability_service = StreamObservabilityService()
 
 
 def render_api_info_metric() -> str:
-    return "\n".join(
-        [
-            "# HELP retailops_api_info RetailOps API service information.",
-            "# TYPE retailops_api_info gauge",
-            f'retailops_api_info{{service="retailops-api",environment="{settings.app_env}"}} 1',
-        ],
+    registry = CollectorRegistry()
+    metric = Gauge(
+        "retailops_api_info",
+        "RetailOps API service information.",
+        labelnames=("service", "environment"),
+        registry=registry,
     )
+    metric.labels(service="retailops-api", environment=settings.app_env).set(1)
+    return generate_latest(registry).decode("utf-8").rstrip()
 
 
 @router.get(
