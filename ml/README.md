@@ -30,6 +30,7 @@ Sprint 12 starts with a dataset contract and a local feature-generation job:
 - `python -m ml.features.demand_forecast --profile small`
 - `python -m ml.models.baseline_forecast --profile small`
 - `python -m ml.evaluation.baseline_report --profile small`
+- `python -m ml.metadata.model_registry --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
 `store_id`, and `channel`, with `units_sold` as the target. Model training,
@@ -50,3 +51,10 @@ The baseline evaluation job runs a rolling holdout backtest and writes
 under `data/synthetic/<profile>/reports/demand_baseline/` by default. The report
 captures MAE, RMSE, MAPE, bias, WAPE, skipped rows, dataset lineage, and model
 version.
+
+The model metadata job persists local model registry artifacts:
+`model_metadata.json` and `model_registry.jsonl` under
+`data/synthetic/<profile>/metadata/model_registry/` by default. The metadata
+links model version, status, feature dataset lineage, training window, evaluation
+metrics, and local artifact paths. API/database persistence remains a later
+commit.
