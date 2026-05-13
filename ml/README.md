@@ -33,6 +33,7 @@ Sprint 12 starts with a dataset contract and a local feature-generation job:
 - `python -m ml.metadata.model_registry --profile small`
 - `python -m ml.inference.batch_forecast --profile small`
 - `python -m ml.observability.model_performance_metrics --profile small`
+- `python -m ml.drift.demand_feature_drift --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
 `store_id`, and `channel`, with `units_sold` as the target. Model training,
@@ -73,3 +74,9 @@ The model performance metrics job writes `model_performance.prom` and
 Prometheus text artifact exposes model identity, evaluation MAE/RMSE/MAPE/WAPE,
 forecast bias, evaluated/skipped rows, batch forecast counts, and artifact
 freshness for local textfile ingestion or CI evidence.
+
+The demand feature drift job compares deterministic reference and current
+feature datasets and writes `drift_report.json` and `drift_summary.md` under
+`data/synthetic/<profile>/reports/demand_feature_drift/` by default. The report
+checks row-count drift, numeric mean drift, and categorical distribution drift
+with configurable warning and failure thresholds.
