@@ -1,8 +1,29 @@
 # Evidence Index
 
-Last reviewed: 2026-05-12
+Last reviewed: 2026-05-13
 
 This index maps tracked evidence to what it proves. It avoids treating documentation claims, roadmap diagrams, or target architecture text as proof of implementation.
+
+## Evidence Refresh Ledger
+
+Use this table as the first stop when reviewing freshness. It records the last captured date, repository commit, validation command, expected outcome, environment, and the tracked artifact.
+
+| Date | Commit SHA | Command run | Expected outcome | Environment | Artifact |
+|---|---|---|---|---|---|
+| 2026-05-12 | `e4d0eb72f6a9c17e5072ca7954e1df03b06f8630` | `make compose-ci` | Backend and frontend images build, Compose stack starts, API/frontend/streaming/observability smoke checks pass, cleanup completes. | Local Docker / Docker Compose | [`docs/evidence/docker/compose-ci-smoke.md`](docker/compose-ci-smoke.md) |
+| 2026-05-12 | `e4d0eb72f6a9c17e5072ca7954e1df03b06f8630` | `cd services/api && PYTHONPATH=. .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8011` | API starts cleanly; `/health` returns `200`; `/openapi.json` is captured. | Local Python / loopback HTTP | [`docs/evidence/api/startup-log.md`](api/startup-log.md) |
+| 2026-01-31 | `legacy-capture` | `PYTHONPATH=. services/api/.venv/bin/python -m ml.models.random_forest_forecast --profile small --window-days 28 --holdout-days 7 --n-estimators 20 --output-dir /private/tmp/retailops-rf-evidence` | RandomForest evidence artifacts are generated and beat the moving-average baseline on the tracked holdout set. | Local Python / temporary output directory | [`docs/evidence/ml/random-forest-v1/README.md`](ml/random-forest-v1/README.md) |
+| Sprint 10 showcase | `legacy-capture` | `terraform destroy` for the temporary AWS showcase environment | Temporary showcase AWS resources are removed and the destroy snapshot is retained. | Temporary AWS showcase account | [`docs/evidence/aws/aws-cleanup-confirmation.md`](aws/aws-cleanup-confirmation.md) |
+
+## Evidence Refresh Workflow
+
+Use the same refresh pattern when an artifact becomes stale:
+
+1. Run the documented command from the relevant evidence README or report.
+2. Sanitize output if it contains account identifiers, machine-specific paths, or volatile IDs.
+3. Update the tracked artifact or snapshot in place.
+4. Add or refresh the row in the ledger above with the capture date and commit SHA.
+5. Update the validation note in the main inventory table below if reviewer expectations changed.
 
 | Category | File path | What it proves | Related area | Audience | Last validation note |
 |---|---|---|---|---|---|

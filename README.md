@@ -588,6 +588,14 @@ It is designed to show not only technical knowledge, but also the ability to con
 
 Parts of the documentation and visual materials were supported with AI tools, including ChatGPT.
 
+Validation performed by author:
+
+- Local Docker Compose smoke and cleanup: `make compose-ci` ([evidence](docs/evidence/docker/compose-ci-smoke.md))
+- API startup and contract checks: Uvicorn startup, `/health`, and `/openapi.json` ([evidence](docs/evidence/api/README.md))
+- Terraform validation: `terraform validate` for `infra/environments/dev` ([evidence](ci-cd/reports/iac/sprint-10-terraform-validate.txt))
+- Security scanning: Trivy filesystem and image scan snapshots ([evidence](ci-cd/reports/security/README.md))
+- Manual UI walkthrough: frontend root and `/api/*` proxy checks captured during Compose smoke ([evidence](docs/evidence/docker/compose-ci-smoke.md))
+
 Architecture decisions, implementation choices, technical validation, and final project structure were reviewed and adapted independently by the author.
 
 ---

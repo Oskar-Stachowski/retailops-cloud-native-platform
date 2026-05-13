@@ -10,6 +10,8 @@ RetailOps uses a local-first delivery model. The project proves application, dat
 
 The current repository keeps CI/CD evidence local-first, with selected sanitized snapshots committed when they are useful for portfolio review.
 
+Evidence freshness is tracked in `docs/evidence/index.md`. When a committed screenshot or snapshot becomes stale, refresh it with the original command path and update the ledger row rather than adding a second undocumented artifact.
+
 Implemented:
 
 - GitHub Actions API CI gate.
@@ -208,6 +210,8 @@ The smoke test validates:
 - frontend proxy `/api/ready`
 
 The evidence is uploaded to the workflow run as an artifact, not committed to the repository.
+
+To refresh reviewer-facing evidence from this workflow locally, rerun `make compose-ci`, replace the curated artifact in `docs/evidence/docker/`, and update the metadata row in `docs/evidence/index.md`.
 
 ### 4.4 Security CI
 

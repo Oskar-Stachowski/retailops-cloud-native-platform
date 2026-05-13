@@ -158,6 +158,8 @@ The current implementation focuses on the MVP and production-readiness foundatio
 
 Advanced real-time processing, full MLOps automation, autonomous optimization, multi-region deployment, and advanced policy-as-code are presented as future maturity stages rather than the initial implementation scope.
 
+Architecture diagrams in `docs/diagrams/` now carry an explicit `Implemented`, `Partially implemented`, or `Target` legend. `docs/evidence/index.md` remains the source of truth for proof.
+
 ### 4.2. Project Deliverables & Evidence
 
 The project deliverables include:

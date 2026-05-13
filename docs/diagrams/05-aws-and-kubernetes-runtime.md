@@ -1,3 +1,6 @@
+**Implementation Status:** Mostly target architecture. Terraform foundation and local Kubernetes manifests exist, but no permanent AWS application runtime is deployed from this repository.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "linear", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart LR

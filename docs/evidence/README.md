@@ -45,3 +45,7 @@ flowchart LR
 - Folder map: `docs/evidence/evidence-folder-map.md`
 - Cleanup report: `docs/evidence/evidence-cleanup-report.md`
 - Raw report policy: `ci-cd/reports/README.md`
+
+## Refresh Rule
+
+When a tracked artifact is refreshed, update `docs/evidence/index.md` with the capture date, commit SHA, command, expected outcome, environment, and artifact link so reviewers can check freshness without opening every file.

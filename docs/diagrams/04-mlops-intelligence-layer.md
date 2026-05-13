@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. Local feature generation, baseline/trained models, evaluation, metadata, and monitoring checks exist; production promotion and serving remain target scope.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "linear", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart LR

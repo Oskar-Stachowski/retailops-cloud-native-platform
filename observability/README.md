@@ -2,6 +2,8 @@
 
 This directory will contain observability assets for the RetailOps Platform.
 
+Current status: `Implemented` for local Prometheus metrics, Grafana provisioning, alert rules, and smoke checks. `Target` for centralized logging, distributed tracing, and cloud runtime observability.
+
 Planned MVP / target responsibilities:
 - define application and platform metrics,
 - store Prometheus configuration,
@@ -117,6 +119,8 @@ evidence under `ci-cd/reports/observability` with:
 ```bash
 make observability-smoke
 ```
+
+When this evidence is refreshed, update the matching metadata row in `docs/evidence/index.md` so the capture date, commit SHA, command, and expected outcome stay visible to reviewers.
 
 Generate a local demo scenario with correlated API traffic, live business
 events, duplicate handling and one dead-lettered event with:

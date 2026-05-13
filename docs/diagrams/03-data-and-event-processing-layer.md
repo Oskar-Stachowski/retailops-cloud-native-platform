@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. Seeded operational data, PostgreSQL storage, and parts of the realtime event flow exist locally; the broader event platform remains target architecture.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "basis", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart LR
