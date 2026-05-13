@@ -31,6 +31,7 @@ Sprint 12 starts with a dataset contract and a local feature-generation job:
 - `python -m ml.models.baseline_forecast --profile small`
 - `python -m ml.evaluation.baseline_report --profile small`
 - `python -m ml.metadata.model_registry --profile small`
+- `python -m ml.inference.batch_forecast --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
 `store_id`, and `channel`, with `units_sold` as the target. Model training,
@@ -58,3 +59,9 @@ The model metadata job persists local model registry artifacts:
 links model version, status, feature dataset lineage, training window, evaluation
 metrics, and local artifact paths. API/database persistence remains a later
 commit.
+
+The batch inference job writes `batch_predictions.csv`, `api_forecasts.csv`, and
+`batch_inference_manifest.json` under
+`data/synthetic/<profile>/inference/demand_baseline/` by default. The
+`api_forecasts.csv` artifact is shaped like the API `forecasts` seed contract so
+a later import/persistence step can load forecast outputs without retraining.
