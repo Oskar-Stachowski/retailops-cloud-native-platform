@@ -22,12 +22,17 @@ Do not treat this directory as an implemented MLOps platform until those assets 
 
 ## Contracts
 
-Sprint 12 starts with a dataset contract only:
+Sprint 12 starts with a dataset contract and a local feature-generation job:
 
 - [Demand forecast feature dataset contract](contracts/README.md)
 - `contracts/demand_forecast_features.schema.json`
 - `contracts/demand_forecast_feature_manifest.schema.json`
+- `python -m ml.features.demand_forecast --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
-`store_id`, and `channel`, with `units_sold` as the target. Feature generation,
-model training, inference writes, and drift monitoring remain future commits.
+`store_id`, and `channel`, with `units_sold` as the target. Model training,
+inference writes, and drift monitoring remain future commits.
+
+The demand feature job writes `features.csv` and `feature_manifest.json` under
+`data/synthetic/<profile>/features/demand_forecast/` by default. Generated
+feature datasets should stay out of Git.

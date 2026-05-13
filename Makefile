@@ -79,6 +79,8 @@ DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
 DATA_QUALITY_REPORT ?= $(DATA_OUTPUT_DIR)/quality_report.json
 DATA_MANIFEST_REPORT ?= $(DATA_OUTPUT_DIR)/dataset_manifest.json
 DATA_REALISM_REPORT ?= $(DATA_OUTPUT_DIR)/realism_report.json
+ML_FEATURE_PROFILE ?= small
+ML_FEATURE_OUTPUT_DIR ?= data/synthetic/$(ML_FEATURE_PROFILE)/features/demand_forecast
 
 export POSTGRES_DB
 export POSTGRES_USER
@@ -103,6 +105,7 @@ help:
 	@echo "  make ci-local             Run local preflight without full Compose smoke"
 	@echo "  make test                 Run backend and frontend tests"
 	@echo "  make data-quality         Generate synthetic data and validate quality report"
+	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo ""
 	@echo "Backend:"
 	@echo "  make api-install          Install backend dependencies"
@@ -181,16 +184,16 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality db-up db-down
+.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features db-up db-down
 
 api-lint: api-install
-	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data
+	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
 
 api-format: api-install
-	$(API_VENV_PYTHON) -m ruff format "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data
+	$(API_VENV_PYTHON) -m ruff format "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
 
 api-format-check: api-install
-	$(API_VENV_PYTHON) -m ruff format --check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data
+	$(API_VENV_PYTHON) -m ruff format --check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
 
 api-test: api-install
 	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
@@ -217,6 +220,11 @@ data-quality: api-install ensure-reports-dir
 	@echo "Data quality report: $(DATA_QUALITY_REPORT)"
 	@echo "Dataset manifest: $(DATA_MANIFEST_REPORT)"
 	@if [ -f "$(DATA_REALISM_REPORT)" ]; then echo "Realism report: $(DATA_REALISM_REPORT)"; fi
+
+ml-features: api-install
+	$(API_VENV_PYTHON) -m ml.features.demand_forecast --profile "$(ML_FEATURE_PROFILE)" --output-dir "$(ML_FEATURE_OUTPUT_DIR)"
+	@echo "Feature dataset: $(ML_FEATURE_OUTPUT_DIR)/features.csv"
+	@echo "Feature manifest: $(ML_FEATURE_OUTPUT_DIR)/feature_manifest.json"
 
 api-migrate: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head

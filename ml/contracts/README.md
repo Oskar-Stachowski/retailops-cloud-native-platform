@@ -16,6 +16,9 @@ training, inference, model registry, or drift monitoring.
 | Grain | `date`, `product_id`, `store_id`, `channel` |
 | Forecast target | `units_sold` |
 
+Supported channel values are `store`, `online`, `marketplace`, and
+`wholesale`, matching the synthetic retail dataset generator.
+
 Each row represents observed demand for one product in one store and channel on
 one business date. The feature job should write a manifest next to the dataset
 so later training and evaluation reports can reference an immutable dataset ID.

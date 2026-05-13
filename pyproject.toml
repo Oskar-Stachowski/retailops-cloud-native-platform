@@ -1,7 +1,7 @@
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-src = ["services/api", "data"]
+src = ["services/api", "data", "ml"]
 force-exclude = true
 
 # Generated migration files are not edited by hand. Lint the migration environment,
@@ -84,7 +84,7 @@ select = ["ALL"]
   ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["app", "data"]
+known-first-party = ["app", "data", "ml"]
 
 [tool.coverage.run]
 branch = true

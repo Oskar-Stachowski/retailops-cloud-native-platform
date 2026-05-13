@@ -55,7 +55,7 @@
     },
     "channel": {
       "type": "string",
-      "enum": ["store", "online", "marketplace", "b2b"]
+      "enum": ["store", "online", "marketplace", "wholesale"]
     },
     "units_sold": {
       "type": "integer",
