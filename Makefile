@@ -98,6 +98,12 @@ ML_INFERENCE_WINDOW_DAYS ?= 28
 ML_INFERENCE_HORIZON_DAYS ?= 7
 ML_INFERENCE_HOLDOUT_DAYS ?= 7
 ML_INFERENCE_MODEL_STATUS ?= candidate
+ML_METRICS_PROFILE ?= small
+ML_METRICS_OUTPUT_DIR ?= data/synthetic/$(ML_METRICS_PROFILE)/observability/model_performance
+ML_METRICS_WINDOW_DAYS ?= 28
+ML_METRICS_HORIZON_DAYS ?= 7
+ML_METRICS_HOLDOUT_DAYS ?= 7
+ML_METRICS_MODEL_STATUS ?= candidate
 
 export POSTGRES_DB
 export POSTGRES_USER
@@ -127,6 +133,7 @@ help:
 	@echo "  make ml-evaluate          Generate baseline model evaluation report"
 	@echo "  make ml-metadata          Persist baseline model metadata locally"
 	@echo "  make ml-inference         Run batch demand forecast inference"
+	@echo "  make ml-metrics           Generate model performance metrics artifacts"
 	@echo ""
 	@echo "Backend:"
 	@echo "  make api-install          Install backend dependencies"
@@ -205,7 +212,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-evaluate ml-metadata ml-inference db-up db-down
+.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-evaluate ml-metadata ml-inference ml-metrics db-up db-down
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -268,6 +275,11 @@ ml-inference: api-install
 	@echo "Batch predictions: $(ML_INFERENCE_OUTPUT_DIR)/batch_predictions.csv"
 	@echo "API forecasts: $(ML_INFERENCE_OUTPUT_DIR)/api_forecasts.csv"
 	@echo "Batch manifest: $(ML_INFERENCE_OUTPUT_DIR)/batch_inference_manifest.json"
+
+ml-metrics: api-install
+	$(API_VENV_PYTHON) -m ml.observability.model_performance_metrics --profile "$(ML_METRICS_PROFILE)" --window-days "$(ML_METRICS_WINDOW_DAYS)" --horizon-days "$(ML_METRICS_HORIZON_DAYS)" --holdout-days "$(ML_METRICS_HOLDOUT_DAYS)" --model-status "$(ML_METRICS_MODEL_STATUS)" --output-dir "$(ML_METRICS_OUTPUT_DIR)"
+	@echo "Model performance metrics: $(ML_METRICS_OUTPUT_DIR)/model_performance.prom"
+	@echo "Model performance snapshot: $(ML_METRICS_OUTPUT_DIR)/model_performance_snapshot.json"
 
 api-migrate: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head

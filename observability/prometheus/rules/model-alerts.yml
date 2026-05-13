@@ -1,0 +1,62 @@
+groups:
+  - name: retailops-model-performance
+    rules:
+      - alert: RetailOpsModelMetricsMissing
+        expr: absent(retailops_model_info)
+        for: 10m
+        labels:
+          severity: warning
+          service: retailops-ml
+        annotations:
+          summary: RetailOps model performance metrics are missing
+          description: Prometheus has no current RetailOps model identity metric.
+
+      - alert: RetailOpsModelEvaluationRowsMissing
+        expr: retailops_model_evaluation_rows <= 0
+        for: 10m
+        labels:
+          severity: warning
+          service: retailops-ml
+        annotations:
+          summary: RetailOps model evaluation has no evaluated rows
+          description: The latest model performance artifact did not evaluate any rows.
+
+      - alert: RetailOpsModelMapeHigh
+        expr: retailops_model_evaluation_mape_percent > 35
+        for: 15m
+        labels:
+          severity: warning
+          service: retailops-ml
+        annotations:
+          summary: RetailOps model MAPE is high
+          description: The latest demand model evaluation exceeded the MAPE threshold.
+
+      - alert: RetailOpsModelWapeCritical
+        expr: retailops_model_evaluation_wape_percent > 50
+        for: 15m
+        labels:
+          severity: critical
+          service: retailops-ml
+        annotations:
+          summary: RetailOps model WAPE is critical
+          description: The latest demand model evaluation exceeded the critical WAPE threshold.
+
+      - alert: RetailOpsModelForecastOutputMissing
+        expr: retailops_model_api_forecasts_total <= 0
+        for: 10m
+        labels:
+          severity: warning
+          service: retailops-ml
+        annotations:
+          summary: RetailOps model produced no API forecasts
+          description: The latest batch inference metrics show zero API-shaped forecast rows.
+
+      - alert: RetailOpsModelMetricsStale
+        expr: time() - retailops_model_artifact_generated_timestamp_seconds > 86400
+        for: 30m
+        labels:
+          severity: warning
+          service: retailops-ml
+        annotations:
+          summary: RetailOps model performance metrics are stale
+          description: The latest model performance metrics artifact is older than 24 hours.

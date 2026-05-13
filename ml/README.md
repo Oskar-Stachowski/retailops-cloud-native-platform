@@ -32,6 +32,7 @@ Sprint 12 starts with a dataset contract and a local feature-generation job:
 - `python -m ml.evaluation.baseline_report --profile small`
 - `python -m ml.metadata.model_registry --profile small`
 - `python -m ml.inference.batch_forecast --profile small`
+- `python -m ml.observability.model_performance_metrics --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
 `store_id`, and `channel`, with `units_sold` as the target. Model training,
@@ -65,3 +66,10 @@ The batch inference job writes `batch_predictions.csv`, `api_forecasts.csv`, and
 `data/synthetic/<profile>/inference/demand_baseline/` by default. The
 `api_forecasts.csv` artifact is shaped like the API `forecasts` seed contract so
 a later import/persistence step can load forecast outputs without retraining.
+
+The model performance metrics job writes `model_performance.prom` and
+`model_performance_snapshot.json` under
+`data/synthetic/<profile>/observability/model_performance/` by default. The
+Prometheus text artifact exposes model identity, evaluation MAE/RMSE/MAPE/WAPE,
+forecast bias, evaluated/skipped rows, batch forecast counts, and artifact
+freshness for local textfile ingestion or CI evidence.

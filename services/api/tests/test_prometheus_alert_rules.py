@@ -14,6 +14,13 @@ API_RULES_PATH = (
     / "rules"
     / "api-alerts.yml"
 )
+MODEL_RULES_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "observability"
+    / "prometheus"
+    / "rules"
+    / "model-alerts.yml"
+)
 
 
 def test_stream_alert_rules_cover_core_realtime_failure_modes() -> None:
@@ -71,6 +78,34 @@ def test_api_alert_rules_cover_platform_and_database_failure_modes() -> None:
         "retailops_api_info",
         "retailops_db_operations_total",
         "retailops_db_operation_duration_seconds_max",
+    }
+
+    for metric_name in expected_metrics:
+        assert metric_name in rules
+
+
+def test_model_alert_rules_cover_model_performance_failure_modes() -> None:
+    rules = MODEL_RULES_PATH.read_text(encoding="utf-8")
+
+    expected_alerts = {
+        "RetailOpsModelMetricsMissing",
+        "RetailOpsModelEvaluationRowsMissing",
+        "RetailOpsModelMapeHigh",
+        "RetailOpsModelWapeCritical",
+        "RetailOpsModelForecastOutputMissing",
+        "RetailOpsModelMetricsStale",
+    }
+
+    for alert_name in expected_alerts:
+        assert f"alert: {alert_name}" in rules
+
+    expected_metrics = {
+        "retailops_model_info",
+        "retailops_model_evaluation_rows",
+        "retailops_model_evaluation_mape_percent",
+        "retailops_model_evaluation_wape_percent",
+        "retailops_model_api_forecasts_total",
+        "retailops_model_artifact_generated_timestamp_seconds",
     }
 
     for metric_name in expected_metrics:
