@@ -1,0 +1,98 @@
+{
+  "artifacts": [
+    "random_forest_model.joblib",
+    "metrics.json",
+    "predictions.csv",
+    "feature_importance.csv",
+    "model_metadata.json",
+    "model_card.md"
+  ],
+  "baseline_metrics": {
+    "bias": "98.5247",
+    "evaluated_rows": 991,
+    "mae": "197.5701",
+    "mape": "85.4670",
+    "rmse": "429.1787",
+    "wape": "81.0797"
+  },
+  "baseline_model_name": "retailops-demand-baseline-moving-average",
+  "evaluation_type": "time_based_holdout",
+  "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+  "feature_date_end": "2026-04-30",
+  "feature_date_start": "2026-01-31",
+  "feature_grain": [
+    "date",
+    "product_id",
+    "store_id",
+    "channel"
+  ],
+  "feature_row_count": 12718,
+  "generated_at": "2026-05-13T05:22:58.789845+00:00",
+  "generator_version": "0.1.0",
+  "holdout_days": 7,
+  "model_name": "retailops-demand-random-forest",
+  "model_status": "candidate",
+  "model_type": "sklearn_random_forest_regressor",
+  "model_version": "random-forest-v1",
+  "n_estimators": 20,
+  "primary_metric": "wape",
+  "primary_metric_improvement_percent": "11.0571",
+  "profile": "small",
+  "random_state": 42,
+  "report_name": "retailops-trained-demand-forecast-evaluation",
+  "seed": 42,
+  "target": "units_sold",
+  "test_row_count": 991,
+  "top_features": [
+    {
+      "feature": "unit_price",
+      "importance": "0.3764"
+    },
+    {
+      "feature": "rolling_mean_units",
+      "importance": "0.1549"
+    },
+    {
+      "feature": "lag_1_units",
+      "importance": "0.1089"
+    },
+    {
+      "feature": "lag_7_units",
+      "importance": "0.0977"
+    },
+    {
+      "feature": "rolling_max_units",
+      "importance": "0.0683"
+    },
+    {
+      "feature": "training_observation_count",
+      "importance": "0.0327"
+    },
+    {
+      "feature": "day_of_week",
+      "importance": "0.0303"
+    },
+    {
+      "feature": "inventory_on_hand",
+      "importance": "0.0237"
+    },
+    {
+      "feature": "rolling_min_units",
+      "importance": "0.0231"
+    },
+    {
+      "feature": "stockout_flag",
+      "importance": "0.0125"
+    }
+  ],
+  "trained_model_metrics": {
+    "bias": "88.7861",
+    "evaluated_rows": 991,
+    "mae": "175.7245",
+    "mape": "75.4369",
+    "rmse": "401.3852",
+    "wape": "72.1146"
+  },
+  "training_row_count": 11227,
+  "window_days": 28
+}

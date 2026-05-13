@@ -1,0 +1,35 @@
+{
+  "artifacts": {
+    "feature_importance": "feature_importance.csv",
+    "metrics": "metrics.json",
+    "model": "random_forest_model.joblib",
+    "model_card": "model_card.md",
+    "predictions": "predictions.csv"
+  },
+  "baseline_metrics": {
+    "bias": "98.5247",
+    "evaluated_rows": 991,
+    "mae": "197.5701",
+    "mape": "85.4670",
+    "rmse": "429.1787",
+    "wape": "81.0797"
+  },
+  "created_at": "2026-05-13T05:22:58.789845+00:00",
+  "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+  "model_name": "retailops-demand-random-forest",
+  "model_type": "sklearn_random_forest_regressor",
+  "model_version": "random-forest-v1",
+  "primary_metric": "wape",
+  "primary_metric_improvement_percent": "11.0571",
+  "status": "candidate",
+  "test_row_count": 991,
+  "trained_model_metrics": {
+    "bias": "88.7861",
+    "evaluated_rows": 991,
+    "mae": "175.7245",
+    "mape": "75.4369",
+    "rmse": "401.3852",
+    "wape": "72.1146"
+  },
+  "training_row_count": 11227
+}

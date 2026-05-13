@@ -85,6 +85,12 @@ ML_BASELINE_PROFILE ?= small
 ML_BASELINE_OUTPUT_DIR ?= data/synthetic/$(ML_BASELINE_PROFILE)/models/demand_baseline
 ML_BASELINE_WINDOW_DAYS ?= 28
 ML_BASELINE_HORIZON_DAYS ?= 7
+ML_TRAINED_PROFILE ?= small
+ML_TRAINED_OUTPUT_DIR ?= data/synthetic/$(ML_TRAINED_PROFILE)/models/demand_random_forest
+ML_TRAINED_WINDOW_DAYS ?= 28
+ML_TRAINED_HORIZON_DAYS ?= 7
+ML_TRAINED_HOLDOUT_DAYS ?= 7
+ML_TRAINED_N_ESTIMATORS ?= 80
 ML_EVALUATION_PROFILE ?= small
 ML_EVALUATION_OUTPUT_DIR ?= data/synthetic/$(ML_EVALUATION_PROFILE)/reports/demand_baseline
 ML_EVALUATION_WINDOW_DAYS ?= 28
@@ -136,6 +142,7 @@ help:
 	@echo "  make data-quality         Generate synthetic data and validate quality report"
 	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
+	@echo "  make ml-trained           Train RandomForest demand forecasting model"
 	@echo "  make ml-evaluate          Generate baseline model evaluation report"
 	@echo "  make ml-metadata          Persist baseline model metadata locally"
 	@echo "  make ml-inference         Run batch demand forecast inference"
@@ -219,7 +226,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down
+.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -265,6 +272,13 @@ ml-baseline: api-install
 	$(API_VENV_PYTHON) -m ml.models.baseline_forecast --profile "$(ML_BASELINE_PROFILE)" --window-days "$(ML_BASELINE_WINDOW_DAYS)" --horizon-days "$(ML_BASELINE_HORIZON_DAYS)" --output-dir "$(ML_BASELINE_OUTPUT_DIR)"
 	@echo "Baseline forecasts: $(ML_BASELINE_OUTPUT_DIR)/baseline_forecasts.csv"
 	@echo "Model manifest: $(ML_BASELINE_OUTPUT_DIR)/model_manifest.json"
+
+ml-trained: api-install
+	$(API_VENV_PYTHON) -m ml.models.random_forest_forecast --profile "$(ML_TRAINED_PROFILE)" --window-days "$(ML_TRAINED_WINDOW_DAYS)" --horizon-days "$(ML_TRAINED_HORIZON_DAYS)" --holdout-days "$(ML_TRAINED_HOLDOUT_DAYS)" --n-estimators "$(ML_TRAINED_N_ESTIMATORS)" --output-dir "$(ML_TRAINED_OUTPUT_DIR)"
+	@echo "Trained model artifact: $(ML_TRAINED_OUTPUT_DIR)/random_forest_model.joblib"
+	@echo "Trained model metrics: $(ML_TRAINED_OUTPUT_DIR)/metrics.json"
+	@echo "Trained model predictions: $(ML_TRAINED_OUTPUT_DIR)/predictions.csv"
+	@echo "Trained model metadata: $(ML_TRAINED_OUTPUT_DIR)/model_metadata.json"
 
 ml-evaluate: api-install
 	$(API_VENV_PYTHON) -m ml.evaluation.baseline_report --profile "$(ML_EVALUATION_PROFILE)" --window-days "$(ML_EVALUATION_WINDOW_DAYS)" --holdout-days "$(ML_EVALUATION_HOLDOUT_DAYS)" --output-dir "$(ML_EVALUATION_OUTPUT_DIR)"

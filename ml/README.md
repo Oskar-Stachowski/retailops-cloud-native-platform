@@ -2,9 +2,9 @@
 
 Machine learning and MLOps in RetailOps are implemented as a local-first
 forecasting lifecycle foundation. The current scope includes deterministic
-feature generation, a moving-average baseline model, evaluation, local metadata
-registry artifacts, batch inference outputs, model performance metrics, and
-feature drift checks.
+feature generation, a moving-average baseline model, a trained RandomForest
+demand forecasting model, evaluation, local metadata registry artifacts, batch
+inference outputs, model performance metrics, and feature drift checks.
 
 This is not a production model serving platform. There is no managed feature
 store, cloud model registry, automated retraining scheduler, online inference
@@ -17,6 +17,7 @@ Current local lifecycle assets include:
 - a versioned demand forecasting feature dataset contract,
 - deterministic demand feature generation,
 - baseline demand forecasting,
+- trained RandomForest demand forecasting,
 - model evaluation and validation reports,
 - local model metadata registry artifacts,
 - batch inference artifacts,
@@ -39,6 +40,7 @@ Sprint 12 includes a dataset contract and local MLOps jobs:
 - `contracts/demand_forecast_feature_manifest.schema.json`
 - `python -m ml.features.demand_forecast --profile small`
 - `python -m ml.models.baseline_forecast --profile small`
+- `python -m ml.models.random_forest_forecast --profile small`
 - `python -m ml.evaluation.baseline_report --profile small`
 - `python -m ml.metadata.model_registry --profile small`
 - `python -m ml.inference.batch_forecast --profile small`
@@ -58,6 +60,14 @@ writes `baseline_forecasts.csv` and `model_manifest.json` under
 `data/synthetic/<profile>/models/demand_baseline/` by default. It is intended as
 a local reference model for later evaluation and model metadata commits, not as
 an inference service or promoted model registry entry.
+
+The trained forecasting model uses scikit-learn `RandomForestRegressor` with a
+time-based holdout split and engineered calendar, product, store, channel,
+pricing, promotion, inventory, lag, and rolling demand features. It writes
+`random_forest_model.joblib`, `metrics.json`, `predictions.csv`,
+`feature_importance.csv`, `model_metadata.json`, and `model_card.md` under
+`data/synthetic/<profile>/models/demand_random_forest/` by default. The model is
+marked `candidate` only when it beats the moving-average baseline on WAPE.
 
 The baseline evaluation job runs a rolling holdout backtest and writes
 `evaluation_report.json`, `evaluation_summary.md`, and `backtest_predictions.csv`

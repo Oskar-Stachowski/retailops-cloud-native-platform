@@ -18,6 +18,7 @@ Implemented in Sprint 12:
 - demand forecast feature dataset contract,
 - deterministic demand feature generation job,
 - moving-average baseline forecast model,
+- trained RandomForestRegressor demand forecast model,
 - rolling holdout evaluation report,
 - local model metadata registry artifacts,
 - API forecast run persistence for model run lineage,
@@ -42,6 +43,7 @@ Not implemented yet:
 | Feature contract | n/a | `ml/contracts/*.schema.json` |
 | Feature generation | `make ml-features` | `features.csv`, `feature_manifest.json` |
 | Baseline model | `make ml-baseline` | `baseline_forecasts.csv`, `model_manifest.json` |
+| Trained model | `make ml-trained` | `random_forest_model.joblib`, `metrics.json`, `predictions.csv`, `feature_importance.csv`, `model_metadata.json`, `model_card.md` |
 | Evaluation | `make ml-evaluate` | `evaluation_report.json`, `evaluation_summary.md`, `backtest_predictions.csv` |
 | Metadata registry | `make ml-metadata` | `model_metadata.json`, `model_registry.jsonl` |
 | Batch inference | `make ml-inference` | `batch_predictions.csv`, `api_forecasts.csv`, `batch_inference_manifest.json` |
@@ -93,6 +95,27 @@ The baseline job records:
 
 This baseline exists so future models can be compared against a stable,
 repeatable reference.
+
+## Trained Model
+
+The trained demand forecasting model uses scikit-learn
+`RandomForestRegressor`. It is still local-first, but unlike the moving-average
+baseline it learns relationships from engineered features and persists a
+reusable `joblib` model artifact.
+
+The trained workflow uses:
+
+- calendar features,
+- product, store, and channel identifiers,
+- pricing and promotion signals,
+- inventory signals,
+- lag demand features,
+- rolling demand statistics.
+
+Evaluation uses a time-based holdout split, not a random split. The model is
+compared against the moving-average baseline on WAPE, MAE, RMSE, MAPE, and
+bias. The model metadata status is `candidate` only when RandomForest beats the
+baseline on WAPE; otherwise it is `rejected`.
 
 ## Evaluation
 
@@ -208,6 +231,7 @@ Run the lifecycle in this order:
 ```bash
 make ml-features
 make ml-baseline
+make ml-trained
 make ml-evaluate
 make ml-metadata
 make ml-inference
