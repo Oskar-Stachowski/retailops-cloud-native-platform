@@ -6,7 +6,8 @@ locals {
 
   required_tags = {
     Project     = var.project_name
-    Environment = var.environment
+    Service     = "platform"
+    Environment = title(local.normalized_environment)
     Owner       = var.owner
     ManagedBy   = var.managed_by
     CostCenter  = var.cost_center
