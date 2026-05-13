@@ -37,9 +37,9 @@ def _apply_recommendation_action(
         )
     except WorkflowNotFoundError as exc:
         raise HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="Resource not found",
-) from exc
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+        ) from exc
     except WorkflowTransitionError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
