@@ -85,6 +85,10 @@ ML_BASELINE_PROFILE ?= small
 ML_BASELINE_OUTPUT_DIR ?= data/synthetic/$(ML_BASELINE_PROFILE)/models/demand_baseline
 ML_BASELINE_WINDOW_DAYS ?= 28
 ML_BASELINE_HORIZON_DAYS ?= 7
+ML_EVALUATION_PROFILE ?= small
+ML_EVALUATION_OUTPUT_DIR ?= data/synthetic/$(ML_EVALUATION_PROFILE)/reports/demand_baseline
+ML_EVALUATION_WINDOW_DAYS ?= 28
+ML_EVALUATION_HOLDOUT_DAYS ?= 7
 
 export POSTGRES_DB
 export POSTGRES_USER
@@ -111,6 +115,7 @@ help:
 	@echo "  make data-quality         Generate synthetic data and validate quality report"
 	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
+	@echo "  make ml-evaluate          Generate baseline model evaluation report"
 	@echo ""
 	@echo "Backend:"
 	@echo "  make api-install          Install backend dependencies"
@@ -189,7 +194,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline db-up db-down
+.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-evaluate db-up db-down
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -235,6 +240,12 @@ ml-baseline: api-install
 	$(API_VENV_PYTHON) -m ml.models.baseline_forecast --profile "$(ML_BASELINE_PROFILE)" --window-days "$(ML_BASELINE_WINDOW_DAYS)" --horizon-days "$(ML_BASELINE_HORIZON_DAYS)" --output-dir "$(ML_BASELINE_OUTPUT_DIR)"
 	@echo "Baseline forecasts: $(ML_BASELINE_OUTPUT_DIR)/baseline_forecasts.csv"
 	@echo "Model manifest: $(ML_BASELINE_OUTPUT_DIR)/model_manifest.json"
+
+ml-evaluate: api-install
+	$(API_VENV_PYTHON) -m ml.evaluation.baseline_report --profile "$(ML_EVALUATION_PROFILE)" --window-days "$(ML_EVALUATION_WINDOW_DAYS)" --holdout-days "$(ML_EVALUATION_HOLDOUT_DAYS)" --output-dir "$(ML_EVALUATION_OUTPUT_DIR)"
+	@echo "Evaluation report: $(ML_EVALUATION_OUTPUT_DIR)/evaluation_report.json"
+	@echo "Evaluation summary: $(ML_EVALUATION_OUTPUT_DIR)/evaluation_summary.md"
+	@echo "Backtest predictions: $(ML_EVALUATION_OUTPUT_DIR)/backtest_predictions.csv"
 
 api-migrate: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head
