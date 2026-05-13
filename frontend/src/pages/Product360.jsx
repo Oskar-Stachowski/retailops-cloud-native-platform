@@ -8,6 +8,7 @@ import StatusBadge from "../components/StatusBadge";
 import {
   applyAlertWorkflowAction,
   applyRecommendationWorkflowAction,
+  createWorkflowIdempotencyKey,
   getCurrentUser,
   getProduct360,
   hasPermission,
@@ -172,10 +173,6 @@ function availableRecommendationActions(recommendation) {
   return [];
 }
 
-function buildIdempotencyKey(entityType, entityId, action) {
-  return ["frontend", "product-360", entityType, entityId, action, Date.now()].join(":");
-}
-
 function workflowErrorMessage(error, entityType) {
   if (error?.status === 404) {
     return `${formatTitle(entityType)} workflow endpoint or record was not found. Refresh Product 360 and verify the backend is running the current workflow API.`;
@@ -197,6 +194,7 @@ export default function Product360() {
   const [workflowComment, setWorkflowComment] = useState("");
   const [activeWorkflowAction, setActiveWorkflowAction] = useState(null);
   const [workflowNotice, setWorkflowNotice] = useState(null);
+  const [workflowAttemptIds, setWorkflowAttemptIds] = useState({});
 
   const handleRetry = useCallback(async () => {
     setState({
@@ -296,15 +294,26 @@ export default function Product360() {
       return;
     }
 
+    const actionKey = `${entityType}:${entity.id}:${action}`;
+    const workflowAttemptKey = `${selectedUserId}:${productId}:${actionKey}`;
+    const idempotencyKey =
+      workflowAttemptIds[workflowAttemptKey] ||
+      createWorkflowIdempotencyKey(["product-360", entityType, entity.id, action]);
     const body = {
-      idempotency_key: buildIdempotencyKey(entityType, entity.id, action),
+      idempotency_key: idempotencyKey,
     };
 
     if (workflowComment.trim()) {
       body.comment = workflowComment.trim();
     }
 
-    const actionKey = `${entityType}:${entity.id}:${action}`;
+    if (!workflowAttemptIds[workflowAttemptKey]) {
+      setWorkflowAttemptIds((current) => ({
+        ...current,
+        [workflowAttemptKey]: idempotencyKey,
+      }));
+    }
+
     setActiveWorkflowAction(actionKey);
     setWorkflowNotice(null);
 
@@ -319,6 +328,15 @@ export default function Product360() {
         });
       }
 
+      setWorkflowAttemptIds((current) => {
+        if (!current[workflowAttemptKey]) {
+          return current;
+        }
+
+        const next = { ...current };
+        delete next[workflowAttemptKey];
+        return next;
+      });
       setWorkflowComment("");
       setWorkflowNotice({
         tone: "success",
@@ -458,6 +476,7 @@ export default function Product360() {
           },
         ]}
         rows={stockRisk ? [stockRisk] : []}
+        getRowKey={(row) => row.id || row.product_id || row.sku}
         emptyMessage="No stock-risk row is available for this product yet."
       />
 
@@ -466,6 +485,7 @@ export default function Product360() {
         description="Sales evidence behind Product 360 commercial context."
         columns={salesColumns}
         rows={state.data.sales}
+        getRowKey={(row) => row.id || `${row.sold_at || "na"}:${row.channel || "na"}:${row.quantity || "na"}`}
         emptyMessage="No sales records returned for this product."
       />
 
@@ -474,6 +494,7 @@ export default function Product360() {
         description="Latest inventory evidence used for stock-risk decisions."
         columns={inventoryColumns}
         rows={state.data.inventory_snapshots}
+        getRowKey={(row) => row.id || `${row.recorded_at || "na"}:${row.warehouse_code || "na"}`}
         emptyMessage="No inventory snapshots returned for this product."
       />
 
@@ -482,6 +503,7 @@ export default function Product360() {
         description="Demand-planning records linked to the product."
         columns={forecastColumns}
         rows={state.data.forecasts}
+        getRowKey={(row) => row.id || `${row.forecast_period_start || "na"}:${row.forecast_period_end || "na"}:${row.method || "na"}`}
         emptyMessage="No forecasts returned for this product."
       />
 
@@ -490,6 +512,7 @@ export default function Product360() {
         description="Product-level anomaly signals from operational data."
         columns={anomalyColumns}
         rows={state.data.anomalies}
+        getRowKey={(row) => row.id || `${row.detected_at || "na"}:${row.anomaly_type || "na"}:${row.metric_name || "na"}`}
         emptyMessage="No anomalies returned for this product."
       />
 
@@ -498,6 +521,7 @@ export default function Product360() {
         description="Operational alerts with workflow actions."
         columns={alertWorkflowColumns}
         rows={state.data.alerts}
+        getRowKey={(row) => row.id || row.alert_id || `${row.title || "alert"}:${row.detected_at || row.created_at || "na"}`}
         emptyMessage="No alerts returned for this product."
       />
 
@@ -506,6 +530,7 @@ export default function Product360() {
         description="Product-level recommendations with accept, reject, dismiss and resolve actions."
         columns={recommendationColumns}
         rows={state.data.recommendations}
+        getRowKey={(row) => row.id || `${row.recommended_action || "recommendation"}:${row.generated_at || row.created_at || "na"}`}
         emptyMessage="No recommendations returned for this product."
       />
 
@@ -514,6 +539,7 @@ export default function Product360() {
         description="Audit trail linked through product alerts."
         columns={workflowColumns}
         rows={state.data.workflow_actions}
+        getRowKey={(row) => row.id || `${row.performed_at || "na"}:${row.action_type || "na"}:${row.alert_title || "na"}`}
         emptyMessage="No workflow actions returned for this product."
       />
     </main>

@@ -163,6 +163,7 @@ export default function Forecasts() {
         description="This is a baseline view. Forecast accuracy charts and model evaluation remain future scope."
         columns={columns}
         rows={state.forecasts}
+        getRowKey={(row) => row.id || `${row.product_id || row.sku || "na"}:${row.forecast_period_start || row.forecast_date || row.date || "na"}`}
         emptyMessage="The backend returned no forecasts. Check seed data and /forecasts API response."
       />
     </main>

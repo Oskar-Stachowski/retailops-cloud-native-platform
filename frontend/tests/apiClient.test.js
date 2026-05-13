@@ -96,6 +96,35 @@ test("apiGet throws ApiError for standardized backend error", async () => {
   }
 });
 
+test("apiGet aborts with timeout error when the backend hangs", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = (_, options) =>
+    new Promise((_, reject) => {
+      options.signal.addEventListener(
+        "abort",
+        () => {
+          reject(options.signal.reason || new DOMException("Aborted", "AbortError"));
+        },
+        { once: true },
+      );
+    });
+
+  try {
+    await assert.rejects(
+      () => apiGet("/health", { baseUrl: "http://localhost:8000", timeoutMs: 5 }),
+      (error) => {
+        assert.ok(error instanceof ApiError);
+        assert.equal(error.code, "timeout_error");
+        assert.equal(error.message, "Backend API request timed out.");
+        return true;
+      },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("apiPost sends JSON body and POST method", async () => {
   const originalFetch = globalThis.fetch;
   const requests = [];

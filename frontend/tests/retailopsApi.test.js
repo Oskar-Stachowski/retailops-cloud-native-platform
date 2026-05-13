@@ -4,6 +4,7 @@ import {
   buildDashboardSummary,
   buildLiveOperationsPath,
   buildWorkflowMutationPath,
+  createWorkflowIdempotencyKey,
   getProduct360,
   getLiveOperations,
   listFromKnownKeys,
@@ -164,6 +165,30 @@ test("buildWorkflowMutationPath builds user-scoped workflow write paths", () => 
     buildWorkflowMutationPath("recommendation", "R1", "accept", "inventory-planner"),
     "/recommendations/R1/accept?user_id=inventory-planner",
   );
+});
+
+test("createWorkflowIdempotencyKey uses a stable UUID-based suffix", () => {
+  const originalCryptoDescriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+
+  Object.defineProperty(globalThis, "crypto", {
+    configurable: true,
+    value: {
+      randomUUID: () => "11111111-2222-4333-8444-555555555555",
+    },
+  });
+
+  try {
+    assert.equal(
+      createWorkflowIdempotencyKey(["alert", "A1", "acknowledge"]),
+      "frontend:alert:A1:acknowledge:11111111-2222-4333-8444-555555555555",
+    );
+  } finally {
+    if (originalCryptoDescriptor) {
+      Object.defineProperty(globalThis, "crypto", originalCryptoDescriptor);
+    } else {
+      delete globalThis.crypto;
+    }
+  }
 });
 
 test("hasPermission supports explicit permissions and platform admin", () => {

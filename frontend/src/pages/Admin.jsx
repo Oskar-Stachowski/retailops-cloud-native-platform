@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import RoleGuard from "../components/auth/RoleGuard.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
+import { EXTENDED_API_TIMEOUT_MS } from "../services/apiClient.js";
 import {
   getCurrentPermissions,
   getCurrentUser,
@@ -78,8 +79,8 @@ function Admin() {
       const [user, permissions, health, readiness] = await Promise.all([
         getCurrentUser({ userId }),
         getCurrentPermissions({ userId }),
-        safeRequest(getHealthStatus),
-        safeRequest(getReadinessStatus),
+        safeRequest(() => getHealthStatus({ timeoutMs: EXTENDED_API_TIMEOUT_MS })),
+        safeRequest(() => getReadinessStatus({ timeoutMs: EXTENDED_API_TIMEOUT_MS })),
       ]);
 
       if (!isMounted) {

@@ -387,6 +387,15 @@ export function buildWorkflowMutationPath(entityType, entityId, action, userId) 
   return buildUserScopedPath(path, userId);
 }
 
+export function createWorkflowIdempotencyKey(scope = []) {
+  const parts = Array.isArray(scope) ? scope : [scope];
+  const attemptId =
+    globalThis.crypto?.randomUUID?.() ||
+    `fallback-${Math.random().toString(36).slice(2, 10)}`;
+
+  return ["frontend", ...parts.filter(Boolean), attemptId].join(":");
+}
+
 export function hasPermission(subject, permission) {
   const permissions = Array.isArray(subject) ? subject : subject?.permissions || [];
   return permissions.includes(permission) || permissions.includes("platform:admin");

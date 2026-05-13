@@ -170,6 +170,7 @@ export default function Products() {
         description="Product rows link to the Product 360 drill-down view."
         columns={columns}
         rows={state.products}
+        getRowKey={(row) => row.id || row.sku}
         emptyMessage="The backend returned no product records. Run database migrations and seed demo data."
       />
     </main>

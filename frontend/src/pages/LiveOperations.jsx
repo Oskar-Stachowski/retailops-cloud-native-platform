@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
@@ -165,14 +165,41 @@ export default function LiveOperations() {
     data: null,
     fetchedAt: null,
   });
+  const activeRequestControllerRef = useRef(null);
 
-  const loadLiveOperations = useCallback(async () => {
+  const loadLiveOperations = useCallback(async ({ showLoading = false } = {}) => {
+    activeRequestControllerRef.current?.abort();
+
+    const requestController = new AbortController();
+    activeRequestControllerRef.current = requestController;
+
+    if (showLoading) {
+      setState((current) => ({
+        ...current,
+        loading: true,
+        error: null,
+      }));
+    } else {
+      setState((current) => ({
+        ...current,
+        error: null,
+      }));
+    }
+
     try {
       const data = await getLiveOperations({
         windowMinutes,
         recentEventsLimit: 20,
         alertsLimit: 10,
+        signal: requestController.signal,
       });
+
+      if (
+        requestController.signal.aborted ||
+        activeRequestControllerRef.current !== requestController
+      ) {
+        return;
+      }
 
       setState({
         loading: false,
@@ -181,58 +208,42 @@ export default function LiveOperations() {
         fetchedAt: new Date().toISOString(),
       });
     } catch (error) {
+      if (
+        requestController.signal.aborted ||
+        error?.code === "request_aborted" ||
+        activeRequestControllerRef.current !== requestController
+      ) {
+        return;
+      }
+
       setState((current) => ({
         ...current,
         loading: false,
         error,
       }));
+    } finally {
+      if (activeRequestControllerRef.current === requestController) {
+        activeRequestControllerRef.current = null;
+      }
     }
   }, [windowMinutes]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function load() {
-      try {
-        const data = await getLiveOperations({
-          windowMinutes,
-          recentEventsLimit: 20,
-          alertsLimit: 10,
-        });
-
-        if (isMounted) {
-          setState({
-            loading: false,
-            error: null,
-            data,
-            fetchedAt: new Date().toISOString(),
-          });
-        }
-      } catch (error) {
-        if (isMounted) {
-          setState({
-            loading: false,
-            error,
-            data: null,
-            fetchedAt: null,
-          });
-        }
-      }
-    }
-
-    load();
-    const intervalId = window.setInterval(load, REFRESH_INTERVAL_MS);
+    loadLiveOperations({ showLoading: true });
+    const intervalId = window.setInterval(() => {
+      loadLiveOperations();
+    }, REFRESH_INTERVAL_MS);
 
     return () => {
-      isMounted = false;
+      activeRequestControllerRef.current?.abort();
+      activeRequestControllerRef.current = null;
       window.clearInterval(intervalId);
     };
-  }, [windowMinutes]);
+  }, [loadLiveOperations]);
 
   const handleRefresh = useCallback(() => {
-    setState((current) => ({ ...current, loading: !current.data, error: null }));
-    loadLiveOperations();
-  }, [loadLiveOperations]);
+    loadLiveOperations({ showLoading: !state.data });
+  }, [loadLiveOperations, state.data]);
 
   const metricRows = useMemo(
     () => rawMetricRows(state.data?.metrics?.raw_metrics),
@@ -365,6 +376,7 @@ export default function LiveOperations() {
         description="Latest persisted event records from the real-time event log."
         columns={eventColumns}
         rows={data.recent_events || []}
+        getRowKey={(row) => row.id || row.event_id}
         emptyMessage="No stream events have been persisted yet."
       />
 
@@ -373,6 +385,7 @@ export default function LiveOperations() {
         description="Alert-like events derived from alert and anomaly event types."
         columns={alertColumns}
         rows={data.alerts || []}
+        getRowKey={(row) => row.id || row.event_id || `${row.title || row.event_type || "alert"}:${row.ingested_at || "na"}`}
         emptyMessage="No alert-like events are available in the live stream."
       />
 
@@ -381,6 +394,7 @@ export default function LiveOperations() {
         description="Persisted state for API consumers processing real-time events."
         columns={consumerColumns}
         rows={consumerStates}
+        getRowKey={(row) => row.id || row.consumer_name}
         emptyMessage="No consumer state has been persisted yet."
       />
 
@@ -389,6 +403,7 @@ export default function LiveOperations() {
         description="Metric observations aggregated by the live operations endpoint."
         columns={metricColumns}
         rows={metricRows}
+        getRowKey={(row) => row.metric_name}
         emptyMessage="No metric observations are available for the selected window."
       />
     </main>

@@ -511,6 +511,7 @@ export default function Dashboard() {
         description="Baseline sales trend evidence for management and commercial planning. In future sprints this can become a chart."
         columns={salesTrendColumns}
         rows={salesTrend.slice(0, 8)}
+        getRowKey={(row) => row.id || row.period || row.date || row.sales_date || row.bucket}
         emptyMessage="Sales trend endpoint returned no records. Check /dashboard/sales-trend."
       />
 
@@ -519,6 +520,7 @@ export default function Dashboard() {
         description="Alerts summarize signals that may require inventory, operations or commercial action."
         columns={alertColumns}
         rows={alerts.slice(0, 8)}
+        getRowKey={(row) => row.id || row.alert_id || `${row.title || row.message || "alert"}:${row.detected_at || row.created_at || "na"}`}
         emptyMessage="Dashboard alerts endpoint returned no records. No fake alert rows are displayed."
       />
 
@@ -527,6 +529,7 @@ export default function Dashboard() {
         description="Recommendations show proposed actions before full workflow approval is implemented."
         columns={recommendationColumns}
         rows={recommendations.slice(0, 8)}
+        getRowKey={(row) => row.id || row.recommendation_id || `${row.title || row.recommended_action || "recommendation"}:${row.generated_at || row.created_at || "na"}`}
         emptyMessage="Dashboard recommendations endpoint returned no records. No local recommendation mocks are displayed."
       />
 
@@ -535,6 +538,7 @@ export default function Dashboard() {
         description="Open work items connect decision signals with operational follow-up."
         columns={workItemColumns}
         rows={openWorkItems.slice(0, 8)}
+        getRowKey={(row) => row.id || `${row.source || "work"}:${row.title || row.message || row.name || "item"}:${row.updated_at || row.created_at || "na"}`}
         emptyMessage="Open work items endpoint returned no records. Workflow actions remain future scope."
       />
 
@@ -543,6 +547,7 @@ export default function Dashboard() {
         description="Inventory risk data supports Operations and Inventory Planner decisions."
         columns={riskColumns}
         rows={stockRisks.slice(0, 8)}
+        getRowKey={(row) => row.id || row.product_id || row.sku}
         emptyMessage="Stock risk endpoint is empty or not implemented yet. No mock risks are displayed."
       />
 
@@ -554,6 +559,7 @@ export default function Dashboard() {
         }
         columns={forecastColumns}
         rows={forecasts.slice(0, 8)}
+        getRowKey={(row) => row.id || `${row.product_id || row.sku || "na"}:${row.forecast_period_start || row.forecast_date || row.date || "na"}`}
         emptyMessage="Forecast endpoint returned no records. Check seed data and /forecasts API response."
       />
 
@@ -562,6 +568,7 @@ export default function Dashboard() {
         description="Product records remain visible as traceability evidence for dashboard metrics."
         columns={productColumns}
         rows={products.slice(0, 8)}
+        getRowKey={(row) => row.id || row.sku}
         emptyMessage="Products endpoint returned no records. Check seed data and /products API response."
       />
     </main>

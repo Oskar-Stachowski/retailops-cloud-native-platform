@@ -7,6 +7,7 @@ import StatusBadge from "../components/StatusBadge";
 import {
   applyAlertWorkflowAction,
   applyRecommendationWorkflowAction,
+  createWorkflowIdempotencyKey,
   getCurrentUser,
   getDashboardData,
   hasPermission,
@@ -155,16 +156,6 @@ function availableActions(item) {
   return [];
 }
 
-function buildIdempotencyKey(item, action) {
-  return [
-    "frontend",
-    item.queueType,
-    item.queueId,
-    action,
-    Date.now(),
-  ].join(":");
-}
-
 function workflowErrorMessage(error, item) {
   if (error?.status === 404 && item.queueType === "recommendation") {
     return (
@@ -210,6 +201,7 @@ export default function ActionQueue() {
   const [comment, setComment] = useState("");
   const [activeAction, setActiveAction] = useState(null);
   const [notice, setNotice] = useState(null);
+  const [workflowAttemptIds, setWorkflowAttemptIds] = useState({});
 
   const loadQueue = useCallback(async (
     userId = selectedUserId,
@@ -299,15 +291,28 @@ export default function ActionQueue() {
       return;
     }
 
+    const actionKey = `${item.queueType}:${item.queueId}:${action}`;
+    const workflowAttemptKey = `${selectedUserId}:${actionKey}`;
+    const idempotencyKey =
+      workflowAttemptIds[workflowAttemptKey] ||
+      createWorkflowIdempotencyKey([item.queueType, item.queueId, action]);
+
+    if (!workflowAttemptIds[workflowAttemptKey]) {
+      setWorkflowAttemptIds((current) => ({
+        ...current,
+        [workflowAttemptKey]: idempotencyKey,
+      }));
+    }
+
     const body = {
-      idempotency_key: buildIdempotencyKey(item, action),
+      idempotency_key: idempotencyKey,
     };
 
     if (comment.trim()) {
       body.comment = comment.trim();
     }
 
-    setActiveAction(`${item.queueType}:${item.queueId}:${action}`);
+    setActiveAction(actionKey);
     setNotice(null);
 
     try {
@@ -322,6 +327,11 @@ export default function ActionQueue() {
       }
 
       setComment("");
+      setWorkflowAttemptIds((current) => {
+        const next = { ...current };
+        delete next[workflowAttemptKey];
+        return next;
+      });
       setNotice({
         tone: "success",
         message: `${ACTION_LABELS[action]} recorded for ${humanizeToken(item.queueType)}.`,
