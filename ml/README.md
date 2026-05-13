@@ -28,6 +28,7 @@ Sprint 12 starts with a dataset contract and a local feature-generation job:
 - `contracts/demand_forecast_features.schema.json`
 - `contracts/demand_forecast_feature_manifest.schema.json`
 - `python -m ml.features.demand_forecast --profile small`
+- `python -m ml.models.baseline_forecast --profile small`
 
 The contract fixes the first forecasting feature grain as `date`, `product_id`,
 `store_id`, and `channel`, with `units_sold` as the target. Model training,
@@ -36,3 +37,9 @@ inference writes, and drift monitoring remain future commits.
 The demand feature job writes `features.csv` and `feature_manifest.json` under
 `data/synthetic/<profile>/features/demand_forecast/` by default. Generated
 feature datasets should stay out of Git.
+
+The baseline forecasting model is a deterministic moving-average benchmark. It
+writes `baseline_forecasts.csv` and `model_manifest.json` under
+`data/synthetic/<profile>/models/demand_baseline/` by default. It is intended as
+a local reference model for later evaluation and model metadata commits, not as
+an inference service or promoted model registry entry.
