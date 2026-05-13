@@ -58,7 +58,10 @@ def _redact_log_value(key: str, value: object) -> object:
         return _REDACTED_VALUE
 
     if isinstance(value, dict):
-        return {nested_key: _redact_log_value(nested_key, nested_value) for nested_key, nested_value in value.items()}
+        return {
+            nested_key: _redact_log_value(nested_key, nested_value)
+            for nested_key, nested_value in value.items()
+        }
 
     if isinstance(value, list):
         return [_redact_log_value(key, item) for item in value]
