@@ -536,11 +536,15 @@ export async function getDemoUsers(options = {}) {
   return listFromPayload(payload);
 }
 
-export async function getCurrentUser(options = {}) {
-  const payload = await apiGet(
+export async function getCurrentUserContext(options = {}) {
+  return apiGet(
     buildUserScopedPath(ENDPOINTS.currentUser[0], options.userId),
     options,
   );
+}
+
+export async function getCurrentUser(options = {}) {
+  const payload = await getCurrentUserContext(options);
 
   return payload?.user || payload;
 }

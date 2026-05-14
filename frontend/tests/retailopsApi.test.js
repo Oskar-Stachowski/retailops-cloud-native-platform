@@ -15,6 +15,7 @@ import {
   normalizeRiskStatus,
   buildUserScopedPath,
   getCurrentUser,
+  getCurrentUserContext,
   getNotifications,
   hasPermission,
   markNotificationRead,
@@ -388,6 +389,41 @@ test("getCurrentUser calls user-scoped /me endpoint", async () => {
 
     assert.equal(requestedUrls[0], "http://localhost:8000/me?user_id=ops-manager");
     assert.deepEqual(user, { id: "ops-manager", role: "operations_manager" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
+test("getCurrentUserContext preserves auth boundary metadata", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(
+      JSON.stringify({
+        user: { id: "platform-admin", role: "platform_admin" },
+        auth_mode: "local_mock",
+        scope_boundary: "Mock identity only.",
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const context = await getCurrentUserContext({
+      baseUrl: "http://localhost:8000",
+      userId: "platform-admin",
+    });
+
+    assert.equal(requestedUrls[0], "http://localhost:8000/me?user_id=platform-admin");
+    assert.equal(context.auth_mode, "local_mock");
+    assert.equal(context.scope_boundary, "Mock identity only.");
+    assert.deepEqual(context.user, { id: "platform-admin", role: "platform_admin" });
   } finally {
     globalThis.fetch = originalFetch;
   }
