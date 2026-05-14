@@ -89,6 +89,8 @@ jobs:
         run: alembic upgrade head
 
       - name: Seed demo data
+        env:
+          RETAILOPS_SEED_DATA_PROFILE: demo
         run: python scripts/seed_demo_data.py
 
       - name: Run API tests
