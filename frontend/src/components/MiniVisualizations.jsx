@@ -45,6 +45,7 @@ export function LineSparkChart({
   rows,
   valueAccessor,
   labelAccessor,
+  valueFormatter = formatCompactNumber,
   emptyMessage = "No trend points available.",
 }) {
   const points = (rows || [])
@@ -92,7 +93,7 @@ export function LineSparkChart({
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`Trend from ${formatCompactNumber(firstPoint.value)} to ${formatCompactNumber(lastPoint.value)}`}
+        aria-label={`Trend from ${valueFormatter(firstPoint.value)} to ${valueFormatter(lastPoint.value)}`}
       >
         <polygon className="line-spark-chart__area" points={areaPoints} />
         <polyline className="line-spark-chart__line" points={polylinePoints} />
@@ -108,12 +109,12 @@ export function LineSparkChart({
       </svg>
       <footer className="line-spark-chart__footer">
         <span>{firstPoint.label}</span>
-        <strong>{formatCompactNumber(lastPoint.value)}</strong>
-        <span>{lastPoint.label}</span>
+        <strong>{valueFormatter(lastPoint.value)}</strong>
+        <span>{points.length > 1 ? lastPoint.label : "single point"}</span>
       </footer>
       <p className="mini-visual-note">
         {delta >= 0 ? "+" : ""}
-        {formatCompactNumber(delta)} vs first point
+        {valueFormatter(delta)} vs first point
       </p>
     </div>
   );

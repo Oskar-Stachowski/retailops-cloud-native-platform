@@ -80,6 +80,49 @@ def test_demo_profile_keeps_current_dataset_shape() -> None:
     assert len(tables["workflow_actions"]) == 4
 
 
+def test_synthetic_profile_generates_forecast_horizon_per_product() -> None:
+    tables = build_dataset(
+        DatasetGenerationConfig(
+            profile="small",
+            days=14,
+            products=20,
+            stores=4,
+            warehouses=4,
+            seed=42,
+        ),
+    )
+
+    forecasts_by_product: dict[str, list[dict[str, str]]] = {}
+    for forecast in tables["forecasts"]:
+        forecasts_by_product.setdefault(forecast["product_id"], []).append(forecast)
+
+    assert len(tables["forecasts"]) == 140
+    assert {len(forecasts) for forecasts in forecasts_by_product.values()} == {7}
+
+
+def test_synthetic_inventory_snapshots_show_replenishment_then_depletion() -> None:
+    tables = build_dataset(
+        DatasetGenerationConfig(
+            profile="small",
+            days=35,
+            products=1,
+            stores=1,
+            warehouses=1,
+            seed=42,
+        ),
+    )
+
+    snapshots = sorted(
+        tables["inventory_snapshots"],
+        key=lambda row: row["recorded_at"],
+    )
+    quantities = [int(snapshot["stock_quantity"]) for snapshot in snapshots]
+
+    assert len(quantities) == 5
+    assert quantities[0] > quantities[1] > quantities[2] > quantities[3]
+    assert quantities[4] == quantities[0]
+
+
 def test_demo_profile_generates_store_and_warehouse_dimensions() -> None:
     tables = build_dataset(DatasetGenerationConfig(profile="demo"))
 

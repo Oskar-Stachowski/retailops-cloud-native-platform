@@ -87,6 +87,8 @@ DOCKER_RUNTIME_EVIDENCE_SCRIPT ?= ./scripts/ci/docker_runtime_evidence.sh
 COMPOSE_PROFILE_SET ?= dev test observability security
 
 DATA_PROFILE ?= small
+RETAILOPS_SEED_DATA_PROFILE ?= small
+RETAILOPS_SEED_DATA_DIR ?=
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
 DATA_QUALITY_REPORT ?= $(DATA_OUTPUT_DIR)/quality_report.json
 DATA_MANIFEST_REPORT ?= $(DATA_OUTPUT_DIR)/dataset_manifest.json
@@ -152,6 +154,8 @@ export APP_ENV
 export COMPOSE_PROFILES
 export DATABASE_URL
 export RETAILOPS_BROKER_BOOTSTRAP_SERVERS
+export RETAILOPS_SEED_DATA_PROFILE
+export RETAILOPS_SEED_DATA_DIR
 
 .PHONY: help
 help:
@@ -187,7 +191,10 @@ help:
 	@echo "  make performance-smoke    Run k6 API smoke baseline and save p95 evidence"
 	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
-	@echo "  make api-seed             Seed demo data"
+	@echo "  make api-seed             Seed the default local dataset profile (small)"
+	@echo "  make api-seed-demo        Seed demo smoke/CI data"
+	@echo "  make api-seed-small       Seed small local portfolio data"
+	@echo "  make api-seed-medium      Seed medium showcase/performance data"
 	@echo "  make db-readiness-evidence Run data readiness evidence gates"
 	@echo ""
 	@echo "Frontend:"
@@ -258,7 +265,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality data-contracts data-scenario-report scenario-coverage-report db-backup db-restore db-readiness-evidence ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down check-k6 performance-smoke
+.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed api-seed-demo api-seed-small api-seed-medium data-generate data-quality data-contracts data-scenario-report scenario-coverage-report db-backup db-restore db-reset-seed-small db-reset-seed-medium db-readiness-evidence ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down check-k6 performance-smoke
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -369,10 +376,32 @@ ml-drift: api-install
 api-migrate: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/alembic -c alembic.ini upgrade head
 
-api-seed: api-install
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python scripts/seed_demo_data.py
+api-seed: api-seed-small
 
-api-integration-test: api-install db-up data-generate api-migrate api-seed
+api-seed-demo: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=demo .venv/bin/python scripts/seed_demo_data.py
+
+api-seed-small: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=small .venv/bin/python scripts/seed_demo_data.py
+
+api-seed-medium: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=medium .venv/bin/python scripts/seed_demo_data.py
+
+db-reset-seed-small:
+	$(MAKE) db-down
+	$(MAKE) db-up
+	sleep 3
+	$(MAKE) api-migrate
+	$(MAKE) api-seed-small
+
+db-reset-seed-medium:
+	$(MAKE) db-down
+	$(MAKE) db-up
+	sleep 3
+	$(MAKE) api-migrate
+	$(MAKE) api-seed-medium
+
+api-integration-test: api-install db-up data-generate api-migrate api-seed-demo
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
 
 check-k6:
@@ -614,7 +643,7 @@ compose-ci: ensure-reports-dir
 	$(COMPOSE) config; \
 	$(MAKE) compose-profile-config; \
 	echo "[compose-ci] Starting full RetailOps stack..."; \
-	COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d || status=$$?; \
+	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d || status=$$?; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \

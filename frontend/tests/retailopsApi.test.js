@@ -3,8 +3,10 @@ import assert from "node:assert/strict";
 import {
   buildDashboardSummary,
   buildLiveOperationsPath,
+  buildQueryPath,
   buildWorkflowMutationPath,
   createWorkflowIdempotencyKey,
+  getProducts,
   getProduct360,
   getLiveOperations,
   listFromKnownKeys,
@@ -93,6 +95,57 @@ test("buildLiveOperationsPath builds dashboard live operations query", () => {
   );
 });
 
+test("buildQueryPath preserves existing query parameters and applies overrides", () => {
+  assert.equal(
+    buildQueryPath("/products?sort_by=sku", { limit: 100, offset: 200 }),
+    "/products?sort_by=sku&limit=100&offset=200",
+  );
+  assert.equal(buildQueryPath("/products?limit=50", { limit: 100 }), "/products?limit=100");
+});
+
+test("getProducts follows backend pagination until all product rows are loaded", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    const parsedUrl = new URL(url);
+    const offset = Number(parsedUrl.searchParams.get("offset"));
+    const limit = Number(parsedUrl.searchParams.get("limit"));
+    const items = Array.from({ length: offset === 200 ? 30 : limit }, (_, index) => ({
+      id: offset + index + 1,
+    }));
+
+    return new Response(
+      JSON.stringify({
+        items,
+        pagination: {
+          total: 230,
+          limit,
+          offset,
+        },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const products = await getProducts({ baseUrl: "http://localhost:8000" });
+
+    assert.equal(products.length, 230);
+    assert.deepEqual(requestedUrls, [
+      "http://localhost:8000/products?limit=100&offset=0",
+      "http://localhost:8000/products?limit=100&offset=100",
+      "http://localhost:8000/products?limit=100&offset=200",
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("getLiveOperations calls the live operations backend endpoint", async () => {
   const originalFetch = globalThis.fetch;
   const requestedUrls = [];
@@ -140,6 +193,27 @@ test("getProduct360 calls the Product 360 backend endpoint", async () => {
 
     assert.equal(requestedUrls[0], "http://localhost:8000/products/abc/360");
     assert.deepEqual(data, { product: { sku: "ELEC-HEAD-001" } });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("getProduct360 can request a larger related-row limit", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(JSON.stringify({ product: { sku: "ELEC-HEAD-001" } }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    await getProduct360("abc", { baseUrl: "http://localhost:8000", limit: 50 });
+
+    assert.equal(requestedUrls[0], "http://localhost:8000/products/abc/360?limit=50");
   } finally {
     globalThis.fetch = originalFetch;
   }
