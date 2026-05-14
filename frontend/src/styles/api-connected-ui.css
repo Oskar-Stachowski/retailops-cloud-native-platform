@@ -785,3 +785,34 @@ th {
     padding-inline: clamp(2rem, 2vw, 3rem);
   }
 }
+
+.business-entity-cell {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.business-entity-cell__primary {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.business-entity-cell__secondary {
+  display: grid;
+  gap: 0.1rem;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.identifier-text {
+  display: inline-flex;
+  max-width: 15ch;
+  overflow: hidden;
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82em;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

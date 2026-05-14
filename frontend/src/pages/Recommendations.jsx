@@ -6,6 +6,7 @@ import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import { ProductReferenceCell } from "../components/tableCells.jsx";
 import { getDashboardData } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
@@ -49,7 +50,11 @@ function signalLabel(row) {
 }
 
 function productReference(row) {
-  return firstPresent(row, ["sku", "product_sku", "product_id"]);
+  return <ProductReferenceCell row={row} />;
+}
+
+function productReferenceKey(row) {
+  return firstPresent(row, ["sku", "product_sku", "product_id"], "na");
 }
 
 function statusWithDefault(row) {
@@ -253,7 +258,7 @@ export default function Recommendations() {
         getRowKey={(row) =>
           row.id ||
           row.recommendation_id ||
-          `${productReference(row)}:${signalLabel(row)}`
+          `${productReferenceKey(row)}:${signalLabel(row)}`
         }
         emptyMessage="No recommendations were returned by the current dashboard endpoint. Dedicated queue records remain planned scope."
       />

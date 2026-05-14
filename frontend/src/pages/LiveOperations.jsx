@@ -5,6 +5,7 @@ import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import { ProductReferenceCell } from "../components/tableCells.jsx";
 import { getLiveOperations } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
@@ -101,7 +102,7 @@ const alertColumns = [
   },
   {
     header: "Product",
-    accessor: (row) => row.product_id || "-",
+    render: (row) => <ProductReferenceCell row={row} />,
   },
   {
     header: "Ingested",

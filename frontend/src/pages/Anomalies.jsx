@@ -6,6 +6,7 @@ import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import { ProductReferenceCell } from "../components/tableCells.jsx";
 import { getDashboardData, normalizeRiskStatus } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
@@ -49,7 +50,7 @@ function signalLabel(row) {
 }
 
 function productReference(row) {
-  return firstPresent(row, ["sku", "product_sku", "product_id"]);
+  return <ProductReferenceCell row={row} />;
 }
 
 function statusWithDefault(row) {
@@ -62,6 +63,7 @@ function statusWithDefault(row) {
 
 function buildAnomalySignalRows(alerts = [], stockRisks = []) {
   const alertRows = alerts.map((row, index) => ({
+    ...row,
     id: row.id || row.alert_id || `alert-${index}`,
     signal: signalLabel(row),
     source: "Dashboard alerts",
@@ -71,6 +73,7 @@ function buildAnomalySignalRows(alerts = [], stockRisks = []) {
   }));
 
   const riskRows = stockRisks.map((row, index) => ({
+    ...row,
     id: row.id || row.product_id || row.sku || `stock-risk-${index}`,
     signal: firstPresent(row, ["reason", "explanation", "notes"], "Inventory risk signal"),
     source: "Stock-risk summary",
@@ -103,7 +106,7 @@ const anomalySignalColumns = [
   },
   {
     header: "SKU / Product",
-    accessor: "product",
+    render: productReference,
   },
 ];
 

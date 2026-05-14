@@ -1,4 +1,7 @@
+import { isValidElement } from "react";
 import EmptyState from "./EmptyState";
+import { IdentifierText } from "./tableCells.jsx";
+import { isTechnicalIdentifier } from "./tableCellFormatters.js";
 import { resolveRowKey } from "./dataTableKeys.js";
 
 function getCellValue(row, column) {
@@ -10,7 +13,19 @@ function getCellValue(row, column) {
 }
 
 function formatCellValue(value) {
-  return value === null || value === undefined || value === "" ? "—" : value;
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  if (isValidElement(value)) {
+    return value;
+  }
+
+  if (isTechnicalIdentifier(value)) {
+    return <IdentifierText value={value} />;
+  }
+
+  return value;
 }
 
 export default function DataTable({

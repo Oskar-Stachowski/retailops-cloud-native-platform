@@ -5,6 +5,7 @@ import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import { ProductReferenceCell } from "../components/tableCells.jsx";
 import { getDashboardData, normalizeRiskStatus } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
@@ -74,7 +75,7 @@ function signalLabel(row) {
 }
 
 function productReference(row) {
-  return firstPresent(row, ["sku", "product_sku", "product_id"]);
+  return <ProductReferenceCell row={row} />;
 }
 
 function statusWithDefault(row) {
@@ -136,8 +137,8 @@ const riskColumns = [
 
 const forecastColumns = [
   {
-    header: "Product ID",
-    accessor: (row) => row.product_id || row.sku || row.product_sku || "—",
+    header: "Product",
+    render: productReference,
   },
   {
     header: "Period",

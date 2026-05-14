@@ -6,6 +6,7 @@ import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import { IdentifierText } from "../components/tableCells.jsx";
 import { getProducts } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
@@ -26,7 +27,7 @@ function formatDateTime(value) {
 const columns = [
   {
     header: "SKU",
-    accessor: (row) => row.sku || row.product_sku || row.id,
+    render: (row) => row.sku || row.product_sku || <IdentifierText value={row.id} />,
   },
   {
     header: "Name",

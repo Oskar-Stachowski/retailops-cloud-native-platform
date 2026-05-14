@@ -5,6 +5,7 @@ import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import { ProductReferenceCell } from "../components/tableCells.jsx";
 import {
   applyAlertWorkflowAction,
   applyRecommendationWorkflowAction,
@@ -90,7 +91,7 @@ function itemTitle(row) {
 }
 
 function productReference(row) {
-  return firstPresent(row, ["sku", "product_sku", "product_id"]);
+  return firstPresent(row, ["sku", "product_sku", "product_name", "name", "product_id"]);
 }
 
 function buildActionQueue(data) {
@@ -457,7 +458,7 @@ export default function ActionQueue() {
                     <td>
                       <StatusBadge status={item.queueStatus} />
                     </td>
-                    <td>{item.queueProduct}</td>
+                    <td><ProductReferenceCell row={item} /></td>
                     <td>{formatDateTime(item.queueUpdatedAt)}</td>
                     <td>
                       <div className="action-button-group">

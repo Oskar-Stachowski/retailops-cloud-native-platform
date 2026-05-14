@@ -4,13 +4,14 @@ import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
+import { ProductReferenceCell } from "../components/tableCells.jsx";
 import { getForecasts } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
 const columns = [
   {
-    header: "Product ID",
-    accessor: (row) => row.product_id || row.sku || row.product_sku || "—",
+    header: "Product",
+    render: (row) => <ProductReferenceCell row={row} />,
   },
   {
     header: "Period start",
