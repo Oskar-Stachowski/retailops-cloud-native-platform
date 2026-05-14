@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-13T21:23:26Z
+# Generated: 2026-05-14T06:31:20Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -97,6 +97,9 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       │   ├── prometheus-rules.json
 │       │   ├── prometheus-stream-events-query.json
 │       │   └── prometheus-targets.json
+│       ├── performance
+│       │   ├── api-smoke-summary.json
+│       │   └── api-smoke.txt
 │       ├── README.md
 │       ├── ruff
 │       │   ├── ruff-all-full.txt
@@ -214,6 +217,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── SQLAlchemy.md
 │   │   ├── Terraform Layout.md
 │   │   └── terraform-plan-readonly-iam-discovery.md
+│   ├── api-list-contract.md
 │   ├── api.md
 │   ├── aws-architecture.md
 │   ├── aws-service-inventory.md
@@ -282,6 +286,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── mlops-lifecycle.md
 │   ├── naming-convention.md
 │   ├── networking-baseline.md
+│   ├── observability
+│   │   └── api-tracing.md
 │   ├── real-time-event-contracts.md
 │   ├── repo-structure.txt
 │   ├── right-sizing-lifecycle.md
@@ -294,6 +300,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── observability-runbook.md
 │   │   ├── terraform-drift-check.md
 │   │   └── terraform-failed-plan.md
+│   ├── security
+│   │   └── demo-auth-boundary.md
 │   ├── synthetic-data-operating-model.md
 │   ├── synthetic-data-profiles.md
 │   ├── tagging-strategy.md
@@ -529,17 +537,20 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── 05-data-realtime-mlops-plan.md
 │   ├── 06-devops-aws-observability-security-plan.md
 │   ├── 07-execution-checklists.md
+│   ├── backend-api-production-readiness-closure.md
 │   ├── FINAL_AUDIT
 │   │   ├── CV_PROJECT_BULLETS.md
 │   │   ├── cv-claims-map.md
 │   │   └── final-repository-closing-audit.md
 │   ├── README.md
+│   ├── retailops-chatgpt-codex-collaboration-model-with-completion-checklists.md
 │   ├── retailops-production-readiness-audit-summary.md
 │   ├── retailops-production-readiness-checklist-audited.md
 │   ├── retailops-production-readiness-checklist.md
 │   ├── SENIOR_LEVEL_UPGRADE_PLAN.md
 │   ├── sprint-11-observability-coverage.md
 │   ├── zOskar - REPOSITORY_AUDIT.md
+│   ├── zOskar - retailops-chatgpt-codex-collaboration-model-with-completion-checklists.md
 │   ├── zOskar - retailops-production-readiness-checklist-audited.md
 │   └── zOskar - retailops-production-readiness-checklist.md
 ├── Makefile
@@ -617,6 +628,14 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 ├── services
 │   ├── api
 │   │   ├── .coverage
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52185.Xa3H0d4x.HNQIp837rWOh
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52185.XoKvHtEx.HNQIp837rWOh
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52186.XNyQSmDx.H7jIHhKNI31h
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52186.XUu2D0gx.HNQIp837rWOh
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52187.XA85HVMx.H7jIHhKNI31h
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52187.XXAFbQyx.HNQIp837rWOh
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52194.Xis7akcx.H7jIHhKNI31h
+│   │   ├── .coverage.Oskars-MacBook-Air_local.pid52194.XzfIzntx.HNQIp837rWOh
 │   │   ├── .dockerignore
 │   │   ├── alembic
 │   │   │   ├── __init__.py
@@ -658,7 +677,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── config.py
 │   │   │   │   ├── correlation.py
-│   │   │   │   └── logging.py
+│   │   │   │   ├── logging.py
+│   │   │   │   └── tracing.py
 │   │   │   ├── db
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── connection.py
@@ -713,6 +733,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   └── tests
 │   │       ├── conftest.py
 │   │       ├── test_alert_workflow_api.py
+│   │       ├── test_api_list_contract_readiness.py
 │   │       ├── test_baseline_evaluation_report.py
 │   │       ├── test_baseline_forecasting_model.py
 │   │       ├── test_batch_forecast_inference.py
@@ -726,6 +747,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       ├── test_database_schema.py
 │   │       ├── test_demand_feature_drift.py
 │   │       ├── test_demand_feature_generation.py
+│   │       ├── test_demo_auth_boundary_readiness.py
 │   │       ├── test_demo_identity_api.py
 │   │       ├── test_domain_models.py
 │   │       ├── test_errors.py
@@ -762,11 +784,16 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       ├── test_stock_risk_api_contract.py
 │   │       ├── test_stream_observability.py
 │   │       ├── test_structured_logging.py
+│   │       ├── test_tracing_config.py
 │   │       ├── test_workflow_api_schemas.py
 │   │       ├── test_workflow_repository.py
 │   │       └── test_workflow_service.py
 │   └── README.md
 └── tests
+    ├── performance
+    │   ├── k6
+    │   │   └── api-smoke.js
+    │   └── README.md
     └── README.md
 
-126 directories, 632 files
+131 directories, 654 files
