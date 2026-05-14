@@ -4,6 +4,7 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import { DistributionBars, InsightVisualCard } from "../components/MiniVisualizations";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import { IdentifierText } from "../components/tableCells.jsx";
@@ -22,6 +23,19 @@ function formatDateTime(value) {
   }
 
   return date.toLocaleString();
+}
+
+function productCategoryItems(products) {
+  const counts = new Map();
+
+  for (const product of products || []) {
+    const category = product.category || "Uncategorized";
+    counts.set(category, (counts.get(category) || 0) + 1);
+  }
+
+  return Array.from(counts, ([label, value]) => ({ label, value })).sort(
+    (left, right) => right.value - left.value || left.label.localeCompare(right.label),
+  );
 }
 
 const columns = [
@@ -170,6 +184,20 @@ export default function Products() {
           value={state.products.length - activeCount}
           helper="Non-active products"
         />
+      </section>
+
+
+      <section className="mini-visual-grid mini-visual-grid--two">
+        <InsightVisualCard
+          eyebrow="Catalog mix"
+          title="Product category distribution"
+          description="A compact category view makes the product page less table-only."
+        >
+          <DistributionBars
+            items={productCategoryItems(state.products)}
+            emptyMessage="No product category data available."
+          />
+        </InsightVisualCard>
       </section>
 
       <DataTable

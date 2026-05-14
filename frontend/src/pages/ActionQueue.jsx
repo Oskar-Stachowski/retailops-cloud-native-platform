@@ -3,6 +3,11 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import {
+  DistributionBars,
+  InsightVisualCard,
+  MiniBarList,
+} from "../components/MiniVisualizations";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import { ProductReferenceCell } from "../components/tableCells.jsx";
@@ -331,6 +336,19 @@ function groupQueueItems(items) {
     .filter((group) => group.items.length > 0);
 }
 
+function distributionItems(items, accessor, fallbackLabel = "Unknown") {
+  const counts = new Map();
+
+  for (const item of items || []) {
+    const label = humanizeToken(accessor(item), fallbackLabel);
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+
+  return Array.from(counts, ([label, value]) => ({ label, value })).sort(
+    (left, right) => right.value - left.value || left.label.localeCompare(right.label),
+  );
+}
+
 export default function ActionQueue() {
   const [selectedUserId, setSelectedUserId] = useState(getSelectedDemoUserId());
   const [state, setState] = useState({
@@ -567,6 +585,31 @@ export default function ActionQueue() {
           status={canWriteWorkflow ? "Enabled" : "Limited"}
           tone={canWriteWorkflow ? "success" : "warning"}
         />
+      </section>
+
+
+      <section className="mini-visual-grid mini-visual-grid--two">
+        <InsightVisualCard
+          eyebrow="Workflow status"
+          title="Queue by status"
+          description="A quick view of how pending decisions are distributed."
+        >
+          <DistributionBars
+            items={distributionItems(queueItems, (item) => item.queueStatus, "Open")}
+            emptyMessage="No pending queue status data available."
+          />
+        </InsightVisualCard>
+
+        <InsightVisualCard
+          eyebrow="Priority mix"
+          title="Decision priority bars"
+          description="Highlights whether the queue contains high-severity work."
+        >
+          <MiniBarList
+            items={distributionItems(queueItems, (item) => item.queuePriority, "Normal")}
+            emptyMessage="No queue priority data available."
+          />
+        </InsightVisualCard>
       </section>
 
       <section className="action-queue-workspace">

@@ -3,6 +3,7 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import { InsightVisualCard, MiniBarList } from "../components/MiniVisualizations";
 import PageHeader from "../components/PageHeader";
 import { ProductReferenceCell } from "../components/tableCells.jsx";
 import { getForecasts } from "../services/retailopsApi";
@@ -40,10 +41,17 @@ const columns = [
   },
   {
     header: "Confidence",
-    accessor: (row) =>
-      row.confidence_level === undefined || row.confidence_level === null
-        ? "—"
-        : `${Math.round(row.confidence_level * 100)}%`,
+    accessor: (row) => {
+      const confidence = row.confidence_level ?? row.confidence ?? row.confidence_score;
+
+      if (confidence === undefined || confidence === null) {
+        return "—";
+      }
+
+      const normalizedConfidence = confidence <= 1 ? confidence * 100 : confidence;
+
+      return `${Math.round(normalizedConfidence)}%`;
+    },
   },
   {
     header: "Method",
@@ -55,6 +63,29 @@ const columns = [
     accessor: (row) => row.generated_at || row.created_at || "—",
   },
 ];
+
+function numberValue(value) {
+  const parsedValue = Number(value);
+
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function forecastConfidenceItems(rows) {
+  return (rows || []).slice(0, 8).map((row, index) => {
+    const rawConfidence = numberValue(
+      row.confidence_level ?? row.confidence ?? row.confidence_score,
+    ) ?? 0;
+    const confidence = rawConfidence <= 1 ? rawConfidence * 100 : rawConfidence;
+    const label =
+      row.sku || row.product_sku || row.product_name || row.product_id || `Forecast ${index + 1}`;
+
+    return {
+      label,
+      value: Math.round(confidence),
+      valueLabel: `${Math.round(confidence)}%`,
+    };
+  });
+}
 
 function countUniqueProducts(rows) {
   return new Set(
@@ -163,6 +194,20 @@ export default function Forecasts() {
           helper="Unique products with forecasts"
           tone="neutral"
         />
+      </section>
+
+
+      <section className="mini-visual-grid mini-visual-grid--two">
+        <InsightVisualCard
+          eyebrow="Forecast confidence"
+          title="Latest confidence mini bars"
+          description="A quick scan of model confidence for the most recent forecast rows."
+        >
+          <MiniBarList
+            items={forecastConfidenceItems(state.forecasts)}
+            emptyMessage="Forecast rows do not expose confidence values yet."
+          />
+        </InsightVisualCard>
       </section>
 
       <DataTable

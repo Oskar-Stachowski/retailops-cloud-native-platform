@@ -3,6 +3,12 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import {
+  DistributionBars,
+  InsightVisualCard,
+  LineSparkChart,
+  MiniBarList,
+} from "../components/MiniVisualizations";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import { ProductReferenceCell } from "../components/tableCells.jsx";
@@ -21,6 +27,105 @@ function formatDateTime(value) {
   }
 
   return date.toLocaleString();
+}
+
+function numberValue(value) {
+  const parsedValue = Number(value);
+
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function firstNumeric(row, keys, fallback = null) {
+  for (const key of keys) {
+    const value = numberValue(row?.[key]);
+
+    if (value !== null) {
+      return value;
+    }
+  }
+
+  return fallback;
+}
+
+function countByLabel(rows, accessor, fallbackLabel = "Unknown") {
+  const counts = new Map();
+
+  for (const row of rows || []) {
+    const rawLabel = accessor(row);
+    const label = humanizeToken(rawLabel, fallbackLabel);
+
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+
+  return Array.from(counts, ([label, value]) => ({ label, value })).sort(
+    (left, right) => right.value - left.value || left.label.localeCompare(right.label),
+  );
+}
+
+function salesTrendValue(row) {
+  return firstNumeric(
+    row,
+    ["revenue", "sales_amount", "total_sales", "units", "quantity", "total_quantity", "orders", "order_count"],
+    0,
+  );
+}
+
+function salesTrendLabel(row, index) {
+  return firstPresent(row, ["period", "date", "sales_date", "bucket"], `Point ${index + 1}`);
+}
+
+function stockRiskDistribution(rows, summary) {
+  const distribution = countByLabel(
+    rows,
+    (row) => normalizeRiskStatus(
+      row.risk_status || row.stock_risk || row.inventory_risk || row.status,
+    ),
+    "Normal",
+  );
+
+  if (distribution.length) {
+    return distribution;
+  }
+
+  return [
+    { label: "Stockout risk", value: summary.stockoutRisks },
+    { label: "Overstock risk", value: summary.overstockRisks },
+  ];
+}
+
+function forecastConfidenceItems(rows) {
+  return (rows || []).slice(0, 6).map((row, index) => {
+    const confidence = firstNumeric(row, ["confidence_level", "confidence", "confidence_score"], 0);
+    const normalizedConfidence = confidence <= 1 ? confidence * 100 : confidence;
+    const label = firstPresent(
+      row,
+      ["sku", "product_sku", "product_name", "product_id"],
+      `Forecast ${index + 1}`,
+    );
+
+    return {
+      label,
+      value: Math.round(normalizedConfidence),
+      valueLabel: `${Math.round(normalizedConfidence)}%`,
+    };
+  });
+}
+
+function workflowStatusDistribution(rows, alerts, recommendations) {
+  const distribution = countByLabel(
+    rows,
+    (row) => row.status || row.state || row.workflow_status,
+    "Open",
+  );
+
+  if (distribution.length) {
+    return distribution;
+  }
+
+  return [
+    { label: "Open alerts", value: alerts.length },
+    { label: "Recommendations", value: recommendations.length },
+  ];
 }
 
 function formatNumber(value) {
@@ -604,6 +709,86 @@ export default function Dashboard() {
 
       <BackendIntegrationPanel sourceStatus={sourceStatus} />
 
+
+      <DashboardSection
+        eyebrow="Visual insights"
+        title="Mini visualizations for portfolio review"
+        description="Small charts make the dashboard less table-heavy while keeping the data source simple and traceable."
+      >
+        <section
+          className="mini-visual-grid dashboard-visual-grid"
+          aria-label="Dashboard mini visualizations"
+        >
+          <InsightVisualCard
+            eyebrow="Sales trend"
+            title="Revenue / volume movement"
+            description="Thirty-day trend window from the sales trend endpoint."
+          >
+            <LineSparkChart
+              rows={salesTrend}
+              valueAccessor={salesTrendValue}
+              labelAccessor={salesTrendLabel}
+              emptyMessage="Sales trend endpoint returned no chartable values."
+            />
+          </InsightVisualCard>
+
+          <InsightVisualCard
+            eyebrow="Stock risk"
+            title="Inventory risk distribution"
+            description="Risk mix across stockout, overstock and normal inventory signals."
+          >
+            <DistributionBars
+              items={stockRiskDistribution(stockRisks, summary)}
+              emptyMessage="No stock risk distribution available."
+            />
+          </InsightVisualCard>
+
+          <InsightVisualCard
+            eyebrow="Forecasts"
+            title="Confidence mini bars"
+            description="Quick confidence scan across the latest forecast records."
+          >
+            <MiniBarList
+              items={forecastConfidenceItems(forecasts)}
+              emptyMessage="Forecast rows do not expose confidence values yet."
+            />
+          </InsightVisualCard>
+
+          <InsightVisualCard
+            eyebrow="Alerts"
+            title="Open alerts by severity"
+            description="Severity distribution from operational alert signals."
+          >
+            <DistributionBars
+              items={countByLabel(alerts, (row) => row.severity || row.priority, "Unknown")}
+              emptyMessage="No alert severity data available."
+            />
+          </InsightVisualCard>
+
+          <InsightVisualCard
+            eyebrow="Workflow"
+            title="Queue by status"
+            description="Workflow backlog shape from open work items and decisions."
+          >
+            <DistributionBars
+              items={workflowStatusDistribution(openWorkItems, alerts, recommendations)}
+              emptyMessage="No workflow status distribution available."
+            />
+          </InsightVisualCard>
+
+          <InsightVisualCard
+            eyebrow="Catalog"
+            title="Product category distribution"
+            description="Category mix from backend product records."
+          >
+            <DistributionBars
+              items={countByLabel(products, (row) => row.category, "Uncategorized")}
+              emptyMessage="No product category data available."
+            />
+          </InsightVisualCard>
+        </section>
+      </DashboardSection>
+
       <DashboardSection
         eyebrow="Tables / evidence"
         title="Traceable records behind the dashboard"
@@ -611,7 +796,7 @@ export default function Dashboard() {
       >
         <DataTable
           title="Sales trend"
-          description="Baseline sales trend evidence for management and commercial planning. In future sprints this can become a chart."
+          description="Baseline sales trend evidence for management and commercial planning. These rows also feed the mini line chart above."
           columns={salesTrendColumns}
           rows={salesTrend.slice(0, 8)}
           getRowKey={(row) =>
