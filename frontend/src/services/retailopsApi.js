@@ -332,7 +332,7 @@ function buildProductListParams(options = {}) {
   };
 }
 
-function buildProductRequestOptions(options = {}) {
+function buildListRequestOptions(options = {}) {
   return {
     baseUrl: options.baseUrl,
     timeoutMs: options.timeoutMs,
@@ -344,7 +344,7 @@ function buildProductRequestOptions(options = {}) {
 export async function getProducts(options = {}) {
   return getPaginatedItems(
     ENDPOINTS.products[0],
-    buildProductRequestOptions(options),
+    buildListRequestOptions(options),
     {
       limit: options.limit || 100,
       maxItems: options.maxItems || 2_000,
@@ -365,9 +365,28 @@ export async function getProduct360(productId, options = {}) {
   return apiGet(path, options);
 }
 
+function buildForecastListParams(options = {}) {
+  return {
+    product_id: options.productId || options.product_id,
+    status: options.status,
+    method: options.method,
+    date_from: options.dateFrom || options.date_from,
+    date_to: options.dateTo || options.date_to,
+    sort_by: options.sortBy || options.sort_by,
+    sort_order: options.sortOrder || options.sort_order,
+  };
+}
+
 export async function getForecasts(options = {}) {
-  const payload = await apiGet(ENDPOINTS.forecasts[0], options);
-  return listFromPayload(payload);
+  return getPaginatedItems(
+    ENDPOINTS.forecasts[0],
+    buildListRequestOptions(options),
+    {
+      limit: options.limit || 100,
+      maxItems: options.maxItems || 2_000,
+      params: buildForecastListParams(options),
+    },
+  );
 }
 
 export async function getStockRisks(options = {}) {

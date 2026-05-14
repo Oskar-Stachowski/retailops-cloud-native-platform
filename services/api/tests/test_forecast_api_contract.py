@@ -37,6 +37,9 @@ class FakeForecastService:
                 {
                     "id": FORECAST_ID,
                     "product_id": PRODUCT_ID,
+                    "product_sku": "ELEC-HEAD-001",
+                    "product_name": "Wireless Headphones",
+                    "product_category": "Electronics",
                     "forecast_period_start": "2026-01-01",
                     "forecast_period_end": "2026-01-31",
                     "predicted_quantity": 120.5,
@@ -61,6 +64,9 @@ class FakeForecastService:
         return {
             "id": FORECAST_ID,
             "product_id": PRODUCT_ID,
+            "product_sku": "ELEC-HEAD-001",
+            "product_name": "Wireless Headphones",
+            "product_category": "Electronics",
             "forecast_period_start": "2026-01-01",
             "forecast_period_end": "2026-01-31",
             "predicted_quantity": 120.5,
@@ -97,6 +103,8 @@ def test_forecasts_list_uses_stable_items_and_pagination_contract(monkeypatch) -
     assert body["pagination"] == {"limit": 5, "offset": 0, "total": 1}
     assert body["items"][0]["id"] == FORECAST_ID
     assert body["items"][0]["product_id"] == PRODUCT_ID
+    assert body["items"][0]["product_sku"] == "ELEC-HEAD-001"
+    assert body["items"][0]["product_name"] == "Wireless Headphones"
 
 
 def test_forecast_detail_returns_one_forecast(monkeypatch) -> None:
@@ -109,6 +117,7 @@ def test_forecast_detail_returns_one_forecast(monkeypatch) -> None:
 
     assert body["id"] == FORECAST_ID
     assert body["method"] == "seeded_demo"
+    assert body["product_sku"] == "ELEC-HEAD-001"
 
 
 def test_forecast_detail_returns_standard_404_error(monkeypatch) -> None:

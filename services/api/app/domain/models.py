@@ -322,6 +322,9 @@ class ForecastStatus(str, Enum):
 class Forecast(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
     product_id: UUID
+    product_sku: str | None = None
+    product_name: str | None = None
+    product_category: str | None = None
 
     forecast_period_start: date = Field(...)
     forecast_period_end: date = Field(...)

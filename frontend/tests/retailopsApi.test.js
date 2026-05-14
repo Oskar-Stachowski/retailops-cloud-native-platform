@@ -7,6 +7,7 @@ import {
   buildWorkflowMutationPath,
   createWorkflowIdempotencyKey,
   getProducts,
+  getForecasts,
   getProduct360,
   getLiveOperations,
   listFromKnownKeys,
@@ -187,6 +188,57 @@ test("getProducts forwards optional catalog query parameters", async () => {
   }
 });
 
+test("getForecasts forwards planning query parameters and pagination", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    const parsedUrl = new URL(url);
+    const offset = Number(parsedUrl.searchParams.get("offset"));
+    const limit = Number(parsedUrl.searchParams.get("limit"));
+    const items = Array.from({ length: offset === 100 ? 20 : limit }, (_, index) => ({
+      id: `forecast-${offset + index + 1}`,
+      product_sku: "ELEC-HEAD-001",
+      product_name: "Wireless Headphones",
+    }));
+
+    return new Response(
+      JSON.stringify({
+        items,
+        pagination: { total: 120, limit, offset },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const forecasts = await getForecasts({
+      baseUrl: "http://localhost:8000",
+      status: "generated",
+      method: "retailops-baseline-demand-model",
+      sortBy: "generated_at",
+      sortOrder: "desc",
+      limit: 100,
+      maxItems: 200,
+    });
+
+    assert.equal(forecasts.length, 120);
+    assert.equal(
+      requestedUrls[0],
+      "http://localhost:8000/forecasts?status=generated&method=retailops-baseline-demand-model&sort_by=generated_at&sort_order=desc&limit=100&offset=0",
+    );
+    assert.equal(
+      requestedUrls[1],
+      "http://localhost:8000/forecasts?status=generated&method=retailops-baseline-demand-model&sort_by=generated_at&sort_order=desc&limit=100&offset=100",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
 
 test("getLiveOperations calls the live operations backend endpoint", async () => {
   const originalFetch = globalThis.fetch;
