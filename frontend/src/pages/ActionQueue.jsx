@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
@@ -38,6 +38,19 @@ const ACTION_LABELS = {
 
 const COMMENT_REQUIRED_ACTIONS = new Set(["dismiss", "reject"]);
 
+const QUEUE_TYPE_COPY = {
+  alert: {
+    label: "Alert",
+    groupTitle: "Alert decisions",
+    groupDescription: "Operational signals requiring acknowledgement or resolution.",
+  },
+  recommendation: {
+    label: "Recommendation",
+    groupTitle: "Recommendation decisions",
+    groupDescription: "Suggested commercial or inventory actions awaiting review.",
+  },
+};
+
 function firstPresent(row, keys, fallback = "—") {
   for (const key of keys) {
     const value = row?.[key];
@@ -74,56 +87,160 @@ function normalizeStatus(value, fallback) {
   return String(value || fallback || "open").toLowerCase();
 }
 
-function itemTitle(row) {
-  return firstPresent(
-    row,
-    [
-      "title",
-      "recommended_action",
-      "recommendation",
-      "message",
-      "description",
-      "name",
-      "action",
-    ],
-    "Operational action",
-  );
+function normalizeSearchText(row) {
+  return [
+    row?.title,
+    row?.recommended_action,
+    row?.recommendation,
+    row?.message,
+    row?.description,
+    row?.name,
+    row?.action,
+    row?.source,
+    row?.type,
+    row?.severity,
+    row?.priority,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 }
 
-function productReference(row) {
-  return firstPresent(row, ["sku", "product_sku", "product_name", "name", "product_id"]);
+function containsAny(text, terms) {
+  return terms.some((term) => text.includes(term));
+}
+
+function cleanActionText(value, fallback) {
+  const text = String(value || "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!text) {
+    return fallback;
+  }
+
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+}
+
+function productIdentity(row) {
+  const sku = firstPresent(row, ["sku", "product_sku"], "");
+  const name = firstPresent(row, ["product_name", "productName"], "");
+  const id = firstPresent(row, ["product_id", "productId"], "");
+
+  return {
+    sku,
+    name,
+    id,
+    display: sku || name || id || "—",
+  };
+}
+
+function alertTitle(alert) {
+  const searchText = normalizeSearchText(alert);
+
+  if (containsAny(searchText, ["sales drop", "revenue drop", "demand drop"])) {
+    return "Investigate sales drop";
+  }
+
+  if (containsAny(searchText, ["stale inventory", "slow moving", "stale stock"])) {
+    return "Review stale inventory";
+  }
+
+  if (containsAny(searchText, ["stockout", "stock out", "out of stock"])) {
+    return "Resolve stockout risk";
+  }
+
+  if (containsAny(searchText, ["overstock", "excess inventory"])) {
+    return "Review overstock exposure";
+  }
+
+  if (containsAny(searchText, ["price", "margin"])) {
+    return "Review pricing anomaly";
+  }
+
+  const source = humanizeToken(firstPresent(alert, ["source", "type"], "alert signal"));
+  return `Investigate ${source.toLowerCase()}`;
+}
+
+function recommendationTitle(recommendation) {
+  const searchText = normalizeSearchText(recommendation);
+
+  if (containsAny(searchText, ["replenish", "reorder", "stockout", "stock out"])) {
+    return "Approve replenish stock";
+  }
+
+  if (containsAny(searchText, ["price", "markdown", "margin"])) {
+    return "Review price recommendation";
+  }
+
+  if (containsAny(searchText, ["forecast", "demand"])) {
+    return "Review demand forecast action";
+  }
+
+  const recommendedAction = firstPresent(
+    recommendation,
+    ["recommended_action", "recommendation", "action", "title"],
+    "",
+  );
+
+  return cleanActionText(recommendedAction, "Review recommendation");
+}
+
+function queueDescription(item) {
+  const source = humanizeToken(item.sourceType, "Operations");
+  const product = item.queueProductDisplay && item.queueProductDisplay !== "—"
+    ? ` · ${item.queueProductDisplay}`
+    : "";
+  const standalone = !item.queueId && item.queueType === "alert" ? " · Standalone action" : "";
+
+  return `${source} signal${product}${standalone}`;
 }
 
 function buildActionQueue(data) {
-  const alerts = (data?.alerts || []).map((alert) => ({
-    ...alert,
-    queueType: "alert",
-    queueId: alert.alert_id || (alert.source === "alert" ? alert.id : null),
-    sourceId: alert.id,
-    sourceType: alert.source || "alert",
-    queueTitle: itemTitle(alert),
-    queueStatus: normalizeStatus(alert.status, "open"),
-    queuePriority: firstPresent(alert, ["severity", "priority"], "normal"),
-    queueProduct: productReference(alert),
-    queueUpdatedAt: firstPresent(alert, ["updated_at", "created_at", "detected_at"], null),
-  }));
+  const alerts = (data?.alerts || []).map((alert) => {
+    const product = productIdentity(alert);
 
-  const recommendations = (data?.recommendations || []).map((recommendation) => ({
-    ...recommendation,
-    queueType: "recommendation",
-    queueId: recommendation.id,
-    sourceId: recommendation.id,
-    sourceType: recommendation.source || "recommendation",
-    queueTitle: itemTitle(recommendation),
-    queueStatus: normalizeStatus(recommendation.status, "proposed"),
-    queuePriority: firstPresent(recommendation, ["priority", "severity"], "normal"),
-    queueProduct: productReference(recommendation),
-    queueUpdatedAt: firstPresent(
-      recommendation,
-      ["generated_at", "updated_at", "created_at"],
-      null,
-    ),
-  }));
+    return {
+      ...alert,
+      queueType: "alert",
+      queueId: alert.alert_id || (alert.source === "alert" ? alert.id : null),
+      sourceId: alert.id,
+      sourceType: alert.source || alert.type || "alert",
+      queueTitle: alertTitle(alert),
+      queueStatus: normalizeStatus(alert.status, "open"),
+      queuePriority: firstPresent(alert, ["severity", "priority"], "normal"),
+      queueProductDisplay: product.display,
+      queueUpdatedAt: firstPresent(alert, ["updated_at", "created_at", "detected_at"], null),
+      product_sku: product.sku,
+      product_name: product.name,
+      product_id: product.id,
+    };
+  });
+
+  const recommendations = (data?.recommendations || []).map((recommendation) => {
+    const product = productIdentity(recommendation);
+
+    return {
+      ...recommendation,
+      queueType: "recommendation",
+      queueId: recommendation.id,
+      sourceId: recommendation.id,
+      sourceType: recommendation.source || recommendation.type || "recommendation",
+      queueTitle: recommendationTitle(recommendation),
+      queueStatus: normalizeStatus(recommendation.status, "proposed"),
+      queuePriority: firstPresent(recommendation, ["priority", "severity"], "normal"),
+      queueProductDisplay: product.display,
+      queueUpdatedAt: firstPresent(
+        recommendation,
+        ["generated_at", "updated_at", "created_at"],
+        null,
+      ),
+      product_sku: product.sku,
+      product_name: product.name,
+      product_id: product.id,
+    };
+  });
 
   return [...alerts, ...recommendations].filter(
     (item) => item.sourceId && !TERMINAL_STATUSES.has(item.queueStatus),
@@ -158,6 +275,18 @@ function availableActions(item) {
   return [];
 }
 
+function actionVariant(action) {
+  if (["accept", "acknowledge", "resolve"].includes(action)) {
+    return "primary";
+  }
+
+  if (action === "reject") {
+    return "danger";
+  }
+
+  return "secondary";
+}
+
 function workflowErrorMessage(error, item) {
   if (error?.status === 404 && item.queueType === "recommendation") {
     return (
@@ -182,7 +311,7 @@ function actionUnavailableReason(item, canWriteWorkflow) {
   }
 
   if (!item.queueId && item.queueType === "alert") {
-    return "No linked alert";
+    return "Standalone action";
   }
 
   if (!availableActions(item).length) {
@@ -190,6 +319,16 @@ function actionUnavailableReason(item, canWriteWorkflow) {
   }
 
   return null;
+}
+
+function groupQueueItems(items) {
+  return ["alert", "recommendation"]
+    .map((type) => ({
+      type,
+      ...QUEUE_TYPE_COPY[type],
+      items: items.filter((item) => item.queueType === type),
+    }))
+    .filter((group) => group.items.length > 0);
 }
 
 export default function ActionQueue() {
@@ -205,6 +344,15 @@ export default function ActionQueue() {
   const [notice, setNotice] = useState(null);
   const [workflowAttemptIds, setWorkflowAttemptIds] = useState({});
 
+  const fetchQueueData = useCallback(
+  async (userId) =>
+    Promise.all([
+      getDashboardData({ userId }),
+      getCurrentUser({ userId }),
+    ]),
+  [],
+);
+
   const loadQueue = useCallback(async (
     userId = selectedUserId,
     { showLoading = true } = {},
@@ -218,10 +366,7 @@ export default function ActionQueue() {
     }
 
     try {
-      const [data, user] = await Promise.all([
-        getDashboardData({ userId }),
-        getCurrentUser({ userId }),
-      ]);
+      const [data, user] = await fetchQueueData(userId);
 
       setState({
         loading: false,
@@ -237,49 +382,51 @@ export default function ActionQueue() {
         user: null,
       });
     }
-  }, [selectedUserId]);
+  }, [fetchQueueData, selectedUserId]);
 
   useEffect(() => {
-    let isMounted = true;
+    let ignore = false;
 
-    async function loadInitialQueue() {
-      try {
-        const [data, user] = await Promise.all([
-          getDashboardData({ userId: selectedUserId }),
-          getCurrentUser({ userId: selectedUserId }),
-        ]);
-
-        if (isMounted) {
-          setState({
-            loading: false,
-            error: null,
-            data,
-            user,
-          });
+    fetchQueueData(selectedUserId)
+      .then(([data, user]) => {
+        if (ignore) {
+          return;
         }
-      } catch (error) {
-        if (isMounted) {
-          setState({
-            loading: false,
-            error,
-            data: null,
-            user: null,
-          });
-        }
-      }
-    }
 
-    loadInitialQueue();
+        setState({
+          loading: false,
+          error: null,
+          data,
+          user,
+        });
+      })
+      .catch((error) => {
+        if (ignore) {
+          return;
+        }
+
+        setState({
+          loading: false,
+          error,
+          data: null,
+          user: null,
+        });
+      });
 
     return () => {
-      isMounted = false;
+      ignore = true;
     };
-  }, [selectedUserId]);
+  }, [fetchQueueData, selectedUserId]);
 
   useEffect(() => subscribeDemoUserChanged(setSelectedUserId), []);
 
   const queueItems = useMemo(() => buildActionQueue(state.data), [state.data]);
+  const queueGroups = useMemo(() => groupQueueItems(queueItems), [queueItems]);
   const canWriteWorkflow = hasPermission(state.user, "workflow:write");
+  const alertCount = queueItems.filter((item) => item.queueType === "alert").length;
+  const recommendationCount = queueItems.filter(
+    (item) => item.queueType === "recommendation",
+  ).length;
   const highPriorityCount = queueItems.filter((item) =>
     ["critical", "high"].includes(String(item.queuePriority).toLowerCase()),
   ).length;
@@ -338,7 +485,7 @@ export default function ActionQueue() {
         tone: "success",
         message: `${ACTION_LABELS[action]} recorded for ${humanizeToken(item.queueType)}.`,
       });
-      await loadQueue(selectedUserId);
+      await loadQueue(selectedUserId, { showLoading: false });
     } catch (error) {
       setNotice({
         tone: "error",
@@ -370,7 +517,7 @@ export default function ActionQueue() {
       <PageHeader
         eyebrow="Workflow operations"
         title="Action queue"
-        description="Open alerts and recommendations are grouped into one operator queue with role-aware workflow actions."
+        description="Operational alerts and recommendations are grouped into a decision queue with role-aware, auditable workflow actions."
         className="action-queue-header"
         actions={
           <button
@@ -388,9 +535,23 @@ export default function ActionQueue() {
         <MetricCard
           label="Queue items"
           value={queueItems.length}
-          helper="Actionable alerts and recommendations"
+          helper="Pending workflow decisions"
           status={queueItems.length > 0 ? "Open" : "Clear"}
           tone={queueItems.length > 0 ? "warning" : "success"}
+        />
+        <MetricCard
+          label="Alert decisions"
+          value={alertCount}
+          helper="Operational signals requiring action"
+          status={alertCount > 0 ? "Open" : "Clear"}
+          tone={alertCount > 0 ? "warning" : "success"}
+        />
+        <MetricCard
+          label="Recommendations"
+          value={recommendationCount}
+          helper="Suggested commercial actions"
+          status={recommendationCount > 0 ? "Review" : "Clear"}
+          tone="neutral"
         />
         <MetricCard
           label="High priority"
@@ -408,95 +569,133 @@ export default function ActionQueue() {
         />
       </section>
 
-      <section className="action-queue-controls">
-        <label htmlFor="queue-comment">
-          Decision comment
-          <textarea
-            id="queue-comment"
-            value={comment}
-            onChange={(event) => setComment(event.target.value)}
-            placeholder="Required for reject and dismiss actions."
-            rows={3}
-          />
-        </label>
-        {notice ? (
-          <p className={`action-queue-notice action-queue-notice--${notice.tone}`}>
-            {notice.message}
-          </p>
-        ) : null}
-      </section>
-
-      <section className="table-card action-queue-table">
-        <header className="table-card__header">
-          <h2>Pending decisions</h2>
-          <p>
-            Actions are sent to workflow write endpoints using the
-            selected demo user.
-          </p>
-        </header>
-        {queueItems.length ? (
-          <div className="table-card__scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Type</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                  <th>Product</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {queueItems.map((item) => (
-                  <tr key={`${item.queueType}:${item.queueId}`}>
-                    <td>
-                      <strong>{item.queueTitle}</strong>
-                    </td>
-                    <td>{humanizeToken(item.queueType)}</td>
-                    <td>
-                      <StatusBadge status={item.queuePriority} />
-                    </td>
-                    <td>
-                      <StatusBadge status={item.queueStatus} />
-                    </td>
-                    <td><ProductReferenceCell row={item} /></td>
-                    <td>{formatDateTime(item.queueUpdatedAt)}</td>
-                    <td>
-                      <div className="action-button-group">
-                        {availableActions(item).map((action) => {
-                          const actionKey = `${item.queueType}:${item.queueId}:${action}`;
-                          return (
-                            <button
-                              className="inline-action"
-                              type="button"
-                              key={action}
-                              onClick={() => handleAction(item, action)}
-                              disabled={!canWriteWorkflow || activeAction === actionKey}
-                            >
-                              {activeAction === actionKey ? "Saving" : ACTION_LABELS[action]}
-                            </button>
-                          );
-                        })}
-                        {actionUnavailableReason(item, canWriteWorkflow) ? (
-                          <span className="action-queue-unavailable">
-                            {actionUnavailableReason(item, canWriteWorkflow)}
-                          </span>
-                        ) : null}
-                      </div>
-                    </td>
+      <section className="action-queue-workspace">
+        <section className="table-card action-queue-table">
+          <header className="table-card__header">
+            <h2>Pending decisions</h2>
+            <p>
+              Primary actions move work forward. Reject and dismiss actions require
+              a short decision comment.
+            </p>
+          </header>
+          {queueItems.length ? (
+            <div className="table-card__scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Product</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="action-queue-empty">
-            <h3>No pending workflow actions</h3>
-            <p>Dashboard endpoints did not return actionable alerts or recommendations.</p>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {queueGroups.map((group) => (
+                    <Fragment key={group.type}>
+                      <tr className="action-queue-group-row">
+                        <td colSpan="7">
+                          <strong>{group.groupTitle}</strong>
+                          <span>{group.groupDescription}</span>
+                        </td>
+                      </tr>
+                      {group.items.map((item) => (
+                        <tr key={`${item.queueType}:${item.queueId || item.sourceId}`}>
+                          <td>
+                            <span className="action-queue-item">
+                              <strong>{item.queueTitle}</strong>
+                              <span>{queueDescription(item)}</span>
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`queue-type-pill queue-type-pill--${item.queueType}`}>
+                              {QUEUE_TYPE_COPY[item.queueType]?.label || humanizeToken(item.queueType)}
+                            </span>
+                          </td>
+                          <td>
+                            <StatusBadge status={item.queuePriority} />
+                          </td>
+                          <td>
+                            <StatusBadge status={item.queueStatus} />
+                          </td>
+                          <td>
+                            <ProductReferenceCell row={item} />
+                          </td>
+                          <td>{formatDateTime(item.queueUpdatedAt)}</td>
+                          <td>
+                            <div className="action-button-group">
+                              {availableActions(item).map((action) => {
+                                const actionKey = `${item.queueType}:${item.queueId}:${action}`;
+                                const variant = actionVariant(action);
+
+                                return (
+                                  <button
+                                    className={`inline-action inline-action--${variant}`}
+                                    type="button"
+                                    key={action}
+                                    onClick={() => handleAction(item, action)}
+                                    disabled={!canWriteWorkflow || activeAction === actionKey}
+                                  >
+                                    {activeAction === actionKey ? "Saving" : ACTION_LABELS[action]}
+                                  </button>
+                                );
+                              })}
+                              {actionUnavailableReason(item, canWriteWorkflow) ? (
+                                <span className="action-queue-unavailable">
+                                  {actionUnavailableReason(item, canWriteWorkflow)}
+                                </span>
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="action-queue-empty">
+              <h3>No pending workflow actions</h3>
+              <p>
+                All actionable alerts and recommendations are resolved or the dashboard
+                endpoints did not return open workflow records.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <aside className="action-queue-side-panel" aria-label="Decision support">
+          <section className="action-queue-controls">
+            <label htmlFor="queue-comment">
+              Decision comment
+              <textarea
+                id="queue-comment"
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                placeholder="Required for Reject and Dismiss. Example: supplier stock checked, no action needed."
+                rows={4}
+              />
+            </label>
+            {notice ? (
+              <p className={`action-queue-notice action-queue-notice--${notice.tone}`}>
+                {notice.message}
+              </p>
+            ) : null}
+          </section>
+
+          <section className="action-queue-guidance">
+            <h3>Decision model</h3>
+            <ul>
+              <li><strong>Accept</strong> moves a recommendation forward.</li>
+              <li><strong>Acknowledge</strong> confirms alert ownership.</li>
+              <li><strong>Resolve</strong> closes completed operational work.</li>
+              <li><strong>Dismiss / Reject</strong> records a controlled no-go decision.</li>
+            </ul>
+          </section>
+        </aside>
       </section>
     </main>
   );

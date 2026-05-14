@@ -86,12 +86,27 @@
 }
 
 
-.action-queue-controls {
+.action-queue-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: 1rem;
+  align-items: start;
+}
+
+.action-queue-side-panel {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.action-queue-controls,
+.action-queue-guidance {
   display: grid;
   gap: 0.75rem;
   border: 1px solid #dbe4f0;
-  border-radius: 0.8rem;
+  border-radius: 1.1rem;
   background: #ffffff;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 0.06);
   padding: 1rem;
 }
 
@@ -104,18 +119,48 @@
 }
 
 .action-queue-controls textarea {
-  min-height: 82px;
+  min-height: 116px;
   resize: vertical;
   border: 1px solid #cbd5e1;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   color: #0f172a;
   font: inherit;
-  padding: 0.7rem 0.8rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.action-queue-controls textarea:focus {
+  border-color: #93c5fd;
+  outline: 3px solid #dbeafe;
+}
+
+.action-queue-guidance h3,
+.action-queue-guidance ul {
+  margin: 0;
+}
+
+.action-queue-guidance h3 {
+  color: #0f172a;
+  font-size: var(--api-type-card-title);
+  font-weight: 900;
+}
+
+.action-queue-guidance ul {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.1rem;
+  color: #64748b;
+  font-size: var(--api-type-card-copy);
+  line-height: 1.45;
+}
+
+.action-queue-guidance strong {
+  color: #0f172a;
 }
 
 .action-queue-notice {
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-weight: 800;
+  line-height: 1.4;
   padding: 0.75rem 0.9rem;
 }
 
@@ -133,6 +178,61 @@
   color: #0f172a;
 }
 
+.action-queue-item {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 220px;
+}
+
+.action-queue-item span {
+  color: #64748b;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.action-queue-group-row td {
+  background: #f8fafc;
+  border-top: 1px solid #dbe4f0;
+  padding-block: 0.7rem;
+}
+
+.action-queue-group-row strong,
+.action-queue-group-row span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.action-queue-group-row strong {
+  color: #0f172a;
+  font-size: 0.9rem;
+  margin-right: 0.55rem;
+}
+
+.action-queue-group-row span {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.queue-type-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 0.28rem 0.62rem;
+}
+
+.queue-type-pill--alert {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.queue-type-pill--recommendation {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
 .action-button-group {
   display: flex;
   flex-wrap: wrap;
@@ -142,8 +242,38 @@
 
 .action-button-group .inline-action {
   min-height: 36px;
-  border-radius: 0.45rem;
-  padding: 0.45rem 0.65rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.72rem;
+}
+
+.action-button-group .inline-action--primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.action-button-group .inline-action--primary:hover {
+  background: #1d4ed8;
+}
+
+.action-button-group .inline-action--secondary {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.action-button-group .inline-action--secondary:hover {
+  background: #f8fafc;
+}
+
+.action-button-group .inline-action--danger {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+}
+
+.action-button-group .inline-action--danger:hover {
+  background: #ffe4e6;
 }
 
 .action-button-group .inline-action:disabled,
@@ -155,13 +285,13 @@
 .action-queue-unavailable {
   align-items: center;
   border: 1px solid #e2e8f0;
-  border-radius: 0.45rem;
+  border-radius: 999px;
   color: #64748b;
   display: inline-flex;
   font-size: 0.78rem;
   font-weight: 800;
   min-height: 36px;
-  padding: 0.45rem 0.65rem;
+  padding: 0.45rem 0.72rem;
 }
 
 .action-queue-empty {
@@ -178,6 +308,17 @@
 .action-queue-empty p {
   color: #64748b;
 }
+
+@media (max-width: 1120px) {
+  .action-queue-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .action-queue-side-panel {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
 
 .live-ops-controls label {
   display: grid;
