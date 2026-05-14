@@ -3,6 +3,7 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import { getForecasts } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
 
@@ -126,23 +127,28 @@ export default function Forecasts() {
   }, []);
 
   if (state.loading) {
-    return <LoadingState title="Loading forecasts" />;
+    return (
+      <main className="api-page">
+        <LoadingState title="Loading forecasts" />
+      </main>
+    );
   }
 
   if (state.error) {
-    return <ErrorState message={state.error.message} onRetry={handleRetry} />;
+    return (
+      <main className="api-page">
+        <ErrorState message={state.error.message} onRetry={handleRetry} />
+      </main>
+    );
   }
 
   return (
     <main className="api-page">
-      <header className="api-page__header">
-        <p className="eyebrow">Forecasts API</p>
-        <h1>Demand forecast foundation</h1>
-        <p>
-          Forecast records are loaded from the backend `/forecasts` endpoint and
-          support inventory planning evidence.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Forecasts API"
+        title="Demand forecast foundation"
+        description="Forecast records are loaded from the backend `/forecasts` endpoint and support inventory planning evidence."
+      />
 
       <section className="metrics-grid">
         <MetricCard

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import PageHeader from "../components/PageHeader";
 import RoleGuard from "../components/auth/RoleGuard.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import { EXTENDED_API_TIMEOUT_MS } from "../services/apiClient.js";
@@ -27,14 +28,11 @@ async function safeRequest(request) {
 function AdminContent({ statusCards, permissions, user }) {
   return (
     <main className="api-page">
-      <section className="api-hero compact">
-        <p className="eyebrow">Platform administration</p>
-        <h1>Admin</h1>
-        <p>
-          Admin view now combines platform health, selected demo identity and
-          permission visibility. It remains local-first and mock-auth only.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Platform administration"
+        title="Admin"
+        description="Admin view combines platform health, selected demo identity and permission visibility. It remains local-first and mock-auth only."
+      />
 
       <section className="identity-panel">
         <div>
@@ -109,10 +107,11 @@ function Admin() {
   if (!state.user) {
     return (
       <main className="api-page">
-        <section className="api-hero compact">
-          <p className="eyebrow">Platform administration</p>
-          <h1>Loading admin context</h1>
-        </section>
+        <PageHeader
+          eyebrow="Platform administration"
+          title="Loading admin context"
+          description="Fetching selected demo identity, permissions and platform health."
+        />
       </main>
     );
   }

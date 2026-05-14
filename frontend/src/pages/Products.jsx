@@ -4,6 +4,7 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import { getProducts } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
@@ -123,11 +124,19 @@ export default function Products() {
   }, []);
 
   if (state.loading) {
-    return <LoadingState title="Loading products" />;
+    return (
+      <main className="api-page">
+        <LoadingState title="Loading products" />
+      </main>
+    );
   }
 
   if (state.error) {
-    return <ErrorState message={state.error.message} onRetry={handleRetry} />;
+    return (
+      <main className="api-page">
+        <ErrorState message={state.error.message} onRetry={handleRetry} />
+      </main>
+    );
   }
 
   const activeCount = state.products.filter(
@@ -136,14 +145,11 @@ export default function Products() {
 
   return (
     <main className="api-page">
-      <header className="api-page__header">
-        <p className="eyebrow">Products API</p>
-        <h1>Product catalog</h1>
-        <p>
-          Product data is loaded from the backend `/products` endpoint. This page
-          no longer uses local mock data.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Products API"
+        title="Product catalog"
+        description="Product data is loaded from the backend `/products` endpoint. This page no longer uses local mock data."
+      />
 
       <section className="metrics-grid">
         <MetricCard

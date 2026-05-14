@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import {
   applyAlertWorkflowAction,
@@ -348,33 +349,39 @@ export default function ActionQueue() {
   }
 
   if (state.loading && !state.data) {
-    return <LoadingState title="Loading action queue" />;
+    return (
+      <main className="api-page action-queue-page">
+        <LoadingState title="Loading action queue" />
+      </main>
+    );
   }
 
   if (state.error && !state.data) {
-    return <ErrorState message={state.error.message} onRetry={() => loadQueue()} />;
+    return (
+      <main className="api-page action-queue-page">
+        <ErrorState message={state.error.message} onRetry={() => loadQueue()} />
+      </main>
+    );
   }
 
   return (
     <main className="api-page action-queue-page">
-      <header className="api-page__header action-queue-header">
-        <div>
-          <p className="eyebrow">Workflow operations</p>
-          <h1>Action queue</h1>
-          <p>
-            Open alerts and recommendations are grouped into one operator queue
-            with role-aware workflow actions.
-          </p>
-        </div>
-        <button
-          className="secondary-button"
-          type="button"
-          onClick={() => loadQueue()}
-          disabled={state.loading}
-        >
-          Refresh
-        </button>
-      </header>
+      <PageHeader
+        eyebrow="Workflow operations"
+        title="Action queue"
+        description="Open alerts and recommendations are grouped into one operator queue with role-aware workflow actions."
+        className="action-queue-header"
+        actions={
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={() => loadQueue()}
+            disabled={state.loading}
+          >
+            Refresh
+          </button>
+        }
+      />
 
       <section className="metrics-grid" aria-label="Action queue summary">
         <MetricCard

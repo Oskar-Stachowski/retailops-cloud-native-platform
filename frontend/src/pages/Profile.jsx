@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
+import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge.jsx";
 import {
   getCurrentPermissions,
@@ -78,21 +79,22 @@ function Profile() {
   if (!state.user) {
     return (
       <main className="api-page">
-        <section className="api-hero compact">
-          <p className="eyebrow">User profile</p>
-          <h1>Loading profile</h1>
-        </section>
+        <PageHeader
+          eyebrow="User profile"
+          title="Loading profile"
+          description="Fetching selected demo identity and notification context."
+        />
       </main>
     );
   }
 
   return (
     <main className="api-page">
-      <section className="api-hero compact">
-        <p className="eyebrow">Local demo identity</p>
-        <h1>{state.user.display_name}</h1>
-        <p>{state.user.email}</p>
-      </section>
+      <PageHeader
+        eyebrow="Local demo identity"
+        title={state.user.display_name}
+        description={state.user.email}
+      />
 
       <section className="identity-panel">
         <div>
@@ -112,7 +114,7 @@ function Profile() {
       </section>
 
       <section className="table-card">
-        <header>
+        <header className="table-card__header">
           <h2>Notifications</h2>
           <p>Local mock notifications visible to the selected demo user.</p>
         </header>

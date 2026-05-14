@@ -3,6 +3,7 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import { getLiveOperations } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
@@ -251,11 +252,19 @@ export default function LiveOperations() {
   );
 
   if (state.loading) {
-    return <LoadingState title="Loading live operations" />;
+    return (
+      <main className="api-page live-operations-page">
+        <LoadingState title="Loading live operations" />
+      </main>
+    );
   }
 
   if (state.error && !state.data) {
-    return <ErrorState message={state.error.message} onRetry={handleRefresh} />;
+    return (
+      <main className="api-page live-operations-page">
+        <ErrorState message={state.error.message} onRetry={handleRefresh} />
+      </main>
+    );
   }
 
   const data = state.data || {};
@@ -266,35 +275,32 @@ export default function LiveOperations() {
 
   return (
     <main className="api-page live-operations-page">
-      <header className="api-page__header live-operations-header">
-        <div>
-          <p className="eyebrow">Real-time analysis</p>
-          <h1>Live operations</h1>
-          <p>
-            Real-time sales, event processing and stream health from the
-            persisted live metrics read model.
-          </p>
-        </div>
-
-        <div className="live-ops-controls" aria-label="Live operations controls">
-          <label>
-            Window
-            <select
-              value={windowMinutes}
-              onChange={(event) => setWindowMinutes(Number(event.target.value))}
-            >
-              {WINDOW_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option} min
-                </option>
-              ))}
-            </select>
-          </label>
-          <button className="secondary-button" type="button" onClick={handleRefresh}>
-            Refresh
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Real-time analysis"
+        title="Live operations"
+        description="Real-time sales, event processing and stream health from the persisted live metrics read model."
+        className="live-operations-header"
+        actions={
+          <div className="live-ops-controls" aria-label="Live operations controls">
+            <label>
+              Window
+              <select
+                value={windowMinutes}
+                onChange={(event) => setWindowMinutes(Number(event.target.value))}
+              >
+                {WINDOW_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option} min
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button className="secondary-button" type="button" onClick={handleRefresh}>
+              Refresh
+            </button>
+          </div>
+        }
+      />
 
       {state.error ? (
         <section className="state-card state-card--error">

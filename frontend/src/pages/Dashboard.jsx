@@ -3,6 +3,7 @@ import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
 import { getDashboardData, normalizeRiskStatus } from "../services/retailopsApi";
 import "../styles/api-connected-ui.css";
@@ -408,11 +409,19 @@ export default function Dashboard() {
   }, []);
 
   if (state.loading) {
-    return <LoadingState title="Loading RetailOps dashboard" />;
+    return (
+      <main className="api-page">
+        <LoadingState title="Loading RetailOps dashboard" />
+      </main>
+    );
   }
 
   if (state.error) {
-    return <ErrorState message={state.error.message} onRetry={handleRetry} />;
+    return (
+      <main className="api-page">
+        <ErrorState message={state.error.message} onRetry={handleRetry} />
+      </main>
+    );
   }
 
   const {
@@ -431,15 +440,11 @@ export default function Dashboard() {
 
   return (
     <main className="api-page">
-      <header className="api-page__header">
-        <p className="eyebrow">Operations view</p>
-        <h1>Retail operations dashboard</h1>
-        <p>
-          This view connects the business dashboard to live FastAPI endpoints:
-          KPI summary, sales trend, alerts, recommendations, open work items,
-          stock-risk summary, products and forecasts.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Operations view"
+        title="Retail operations dashboard"
+        description="This view connects the business dashboard to live FastAPI endpoints: KPI summary, sales trend, alerts, recommendations, open work items, stock-risk summary, products and forecasts."
+      />
 
       <section className="metrics-grid" aria-label="Dashboard metrics">
         <MetricCard
