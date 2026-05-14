@@ -273,78 +273,134 @@ const workItemColumns = [
   },
 ];
 
-function SourceCard({ name, source }) {
-  const safeSource = source || {
-    ok: false,
-    label: "unavailable",
-    path: "not configured",
-    message: "Frontend source was not configured.",
-  };
+const SOURCE_DEFINITIONS = [
+  ["health", "API health"],
+  ["readiness", "Readiness"],
+  ["dashboardSummary", "Dashboard summary"],
+  ["operationalVisibility", "Operational visibility"],
+  ["salesTrend", "Sales trend"],
+  ["alerts", "Alerts"],
+  ["recommendations", "Recommendations"],
+  ["openWorkItems", "Open work items"],
+  ["stockRiskSummary", "Stock-risk summary"],
+  ["products", "Products"],
+  ["forecasts", "Forecasts"],
+  ["stockRisks", "Stock risks"],
+];
 
+function sourceEntries(sourceStatus) {
+  return SOURCE_DEFINITIONS.map(([key, label]) => {
+    const source = sourceStatus?.[key] || {};
+
+    return {
+      key,
+      label,
+      ok: Boolean(source.ok),
+      statusLabel: source.label || (source.ok ? "connected" : "unavailable"),
+      path: source.path || "not configured",
+    };
+  });
+}
+
+function DashboardSection({ eyebrow, title, description, children }) {
   return (
-    <article className="source-card">
-      <strong>{name}</strong>
-      <StatusBadge status={safeSource.ok ? "connected" : "unavailable"}>
-        {safeSource.label}
-      </StatusBadge>
-      <code>{safeSource.path}</code>
-      <p>{safeSource.message}</p>
-    </article>
+    <section className="dashboard-section">
+      <header className="dashboard-section__header">
+        {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+        <h2>{title}</h2>
+        {description ? <p>{description}</p> : null}
+      </header>
+      {children}
+    </section>
   );
 }
 
-function ExecutiveSummary({ summary, operationalVisibility, fetchedAt }) {
+function PortfolioEvidenceBanner({
+  summary,
+  operationalVisibility,
+  sourceStatus,
+  fetchedAt,
+}) {
+  const entries = sourceEntries(sourceStatus);
+  const connectedCount = entries.filter((entry) => entry.ok).length;
+
   return (
-    <section className="api-page__section" aria-label="Executive summary">
-      <header className="section-heading">
-        <p className="eyebrow">Executive view</p>
-        <h2>Business decision snapshot</h2>
+    <section
+      className="dashboard-evidence-banner"
+      aria-label="Portfolio evidence summary"
+    >
+      <div className="dashboard-evidence-banner__copy">
+        <p className="eyebrow">Portfolio entry point</p>
+        <h2>Executive dashboard backed by live platform evidence</h2>
         <p>
-          This section translates backend signals into management-friendly
-          indicators: catalog coverage, demand planning, inventory risk and
-          open operational work.
+          This screen starts with business KPIs, then shows operational signals,
+          backend integration health and traceable records from the local FastAPI
+          platform.
         </p>
+      </div>
+
+      <dl className="dashboard-evidence-banner__facts">
+        <div>
+          <dt>Backend sources</dt>
+          <dd>
+            {connectedCount}/{entries.length}
+          </dd>
+        </div>
+        <div>
+          <dt>Operational state</dt>
+          <dd>{operationalVisibility.status || "Live API"}</dd>
+        </div>
+        <div>
+          <dt>Latest refresh</dt>
+          <dd>{formatDateTime(summary.lastRefreshAt || fetchedAt)}</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+function BackendIntegrationPanel({ sourceStatus }) {
+  const entries = sourceEntries(sourceStatus);
+  const connectedCount = entries.filter((entry) => entry.ok).length;
+  const allConnected = connectedCount === entries.length;
+
+  return (
+    <section
+      className="backend-evidence-panel"
+      aria-label="Backend integration status"
+    >
+      <header className="backend-evidence-panel__header">
+        <div>
+          <p className="eyebrow">Backend integration evidence</p>
+          <h2>Live FastAPI source status</h2>
+          <p>
+            Compact endpoint evidence replaces a wall of status cards while still
+            showing that dashboard data is coming from backend services.
+          </p>
+        </div>
+        <div className="backend-evidence-panel__summary">
+          <strong>
+            {connectedCount}/{entries.length}
+          </strong>
+          <StatusBadge status={allConnected ? "connected" : "warning"}>
+            {allConnected ? "Connected" : "Partial"}
+          </StatusBadge>
+        </div>
       </header>
 
-      <section className="metrics-grid">
-        <MetricCard
-          label="Risky products"
-          value={summary.riskyProducts}
-          helper="Products requiring inventory attention"
-          status={summary.riskyProducts > 0 ? "Risk" : "Clear"}
-          tone={summary.riskyProducts > 0 ? "danger" : "success"}
-        />
-        <MetricCard
-          label="Open alerts"
-          value={summary.openAlerts}
-          helper="Operational signals from dashboard API"
-          status={summary.openAlerts > 0 ? "Open" : "Clear"}
-          tone={summary.openAlerts > 0 ? "warning" : "success"}
-        />
-        <MetricCard
-          label="Recommendations"
-          value={summary.recommendationCount}
-          helper="Suggested actions available for review"
-          tone="neutral"
-        />
-        <MetricCard
-          label="Open work items"
-          value={summary.openWorkItems}
-          helper="Pending operational backlog"
-          status={summary.openWorkItems > 0 ? "Backlog" : "Clear"}
-          tone={summary.openWorkItems > 0 ? "warning" : "success"}
-        />
-        <MetricCard
-          label="Sales trend rows"
-          value={summary.salesTrendRecords}
-          helper="Backend trend points loaded"
-        />
-        <MetricCard
-          label="Last refresh"
-          value={formatDateTime(summary.lastRefreshAt || fetchedAt)}
-          helper={operationalVisibility.status || "Live local API evidence"}
-        />
-      </section>
+      <ul className="backend-evidence-list">
+        {entries.map((entry) => (
+          <li key={entry.key} className="backend-evidence-list__item">
+            <div>
+              <strong>{entry.label}</strong>
+              <code>{entry.path}</code>
+            </div>
+            <StatusBadge status={entry.ok ? "connected" : "unavailable"}>
+              {entry.statusLabel}
+            </StatusBadge>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -445,144 +501,206 @@ export default function Dashboard() {
   return (
     <main className="api-page">
       <PageHeader
-        eyebrow="Operations view"
-        title="Retail operations dashboard"
-        description="This view connects the business dashboard to live FastAPI endpoints: KPI summary, sales trend, alerts, recommendations, open work items, stock-risk summary, products and forecasts."
+        eyebrow="Operations command center"
+        title="RetailOps executive dashboard"
+        description="Portfolio entry point for the RetailOps platform: business KPIs first, operational signals second, and compact backend integration evidence behind the data."
       />
 
-      <section className="metrics-grid" aria-label="Dashboard metrics">
-        <MetricCard
-          label="Products"
-          value={summary.totalProducts}
-          helper="From products API or dashboard summary"
-          tone="neutral"
-        />
-        <MetricCard
-          label="Forecast records"
-          value={summary.forecastRecords}
-          helper="Demand planning coverage"
-        />
-        <MetricCard
-          label="Stockout risks"
-          value={summary.stockoutRisks}
-          helper="Inventory decision signal"
-          status="Risk"
-          tone="danger"
-        />
-        <MetricCard
-          label="Overstock risks"
-          value={summary.overstockRisks}
-          helper="Working capital signal"
-          status="Watch"
-          tone="warning"
-        />
-        <MetricCard
-          label="Open alerts"
-          value={summary.openAlerts}
-          helper="Operations backlog signal"
-          status={summary.openAlerts > 0 ? "Open" : "Clear"}
-          tone={summary.openAlerts > 0 ? "warning" : "success"}
-        />
-        <MetricCard
-          label="Recommendations"
-          value={summary.recommendationCount}
-          helper="Action guidance from dashboard API"
-          tone="neutral"
-        />
-      </section>
-
-      <ExecutiveSummary
+      <PortfolioEvidenceBanner
         summary={summary}
         operationalVisibility={operationalVisibility}
+        sourceStatus={sourceStatus}
         fetchedAt={fetchedAt}
       />
 
-      <section className="source-grid" aria-label="Backend source status">
-        <SourceCard name="Health" source={sourceStatus.health} />
-        <SourceCard name="Readiness" source={sourceStatus.readiness} />
-        <SourceCard name="Dashboard summary" source={sourceStatus.dashboardSummary} />
-        <SourceCard
-          name="Operational visibility"
-          source={sourceStatus.operationalVisibility}
+      <DashboardSection
+        eyebrow="Business KPIs"
+        title="Commercial and inventory health"
+        description="Top-level indicators for catalog coverage, demand planning, inventory risk and action guidance."
+      >
+        <section
+          className="metrics-grid dashboard-kpi-grid"
+          aria-label="Business KPI metrics"
+        >
+          <MetricCard
+            label="Products"
+            value={summary.totalProducts}
+            helper="Catalog records available through the products API"
+            tone="neutral"
+          />
+          <MetricCard
+            label="Forecast coverage"
+            value={summary.forecastRecords}
+            helper="Demand planning records available for review"
+            tone="neutral"
+          />
+          <MetricCard
+            label="Stockout risks"
+            value={summary.stockoutRisks}
+            helper="Inventory decision signal"
+            status="Risk"
+            tone="danger"
+          />
+          <MetricCard
+            label="Overstock risks"
+            value={summary.overstockRisks}
+            helper="Working capital signal"
+            status="Watch"
+            tone="warning"
+          />
+          <MetricCard
+            label="Open alerts"
+            value={summary.openAlerts}
+            helper="Operations backlog signal"
+            status={summary.openAlerts > 0 ? "Open" : "Clear"}
+            tone={summary.openAlerts > 0 ? "warning" : "success"}
+          />
+          <MetricCard
+            label="Recommendations"
+            value={summary.recommendationCount}
+            helper="Action guidance from dashboard API"
+            tone="neutral"
+          />
+        </section>
+      </DashboardSection>
+
+      <DashboardSection
+        eyebrow="Operational signals"
+        title="Decision queue summary"
+        description="Management-friendly indicators that connect backend signals with follow-up work."
+      >
+        <section
+          className="metrics-grid dashboard-signal-grid"
+          aria-label="Operational signal metrics"
+        >
+          <MetricCard
+            label="Risky products"
+            value={summary.riskyProducts}
+            helper="Products requiring inventory attention"
+            status={summary.riskyProducts > 0 ? "Risk" : "Clear"}
+            tone={summary.riskyProducts > 0 ? "danger" : "success"}
+          />
+          <MetricCard
+            label="Open work items"
+            value={summary.openWorkItems}
+            helper="Pending operational backlog"
+            status={summary.openWorkItems > 0 ? "Backlog" : "Clear"}
+            tone={summary.openWorkItems > 0 ? "warning" : "success"}
+          />
+          <MetricCard
+            label="Sales trend rows"
+            value={summary.salesTrendRecords}
+            helper="Backend trend points loaded"
+            tone="neutral"
+          />
+          <MetricCard
+            label="Last refresh"
+            value={formatDateTime(summary.lastRefreshAt || fetchedAt)}
+            helper={operationalVisibility.status || "Live local API evidence"}
+            tone="neutral"
+          />
+        </section>
+      </DashboardSection>
+
+      <BackendIntegrationPanel sourceStatus={sourceStatus} />
+
+      <DashboardSection
+        eyebrow="Tables / evidence"
+        title="Traceable records behind the dashboard"
+        description="Business tables remain available below the executive summary for reviewers who want to inspect the underlying records."
+      >
+        <DataTable
+          title="Sales trend"
+          description="Baseline sales trend evidence for management and commercial planning. In future sprints this can become a chart."
+          columns={salesTrendColumns}
+          rows={salesTrend.slice(0, 8)}
+          getRowKey={(row) =>
+            row.id || row.period || row.date || row.sales_date || row.bucket
+          }
+          emptyMessage="Sales trend endpoint returned no records. Check /dashboard/sales-trend."
         />
-        <SourceCard name="Sales trend" source={sourceStatus.salesTrend} />
-        <SourceCard name="Alerts" source={sourceStatus.alerts} />
-        <SourceCard name="Recommendations" source={sourceStatus.recommendations} />
-        <SourceCard name="Open work items" source={sourceStatus.openWorkItems} />
-        <SourceCard
-          name="Stock-risk summary"
-          source={sourceStatus.stockRiskSummary}
+
+        <DataTable
+          title="Operational alerts"
+          description="Alerts summarize signals that may require inventory, operations or commercial action."
+          columns={alertColumns}
+          rows={alerts.slice(0, 8)}
+          getRowKey={(row) =>
+            row.id ||
+            row.alert_id ||
+            `${row.title || row.message || "alert"}:${
+              row.detected_at || row.created_at || "na"
+            }`
+          }
+          emptyMessage="Dashboard alerts endpoint returned no records. No fake alert rows are displayed."
         />
-        <SourceCard name="Products" source={sourceStatus.products} />
-        <SourceCard name="Forecasts" source={sourceStatus.forecasts} />
-        <SourceCard name="Stock risks" source={sourceStatus.stockRisks} />
-      </section>
 
-      <DataTable
-        title="Sales trend"
-        description="Baseline sales trend evidence for management and commercial planning. In future sprints this can become a chart."
-        columns={salesTrendColumns}
-        rows={salesTrend.slice(0, 8)}
-        getRowKey={(row) => row.id || row.period || row.date || row.sales_date || row.bucket}
-        emptyMessage="Sales trend endpoint returned no records. Check /dashboard/sales-trend."
-      />
+        <DataTable
+          title="Top recommendations"
+          description="Recommendations show proposed actions before full workflow approval is implemented."
+          columns={recommendationColumns}
+          rows={recommendations.slice(0, 8)}
+          getRowKey={(row) =>
+            row.id ||
+            row.recommendation_id ||
+            `${row.title || row.recommended_action || "recommendation"}:${
+              row.generated_at || row.created_at || "na"
+            }`
+          }
+          emptyMessage="Dashboard recommendations endpoint returned no records. No local recommendation mocks are displayed."
+        />
 
-      <DataTable
-        title="Operational alerts"
-        description="Alerts summarize signals that may require inventory, operations or commercial action."
-        columns={alertColumns}
-        rows={alerts.slice(0, 8)}
-        getRowKey={(row) => row.id || row.alert_id || `${row.title || row.message || "alert"}:${row.detected_at || row.created_at || "na"}`}
-        emptyMessage="Dashboard alerts endpoint returned no records. No fake alert rows are displayed."
-      />
+        <DataTable
+          title="Open work items"
+          description="Open work items connect decision signals with operational follow-up."
+          columns={workItemColumns}
+          rows={openWorkItems.slice(0, 8)}
+          getRowKey={(row) =>
+            row.id ||
+            `${row.source || "work"}:${
+              row.title || row.message || row.name || "item"
+            }:${
+              row.updated_at || row.created_at || "na"
+            }`
+          }
+          emptyMessage="Open work items endpoint returned no records. Workflow actions remain future scope."
+        />
 
-      <DataTable
-        title="Top recommendations"
-        description="Recommendations show proposed actions before full workflow approval is implemented."
-        columns={recommendationColumns}
-        rows={recommendations.slice(0, 8)}
-        getRowKey={(row) => row.id || row.recommendation_id || `${row.title || row.recommended_action || "recommendation"}:${row.generated_at || row.created_at || "na"}`}
-        emptyMessage="Dashboard recommendations endpoint returned no records. No local recommendation mocks are displayed."
-      />
+        <DataTable
+          title="Stock risk signals"
+          description="Inventory risk data supports Operations and Inventory Planner decisions."
+          columns={riskColumns}
+          rows={stockRisks.slice(0, 8)}
+          getRowKey={(row) => row.id || row.product_id || row.sku}
+          emptyMessage="Stock risk endpoint is empty or not implemented yet. No mock risks are displayed."
+        />
 
-      <DataTable
-        title="Open work items"
-        description="Open work items connect decision signals with operational follow-up."
-        columns={workItemColumns}
-        rows={openWorkItems.slice(0, 8)}
-        getRowKey={(row) => row.id || `${row.source || "work"}:${row.title || row.message || row.name || "item"}:${row.updated_at || row.created_at || "na"}`}
-        emptyMessage="Open work items endpoint returned no records. Workflow actions remain future scope."
-      />
+        <DataTable
+          title="Forecast records"
+          description={
+            `Latest frontend refresh: ${formatDateTime(fetchedAt)}. ` +
+            `Backend data refresh: ${formatDateTime(summary.lastRefreshAt)}.`
+          }
+          columns={forecastColumns}
+          rows={forecasts.slice(0, 8)}
+          getRowKey={(row) =>
+            row.id ||
+            `${row.product_id || row.sku || "na"}:${
+              row.forecast_period_start || row.forecast_date || row.date || "na"
+            }`
+          }
+          emptyMessage="Forecast endpoint returned no records. Check seed data and /forecasts API response."
+        />
 
-      <DataTable
-        title="Stock risk signals"
-        description="Inventory risk data supports Operations and Inventory Planner decisions."
-        columns={riskColumns}
-        rows={stockRisks.slice(0, 8)}
-        getRowKey={(row) => row.id || row.product_id || row.sku}
-        emptyMessage="Stock risk endpoint is empty or not implemented yet. No mock risks are displayed."
-      />
-
-      <DataTable
-        title="Forecast records"
-        description={
-          `Latest frontend refresh: ${formatDateTime(fetchedAt)}. ` +
-          `Backend data refresh: ${formatDateTime(summary.lastRefreshAt)}.`
-        }
-        columns={forecastColumns}
-        rows={forecasts.slice(0, 8)}
-        getRowKey={(row) => row.id || `${row.product_id || row.sku || "na"}:${row.forecast_period_start || row.forecast_date || row.date || "na"}`}
-        emptyMessage="Forecast endpoint returned no records. Check seed data and /forecasts API response."
-      />
-
-      <DataTable
-        title="Products from backend"
-        description="Product records remain visible as traceability evidence for dashboard metrics."
-        columns={productColumns}
-        rows={products.slice(0, 8)}
-        getRowKey={(row) => row.id || row.sku}
-        emptyMessage="Products endpoint returned no records. Check seed data and /products API response."
-      />
+        <DataTable
+          title="Products from backend"
+          description="Product records remain visible as traceability evidence for dashboard metrics."
+          columns={productColumns}
+          rows={products.slice(0, 8)}
+          getRowKey={(row) => row.id || row.sku}
+          emptyMessage="Products endpoint returned no records. Check seed data and /products API response."
+        />
+      </DashboardSection>
     </main>
   );
 }
