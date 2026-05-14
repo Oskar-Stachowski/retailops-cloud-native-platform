@@ -1,7 +1,15 @@
 .api-page {
   display: grid;
   gap: 1.5rem;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
   padding: 2rem;
+}
+
+.api-page > * {
+  min-width: 0;
 }
 
 .api-page__header {
@@ -506,8 +514,9 @@ th {
   border: 1px solid #dbe4f0;
   border-radius: 1.5rem;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-  margin: 2rem auto;
-  max-width: 72rem;
+  margin: 2rem 0;
+  max-width: none;
+  width: 100%;
   padding: 2rem;
 }
 
@@ -536,8 +545,9 @@ th {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin: 1.5rem auto 2.5rem;
-  max-width: 72rem;
+  margin: 1.5rem 0 2.5rem;
+  max-width: none;
+  width: 100%;
 }
 
 .permission-pill {
@@ -638,8 +648,8 @@ th {
 
 .api-page {
   width: 100%;
-  max-width: 1480px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 }
 
 @media (max-width: 760px) {
@@ -654,6 +664,6 @@ th {
 
 @media (min-width: 1440px) {
   .api-page {
-    padding-inline: 3rem;
+    padding-inline: clamp(2rem, 2vw, 3rem);
   }
 }
