@@ -402,7 +402,7 @@ db-reset-seed-medium:
 	$(MAKE) api-seed-medium
 
 api-integration-test: api-install db-up data-generate api-migrate api-seed-demo
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
+	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
 
 check-k6:
 	@command -v "$(K6)" >/dev/null 2>&1 || { \
