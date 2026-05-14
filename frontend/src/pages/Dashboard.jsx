@@ -311,25 +311,28 @@ function ExecutiveSummary({ summary, operationalVisibility, fetchedAt }) {
           label="Risky products"
           value={summary.riskyProducts}
           helper="Products requiring inventory attention"
-          tone={summary.riskyProducts > 0 ? "risk" : "positive"}
+          status={summary.riskyProducts > 0 ? "Risk" : "Clear"}
+          tone={summary.riskyProducts > 0 ? "danger" : "success"}
         />
         <MetricCard
           label="Open alerts"
           value={summary.openAlerts}
           helper="Operational signals from dashboard API"
-          tone={summary.openAlerts > 0 ? "warning" : "positive"}
+          status={summary.openAlerts > 0 ? "Open" : "Clear"}
+          tone={summary.openAlerts > 0 ? "warning" : "success"}
         />
         <MetricCard
           label="Recommendations"
           value={summary.recommendationCount}
           helper="Suggested actions available for review"
-          tone="positive"
+          tone="neutral"
         />
         <MetricCard
           label="Open work items"
           value={summary.openWorkItems}
           helper="Pending operational backlog"
-          tone={summary.openWorkItems > 0 ? "warning" : "positive"}
+          status={summary.openWorkItems > 0 ? "Backlog" : "Clear"}
+          tone={summary.openWorkItems > 0 ? "warning" : "success"}
         />
         <MetricCard
           label="Sales trend rows"
@@ -452,7 +455,7 @@ export default function Dashboard() {
           label="Products"
           value={summary.totalProducts}
           helper="From products API or dashboard summary"
-          tone="positive"
+          tone="neutral"
         />
         <MetricCard
           label="Forecast records"
@@ -463,25 +466,28 @@ export default function Dashboard() {
           label="Stockout risks"
           value={summary.stockoutRisks}
           helper="Inventory decision signal"
-          tone="risk"
+          status="Risk"
+          tone="danger"
         />
         <MetricCard
           label="Overstock risks"
           value={summary.overstockRisks}
           helper="Working capital signal"
+          status="Watch"
           tone="warning"
         />
         <MetricCard
           label="Open alerts"
           value={summary.openAlerts}
           helper="Operations backlog signal"
-          tone={summary.openAlerts > 0 ? "warning" : "positive"}
+          status={summary.openAlerts > 0 ? "Open" : "Clear"}
+          tone={summary.openAlerts > 0 ? "warning" : "success"}
         />
         <MetricCard
           label="Recommendations"
           value={summary.recommendationCount}
           helper="Action guidance from dashboard API"
-          tone="positive"
+          tone="neutral"
         />
       </section>
 

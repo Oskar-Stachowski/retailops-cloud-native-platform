@@ -389,19 +389,22 @@ export default function ActionQueue() {
           label="Queue items"
           value={queueItems.length}
           helper="Actionable alerts and recommendations"
-          tone={queueItems.length > 0 ? "warning" : "positive"}
+          status={queueItems.length > 0 ? "Open" : "Clear"}
+          tone={queueItems.length > 0 ? "warning" : "success"}
         />
         <MetricCard
           label="High priority"
           value={highPriorityCount}
           helper="Critical and high-severity records"
-          tone={highPriorityCount > 0 ? "risk" : "positive"}
+          status={highPriorityCount > 0 ? "High" : "Clear"}
+          tone={highPriorityCount > 0 ? "danger" : "success"}
         />
         <MetricCard
           label="Workflow access"
           value={canWriteWorkflow ? "Write" : "Read only"}
           helper={state.user?.display_name || selectedUserId}
-          tone={canWriteWorkflow ? "positive" : "warning"}
+          status={canWriteWorkflow ? "Enabled" : "Limited"}
+          tone={canWriteWorkflow ? "success" : "warning"}
         />
       </section>
 

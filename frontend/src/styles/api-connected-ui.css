@@ -228,9 +228,24 @@
 }
 
 .metric-card {
+  --metric-accent: #cbd5e1;
+  --metric-accent-soft: #f8fafc;
+  --metric-accent-text: #334155;
+
   display: grid;
-  gap: 0.4rem;
+  align-content: start;
+  gap: 0.42rem;
+  min-height: 8.4rem;
   padding: 1rem;
+  border-color: #e5e7eb;
+}
+
+.metric-card__topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 .metric-card__label,
@@ -240,24 +255,57 @@
   line-height: 1.45;
 }
 
+.metric-card__label {
+  overflow-wrap: anywhere;
+}
+
 .metric-card__value {
   color: #0f172a;
-  font-size: clamp(1.95rem, 2.6vw, 2.25rem);
+  font-size: clamp(1.9rem, 2.4vw, 2.2rem);
   font-weight: 900;
   letter-spacing: -0.04em;
-  line-height: 0.95;
+  line-height: 0.98;
 }
 
-.metric-card--risk {
-  border-color: #fed7aa;
+.metric-card__badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--metric-accent-soft);
+  color: var(--metric-accent-text);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1.15;
+  padding: 0.24rem 0.52rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
+.metric-card--success,
 .metric-card--positive {
-  border-color: #bbf7d0;
+  --metric-accent: #86efac;
+  --metric-accent-soft: #dcfce7;
+  --metric-accent-text: #166534;
 }
 
 .metric-card--warning {
-  border-color: #fde68a;
+  --metric-accent: #facc15;
+  --metric-accent-soft: #fef3c7;
+  --metric-accent-text: #92400e;
+}
+
+.metric-card--danger,
+.metric-card--risk {
+  --metric-accent: #fdba74;
+  --metric-accent-soft: #ffedd5;
+  --metric-accent-text: #9a3412;
+}
+
+.metric-card--success,
+.metric-card--warning,
+.metric-card--danger,
+.metric-card--positive,
+.metric-card--risk {
+  border-color: var(--metric-accent);
 }
 
 .state-card {

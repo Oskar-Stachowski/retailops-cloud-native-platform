@@ -157,13 +157,13 @@ export default function Products() {
           label="Products"
           value={state.products.length}
           helper="Rows returned by backend"
-          tone="positive"
+          tone="neutral"
         />
         <MetricCard
           label="Active"
           value={activeCount}
           helper="Status = active"
-          tone="positive"
+          tone="neutral"
         />
         <MetricCard
           label="Inactive / other"

@@ -62,10 +62,10 @@ function consumerTone(consumerStates) {
   }
 
   if (consumerStates.some((consumer) => Number(consumer.failed_events) > 0)) {
-    return "risk";
+    return "danger";
   }
 
-  return consumerStates.some((consumer) => consumer.running) ? "positive" : "warning";
+  return consumerStates.some((consumer) => consumer.running) ? "success" : "warning";
 }
 
 const eventColumns = [
@@ -320,7 +320,7 @@ export default function LiveOperations() {
           label="Revenue"
           value={formatNumber(metrics.revenue, { maximumFractionDigits: 2 })}
           helper={`${data.window_minutes || windowMinutes} minute window`}
-          tone="positive"
+          tone="neutral"
         />
         <MetricCard
           label="Units sold"
@@ -331,24 +331,28 @@ export default function LiveOperations() {
           label="Alerts"
           value={formatNumber(metrics.alerts_created)}
           helper={`${formatNumber(metrics.anomalies_detected)} anomalies detected`}
-          tone={Number(metrics.alerts_created) > 0 ? "warning" : "positive"}
+          status={Number(metrics.alerts_created) > 0 ? "Watch" : "Clear"}
+          tone={Number(metrics.alerts_created) > 0 ? "warning" : "success"}
         />
         <MetricCard
           label="Freshness"
           value={freshnessLabel(freshness)}
           helper={formatDateTime(freshness.latest_event_at)}
-          tone={freshness.is_fresh ? "positive" : "warning"}
+          status={freshness.is_fresh ? "Fresh" : "Stale"}
+          tone={freshness.is_fresh ? "success" : "warning"}
         />
         <MetricCard
           label="Failed events"
           value={formatNumber(statusCounts.failed_dead_lettered)}
           helper={`${formatNumber(statusCounts.processed)} processed`}
-          tone={Number(statusCounts.failed_dead_lettered) > 0 ? "risk" : "positive"}
+          status={Number(statusCounts.failed_dead_lettered) > 0 ? "Error" : "OK"}
+          tone={Number(statusCounts.failed_dead_lettered) > 0 ? "danger" : "success"}
         />
         <MetricCard
           label="Consumers"
           value={formatNumber(consumerStates.length)}
           helper={`Last refresh ${formatDateTime(state.fetchedAt)}`}
+          status={consumerStates.some((consumer) => consumer.running) ? "Running" : "Check"}
           tone={consumerTone(consumerStates)}
         />
       </section>

@@ -212,19 +212,21 @@ export default function Recommendations() {
           label="Recommendations"
           value={recommendations.length || summary.recommendationCount || 0}
           helper="Suggested actions from dashboard API"
-          tone="positive"
+          tone="neutral"
         />
         <MetricCard
           label="Open work items"
           value={openWorkItems.length || summary.openWorkItems || 0}
           helper="Follow-up actions available today"
-          tone={openWorkItems.length ? "warning" : "positive"}
+          status={openWorkItems.length ? "Open" : "Clear"}
+          tone={openWorkItems.length ? "warning" : "success"}
         />
         <MetricCard
           label="Related alerts"
           value={alerts.length || summary.openAlerts || 0}
           helper="Signals that may trigger recommendations"
-          tone={alerts.length ? "warning" : "positive"}
+          status={alerts.length ? "Watch" : "Clear"}
+          tone={alerts.length ? "warning" : "success"}
         />
         <MetricCard
           label="Approval queue"

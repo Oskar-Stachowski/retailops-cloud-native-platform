@@ -161,7 +161,7 @@ export default function Forecasts() {
           label="Covered products"
           value={countUniqueProducts(state.forecasts)}
           helper="Unique products with forecasts"
-          tone="positive"
+          tone="neutral"
         />
       </section>
 

@@ -216,19 +216,22 @@ export default function Anomalies() {
           label="Alert signals"
           value={alerts.length || summary.openAlerts || 0}
           helper="Loaded from dashboard alerts"
-          tone={alerts.length ? "warning" : "positive"}
+          status={alerts.length ? "Open" : "Clear"}
+          tone={alerts.length ? "warning" : "success"}
         />
         <MetricCard
           label="Stock-risk signals"
           value={stockRisks.length || summary.stockoutRisks || 0}
           helper="Inventory anomalies visible today"
-          tone={stockRisks.length ? "risk" : "positive"}
+          status={stockRisks.length ? "Risk" : "Clear"}
+          tone={stockRisks.length ? "danger" : "success"}
         />
         <MetricCard
           label="Open work items"
           value={summary.openWorkItems || 0}
           helper="Follow-up backlog from dashboard"
-          tone={summary.openWorkItems > 0 ? "warning" : "positive"}
+          status={summary.openWorkItems > 0 ? "Backlog" : "Clear"}
+          tone={summary.openWorkItems > 0 ? "warning" : "success"}
         />
         <MetricCard
           label="Dedicated queue"
