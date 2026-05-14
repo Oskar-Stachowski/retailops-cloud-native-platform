@@ -239,7 +239,7 @@ def test_alerts_have_matching_recommendations(database_url: str) -> None:
             OR a.alert_type NOT IN (
                 'stale_inventory',
                 'sales_drop',
-                'stockout_risk'
+                'stockout_risk',
                 'overstock_risk'
             )
             OR a.severity NOT IN ('low', 'medium', 'high', 'critical')
@@ -247,7 +247,8 @@ def test_alerts_have_matching_recommendations(database_url: str) -> None:
                 'open',
                 'acknowledged',
                 'in_progress',
-                'resolved'
+                'resolved',
+                'dismissed'
             )
             OR a.title = ''
             OR a.recommended_action = '';

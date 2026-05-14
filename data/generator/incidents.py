@@ -25,7 +25,7 @@ INCIDENT_SCENARIOS: list[dict[str, object]] = [
     {
         "sku": "HOME-FLOOR-001",
         "anomaly_type": "stale_inventory",
-        "alert_type": "stale_inventory",
+        "alert_type": "overstock_risk",
         "rationale": "stale_inventory",
         "severity": "medium",
         "metric_name": "days_of_supply",
@@ -59,7 +59,7 @@ INCIDENT_SCENARIOS: list[dict[str, object]] = [
     {
         "sku": "FASHION-JACKET-001",
         "anomaly_type": "sales_spike",
-        "alert_type": "stale_inventory",
+        "alert_type": "stockout_risk",
         "rationale": "stockout_risk",
         "severity": "critical",
         "metric_name": "on_hand_quantity",
@@ -100,6 +100,7 @@ def _assigned_to_user_id(
         "sales_spike": "category_manager",
         "stale_inventory": "inventory_planner",
         "stockout_risk": "inventory_planner",
+        "overstock_risk": "inventory_planner",
     }
 
     assigned_role = role_by_alert_type.get(alert_type, "analyst")

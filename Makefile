@@ -87,6 +87,15 @@ DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
 DATA_QUALITY_REPORT ?= $(DATA_OUTPUT_DIR)/quality_report.json
 DATA_MANIFEST_REPORT ?= $(DATA_OUTPUT_DIR)/dataset_manifest.json
 DATA_REALISM_REPORT ?= $(DATA_OUTPUT_DIR)/realism_report.json
+DATA_CONTRACT ?= data/contracts/retailops_seed_dataset.contract.json
+EVENT_CONTRACT ?= events/contracts/retailops-realtime-events.v1.contract.json
+DATA_CONTRACT_REPORT ?= $(DATA_REPORTS_DIR)/data-contract-report.json
+SCENARIO_COVERAGE_REPORT ?= $(DATA_REPORTS_DIR)/scenario-coverage-report.json
+SCENARIO_COVERAGE_MARKDOWN ?= docs/evidence/data/scenario-coverage-report.md
+DB_BACKUP_DIR ?= $(REPORTS_DIR)/db/backups
+DB_BACKUP_FILE ?=
+DB_SERVICE ?= db
+
 ML_FEATURE_PROFILE ?= small
 ML_FEATURE_OUTPUT_DIR ?= data/synthetic/$(ML_FEATURE_PROFILE)/features/demand_forecast
 ML_BASELINE_PROFILE ?= small
@@ -148,6 +157,10 @@ help:
 	@echo "  make ci-local             Run local preflight without full Compose smoke"
 	@echo "  make test                 Run backend and frontend tests"
 	@echo "  make data-quality         Generate synthetic data and validate quality report"
+	@echo "  make data-contracts       Validate demo CSVs and event schema against data contracts"
+	@echo "  make data-scenario-report Generate scenario coverage evidence"
+	@echo "  make db-backup            Create local PostgreSQL logical backup evidence"
+	@echo "  make db-restore           Restore local PostgreSQL backup evidence"
 	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
 	@echo "  make ml-trained           Train RandomForest demand forecasting model"
@@ -170,6 +183,7 @@ help:
 	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
 	@echo "  make api-seed             Seed demo data"
+	@echo "  make db-readiness-evidence Run data readiness evidence gates"
 	@echo ""
 	@echo "Frontend:"
 	@echo "  make frontend-install     Install frontend dependencies"
@@ -208,7 +222,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(REPORTS_DIR)/k8s"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -237,7 +251,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down check-k6 performance-smoke
+.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality data-contracts data-scenario-report scenario-coverage-report db-backup db-restore db-readiness-evidence ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down check-k6 performance-smoke
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -279,6 +293,27 @@ data-quality: api-install ensure-reports-dir
 	@echo "Data quality report: $(DATA_QUALITY_REPORT)"
 	@echo "Dataset manifest: $(DATA_MANIFEST_REPORT)"
 	@if [ -f "$(DATA_REALISM_REPORT)" ]; then echo "Realism report: $(DATA_REALISM_REPORT)"; fi
+
+data-contracts: api-install ensure-reports-dir
+	$(API_VENV_PYTHON) scripts/data/validate_data_contracts.py --contract "$(DATA_CONTRACT)" --data-dir data/demo --event-contract "$(EVENT_CONTRACT)" --report "$(DATA_CONTRACT_REPORT)"
+
+scenario-coverage-report: data-scenario-report
+
+data-scenario-report: api-install ensure-reports-dir
+	$(API_VENV_PYTHON) scripts/data/generate_scenario_coverage_report.py --data-dir data/demo --json-report "$(SCENARIO_COVERAGE_REPORT)" --markdown-report "$(SCENARIO_COVERAGE_MARKDOWN)"
+
+db-backup: ensure-reports-dir
+	BACKUP_DIR="$(DB_BACKUP_DIR)" DB_SERVICE="$(DB_SERVICE)" POSTGRES_USER="$(POSTGRES_USER)" POSTGRES_DB="$(POSTGRES_DB)" COMPOSE="$(COMPOSE)" scripts/db/backup.sh
+
+db-restore: ensure-reports-dir
+	@test -n "$(DB_BACKUP_FILE)" || { echo "ERROR: set DB_BACKUP_FILE=path/to/backup.dump"; exit 1; }
+	DB_SERVICE="$(DB_SERVICE)" POSTGRES_USER="$(POSTGRES_USER)" POSTGRES_DB="$(POSTGRES_DB)" COMPOSE="$(COMPOSE)" scripts/db/restore.sh "$(DB_BACKUP_FILE)"
+
+db-readiness-evidence: data-generate data-contracts data-scenario-report
+	@echo "DB readiness evidence generated:"
+	@echo "- $(DATA_CONTRACT_REPORT)"
+	@echo "- $(SCENARIO_COVERAGE_REPORT)"
+	@echo "- $(SCENARIO_COVERAGE_MARKDOWN)"
 
 ml-features: api-install
 	$(API_VENV_PYTHON) -m ml.features.demand_forecast --profile "$(ML_FEATURE_PROFILE)" --output-dir "$(ML_FEATURE_OUTPUT_DIR)"
@@ -325,7 +360,7 @@ ml-drift: api-install
 	@echo "Drift summary: $(ML_DRIFT_OUTPUT_DIR)/drift_summary.md"
 
 api-migrate: api-install
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/alembic -c alembic.ini upgrade head
 
 api-seed: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python scripts/seed_demo_data.py
@@ -372,7 +407,7 @@ frontend-build:
 
 test: api-test frontend-test
 
-ci-local: compose-config data-quality api-lint api-format-check api-type-check api-security-lint api-coverage frontend-test frontend-lint frontend-build
+ci-local: compose-config data-quality data-contracts data-scenario-report api-lint api-format-check api-type-check api-security-lint api-coverage frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
 
 # -------------------------------------------------------------------

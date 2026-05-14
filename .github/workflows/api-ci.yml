@@ -5,12 +5,16 @@ on:
     paths:
       - "services/api/**"
       - "data/**"
+      - "events/**"
+      - "scripts/data/**"
       - "pyproject.toml"
       - ".github/workflows/api-ci.yml"
   pull_request:
     paths:
       - "services/api/**"
       - "data/**"
+      - "events/**"
+      - "scripts/data/**"
       - "pyproject.toml"
       - ".github/workflows/api-ci.yml"
 
@@ -73,6 +77,10 @@ jobs:
 
       - name: Generate demo CSV dataset
         run: python -m data.generator.main
+        working-directory: .
+
+      - name: Validate data contracts and scenario coverage
+        run: make data-contracts data-scenario-report
         working-directory: .
 
       - name: Run database migrations

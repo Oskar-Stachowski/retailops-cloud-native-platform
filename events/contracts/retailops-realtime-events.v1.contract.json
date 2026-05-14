@@ -1,0 +1,50 @@
+{
+  "$schema": "https://retailops.local/contracts/realtime-event-envelope/v1",
+  "contract_name": "retailops_realtime_events",
+  "version": "1.0.0",
+  "status": "event-ready-design-gate",
+  "owner": "RetailOps platform",
+  "envelope": {
+    "required_fields": [
+      "event_id",
+      "event_type",
+      "topic",
+      "schema_version",
+      "source",
+      "correlation_id",
+      "occurred_at",
+      "ingested_at",
+      "payload"
+    ],
+    "idempotency_key": "event_id",
+    "ordering_hint": "occurred_at",
+    "payload_format": "json"
+  },
+  "supported_event_types": [
+    "order_created",
+    "sale_completed",
+    "stock_changed",
+    "inventory_snapshot_recorded",
+    "price_changed",
+    "promotion_started",
+    "promotion_ended",
+    "forecast_generated",
+    "anomaly_detected",
+    "alert_created",
+    "workflow_action_performed"
+  ],
+  "supported_topics": [
+    "retailops.orders.v1",
+    "retailops.sales.v1",
+    "retailops.inventory.v1",
+    "retailops.pricing.v1",
+    "retailops.ml.v1",
+    "retailops.operations.v1"
+  ],
+  "persistence": {
+    "event_log_table": "realtime_event_log",
+    "metric_observation_table": "live_metric_observations",
+    "consumer_state_table": "realtime_consumer_state"
+  },
+  "claim_boundary": "This contract supports event-ready design and local schema validation. It is not a claim that production CDC or a managed broker is already running."
+}
