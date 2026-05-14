@@ -48,3 +48,14 @@ def test_platform_admin_can_mark_notification_read() -> None:
     assert payload["notification"]["status"] == "read"
     assert payload["notification"]["read_at"] is not None
     assert payload["unread_count"] == before_payload["unread_count"] - 1
+
+
+def test_notifications_support_standard_pagination_metadata() -> None:
+    response = client.get("/notifications?user_id=platform-admin&limit=1&offset=1")
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert len(payload["items"]) == 1
+    assert payload["pagination"] == {"limit": 1, "offset": 1, "total": payload["total_count"]}
+    assert payload["total_count"] >= 3

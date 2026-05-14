@@ -28,6 +28,7 @@ SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
+PERFORMANCE_REPORTS_DIR ?= $(REPORTS_DIR)/performance
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
@@ -38,6 +39,10 @@ TFLINT ?= tflint
 CHECKOV ?= checkov
 MYPY ?= mypy
 BANDIT ?= bandit
+K6 ?= k6
+K6_API_SMOKE_SCRIPT ?= tests/performance/k6/api-smoke.js
+K6_API_SMOKE_TEXT_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke.txt
+K6_API_SMOKE_SUMMARY_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke-summary.json
 
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
@@ -161,6 +166,7 @@ help:
 	@echo "  make api-coverage         Run backend pytest with coverage gate"
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
+	@echo "  make performance-smoke    Run k6 API smoke baseline and save p95 evidence"
 	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
 	@echo "  make api-seed             Seed demo data"
@@ -202,7 +208,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(REPORTS_DIR)/k8s"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(REPORTS_DIR)/k8s"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -231,7 +237,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down
+.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down check-k6 performance-smoke
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -326,6 +332,22 @@ api-seed: api-install
 
 api-integration-test: api-install db-up data-generate api-migrate api-seed
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
+
+check-k6:
+	@command -v "$(K6)" >/dev/null 2>&1 || { \
+		echo "ERROR: k6 is not installed or not available in PATH."; \
+		echo "Install k6 first, then rerun make performance-smoke."; \
+		exit 1; \
+	}
+
+performance-smoke: check-k6 ensure-reports-dir
+	@set -o pipefail; \
+	API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
+	$(K6) run \
+		--summary-export "$(K6_API_SMOKE_SUMMARY_REPORT)" \
+		"$(K6_API_SMOKE_SCRIPT)" | tee "$(K6_API_SMOKE_TEXT_REPORT)"
+	@echo "k6 text report: $(K6_API_SMOKE_TEXT_REPORT)"
+	@echo "k6 summary report: $(K6_API_SMOKE_SUMMARY_REPORT)"
 
 # -------------------------------------------------------------------
 # Frontend

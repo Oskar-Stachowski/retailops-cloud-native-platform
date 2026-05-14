@@ -686,6 +686,7 @@ class NotificationListResponse(ApiBaseModel):
     """Response for GET /notifications."""
 
     items: list[NotificationResponse]
+    pagination: PaginationMetadata
     unread_count: int = Field(..., ge=0)
     total_count: int = Field(..., ge=0)
     user: DemoUserResponse
