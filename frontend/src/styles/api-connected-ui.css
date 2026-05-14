@@ -392,6 +392,13 @@
   color: #92400e;
 }
 
+.status-badge--proposed,
+.status-badge--planned,
+.status-badge--pending {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
 .table-card {
   overflow: hidden;
 }
@@ -439,12 +446,18 @@ th {
 
 .feature-boundary {
   display: grid;
-  gap: 0.75rem;
-  padding: 1.25rem;
+  gap: 1rem;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.feature-boundary__intro {
+  display: grid;
+  gap: 0.35rem;
 }
 
 .feature-boundary h2,
-.feature-boundary p {
+.feature-boundary p,
+.feature-boundary ul {
   margin: 0;
 }
 
@@ -455,17 +468,52 @@ th {
   line-height: 1.1;
 }
 
-.feature-boundary p,
-.feature-boundary__next span {
-  color: #64748b;
+.feature-boundary__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.feature-boundary__next {
+.feature-boundary__card {
   display: grid;
-  gap: 0.25rem;
-  border-radius: 0.9rem;
+  align-content: start;
+  gap: 0.75rem;
+  min-height: 100%;
+  border: 1px solid #dbe4f0;
+  border-radius: 1rem;
   background: #f8fafc;
   padding: 1rem;
+}
+
+.feature-boundary__card--planned {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.feature-boundary__card span {
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.feature-boundary p,
+.feature-boundary li {
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.feature-boundary ul {
+  display: grid;
+  gap: 0.45rem;
+  padding-left: 1rem;
+}
+
+@media (max-width: 900px) {
+  .feature-boundary__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @keyframes spin {
