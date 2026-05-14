@@ -146,6 +146,48 @@ test("getProducts follows backend pagination until all product rows are loaded",
   }
 });
 
+test("getProducts forwards optional catalog query parameters", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+
+    return new Response(
+      JSON.stringify({
+        items: [{ id: 1, sku: "ELEC-HEAD-001" }],
+        pagination: { total: 1, limit: 50, offset: 0 },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const products = await getProducts({
+      baseUrl: "http://localhost:8000",
+      search: "head",
+      category: "Electronics",
+      status: "active",
+      sortBy: "updated_at",
+      sortOrder: "desc",
+      limit: 50,
+      maxItems: 50,
+    });
+
+    assert.deepEqual(products, [{ id: 1, sku: "ELEC-HEAD-001" }]);
+    assert.equal(
+      requestedUrls[0],
+      "http://localhost:8000/products?search=head&category=Electronics&status=active&sort_by=updated_at&sort_order=desc&limit=50&offset=0",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
 test("getLiveOperations calls the live operations backend endpoint", async () => {
   const originalFetch = globalThis.fetch;
   const requestedUrls = [];

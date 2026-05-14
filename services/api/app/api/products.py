@@ -18,6 +18,7 @@ class ProductSortBy(str, Enum):
     category = "category"
     status = "status"
     created_at = "created_at"
+    updated_at = "updated_at"
 
 
 class SortOrder(str, Enum):
@@ -43,7 +44,7 @@ def list_products(
     ] = None,
     search: Annotated[
         str | None,
-        Query(min_length=1, description="Search in SKU, name or category."),
+        Query(min_length=1, description="Search in SKU, name, brand or category."),
     ] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,

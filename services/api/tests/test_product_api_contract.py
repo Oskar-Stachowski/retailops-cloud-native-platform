@@ -112,3 +112,53 @@ def test_product_detail_returns_standard_404_error(monkeypatch) -> None:
             "message": "Resource not found",
         },
     }
+
+
+def test_products_list_accepts_updated_at_sort(monkeypatch) -> None:
+    class UpdatedSortProductService:
+        def list_products_response(
+            self,
+            category=None,
+            status=None,
+            search=None,
+            limit=50,
+            offset=0,
+            sort_by="sku",
+            sort_order="asc",
+        ):
+            assert category is None
+            assert status is None
+            assert search is None
+            assert limit == 50
+            assert offset == 0
+            assert sort_by == "updated_at"
+            assert sort_order == "desc"
+
+            return {
+                "items": [],
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset,
+                    "total": 0,
+                },
+            }
+
+    monkeypatch.setattr("app.api.products.product_service", UpdatedSortProductService())
+
+    response = client.get(
+        "/products",
+        params={
+            "sort_by": "updated_at",
+            "sort_order": "desc",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [],
+        "pagination": {
+            "limit": 50,
+            "offset": 0,
+            "total": 0,
+        },
+    }

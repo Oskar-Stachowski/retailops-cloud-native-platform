@@ -322,8 +322,35 @@ export async function getReadinessStatus(options = {}) {
   return apiGetOptional(ENDPOINTS.readiness, options);
 }
 
+function buildProductListParams(options = {}) {
+  return {
+    search: options.search,
+    category: options.category,
+    status: options.status,
+    sort_by: options.sortBy || options.sort_by,
+    sort_order: options.sortOrder || options.sort_order,
+  };
+}
+
+function buildProductRequestOptions(options = {}) {
+  return {
+    baseUrl: options.baseUrl,
+    timeoutMs: options.timeoutMs,
+    signal: options.signal,
+    headers: options.headers,
+  };
+}
+
 export async function getProducts(options = {}) {
-  return getPaginatedItems(ENDPOINTS.products[0], options);
+  return getPaginatedItems(
+    ENDPOINTS.products[0],
+    buildProductRequestOptions(options),
+    {
+      limit: options.limit || 100,
+      maxItems: options.maxItems || 2_000,
+      params: buildProductListParams(options),
+    },
+  );
 }
 
 export async function getProduct360(productId, options = {}) {

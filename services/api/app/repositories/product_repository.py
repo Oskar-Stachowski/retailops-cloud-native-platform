@@ -22,6 +22,7 @@ class ProductRepository:
         "category": "category",
         "status": "status",
         "created_at": "created_at",
+        "updated_at": "updated_at",
     }
 
     def __init__(self, connection: object | None = None) -> None:
@@ -77,11 +78,12 @@ class ProductRepository:
                 "("
                 "LOWER(sku) LIKE LOWER(%s) OR "
                 "LOWER(name) LIKE LOWER(%s) OR "
+                "LOWER(COALESCE(brand, '')) LIKE LOWER(%s) OR "
                 "LOWER(COALESCE(category, '')) LIKE LOWER(%s)"
                 ")",
             )
             pattern = f"%{search.strip()}%"
-            params.extend([pattern, pattern, pattern])
+            params.extend([pattern, pattern, pattern, pattern])
 
         if not filters:
             return "", params
