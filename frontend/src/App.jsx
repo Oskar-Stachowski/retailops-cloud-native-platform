@@ -9,8 +9,9 @@ function App() {
 
       <Outlet />
 
-      <footer className="footer" id="about">
+      <footer className="footer" id="about" aria-label="RetailOps platform footer">
         <span>⚛️ React + Vite</span>
+        <span>🔌 API connected</span>
         <span>🐳 Docker Compose ready</span>
         <span>RetailOps operator dashboard</span>
       </footer>
