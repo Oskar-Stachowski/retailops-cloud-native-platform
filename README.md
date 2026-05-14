@@ -255,7 +255,13 @@ You can optionally adjust ports and database credentials in `.env`.
 ### ▶️ Run the full stack
 
 ```bash
-docker compose up --build
+make compose-up
+```
+
+Equivalent direct Docker Compose command:
+
+```bash
+COMPOSE_PROFILES=dev,observability docker compose up --build -d
 ```
 
 ### Docker Compose Local Runtime
@@ -270,7 +276,7 @@ Redpanda -> local real-time event topics
 Run the stack in the background:
 
 ```bash
-docker compose up --build -d
+make compose-up
 ```
 
 Verify the full runtime:
@@ -287,8 +293,16 @@ health and stream alert rules.
 For a faster check against an already running stack:
 
 ```bash
-./scripts/ci/compose_smoke.sh
+make compose-smoke
 make streaming-smoke
+make observability-smoke
+```
+
+Validate profile rendering and non-root runtime evidence:
+
+```bash
+make compose-profile-config
+make docker-runtime-evidence
 ```
 
 Useful URLs:
@@ -299,6 +313,8 @@ Useful URLs:
 * Frontend API proxy: http://localhost:3000/api/health
 * Redpanda Kafka API: localhost:19092
 * Redpanda Admin API: http://localhost:19644
+* Prometheus: http://localhost:9090
+* Grafana: http://localhost:3001
 
 Start only the local event broker and create topics:
 
@@ -321,7 +337,7 @@ make realtime-consumer
 Stop the stack:
 
 ```bash
-docker compose down
+make compose-down
 ```
 
 ---

@@ -101,10 +101,22 @@ Current alert coverage:
 - consumer down or missing,
 - high and critical processing latency.
 
-Run the local API and Prometheus stack with:
+Run the local API and Prometheus/Grafana stack with:
 
 ```bash
 make observability-up
+```
+
+Validate the dedicated observability profile with:
+
+```bash
+COMPOSE_PROFILES=observability docker compose config
+```
+
+If a checklist requires an explicit observability Compose file, use the thin overlay:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.observability.yml --profile observability config
 ```
 
 Run the streaming smoke checks against a running Compose stack with:

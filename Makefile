@@ -29,6 +29,7 @@ IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
 PERFORMANCE_REPORTS_DIR ?= $(REPORTS_DIR)/performance
+DOCKER_REPORTS_DIR ?= $(REPORTS_DIR)/docker
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
@@ -69,6 +70,7 @@ GRAFANA_PORT ?= 3001
 API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
 APP_ENV ?= local
+COMPOSE_PROFILES ?= dev
 
 DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
@@ -81,6 +83,8 @@ STREAMING_SMOKE_SCRIPT ?= ./scripts/ci/streaming_smoke.sh
 OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/ci/observability_smoke.sh
 OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/dev/observability_demo_traffic.sh
 KUBERNETES_SMOKE_SCRIPT ?= ./scripts/ci/kubernetes_smoke.sh
+DOCKER_RUNTIME_EVIDENCE_SCRIPT ?= ./scripts/ci/docker_runtime_evidence.sh
+COMPOSE_PROFILE_SET ?= dev test observability security
 
 DATA_PROFILE ?= small
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
@@ -145,6 +149,7 @@ export GRAFANA_PORT
 export API_PORT
 export FRONTEND_PORT
 export APP_ENV
+export COMPOSE_PROFILES
 export DATABASE_URL
 export RETAILOPS_BROKER_BOOTSTRAP_SERVERS
 
@@ -202,8 +207,10 @@ help:
 	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
-	@echo "  make compose-config       Validate Docker Compose config"
-	@echo "  make compose-up           Start full local stack"
+	@echo "  make compose-config       Validate default Docker Compose config"
+	@echo "  make compose-profile-config Validate dev/test/observability/security Compose profiles"
+	@echo "  make docker-runtime-evidence Capture profile and non-root runtime evidence"
+	@echo "  make compose-up           Start full local dev stack"
 	@echo "  make broker-up            Start local Redpanda broker and create topics"
 	@echo "  make broker-topics        List local Redpanda topics"
 	@echo "  make realtime-consumer    Run local long-running realtime consumer"
@@ -222,7 +229,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -536,7 +543,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke
+.PHONY: docker-build compose-config compose-profile-config docker-runtime-evidence compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -545,11 +552,17 @@ docker-build:
 compose-config:
 	$(COMPOSE) config
 
+compose-profile-config: ensure-reports-dir
+	@for profile in $(COMPOSE_PROFILE_SET); do \
+		echo "[compose-profile-config] Validating profile: $${profile}"; \
+		COMPOSE_PROFILES="$${profile}" $(COMPOSE) config > "$(DOCKER_REPORTS_DIR)/compose-profile-$${profile}.yml"; \
+	done
+
 compose-up:
-	$(COMPOSE) up --build -d
+	COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d
 
 broker-up:
-	$(COMPOSE) up -d redpanda redpanda-init
+	COMPOSE_PROFILES=dev $(COMPOSE) up -d redpanda redpanda-init
 
 broker-topics:
 	$(COMPOSE) exec redpanda rpk topic list --brokers redpanda:9092
@@ -558,7 +571,7 @@ realtime-consumer:
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_BROKER_BOOTSTRAP_SERVERS="$(RETAILOPS_BROKER_BOOTSTRAP_SERVERS)" .venv/bin/python scripts/run_realtime_consumer.py
 
 observability-up:
-	$(COMPOSE) up --build -d db migrate seed api prometheus grafana
+	COMPOSE_PROFILES=observability $(COMPOSE) up --build -d db migrate seed api prometheus grafana
 
 compose-down:
 	$(COMPOSE) down -v --remove-orphans
@@ -582,6 +595,10 @@ observability-demo-traffic: ensure-reports-dir
 	chmod +x "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
 	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" COMPOSE="$(COMPOSE)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
 
+docker-runtime-evidence: ensure-reports-dir
+	chmod +x "$(DOCKER_RUNTIME_EVIDENCE_SCRIPT)"
+	COMPOSE="$(COMPOSE)" DOCKER_REPORTS_DIR="$(DOCKER_REPORTS_DIR)" API_IMAGE="retailops-api:0.1.0" FRONTEND_IMAGE="retailops-frontend:0.1.0" COMPOSE_PROFILE_SET="$(COMPOSE_PROFILE_SET)" "$(DOCKER_RUNTIME_EVIDENCE_SCRIPT)"
+
 k8s-smoke: ensure-reports-dir
 	chmod +x "$(KUBERNETES_SMOKE_SCRIPT)"
 	K8S_REPORTS_DIR="$(REPORTS_DIR)/k8s" "$(KUBERNETES_SMOKE_SCRIPT)"
@@ -595,8 +612,9 @@ compose-ci: ensure-reports-dir
 	$(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
 	echo "[compose-ci] Validating Compose config..."; \
 	$(COMPOSE) config; \
+	$(MAKE) compose-profile-config; \
 	echo "[compose-ci] Starting full RetailOps stack..."; \
-	$(COMPOSE) up --build -d || status=$$?; \
+	COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d || status=$$?; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \

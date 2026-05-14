@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-14T06:31:20Z
+# Generated: 2026-05-14T08:04:38Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -36,28 +36,34 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       ├── api
 │       │   └── coverage.xml
 │       ├── data
-│       │   └── generated
-│       │       └── small
-│       │           ├── alerts.csv
-│       │           ├── anomalies.csv
-│       │           ├── dataset_manifest.json
-│       │           ├── forecasts.csv
-│       │           ├── inventory_snapshots.csv
-│       │           ├── order_items.csv
-│       │           ├── orders.csv
-│       │           ├── price_history.csv
-│       │           ├── products.csv
-│       │           ├── promotions.csv
-│       │           ├── quality_report.json
-│       │           ├── realism_report.json
-│       │           ├── recommendations.csv
-│       │           ├── returns.csv
-│       │           ├── sales.csv
-│       │           ├── stock_movements.csv
-│       │           ├── stores.csv
-│       │           ├── users.csv
-│       │           ├── warehouses.csv
-│       │           └── workflow_actions.csv
+│       │   ├── data-contract-report.json
+│       │   ├── generated
+│       │   │   └── small
+│       │   │       ├── alerts.csv
+│       │   │       ├── anomalies.csv
+│       │   │       ├── dataset_manifest.json
+│       │   │       ├── forecasts.csv
+│       │   │       ├── inventory_snapshots.csv
+│       │   │       ├── order_items.csv
+│       │   │       ├── orders.csv
+│       │   │       ├── price_history.csv
+│       │   │       ├── products.csv
+│       │   │       ├── promotions.csv
+│       │   │       ├── quality_report.json
+│       │   │       ├── realism_report.json
+│       │   │       ├── recommendations.csv
+│       │   │       ├── returns.csv
+│       │   │       ├── sales.csv
+│       │   │       ├── stock_movements.csv
+│       │   │       ├── stores.csv
+│       │   │       ├── users.csv
+│       │   │       ├── warehouses.csv
+│       │   │       └── workflow_actions.csv
+│       │   └── scenario-coverage-report.json
+│       ├── db
+│       │   └── backups
+│       │       ├── retailops-retailops-20260514T073210Z.dump
+│       │       └── retailops-retailops-20260514T073210Z.dump.sha256
 │       ├── docker-compose-logs.txt
 │       ├── docker-compose-ps.txt
 │       ├── finops
@@ -118,6 +124,9 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │           └── trivy-fs.txt
 ├── data
 │   ├── __init__.py
+│   ├── contracts
+│   │   ├── README.md
+│   │   └── retailops_seed_dataset.contract.json
 │   ├── demo
 │   │   ├── alerts.csv
 │   │   ├── anomalies.csv
@@ -242,6 +251,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── eks-bootstrap.md
 │   ├── eks-sizing-cost-review.md
 │   ├── enterprise-scorecard.md
+│   ├── event-schema.md
 │   ├── evidence
 │   │   ├── api
 │   │   │   ├── openapi-snapshot.json
@@ -255,6 +265,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   ├── aws-console-iam.png
 │   │   │   ├── aws-console-vpc.png
 │   │   │   └── README.md
+│   │   ├── data
+│   │   │   └── scenario-coverage-report.md
 │   │   ├── docker
 │   │   │   ├── compose-ci-smoke.md
 │   │   │   └── README.md
@@ -296,6 +308,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       └── README.md
 │   ├── runbooks
 │   │   ├── aws-cleanup-runbook.md
+│   │   ├── db-restore.md
 │   │   ├── local-kubernetes-runbook.md
 │   │   ├── observability-runbook.md
 │   │   ├── terraform-drift-check.md
@@ -307,6 +320,9 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── tagging-strategy.md
 │   ├── user-groups.md
 │   └── workflows.md
+├── events
+│   └── contracts
+│       └── retailops-realtime-events.v1.contract.json
 ├── frontend
 │   ├── .dockerignore
 │   ├── .gitignore
@@ -615,6 +631,12 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── kubernetes_smoke.sh
 │   │   ├── observability_smoke.sh
 │   │   └── streaming_smoke.sh
+│   ├── data
+│   │   ├── generate_scenario_coverage_report.py
+│   │   └── validate_data_contracts.py
+│   ├── db
+│   │   ├── backup.sh
+│   │   └── restore.sh
 │   ├── dev
 │   │   └── observability_demo_traffic.sh
 │   ├── evidence
@@ -638,7 +660,6 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── .coverage.Oskars-MacBook-Air_local.pid52194.XzfIzntx.HNQIp837rWOh
 │   │   ├── .dockerignore
 │   │   ├── alembic
-│   │   │   ├── __init__.py
 │   │   │   ├── env.py
 │   │   │   ├── README
 │   │   │   ├── script.py.mako
@@ -742,6 +763,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       ├── test_dashboard_endpoints.py
 │   │       ├── test_dashboard_repository.py
 │   │       ├── test_dashboard_service.py
+│   │       ├── test_data_contracts.py
 │   │       ├── test_data_generator_cli.py
 │   │       ├── test_database_instrumentation.py
 │   │       ├── test_database_schema.py
@@ -780,6 +802,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       ├── test_realtime_metrics_repository.py
 │   │       ├── test_recommendation_workflow_api.py
 │   │       ├── test_sales_api_contract.py
+│   │       ├── test_scenario_coverage.py
 │   │       ├── test_seed_data.py
 │   │       ├── test_stock_risk_api_contract.py
 │   │       ├── test_stream_observability.py
@@ -796,4 +819,4 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
     │   └── README.md
     └── README.md
 
-131 directories, 654 files
+139 directories, 669 files

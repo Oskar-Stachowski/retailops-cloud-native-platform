@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "docker-compose.yml"
+      - "docker-compose.observability.yml"
       - "Makefile"
       - ".env.example"
       - "scripts/**"
@@ -15,6 +16,7 @@ on:
   pull_request:
     paths:
       - "docker-compose.yml"
+      - "docker-compose.observability.yml"
       - "Makefile"
       - ".env.example"
       - "scripts/**"
@@ -39,6 +41,9 @@ jobs:
 
       - name: Validate Docker Compose config
         run: make compose-config
+
+      - name: Validate Compose profiles
+        run: make compose-profile-config
 
   compose-smoke:
     name: Build full stack and run smoke tests
@@ -70,6 +75,7 @@ jobs:
           path: |
             ci-cd/reports/docker-compose-ps.txt
             ci-cd/reports/docker-compose-logs.txt
+            ci-cd/reports/docker/
             ci-cd/reports/observability/
           if-no-files-found: ignore
 

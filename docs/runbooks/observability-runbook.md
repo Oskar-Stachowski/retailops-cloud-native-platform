@@ -58,10 +58,16 @@ Start the observability stack:
 make observability-up
 ```
 
-Validate the rendered Compose configuration:
+Validate the rendered observability profile:
 
 ```bash
-docker compose config
+COMPOSE_PROFILES=observability docker compose config
+```
+
+When a separate checklist evidence file is required, validate the thin overlay:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.observability.yml --profile observability config
 ```
 
 Stop and remove local state:
@@ -189,13 +195,13 @@ http://localhost:3001/d/retailops-stream-processing/retailops-stream-processing
 If a dashboard is missing, check that Grafana sees the provisioned files:
 
 ```bash
-docker compose exec -T grafana ls -la /var/lib/grafana-dashboards
+COMPOSE_PROFILES=observability docker compose exec -T grafana ls -la /var/lib/grafana-dashboards
 ```
 
 Then restart only Grafana:
 
 ```bash
-docker compose restart grafana
+COMPOSE_PROFILES=observability docker compose restart grafana
 ```
 
 ---
@@ -245,7 +251,7 @@ docker compose restart prometheus
 
 | Symptom | Likely cause | First check |
 |---|---|---|
-| Grafana shows only one dashboard | Grafana provisioned before new JSON file existed. | `docker compose restart grafana` |
+| Grafana shows only one dashboard | Grafana provisioned before new JSON file existed. | `COMPOSE_PROFILES=observability docker compose restart grafana` |
 | Dashboard panels show `No data` | Prometheus has no matching series. | Query Prometheus directly. |
 | Panels show `0` | Signal path works, but source tables have no events or no DB calls. | Check `/metrics`. |
 | Prometheus target is down | API not healthy or scrape path unavailable. | `/api/v1/targets?state=active` |
