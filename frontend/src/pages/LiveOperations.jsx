@@ -68,6 +68,61 @@ function consumerTone(consumerStates) {
   return consumerStates.some((consumer) => consumer.running) ? "success" : "warning";
 }
 
+function positiveNumber(value) {
+  const number = Number(value);
+
+  return Number.isFinite(number) && number > 0;
+}
+
+function hasMetricActivity(metrics = {}) {
+  return [
+    metrics.revenue,
+    metrics.units_sold,
+    metrics.sales_events,
+    metrics.stock_events,
+    metrics.alerts_created,
+    metrics.anomalies_detected,
+    metrics.replenishment_units,
+  ].some(positiveNumber);
+}
+
+function liveOpsMode({ recentEvents, liveAlerts, metrics, statusCounts }) {
+  const hasEvents =
+    recentEvents.length > 0 ||
+    liveAlerts.length > 0 ||
+    positiveNumber(statusCounts.total) ||
+    hasMetricActivity(metrics);
+
+  if (!hasEvents) {
+    return {
+      badge: "idle",
+      status: "warning",
+      title: "Idle local stream",
+      description:
+        "No stream events are present in the selected time window. " +
+        "The UI is connected, but the local event pipeline has no recent traffic to display.",
+    };
+  }
+
+  if (positiveNumber(statusCounts.failed_dead_lettered)) {
+    return {
+      badge: "attention",
+      status: "error",
+      title: "Stream needs attention",
+      description:
+        "Live events are flowing, but at least one event reached the failed/dead-lettered path.",
+    };
+  }
+
+  return {
+    badge: "active",
+    status: "connected",
+    title: "Active stream",
+    description:
+      "Recent live events are available in the persisted read model and can be inspected below.",
+  };
+}
+
 const eventColumns = [
   {
     header: "Event",
@@ -273,13 +328,28 @@ export default function LiveOperations() {
   const statusCounts = data.event_status_counts || {};
   const freshness = data.freshness || {};
   const consumerStates = data.consumer_states || [];
+  const recentEvents = data.recent_events || [];
+  const liveAlerts = data.alerts || [];
+  const mode = liveOpsMode({ recentEvents, liveAlerts, metrics, statusCounts });
+  const hasMetricRowsWithObservations = metricRows.some(
+    (row) => positiveNumber(row.value) || positiveNumber(row.observation_count),
+  );
+  const hasVisibleLiveTables =
+    recentEvents.length > 0 ||
+    liveAlerts.length > 0 ||
+    consumerStates.length > 0 ||
+    hasMetricRowsWithObservations;
+  const windowLabel = `${data.window_minutes || windowMinutes} minute window`;
 
   return (
     <main className="api-page live-operations-page">
       <PageHeader
         eyebrow="Real-time analysis"
         title="Live operations"
-        description="Real-time sales, event processing and stream health from the persisted live metrics read model."
+        description={
+          "Real-time sales, event processing and stream health from the persisted live metrics " +
+          "read model."
+        }
         className="live-operations-header"
         actions={
           <div className="live-ops-controls" aria-label="Live operations controls">
@@ -319,42 +389,101 @@ export default function LiveOperations() {
         <MetricCard
           label="Revenue"
           value={formatNumber(metrics.revenue, { maximumFractionDigits: 2 })}
-          helper={`${data.window_minutes || windowMinutes} minute window`}
+          helper={
+            positiveNumber(metrics.revenue) ? windowLabel : "No sales revenue in selected window"
+          }
           tone="neutral"
         />
         <MetricCard
           label="Units sold"
           value={formatNumber(metrics.units_sold)}
-          helper={`${formatNumber(metrics.sales_events)} sale events`}
+          helper={
+            positiveNumber(metrics.sales_events)
+              ? `${formatNumber(metrics.sales_events)} sale events`
+              : "No sale events captured"
+          }
+          tone="neutral"
         />
         <MetricCard
           label="Alerts"
           value={formatNumber(metrics.alerts_created)}
-          helper={`${formatNumber(metrics.anomalies_detected)} anomalies detected`}
-          status={Number(metrics.alerts_created) > 0 ? "Watch" : "Clear"}
-          tone={Number(metrics.alerts_created) > 0 ? "warning" : "success"}
+          helper={
+            positiveNumber(metrics.anomalies_detected)
+              ? `${formatNumber(metrics.anomalies_detected)} anomalies detected`
+              : "No anomaly events in selected window"
+          }
+          status={positiveNumber(metrics.alerts_created) ? "Watch" : "Clear"}
+          tone={positiveNumber(metrics.alerts_created) ? "warning" : "success"}
         />
         <MetricCard
           label="Freshness"
           value={freshnessLabel(freshness)}
-          helper={formatDateTime(freshness.latest_event_at)}
-          status={freshness.is_fresh ? "Fresh" : "Stale"}
+          helper={
+            freshness.latest_event_at
+              ? formatDateTime(freshness.latest_event_at)
+              : "No event timestamp yet"
+          }
+          status={freshness.latest_event_at ? (freshness.is_fresh ? "Fresh" : "Stale") : "Idle"}
           tone={freshness.is_fresh ? "success" : "warning"}
         />
         <MetricCard
           label="Failed events"
           value={formatNumber(statusCounts.failed_dead_lettered)}
           helper={`${formatNumber(statusCounts.processed)} processed`}
-          status={Number(statusCounts.failed_dead_lettered) > 0 ? "Error" : "OK"}
-          tone={Number(statusCounts.failed_dead_lettered) > 0 ? "danger" : "success"}
+          status={positiveNumber(statusCounts.failed_dead_lettered) ? "Error" : "OK"}
+          tone={positiveNumber(statusCounts.failed_dead_lettered) ? "danger" : "success"}
         />
         <MetricCard
           label="Consumers"
           value={formatNumber(consumerStates.length)}
-          helper={`Last refresh ${formatDateTime(state.fetchedAt)}`}
-          status={consumerStates.some((consumer) => consumer.running) ? "Running" : "Check"}
+          helper={
+            consumerStates.length > 0
+              ? `Last refresh ${formatDateTime(state.fetchedAt)}`
+              : "No consumer heartbeat recorded"
+          }
+          status={consumerStates.some((consumer) => consumer.running) ? "Running" : "Idle"}
           tone={consumerTone(consumerStates)}
         />
+      </section>
+
+      <section className={`live-ops-insight live-ops-insight--${mode.badge}`}>
+        <header className="live-ops-insight__header">
+          <div>
+            <p className="eyebrow">Stream operating mode</p>
+            <h2>{mode.title}</h2>
+            <p>{mode.description}</p>
+          </div>
+          <StatusBadge status={mode.status}>{mode.badge}</StatusBadge>
+        </header>
+
+        <div className="live-ops-insight__grid">
+          <article>
+            <span>Current scope</span>
+            <strong>{windowLabel}</strong>
+            <p>
+              Showing persisted stream metrics, recent event records, alert-like events and consumer
+              state for the selected local time window.
+            </p>
+          </article>
+          <article>
+            <span>Next action</span>
+            <strong>
+              {mode.badge === "idle" ? "Generate demo traffic" : "Monitor stream health"}
+            </strong>
+            <p>
+              {mode.badge === "idle"
+                ? "Run the local demo traffic script or switch to a wider window, then refresh this view."
+                : "Review failed events, alert-like records and consumer state before " +
+                  "promoting the pipeline."}
+            </p>
+            {mode.badge === "idle" ? <code>scripts/dev/observability_demo_traffic.sh</code> : null}
+          </article>
+          <article>
+            <span>Evidence</span>
+            <strong>Backend read model connected</strong>
+            <p>Last refresh: {formatDateTime(state.fetchedAt)}</p>
+          </article>
+        </div>
       </section>
 
       <section className="live-ops-status-grid" aria-label="Stream processing status">
@@ -367,7 +496,7 @@ export default function LiveOperations() {
             </p>
           </div>
           <StatusBadge status={freshness.is_fresh ? "connected" : "warning"}>
-            {freshness.is_fresh ? "fresh" : "stale"}
+            {freshness.latest_event_at ? (freshness.is_fresh ? "fresh" : "stale") : "idle"}
           </StatusBadge>
         </article>
         <article className="state-card live-ops-status-card">
@@ -382,41 +511,66 @@ export default function LiveOperations() {
         </article>
       </section>
 
-      <DataTable
-        title="Recent stream events"
-        description="Latest persisted event records from the real-time event log."
-        columns={eventColumns}
-        rows={data.recent_events || []}
-        getRowKey={(row) => row.id || row.event_id}
-        emptyMessage="No stream events have been persisted yet."
-      />
+      {hasVisibleLiveTables ? (
+        <section className="live-ops-table-stack" aria-label="Live operations evidence tables">
+          {recentEvents.length > 0 ? (
+            <DataTable
+              title="Recent stream events"
+              description="Latest persisted event records from the real-time event log."
+              columns={eventColumns}
+              rows={recentEvents}
+              getRowKey={(row) => row.id || row.event_id}
+            />
+          ) : null}
 
-      <DataTable
-        title="Live alerts"
-        description="Alert-like events derived from alert and anomaly event types."
-        columns={alertColumns}
-        rows={data.alerts || []}
-        getRowKey={(row) => row.id || row.event_id || `${row.title || row.event_type || "alert"}:${row.ingested_at || "na"}`}
-        emptyMessage="No alert-like events are available in the live stream."
-      />
+          {liveAlerts.length > 0 ? (
+            <DataTable
+              title="Live alerts"
+              description="Alert-like events derived from alert and anomaly event types."
+              columns={alertColumns}
+              rows={liveAlerts}
+              getRowKey={(row) =>
+                row.id ||
+                row.event_id ||
+                `${row.title || row.event_type || "alert"}:${row.ingested_at || "na"}`
+              }
+            />
+          ) : null}
 
-      <DataTable
-        title="Consumer state"
-        description="Persisted state for API consumers processing real-time events."
-        columns={consumerColumns}
-        rows={consumerStates}
-        getRowKey={(row) => row.id || row.consumer_name}
-        emptyMessage="No consumer state has been persisted yet."
-      />
+          {consumerStates.length > 0 ? (
+            <DataTable
+              title="Consumer state"
+              description="Persisted state for API consumers processing real-time events."
+              columns={consumerColumns}
+              rows={consumerStates}
+              getRowKey={(row) => row.id || row.consumer_name}
+            />
+          ) : null}
 
-      <DataTable
-        title="Raw live metrics"
-        description="Metric observations aggregated by the live operations endpoint."
-        columns={metricColumns}
-        rows={metricRows}
-        getRowKey={(row) => row.metric_name}
-        emptyMessage="No metric observations are available for the selected window."
-      />
+          {hasMetricRowsWithObservations ? (
+            <DataTable
+              title="Raw live metrics"
+              description="Metric observations aggregated by the live operations endpoint."
+              columns={metricColumns}
+              rows={metricRows}
+              getRowKey={(row) => row.metric_name}
+            />
+          ) : null}
+        </section>
+      ) : (
+        <section className="state-card state-card--empty live-ops-empty-state">
+          <div>
+            <p className="eyebrow">Controlled empty state</p>
+            <h2>No stream events in the selected {windowMinutes}-minute window</h2>
+            <p>
+              This is a valid local-development state, not a frontend failure. Run the local event
+              generator, widen the window to 60 minutes, then refresh to inspect persisted live
+              metrics.
+            </p>
+          </div>
+          <code>scripts/dev/observability_demo_traffic.sh</code>
+        </section>
+      )}
     </main>
   );
 }

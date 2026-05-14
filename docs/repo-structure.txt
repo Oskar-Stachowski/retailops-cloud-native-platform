@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-14T08:04:38Z
+# Generated: 2026-05-14T11:21:28Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -64,6 +64,13 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       │   └── backups
 │       │       ├── retailops-retailops-20260514T073210Z.dump
 │       │       └── retailops-retailops-20260514T073210Z.dump.sha256
+│       ├── docker
+│       │   ├── compose-profile-dev.yml
+│       │   ├── compose-profile-observability.yml
+│       │   ├── compose-profile-security.yml
+│       │   ├── compose-profile-test.yml
+│       │   ├── docker-compose-ps.txt
+│       │   └── image-users.txt
 │       ├── docker-compose-logs.txt
 │       ├── docker-compose-ps.txt
 │       ├── finops
@@ -211,6 +218,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │           ├── users.csv
 │           ├── warehouses.csv
 │           └── workflow_actions.csv
+├── docker-compose.observability.yml
 ├── docker-compose.yml
 ├── docs
 │   ├── ADR
@@ -310,6 +318,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── aws-cleanup-runbook.md
 │   │   ├── db-restore.md
 │   │   ├── local-kubernetes-runbook.md
+│   │   ├── local-troubleshooting.md
 │   │   ├── observability-runbook.md
 │   │   ├── terraform-drift-check.md
 │   │   └── terraform-failed-plan.md
@@ -363,7 +372,10 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   ├── MetricCard.jsx
 │   │   │   ├── notifications
 │   │   │   │   └── NotificationBell.jsx
+│   │   │   ├── PageHeader.jsx
 │   │   │   ├── StatusBadge.jsx
+│   │   │   ├── tableCellFormatters.js
+│   │   │   ├── tableCells.jsx
 │   │   │   └── Topbar.jsx
 │   │   ├── data
 │   │   │   ├── modules.json
@@ -558,6 +570,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── CV_PROJECT_BULLETS.md
 │   │   ├── cv-claims-map.md
 │   │   └── final-repository-closing-audit.md
+│   ├── FRONTEND
+│   │   └── retailops-frontend-review.md
 │   ├── README.md
 │   ├── retailops-chatgpt-codex-collaboration-model-with-completion-checklists.md
 │   ├── retailops-production-readiness-audit-summary.md
@@ -628,6 +642,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 ├── scripts
 │   ├── ci
 │   │   ├── compose_smoke.sh
+│   │   ├── docker_runtime_evidence.sh
 │   │   ├── kubernetes_smoke.sh
 │   │   ├── observability_smoke.sh
 │   │   └── streaming_smoke.sh
@@ -819,4 +834,4 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
     │   └── README.md
     └── README.md
 
-139 directories, 669 files
+141 directories, 682 files
