@@ -1,0 +1,6 @@
+id,store_code,name,region,country,city,channel,status,traffic_multiplier,promo_sensitivity
+a2ac838d-a4ad-5054-9aad-660428b4817c,STORE-0001,RetailOps Store 0001,PL-North,PL,City 0001,online,active,1.6375,1.1933
+c1ca292a-ed5d-5123-9067-da1959a33604,STORE-0002,RetailOps Store 0002,PL-Central,PL,City 0002,store,active,1.6156,1.1270
+2761a8b7-f541-58d3-a24a-a69e1ad6ee09,STORE-0003,RetailOps Store 0003,PL-South,PL,City 0003,marketplace,active,1.8408,0.9474
+173ee44c-0459-54cb-b9a6-01f9b422e02f,STORE-0004,RetailOps Store 0004,DE-East,DE,City 0004,wholesale,active,0.8821,1.0016
+ba4881fd-78b5-5016-847d-8066d661bcfa,STORE-0005,RetailOps Store 0005,PL-North,PL,City 0005,online,active,1.4426,0.7697

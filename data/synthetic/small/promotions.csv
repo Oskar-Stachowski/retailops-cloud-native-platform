@@ -1,0 +1,101 @@
+id,promotion_code,product_id,name,promotion_type,discount_percent,starts_at,ends_at,channel,status
+3886d7b6-cdec-5940-94f6-4f87f4460a27,PROMO-ELEC-000001,576f0781-3104-5d50-92f3-befe834a6fa6,Synthetic promotion for ELEC-000001,discount,8.00,2026-04-16,2026-05-14,all,active
+356a6e89-46ee-5f6c-9ce3-191f56b5ec02,PROMO-HOME-000002,38d5dc41-891b-50f6-a02f-fda88ad8ccde,Synthetic promotion for HOME-000002,discount,10.00,2026-04-17,2026-05-15,all,active
+e3980f43-2795-54ca-82f2-cf28154ea47d,PROMO-GROC-000003,de0b3ef5-2bd5-55d5-8b53-6dc8eda6d60f,Synthetic promotion for GROC-000003,discount,8.00,2026-04-18,2026-05-16,all,active
+bc2491a9-cc49-55eb-8ae0-7d45b57054f0,PROMO-FASH-000004,b17680da-3917-5612-9246-0a9b60e6efe9,Synthetic promotion for FASH-000004,discount,10.00,2026-04-19,2026-05-17,all,active
+e31ff3ac-04ef-50bb-bf8b-c562a113f045,PROMO-BEAU-000005,62b81abd-84c4-5de4-b8f1-2d5b6b547bc3,Synthetic promotion for BEAU-000005,discount,8.00,2026-04-16,2026-05-14,all,active
+c4830632-b2ee-51db-b2a2-e8245520e798,PROMO-SPOR-000006,e3e08a14-471a-5347-94f6-b2369070c3a7,Synthetic promotion for SPOR-000006,discount,10.00,2026-04-17,2026-05-15,all,active
+cb3a2b5d-0a1a-5d67-8145-ced33f750922,PROMO-TOYS-000007,6ef80540-16c7-551c-95b8-9ae7373e7908,Synthetic promotion for TOYS-000007,discount,8.00,2026-04-18,2026-05-16,all,active
+ab642069-e6ff-5f7c-953e-6a22abd2c79d,PROMO-PET -000008,f000d381-f2f7-5a93-bc43-825f298a7685,Synthetic promotion for PET -000008,discount,10.00,2026-04-19,2026-05-17,all,active
+bb7aef35-6f17-5531-867b-fb5cd8b579ff,PROMO-ELEC-000009,22d48f3a-5014-5123-a1e5-345e1ddd84a3,Synthetic promotion for ELEC-000009,discount,8.00,2026-04-16,2026-05-14,all,active
+e827c6a0-b622-54f5-9057-ccca6d36dcd4,PROMO-HOME-000010,7b6c271c-85eb-5849-9da9-76e7ab8e881f,Synthetic promotion for HOME-000010,discount,10.00,2026-04-17,2026-05-15,all,active
+35c15df1-4bff-5a5b-8903-653f9b0bd80b,PROMO-GROC-000011,163da9b8-d3e0-5f9e-9dd3-954c345c7684,Synthetic promotion for GROC-000011,discount,8.00,2026-04-18,2026-05-16,all,active
+b57608d9-0f5c-59d9-ae29-598f20c59320,PROMO-FASH-000012,ca2f4809-df5a-51b1-b5eb-635bec356f40,Synthetic promotion for FASH-000012,discount,10.00,2026-04-19,2026-05-17,all,active
+2225ef89-8d59-5f7c-976f-5f6604855e71,PROMO-BEAU-000013,f8f45205-4b7d-5a19-9e70-2c6d708ac79c,Synthetic promotion for BEAU-000013,discount,8.00,2026-04-16,2026-05-14,all,active
+5cdc243f-5f05-5b9e-901e-eb16d810addc,PROMO-SPOR-000014,5030188b-d814-53c3-9914-3a99743cea2f,Synthetic promotion for SPOR-000014,discount,10.00,2026-04-17,2026-05-15,all,active
+a1edd6b1-7694-5d83-8186-09f7e444a0c8,PROMO-TOYS-000015,92541b74-41dc-5325-b5f8-c731758cbdfc,Synthetic promotion for TOYS-000015,discount,8.00,2026-04-18,2026-05-16,all,active
+5610aa7b-823e-5fc3-bab8-61c143a13168,PROMO-PET -000016,5e4db0b5-3afc-5b37-b821-e41339bfcb8f,Synthetic promotion for PET -000016,discount,10.00,2026-04-19,2026-05-17,all,active
+fea3b50f-0f71-5a88-8549-0cd630873aca,PROMO-ELEC-000017,6836df32-8a55-5c22-8e6b-ed15005c6d4a,Synthetic promotion for ELEC-000017,discount,8.00,2026-04-16,2026-05-14,all,active
+bd8516a6-3478-53a0-8b3b-e2ffca0b9731,PROMO-HOME-000018,60fc91ce-c105-5d41-a03f-c6f4490669e1,Synthetic promotion for HOME-000018,discount,10.00,2026-04-17,2026-05-15,all,active
+3eab8af7-d13b-50ec-b8b1-9c47ea6aac6b,PROMO-GROC-000019,944b935c-7308-50ea-a7a3-71cc8f2fd4c5,Synthetic promotion for GROC-000019,discount,8.00,2026-04-18,2026-05-16,all,active
+94e87d65-21cb-5109-abb0-324daf1749ba,PROMO-FASH-000020,b3eddb5e-2feb-5a7d-9d80-832a203e282f,Synthetic promotion for FASH-000020,discount,10.00,2026-04-19,2026-05-17,all,active
+a2efae17-6cb2-5885-bd7b-3e5add78f035,PROMO-BEAU-000021,360ec9af-06ab-53b8-adcc-f0a8badedcdf,Synthetic promotion for BEAU-000021,discount,8.00,2026-04-16,2026-05-14,all,active
+808bef0b-5a24-5dcf-8884-e1d9e939fa45,PROMO-SPOR-000022,c6ad2817-6d98-5707-85ba-460e2ab44c7a,Synthetic promotion for SPOR-000022,discount,10.00,2026-04-17,2026-05-15,all,active
+f5b4d7ec-48ed-5fe4-adb7-fdb024756f62,PROMO-TOYS-000023,44953a4d-66fb-5d64-9644-a9213ce753fb,Synthetic promotion for TOYS-000023,discount,8.00,2026-04-18,2026-05-16,all,active
+e2175ee2-b763-5695-bf57-51f6d29f2e38,PROMO-PET -000024,5acda6c0-5a1e-5e97-9a2c-6a29d8118012,Synthetic promotion for PET -000024,discount,10.00,2026-04-19,2026-05-17,all,active
+5c5291f1-e8e0-55c6-a5c8-a0418ac7a7d4,PROMO-ELEC-000025,06f4fcc4-2bd2-526c-bfc8-6a4cbad967b3,Synthetic promotion for ELEC-000025,discount,8.00,2026-04-16,2026-05-14,all,active
+1a131d6b-e967-50a3-afd1-c4dfbbe1d06c,PROMO-HOME-000026,b6756d87-a0a0-556a-b6ed-1c904680ceb4,Synthetic promotion for HOME-000026,discount,10.00,2026-04-17,2026-05-15,all,active
+56bcd416-387c-528e-8cc9-d9b765001182,PROMO-GROC-000027,78d65be0-4c32-5c7a-932c-89673632def9,Synthetic promotion for GROC-000027,discount,8.00,2026-04-18,2026-05-16,all,active
+e972e13c-a63d-5f1e-96b0-759769a9fbd9,PROMO-FASH-000028,01fc3b7e-8b29-50d3-a3d4-bc713fa84405,Synthetic promotion for FASH-000028,discount,10.00,2026-04-19,2026-05-17,all,active
+73a97f4f-4211-53e9-89f5-f7f9ba0373db,PROMO-BEAU-000029,e97682bc-117f-532b-8b65-b717c09bc30f,Synthetic promotion for BEAU-000029,discount,8.00,2026-04-16,2026-05-14,all,active
+864ad5b8-29b9-5ce4-9c0a-d470cf4b796b,PROMO-SPOR-000030,b7d44817-034b-51e8-84f0-70a921a96cdb,Synthetic promotion for SPOR-000030,discount,10.00,2026-04-17,2026-05-15,all,active
+e138204e-8dfc-54dc-81a2-132fc9dc1857,PROMO-TOYS-000031,85e7e944-3e11-5a89-ac96-c23167ff32dc,Synthetic promotion for TOYS-000031,discount,8.00,2026-04-18,2026-05-16,all,active
+d0eef276-bc40-52df-9721-0ff8fdecc96a,PROMO-PET -000032,975dfb1e-69d1-5f10-8875-2e1acefd4859,Synthetic promotion for PET -000032,discount,10.00,2026-04-19,2026-05-17,all,active
+171a2472-4cb5-58fc-8902-961bb88d97f9,PROMO-ELEC-000033,ac6c0b36-b856-5925-aca7-b8e3bb4639a3,Synthetic promotion for ELEC-000033,discount,8.00,2026-04-16,2026-05-14,all,active
+c1a9f707-7aad-5c15-9dc2-127f1d836ce9,PROMO-HOME-000034,7d15b52f-782f-5fa8-9c0b-78ebb03a07a5,Synthetic promotion for HOME-000034,discount,10.00,2026-04-17,2026-05-15,all,active
+7287348a-187b-5564-931d-f160a2ffd507,PROMO-GROC-000035,2532c2ec-f726-59a0-9af7-a077b1c5c99d,Synthetic promotion for GROC-000035,discount,8.00,2026-04-18,2026-05-16,all,active
+3853a6b3-60ad-5ec6-ba9b-a1ef5f8806c4,PROMO-FASH-000036,6e80b7e9-0667-54ce-838e-56aca777afef,Synthetic promotion for FASH-000036,discount,10.00,2026-04-19,2026-05-17,all,active
+d4ff059e-8ba8-55fc-9523-b2d2b69165fd,PROMO-BEAU-000037,9a6922f7-9343-52bc-89b0-d1db33a0340d,Synthetic promotion for BEAU-000037,discount,8.00,2026-04-16,2026-05-14,all,active
+a962b89d-1648-5a22-be9c-e60a0a8c4899,PROMO-SPOR-000038,f42ebea5-b984-5835-bd6a-106e6e6fdcfb,Synthetic promotion for SPOR-000038,discount,10.00,2026-04-17,2026-05-15,all,active
+4cd78e55-1817-539a-96ff-a5e827a788ac,PROMO-TOYS-000039,9cf88386-0bed-5ac4-9a5f-045e8b2a7a00,Synthetic promotion for TOYS-000039,discount,8.00,2026-04-18,2026-05-16,all,active
+657ab8a8-0ee9-566e-ae61-f84ac39418cd,PROMO-PET -000040,ac8ce360-9980-5f71-b176-285323c963b8,Synthetic promotion for PET -000040,discount,10.00,2026-04-19,2026-05-17,all,active
+53b78eb6-951d-5602-9f14-7e3e1daa1690,PROMO-ELEC-000041,58e54d28-afe6-5090-9990-c3649b754085,Synthetic promotion for ELEC-000041,discount,8.00,2026-04-16,2026-05-14,all,active
+b627d476-b742-5596-929f-0b5098930a69,PROMO-HOME-000042,ab1d5346-1d4b-582e-bd7a-c0685e487f0b,Synthetic promotion for HOME-000042,discount,10.00,2026-04-17,2026-05-15,all,active
+d8eeb311-41ff-576c-a6fd-9245af4bf272,PROMO-GROC-000043,5a4f9e8e-a5d6-5631-ae53-ffbfaec4450c,Synthetic promotion for GROC-000043,discount,8.00,2026-04-18,2026-05-16,all,active
+43491018-2411-5d8f-ba4b-e1c39e062fd6,PROMO-FASH-000044,aea54154-8157-5774-8110-fba37ae17360,Synthetic promotion for FASH-000044,discount,10.00,2026-04-19,2026-05-17,all,active
+32d0aeb5-8ee7-5a2b-9652-56bb856caeb8,PROMO-BEAU-000045,293b0637-4956-51c6-b5b9-b71cef14f7a6,Synthetic promotion for BEAU-000045,discount,8.00,2026-04-16,2026-05-14,all,active
+d9733cd4-d22f-507a-a1a6-0db6bb54f55a,PROMO-SPOR-000046,5125db4d-be56-5fed-8c57-2cb37186845a,Synthetic promotion for SPOR-000046,discount,10.00,2026-04-17,2026-05-15,all,active
+24d7b0bf-854f-5f40-8b3d-9ee9b2689241,PROMO-TOYS-000047,ce797b7a-af13-5663-88da-14c0a9fe5a63,Synthetic promotion for TOYS-000047,discount,8.00,2026-04-18,2026-05-16,all,active
+8603c7bd-0c3f-5341-ba34-0948aa4d337f,PROMO-PET -000048,ef4975d2-c692-52bd-9c55-6fc144747695,Synthetic promotion for PET -000048,discount,10.00,2026-04-19,2026-05-17,all,active
+c66686d8-a6ec-54e0-8cc0-c30a19f224be,PROMO-ELEC-000049,91c81a29-2ca8-52e7-bffd-af9c56b7218c,Synthetic promotion for ELEC-000049,discount,8.00,2026-04-16,2026-05-14,all,active
+7305f96e-9cd3-5965-b9f9-56e6cadc0562,PROMO-HOME-000050,ef601e27-fbe0-531a-8b8b-900d8745a901,Synthetic promotion for HOME-000050,discount,10.00,2026-04-17,2026-05-15,all,active
+3d05b80b-bfac-5894-8d65-90345a6577b9,PROMO-GROC-000051,ee0c49cd-0889-5cbf-90de-badbe7517995,Synthetic promotion for GROC-000051,discount,8.00,2026-04-18,2026-05-16,all,active
+978bb766-d502-539d-a7c9-c2e5e7e4c095,PROMO-FASH-000052,c74c4e40-b157-5011-aa3d-ec349fb61826,Synthetic promotion for FASH-000052,discount,10.00,2026-04-19,2026-05-17,all,active
+ae70d88a-3c7c-592a-99f6-1a2c1305bfb3,PROMO-BEAU-000053,bdef6401-48fd-5078-a4a6-0b385d763314,Synthetic promotion for BEAU-000053,discount,8.00,2026-04-16,2026-05-14,all,active
+26ae4c37-61a8-5f44-9f0a-9f753d4774b9,PROMO-SPOR-000054,7ee0dda2-02c2-549d-92e2-6eb7117b919d,Synthetic promotion for SPOR-000054,discount,10.00,2026-04-17,2026-05-15,all,active
+e6d4a150-13ee-5ea5-9017-4b3059efd824,PROMO-TOYS-000055,ab4674bc-4106-51c6-b44a-9ca109374b4f,Synthetic promotion for TOYS-000055,discount,8.00,2026-04-18,2026-05-16,all,active
+3d52487c-f68b-5545-a89e-b286fd1d083c,PROMO-PET -000056,88370064-3581-5cf2-9047-50dd2a1397e0,Synthetic promotion for PET -000056,discount,10.00,2026-04-19,2026-05-17,all,active
+a97023eb-9ccb-50c9-996b-c99a979c2f44,PROMO-ELEC-000057,e99fb2c3-af82-55dc-a4f5-05e1d6698616,Synthetic promotion for ELEC-000057,discount,8.00,2026-04-16,2026-05-14,all,active
+a83a03e3-d20b-547d-87a3-a44b682a1530,PROMO-HOME-000058,f32ca738-f369-5d10-a674-7ee267c90f10,Synthetic promotion for HOME-000058,discount,10.00,2026-04-17,2026-05-15,all,active
+dfe66f46-3679-5b8b-8447-679e2e453cff,PROMO-GROC-000059,1a75e928-29ff-5256-9b8e-492b71e4a9eb,Synthetic promotion for GROC-000059,discount,8.00,2026-04-18,2026-05-16,all,active
+6b843561-6b14-5b43-bba3-971318edf915,PROMO-FASH-000060,c05f9712-2ad5-54a6-bb81-158133cd3bd9,Synthetic promotion for FASH-000060,discount,10.00,2026-04-19,2026-05-17,all,active
+3057af5b-47ef-5715-ad1d-7f9ae45e2e70,PROMO-BEAU-000061,dcbefd02-d790-5d82-b528-14470a618fa6,Synthetic promotion for BEAU-000061,discount,8.00,2026-04-16,2026-05-14,all,active
+adf54ce3-8f66-52be-87d4-af7ab4dca0cb,PROMO-SPOR-000062,70103cb6-8c8c-5035-8835-8dba958ea703,Synthetic promotion for SPOR-000062,discount,10.00,2026-04-17,2026-05-15,all,active
+6045385f-1096-5705-9db4-e84f9649c5b0,PROMO-TOYS-000063,874f1b3f-f15c-5575-af9b-537ba7b68f80,Synthetic promotion for TOYS-000063,discount,8.00,2026-04-18,2026-05-16,all,active
+9eba14a1-113a-5ce4-8965-daceb5620486,PROMO-PET -000064,68343b6b-e6e1-53cd-9d7e-113d3dd3fb4f,Synthetic promotion for PET -000064,discount,10.00,2026-04-19,2026-05-17,all,active
+af86ea79-6df6-556e-ac9e-50ff38a762fe,PROMO-ELEC-000065,9b06f7c5-92ba-5990-be5b-a7cd92658adc,Synthetic promotion for ELEC-000065,discount,8.00,2026-04-16,2026-05-14,all,active
+c908ca5b-e994-5d72-ae3f-2e6637011905,PROMO-HOME-000066,2e22974b-0c82-5383-be4f-44adda569aa6,Synthetic promotion for HOME-000066,discount,10.00,2026-04-17,2026-05-15,all,active
+09e0292c-1555-5258-b446-8061497c8287,PROMO-GROC-000067,284bddee-b37c-5c36-8aab-81867975f179,Synthetic promotion for GROC-000067,discount,8.00,2026-04-18,2026-05-16,all,active
+7bcc4c6b-c366-52a1-8fb6-c6b2e8d0d347,PROMO-FASH-000068,06acb399-de3d-5662-8c40-c27c44a03030,Synthetic promotion for FASH-000068,discount,10.00,2026-04-19,2026-05-17,all,active
+7273db2e-0eab-5f6f-9ea0-0327854e97e3,PROMO-BEAU-000069,b3187164-9efe-5f40-864a-e693c1808c39,Synthetic promotion for BEAU-000069,discount,8.00,2026-04-16,2026-05-14,all,active
+2cdd14fb-70e4-5c43-9259-7c559e8704e0,PROMO-SPOR-000070,c9bc50a8-e5f6-504c-8618-2e9c520992ff,Synthetic promotion for SPOR-000070,discount,10.00,2026-04-17,2026-05-15,all,active
+6a8b772f-f4f9-55d4-b971-f3222aeac9b8,PROMO-TOYS-000071,13aa843a-9cf9-5e5e-b377-21f2c5c1cfe1,Synthetic promotion for TOYS-000071,discount,8.00,2026-04-18,2026-05-16,all,active
+58fafc86-7f4e-5576-a557-2c4c33446058,PROMO-PET -000072,4dd85a2c-b259-5694-a7e6-1dbdd7a8b9f3,Synthetic promotion for PET -000072,discount,10.00,2026-04-19,2026-05-17,all,active
+ac200267-f62e-53a0-b9ea-c1666a4c74ee,PROMO-ELEC-000073,953af428-8548-5852-860e-88337bcfda1c,Synthetic promotion for ELEC-000073,discount,8.00,2026-04-16,2026-05-14,all,active
+1f2688af-db31-5c6a-a9c9-a8d5c9a1e5ca,PROMO-HOME-000074,6a250ba0-29a8-5939-9cc1-cba774d5109f,Synthetic promotion for HOME-000074,discount,10.00,2026-04-17,2026-05-15,all,active
+f907a6ef-4126-527c-91b7-099ab20cae88,PROMO-GROC-000075,260c2bee-e4ea-5a81-b7cd-575a8882e7ca,Synthetic promotion for GROC-000075,discount,8.00,2026-04-18,2026-05-16,all,active
+c1add975-fd5c-55a4-b3a8-65dc65fa465f,PROMO-FASH-000076,39f8628a-0f86-548c-91ee-718cae91d0c3,Synthetic promotion for FASH-000076,discount,10.00,2026-04-19,2026-05-17,all,active
+7eada114-d595-5d7f-89ac-fbef29876abd,PROMO-BEAU-000077,d7ba719e-c372-52f1-a68d-888ec8fb1196,Synthetic promotion for BEAU-000077,discount,8.00,2026-04-16,2026-05-14,all,active
+8631dc7a-518a-513e-9de3-283c6934bc46,PROMO-SPOR-000078,09e0d5b3-b51d-50cb-b5b7-2e5b62f35dc6,Synthetic promotion for SPOR-000078,discount,10.00,2026-04-17,2026-05-15,all,active
+cade89ce-0cd3-5def-bf90-1ce9a443efdc,PROMO-TOYS-000079,1564b2e3-5405-5bf0-8ac8-706225799233,Synthetic promotion for TOYS-000079,discount,8.00,2026-04-18,2026-05-16,all,active
+d51849ff-8273-5960-bc1a-89815e1cfd37,PROMO-PET -000080,fe2b63a8-eeb4-5208-b8d1-f4bb758543f5,Synthetic promotion for PET -000080,discount,10.00,2026-04-19,2026-05-17,all,active
+179eab93-eed6-5a3c-9ef2-fb5deb2e656a,PROMO-ELEC-000081,818addc5-51d4-57c7-a7c6-b66bb513dcaf,Synthetic promotion for ELEC-000081,discount,8.00,2026-04-16,2026-05-14,all,active
+ac7b3825-89ba-5156-bfe2-5dd2e1013247,PROMO-HOME-000082,6b73c00c-e450-51d6-b955-9cca56d368d3,Synthetic promotion for HOME-000082,discount,10.00,2026-04-17,2026-05-15,all,active
+2e33500a-02bf-5310-9a2f-6b560e13acd2,PROMO-GROC-000083,e213b766-e8ca-56ff-8715-94a8c16a108d,Synthetic promotion for GROC-000083,discount,8.00,2026-04-18,2026-05-16,all,active
+dd80298b-e73c-5b75-b028-5209a8a4d70c,PROMO-FASH-000084,4043dc4a-96a5-5cb6-8f09-37f10cce0de1,Synthetic promotion for FASH-000084,discount,10.00,2026-04-19,2026-05-17,all,active
+0d3381e8-1ac1-5644-8269-b1f3307d3853,PROMO-BEAU-000085,fafbca1c-6412-5747-af13-5c9678cf76df,Synthetic promotion for BEAU-000085,discount,8.00,2026-04-16,2026-05-14,all,active
+39a03b7b-b465-56e9-8d0e-ec22e0fb0925,PROMO-SPOR-000086,80c37084-5ec1-5934-99a2-404b2f4d677a,Synthetic promotion for SPOR-000086,discount,10.00,2026-04-17,2026-05-15,all,active
+566d3fb8-b121-5f45-bbcf-71ba286b2328,PROMO-TOYS-000087,4f4cdd86-60e0-5d5c-9eda-86f193a7cd21,Synthetic promotion for TOYS-000087,discount,8.00,2026-04-18,2026-05-16,all,active
+cf02d9e4-203d-5bfc-b522-1e75c6af3ad3,PROMO-PET -000088,2480ade4-fd45-5f2a-96a0-bdb49cf41ba8,Synthetic promotion for PET -000088,discount,10.00,2026-04-19,2026-05-17,all,active
+f271cddd-1aa9-53f6-851b-546c1f74d843,PROMO-ELEC-000089,adacd216-df4b-557a-bee5-9d117848c764,Synthetic promotion for ELEC-000089,discount,8.00,2026-04-16,2026-05-14,all,active
+9ad8f67e-b4df-565b-8aef-947dae24c024,PROMO-HOME-000090,ec348c6b-cb3f-5826-a791-37217bfd82f6,Synthetic promotion for HOME-000090,discount,10.00,2026-04-17,2026-05-15,all,active
+34c8aad5-66b3-5ae7-98fa-dca4779b1482,PROMO-GROC-000091,8cf4f802-4e89-570e-93f8-e6fcceaa622b,Synthetic promotion for GROC-000091,discount,8.00,2026-04-18,2026-05-16,all,active
+588e35ae-e0f7-568c-a6eb-91004cf1435d,PROMO-FASH-000092,398b86fc-73de-5291-ac6a-14681329475c,Synthetic promotion for FASH-000092,discount,10.00,2026-04-19,2026-05-17,all,active
+7ecac57e-a84f-53b0-91b4-8a6b628434c0,PROMO-BEAU-000093,e760945c-f9e6-5e2e-9858-aceb64faaf84,Synthetic promotion for BEAU-000093,discount,8.00,2026-04-16,2026-05-14,all,active
+cae8bb74-1708-50dc-9362-e7e88ecc7f60,PROMO-SPOR-000094,a5c55cd2-b68a-541d-8134-ac1136a677dc,Synthetic promotion for SPOR-000094,discount,10.00,2026-04-17,2026-05-15,all,active
+ad0e64c9-2484-5eed-bf2d-7b5617e42745,PROMO-TOYS-000095,ebd800fd-0820-5593-9f02-c5ad7575757b,Synthetic promotion for TOYS-000095,discount,8.00,2026-04-18,2026-05-16,all,active
+2dc3a699-9c91-5b4d-a89c-aa9f3b4dde9d,PROMO-PET -000096,57a04d7b-ffa2-55d5-8e3c-3099d16cc188,Synthetic promotion for PET -000096,discount,10.00,2026-04-19,2026-05-17,all,active
+e193ff91-b316-5a08-8624-e99e014475c4,PROMO-ELEC-000097,746e83f8-c019-5f34-be65-3ba6d9311b16,Synthetic promotion for ELEC-000097,discount,8.00,2026-04-16,2026-05-14,all,active
+32a3fbea-329c-5f3f-bb48-00083accf1c6,PROMO-HOME-000098,20bd9198-afef-51b5-88cd-25eecdc6a243,Synthetic promotion for HOME-000098,discount,10.00,2026-04-17,2026-05-15,all,active
+5dbc8088-7e7d-54b0-83ba-25b0f3689562,PROMO-GROC-000099,da3b1539-9617-5466-87e9-e053e2419729,Synthetic promotion for GROC-000099,discount,8.00,2026-04-18,2026-05-16,all,active
+1fae1fab-0184-51e9-b863-f1197f6166bc,PROMO-FASH-000100,1e4e8bdc-40be-58a9-9f14-c7b0c6af9c9c,Synthetic promotion for FASH-000100,discount,10.00,2026-04-19,2026-05-17,all,active

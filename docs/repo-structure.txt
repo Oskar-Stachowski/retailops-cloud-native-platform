@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-14T11:21:28Z
+# Generated: 2026-05-14T15:26:41Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -180,6 +180,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       ├── medium
 │       │   ├── alerts.csv
 │       │   ├── anomalies.csv
+│       │   ├── dataset_manifest.json
 │       │   ├── forecasts.csv
 │       │   ├── inventory_snapshots.csv
 │       │   ├── order_items.csv
@@ -187,6 +188,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       │   ├── price_history.csv
 │       │   ├── products.csv
 │       │   ├── promotions.csv
+│       │   ├── quality_report.json
 │       │   ├── realism_report.json
 │       │   ├── recommendations.csv
 │       │   ├── returns.csv
@@ -370,6 +372,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   │   └── StackStatus.jsx
 │   │   │   ├── LoadingState.jsx
 │   │   │   ├── MetricCard.jsx
+│   │   │   ├── MiniVisualizations.jsx
 │   │   │   ├── notifications
 │   │   │   │   └── NotificationBell.jsx
 │   │   │   ├── PageHeader.jsx
@@ -681,6 +684,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   └── versions
 │   │   │       ├── 1df5d2a8c9e7_add_realtime_metrics_tables.py
 │   │   │       ├── 4f2c9d1e8a77_add_forecast_runs.py
+│   │   │       ├── 6b0f1c2d3e4a_allow_realism_forecast_method.py
 │   │   │       ├── 7c4d9a2e1b6f_add_workflow_audit_log.py
 │   │   │       ├── 8d6f3b1a4c20_add_workflow_audit_idempotency_constraint.py
 │   │   │       └── 9d505dd3b320_create_initial_retailops_schema.py
@@ -818,6 +822,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       ├── test_recommendation_workflow_api.py
 │   │       ├── test_sales_api_contract.py
 │   │       ├── test_scenario_coverage.py
+│   │       ├── test_seed_data_profiles.py
 │   │       ├── test_seed_data.py
 │   │       ├── test_stock_risk_api_contract.py
 │   │       ├── test_stream_observability.py
@@ -834,4 +839,4 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
     │   └── README.md
     └── README.md
 
-141 directories, 682 files
+141 directories, 687 files

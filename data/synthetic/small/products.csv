@@ -1,0 +1,101 @@
+id,sku,name,category,brand,status,demand_class,demand_weight,price_elasticity,seasonal_pattern,return_rate
+576f0781-3104-5d50-92f3-befe834a6fa6,ELEC-000001,Electronics Product 000001,Electronics,SoundWave,active,hero_product,4.6145,1.15,weekly_sensitive,0.12
+38d5dc41-891b-50f6-a02f-fda88ad8ccde,HOME-000002,Home Improvement Product 000002,Home Improvement,NordicHome,active,hero_product,4.9197,0.80,spring_summer_peak,0.14
+de0b3ef5-2bd5-55d5-8b53-6dc8eda6d60f,GROC-000003,Grocery Product 000003,Grocery,GreenFarm,active,hero_product,5.1135,0.35,stable,0.01
+b17680da-3917-5612-9246-0a9b60e6efe9,FASH-000004,Fashion Product 000004,Fashion,UrbanNorth,active,hero_product,4.2281,1.35,holiday_peak,0.34
+62b81abd-84c4-5de4-b8f1-2d5b6b547bc3,BEAU-000005,Beauty Product 000005,Beauty,SkinLab,active,hero_product,4.0237,0.70,weekly_sensitive,0.08
+e3e08a14-471a-5347-94f6-b2369070c3a7,SPOR-000006,Sports Product 000006,Sports,FitCore,active,hero_product,3.4904,0.95,spring_summer_peak,0.11
+6ef80540-16c7-551c-95b8-9ae7373e7908,TOYS-000007,Toys Product 000007,Toys,PlayBox,active,hero_product,3.1930,1.05,holiday_peak,0.09
+f000d381-f2f7-5a93-bc43-825f298a7685,PET -000008,Pet Care Product 000008,Pet Care,HappyPaws,active,hero_product,2.9191,0.45,weekly_sensitive,0.02
+22d48f3a-5014-5123-a1e5-345e1ddd84a3,ELEC-000009,Electronics Product 000009,Electronics,SoundWave,active,core_product,2.0469,1.15,weekly_sensitive,0.12
+7b6c271c-85eb-5849-9da9-76e7ab8e881f,HOME-000010,Home Improvement Product 000010,Home Improvement,NordicHome,active,core_product,2.3317,0.80,spring_summer_peak,0.14
+163da9b8-d3e0-5f9e-9dd3-954c345c7684,GROC-000011,Grocery Product 000011,Grocery,GreenFarm,active,core_product,1.8013,0.35,stable,0.01
+ca2f4809-df5a-51b1-b5eb-635bec356f40,FASH-000012,Fashion Product 000012,Fashion,UrbanNorth,active,core_product,1.5619,1.35,holiday_peak,0.34
+f8f45205-4b7d-5a19-9e70-2c6d708ac79c,BEAU-000013,Beauty Product 000013,Beauty,SkinLab,active,core_product,1.8640,0.70,weekly_sensitive,0.08
+5030188b-d814-53c3-9914-3a99743cea2f,SPOR-000014,Sports Product 000014,Sports,FitCore,active,core_product,2.4334,0.95,spring_summer_peak,0.11
+92541b74-41dc-5325-b5f8-c731758cbdfc,TOYS-000015,Toys Product 000015,Toys,PlayBox,active,core_product,2.6445,1.05,holiday_peak,0.09
+5e4db0b5-3afc-5b37-b821-e41339bfcb8f,PET -000016,Pet Care Product 000016,Pet Care,HappyPaws,active,core_product,1.7637,0.45,weekly_sensitive,0.02
+6836df32-8a55-5c22-8e6b-ed15005c6d4a,ELEC-000017,Electronics Product 000017,Electronics,SoundWave,active,core_product,2.6448,1.15,weekly_sensitive,0.12
+60fc91ce-c105-5d41-a03f-c6f4490669e1,HOME-000018,Home Improvement Product 000018,Home Improvement,NordicHome,active,core_product,1.7128,0.80,spring_summer_peak,0.14
+944b935c-7308-50ea-a7a3-71cc8f2fd4c5,GROC-000019,Grocery Product 000019,Grocery,GreenFarm,active,core_product,2.3658,0.35,stable,0.01
+b3eddb5e-2feb-5a7d-9d80-832a203e282f,FASH-000020,Fashion Product 000020,Fashion,UrbanNorth,active,core_product,1.8529,1.35,holiday_peak,0.34
+360ec9af-06ab-53b8-adcc-f0a8badedcdf,BEAU-000021,Beauty Product 000021,Beauty,SkinLab,active,core_product,1.5617,0.70,weekly_sensitive,0.08
+c6ad2817-6d98-5707-85ba-460e2ab44c7a,SPOR-000022,Sports Product 000022,Sports,FitCore,active,core_product,1.9726,0.95,spring_summer_peak,0.11
+44953a4d-66fb-5d64-9644-a9213ce753fb,TOYS-000023,Toys Product 000023,Toys,PlayBox,active,core_product,2.1256,1.05,holiday_peak,0.09
+5acda6c0-5a1e-5e97-9a2c-6a29d8118012,PET -000024,Pet Care Product 000024,Pet Care,HappyPaws,active,core_product,2.9352,0.45,weekly_sensitive,0.02
+06f4fcc4-2bd2-526c-bfc8-6a4cbad967b3,ELEC-000025,Electronics Product 000025,Electronics,SoundWave,active,core_product,2.7587,1.15,weekly_sensitive,0.12
+b6756d87-a0a0-556a-b6ed-1c904680ceb4,HOME-000026,Home Improvement Product 000026,Home Improvement,NordicHome,active,seasonal,1.2527,0.80,seasonal_peak,0.14
+78d65be0-4c32-5c7a-932c-89673632def9,GROC-000027,Grocery Product 000027,Grocery,GreenFarm,active,seasonal,1.3091,0.35,seasonal_peak,0.01
+01fc3b7e-8b29-50d3-a3d4-bc713fa84405,FASH-000028,Fashion Product 000028,Fashion,UrbanNorth,active,seasonal,0.9041,1.35,seasonal_peak,0.34
+e97682bc-117f-532b-8b65-b717c09bc30f,BEAU-000029,Beauty Product 000029,Beauty,SkinLab,active,seasonal,1.1543,0.70,seasonal_peak,0.08
+b7d44817-034b-51e8-84f0-70a921a96cdb,SPOR-000030,Sports Product 000030,Sports,FitCore,active,seasonal,1.5831,0.95,seasonal_peak,0.11
+85e7e944-3e11-5a89-ac96-c23167ff32dc,TOYS-000031,Toys Product 000031,Toys,PlayBox,active,seasonal,1.1839,1.05,seasonal_peak,0.09
+975dfb1e-69d1-5f10-8875-2e1acefd4859,PET -000032,Pet Care Product 000032,Pet Care,HappyPaws,active,seasonal,1.5478,0.45,seasonal_peak,0.02
+ac6c0b36-b856-5925-aca7-b8e3bb4639a3,ELEC-000033,Electronics Product 000033,Electronics,SoundWave,active,seasonal,1.1918,1.15,seasonal_peak,0.12
+7d15b52f-782f-5fa8-9c0b-78ebb03a07a5,HOME-000034,Home Improvement Product 000034,Home Improvement,NordicHome,active,seasonal,1.9109,0.80,seasonal_peak,0.14
+2532c2ec-f726-59a0-9af7-a077b1c5c99d,GROC-000035,Grocery Product 000035,Grocery,GreenFarm,active,seasonal,1.0989,0.35,seasonal_peak,0.01
+6e80b7e9-0667-54ce-838e-56aca777afef,FASH-000036,Fashion Product 000036,Fashion,UrbanNorth,active,seasonal,1.1991,1.35,seasonal_peak,0.34
+9a6922f7-9343-52bc-89b0-d1db33a0340d,BEAU-000037,Beauty Product 000037,Beauty,SkinLab,active,seasonal,1.1180,0.70,seasonal_peak,0.08
+f42ebea5-b984-5835-bd6a-106e6e6fdcfb,SPOR-000038,Sports Product 000038,Sports,FitCore,active,seasonal,1.7789,0.95,seasonal_peak,0.11
+9cf88386-0bed-5ac4-9a5f-045e8b2a7a00,TOYS-000039,Toys Product 000039,Toys,PlayBox,active,seasonal,0.9398,1.05,seasonal_peak,0.09
+ac8ce360-9980-5f71-b176-285323c963b8,PET -000040,Pet Care Product 000040,Pet Care,HappyPaws,active,seasonal,1.0173,0.45,seasonal_peak,0.02
+58e54d28-afe6-5090-9990-c3649b754085,ELEC-000041,Electronics Product 000041,Electronics,SoundWave,active,seasonal,1.5250,1.15,seasonal_peak,0.12
+ab1d5346-1d4b-582e-bd7a-c0685e487f0b,HOME-000042,Home Improvement Product 000042,Home Improvement,NordicHome,active,seasonal,1.0524,0.80,seasonal_peak,0.14
+5a4f9e8e-a5d6-5631-ae53-ffbfaec4450c,GROC-000043,Grocery Product 000043,Grocery,GreenFarm,active,seasonal,1.6664,0.35,seasonal_peak,0.01
+aea54154-8157-5774-8110-fba37ae17360,FASH-000044,Fashion Product 000044,Fashion,UrbanNorth,active,seasonal,1.4703,1.35,seasonal_peak,0.34
+293b0637-4956-51c6-b5b9-b71cef14f7a6,BEAU-000045,Beauty Product 000045,Beauty,SkinLab,active,seasonal,1.4341,0.70,seasonal_peak,0.08
+5125db4d-be56-5fed-8c57-2cb37186845a,SPOR-000046,Sports Product 000046,Sports,FitCore,active,new_product,0.9051,0.95,spring_summer_peak,0.11
+ce797b7a-af13-5663-88da-14c0a9fe5a63,TOYS-000047,Toys Product 000047,Toys,PlayBox,active,new_product,0.6057,1.05,holiday_peak,0.09
+ef4975d2-c692-52bd-9c55-6fc144747695,PET -000048,Pet Care Product 000048,Pet Care,HappyPaws,active,new_product,1.5452,0.45,weekly_sensitive,0.02
+91c81a29-2ca8-52e7-bffd-af9c56b7218c,ELEC-000049,Electronics Product 000049,Electronics,SoundWave,active,new_product,0.6170,1.15,weekly_sensitive,0.12
+ef601e27-fbe0-531a-8b8b-900d8745a901,HOME-000050,Home Improvement Product 000050,Home Improvement,NordicHome,active,new_product,1.3830,0.80,spring_summer_peak,0.14
+ee0c49cd-0889-5cbf-90de-badbe7517995,GROC-000051,Grocery Product 000051,Grocery,GreenFarm,active,new_product,0.9620,0.35,stable,0.01
+c74c4e40-b157-5011-aa3d-ec349fb61826,FASH-000052,Fashion Product 000052,Fashion,UrbanNorth,active,new_product,1.0976,1.35,holiday_peak,0.34
+bdef6401-48fd-5078-a4a6-0b385d763314,BEAU-000053,Beauty Product 000053,Beauty,SkinLab,active,new_product,1.3071,0.70,weekly_sensitive,0.08
+7ee0dda2-02c2-549d-92e2-6eb7117b919d,SPOR-000054,Sports Product 000054,Sports,FitCore,active,new_product,0.9313,0.95,spring_summer_peak,0.11
+ab4674bc-4106-51c6-b44a-9ca109374b4f,TOYS-000055,Toys Product 000055,Toys,PlayBox,active,new_product,1.2628,1.05,holiday_peak,0.09
+88370064-3581-5cf2-9047-50dd2a1397e0,PET -000056,Pet Care Product 000056,Pet Care,HappyPaws,active,new_product,0.9380,0.45,weekly_sensitive,0.02
+e99fb2c3-af82-55dc-a4f5-05e1d6698616,ELEC-000057,Electronics Product 000057,Electronics,SoundWave,active,new_product,0.7743,1.15,weekly_sensitive,0.12
+f32ca738-f369-5d10-a674-7ee267c90f10,HOME-000058,Home Improvement Product 000058,Home Improvement,NordicHome,active,new_product,0.6676,0.80,spring_summer_peak,0.14
+1a75e928-29ff-5256-9b8e-492b71e4a9eb,GROC-000059,Grocery Product 000059,Grocery,GreenFarm,active,new_product,1.1946,0.35,stable,0.01
+c05f9712-2ad5-54a6-bb81-158133cd3bd9,FASH-000060,Fashion Product 000060,Fashion,UrbanNorth,active,new_product,1.5072,1.35,holiday_peak,0.34
+dcbefd02-d790-5d82-b528-14470a618fa6,BEAU-000061,Beauty Product 000061,Beauty,SkinLab,active,declining_product,0.9046,0.70,weekly_sensitive,0.08
+70103cb6-8c8c-5035-8835-8dba958ea703,SPOR-000062,Sports Product 000062,Sports,FitCore,active,declining_product,0.7393,0.95,spring_summer_peak,0.11
+874f1b3f-f15c-5575-af9b-537ba7b68f80,TOYS-000063,Toys Product 000063,Toys,PlayBox,active,declining_product,1.0983,1.05,holiday_peak,0.09
+68343b6b-e6e1-53cd-9d7e-113d3dd3fb4f,PET -000064,Pet Care Product 000064,Pet Care,HappyPaws,active,declining_product,1.2348,0.45,weekly_sensitive,0.02
+9b06f7c5-92ba-5990-be5b-a7cd92658adc,ELEC-000065,Electronics Product 000065,Electronics,SoundWave,active,declining_product,1.3027,1.15,weekly_sensitive,0.12
+2e22974b-0c82-5383-be4f-44adda569aa6,HOME-000066,Home Improvement Product 000066,Home Improvement,NordicHome,active,declining_product,1.0666,0.80,spring_summer_peak,0.14
+284bddee-b37c-5c36-8aab-81867975f179,GROC-000067,Grocery Product 000067,Grocery,GreenFarm,active,declining_product,0.7942,0.35,stable,0.01
+06acb399-de3d-5662-8c40-c27c44a03030,FASH-000068,Fashion Product 000068,Fashion,UrbanNorth,active,declining_product,1.0613,1.35,holiday_peak,0.34
+b3187164-9efe-5f40-864a-e693c1808c39,BEAU-000069,Beauty Product 000069,Beauty,SkinLab,active,declining_product,0.9486,0.70,weekly_sensitive,0.08
+c9bc50a8-e5f6-504c-8618-2e9c520992ff,SPOR-000070,Sports Product 000070,Sports,FitCore,active,declining_product,0.7951,0.95,spring_summer_peak,0.11
+13aa843a-9cf9-5e5e-b377-21f2c5c1cfe1,TOYS-000071,Toys Product 000071,Toys,PlayBox,active,declining_product,1.2048,1.05,holiday_peak,0.09
+4dd85a2c-b259-5694-a7e6-1dbdd7a8b9f3,PET -000072,Pet Care Product 000072,Pet Care,HappyPaws,active,declining_product,1.0502,0.45,weekly_sensitive,0.02
+953af428-8548-5852-860e-88337bcfda1c,ELEC-000073,Electronics Product 000073,Electronics,SoundWave,active,declining_product,0.8902,1.15,weekly_sensitive,0.12
+6a250ba0-29a8-5939-9cc1-cba774d5109f,HOME-000074,Home Improvement Product 000074,Home Improvement,NordicHome,active,declining_product,1.2946,0.80,spring_summer_peak,0.14
+260c2bee-e4ea-5a81-b7cd-575a8882e7ca,GROC-000075,Grocery Product 000075,Grocery,GreenFarm,active,declining_product,1.0521,0.35,stable,0.01
+39f8628a-0f86-548c-91ee-718cae91d0c3,FASH-000076,Fashion Product 000076,Fashion,UrbanNorth,active,clearance_product,1.0557,1.35,holiday_peak,0.34
+d7ba719e-c372-52f1-a68d-888ec8fb1196,BEAU-000077,Beauty Product 000077,Beauty,SkinLab,active,clearance_product,0.9775,0.70,weekly_sensitive,0.08
+09e0d5b3-b51d-50cb-b5b7-2e5b62f35dc6,SPOR-000078,Sports Product 000078,Sports,FitCore,active,clearance_product,0.8159,0.95,spring_summer_peak,0.11
+1564b2e3-5405-5bf0-8ac8-706225799233,TOYS-000079,Toys Product 000079,Toys,PlayBox,active,clearance_product,1.1625,1.05,holiday_peak,0.09
+fe2b63a8-eeb4-5208-b8d1-f4bb758543f5,PET -000080,Pet Care Product 000080,Pet Care,HappyPaws,active,clearance_product,0.8321,0.45,weekly_sensitive,0.02
+818addc5-51d4-57c7-a7c6-b66bb513dcaf,ELEC-000081,Electronics Product 000081,Electronics,SoundWave,active,clearance_product,0.6648,1.15,weekly_sensitive,0.12
+6b73c00c-e450-51d6-b955-9cca56d368d3,HOME-000082,Home Improvement Product 000082,Home Improvement,NordicHome,active,clearance_product,1.1758,0.80,spring_summer_peak,0.14
+e213b766-e8ca-56ff-8715-94a8c16a108d,GROC-000083,Grocery Product 000083,Grocery,GreenFarm,active,clearance_product,0.6007,0.35,stable,0.01
+4043dc4a-96a5-5cb6-8f09-37f10cce0de1,FASH-000084,Fashion Product 000084,Fashion,UrbanNorth,active,clearance_product,0.7756,1.35,holiday_peak,0.34
+fafbca1c-6412-5747-af13-5c9678cf76df,BEAU-000085,Beauty Product 000085,Beauty,SkinLab,active,clearance_product,0.8211,0.70,weekly_sensitive,0.08
+80c37084-5ec1-5934-99a2-404b2f4d677a,SPOR-000086,Sports Product 000086,Sports,FitCore,active,long_tail,0.5251,0.95,spring_summer_peak,0.11
+4f4cdd86-60e0-5d5c-9eda-86f193a7cd21,TOYS-000087,Toys Product 000087,Toys,PlayBox,active,long_tail,0.7451,1.05,holiday_peak,0.09
+2480ade4-fd45-5f2a-96a0-bdb49cf41ba8,PET -000088,Pet Care Product 000088,Pet Care,HappyPaws,active,long_tail,0.4493,0.45,weekly_sensitive,0.02
+adacd216-df4b-557a-bee5-9d117848c764,ELEC-000089,Electronics Product 000089,Electronics,SoundWave,active,long_tail,0.5136,1.15,weekly_sensitive,0.12
+ec348c6b-cb3f-5826-a791-37217bfd82f6,HOME-000090,Home Improvement Product 000090,Home Improvement,NordicHome,active,long_tail,0.7228,0.80,spring_summer_peak,0.14
+8cf4f802-4e89-570e-93f8-e6fcceaa622b,GROC-000091,Grocery Product 000091,Grocery,GreenFarm,active,long_tail,0.6813,0.35,stable,0.01
+398b86fc-73de-5291-ac6a-14681329475c,FASH-000092,Fashion Product 000092,Fashion,UrbanNorth,active,long_tail,0.3496,1.35,holiday_peak,0.34
+e760945c-f9e6-5e2e-9858-aceb64faaf84,BEAU-000093,Beauty Product 000093,Beauty,SkinLab,active,long_tail,0.5957,0.70,weekly_sensitive,0.08
+a5c55cd2-b68a-541d-8134-ac1136a677dc,SPOR-000094,Sports Product 000094,Sports,FitCore,active,long_tail,0.4277,0.95,spring_summer_peak,0.11
+ebd800fd-0820-5593-9f02-c5ad7575757b,TOYS-000095,Toys Product 000095,Toys,PlayBox,active,long_tail,0.1965,1.05,holiday_peak,0.09
+57a04d7b-ffa2-55d5-8e3c-3099d16cc188,PET -000096,Pet Care Product 000096,Pet Care,HappyPaws,active,long_tail,0.2913,0.45,weekly_sensitive,0.02
+746e83f8-c019-5f34-be65-3ba6d9311b16,ELEC-000097,Electronics Product 000097,Electronics,SoundWave,active,long_tail,0.2700,1.15,weekly_sensitive,0.12
+20bd9198-afef-51b5-88cd-25eecdc6a243,HOME-000098,Home Improvement Product 000098,Home Improvement,NordicHome,active,long_tail,0.4114,0.80,spring_summer_peak,0.14
+da3b1539-9617-5466-87e9-e053e2419729,GROC-000099,Grocery Product 000099,Grocery,GreenFarm,active,long_tail,0.4960,0.35,stable,0.01
+1e4e8bdc-40be-58a9-9f14-c7b0c6af9c9c,FASH-000100,Fashion Product 000100,Fashion,UrbanNorth,active,long_tail,0.2458,1.35,holiday_peak,0.34

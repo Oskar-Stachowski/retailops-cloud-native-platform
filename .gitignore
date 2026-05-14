@@ -252,8 +252,11 @@ SENIOR_LEVEL_UPGRADE_PLAN.md
 REPOSITORY_AUDIT.md
 SENIOR_LEVEL_UPGRADE_PLAN.md
 
-# Generated synthetic datasets beyond the small committed demo seed.
-data/synthetic/
+# Generated synthetic datasets.
+# Keep the small seed profile versioned for CI/local reproducibility.
+data/synthetic/*
+!data/synthetic/small/
+!data/synthetic/small/**
 data/generated/
 data/replay/
 
