@@ -514,3 +514,20 @@ Future sprints will extend this foundation:
 | MLOps | Model evaluation, model promotion, model rollback evidence |
 
 Until those foundations exist, Jenkins remains a local release-confidence pipeline skeleton rather than a real cloud deployment pipeline.
+
+---
+
+## GitHub Actions CI governance update
+
+Reviewer-facing CI governance is documented in:
+
+- `docs/governance/github-actions-ci.md`
+- `docs/governance/branch-protection.md`
+
+Reusable GitHub Actions logic is kept intentionally small under:
+
+- `.github/actions/setup-python-ci`
+- `.github/actions/setup-node-ci`
+- `.github/actions/upload-ci-evidence`
+
+CI evidence uploaded by workflows should continue to use the `ci-cd/reports/**` convention. Branch protection is considered documented from repository code, but not fully proven until a GitHub Settings screenshot confirms that the required checks are enabled on `main`.

@@ -1,0 +1,30 @@
+name: Upload CI Evidence
+
+description: Upload a workflow evidence artifact with a consistent naming and retention policy.
+
+inputs:
+  name:
+    description: Artifact name shown in the GitHub Actions run.
+    required: true
+  path:
+    description: File, directory, or newline-separated paths to upload.
+    required: true
+  if-no-files-found:
+    description: Behavior when evidence paths do not exist.
+    required: false
+    default: warn
+  retention-days:
+    description: Number of days GitHub should retain the evidence artifact.
+    required: false
+    default: "14"
+
+runs:
+  using: composite
+  steps:
+    - name: Upload CI evidence
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.name }}
+        path: ${{ inputs.path }}
+        if-no-files-found: ${{ inputs.if-no-files-found }}
+        retention-days: ${{ inputs.retention-days }}

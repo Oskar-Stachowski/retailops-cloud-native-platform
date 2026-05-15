@@ -7,7 +7,11 @@ on:
       - "data/**"
       - "events/**"
       - "scripts/data/**"
+      - "ml/**"
       - "pyproject.toml"
+      - "pytest.ini"
+      - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/api-ci.yml"
   pull_request:
     paths:
@@ -15,16 +19,34 @@ on:
       - "data/**"
       - "events/**"
       - "scripts/data/**"
+      - "ml/**"
       - "pyproject.toml"
+      - "pytest.ini"
+      - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/api-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: api-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DATABASE_URL: postgresql://retailops:retailops@localhost:5432/retailops
+  REQUIRE_DB_TESTS: "1"
+  PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/services/api
+  API_REPORT_DIR: ci-cd/reports/api
+  DATA_REPORT_DIR: ci-cd/reports/data
+  SECURITY_REPORT_DIR: ci-cd/reports/security
 
 jobs:
   api-integration-tests:
     name: API integration tests
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     services:
       postgres:
@@ -41,60 +63,55 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    env:
-      DATABASE_URL: postgresql://retailops:retailops@localhost:5432/retailops
-      REQUIRE_DB_TESTS: "1"
-      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/services/api
-
     defaults:
       run:
+        shell: bash
         working-directory: services/api
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: |
-            services/api/requirements.txt
-            services/api/requirements-dev.txt
+          persist-credentials: false
 
-      - name: Install Python dependencies
-        run: pip install -r requirements-dev.txt
+      - name: Set up Python CI toolchain
+        uses: ./.github/actions/setup-python-ci
+
+      - name: Prepare evidence directories
+        working-directory: .
+        run: mkdir -p "${API_REPORT_DIR}" "${DATA_REPORT_DIR}" "${SECURITY_REPORT_DIR}"
 
       - name: Run backend static quality gates
         working-directory: .
         run: |
-          ruff check services/api data --config pyproject.toml
-          ruff format --check services/api data --config pyproject.toml
-          mypy --config-file pyproject.toml
-          mkdir -p ci-cd/reports/security
-          bandit --exit-zero -q -r services/api/app services/api/scripts -f txt -o ci-cd/reports/security/bandit-api.txt
+          set -euo pipefail
+          python -m ruff check services/api/app services/api/scripts services/api/tests data ml --config pyproject.toml
+          python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml --config pyproject.toml
+          python -m mypy --config-file pyproject.toml
+          python -m bandit --exit-zero -q -r services/api/app services/api/scripts -f txt -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
 
       - name: Generate demo CSV dataset
-        run: python -m data.generator.main
         working-directory: .
+        run: python -m data.generator.main
 
       - name: Validate data contracts and scenario coverage
-        run: make data-contracts data-scenario-report
         working-directory: .
+        run: make data-contracts data-scenario-report
 
       - name: Run database migrations
         env:
-          PYTHONPATH: ""
+          PYTHONPATH: .
         run: alembic upgrade head
 
       - name: Seed demo data
         env:
+          PYTHONPATH: .
           RETAILOPS_SEED_DATA_PROFILE: demo
         run: python scripts/seed_demo_data.py
 
-      - name: Run API tests
+      - name: Run API tests with coverage
         run: |
+          set -euo pipefail
           mkdir -p ../../ci-cd/reports/api
           rm -f .coverage .coverage.*
           pytest \
@@ -103,30 +120,74 @@ jobs:
             --cov-branch \
             --cov-report=xml:../../ci-cd/reports/api/coverage.xml
 
+      - name: Write API CI summary
+        if: always()
+        working-directory: .
+        run: |
+          {
+            echo "## API CI evidence"
+            echo ""
+            echo "| Evidence | Path |"
+            echo "|---|---|"
+            echo "| Coverage XML | \`ci-cd/reports/api/coverage.xml\` |"
+            echo "| Bandit report | \`ci-cd/reports/security/bandit-api.txt\` |"
+            echo "| Data contract report | \`ci-cd/reports/data/data-contract-report.json\` |"
+            echo "| Scenario coverage report | \`ci-cd/reports/data/scenario-coverage-report.json\` |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Upload API coverage evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: api-coverage-evidence
           path: ci-cd/reports/api/coverage.xml
           if-no-files-found: warn
 
-      - name: Upload API security lint evidence
+      - name: Upload API security evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: api-bandit-evidence
           path: ci-cd/reports/security/bandit-api.txt
           if-no-files-found: warn
 
+      - name: Upload API data evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: api-data-contract-evidence
+          path: |
+            ci-cd/reports/data/data-contract-report.json
+            ci-cd/reports/data/scenario-coverage-report.json
+            docs/evidence/data/scenario-coverage-report.md
+          if-no-files-found: warn
+
   api-image-build:
     name: API Docker image build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: api-integration-tests
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare API image evidence directory
+        run: mkdir -p ci-cd/reports/docker
 
       - name: Build API Docker image
         run: docker build -t retailops-api:ci services/api
+
+      - name: Capture API image metadata
+        if: always()
+        run: docker image inspect retailops-api:ci > ci-cd/reports/docker/api-image-inspect.json || true
+
+      - name: Upload API image build evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: api-image-build-evidence
+          path: ci-cd/reports/docker/api-image-inspect.json
+          if-no-files-found: warn

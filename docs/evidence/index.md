@@ -1,6 +1,6 @@
 # Evidence Index
 
-Last reviewed: 2026-05-13
+Last reviewed: 2026-05-15
 
 This index maps tracked evidence to what it proves. It avoids treating documentation claims, roadmap diagrams, or target architecture text as proof of implementation.
 
@@ -30,6 +30,8 @@ Use the same refresh pattern when an artifact becomes stale:
 | Evidence governance | `docs/evidence/README.md` | Evidence layer has a documented purpose and split between curated evidence and raw reports. | Documentation | Recruiter-facing | Updated during evidence cleanup. |
 | Evidence governance | `docs/evidence/evidence-folder-map.md` | Final evidence structure and expected folder usage are documented. | Documentation | Internal and reviewer-facing | Updated during evidence cleanup. |
 | Evidence governance | `docs/evidence/gitignore-evidence-policy.md` | Repository has explicit rules for tracked versus ignored evidence. | Git hygiene | Internal | Matched against root `.gitignore`. |
+| CI governance | `docs/governance/github-actions-ci.md` | GitHub Actions workflows, composite actions, evidence paths, and known CI boundaries are mapped to the readiness checklist. | GitHub Actions, CI/CD | Reviewer-facing | Added during GitHub Actions CI readiness update. |
+| CI governance | `docs/governance/branch-protection.md` | Expected `main` branch protection settings and required GitHub Actions checks are documented. | GitHub Actions, branch protection | Reviewer-facing | Requires GitHub Settings screenshot before claiming enforcement. |
 | API | `docs/evidence/api/README.md` | API evidence folder is indexed for reviewer navigation. | Backend/API | Recruiter-facing | Added for API-001 and API-009 evidence. |
 | API | `docs/evidence/api/startup-log.md` | FastAPI starts under Uvicorn and responds to `/health`. | Backend/API | Recruiter-facing | Captured from local Uvicorn run on `127.0.0.1:8011`. |
 | API | `docs/evidence/api/openapi-snapshot.json` | Running API exposes a concrete OpenAPI schema at `/openapi.json`. | Backend/API | Technical reviewer | Captured with `curl` and formatted with `jq`. |

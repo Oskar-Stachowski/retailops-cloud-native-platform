@@ -11,7 +11,9 @@ on:
       - "services/api/**"
       - "frontend/**"
       - "data/**"
+      - "events/**"
       - "observability/**"
+      - ".github/actions/**"
       - ".github/workflows/docker-ci.yml"
   pull_request:
     paths:
@@ -23,21 +25,30 @@ on:
       - "services/api/**"
       - "frontend/**"
       - "data/**"
+      - "events/**"
       - "observability/**"
+      - ".github/actions/**"
       - ".github/workflows/docker-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: docker-compose-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   compose-config:
     name: Validate Docker Compose config
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Validate Docker Compose config
         run: make compose-config
@@ -45,10 +56,18 @@ jobs:
       - name: Validate Compose profiles
         run: make compose-profile-config
 
+      - name: Upload Compose config evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: docker-compose-config-evidence
+          path: ci-cd/reports/docker/
+          if-no-files-found: warn
+
   compose-smoke:
     name: Build full stack and run smoke tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: compose-config
 
     env:
@@ -58,6 +77,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Show Docker versions
         run: |
@@ -67,9 +88,23 @@ jobs:
       - name: Build, start and smoke-test full stack
         run: make compose-ci
 
-      - name: Upload Compose evidence
+      - name: Write Docker Compose CI summary
         if: always()
-        uses: actions/upload-artifact@v4
+        run: |
+          {
+            echo "## Docker Compose CI evidence"
+            echo ""
+            echo "| Evidence | Path |"
+            echo "|---|---|"
+            echo "| Compose process snapshot | \`ci-cd/reports/docker-compose-ps.txt\` |"
+            echo "| Compose failure logs | \`ci-cd/reports/docker-compose-logs.txt\` |"
+            echo "| Docker profile configs | \`ci-cd/reports/docker/\` |"
+            echo "| Observability smoke evidence | \`ci-cd/reports/observability/\` |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload Compose smoke evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: docker-compose-ci-evidence
           path: |

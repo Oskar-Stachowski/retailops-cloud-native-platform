@@ -1,6 +1,13 @@
 # Default code review owner for this portfolio repository.
 * @Oskar-Stachowski
 
+# CI/CD and governance files should be reviewed carefully because they define merge confidence.
+/.github/ @Oskar-Stachowski
+/.github/workflows/ @Oskar-Stachowski
+/.github/actions/ @Oskar-Stachowski
+/docs/governance/ @Oskar-Stachowski
+/ci-cd/ @Oskar-Stachowski
+
 # Domain-specific ownership hints for future expansion.
 /services/api/ @Oskar-Stachowski
 /frontend/ @Oskar-Stachowski

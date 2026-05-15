@@ -20,8 +20,8 @@ on:
       - "services/api/requirements-dev.txt"
       - "scripts/ci/observability_smoke.sh"
       - "scripts/dev/observability_demo_traffic.sh"
+      - ".github/actions/**"
       - ".github/workflows/observability-ci.yml"
-
   pull_request:
     paths:
       - "observability/**"
@@ -41,54 +41,57 @@ on:
       - "services/api/requirements-dev.txt"
       - "scripts/ci/observability_smoke.sh"
       - "scripts/dev/observability_demo_traffic.sh"
+      - ".github/actions/**"
       - ".github/workflows/observability-ci.yml"
-
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: observability-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   observability-static-checks:
     name: Validate observability assets
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare observability evidence directory
+        run: mkdir -p ci-cd/reports/observability
 
       - name: Validate Prometheus configuration
         run: |
+          set -euo pipefail
           docker run --rm \
             --entrypoint=/bin/promtool \
             -v "${PWD}/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
             prom/prometheus:v3.7.3 \
-            check config /etc/prometheus/prometheus.yml
+            check config /etc/prometheus/prometheus.yml 2>&1 | tee ci-cd/reports/observability/prometheus-config-check.txt
 
       - name: Validate Prometheus alert rules
         run: |
+          set -euo pipefail
           docker run --rm \
             --entrypoint=/bin/sh \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
             prom/prometheus:v3.7.3 \
-            -c '/bin/promtool check rules /etc/prometheus/rules/*.yml'
+            -c '/bin/promtool check rules /etc/prometheus/rules/*.yml' 2>&1 | tee ci-cd/reports/observability/prometheus-rules-check.txt
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: |
-            services/api/requirements.txt
-            services/api/requirements-dev.txt
-
-      - name: Install Python dependencies
-        run: pip install -r services/api/requirements-dev.txt
+      - name: Set up Python CI toolchain
+        uses: ./.github/actions/setup-python-ci
 
       - name: Run focused observability tests
         run: |
+          set -euo pipefail
           PYTHONPATH=services/api pytest \
             services/api/tests/test_prometheus_configuration.py \
             services/api/tests/test_prometheus_alert_rules.py \
@@ -97,4 +100,12 @@ jobs:
             services/api/tests/test_database_instrumentation.py \
             services/api/tests/test_structured_logging.py \
             services/api/tests/test_correlation_id.py \
-            services/api/tests/test_stream_observability.py
+            services/api/tests/test_stream_observability.py 2>&1 | tee ci-cd/reports/observability/pytest-observability.txt
+
+      - name: Upload observability evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: observability-ci-evidence
+          path: ci-cd/reports/observability/
+          if-no-files-found: warn
