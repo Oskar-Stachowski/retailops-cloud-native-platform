@@ -291,3 +291,6 @@ override.tf.json
 
 # Local editor preferences
 .vscode/settings.json
+
+# k8s
+k8s/overlays/dev/secrets.env

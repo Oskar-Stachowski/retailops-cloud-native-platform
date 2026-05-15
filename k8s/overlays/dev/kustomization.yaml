@@ -54,6 +54,5 @@ configMapGenerator:
 
 secretGenerator:
   - name: retailops-runtime-secrets
-    literals:
-      - DATABASE_URL=postgresql://retailops:change-me@postgres:5432/retailops
-      - POSTGRES_PASSWORD=change-me
+    envs:
+      - secrets.env

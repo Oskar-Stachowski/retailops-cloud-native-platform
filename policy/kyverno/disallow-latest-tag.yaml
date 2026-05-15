@@ -1,0 +1,34 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: retailops-disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow latest image tag
+    policies.kyverno.io/category: Supply Chain Security
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-immutable-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Images must not use the mutable ':latest' tag."
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: EndsWith
+                    value: ":latest"
+          - list: "request.object.spec.initContainers || []"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: EndsWith
+                    value: ":latest"

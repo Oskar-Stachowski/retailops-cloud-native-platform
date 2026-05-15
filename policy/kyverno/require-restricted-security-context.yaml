@@ -1,0 +1,37 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: retailops-require-restricted-security-context
+  annotations:
+    policies.kyverno.io/title: Require restricted container security context
+    policies.kyverno.io/category: Pod Security
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: disallow-privilege-escalation
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Containers must not allow privilege escalation."
+        foreach:
+          - list: "request.object.spec.containers"
+            pattern:
+              securityContext:
+                allowPrivilegeEscalation: false
+    - name: require-runtime-default-seccomp
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Pods must use seccompProfile RuntimeDefault."
+        pattern:
+          spec:
+            securityContext:
+              seccompProfile:
+                type: RuntimeDefault
