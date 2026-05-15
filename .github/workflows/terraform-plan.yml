@@ -5,11 +5,13 @@ on:
     paths:
       - "infra/**"
       - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/terraform-plan.yml"
   pull_request:
     paths:
       - "infra/**"
       - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/terraform-plan.yml"
   workflow_dispatch:
     inputs:
@@ -21,6 +23,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: terraform-iac-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   TF_IN_AUTOMATION: "true"
@@ -36,6 +42,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -51,19 +59,18 @@ jobs:
 
       - name: Upload Terraform validation evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: terraform-validation-evidence
-          path: |
-            ci-cd/reports/iac/terraform-validate.txt
-          if-no-files-found: ignore
+          path: ci-cd/reports/iac/terraform-validate.txt
+          if-no-files-found: warn
 
   terraform-plan-dev:
     name: Optional dev Terraform plan
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: terraform-validate
-    if: github.event_name == 'workflow_dispatch' && inputs.run_dev_plan == true
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_dev_plan == 'true'
 
     permissions:
       contents: read
@@ -72,6 +79,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -94,9 +103,8 @@ jobs:
 
       - name: Upload Terraform plan evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: terraform-dev-plan-evidence
-          path: |
-            ci-cd/reports/iac/terraform-plan-dev.txt
-          if-no-files-found: ignore
+          path: ci-cd/reports/iac/terraform-plan-dev.txt
+          if-no-files-found: warn

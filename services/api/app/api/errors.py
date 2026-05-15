@@ -38,27 +38,35 @@ def _http_error_message(status_code: int) -> str:
     }.get(status_code, "HTTP error")
 
 
+def _normalize_http_exception_detail(status_code: int, detail: object) -> dict:
+    default_code = _http_error_code(status_code)
+    default_message = _http_error_message(status_code)
+
+    if isinstance(detail, dict):
+        normalized = error_response(
+            code=str(detail.get("code") or default_code),
+            message=str(detail.get("message") or default_message),
+        )
+        details = detail.get("details")
+        if isinstance(details, list):
+            normalized["error"]["details"] = details
+        return normalized
+
+    if isinstance(detail, str) and detail.strip():
+        return error_response(code=default_code, message=detail)
+
+    return error_response(code=default_code, message=default_message)
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(
         request: Request,  # noqa: ARG001 - FastAPI exception handler signature
         exc: StarletteHTTPException,
     ) -> JSONResponse:
-        if isinstance(exc.detail, dict):
-            code = str(exc.detail.get("code") or _http_error_code(exc.status_code))
-            message = str(exc.detail.get("message") or _http_error_message(exc.status_code))
-
-            return JSONResponse(
-                status_code=exc.status_code,
-                content=error_response(code=code, message=message),
-            )
-
         return JSONResponse(
             status_code=exc.status_code,
-            content=error_response(
-                code=_http_error_code(exc.status_code),
-                message=_http_error_message(exc.status_code),
-            ),
+            content=_normalize_http_exception_detail(exc.status_code, exc.detail),
         )
 
     @app.exception_handler(RequestValidationError)

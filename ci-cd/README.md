@@ -10,6 +10,8 @@ RetailOps uses a local-first delivery model. The project proves application, dat
 
 The current repository keeps CI/CD evidence local-first, with selected sanitized snapshots committed when they are useful for portfolio review.
 
+Evidence freshness is tracked in `docs/evidence/index.md`. When a committed screenshot or snapshot becomes stale, refresh it with the original command path and update the ledger row rather than adding a second undocumented artifact.
+
 Implemented:
 
 - GitHub Actions API CI gate.
@@ -77,6 +79,8 @@ Common commands:
 |---|---|
 | `make install` | Install backend and frontend dependencies |
 | `make ci-local` | Run local code-confidence checks |
+| `make api-type-check` | Run mypy against the curated typed backend modules |
+| `make api-security-lint` | Generate a report-only Bandit scan for backend application and script code |
 | `make data-quality` | Generate a synthetic dataset and fail if `quality_report.json` is not `passed` |
 | `make compose-ci` | Build and run the full Docker Compose stack, then execute smoke tests |
 | `make security-scan` | Run local secret, filesystem, and image security scans |
@@ -123,6 +127,7 @@ Purpose:
 
 - Start PostgreSQL service.
 - Generate demo CSV data.
+- Run Ruff and mypy as gates, plus a report-only Bandit backend security scan.
 - Run Alembic migrations.
 - Seed demo data.
 - Run backend tests.
@@ -208,6 +213,8 @@ The smoke test validates:
 - frontend proxy `/api/ready`
 
 The evidence is uploaded to the workflow run as an artifact, not committed to the repository.
+
+To refresh reviewer-facing evidence from this workflow locally, rerun `make compose-ci`, replace the curated artifact in `docs/evidence/docker/`, and update the metadata row in `docs/evidence/index.md`.
 
 ### 4.4 Security CI
 
@@ -507,3 +514,20 @@ Future sprints will extend this foundation:
 | MLOps | Model evaluation, model promotion, model rollback evidence |
 
 Until those foundations exist, Jenkins remains a local release-confidence pipeline skeleton rather than a real cloud deployment pipeline.
+
+---
+
+## GitHub Actions CI governance update
+
+Reviewer-facing CI governance is documented in:
+
+- `docs/governance/github-actions-ci.md`
+- `docs/governance/branch-protection.md`
+
+Reusable GitHub Actions logic is kept intentionally small under:
+
+- `.github/actions/setup-python-ci`
+- `.github/actions/setup-node-ci`
+- `.github/actions/upload-ci-evidence`
+
+CI evidence uploaded by workflows should continue to use the `ci-cd/reports/**` convention. Branch protection is considered documented from repository code, but not fully proven until a GitHub Settings screenshot confirms that the required checks are enabled on `main`.

@@ -67,6 +67,25 @@ The `demo` profile writes to `data/demo` by default. The `small`, `medium`, and
 by Git. Their sizing strategy is documented in
 [RetailOps Synthetic Data Profiles](../docs/synthetic-data-profiles.md).
 
+## Seed PostgreSQL with a dataset profile
+
+The API seed loader supports three operational seed profiles:
+
+- `demo`: small smoke/CI dataset
+- `small`: default local portfolio dataset
+- `medium`: optional showcase/performance dataset
+
+From the repository root:
+
+```bash
+make api-seed-demo
+make api-seed-small
+make api-seed-medium
+```
+
+The loader reads `RETAILOPS_SEED_DATA_PROFILE=demo|small|medium`. You can point
+at a custom CSV directory with `RETAILOPS_SEED_DATA_DIR=/path/to/csvs`.
+
 Synthetic profiles beyond `demo` include a realism layer:
 
 - deterministic randomness controlled by `--seed`,

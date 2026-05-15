@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. The frontend, API routes, dashboard views, and workflow foundations exist; auth hardening and several surrounding services remain target design.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "basis", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart LR

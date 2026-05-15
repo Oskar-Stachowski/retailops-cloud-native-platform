@@ -2,6 +2,8 @@
 
 This directory will contain observability assets for the RetailOps Platform.
 
+Current status: `Implemented` for local Prometheus metrics, Grafana provisioning, alert rules, and smoke checks. `Target` for centralized logging, distributed tracing, and cloud runtime observability.
+
 Planned MVP / target responsibilities:
 - define application and platform metrics,
 - store Prometheus configuration,
@@ -99,10 +101,22 @@ Current alert coverage:
 - consumer down or missing,
 - high and critical processing latency.
 
-Run the local API and Prometheus stack with:
+Run the local API and Prometheus/Grafana stack with:
 
 ```bash
 make observability-up
+```
+
+Validate the dedicated observability profile with:
+
+```bash
+COMPOSE_PROFILES=observability docker compose config
+```
+
+If a checklist requires an explicit observability Compose file, use the thin overlay:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.observability.yml --profile observability config
 ```
 
 Run the streaming smoke checks against a running Compose stack with:
@@ -117,6 +131,8 @@ evidence under `ci-cd/reports/observability` with:
 ```bash
 make observability-smoke
 ```
+
+When this evidence is refreshed, update the matching metadata row in `docs/evidence/index.md` so the capture date, commit SHA, command, and expected outcome stay visible to reviewers.
 
 Generate a local demo scenario with correlated API traffic, live business
 events, duplicate handling and one dead-lettered event with:

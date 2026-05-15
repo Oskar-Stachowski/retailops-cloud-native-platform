@@ -30,6 +30,29 @@ def parse_cors_origins(value: str | None) -> list[str]:
     return parse_csv_values(value, DEFAULT_CORS_ORIGINS)
 
 
+def parse_bool(value: str | None, *, default: bool = False) -> bool:
+    if value is None or value.strip() == "":
+        return default
+
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+
+    return default
+
+
+def parse_float(value: str | None, default: float) -> float:
+    if value is None or value.strip() == "":
+        return default
+
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
 class Settings(BaseModel):
     app_env: str = "local"
     database_url: str | None = None
@@ -38,6 +61,12 @@ class Settings(BaseModel):
     broker_group_id: str = "retailops-api-consumer"
     broker_client_id: str = "retailops-api"
     broker_topics: list[str] = DEFAULT_BROKER_TOPICS
+    otel_enabled: bool = False
+    otel_service_name: str = "retailops-api"
+    otel_exporter: str = "console"
+    otel_otlp_endpoint: str | None = None
+    otel_trace_sample_rate: float = 1.0
+    otel_excluded_urls: str = "/health,/ready,/metrics"
 
 
 @lru_cache
@@ -58,6 +87,18 @@ def get_settings() -> Settings:
         broker_topics=parse_csv_values(
             os.getenv("RETAILOPS_BROKER_TOPICS"),
             DEFAULT_BROKER_TOPICS,
+        ),
+        otel_enabled=parse_bool(os.getenv("RETAILOPS_OTEL_ENABLED")),
+        otel_service_name=os.getenv("RETAILOPS_OTEL_SERVICE_NAME", "retailops-api"),
+        otel_exporter=os.getenv("RETAILOPS_OTEL_EXPORTER", "console"),
+        otel_otlp_endpoint=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"),
+        otel_trace_sample_rate=parse_float(
+            os.getenv("RETAILOPS_OTEL_TRACE_SAMPLE_RATE"),
+            1.0,
+        ),
+        otel_excluded_urls=os.getenv(
+            "RETAILOPS_OTEL_EXCLUDED_URLS",
+            "/health,/ready,/metrics",
         ),
     )
 

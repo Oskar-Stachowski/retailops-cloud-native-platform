@@ -4,82 +4,143 @@ on:
   push:
     paths:
       - "frontend/**"
+      - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/frontend-ci.yml"
   pull_request:
     paths:
       - "frontend/**"
+      - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/frontend-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FRONTEND_REPORT_DIR: ci-cd/reports/frontend
 
 jobs:
   frontend-quality-checks:
     name: Frontend tests and lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     defaults:
       run:
+        shell: bash
         working-directory: frontend
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
         with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          persist-credentials: false
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Set up Node.js CI toolchain
+        uses: ./.github/actions/setup-node-ci
+
+      - name: Prepare frontend evidence directory
+        working-directory: .
+        run: mkdir -p "${FRONTEND_REPORT_DIR}"
 
       - name: Run frontend tests
-        run: npm test
+        run: |
+          set -euo pipefail
+          npm test 2>&1 | tee ../ci-cd/reports/frontend/test.txt
 
       - name: Run frontend lint
-        run: npm run lint --if-present
+        run: |
+          set -euo pipefail
+          npm run lint 2>&1 | tee ../ci-cd/reports/frontend/lint.txt
+
+      - name: Upload frontend quality evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: frontend-quality-evidence
+          path: |
+            ci-cd/reports/frontend/test.txt
+            ci-cd/reports/frontend/lint.txt
+          if-no-files-found: warn
 
   frontend-build:
     name: Build frontend application
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: frontend-quality-checks
 
     defaults:
       run:
+        shell: bash
         working-directory: frontend
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
         with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          persist-credentials: false
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Set up Node.js CI toolchain
+        uses: ./.github/actions/setup-node-ci
+
+      - name: Prepare frontend evidence directory
+        working-directory: .
+        run: mkdir -p "${FRONTEND_REPORT_DIR}"
 
       - name: Build frontend application
-        run: npm run build
+        run: |
+          set -euo pipefail
+          npm run build 2>&1 | tee ../ci-cd/reports/frontend/build.txt
+
+      - name: Upload frontend build evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: frontend-build-evidence
+          path: |
+            ci-cd/reports/frontend/build.txt
+            frontend/dist/
+          if-no-files-found: warn
 
   frontend-docker-image:
     name: Build frontend Docker image
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: frontend-build
 
     defaults:
       run:
+        shell: bash
         working-directory: frontend
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare Docker evidence directory
+        working-directory: .
+        run: mkdir -p ci-cd/reports/docker
 
       - name: Build frontend Docker image
         run: docker build -t retailops-frontend:ci .
+
+      - name: Capture frontend image metadata
+        if: always()
+        working-directory: .
+        run: docker image inspect retailops-frontend:ci > ci-cd/reports/docker/frontend-image-inspect.json || true
+
+      - name: Upload frontend image build evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: frontend-image-build-evidence
+          path: ci-cd/reports/docker/frontend-image-inspect.json
+          if-no-files-found: warn

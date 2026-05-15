@@ -9,8 +9,8 @@ export const ENDPOINTS = {
   health: ["/health"],
   readiness: ["/ready"],
   dashboardSummary: ["/dashboard/summary", "/dashboard-summary"],
-  dashboardOperationalVisibility: ["/dashboard/operational-visibility"],
-  dashboardSalesTrend: ["/dashboard/sales-trend"],
+  dashboardOperationalVisibility: ["/dashboard/operational-visibility?sales_trend_days=30"],
+  dashboardSalesTrend: ["/dashboard/sales-trend?days=30"],
   dashboardAlerts: ["/dashboard/alerts"],
   dashboardRecommendations: ["/dashboard/recommendations"],
   dashboardOpenWorkItems: ["/dashboard/open-work-items"],
@@ -93,6 +93,87 @@ export function listFromKnownKeys(payload, keys = []) {
   }
 
   return listFromPayload(unwrapped);
+}
+
+export function buildQueryPath(path, params = {}) {
+  const [basePath, existingQuery = ""] = path.split("?");
+  const query = new URLSearchParams(existingQuery);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      query.set(key, String(value));
+    }
+  });
+
+  const queryString = query.toString();
+  return queryString ? `${basePath}?${queryString}` : basePath;
+}
+
+function paginationFromPayload(payload) {
+  const unwrapped = unwrapPayload(payload);
+  return payload?.pagination || unwrapped?.pagination || null;
+}
+
+async function getPaginatedItems(
+  path,
+  options = {},
+  { limit = 100, maxItems = 2_000, params = {} } = {},
+) {
+  const items = [];
+  let offset = 0;
+
+  while (items.length < maxItems) {
+    const pagePath = buildQueryPath(path, {
+      ...params,
+      limit,
+      offset,
+    });
+    const payload = await apiGet(pagePath, options);
+    const pageItems = listFromPayload(payload);
+    const pagination = paginationFromPayload(payload);
+
+    items.push(...pageItems);
+
+    if (!pagination || pageItems.length === 0) {
+      break;
+    }
+
+    const total = Number(pagination.total ?? pagination.total_items ?? pagination.count);
+    const pageLimit = Number(pagination.limit) || limit;
+    const pageOffset = Number(pagination.offset) || offset;
+
+    if (Number.isFinite(total) && items.length >= total) {
+      break;
+    }
+
+    if (pageItems.length < pageLimit) {
+      break;
+    }
+
+    offset = pageOffset + pageLimit;
+  }
+
+  return items.slice(0, maxItems);
+}
+
+async function apiGetPaginatedOptional(path, options = {}, pagingOptions = {}) {
+  try {
+    return {
+      ok: true,
+      path,
+      data: {
+        items: await getPaginatedItems(path, options, pagingOptions),
+      },
+      error: null,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      path,
+      data: null,
+      error,
+    };
+  }
 }
 
 export function formatSourceStatus(result) {
@@ -241,9 +322,35 @@ export async function getReadinessStatus(options = {}) {
   return apiGetOptional(ENDPOINTS.readiness, options);
 }
 
+function buildProductListParams(options = {}) {
+  return {
+    search: options.search,
+    category: options.category,
+    status: options.status,
+    sort_by: options.sortBy || options.sort_by,
+    sort_order: options.sortOrder || options.sort_order,
+  };
+}
+
+function buildListRequestOptions(options = {}) {
+  return {
+    baseUrl: options.baseUrl,
+    timeoutMs: options.timeoutMs,
+    signal: options.signal,
+    headers: options.headers,
+  };
+}
+
 export async function getProducts(options = {}) {
-  const payload = await apiGet(ENDPOINTS.products[0], options);
-  return listFromPayload(payload);
+  return getPaginatedItems(
+    ENDPOINTS.products[0],
+    buildListRequestOptions(options),
+    {
+      limit: options.limit || 100,
+      maxItems: options.maxItems || 2_000,
+      params: buildProductListParams(options),
+    },
+  );
 }
 
 export async function getProduct360(productId, options = {}) {
@@ -251,12 +358,35 @@ export async function getProduct360(productId, options = {}) {
     throw new Error("Product id is required to load Product 360.");
   }
 
-  return apiGet(ENDPOINTS.product360(productId), options);
+  const path = buildQueryPath(ENDPOINTS.product360(productId), {
+    limit: options.limit,
+  });
+
+  return apiGet(path, options);
+}
+
+function buildForecastListParams(options = {}) {
+  return {
+    product_id: options.productId || options.product_id,
+    status: options.status,
+    method: options.method,
+    date_from: options.dateFrom || options.date_from,
+    date_to: options.dateTo || options.date_to,
+    sort_by: options.sortBy || options.sort_by,
+    sort_order: options.sortOrder || options.sort_order,
+  };
 }
 
 export async function getForecasts(options = {}) {
-  const payload = await apiGet(ENDPOINTS.forecasts[0], options);
-  return listFromPayload(payload);
+  return getPaginatedItems(
+    ENDPOINTS.forecasts[0],
+    buildListRequestOptions(options),
+    {
+      limit: options.limit || 100,
+      maxItems: options.maxItems || 2_000,
+      params: buildForecastListParams(options),
+    },
+  );
 }
 
 export async function getStockRisks(options = {}) {
@@ -293,7 +423,7 @@ export async function getDashboardData(options = {}) {
     apiGetOptional(ENDPOINTS.dashboardRecommendations, options),
     apiGetOptional(ENDPOINTS.dashboardOpenWorkItems, options),
     apiGetOptional(ENDPOINTS.dashboardStockRiskSummary, options),
-    apiGetOptional(ENDPOINTS.products, options),
+    apiGetPaginatedOptional(ENDPOINTS.products[0], options),
     apiGetOptional(ENDPOINTS.forecasts, options),
     apiGetOptional(ENDPOINTS.stockRisks, options),
   ]);
@@ -387,6 +517,15 @@ export function buildWorkflowMutationPath(entityType, entityId, action, userId) 
   return buildUserScopedPath(path, userId);
 }
 
+export function createWorkflowIdempotencyKey(scope = []) {
+  const parts = Array.isArray(scope) ? scope : [scope];
+  const attemptId =
+    globalThis.crypto?.randomUUID?.() ||
+    `fallback-${Math.random().toString(36).slice(2, 10)}`;
+
+  return ["frontend", ...parts.filter(Boolean), attemptId].join(":");
+}
+
 export function hasPermission(subject, permission) {
   const permissions = Array.isArray(subject) ? subject : subject?.permissions || [];
   return permissions.includes(permission) || permissions.includes("platform:admin");
@@ -397,11 +536,15 @@ export async function getDemoUsers(options = {}) {
   return listFromPayload(payload);
 }
 
-export async function getCurrentUser(options = {}) {
-  const payload = await apiGet(
+export async function getCurrentUserContext(options = {}) {
+  return apiGet(
     buildUserScopedPath(ENDPOINTS.currentUser[0], options.userId),
     options,
   );
+}
+
+export async function getCurrentUser(options = {}) {
+  const payload = await getCurrentUserContext(options);
 
   return payload?.user || payload;
 }

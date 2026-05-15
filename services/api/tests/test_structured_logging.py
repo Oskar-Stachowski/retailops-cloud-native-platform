@@ -38,3 +38,29 @@ def test_json_log_formatter_emits_structured_payload() -> None:
         assert "timestamp" in payload
     finally:
         correlation_id_context.reset(token)
+
+
+def test_json_log_formatter_redacts_sensitive_fields() -> None:
+    record = logging.LogRecord(
+        name="app.test",
+        level=logging.INFO,
+        pathname=__file__,
+        lineno=40,
+        msg="request completed",
+        args=(),
+        exc_info=None,
+    )
+    record.authorization = "Bearer secret-token"
+    record.metadata = {
+        "password": "super-secret",
+        "nested": {
+            "api_token": "abc123",
+        },
+    }
+
+    output = JsonLogFormatter().format(record)
+    payload = json.loads(output)
+
+    assert payload["authorization"] == "[REDACTED]"
+    assert payload["metadata"]["password"] == "[REDACTED]"
+    assert payload["metadata"]["nested"]["api_token"] == "[REDACTED]"

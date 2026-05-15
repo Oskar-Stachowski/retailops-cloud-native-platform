@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. This dependency map spans the implemented local platform, partially implemented foundations, and target AWS/Kubernetes/MLOps relationships.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "basis", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart TB

@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. Local and GitHub Actions quality gates are implemented, Jenkins release confidence is partially implemented, and AWS/Kubernetes promotion stages remain target scope.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "basis", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart LR

@@ -10,6 +10,9 @@ from psycopg import sql
 
 from app.core.config import get_settings
 
+SEED_DATA_PROFILES = ("demo", "small", "medium")
+DEFAULT_SEED_DATA_PROFILE = "small"
+
 
 @dataclass(frozen=True)
 class TableConfig:
@@ -139,45 +142,78 @@ TABLE_CONFIGS: tuple[TableConfig, ...] = (
 TRUNCATE_ORDER = tuple(reversed([table.name for table in TABLE_CONFIGS]))
 
 
-def _candidate_data_dirs() -> list[Path]:
-    candidates: list[Path] = []
+def _profile_data_subdir(profile: str) -> Path:
+    if profile == "demo":
+        return Path("demo")
 
-    if os.getenv("RETAILOPS_DEMO_DATA_DIR"):
+    return Path("synthetic") / profile
+
+
+def resolve_seed_data_profile() -> str:
+    profile = os.getenv("RETAILOPS_SEED_DATA_PROFILE")
+    if profile is None and os.getenv("RETAILOPS_DEMO_DATA_DIR"):
+        profile = "demo"
+
+    profile = (profile or DEFAULT_SEED_DATA_PROFILE).strip().lower()
+    if profile not in SEED_DATA_PROFILES:
+        supported = "|".join(SEED_DATA_PROFILES)
+        msg = (
+            f"Unsupported RETAILOPS_SEED_DATA_PROFILE '{profile}'. "
+            f"Supported profiles: {supported}."
+        )
+        raise ValueError(msg)
+
+    return profile
+
+
+def _candidate_data_dirs(profile: str) -> list[Path]:
+    candidates: list[Path] = []
+    data_subdir = _profile_data_subdir(profile)
+
+    if os.getenv("RETAILOPS_SEED_DATA_DIR"):
+        candidates.append(Path(os.environ["RETAILOPS_SEED_DATA_DIR"]))
+    elif os.getenv("RETAILOPS_DEMO_DATA_DIR"):
         candidates.append(Path(os.environ["RETAILOPS_DEMO_DATA_DIR"]))
 
     script_path = Path(__file__).resolve()
     if len(script_path.parents) > 3:
-        candidates.append(script_path.parents[3] / "data" / "demo")
+        candidates.append(script_path.parents[3] / "data" / data_subdir)
 
     candidates.extend(
         [
             # Useful when the API container mounts ./data into /workspace/data.
-            Path("/workspace/data/demo"),
+            Path("/workspace/data") / data_subdir,
             # Useful when the project root is copied into the image.
-            Path("/app/data/demo"),
+            Path("/app/data") / data_subdir,
             # Useful when running from repo root.
-            Path.cwd() / "data" / "demo",
+            Path.cwd() / "data" / data_subdir,
             # Useful when running from services/api.
-            Path.cwd().parents[1] / "data" / "demo"
+            Path.cwd().parents[1] / "data" / data_subdir
             if len(Path.cwd().parents) >= 2
-            else Path.cwd() / "data" / "demo",
+            else Path.cwd() / "data" / data_subdir,
         ],
     )
 
     return candidates
 
 
-def resolve_demo_data_dir() -> Path:
-    for candidate in _candidate_data_dirs():
+def resolve_seed_data_dir(profile: str | None = None) -> Path:
+    profile = profile or resolve_seed_data_profile()
+    for candidate in _candidate_data_dirs(profile):
         if candidate.exists() and candidate.is_dir():
             return candidate
 
-    searched = "\n".join(f"- {candidate}" for candidate in _candidate_data_dirs())
+    searched = "\n".join(f"- {candidate}" for candidate in _candidate_data_dirs(profile))
     raise FileNotFoundError(
-        "Could not find demo CSV directory. "
-        "Run `python -m data.generator.main` from the repository root first, "
-        "or set RETAILOPS_DEMO_DATA_DIR.\n\nSearched:\n" + searched,
+        f"Could not find seed CSV directory for profile '{profile}'. "
+        "Run `python -m data.generator.main --profile "
+        f"{profile}` from the repository root first, or set RETAILOPS_SEED_DATA_DIR.\n\n"
+        "Searched:\n" + searched,
     )
+
+
+def resolve_demo_data_dir() -> Path:
+    return resolve_seed_data_dir("demo")
 
 
 def normalize_csv_value(value: str | None) -> str | None:
@@ -252,7 +288,7 @@ def seed_demo_data(
     database_url: str,
     data_dir: Path | None = None,
 ) -> dict[str, int]:
-    data_dir = data_dir or resolve_demo_data_dir()
+    data_dir = data_dir or resolve_seed_data_dir()
     seed_counts: dict[str, int] = {}
 
     with psycopg.connect(database_url) as conn:
@@ -278,14 +314,16 @@ def main() -> None:
         msg = "DATABASE_URL is not configured."
         raise RuntimeError(msg)
 
-    data_dir = resolve_demo_data_dir()
+    profile = resolve_seed_data_profile()
+    data_dir = resolve_seed_data_dir(profile)
     seed_counts = seed_demo_data(settings.database_url, data_dir)
 
     print("\nSeed summary:")  # noqa: T201 - CLI output
     for table_config in TABLE_CONFIGS:
         print(f"- {table_config.name}: {seed_counts[table_config.name]}")  # noqa: T201 - CLI output
-    print(f"\nDemo CSV directory: {data_dir}")  # noqa: T201 - CLI output
-    print("Demo seed data inserted successfully.")  # noqa: T201 - CLI output
+    print(f"\nSeed data profile: {profile}")  # noqa: T201 - CLI output
+    print(f"Seed CSV directory: {data_dir}")  # noqa: T201 - CLI output
+    print("Seed data inserted successfully.")  # noqa: T201 - CLI output
 
 
 if __name__ == "__main__":

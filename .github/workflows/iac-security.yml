@@ -5,11 +5,15 @@ on:
     paths:
       - "infra/**"
       - "security/iac/**"
+      - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/iac-security.yml"
   pull_request:
     paths:
       - "infra/**"
       - "security/iac/**"
+      - "Makefile"
+      - ".github/actions/**"
       - ".github/workflows/iac-security.yml"
   workflow_dispatch:
 
@@ -35,6 +39,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -66,11 +72,11 @@ jobs:
 
       - name: Upload TFLint report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: iac-tflint-report
           path: ci-cd/reports/iac/tflint.txt
-          if-no-files-found: ignore
+          if-no-files-found: warn
 
   checkov:
     name: Checkov IaC security report
@@ -80,56 +86,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          persist-credentials: false
 
-      - name: Install Checkov
-        run: python -m pip install --upgrade checkov
+      - name: Set up Python and Checkov
+        uses: ./.github/actions/setup-python-ci
+        with:
+          install-command: python -m pip install --upgrade checkov
 
       - name: Prepare IaC report directory
         run: mkdir -p "${IAC_REPORT_DIR}"
 
       - name: Run critical IaC guardrail checks
-        run: |
-          set -euo pipefail
-          echo "Checking for IAM users, access keys, AdministratorAccess and wildcard IAM actions..."
-          if grep -R -I --include="*.tf" --exclude-dir=".terraform" \
-            -E 'aws_iam_access_key|aws_iam_user|policy_arn[[:space:]]*=[[:space:]]*"arn:aws:iam::aws:policy/AdministratorAccess"|actions[[:space:]]*=[[:space:]]*\[[^]]*"\*"' \
-            infra; then
-            echo "ERROR: Critical IaC guardrail violation found. Review IAM definitions before merging."
-            exit 1
-          fi
-          echo "Critical IaC guardrail checks passed."
+        run: make iac-critical-guardrails
 
       - name: Run Checkov report-only scan
-        run: |
-          set -o pipefail
-          checkov \
-            --config-file security/iac/checkov.yml \
-            --directory infra \
-            --framework terraform \
-            --soft-fail \
-            --output cli | tee "${IAC_REPORT_DIR}/checkov.txt"
+        run: make checkov-report
 
       - name: Run Checkov JSON report
         if: always()
-        run: |
-          checkov \
-            --config-file security/iac/checkov.yml \
-            --directory infra \
-            --framework terraform \
-            --soft-fail \
-            --output json > "${IAC_REPORT_DIR}/checkov.json"
+        run: make checkov-json
 
       - name: Upload Checkov reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/upload-ci-evidence
         with:
           name: iac-checkov-reports
           path: |
             ci-cd/reports/iac/checkov.txt
             ci-cd/reports/iac/checkov.json
-          if-no-files-found: ignore
+          if-no-files-found: warn

@@ -1,0 +1,91 @@
+name: Provenance CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "services/api/**"
+      - "frontend/**"
+      - ".github/actions/**"
+      - ".github/workflows/provenance-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: provenance-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROVENANCE_REPORT_DIR: ci-cd/reports/provenance
+
+jobs:
+  docker-image-provenance:
+    name: Build local images and generate provenance attestations
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare provenance evidence directory
+        run: mkdir -p "${PROVENANCE_REPORT_DIR}"
+
+      - name: Build local API and frontend images
+        run: |
+          set -euo pipefail
+          docker build -t retailops-api:provenance services/api
+          docker build -t retailops-frontend:provenance frontend
+
+      - name: Capture image digests
+        id: image-digests
+        run: |
+          set -euo pipefail
+          api_digest="$(docker image inspect retailops-api:provenance --format='{{.Id}}')"
+          frontend_digest="$(docker image inspect retailops-frontend:provenance --format='{{.Id}}')"
+          echo "api_digest=${api_digest}" >> "${GITHUB_OUTPUT}"
+          echo "frontend_digest=${frontend_digest}" >> "${GITHUB_OUTPUT}"
+          {
+            echo "# RetailOps provenance evidence"
+            echo ""
+            echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Workflow: ${GITHUB_WORKFLOW}"
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo ""
+            echo "| Subject | Digest |"
+            echo "|---|---|"
+            echo "| retailops-api | ${api_digest} |"
+            echo "| retailops-frontend | ${frontend_digest} |"
+          } > "${PROVENANCE_REPORT_DIR}/provenance-summary.md"
+
+      - name: Attest API image provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: retailops-api
+          subject-digest: ${{ steps.image-digests.outputs.api_digest }}
+
+      - name: Attest frontend image provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: retailops-frontend
+          subject-digest: ${{ steps.image-digests.outputs.frontend_digest }}
+
+      - name: Write provenance summary
+        if: always()
+        run: cat "${PROVENANCE_REPORT_DIR}/provenance-summary.md" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload provenance evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: provenance-ci-evidence
+          path: ci-cd/reports/provenance/provenance-summary.md
+          if-no-files-found: warn

@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. This diagram combines implemented local platform layers, partially implemented platform foundations, and target cloud/runtime architecture.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {"theme": "base", "flowchart": {"curve": "basis", "nodeSpacing": 35, "rankSpacing": 45}}}%%
 flowchart LR

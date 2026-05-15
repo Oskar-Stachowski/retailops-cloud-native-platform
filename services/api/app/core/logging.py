@@ -39,6 +39,38 @@ _STANDARD_LOG_RECORD_FIELDS = {
     "threadName",
 }
 
+_REDACTED_VALUE = "[REDACTED]"
+_SENSITIVE_FIELD_TOKENS = (
+    "authorization",
+    "password",
+    "secret",
+    "token",
+)
+
+
+def _is_sensitive_field(key: str) -> bool:
+    normalized = key.strip().lower().replace("-", "_")
+    return any(token in normalized for token in _SENSITIVE_FIELD_TOKENS)
+
+
+def _redact_log_value(key: str, value: object) -> object:
+    if _is_sensitive_field(key):
+        return _REDACTED_VALUE
+
+    if isinstance(value, dict):
+        return {
+            nested_key: _redact_log_value(nested_key, nested_value)
+            for nested_key, nested_value in value.items()
+        }
+
+    if isinstance(value, list):
+        return [_redact_log_value(key, item) for item in value]
+
+    if isinstance(value, tuple):
+        return tuple(_redact_log_value(key, item) for item in value)
+
+    return value
+
 
 class CorrelationIdFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
@@ -65,7 +97,7 @@ class JsonLogFormatter(logging.Formatter):
         for key, value in record.__dict__.items():
             if key in _STANDARD_LOG_RECORD_FIELDS or key == "correlation_id":
                 continue
-            payload[key] = value
+            payload[key] = _redact_log_value(key, value)
 
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)

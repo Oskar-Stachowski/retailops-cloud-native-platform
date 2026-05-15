@@ -1,0 +1,4 @@
+id,warehouse_code,name,region,country,city,status
+c2606a32-f74a-5660-a2aa-d46f0df3dc26,WH-0001,RetailOps Warehouse 0001,PL-North,PL,Warehouse City 0001,active
+f7b98a5a-0447-5317-8609-e9640a276668,WH-0002,RetailOps Warehouse 0002,PL-Central,PL,Warehouse City 0002,active
+9152fc64-680a-5069-82fd-ba2ff1073392,WH-0003,RetailOps Warehouse 0003,PL-South,PL,Warehouse City 0003,active

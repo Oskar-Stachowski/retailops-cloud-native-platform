@@ -540,6 +540,7 @@ def generate_profile_inventory_snapshots(
     days: int,
 ) -> list[dict[str, str]]:
     snapshots: list[dict[str, str]] = []
+    oldest_snapshot_day_index = ((days - 1) // 7) * 7
 
     for day_index in range(days):
         if day_index % 7 != 0 and day_index != 0:
@@ -548,13 +549,12 @@ def generate_profile_inventory_snapshots(
         for product_index, product in enumerate(products):
             warehouse = warehouses[(product_index + day_index) % len(warehouses)]
             normal_daily_sales = int(product["normal_daily_sales"])
-            cycle_position = day_index % 28
-            replenishment_boost = 160 if cycle_position == 0 else 0
+            chronological_day = oldest_snapshot_day_index - day_index
+            cycle_position = chronological_day % 28
+            cycle_start_stock = normal_daily_sales * (12 + product_index % 18) + 160
             stock_quantity = max(
                 0,
-                normal_daily_sales * (12 + product_index % 18)
-                + replenishment_boost
-                - cycle_position * max(1, normal_daily_sales // 3),
+                cycle_start_stock - cycle_position * max(1, normal_daily_sales // 3),
             )
             natural_key = f"{product['sku']}-{warehouse['warehouse_code']}-{day_index}"
             recorded_at = _date_at_offset(day_index, product_index % 8)
@@ -695,6 +695,7 @@ def generate_profile_forecasts(
 ) -> list[dict[str, str]]:
     forecasts: list[dict[str, str]] = []
     forecast_product_count = min(len(products), max(20, len(products) // 2))
+    horizon_days = 7
 
     for index, product in enumerate(products[:forecast_product_count]):
         normal_daily_sales = Decimal(product["normal_daily_sales"])
@@ -712,24 +713,31 @@ def generate_profile_forecasts(
             int(normal_daily_sales * demand_weight * Decimal("7") * forecast_multiplier),
         )
         confidence = Decimal("0.82") - Decimal(index % 9) * Decimal("0.015")
-        natural_key = f"{product['sku']}-profile-weekly-forecast"
 
-        forecasts.append(
-            {
-                "id": deterministic_uuid("forecast", natural_key),
-                "product_id": product["id"],
-                "forecast_period_start": _date_only_at_offset(-1),
-                "forecast_period_end": _date_only_at_offset(-7),
-                "predicted_quantity": str(predicted_quantity),
-                "unit_of_measure": "pcs",
-                "generated_at": _date_at_offset(0, 1),
-                "method": "retailops-realism-baseline-demand-model",
-                "status": "generated",
-                "confidence_level": str(
-                    max(Decimal("0.55"), confidence).quantize(Decimal("0.0001")),
-                ),
-            },
-        )
+        for horizon_index in range(horizon_days):
+            horizon_multiplier = Decimal("0.94") + Decimal(horizon_index) * Decimal("0.02")
+            horizon_quantity = max(1, int(Decimal(predicted_quantity) * horizon_multiplier))
+            natural_key = f"{product['sku']}-profile-weekly-forecast-{horizon_index + 1}"
+            forecast_start_offset = -(horizon_index + 1)
+            forecast_end_offset = -(horizon_index + horizon_days)
+            horizon_confidence = confidence - Decimal(horizon_index) * Decimal("0.01")
+
+            forecasts.append(
+                {
+                    "id": deterministic_uuid("forecast", natural_key),
+                    "product_id": product["id"],
+                    "forecast_period_start": _date_only_at_offset(forecast_start_offset),
+                    "forecast_period_end": _date_only_at_offset(forecast_end_offset),
+                    "predicted_quantity": str(horizon_quantity),
+                    "unit_of_measure": "pcs",
+                    "generated_at": _date_at_offset(0, horizon_index + 1),
+                    "method": "retailops-realism-baseline-demand-model",
+                    "status": "generated",
+                    "confidence_level": str(
+                        max(Decimal("0.55"), horizon_confidence).quantize(Decimal("0.0001")),
+                    ),
+                },
+            )
 
     return forecasts
 

@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. The Terraform AWS foundation is implemented and validated as code, but the downstream workload runtime shown as future architecture is still target scope.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 flowchart TB
     classDef local fill:#eef2ff,stroke:#4f46e5,stroke-width:1px,color:#111;
