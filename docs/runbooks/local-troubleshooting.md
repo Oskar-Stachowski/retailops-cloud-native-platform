@@ -1,6 +1,6 @@
 # Local Runtime Troubleshooting Runbook
 
-**Project:** RetailOps — Cloud-Native AI Platform  
+**Project:** RetailOps — Cloud-Native AI Platform
 **Scope:** Docker Compose, local runtime reproducibility, profile validation and smoke evidence
 
 ---

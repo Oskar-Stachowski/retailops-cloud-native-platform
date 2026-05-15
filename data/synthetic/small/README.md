@@ -250,4 +250,3 @@ Najlepsza kolejnosc analizy:
 - Promocje jeszcze nie wplywaja bezposrednio na popyt.
 - Fulfillment jest uproszczony: ruchy sprzedazowe rotuja po magazynach.
 - `small` nie jest seedowany do PostgreSQL; to synthetic data layer.
-
