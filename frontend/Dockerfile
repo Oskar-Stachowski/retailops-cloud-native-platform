@@ -17,16 +17,13 @@ RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime
 
-USER root
-RUN apk add --no-cache --upgrade libcrypto3 libssl3 libxml2
-
 LABEL org.opencontainers.image.title="RetailOps Frontend"
 LABEL org.opencontainers.image.description="Nginx-served React/Vite frontend for the RetailOps local runtime"
 LABEL org.opencontainers.image.version="0.1.0"
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
-RUN chown -R 101:101 /usr/share/nginx/html
+COPY --from=build --chown=101:101 /app/dist /usr/share/nginx/html
+
 USER 101:101
 
 EXPOSE 8080

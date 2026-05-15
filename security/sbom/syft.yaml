@@ -1,0 +1,30 @@
+# Syft configuration for RetailOps SBOM generation.
+# Used by GitHub Actions, Jenkins/local scripts and release evidence commands.
+
+# For image scans this controls image layer visibility.
+# For dir:. scans it is effectively not the important part, but it is valid.
+scope: all-layers
+
+# Avoid non-deterministic update checks in CI.
+check-for-app-update: false
+
+package:
+  search-unindexed-archives: true
+  search-indexed-archives: true
+
+format:
+  pretty: true
+
+exclude:
+  - "**/.git/**"
+  - "**/.terraform/**"
+  - "**/node_modules/**"
+  - "**/.venv/**"
+  - "**/venv/**"
+  - "**/__pycache__/**"
+  - "**/.pytest_cache/**"
+  - "**/.ruff_cache/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/coverage/**"
+  - "**/.DS_Store"

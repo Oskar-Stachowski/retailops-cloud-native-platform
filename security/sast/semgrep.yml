@@ -1,0 +1,60 @@
+rules:
+  - id: retailops-python-hardcoded-secret
+    languages: [python]
+    severity: ERROR
+    message: "Possible hardcoded secret. Move secrets to environment variables, AWS Secrets Manager, or External Secrets."
+    patterns:
+      - pattern-either:
+          - pattern: $KEY = "$VALUE"
+          - pattern: '$KEY: "$VALUE"'
+      - metavariable-regex:
+          metavariable: $KEY
+          regex: (?i).*(password|passwd|secret|token|api_key|apikey|private_key).*
+      - metavariable-regex:
+          metavariable: $VALUE
+          regex: .{8,}
+    metadata:
+      category: security
+      technology:
+        - python
+
+  - id: retailops-python-shell-true
+    languages: [python]
+    severity: ERROR
+    message: "Avoid shell=True. Use an argument list and explicit command validation."
+    patterns:
+      - pattern: subprocess.$FUNC(..., shell=True, ...)
+    metadata:
+      category: security
+      cwe:
+        - "CWE-78"
+
+  - id: retailops-python-unsafe-yaml-load
+    languages: [python]
+    severity: ERROR
+    message: "Use yaml.safe_load instead of yaml.load for untrusted YAML."
+    patterns:
+      - pattern: yaml.load(...)
+    metadata:
+      category: security
+      cwe:
+        - "CWE-20"
+
+  - id: retailops-js-dangerously-set-inner-html
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: "Review dangerouslySetInnerHTML usage and sanitize any untrusted input."
+    patterns:
+      - pattern: dangerouslySetInnerHTML={...}
+    metadata:
+      category: security
+      cwe:
+        - "CWE-79"
+
+  - id: retailops-docker-root-user
+    languages: [dockerfile]
+    severity: WARNING
+    message: "Container image should define a non-root USER unless there is a documented exception."
+    pattern-regex: ^\s*USER\s+root\s*$
+    metadata:
+      category: container-security
