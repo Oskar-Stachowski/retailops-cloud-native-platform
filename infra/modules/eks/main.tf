@@ -6,6 +6,9 @@ locals {
   name_prefix         = var.name_prefix != null && trimspace(var.name_prefix) != "" ? var.name_prefix : local.default_name_prefix
   cluster_name        = var.cluster_name != null && trimspace(var.cluster_name) != "" ? var.cluster_name : "${local.name_prefix}-eks"
 
+  cluster_secrets_kms_key_arn = var.cluster_secrets_kms_key_arn != null ? var.cluster_secrets_kms_key_arn : aws_kms_key.cluster_secrets[0].arn
+  cloudwatch_kms_key_id       = var.cloudwatch_log_group_kms_key_id != null ? var.cloudwatch_log_group_kms_key_id : local.cluster_secrets_kms_key_arn
+
   common_tags = merge(
     {
       Project     = var.project_name
@@ -15,10 +18,32 @@ locals {
       Workload    = "platform"
       Module      = "infra/modules/eks"
       CostCenter  = "portfolio"
-      Lifecycle   = var.lifecycle
+      Lifecycle   = var.resource_lifecycle
     },
     var.tags,
   )
+}
+
+resource "aws_kms_key" "cluster_secrets" {
+  count = var.create_cluster_secrets_kms_key ? 1 : 0
+
+  description             = "KMS key for ${local.cluster_name} Kubernetes secrets encryption and EKS control plane logs"
+  deletion_window_in_days = var.kms_key_deletion_window_in_days
+  enable_key_rotation     = true
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.cluster_name}-secrets"
+    },
+  )
+}
+
+resource "aws_kms_alias" "cluster_secrets" {
+  count = var.create_cluster_secrets_kms_key ? 1 : 0
+
+  name          = "alias/${local.cluster_name}-secrets"
+  target_key_id = aws_kms_key.cluster_secrets[0].key_id
 }
 
 resource "aws_cloudwatch_log_group" "cluster" {
@@ -26,6 +51,7 @@ resource "aws_cloudwatch_log_group" "cluster" {
 
   name              = "/aws/eks/${local.cluster_name}/cluster"
   retention_in_days = var.cloudwatch_log_retention_in_days
+  kms_key_id        = local.cloudwatch_kms_key_id
   tags              = local.common_tags
 }
 
@@ -39,6 +65,14 @@ resource "aws_eks_cluster" "this" {
   access_config {
     authentication_mode                         = var.authentication_mode
     bootstrap_cluster_creator_admin_permissions = var.bootstrap_cluster_creator_admin_permissions
+  }
+
+  encryption_config {
+    provider {
+      key_arn = local.cluster_secrets_kms_key_arn
+    }
+
+    resources = ["secrets"]
   }
 
   kubernetes_network_config {
@@ -68,6 +102,11 @@ resource "aws_eks_cluster" "this" {
     precondition {
       condition     = length(var.enabled_cluster_log_types) == 0 || var.create_cloudwatch_log_group
       error_message = "Set create_cloudwatch_log_group=true when EKS control plane logs are enabled so log retention is explicitly controlled."
+    }
+
+    precondition {
+      condition     = !var.endpoint_public_access || length(var.public_access_cidrs) > 0
+      error_message = "Set at least one trusted public_access_cidrs entry when endpoint_public_access=true, or keep the EKS endpoint private-only."
     }
   }
 }

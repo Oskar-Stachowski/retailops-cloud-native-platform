@@ -28,7 +28,9 @@ This commit intentionally focuses on:
 When used by an environment and applied intentionally, this module can create:
 
 - one `aws_eks_cluster`,
-- optionally one CloudWatch log group for EKS control plane logs with explicit retention.
+- one customer managed KMS key for Kubernetes secrets encryption by default,
+- one KMS alias for the EKS secrets key,
+- one CloudWatch log group for EKS control plane logs with explicit retention and KMS encryption by default.
 
 ## What this module does not create yet
 
@@ -56,10 +58,12 @@ Those belong to later Sprint 13 commits.
 | Module scope | EKS control plane only; no node group yet. |
 | IAM role | Passed as `cluster_role_arn` from an IAM/environment layer. |
 | Subnets | Passed as `subnet_ids`; the environment decides public/private subnet strategy. |
-| Public API endpoint | Enabled by default but restricted to `127.0.0.1/32` so a real apply requires an intentional override. |
-| Public endpoint wide-open access | Blocked by validation for `0.0.0.0/0`. |
-| Control plane logs | Disabled by default to avoid unnecessary CloudWatch ingestion cost. |
-| Log retention | Required when control plane logs are enabled. |
+| Public API endpoint | Disabled by default; the module is private-endpoint-first to satisfy the EKS public endpoint Checkov gate. |
+| Public endpoint wide-open access | Blocked by validation for `0.0.0.0/0` when a temporary public endpoint is intentionally enabled. |
+| Kubernetes secrets encryption | Enabled by default with a customer managed KMS key, or an existing KMS key ARN can be injected. |
+| Control plane logs | API, audit, and authenticator logs are enabled by default for baseline visibility. |
+| Log retention | Required when control plane logs are enabled and defaults to a short dev-friendly retention period. |
+| Log encryption | EKS control plane logs use the same customer managed KMS key unless a dedicated CloudWatch KMS key is injected. |
 | Kubernetes version | Pinned as an explicit input with a safe default; verify standard support before apply. |
 | Upgrade support | Defaults to `STANDARD` to avoid extended-support cost posture. |
 | Access mode | Defaults to `API_AND_CONFIG_MAP` for compatibility during transition to EKS access entries. |
@@ -80,8 +84,11 @@ module "eks" {
 
   kubernetes_version = "1.33"
 
-  endpoint_public_access = true
-  public_access_cidrs    = ["YOUR_PUBLIC_IP/32"]
+  # Private endpoint is the default. Temporarily set endpoint_public_access=true
+  # and public_access_cidrs=["YOUR_PUBLIC_IP/32"] only for controlled validation.
+  endpoint_public_access = false
+
+  create_cluster_secrets_kms_key = true
 
   tags = local.common_tags
 }
@@ -129,7 +136,9 @@ Before moving to Commit 13.3 or 13.5, verify:
 - the module has no node group resources,
 - the cluster role is injected instead of hardcoded,
 - subnet IDs are injected instead of discovered implicitly,
-- public API access is not open to `0.0.0.0/0`,
+- public API access is disabled by default and never open to `0.0.0.0/0`,
+- Kubernetes secrets encryption is configured with a customer managed KMS key,
+- EKS control plane logs have explicit retention and KMS encryption,
 - tags include project, environment, owner/cost context from the environment layer,
 - OIDC issuer output is available for future IRSA work,
 - outputs are useful but do not expose secrets,

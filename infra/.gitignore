@@ -1,3 +1,7 @@
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
 # Terraform working directories
 .terraform/
 **/.terraform/
@@ -14,6 +18,8 @@
 # Local plans and crash logs
 *.tfplan
 *.plan
+tfplan
+**/tfplan
 crash.log
 crash.*.log
 

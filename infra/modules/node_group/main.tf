@@ -32,7 +32,7 @@ locals {
       NodeGroupPurpose = var.node_group_purpose
       Module           = "infra/modules/node_group"
       CostCenter       = "portfolio"
-      Lifecycle        = var.lifecycle
+      Lifecycle        = var.resource_lifecycle
     },
     var.tags,
   )
