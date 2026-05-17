@@ -1,0 +1,46 @@
+NAME                                    VERSION  TYPE                            
+./.github/actions/setup-node-ci         UNKNOWN  github-action  (+2 duplicates)  
+./.github/actions/setup-python-ci       UNKNOWN  github-action  (+5 duplicates)  
+./.github/actions/upload-ci-evidence    UNKNOWN  github-action  (+8 duplicates)  
+actions/attest-build-provenance         v2       github-action                   
+actions/checkout                        v6       github-action  (+9 duplicates)  
+actions/download-artifact               v4       github-action                   
+actions/setup-node                      v6       github-action                   
+actions/setup-python                    v6       github-action                   
+actions/upload-artifact                 v4       github-action  (+1 duplicate)   
+alembic                                 1.18.4   python                          
+aquasecurity/trivy-action               v0.36.0  github-action                   
+aws-actions/configure-aws-credentials   v5       github-action                   
+bandit                                  1.7.10   python                          
+confluent-kafka                         2.13.2   python                          
+cookie                                  1.1.1    npm                             
+fastapi                                 0.136.1  python                          
+frontend                                0.0.0    npm                             
+gitleaks/gitleaks-action                v2.3.9   github-action                   
+hashicorp/setup-terraform               v3       github-action  (+2 duplicates)  
+httpx                                   0.28.1   python                          
+joblib                                  1.4.2    python                          
+mypy                                    1.13.0   python                          
+opentelemetry-api                       1.41.1   python                          
+opentelemetry-exporter-otlp-proto-http  1.41.1   python                          
+opentelemetry-instrumentation-fastapi   0.62b1   python                          
+opentelemetry-sdk                       1.41.1   python                          
+pre-commit                              4.0.1    python                          
+prometheus-client                       0.25.0   python                          
+psycopg                                 3.2.3    python                          
+pydantic                                2.13.0   python                          
+pytest                                  9.0.3    python                          
+pytest-cov                              6.0.0    python                          
+react                                   19.2.6   npm                             
+react-dom                               19.2.6   npm                             
+react-router                            7.15.0   npm                             
+react-router-dom                        7.15.0   npm                             
+registry.terraform.io/hashicorp/aws     5.100.0  terraform      (+1 duplicate)   
+registry.terraform.io/hashicorp/aws     6.45.0   terraform      (+2 duplicates)  
+ruff                                    0.8.6    python                          
+scheduler                               0.27.0   npm                             
+scikit-learn                            1.5.2    python                          
+set-cookie-parser                       2.7.2    npm                             
+sqlalchemy                              2.0.49   python                          
+terraform-linters/setup-tflint          v4       github-action                   
+uvicorn                                 0.46.0   python                          

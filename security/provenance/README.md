@@ -1,14 +1,16 @@
 # RetailOps provenance implementation
 
-RetailOps uses GitHub artifact attestations for build provenance and SBOM attestations.
+RetailOps uses GitHub artifact attestations for build provenance of local API
+and frontend image subjects.
 
 ## Implemented workflow
 
-`.github/workflows/ecr-release.yml` uses `actions/attest@v4` for:
+`.github/workflows/provenance-ci.yml` uses
+`actions/attest-build-provenance@v2` for:
 
-- image provenance attestation;
-- SPDX SBOM attestation;
-- pushing attestations to the container registry.
+- API image provenance attestation;
+- frontend image provenance attestation;
+- a Markdown provenance summary uploaded as a workflow artifact.
 
 ## Required workflow permissions
 
@@ -23,14 +25,25 @@ permissions:
 
 ```bash
 gh attestation verify \
-  "oci://<account-id>.dkr.ecr.eu-central-1.amazonaws.com/retailops-dev-api:<tag>" \
-  -R Oskar-Stachowski/retailops-cloud-native-platform
+  --repo Oskar-Stachowski/retailops-cloud-native-platform \
+  <subject-digest-or-artifact>
 ```
+
+For a registry-backed release, verify immutable image digests after the release
+workflow publishes them. Do not claim production release provenance from the
+local workflow alone.
 
 ## Evidence
 
-The release workflow writes:
+The provenance CI workflow writes:
 
 ```text
-ci-cd/reports/provenance/ecr-release-summary.md
+ci-cd/reports/provenance/provenance-summary.md
+```
+
+The curated local evidence boundary is documented in:
+
+```text
+ci-cd/reports/provenance/provenance-ci.evidence.md
+docs/evidence/security/sbom-provenance-evidence.md
 ```

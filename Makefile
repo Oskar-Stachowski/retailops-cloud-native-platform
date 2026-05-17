@@ -31,6 +31,7 @@ OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
 PERFORMANCE_REPORTS_DIR ?= $(REPORTS_DIR)/performance
 E2E_REPORTS_DIR ?= $(REPORTS_DIR)/e2e
 DOCKER_REPORTS_DIR ?= $(REPORTS_DIR)/docker
+SBOM_REPORTS_DIR ?= $(REPORTS_DIR)/sbom
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
@@ -42,10 +43,17 @@ CHECKOV ?= checkov
 MYPY ?= mypy
 BANDIT ?= bandit
 K6 ?= k6
+SYFT ?= syft
 K6_API_SMOKE_SCRIPT ?= tests/performance/k6/api-smoke.js
 K6_API_SMOKE_TEXT_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke.txt
 K6_API_SMOKE_SUMMARY_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke-summary.json
 PLAYWRIGHT ?= $(FRONTEND_DIR)/node_modules/.bin/playwright
+
+SBOM_SOURCE_NAME ?= retailops-cloud-native-platform
+SBOM_SOURCE_VERSION ?= local
+SBOM_REPOSITORY_SPDX_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbom-spdx-snapshot.json
+SBOM_REPOSITORY_CYCLONEDX_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbom-cyclonedx-snapshot.json
+SBOM_REPOSITORY_SUMMARY_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbom-summary-snapshot.txt
 
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
@@ -236,12 +244,13 @@ help:
 	@echo ""
 	@echo "Security:"
 	@echo "  make security-scan        Run local secret, filesystem and image scans"
+	@echo "  make sbom-repository      Generate repository SBOM snapshots with Syft"
 	@echo ""
 
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(E2E_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(SBOM_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -699,7 +708,7 @@ compose-ci: ensure-reports-dir
 # These are local/Jenkins helpers. GitHub Actions also runs security-ci.yml.
 # -------------------------------------------------------------------
 
-.PHONY: check-trivy check-gitleaks secret-scan security-fs-scan security-image-scan security-scan
+.PHONY: check-trivy check-gitleaks check-syft secret-scan security-fs-scan security-image-scan sbom-repository security-scan
 
 check-trivy:
 	@command -v trivy >/dev/null 2>&1 || { \
@@ -710,6 +719,12 @@ check-trivy:
 check-gitleaks:
 	@command -v gitleaks >/dev/null 2>&1 || { \
 		echo "ERROR: gitleaks is not installed. Install Gitleaks or run GitHub Actions security-ci."; \
+		exit 1; \
+	}
+
+check-syft:
+	@command -v "$(SYFT)" >/dev/null 2>&1 || { \
+		echo "ERROR: syft is not installed. Install Syft or run a CI workflow that generates SBOM evidence."; \
 		exit 1; \
 	}
 
@@ -740,6 +755,18 @@ security-image-scan: check-trivy ensure-reports-dir docker-build
 		--format table \
 		--output "$(SECURITY_REPORTS_DIR)/trivy-frontend-image.txt" \
 		"$(FRONTEND_IMAGE)"
+
+sbom-repository: check-syft ensure-reports-dir
+	$(SYFT) dir:. \
+		--config security/sbom/syft.yaml \
+		--source-name "$(SBOM_SOURCE_NAME)" \
+		--source-version "$(SBOM_SOURCE_VERSION)" \
+		-o spdx-json="$(SBOM_REPOSITORY_SPDX_SNAPSHOT)" \
+		-o cyclonedx-json="$(SBOM_REPOSITORY_CYCLONEDX_SNAPSHOT)" \
+		-o syft-table="$(SBOM_REPOSITORY_SUMMARY_SNAPSHOT)"
+	@echo "SBOM SPDX snapshot: $(SBOM_REPOSITORY_SPDX_SNAPSHOT)"
+	@echo "SBOM CycloneDX snapshot: $(SBOM_REPOSITORY_CYCLONEDX_SNAPSHOT)"
+	@echo "SBOM summary snapshot: $(SBOM_REPOSITORY_SUMMARY_SNAPSHOT)"
 
 security-scan: secret-scan security-fs-scan security-image-scan
 	@echo "Security scans passed."

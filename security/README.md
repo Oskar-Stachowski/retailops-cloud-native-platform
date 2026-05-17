@@ -13,6 +13,8 @@ This directory contains the security and DevSecOps configuration currently used 
 | Terraform linting | TFLint configuration for IaC quality gates |
 | Terraform policy scanning | Checkov configuration for IaC security reports |
 | Critical IaC guardrails | Makefile and CI checks for IAM users, access keys, AdministratorAccess, and wildcard IAM actions |
+| Repository SBOM | Syft-based `make sbom-repository` target with SPDX, CycloneDX and text snapshots |
+| Build provenance | GitHub Actions provenance workflow for local API/frontend image subjects |
 
 ## Current Policy
 
@@ -51,7 +53,7 @@ Safe Kubernetes hardening that does not change runtime behavior may still be app
 ## Future Hardening
 
 - Promote dependency audits to blocking checks for high and critical findings.
-- Add SBOM generation and image signing for release images.
+- Add registry-backed image signing and verification for release images.
 - Add cloud secret storage through AWS Secrets Manager or SSM Parameter Store when a cloud runtime is implemented.
 - Add a threat model and accepted-risk register.
 - Add runtime detection only when there is a real deployed workload to monitor.
