@@ -20,7 +20,12 @@ spec:
         app.kubernetes.io/part-of: retailops-platform
         app.kubernetes.io/component: frontend
     spec:
+      serviceAccountName: retailops-frontend
+      automountServiceAccountToken: false
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -33,6 +38,13 @@ spec:
               protocol: TCP
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: nginx-tmp
+              mountPath: /tmp
           startupProbe:
             httpGet:
               path: /
@@ -62,3 +74,6 @@ spec:
             limits:
               cpu: 250m
               memory: 256Mi
+      volumes:
+        - name: nginx-tmp
+          emptyDir: {}

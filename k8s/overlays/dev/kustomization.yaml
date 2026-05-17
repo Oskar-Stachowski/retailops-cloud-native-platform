@@ -55,4 +55,4 @@ configMapGenerator:
 secretGenerator:
   - name: retailops-runtime-secrets
     envs:
-      - secrets.env
+      - secrets/runtime-secrets.env

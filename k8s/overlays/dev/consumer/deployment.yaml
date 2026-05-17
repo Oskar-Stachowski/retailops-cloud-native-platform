@@ -21,6 +21,8 @@ spec:
         app.kubernetes.io/component: realtime-consumer
         retailops.io/environment: dev
     spec:
+      serviceAccountName: retailops-api
+      automountServiceAccountToken: false
       restartPolicy: Always
       securityContext:
         runAsNonRoot: true
