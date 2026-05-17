@@ -38,3 +38,18 @@ Before promoting a local report to tracked evidence:
 3. Name the file predictably with `*-snapshot.*` or `*.evidence.md`.
 4. Link it from `docs/evidence/index.md`.
 5. Record limitations and freshness notes.
+
+## Evidence Refresh Workflow
+
+Use this workflow when a tracked CI/CD report, screenshot, or snapshot is stale:
+
+| Evidence area | Refresh command or source | Expected outcome | Tracked destination |
+|---|---|---|---|
+| Docker / full-stack smoke | `make compose-ci` | Images build, stack starts, smoke checks pass, cleanup completes. | `docs/evidence/docker/compose-ci-smoke.md` |
+| API startup / contract proof | Run the Uvicorn command in `docs/evidence/api/startup-log.md` plus the listed `curl` checks. | API starts and serves `/health` and `/openapi.json`. | `docs/evidence/api/startup-log.md`, `docs/evidence/api/openapi-snapshot.json` |
+| Observability local proof | `make observability-smoke` against the running local stack | Prometheus, Grafana, targets, rules, and dashboards respond successfully. | `ci-cd/reports/observability/` plus any curated note added under `docs/evidence/` |
+| Kubernetes validation | `make k8s-smoke` | Base and dev manifests render and pass validation. | `ci-cd/reports/k8s/kubernetes-smoke-snapshot.txt` |
+| Security snapshots | `make security-scan` | Secret scan and vulnerability scans complete. | `ci-cd/reports/security/*-snapshot.txt` |
+| Terraform showcase snapshots | `make terraform-validate`, `make terraform-plan-dev`, or documented showcase apply/destroy flow | Validation or sanitized plan/apply/destroy evidence is captured. | `ci-cd/reports/iac/` |
+
+After refreshing one of these artifacts, update the corresponding row in `docs/evidence/index.md` with the date, commit SHA, command, expected outcome, and artifact path.

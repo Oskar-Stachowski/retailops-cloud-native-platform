@@ -1,0 +1,61 @@
+{
+  "profile": "small",
+  "realism_metrics": {
+    "average_order_items": "1.9366",
+    "data_quality_status_counts": {
+      "duplicate_candidate": 93,
+      "late_event": 239,
+      "missing_optional_context": 135,
+      "ok": 16962
+    },
+    "demand_class_counts": {
+      "clearance_product": 10,
+      "core_product": 17,
+      "declining_product": 15,
+      "hero_product": 8,
+      "long_tail": 15,
+      "new_product": 15,
+      "seasonal": 20
+    },
+    "promotion_uplift_ratio": "1.5485",
+    "return_rate_by_category": {
+      "Beauty": "0.0395",
+      "Electronics": "0.0588",
+      "Fashion": "0.1396",
+      "Grocery": "0.0048",
+      "Home Improvement": "0.0608",
+      "Pet Care": "0.0096",
+      "Sports": "0.0551",
+      "Toys": "0.0470"
+    },
+    "stockout_rate": "0.0471",
+    "top_20_percent_product_revenue_share": "0.7009"
+  },
+  "row_counts": {
+    "alerts": 20,
+    "anomalies": 20,
+    "forecasts": 350,
+    "inventory_snapshots": 1300,
+    "order_items": 17429,
+    "orders": 9000,
+    "price_history": 300,
+    "products": 100,
+    "promotions": 100,
+    "recommendations": 20,
+    "returns": 2388,
+    "sales": 17429,
+    "stock_movements": 18829,
+    "stores": 5,
+    "users": 4,
+    "warehouses": 3,
+    "workflow_actions": 20
+  },
+  "seed": 42,
+  "validation_notes": [
+    "Top product revenue share should show a long-tail distribution.",
+    "Average order items should be above 1 for synthetic profiles.",
+    "Promotion uplift should be positive but not perfect.",
+    "Stockout rate should be non-zero for operational realism.",
+    "Data quality issues are intentionally low and controlled."
+  ]
+}

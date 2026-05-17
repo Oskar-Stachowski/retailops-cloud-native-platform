@@ -1,0 +1,42 @@
+name: Setup Python CI
+
+description: Install the Python toolchain used by RetailOps GitHub Actions.
+
+inputs:
+  python-version:
+    description: Python version used by backend/data/observability jobs.
+    required: false
+    default: "3.11"
+  cache-dependency-path:
+    description: Newline-separated dependency files used for the pip cache key.
+    required: false
+    default: |
+      services/api/requirements.txt
+      services/api/requirements-dev.txt
+  install-command:
+    description: Shell command used to install Python dependencies. Leave empty to skip install.
+    required: false
+    default: python -m pip install -r services/api/requirements-dev.txt
+  working-directory:
+    description: Directory in which the install command is executed.
+    required: false
+    default: "."
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: pip
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+    - name: Install Python dependencies
+      if: ${{ inputs.install-command != '' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        python -m pip install --upgrade pip
+        ${{ inputs.install-command }}

@@ -24,6 +24,8 @@ def test_forecast_repository_lists_forecasts_for_product() -> None:
 
     assert len(existing_forecasts) >= 1
     assert all(isinstance(forecast, Forecast) for forecast in existing_forecasts)
+    assert existing_forecasts[0].product_sku is not None
+    assert existing_forecasts[0].product_name is not None
     assert missing_forecasts == []
 
 

@@ -1,0 +1,39 @@
+name: Setup Node CI
+
+description: Install the Node.js toolchain used by RetailOps frontend GitHub Actions.
+
+inputs:
+  node-version:
+    description: Node.js version used by frontend jobs.
+    required: false
+    default: "22"
+  cache-dependency-path:
+    description: npm lockfile used for the cache key.
+    required: false
+    default: frontend/package-lock.json
+  working-directory:
+    description: Directory in which npm commands are executed.
+    required: false
+    default: frontend
+  install-command:
+    description: Shell command used to install frontend dependencies. Leave empty to skip install.
+    required: false
+    default: npm ci
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+    - name: Install frontend dependencies
+      if: ${{ inputs.install-command != '' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        ${{ inputs.install-command }}

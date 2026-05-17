@@ -1,0 +1,33 @@
+# RetailOps local observability profile overlay.
+#
+# The canonical service definitions live in docker-compose.yml. This file exists
+# as an explicit, reviewer-friendly entry point for DOCKER-009 evidence and can
+# be used when a separate observability Compose file is required by the checklist.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.observability.yml --profile observability up --build -d
+
+services:
+  db:
+    profiles: ["observability"]
+
+  migrate:
+    profiles: ["observability"]
+
+  seed:
+    profiles: ["observability"]
+
+  api:
+    profiles: ["observability"]
+
+  prometheus:
+    profiles: ["observability"]
+
+  grafana:
+    profiles: ["observability"]
+
+  redpanda:
+    profiles: ["observability"]
+
+  redpanda-init:
+    profiles: ["observability"]

@@ -20,6 +20,8 @@ spec:
         app.kubernetes.io/part-of: retailops-platform
         app.kubernetes.io/component: api
     spec:
+      serviceAccountName: retailops-api
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

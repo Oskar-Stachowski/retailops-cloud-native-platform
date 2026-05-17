@@ -1,4 +1,6 @@
 const DEFAULT_API_BASE_URL = "/api";
+export const DEFAULT_API_TIMEOUT_MS = 10_000;
+export const EXTENDED_API_TIMEOUT_MS = 15_000;
 
 function readViteEnv() {
   try {
@@ -79,8 +81,72 @@ function getApiErrorCode(body, response) {
   return body?.error?.code || `http_${response.status}`;
 }
 
+function createRequestController(options = {}) {
+  const timeoutMs =
+    Number.isFinite(options.timeoutMs) && options.timeoutMs > 0
+      ? options.timeoutMs
+      : DEFAULT_API_TIMEOUT_MS;
+  const controller = new AbortController();
+  const upstreamSignal = options.signal;
+  let didTimeout = false;
+
+  const abortFromUpstream = () => {
+    if (!controller.signal.aborted) {
+      controller.abort(upstreamSignal?.reason);
+    }
+  };
+
+  if (upstreamSignal?.aborted) {
+    abortFromUpstream();
+  } else if (upstreamSignal) {
+    upstreamSignal.addEventListener("abort", abortFromUpstream, { once: true });
+  }
+
+  const timeoutId = globalThis.setTimeout(() => {
+    didTimeout = true;
+
+    if (!controller.signal.aborted) {
+      controller.abort(new Error("Request timed out."));
+    }
+  }, timeoutMs);
+
+  return {
+    signal: controller.signal,
+    didTimeout: () => didTimeout,
+    cleanup() {
+      globalThis.clearTimeout(timeoutId);
+      upstreamSignal?.removeEventListener?.("abort", abortFromUpstream);
+    },
+  };
+}
+
+function toRequestError(error, path, requestController) {
+  if (requestController.didTimeout()) {
+    return new ApiError("Backend API request timed out.", {
+      code: "timeout_error",
+      path,
+      body: error,
+    });
+  }
+
+  if (requestController.signal.aborted) {
+    return new ApiError("API request was cancelled.", {
+      code: "request_aborted",
+      path,
+      body: error,
+    });
+  }
+
+  return new ApiError("Backend API is not reachable.", {
+    code: "network_error",
+    path,
+    body: error,
+  });
+}
+
 export async function apiGet(path, options = {}) {
   const url = toApiUrl(path, options.baseUrl);
+  const requestController = createRequestController(options);
 
   let response;
 
@@ -91,14 +157,12 @@ export async function apiGet(path, options = {}) {
         Accept: "application/json",
         ...(options.headers || {}),
       },
-      signal: options.signal,
+      signal: requestController.signal,
     });
   } catch (error) {
-    throw new ApiError("Backend API is not reachable.", {
-      code: "network_error",
-      path,
-      body: error,
-    });
+    throw toRequestError(error, path, requestController);
+  } finally {
+    requestController.cleanup();
   }
 
   const body = await parseResponseBody(response);
@@ -117,6 +181,7 @@ export async function apiGet(path, options = {}) {
 
 export async function apiPost(path, body = {}, options = {}) {
   const url = toApiUrl(path, options.baseUrl);
+  const requestController = createRequestController(options);
 
   let response;
 
@@ -129,14 +194,12 @@ export async function apiPost(path, body = {}, options = {}) {
         ...(options.headers || {}),
       },
       body: JSON.stringify(body || {}),
-      signal: options.signal,
+      signal: requestController.signal,
     });
   } catch (error) {
-    throw new ApiError("Backend API is not reachable.", {
-      code: "network_error",
-      path,
-      body: error,
-    });
+    throw toRequestError(error, path, requestController);
+  } finally {
+    requestController.cleanup();
   }
 
   const responseBody = await parseResponseBody(response);

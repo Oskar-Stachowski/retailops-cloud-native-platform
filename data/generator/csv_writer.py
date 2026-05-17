@@ -223,6 +223,7 @@ def write_csv(
             file,
             fieldnames=columns,
             extrasaction="ignore",
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(rows)

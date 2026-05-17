@@ -22,6 +22,7 @@ from app.api.health import router as health_router
 from app.core.config import settings
 from app.core.correlation import CorrelationIdMiddleware
 from app.core.logging import configure_logging
+from app.core.tracing import configure_tracing
 from app.services.realtime_consumer import build_realtime_event_consumer
 
 configure_logging()
@@ -42,6 +43,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(CorrelationIdMiddleware)
+configure_tracing(app)
 
 register_exception_handlers(app)
 app.state.realtime_event_consumer = build_realtime_event_consumer()

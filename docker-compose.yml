@@ -4,6 +4,10 @@
 # and CI smoke validation only. It intentionally exposes service ports on the
 # host and uses simple default credentials to keep the local setup reproducible.
 #
+# Image tags in this local stack are intentionally pinned to explicit versions,
+# not digests. For production-style delivery, prefer digest-pinned images in
+# deployment manifests and CI promotion steps.
+#
 # Do not use this file as a production deployment template.
 # Non-local environments must override APP_ENV and inject credentials through
 # a secret manager or protected CI/CD environment variables.
@@ -25,16 +29,18 @@
 
 services:
   frontend:
+    profiles: ["dev"]
     build:
       context: ./frontend
     image: retailops-frontend:0.1.0
     ports:
-      - "${FRONTEND_PORT:-3000}:80"
+      - "${FRONTEND_PORT:-3000}:8080"
     depends_on:
       api:
         condition: service_healthy
 
   api:
+    profiles: ["dev", "observability", "test"]
     build:
       context: ./services/api
     image: retailops-api:0.1.0
@@ -49,6 +55,7 @@ services:
         condition: service_completed_successfully
 
   prometheus:
+    profiles: ["observability"]
     image: prom/prometheus:v3.7.3
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -80,6 +87,7 @@ services:
       start_period: 10s
 
   grafana:
+    profiles: ["observability"]
     image: grafana/grafana:12.4.3
     ports:
       - "${GRAFANA_PORT:-3001}:3000"
@@ -109,6 +117,7 @@ services:
       start_period: 15s
 
   redpanda:
+    profiles: ["dev", "observability", "test"]
     image: redpandadata/redpanda:v25.3.6
     command:
       - redpanda
@@ -145,6 +154,7 @@ services:
       retries: 12
 
   redpanda-init:
+    profiles: ["dev", "observability", "test"]
     image: redpandadata/redpanda:v25.3.6
     entrypoint: ["/bin/sh", "-c"]
     command:
@@ -172,6 +182,7 @@ services:
   # Build it first when running migration/seed jobs directly:
   #   docker compose build api
   migrate:
+    profiles: ["dev", "observability", "test"]
     image: retailops-api:0.1.0
     command: ["alembic", "upgrade", "head"]
     environment:
@@ -183,13 +194,15 @@ services:
     restart: "no"
 
   seed:
+    profiles: ["dev", "observability", "test"]
     image: retailops-api:0.1.0
     command: ["python", "scripts/seed_demo_data.py"]
     environment:
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
       PYTHONPATH: /app
-      RETAILOPS_DEMO_DATA_DIR: /workspace/data/demo
+      RETAILOPS_SEED_DATA_PROFILE: ${RETAILOPS_SEED_DATA_PROFILE:-small}
+      RETAILOPS_SEED_DATA_DIR: ${RETAILOPS_SEED_DATA_DIR:-}
     volumes:
       - ./data:/workspace/data:ro
     depends_on:
@@ -198,6 +211,7 @@ services:
     restart: "no"
 
   db:
+    profiles: ["dev", "observability", "test"]
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-retailops}
@@ -213,8 +227,27 @@ services:
       timeout: 5s
       retries: 5
 
+  security-tools:
+    profiles: ["security"]
+    image: aquasec/trivy:0.59.1
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+      - trivy_cache:/root/.cache/trivy
+    entrypoint: ["trivy"]
+    command:
+      - fs
+      - --severity
+      - CRITICAL,HIGH
+      - --ignore-unfixed
+      - --exit-code
+      - "0"
+      - /workspace
+    restart: "no"
+
 volumes:
   postgres_data:
   redpanda_data:
   prometheus_data:
   grafana_data:
+  trivy_cache:

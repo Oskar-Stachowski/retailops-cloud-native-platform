@@ -1,0 +1,5 @@
+id,login,display_name,role,team,status
+89fb7da5-b69e-5f51-b939-5a62abcae0fa,category.manager,Category Manager,category_manager,Commercial,active
+4fe049b4-e3a5-5feb-bd0a-dff23dded483,inventory.planner,Inventory Planner,inventory_planner,Supply Chain,active
+feabce1d-fbac-5fc2-9d83-50ec2c19193c,retail.analyst,Retail Analyst,analyst,Analytics,active
+c7b0b755-a0da-5e50-aa08-cd8537f2f467,admin.user,Admin User,admin,Platform,active

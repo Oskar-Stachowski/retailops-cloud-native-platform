@@ -12,11 +12,11 @@ class ForecastRepository:
     """PostgreSQL-backed read repository for forecast data."""
 
     SORT_COLUMNS: ClassVar[dict[str, str]] = {
-        "forecast_period_start": "forecast_period_start",
-        "forecast_period_end": "forecast_period_end",
-        "generated_at": "generated_at",
-        "predicted_quantity": "predicted_quantity",
-        "confidence_level": "confidence_level",
+        "forecast_period_start": "f.forecast_period_start",
+        "forecast_period_end": "f.forecast_period_end",
+        "generated_at": "f.generated_at",
+        "predicted_quantity": "f.predicted_quantity",
+        "confidence_level": "f.confidence_level",
     }
 
     def __init__(self, connection: object | None = None) -> None:
@@ -42,6 +42,9 @@ class ForecastRepository:
         return Forecast(
             id=row["id"],
             product_id=row["product_id"],
+            product_sku=row.get("product_sku"),
+            product_name=row.get("product_name"),
+            product_category=row.get("product_category"),
             forecast_period_start=row["forecast_period_start"],
             forecast_period_end=row["forecast_period_end"],
             predicted_quantity=row["predicted_quantity"],
@@ -64,23 +67,23 @@ class ForecastRepository:
         params: list[Any] = []
 
         if product_id:
-            filters.append("product_id = %s")
+            filters.append("f.product_id = %s")
             params.append(product_id)
 
         if status:
-            filters.append("status = %s")
+            filters.append("f.status = %s")
             params.append(status.strip())
 
         if method:
-            filters.append("method = %s")
+            filters.append("f.method = %s")
             params.append(method.strip())
 
         if date_from:
-            filters.append("forecast_period_start >= %s")
+            filters.append("f.forecast_period_start >= %s")
             params.append(date_from)
 
         if date_to:
-            filters.append("forecast_period_end <= %s")
+            filters.append("f.forecast_period_end <= %s")
             params.append(date_to)
 
         if not filters:
@@ -107,24 +110,28 @@ class ForecastRepository:
             date_from=date_from,
             date_to=date_to,
         )
-        sort_column = self.SORT_COLUMNS.get(sort_by, "forecast_period_start")
+        sort_column = self.SORT_COLUMNS.get(sort_by, "f.forecast_period_start")
         direction = "DESC" if sort_order.lower() == "desc" else "ASC"
 
         query = f"""
             SELECT
-                id,
-                product_id,
-                forecast_period_start,
-                forecast_period_end,
-                predicted_quantity,
-                unit_of_measure,
-                generated_at,
-                method,
-                status,
-                confidence_level
-            FROM forecasts
+                f.id,
+                f.product_id,
+                p.sku AS product_sku,
+                p.name AS product_name,
+                p.category AS product_category,
+                f.forecast_period_start,
+                f.forecast_period_end,
+                f.predicted_quantity,
+                f.unit_of_measure,
+                f.generated_at,
+                f.method,
+                f.status,
+                f.confidence_level
+            FROM forecasts f
+            LEFT JOIN products p ON p.id = f.product_id
             {where_clause}
-            ORDER BY {sort_column} {direction}, generated_at DESC
+            ORDER BY {sort_column} {direction}, f.generated_at DESC
             LIMIT %s OFFSET %s;
         """
         rows = self._fetch_all(query, (*params, limit, offset))
@@ -145,7 +152,7 @@ class ForecastRepository:
             date_from=date_from,
             date_to=date_to,
         )
-        query = f"SELECT COUNT(*) AS total FROM forecasts {where_clause};"  # noqa: S608 - where clause is built from fixed filters
+        query = f"SELECT COUNT(*) AS total FROM forecasts f {where_clause};"  # noqa: S608 - where clause is built from fixed filters
         row = self._fetch_one(query, tuple(params))
         return int(row["total"]) if row else 0
 
@@ -153,18 +160,22 @@ class ForecastRepository:
         row = self._fetch_one(
             """
             SELECT
-                id,
-                product_id,
-                forecast_period_start,
-                forecast_period_end,
-                predicted_quantity,
-                unit_of_measure,
-                generated_at,
-                method,
-                status,
-                confidence_level
-            FROM forecasts
-            WHERE id = %s;
+                f.id,
+                f.product_id,
+                p.sku AS product_sku,
+                p.name AS product_name,
+                p.category AS product_category,
+                f.forecast_period_start,
+                f.forecast_period_end,
+                f.predicted_quantity,
+                f.unit_of_measure,
+                f.generated_at,
+                f.method,
+                f.status,
+                f.confidence_level
+            FROM forecasts f
+            LEFT JOIN products p ON p.id = f.product_id
+            WHERE f.id = %s;
             """,
             (forecast_id,),
         )
@@ -177,19 +188,23 @@ class ForecastRepository:
         row = self._fetch_one(
             """
             SELECT
-                id,
-                product_id,
-                forecast_period_start,
-                forecast_period_end,
-                predicted_quantity,
-                unit_of_measure,
-                generated_at,
-                method,
-                status,
-                confidence_level
-            FROM forecasts
-            WHERE product_id = %s
-            ORDER BY generated_at DESC
+                f.id,
+                f.product_id,
+                p.sku AS product_sku,
+                p.name AS product_name,
+                p.category AS product_category,
+                f.forecast_period_start,
+                f.forecast_period_end,
+                f.predicted_quantity,
+                f.unit_of_measure,
+                f.generated_at,
+                f.method,
+                f.status,
+                f.confidence_level
+            FROM forecasts f
+            LEFT JOIN products p ON p.id = f.product_id
+            WHERE f.product_id = %s
+            ORDER BY f.generated_at DESC
             LIMIT 1;
             """,
             (product_id,),

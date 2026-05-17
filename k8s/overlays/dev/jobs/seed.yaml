@@ -17,6 +17,8 @@ spec:
         app.kubernetes.io/component: seed
         retailops.io/environment: dev
     spec:
+      serviceAccountName: retailops-api
+      automountServiceAccountToken: false
       restartPolicy: Never
       securityContext:
         runAsNonRoot: true

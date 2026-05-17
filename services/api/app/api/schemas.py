@@ -78,6 +78,9 @@ class ForecastResponse(ApiBaseModel):
 
     id: UUID
     product_id: UUID
+    product_sku: str | None = None
+    product_name: str | None = None
+    product_category: str | None = None
     forecast_period_start: date
     forecast_period_end: date
     predicted_quantity: float = Field(..., ge=0)
@@ -686,6 +689,7 @@ class NotificationListResponse(ApiBaseModel):
     """Response for GET /notifications."""
 
     items: list[NotificationResponse]
+    pagination: PaginationMetadata
     unread_count: int = Field(..., ge=0)
     total_count: int = Field(..., ge=0)
     user: DemoUserResponse

@@ -97,6 +97,9 @@ def get_forecast_run(
     forecast_run = forecast_run_service.get_forecast_run_response(forecast_run_id)
 
     if forecast_run is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+        )
 
     return forecast_run

@@ -14,3 +14,16 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
       - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: api-type-check
+        name: api-type-check
+        entry: make api-type-check
+        language: system
+        pass_filenames: false
+      - id: api-security-lint
+        name: api-security-lint
+        entry: make api-security-lint
+        language: system
+        pass_filenames: false

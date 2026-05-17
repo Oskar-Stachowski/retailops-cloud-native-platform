@@ -255,7 +255,13 @@ You can optionally adjust ports and database credentials in `.env`.
 ### ▶️ Run the full stack
 
 ```bash
-docker compose up --build
+make compose-up
+```
+
+Equivalent direct Docker Compose command:
+
+```bash
+COMPOSE_PROFILES=dev,observability docker compose up --build -d
 ```
 
 ### Docker Compose Local Runtime
@@ -270,7 +276,7 @@ Redpanda -> local real-time event topics
 Run the stack in the background:
 
 ```bash
-docker compose up --build -d
+make compose-up
 ```
 
 Verify the full runtime:
@@ -287,8 +293,16 @@ health and stream alert rules.
 For a faster check against an already running stack:
 
 ```bash
-./scripts/ci/compose_smoke.sh
+make compose-smoke
 make streaming-smoke
+make observability-smoke
+```
+
+Validate profile rendering and non-root runtime evidence:
+
+```bash
+make compose-profile-config
+make docker-runtime-evidence
 ```
 
 Useful URLs:
@@ -299,6 +313,8 @@ Useful URLs:
 * Frontend API proxy: http://localhost:3000/api/health
 * Redpanda Kafka API: localhost:19092
 * Redpanda Admin API: http://localhost:19644
+* Prometheus: http://localhost:9090
+* Grafana: http://localhost:3001
 
 Start only the local event broker and create topics:
 
@@ -321,7 +337,7 @@ make realtime-consumer
 Stop the stack:
 
 ```bash
-docker compose down
+make compose-down
 ```
 
 ---
@@ -587,6 +603,14 @@ It is designed to show not only technical knowledge, but also the ability to con
 ## Notes
 
 Parts of the documentation and visual materials were supported with AI tools, including ChatGPT.
+
+Validation performed by author:
+
+- Local Docker Compose smoke and cleanup: `make compose-ci` ([evidence](docs/evidence/docker/compose-ci-smoke.md))
+- API startup and contract checks: Uvicorn startup, `/health`, and `/openapi.json` ([evidence](docs/evidence/api/README.md))
+- Terraform validation: `terraform validate` for `infra/environments/dev` ([evidence](ci-cd/reports/iac/sprint-10-terraform-validate.txt))
+- Security scanning: Trivy filesystem and image scan snapshots ([evidence](ci-cd/reports/security/README.md))
+- Manual UI walkthrough: frontend root and `/api/*` proxy checks captured during Compose smoke ([evidence](docs/evidence/docker/compose-ci-smoke.md))
 
 Architecture decisions, implementation choices, technical validation, and final project structure were reviewed and adapted independently by the author.
 

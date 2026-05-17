@@ -38,6 +38,9 @@ def get_product_360(
     product_360 = product_360_service.get_product_360(product_id, limit=limit)
 
     if product_360 is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+        )
 
     return product_360

@@ -1,3 +1,6 @@
+**Implementation Status:** Mixed. Repository security scanning, IAM documentation, and governance evidence are implemented; runtime-only cloud controls remain target scope.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 flowchart TB
 

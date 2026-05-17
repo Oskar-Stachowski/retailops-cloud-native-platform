@@ -1,4 +1,8 @@
+import { isValidElement } from "react";
 import EmptyState from "./EmptyState";
+import { IdentifierText } from "./tableCells.jsx";
+import { isTechnicalIdentifier } from "./tableCellFormatters.js";
+import { resolveRowKey } from "./dataTableKeys.js";
 
 function getCellValue(row, column) {
   if (typeof column.accessor === "function") {
@@ -9,10 +13,29 @@ function getCellValue(row, column) {
 }
 
 function formatCellValue(value) {
-  return value === null || value === undefined || value === "" ? "—" : value;
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  if (isValidElement(value)) {
+    return value;
+  }
+
+  if (isTechnicalIdentifier(value)) {
+    return <IdentifierText value={value} />;
+  }
+
+  return value;
 }
 
-export default function DataTable({ title, description, columns, rows, emptyMessage }) {
+export default function DataTable({
+  title,
+  description,
+  columns,
+  rows,
+  emptyMessage,
+  getRowKey,
+}) {
   if (!rows?.length) {
     return <EmptyState title={title || "No records"} message={emptyMessage} />;
   }
@@ -35,8 +58,8 @@ export default function DataTable({ title, description, columns, rows, emptyMess
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => (
-              <tr key={row.id || row.product_id || row.sku || index}>
+            {rows.map((row) => (
+              <tr key={resolveRowKey(row, getRowKey)}>
                 {columns.map((column) => (
                   <td key={column.key || column.header}>
                     {formatCellValue(column.render ? column.render(row) : getCellValue(row, column))}

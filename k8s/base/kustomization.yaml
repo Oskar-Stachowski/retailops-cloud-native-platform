@@ -4,6 +4,8 @@ kind: Kustomization
 resources:
   - namespaces/retailops.yaml
   - config/app-config.yaml
+  - serviceaccounts/api.yaml
+  - serviceaccounts/frontend.yaml
   - api/deployment.yaml
   - api/service.yaml
   - frontend/deployment.yaml

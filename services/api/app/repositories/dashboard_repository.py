@@ -87,17 +87,26 @@ class DashboardRepository:
 
         query = sql.SQL(
             """
+            WITH sale_window AS (
+                SELECT MAX(DATE({date_column})) AS latest_sale_date
+                FROM sales
+            )
             SELECT
-                DATE({date_column}) AS date,
+                DATE({qualified_date_column}) AS date,
                 {units_expression} AS units_sold,
                 {revenue_expression} AS revenue
-            FROM sales
-            WHERE {date_column} >= CURRENT_DATE - (%s::int * INTERVAL '1 day')
-            GROUP BY DATE({date_column})
-            ORDER BY DATE({date_column}) ASC
+            FROM sales AS s
+            CROSS JOIN sale_window
+            WHERE sale_window.latest_sale_date IS NOT NULL
+              AND DATE({qualified_date_column}) >=
+                  sale_window.latest_sale_date - ((%s::int - 1) * INTERVAL '1 day')
+              AND DATE({qualified_date_column}) <= sale_window.latest_sale_date
+            GROUP BY DATE({qualified_date_column})
+            ORDER BY DATE({qualified_date_column}) ASC
             """,
         ).format(
             date_column=sql.Identifier(date_column),
+            qualified_date_column=sql.Identifier("s", date_column),
             units_expression=units_expression,
             revenue_expression=revenue_expression,
         )

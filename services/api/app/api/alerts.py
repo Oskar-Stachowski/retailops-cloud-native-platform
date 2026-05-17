@@ -36,7 +36,10 @@ def _apply_alert_action(
             idempotency_key=body.idempotency_key,
         )
     except WorkflowNotFoundError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND) from exc
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resource not found",
+        ) from exc
     except WorkflowTransitionError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

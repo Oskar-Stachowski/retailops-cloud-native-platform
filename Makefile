@@ -28,13 +28,22 @@ SECURITY_REPORTS_DIR ?= $(REPORTS_DIR)/security
 IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
+PERFORMANCE_REPORTS_DIR ?= $(REPORTS_DIR)/performance
+DOCKER_REPORTS_DIR ?= $(REPORTS_DIR)/docker
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
+API_BANDIT_REPORT ?= $(SECURITY_REPORTS_DIR)/bandit-api.txt
 
 TERRAFORM ?= terraform
 TFLINT ?= tflint
 CHECKOV ?= checkov
+MYPY ?= mypy
+BANDIT ?= bandit
+K6 ?= k6
+K6_API_SMOKE_SCRIPT ?= tests/performance/k6/api-smoke.js
+K6_API_SMOKE_TEXT_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke.txt
+K6_API_SMOKE_SUMMARY_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke-summary.json
 
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
@@ -61,6 +70,7 @@ GRAFANA_PORT ?= 3001
 API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
 APP_ENV ?= local
+COMPOSE_PROFILES ?= dev
 
 DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
@@ -73,12 +83,25 @@ STREAMING_SMOKE_SCRIPT ?= ./scripts/ci/streaming_smoke.sh
 OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/ci/observability_smoke.sh
 OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/dev/observability_demo_traffic.sh
 KUBERNETES_SMOKE_SCRIPT ?= ./scripts/ci/kubernetes_smoke.sh
+DOCKER_RUNTIME_EVIDENCE_SCRIPT ?= ./scripts/ci/docker_runtime_evidence.sh
+COMPOSE_PROFILE_SET ?= dev test observability security
 
 DATA_PROFILE ?= small
+RETAILOPS_SEED_DATA_PROFILE ?= small
+RETAILOPS_SEED_DATA_DIR ?=
 DATA_OUTPUT_DIR ?= $(DATA_REPORTS_DIR)/generated/$(DATA_PROFILE)
 DATA_QUALITY_REPORT ?= $(DATA_OUTPUT_DIR)/quality_report.json
 DATA_MANIFEST_REPORT ?= $(DATA_OUTPUT_DIR)/dataset_manifest.json
 DATA_REALISM_REPORT ?= $(DATA_OUTPUT_DIR)/realism_report.json
+DATA_CONTRACT ?= data/contracts/retailops_seed_dataset.contract.json
+EVENT_CONTRACT ?= events/contracts/retailops-realtime-events.v1.contract.json
+DATA_CONTRACT_REPORT ?= $(DATA_REPORTS_DIR)/data-contract-report.json
+SCENARIO_COVERAGE_REPORT ?= $(DATA_REPORTS_DIR)/scenario-coverage-report.json
+SCENARIO_COVERAGE_MARKDOWN ?= docs/evidence/data/scenario-coverage-report.md
+DB_BACKUP_DIR ?= $(REPORTS_DIR)/db/backups
+DB_BACKUP_FILE ?=
+DB_SERVICE ?= db
+
 ML_FEATURE_PROFILE ?= small
 ML_FEATURE_OUTPUT_DIR ?= data/synthetic/$(ML_FEATURE_PROFILE)/features/demand_forecast
 ML_BASELINE_PROFILE ?= small
@@ -128,8 +151,11 @@ export GRAFANA_PORT
 export API_PORT
 export FRONTEND_PORT
 export APP_ENV
+export COMPOSE_PROFILES
 export DATABASE_URL
 export RETAILOPS_BROKER_BOOTSTRAP_SERVERS
+export RETAILOPS_SEED_DATA_PROFILE
+export RETAILOPS_SEED_DATA_DIR
 
 .PHONY: help
 help:
@@ -140,6 +166,10 @@ help:
 	@echo "  make ci-local             Run local preflight without full Compose smoke"
 	@echo "  make test                 Run backend and frontend tests"
 	@echo "  make data-quality         Generate synthetic data and validate quality report"
+	@echo "  make data-contracts       Validate demo CSVs and event schema against data contracts"
+	@echo "  make data-scenario-report Generate scenario coverage evidence"
+	@echo "  make db-backup            Create local PostgreSQL logical backup evidence"
+	@echo "  make db-restore           Restore local PostgreSQL backup evidence"
 	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
 	@echo "  make ml-trained           Train RandomForest demand forecasting model"
@@ -153,12 +183,19 @@ help:
 	@echo "  make api-install          Install backend dependencies"
 	@echo "  make api-lint             Run Ruff backend/data checks"
 	@echo "  make api-format-check     Check Ruff formatting"
+	@echo "  make api-type-check       Run mypy against the curated typed backend modules"
+	@echo "  make api-security-lint    Generate a report-only Bandit scan for backend application and script code"
 	@echo "  make api-coverage         Run backend pytest with coverage gate"
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
+	@echo "  make performance-smoke    Run k6 API smoke baseline and save p95 evidence"
 	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
-	@echo "  make api-seed             Seed demo data"
+	@echo "  make api-seed             Seed the default local dataset profile (small)"
+	@echo "  make api-seed-demo        Seed demo smoke/CI data"
+	@echo "  make api-seed-small       Seed small local portfolio data"
+	@echo "  make api-seed-medium      Seed medium showcase/performance data"
+	@echo "  make db-readiness-evidence Run data readiness evidence gates"
 	@echo ""
 	@echo "Frontend:"
 	@echo "  make frontend-install     Install frontend dependencies"
@@ -177,8 +214,10 @@ help:
 	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
-	@echo "  make compose-config       Validate Docker Compose config"
-	@echo "  make compose-up           Start full local stack"
+	@echo "  make compose-config       Validate default Docker Compose config"
+	@echo "  make compose-profile-config Validate dev/test/observability/security Compose profiles"
+	@echo "  make docker-runtime-evidence Capture profile and non-root runtime evidence"
+	@echo "  make compose-up           Start full local dev stack"
 	@echo "  make broker-up            Start local Redpanda broker and create topics"
 	@echo "  make broker-topics        List local Redpanda topics"
 	@echo "  make realtime-consumer    Run local long-running realtime consumer"
@@ -197,7 +236,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(REPORTS_DIR)/k8s"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -226,7 +265,7 @@ pre-commit-run: api-install
 # Backend
 # -------------------------------------------------------------------
 
-.PHONY: api-lint api-format api-format-check api-test api-coverage api-integration-test api-migrate api-seed data-generate data-quality ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down
+.PHONY: api-lint api-format api-format-check api-type-check api-security-lint api-test api-coverage api-integration-test api-migrate api-seed api-seed-demo api-seed-small api-seed-medium data-generate data-quality data-contracts data-scenario-report scenario-coverage-report db-backup db-restore db-reset-seed-small db-reset-seed-medium db-readiness-evidence ml-features ml-baseline ml-trained ml-evaluate ml-metadata ml-inference ml-metrics ml-drift db-up db-down check-k6 performance-smoke
 
 api-lint: api-install
 	$(API_VENV_PYTHON) -m ruff check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
@@ -236,6 +275,12 @@ api-format: api-install
 
 api-format-check: api-install
 	$(API_VENV_PYTHON) -m ruff format --check "$(API_DIR)/app" "$(API_DIR)/scripts" "$(API_DIR)/tests" data ml
+
+api-type-check: api-install
+	$(API_VENV_PYTHON) -m $(MYPY) --config-file "$(ROOT_DIR)/pyproject.toml"
+
+api-security-lint: api-install ensure-reports-dir
+	$(API_VENV_PYTHON) -m $(BANDIT) --exit-zero -q -r "$(API_DIR)/app" "$(API_DIR)/scripts" -f txt -o "$(ROOT_DIR)/$(API_BANDIT_REPORT)"
 
 api-test: api-install
 	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
@@ -262,6 +307,27 @@ data-quality: api-install ensure-reports-dir
 	@echo "Data quality report: $(DATA_QUALITY_REPORT)"
 	@echo "Dataset manifest: $(DATA_MANIFEST_REPORT)"
 	@if [ -f "$(DATA_REALISM_REPORT)" ]; then echo "Realism report: $(DATA_REALISM_REPORT)"; fi
+
+data-contracts: api-install ensure-reports-dir
+	$(API_VENV_PYTHON) scripts/data/validate_data_contracts.py --contract "$(DATA_CONTRACT)" --data-dir data/demo --event-contract "$(EVENT_CONTRACT)" --report "$(DATA_CONTRACT_REPORT)"
+
+scenario-coverage-report: data-scenario-report
+
+data-scenario-report: api-install ensure-reports-dir
+	$(API_VENV_PYTHON) scripts/data/generate_scenario_coverage_report.py --data-dir data/demo --json-report "$(SCENARIO_COVERAGE_REPORT)" --markdown-report "$(SCENARIO_COVERAGE_MARKDOWN)"
+
+db-backup: ensure-reports-dir
+	BACKUP_DIR="$(DB_BACKUP_DIR)" DB_SERVICE="$(DB_SERVICE)" POSTGRES_USER="$(POSTGRES_USER)" POSTGRES_DB="$(POSTGRES_DB)" COMPOSE="$(COMPOSE)" scripts/db/backup.sh
+
+db-restore: ensure-reports-dir
+	@test -n "$(DB_BACKUP_FILE)" || { echo "ERROR: set DB_BACKUP_FILE=path/to/backup.dump"; exit 1; }
+	DB_SERVICE="$(DB_SERVICE)" POSTGRES_USER="$(POSTGRES_USER)" POSTGRES_DB="$(POSTGRES_DB)" COMPOSE="$(COMPOSE)" scripts/db/restore.sh "$(DB_BACKUP_FILE)"
+
+db-readiness-evidence: data-generate data-contracts data-scenario-report
+	@echo "DB readiness evidence generated:"
+	@echo "- $(DATA_CONTRACT_REPORT)"
+	@echo "- $(SCENARIO_COVERAGE_REPORT)"
+	@echo "- $(SCENARIO_COVERAGE_MARKDOWN)"
 
 ml-features: api-install
 	$(API_VENV_PYTHON) -m ml.features.demand_forecast --profile "$(ML_FEATURE_PROFILE)" --output-dir "$(ML_FEATURE_OUTPUT_DIR)"
@@ -308,13 +374,51 @@ ml-drift: api-install
 	@echo "Drift summary: $(ML_DRIFT_OUTPUT_DIR)/drift_summary.md"
 
 api-migrate: api-install
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m alembic upgrade head
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/alembic -c alembic.ini upgrade head
 
-api-seed: api-install
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" .venv/bin/python scripts/seed_demo_data.py
+api-seed: api-seed-small
 
-api-integration-test: api-install db-up data-generate api-migrate api-seed
-	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
+api-seed-demo: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=demo .venv/bin/python scripts/seed_demo_data.py
+
+api-seed-small: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=small .venv/bin/python scripts/seed_demo_data.py
+
+api-seed-medium: api-install
+	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=medium .venv/bin/python scripts/seed_demo_data.py
+
+db-reset-seed-small:
+	$(MAKE) db-down
+	$(MAKE) db-up
+	sleep 3
+	$(MAKE) api-migrate
+	$(MAKE) api-seed-small
+
+db-reset-seed-medium:
+	$(MAKE) db-down
+	$(MAKE) db-up
+	sleep 3
+	$(MAKE) api-migrate
+	$(MAKE) api-seed-medium
+
+api-integration-test: api-install db-up data-generate api-migrate api-seed-demo
+	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" REQUIRE_DB_TESTS=1 .venv/bin/python -m pytest
+
+check-k6:
+	@command -v "$(K6)" >/dev/null 2>&1 || { \
+		echo "ERROR: k6 is not installed or not available in PATH."; \
+		echo "Install k6 first, then rerun make performance-smoke."; \
+		exit 1; \
+	}
+
+performance-smoke: check-k6 ensure-reports-dir
+	@set -o pipefail; \
+	API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
+	$(K6) run \
+		--summary-export "$(K6_API_SMOKE_SUMMARY_REPORT)" \
+		"$(K6_API_SMOKE_SCRIPT)" | tee "$(K6_API_SMOKE_TEXT_REPORT)"
+	@echo "k6 text report: $(K6_API_SMOKE_TEXT_REPORT)"
+	@echo "k6 summary report: $(K6_API_SMOKE_SUMMARY_REPORT)"
 
 # -------------------------------------------------------------------
 # Frontend
@@ -339,7 +443,7 @@ frontend-build:
 
 test: api-test frontend-test
 
-ci-local: compose-config data-quality api-lint api-format-check api-coverage frontend-test frontend-lint frontend-build
+ci-local: compose-config data-quality data-contracts data-scenario-report api-lint api-format-check api-type-check api-security-lint api-coverage frontend-test frontend-lint frontend-build
 	@echo "Local CI preflight passed."
 
 # -------------------------------------------------------------------
@@ -468,7 +572,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke
+.PHONY: docker-build compose-config compose-profile-config docker-runtime-evidence compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -477,11 +581,17 @@ docker-build:
 compose-config:
 	$(COMPOSE) config
 
+compose-profile-config: ensure-reports-dir
+	@for profile in $(COMPOSE_PROFILE_SET); do \
+		echo "[compose-profile-config] Validating profile: $${profile}"; \
+		COMPOSE_PROFILES="$${profile}" $(COMPOSE) config > "$(DOCKER_REPORTS_DIR)/compose-profile-$${profile}.yml"; \
+	done
+
 compose-up:
-	$(COMPOSE) up --build -d
+	COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d
 
 broker-up:
-	$(COMPOSE) up -d redpanda redpanda-init
+	COMPOSE_PROFILES=dev $(COMPOSE) up -d redpanda redpanda-init
 
 broker-topics:
 	$(COMPOSE) exec redpanda rpk topic list --brokers redpanda:9092
@@ -490,7 +600,7 @@ realtime-consumer:
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_BROKER_BOOTSTRAP_SERVERS="$(RETAILOPS_BROKER_BOOTSTRAP_SERVERS)" .venv/bin/python scripts/run_realtime_consumer.py
 
 observability-up:
-	$(COMPOSE) up --build -d db migrate seed api prometheus grafana
+	COMPOSE_PROFILES=observability $(COMPOSE) up --build -d db migrate seed api prometheus grafana
 
 compose-down:
 	$(COMPOSE) down -v --remove-orphans
@@ -514,6 +624,10 @@ observability-demo-traffic: ensure-reports-dir
 	chmod +x "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
 	API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" COMPOSE="$(COMPOSE)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_DEMO_TRAFFIC_SCRIPT)"
 
+docker-runtime-evidence: ensure-reports-dir
+	chmod +x "$(DOCKER_RUNTIME_EVIDENCE_SCRIPT)"
+	COMPOSE="$(COMPOSE)" DOCKER_REPORTS_DIR="$(DOCKER_REPORTS_DIR)" API_IMAGE="retailops-api:0.1.0" FRONTEND_IMAGE="retailops-frontend:0.1.0" COMPOSE_PROFILE_SET="$(COMPOSE_PROFILE_SET)" "$(DOCKER_RUNTIME_EVIDENCE_SCRIPT)"
+
 k8s-smoke: ensure-reports-dir
 	chmod +x "$(KUBERNETES_SMOKE_SCRIPT)"
 	K8S_REPORTS_DIR="$(REPORTS_DIR)/k8s" "$(KUBERNETES_SMOKE_SCRIPT)"
@@ -527,8 +641,9 @@ compose-ci: ensure-reports-dir
 	$(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
 	echo "[compose-ci] Validating Compose config..."; \
 	$(COMPOSE) config; \
+	$(MAKE) compose-profile-config; \
 	echo "[compose-ci] Starting full RetailOps stack..."; \
-	$(COMPOSE) up --build -d || status=$$?; \
+	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d || status=$$?; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \

@@ -1,3 +1,5 @@
+# Tag pinning is intentional for local and portfolio reproducibility.
+# Production deployment manifests should prefer digest-pinned base images.
 FROM python:3.11-slim
 
 LABEL org.opencontainers.image.title="RetailOps API"
@@ -7,6 +9,7 @@ LABEL org.opencontainers.image.version="0.1.0"
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
+ENV PIP_VERSION=26.1.1
 ENV APP_HOME=/app
 
 WORKDIR ${APP_HOME}
@@ -17,7 +20,7 @@ RUN apt-get update \
 
 COPY requirements.txt .
 
-RUN pip install --upgrade pip \
+RUN pip install --no-cache-dir "pip==${PIP_VERSION}" \
     && pip install --no-cache-dir -r requirements.txt
 
 RUN adduser --disabled-password --gecos "" appuser

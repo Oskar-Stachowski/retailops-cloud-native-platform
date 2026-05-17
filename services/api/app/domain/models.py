@@ -310,6 +310,7 @@ class ForecastMethod(str, Enum):
     naive_baseline = "naive_baseline"
     seeded_demo = "seeded_demo"
     retailops_baseline_demand_model = "retailops-baseline-demand-model"
+    retailops_realism_baseline_demand_model = "retailops-realism-baseline-demand-model"
 
 
 class ForecastStatus(str, Enum):
@@ -321,6 +322,9 @@ class ForecastStatus(str, Enum):
 class Forecast(RetailOpsBaseModel):
     id: UUID = Field(default_factory=uuid4)
     product_id: UUID
+    product_sku: str | None = None
+    product_name: str | None = None
+    product_category: str | None = None
 
     forecast_period_start: date = Field(...)
     forecast_period_end: date = Field(...)

@@ -1,3 +1,6 @@
+**Implementation Status:** Implemented foundation. The schema, repository, service, and local/CI orchestration shown here are represented by working code and tests in the repository.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 %%{init: {
   "theme": "base",

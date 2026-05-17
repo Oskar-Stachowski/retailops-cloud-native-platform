@@ -21,6 +21,9 @@ def make_test_forecast() -> Forecast:
     return Forecast(
         id=UUID("11111111-1111-1111-1111-111111111111"),
         product_id=PRODUCT_WITH_FORECAST_ID,
+        product_sku="ELEC-HEAD-001",
+        product_name="Wireless Headphones",
+        product_category="Electronics",
         forecast_period_start=date(2026, 5, 1),
         forecast_period_end=date(2026, 5, 7),
         predicted_quantity=120.5,

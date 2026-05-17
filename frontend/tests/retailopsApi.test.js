@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import {
   buildDashboardSummary,
   buildLiveOperationsPath,
+  buildQueryPath,
   buildWorkflowMutationPath,
+  createWorkflowIdempotencyKey,
+  getProducts,
+  getForecasts,
   getProduct360,
   getLiveOperations,
   listFromKnownKeys,
@@ -11,6 +15,7 @@ import {
   normalizeRiskStatus,
   buildUserScopedPath,
   getCurrentUser,
+  getCurrentUserContext,
   getNotifications,
   hasPermission,
   markNotificationRead,
@@ -92,6 +97,150 @@ test("buildLiveOperationsPath builds dashboard live operations query", () => {
   );
 });
 
+test("buildQueryPath preserves existing query parameters and applies overrides", () => {
+  assert.equal(
+    buildQueryPath("/products?sort_by=sku", { limit: 100, offset: 200 }),
+    "/products?sort_by=sku&limit=100&offset=200",
+  );
+  assert.equal(buildQueryPath("/products?limit=50", { limit: 100 }), "/products?limit=100");
+});
+
+test("getProducts follows backend pagination until all product rows are loaded", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    const parsedUrl = new URL(url);
+    const offset = Number(parsedUrl.searchParams.get("offset"));
+    const limit = Number(parsedUrl.searchParams.get("limit"));
+    const items = Array.from({ length: offset === 200 ? 30 : limit }, (_, index) => ({
+      id: offset + index + 1,
+    }));
+
+    return new Response(
+      JSON.stringify({
+        items,
+        pagination: {
+          total: 230,
+          limit,
+          offset,
+        },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const products = await getProducts({ baseUrl: "http://localhost:8000" });
+
+    assert.equal(products.length, 230);
+    assert.deepEqual(requestedUrls, [
+      "http://localhost:8000/products?limit=100&offset=0",
+      "http://localhost:8000/products?limit=100&offset=100",
+      "http://localhost:8000/products?limit=100&offset=200",
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("getProducts forwards optional catalog query parameters", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+
+    return new Response(
+      JSON.stringify({
+        items: [{ id: 1, sku: "ELEC-HEAD-001" }],
+        pagination: { total: 1, limit: 50, offset: 0 },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const products = await getProducts({
+      baseUrl: "http://localhost:8000",
+      search: "head",
+      category: "Electronics",
+      status: "active",
+      sortBy: "updated_at",
+      sortOrder: "desc",
+      limit: 50,
+      maxItems: 50,
+    });
+
+    assert.deepEqual(products, [{ id: 1, sku: "ELEC-HEAD-001" }]);
+    assert.equal(
+      requestedUrls[0],
+      "http://localhost:8000/products?search=head&category=Electronics&status=active&sort_by=updated_at&sort_order=desc&limit=50&offset=0",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("getForecasts forwards planning query parameters and pagination", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    const parsedUrl = new URL(url);
+    const offset = Number(parsedUrl.searchParams.get("offset"));
+    const limit = Number(parsedUrl.searchParams.get("limit"));
+    const items = Array.from({ length: offset === 100 ? 20 : limit }, (_, index) => ({
+      id: `forecast-${offset + index + 1}`,
+      product_sku: "ELEC-HEAD-001",
+      product_name: "Wireless Headphones",
+    }));
+
+    return new Response(
+      JSON.stringify({
+        items,
+        pagination: { total: 120, limit, offset },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const forecasts = await getForecasts({
+      baseUrl: "http://localhost:8000",
+      status: "generated",
+      method: "retailops-baseline-demand-model",
+      sortBy: "generated_at",
+      sortOrder: "desc",
+      limit: 100,
+      maxItems: 200,
+    });
+
+    assert.equal(forecasts.length, 120);
+    assert.equal(
+      requestedUrls[0],
+      "http://localhost:8000/forecasts?status=generated&method=retailops-baseline-demand-model&sort_by=generated_at&sort_order=desc&limit=100&offset=0",
+    );
+    assert.equal(
+      requestedUrls[1],
+      "http://localhost:8000/forecasts?status=generated&method=retailops-baseline-demand-model&sort_by=generated_at&sort_order=desc&limit=100&offset=100",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("getLiveOperations calls the live operations backend endpoint", async () => {
   const originalFetch = globalThis.fetch;
   const requestedUrls = [];
@@ -144,6 +293,27 @@ test("getProduct360 calls the Product 360 backend endpoint", async () => {
   }
 });
 
+test("getProduct360 can request a larger related-row limit", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(JSON.stringify({ product: { sku: "ELEC-HEAD-001" } }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  try {
+    await getProduct360("abc", { baseUrl: "http://localhost:8000", limit: 50 });
+
+    assert.equal(requestedUrls[0], "http://localhost:8000/products/abc/360?limit=50");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("buildUserScopedPath adds selected demo user query parameter", () => {
   assert.equal(
     buildUserScopedPath("/me", "inventory-planner"),
@@ -164,6 +334,30 @@ test("buildWorkflowMutationPath builds user-scoped workflow write paths", () => 
     buildWorkflowMutationPath("recommendation", "R1", "accept", "inventory-planner"),
     "/recommendations/R1/accept?user_id=inventory-planner",
   );
+});
+
+test("createWorkflowIdempotencyKey uses a stable UUID-based suffix", () => {
+  const originalCryptoDescriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+
+  Object.defineProperty(globalThis, "crypto", {
+    configurable: true,
+    value: {
+      randomUUID: () => "11111111-2222-4333-8444-555555555555",
+    },
+  });
+
+  try {
+    assert.equal(
+      createWorkflowIdempotencyKey(["alert", "A1", "acknowledge"]),
+      "frontend:alert:A1:acknowledge:11111111-2222-4333-8444-555555555555",
+    );
+  } finally {
+    if (originalCryptoDescriptor) {
+      Object.defineProperty(globalThis, "crypto", originalCryptoDescriptor);
+    } else {
+      delete globalThis.crypto;
+    }
+  }
 });
 
 test("hasPermission supports explicit permissions and platform admin", () => {
@@ -195,6 +389,41 @@ test("getCurrentUser calls user-scoped /me endpoint", async () => {
 
     assert.equal(requestedUrls[0], "http://localhost:8000/me?user_id=ops-manager");
     assert.deepEqual(user, { id: "ops-manager", role: "operations_manager" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
+test("getCurrentUserContext preserves auth boundary metadata", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  globalThis.fetch = async (url) => {
+    requestedUrls.push(url);
+    return new Response(
+      JSON.stringify({
+        user: { id: "platform-admin", role: "platform_admin" },
+        auth_mode: "local_mock",
+        scope_boundary: "Mock identity only.",
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  };
+
+  try {
+    const context = await getCurrentUserContext({
+      baseUrl: "http://localhost:8000",
+      userId: "platform-admin",
+    });
+
+    assert.equal(requestedUrls[0], "http://localhost:8000/me?user_id=platform-admin");
+    assert.equal(context.auth_mode, "local_mock");
+    assert.equal(context.scope_boundary, "Mock identity only.");
+    assert.deepEqual(context.user, { id: "platform-admin", role: "platform_admin" });
   } finally {
     globalThis.fetch = originalFetch;
   }

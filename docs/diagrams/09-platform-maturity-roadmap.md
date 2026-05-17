@@ -1,3 +1,6 @@
+**Implementation Status:** Roadmap view. Phase 1 and parts of Phase 2 are implemented locally; later phases are target maturity steps, not current runtime claims.
+**Legend:** `Implemented` = working in this repository, `Partially implemented` = some code/config/evidence exists, `Target` = design direction only.
+
 ```mermaid
 flowchart LR
   %% Platform Maturity Roadmap for RetailOps AI Platform

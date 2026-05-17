@@ -10,6 +10,7 @@ from app.api.schemas import (
     NotificationListResponse,
     NotificationReadResponse,
     NotificationResponse,
+    PaginationMetadata,
 )
 from app.auth.roles import (
     PERMISSION_NOTIFICATIONS_READ,
@@ -104,18 +105,32 @@ def _visible_notifications_for_user(user: DemoUser) -> list[NotificationResponse
 @router.get("/notifications")
 def list_notifications(
     user_id: Annotated[str | None, Query(description="Local demo user id.")] = None,
+    limit: Annotated[
+        int,
+        Query(ge=1, le=100, description="Maximum number of notifications to return."),
+    ] = 50,
+    offset: Annotated[
+        int,
+        Query(ge=0, description="Number of visible notifications to skip."),
+    ] = 0,
 ) -> NotificationListResponse:
     """Return mock notifications visible to the selected demo user."""
     user = get_demo_user(user_id)
     require_permission(user, PERMISSION_NOTIFICATIONS_READ)
 
-    items = _visible_notifications_for_user(user)
-    unread_count = sum(1 for item in items if item.status == "unread")
+    all_items = _visible_notifications_for_user(user)
+    paged_items = all_items[offset : offset + limit]
+    unread_count = sum(1 for item in all_items if item.status == "unread")
 
     return NotificationListResponse(
-        items=items,
+        items=paged_items,
+        pagination=PaginationMetadata(
+            limit=limit,
+            offset=offset,
+            total=len(all_items),
+        ),
         unread_count=unread_count,
-        total_count=len(items),
+        total_count=len(all_items),
         user=to_demo_user_response(user),
     )
 

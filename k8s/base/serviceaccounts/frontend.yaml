@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: retailops-frontend
+  namespace: retailops
+  labels:
+    app.kubernetes.io/name: retailops-frontend
+    app.kubernetes.io/part-of: retailops-platform
+    app.kubernetes.io/component: frontend
+automountServiceAccountToken: false
