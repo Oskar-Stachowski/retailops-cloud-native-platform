@@ -6,6 +6,12 @@ This directory contains a small k6 smoke baseline for the Backend/API production
 
 This is a local smoke baseline, not a production capacity test. It proves that the API can be exercised with repeatable load-test tooling and that a p95 latency report can be captured as evidence.
 
+Responsibility boundary:
+
+- k6 validates backend/API runtime behavior, p95 latency and failed request rate.
+- Playwright validates browser/UI behavior in `frontend/e2e/`.
+- `make runtime-smoke-evidence` runs both layers against the same running Compose stack.
+
 Covered endpoints:
 
 - `GET /health`
@@ -24,6 +30,14 @@ Covered endpoints:
 ```bash
 make compose-up
 make performance-smoke
+```
+
+To run the full local runtime evidence path:
+
+```bash
+make compose-up
+make runtime-smoke-evidence
+make compose-down
 ```
 
 Optional overrides:

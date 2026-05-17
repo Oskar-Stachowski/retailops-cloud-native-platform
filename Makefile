@@ -29,6 +29,7 @@ IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
 PERFORMANCE_REPORTS_DIR ?= $(REPORTS_DIR)/performance
+E2E_REPORTS_DIR ?= $(REPORTS_DIR)/e2e
 DOCKER_REPORTS_DIR ?= $(REPORTS_DIR)/docker
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
@@ -44,6 +45,7 @@ K6 ?= k6
 K6_API_SMOKE_SCRIPT ?= tests/performance/k6/api-smoke.js
 K6_API_SMOKE_TEXT_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke.txt
 K6_API_SMOKE_SUMMARY_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke-summary.json
+PLAYWRIGHT ?= $(FRONTEND_DIR)/node_modules/.bin/playwright
 
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
@@ -190,6 +192,7 @@ help:
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
 	@echo "  make performance-smoke    Run k6 API smoke baseline and save p95 evidence"
+	@echo "  make runtime-smoke-evidence Run API smoke, k6 baseline and browser E2E against a running stack"
 	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
 	@echo "  make api-seed             Seed the default local dataset profile (small)"
@@ -203,6 +206,7 @@ help:
 	@echo "  make frontend-test        Run frontend tests"
 	@echo "  make frontend-lint        Run frontend lint"
 	@echo "  make frontend-build       Build frontend"
+	@echo "  make browser-smoke        Run Playwright browser smoke against a running frontend/API stack"
 	@echo ""
 	@echo "Terraform / IaC:"
 	@echo "  make terraform-fmt        Format Terraform files under infra/"
@@ -412,6 +416,13 @@ check-k6:
 		exit 1; \
 	}
 
+check-playwright:
+	@test -x "$(PLAYWRIGHT)" || { \
+		echo "ERROR: Playwright is not installed under $(FRONTEND_DIR)."; \
+		echo "Run 'cd $(FRONTEND_DIR) && npm ci' before make browser-smoke."; \
+		exit 1; \
+	}
+
 performance-smoke: check-k6 ensure-reports-dir
 	@set -o pipefail; \
 	API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
@@ -421,11 +432,24 @@ performance-smoke: check-k6 ensure-reports-dir
 	@echo "k6 text report: $(K6_API_SMOKE_TEXT_REPORT)"
 	@echo "k6 summary report: $(K6_API_SMOKE_SUMMARY_REPORT)"
 
+browser-smoke: check-playwright ensure-reports-dir
+	@mkdir -p "$(E2E_REPORTS_DIR)"
+	cd "$(FRONTEND_DIR)" && \
+		FRONTEND_BASE_URL="$${FRONTEND_BASE_URL:-http://localhost:$(FRONTEND_PORT)}" \
+		API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
+		PLAYWRIGHT_BROWSER_CHANNEL="$${PLAYWRIGHT_BROWSER_CHANNEL-chrome}" \
+		"$(NPM)" run e2e
+	@echo "Playwright JUnit report: $(E2E_REPORTS_DIR)/playwright-junit.xml"
+	@echo "Playwright dashboard screenshot: $(E2E_REPORTS_DIR)/dashboard-smoke-snapshot.png"
+
+runtime-smoke-evidence: compose-smoke performance-smoke browser-smoke
+	@echo "Runtime smoke evidence passed: compose API/frontend smoke, k6 API baseline and Playwright browser E2E."
+
 # -------------------------------------------------------------------
 # Frontend
 # -------------------------------------------------------------------
 
-.PHONY: frontend-test frontend-lint frontend-build
+.PHONY: frontend-test frontend-lint frontend-build check-playwright browser-smoke runtime-smoke-evidence
 
 frontend-test:
 	cd "$(FRONTEND_DIR)" && "$(NPM)" test
@@ -589,7 +613,7 @@ compose-profile-config: ensure-reports-dir
 	done
 
 compose-up:
-	COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up --build -d
 
 broker-up:
 	COMPOSE_PROFILES=dev $(COMPOSE) up -d redpanda redpanda-init
@@ -604,10 +628,10 @@ observability-up:
 	COMPOSE_PROFILES=observability $(COMPOSE) up --build -d db migrate seed api prometheus grafana
 
 compose-down:
-	$(COMPOSE) down -v --remove-orphans
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans
 
 compose-logs:
-	$(COMPOSE) logs --no-color
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) logs --no-color
 
 compose-smoke:
 	chmod +x "$(SMOKE_SCRIPT)"
