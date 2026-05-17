@@ -140,8 +140,17 @@ is_example_secret if {
   endswith(resource_name, "-example")
 }
 
+is_local_generated_runtime_secret if {
+  input.kind == "Secret"
+  metadata := object.get(input, "metadata", {})
+  annotations := object.get(metadata, "annotations", {})
+  object.get(annotations, "retailops.io/generated-by", "") == "kustomize-secretGenerator"
+  object.get(annotations, "retailops.io/secret-source", "") == "uncommitted-local-env"
+}
+
 deny contains msg if {
   input.kind == "Secret"
   not is_example_secret
+  not is_local_generated_runtime_secret
   msg := sprintf("Kubernetes Secret %s is committed as a manifest; use External Secrets or uncommitted local secret files", [resource_name])
 }
