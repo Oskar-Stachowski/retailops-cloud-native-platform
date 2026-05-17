@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: retailops-seed-demo-data
+  namespace: retailops
   labels:
     app.kubernetes.io/name: retailops-seed-demo-data
     app.kubernetes.io/part-of: retailops-platform

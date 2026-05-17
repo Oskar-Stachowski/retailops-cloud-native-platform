@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
+  namespace: retailops
   labels:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/part-of: retailops-platform
@@ -21,6 +22,7 @@ spec:
         app.kubernetes.io/component: database
         retailops.io/environment: dev
     spec:
+      automountServiceAccountToken: false
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -39,6 +41,9 @@ spec:
                 name: retailops-runtime-secrets
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           startupProbe:
             exec:
               command:
