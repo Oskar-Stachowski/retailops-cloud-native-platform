@@ -71,6 +71,7 @@ API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
 APP_ENV ?= local
 COMPOSE_PROFILES ?= dev
+COMPOSE_CI_PROFILES ?= dev,observability
 
 DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
@@ -638,12 +639,12 @@ compose-ci: ensure-reports-dir
 	@set -e; \
 	status=0; \
 	echo "[compose-ci] Cleaning previous Compose state..."; \
-	$(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
 	echo "[compose-ci] Validating Compose config..."; \
 	$(COMPOSE) config; \
 	$(MAKE) compose-profile-config; \
 	echo "[compose-ci] Starting full RetailOps stack..."; \
-	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d || status=$$?; \
+	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up --build -d || status=$$?; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \
@@ -659,14 +660,14 @@ compose-ci: ensure-reports-dir
 		chmod +x "$(OBSERVABILITY_SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_SMOKE_SCRIPT)" || status=$$?; \
 	fi; \
-	$(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
 	if [[ $$status -ne 0 ]]; then \
 		echo "[compose-ci] Failure detected. Capturing Compose logs..."; \
-		$(COMPOSE) logs --no-color > "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
+		COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) logs --no-color > "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
 		cat "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
 	fi; \
 	echo "[compose-ci] Cleaning Compose stack..."; \
-	$(COMPOSE) down -v --remove-orphans || true; \
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans || true; \
 	exit $$status
 
 # -------------------------------------------------------------------
