@@ -1,6 +1,6 @@
 # Evidence Index
 
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-18
 
 This index maps tracked evidence to what it proves. It avoids treating documentation claims, roadmap diagrams, or target architecture text as proof of implementation.
 
@@ -10,7 +10,8 @@ Use this table as the first stop when reviewing freshness. It records the last c
 
 | Date | Commit SHA | Command run | Expected outcome | Environment | Artifact |
 |---|---|---|---|---|---|
-| 2026-05-12 | `e4d0eb72f6a9c17e5072ca7954e1df03b06f8630` | `make compose-ci` | Backend and frontend images build, Compose stack starts, API/frontend/streaming/observability smoke checks pass, cleanup completes. | Local Docker / Docker Compose | [`docs/evidence/docker/compose-ci-smoke.md`](docker/compose-ci-smoke.md) |
+| 2026-05-18 | `5aedb2bdc7d7` | `make compose-ci` | Backend and frontend images build, Compose stack starts, API/frontend/streaming/observability smoke checks pass, cleanup completes. | Local Docker / Docker Compose | [`docs/evidence/docker/compose-ci-smoke.md`](docker/compose-ci-smoke.md) |
+| 2026-05-18 | `5aedb2bdc7d7` | `make compose-up && make runtime-smoke-evidence && make compose-down` | Running local stack passes API/frontend smoke, k6 API p95 baseline and Playwright browser smoke. | Local Docker / Docker Compose / k6 / Playwright | [`docs/evidence/runtime/local-runtime-smoke.md`](runtime/local-runtime-smoke.md) |
 | 2026-05-12 | `e4d0eb72f6a9c17e5072ca7954e1df03b06f8630` | `cd services/api && PYTHONPATH=. .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8011` | API starts cleanly; `/health` returns `200`; `/openapi.json` is captured. | Local Python / loopback HTTP | [`docs/evidence/api/startup-log.md`](api/startup-log.md) |
 | 2026-05-17 | `38cab9839f2c` | `make sbom-repository SBOM_SOURCE_VERSION=38cab9839f2c` | Repository SBOM snapshots are generated in SPDX, CycloneDX and Syft table formats. | Local Syft 1.44.0 | [`docs/evidence/security/sbom-provenance-evidence.md`](security/sbom-provenance-evidence.md) |
 | 2026-01-31 | `legacy-capture` | `PYTHONPATH=. services/api/.venv/bin/python -m ml.models.random_forest_forecast --profile small --window-days 28 --holdout-days 7 --n-estimators 20 --output-dir /private/tmp/retailops-rf-evidence` | RandomForest evidence artifacts are generated and beat the moving-average baseline on the tracked holdout set. | Local Python / temporary output directory | [`docs/evidence/ml/random-forest-v1/README.md`](ml/random-forest-v1/README.md) |
@@ -37,7 +38,9 @@ Use the same refresh pattern when an artifact becomes stale:
 | API | `docs/evidence/api/startup-log.md` | FastAPI starts under Uvicorn and responds to `/health`. | Backend/API | Recruiter-facing | Captured from local Uvicorn run on `127.0.0.1:8011`. |
 | API | `docs/evidence/api/openapi-snapshot.json` | Running API exposes a concrete OpenAPI schema at `/openapi.json`. | Backend/API | Technical reviewer | Captured with `curl` and formatted with `jq`. |
 | Docker | `docs/evidence/docker/README.md` | Docker evidence folder is indexed for reviewer navigation. | Docker, local runtime | Recruiter-facing | Added for DOCKER-001, DOCKER-002 and DOCKER-005 evidence. |
-| Docker | `docs/evidence/docker/compose-ci-smoke.md` | Backend and frontend images build; full Compose stack starts; API/frontend/streaming/observability smoke tests pass; cleanup runs. | Docker, Compose, local runtime | Recruiter-facing | Captured from `make compose-ci`. |
+| Docker | `docs/evidence/docker/compose-ci-smoke.md` | Backend and frontend images build; full Compose stack starts; API/frontend/streaming/observability smoke tests pass; cleanup runs. | Docker, Compose, local runtime | Recruiter-facing | Refreshed from `make compose-ci` on commit `5aedb2bdc7d7`. |
+| Runtime smoke | `docs/evidence/runtime/README.md` | Runtime smoke evidence folder is indexed for reviewer navigation. | Docker, API, frontend, testing | Recruiter-facing | Added for local k6 and Playwright runtime smoke evidence. |
+| Runtime smoke | `docs/evidence/runtime/local-runtime-smoke.md` | Running local stack passed API/frontend smoke, k6 API smoke baseline and Playwright browser smoke. | Docker, API, frontend, testing | Recruiter and technical reviewer | Captured from `make runtime-smoke-evidence`; k6 p95 `34.19 ms`, failed HTTP requests `0.00%`, Playwright `1/1` passed. |
 | ML/MLOps | `docs/evidence/ml/README.md` | ML evidence folder is indexed for reviewer navigation. | ML, MLOps | Recruiter-facing | Added for trained RandomForest demand model evidence. |
 | ML/MLOps | `docs/evidence/ml/random-forest-v1/README.md` | RandomForest training command, metrics, baseline comparison, and evidence file map are documented. | ML, MLOps | Recruiter-facing | Captured from local `ml.models.random_forest_forecast` run. |
 | ML/MLOps | `docs/evidence/ml/random-forest-v1/metrics.json` | Trained RandomForest model beat the moving-average baseline on WAPE and was marked `candidate`. | ML, MLOps | Technical reviewer | WAPE `72.1146` vs baseline `81.0797`, improvement `11.0571%`. |

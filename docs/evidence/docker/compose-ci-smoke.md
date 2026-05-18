@@ -1,14 +1,34 @@
 # Docker Compose CI Smoke Evidence
 
-Captured: 2026-05-12
-
-## Command
+Captured: 2026-05-18
+Branch: `devops-platform-readiness`
+Commit: `5aedb2bdc7d7`
+Command:
 
 ```bash
 make compose-ci
 ```
 
-The first sandboxed attempt could validate Compose config but could not access the local Docker socket. The successful run used the same command with permission to access local Docker.
+The command was run with local Docker access because the Compose stack depends
+on the host Docker socket and host-published ports.
+
+## Result
+
+PASS. `make compose-ci` completed the full local runtime gate and cleaned up the
+stack at the end.
+
+Validated stages:
+
+- previous Compose state cleanup;
+- default Compose config render;
+- profile config render for `dev`, `test`, `observability` and `security`;
+- API and frontend Docker image build;
+- local stack startup with PostgreSQL, Redpanda, migration job, seed job, API,
+  frontend, Prometheus and Grafana;
+- API/frontend Compose smoke;
+- streaming smoke;
+- observability smoke;
+- final Compose teardown with volumes and network removed.
 
 ## Build Evidence
 
@@ -19,16 +39,19 @@ Image retailops-api:0.1.0 Built
 Image retailops-frontend:0.1.0 Built
 ```
 
-Local image metadata after the run:
+Frontend production build inside Docker completed successfully:
 
-| Image | Image ID | Size |
-|---|---|---:|
-| `retailops-api:0.1.0` | `sha256:5b1b4f5560ab5d400a33b1c0e9d4bfdd6ec7705d04d217be7bbfe342e7e36b83` | 73182416 bytes |
-| `retailops-frontend:0.1.0` | `sha256:7bd56762e5681652c48db59d4809364ba6f2cab5f98c886f006ae6586b322e5c` | 25839238 bytes |
+```text
+vite v8.0.12 building client environment for production...
+56 modules transformed.
+dist/index.html
+dist/assets/index-DYafTXil.css
+dist/assets/index-C0iMcHuL.js
+```
 
 ## Compose Startup Evidence
 
-The full local stack started successfully:
+The full local stack reached the expected healthy/started states:
 
 ```text
 Container retailops-cloud-native-platform-db-1 Healthy
@@ -41,7 +64,7 @@ Container retailops-cloud-native-platform-prometheus-1 Healthy
 Container retailops-cloud-native-platform-grafana-1 Started
 ```
 
-## Compose Smoke Evidence
+## API And Frontend Smoke Evidence
 
 ```text
 [compose-smoke] API is reachable at http://localhost:8000.
@@ -68,17 +91,19 @@ Container retailops-cloud-native-platform-grafana-1 Started
 [streaming-smoke] Checking stream metrics endpoint...
 [streaming-smoke] Checking Prometheus target health (1/30)...
 [streaming-smoke] Checking Prometheus target health (2/30)...
-[streaming-smoke] Checking Prometheus target health (3/30)...
-[streaming-smoke] Checking Prometheus target health (4/30)...
 [streaming-smoke] Checking Prometheus stream alert rules...
 [streaming-smoke] Streaming smoke test passed.
 ```
 
 ## Observability Smoke Evidence
 
+Grafana returned one transient connection reset while it was still starting, then
+became reachable inside the retry window. The smoke gate passed:
+
 ```text
 [observability-smoke] API is reachable.
 [observability-smoke] Prometheus is reachable.
+[observability-smoke] Waiting for Grafana (1/30)...
 [observability-smoke] Grafana is reachable.
 [observability-smoke] Checking API metrics...
 [observability-smoke] Checking Prometheus targets...
@@ -90,13 +115,15 @@ Container retailops-cloud-native-platform-grafana-1 Started
 
 ## Cleanup Evidence
 
+`make compose-ci` removed the containers, volumes and network at the end of the
+run. A follow-up `docker compose ps` check returned no running services:
+
 ```text
-[compose-ci] Cleaning Compose stack...
-Container retailops-cloud-native-platform-api-1 Removed
-Container retailops-cloud-native-platform-db-1 Removed
-Network retailops-cloud-native-platform_default Removed
-Volume retailops-cloud-native-platform_postgres_data Removed
-Volume retailops-cloud-native-platform_prometheus_data Removed
-Volume retailops-cloud-native-platform_grafana_data Removed
-Volume retailops-cloud-native-platform_redpanda_data Removed
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
 ```
+
+Safe claim:
+
+> The full local Docker Compose runtime gate builds the images, starts the stack,
+> validates API/frontend, streaming and observability smoke checks, and tears the
+> environment down cleanly.
