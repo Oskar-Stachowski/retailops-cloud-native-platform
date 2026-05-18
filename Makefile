@@ -48,6 +48,7 @@ K6_API_SMOKE_SCRIPT ?= tests/performance/k6/api-smoke.js
 K6_API_SMOKE_TEXT_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke.txt
 K6_API_SMOKE_SUMMARY_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke-summary.json
 PLAYWRIGHT ?= $(FRONTEND_DIR)/node_modules/.bin/playwright
+EVIDENCE_GENERATE_TRAFFIC ?= 1
 
 SBOM_SOURCE_NAME ?= retailops-cloud-native-platform
 SBOM_SOURCE_VERSION ?= local
@@ -215,6 +216,7 @@ help:
 	@echo "  make frontend-lint        Run frontend lint"
 	@echo "  make frontend-build       Build frontend"
 	@echo "  make browser-smoke        Run Playwright browser smoke against a running frontend/API stack"
+	@echo "  make evidence-frontend-api Capture connected frontend screenshots and API smoke evidence"
 	@echo ""
 	@echo "Terraform / IaC:"
 	@echo "  make terraform-fmt        Format Terraform files under infra/"
@@ -454,11 +456,29 @@ browser-smoke: check-playwright ensure-reports-dir
 runtime-smoke-evidence: compose-smoke performance-smoke browser-smoke
 	@echo "Runtime smoke evidence passed: compose API/frontend smoke, k6 API baseline and Playwright browser E2E."
 
+evidence-frontend-api: check-playwright ensure-reports-dir
+	@mkdir -p "$(E2E_REPORTS_DIR)" "docs/evidence/frontend-api"
+	@if [ "$(EVIDENCE_GENERATE_TRAFFIC)" = "1" ]; then \
+		$(MAKE) observability-demo-traffic; \
+	else \
+		echo "Skipping demo traffic generation because EVIDENCE_GENERATE_TRAFFIC=$(EVIDENCE_GENERATE_TRAFFIC)."; \
+	fi
+	cd "$(FRONTEND_DIR)" && \
+		if [ -z "$${PLAYWRIGHT_BROWSER_CHANNEL:-}" ] && [ -z "$${CI:-}" ]; then \
+			export PLAYWRIGHT_BROWSER_CHANNEL=chrome; \
+		fi; \
+		EXPECT_LIVE_OPERATIONS_TRAFFIC="$${EXPECT_LIVE_OPERATIONS_TRAFFIC:-$(EVIDENCE_GENERATE_TRAFFIC)}" \
+		FRONTEND_BASE_URL="$${FRONTEND_BASE_URL:-http://localhost:$(FRONTEND_PORT)}" \
+		API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
+		"$(NPM)" run evidence:frontend-api
+	@echo "Frontend/API screenshots: docs/evidence/frontend-api/"
+	@echo "Frontend/API API smoke report: $(E2E_REPORTS_DIR)/frontend-api-smoke.txt"
+
 # -------------------------------------------------------------------
 # Frontend
 # -------------------------------------------------------------------
 
-.PHONY: frontend-test frontend-lint frontend-build check-playwright browser-smoke runtime-smoke-evidence
+.PHONY: frontend-test frontend-lint frontend-build check-playwright browser-smoke runtime-smoke-evidence evidence-frontend-api
 
 frontend-test:
 	cd "$(FRONTEND_DIR)" && "$(NPM)" test

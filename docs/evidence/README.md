@@ -12,6 +12,8 @@ It is intentionally separate from `ci-cd/reports/`, which stores raw or semi-raw
 | `docs/evidence/api/` | API startup and OpenAPI schema evidence. | Recruiter and technical reviewer |
 | `docs/evidence/aws/` | Curated AWS/Terraform showcase screenshots and cleanup notes. | Recruiter and technical reviewer |
 | `docs/evidence/docker/` | Docker build and Compose smoke evidence. | Recruiter and technical reviewer |
+| `docs/evidence/e2e/` | Browser/API evidence capture instructions and claim boundary. | Recruiter and technical reviewer |
+| `docs/evidence/frontend-api/` | Generated Playwright screenshots from connected frontend pages. | Recruiter and technical reviewer |
 | `docs/evidence/runtime/` | k6 API smoke and Playwright browser smoke evidence against the local Compose stack. | Recruiter and technical reviewer |
 | `docs/evidence/security/` | Curated security, SBOM and supply-chain evidence. | Recruiter and technical reviewer |
 | `docs/evidence/ml/` | Local trained ML model evidence, metrics, model card, and artifact checksums. | Recruiter and technical reviewer |
