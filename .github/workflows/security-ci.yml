@@ -1,6 +1,7 @@
 name: Security CI
 
 on:
+  workflow_call:
   push:
     paths:
       - "services/api/**"
@@ -136,7 +137,6 @@ jobs:
           install-command: python -m pip install "pip-audit==${PIP_AUDIT_VERSION}"
 
       - name: Python dependency audit report
-        continue-on-error: true
         run: |
           pip-audit \
             -r services/api/requirements.txt \
@@ -169,10 +169,9 @@ jobs:
         uses: ./.github/actions/setup-node-ci
 
       - name: Frontend dependency audit report
-        continue-on-error: true
         run: |
           cd frontend
-          npm audit --audit-level=high --json > "../${REPORT_DIR}/npm-audit.json"
+          npm audit --omit=dev --audit-level=high --json > "../${REPORT_DIR}/npm-audit.json"
 
       - name: Upload frontend dependency evidence
         if: always()
@@ -267,7 +266,6 @@ jobs:
 
     steps:
       - name: Download security evidence
-        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: security-*-evidence

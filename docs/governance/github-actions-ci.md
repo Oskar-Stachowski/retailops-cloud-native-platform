@@ -12,7 +12,8 @@ This document maps the RetailOps GitHub Actions implementation to the production
 | GHA-002 | Implemented | `.github/workflows/frontend-ci.yml` | Runs frontend tests, lint, production build, and frontend image build. |
 | GHA-003 | Implemented | `.github/workflows/docker-ci.yml` | Validates Compose config/profiles and runs full-stack Compose smoke tests. |
 | GHA-004 | Implemented | `.github/workflows/security-ci.yml` | Runs secret scan, Trivy filesystem scan, dependency audits, image scans, and consolidated evidence summary. |
-| GHA-008 | Implemented/documented | `.github/workflows/required-ci.yml`, `docs/governance/branch-protection.md` | Provides one always-running required branch-protection check, `Required CI / required-result`; still requires a GitHub Settings screenshot before claiming enforcement. |
+| GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize render, Kubeconform schema validation, Conftest and blocking Checkov policy checks. |
+| GHA-008 | Implemented/documented | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/governance/branch-protection.md` | Provides one always-running aggregate, `Required CI / required-result`; still requires a GitHub Settings screenshot before claiming enforcement. |
 | GHA-009 | Designed/partly implemented | `.github/workflows/terraform-plan.yml`, `docs/ADR/IAM delivery access.md` | Optional Terraform plan uses GitHub OIDC when safe AWS role variable exists. |
 | GHA-010 | Implemented | `.github/actions/**` | Composite actions centralize Python setup, Node setup, and CI evidence upload. |
 | GHA-011 | Candidate implemented | `.github/workflows/provenance-ci.yml` | Creates GitHub artifact attestations for locally built API/frontend image subjects. |
@@ -23,9 +24,9 @@ This document maps the RetailOps GitHub Actions implementation to the production
 
 `Required CI / required-result` is the only check that should be configured as required on `main`.
 
-The required workflow intentionally does not use workflow-level `paths` filters. It runs for every pull request, every push to `main`, and manual dispatches. A `detect-changes` job classifies changed areas, path-aware gate jobs run only when relevant, skipped gates are accepted, and `required-result` fails if any required gate fails.
+The required workflow intentionally does not use workflow-level `paths` filters. It runs for every pull request, every push to `main`, and manual dispatches. A tested Python classifier selects full reusable domain workflows. Shared and unknown paths select every domain gate. A skipped result is valid only when the classifier marked that gate unnecessary; a selected gate must finish with `success`.
 
-The domain workflows remain path-filtered and optional:
+The reusable domain workflows are:
 
 - API CI
 - Frontend CI
@@ -34,8 +35,23 @@ The domain workflows remain path-filtered and optional:
 - Security CI
 - Terraform IaC CI
 - IaC Security CI
+- Kubernetes Policy CI
 - Observability CI
 - Provenance CI
+
+Observability and provenance remain standalone evidence workflows and are not part of the required merge contract. Playwright is also intentionally excluded from Required CI.
+
+| Changed area | Full workflows selected by Required CI |
+|---|---|
+| API | API, Docker Compose, Security |
+| Frontend | Frontend, Docker Compose, Security |
+| Data/events/ML data | Data, API, Docker Compose, Security |
+| Docker/Compose | Docker Compose, Security |
+| Terraform/IaC | Terraform validation, IaC Security |
+| Kubernetes | Kubernetes Policy, Security |
+| Policy | Kubernetes Policy, Security |
+| Documentation only | Contract tests and diff hygiene only |
+| Shared or unknown | API, Frontend, Data, Docker Compose, Terraform, IaC Security, Kubernetes Policy, Security |
 
 | Composite action | Purpose |
 |---|---|
@@ -79,7 +95,9 @@ Targeted validation:
 ```bash
 make data-quality data-contracts data-scenario-report
 make terraform-fmt-check terraform-validate
-make iac-critical-guardrails
+make tflint-report checkov-scan
+make k8s-ci
+python3 scripts/ci/test_detect_required_ci_changes.py
 ```
 
 GitHub-side validation:

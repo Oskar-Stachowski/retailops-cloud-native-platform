@@ -62,6 +62,11 @@ TERRAFORM_VAR_FILE ?= terraform.tfvars.example
 
 TFLINT_CONFIG ?= $(ROOT_DIR)/security/iac/tflint.hcl
 CHECKOV_CONFIG ?= $(ROOT_DIR)/security/iac/checkov.yml
+K8S_CHECKOV_CONFIG ?= $(ROOT_DIR)/security/k8s/checkov.yml
+K8S_BASE_DIR ?= k8s/base
+K8S_DEV_OVERLAY_DIR ?= k8s/overlays/dev
+K8S_REPORTS_DIR ?= $(REPORTS_DIR)/k8s
+POLICY_REPORTS_DIR ?= $(REPORTS_DIR)/policy
 
 TERRAFORM_VALIDATE_REPORT ?= $(IAC_REPORTS_DIR)/terraform-validate.txt
 TERRAFORM_PLAN_REPORT ?= $(IAC_REPORTS_DIR)/terraform-plan-dev.txt
@@ -196,7 +201,7 @@ help:
 	@echo "  make api-lint             Run Ruff backend/data checks"
 	@echo "  make api-format-check     Check Ruff formatting"
 	@echo "  make api-type-check       Run mypy against the curated typed backend modules"
-	@echo "  make api-security-lint    Generate a report-only Bandit scan for backend application and script code"
+	@echo "  make api-security-lint    Block high-severity/high-confidence Bandit findings"
 	@echo "  make api-coverage         Run backend pytest with coverage gate"
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
@@ -223,9 +228,12 @@ help:
 	@echo "  make terraform-validate   Initialize Terraform locally and validate dev"
 	@echo "  make terraform-plan-dev   Create a dev Terraform plan report"
 	@echo "  make tflint-report        Run TFLint only against infra/ and save report"
-	@echo "  make checkov-scan         Run Checkov report-only IaC scan"
+	@echo "  make checkov-scan         Run blocking Checkov IaC scan"
 	@echo "  make iac-scan             Run Terraform validation, guardrails, TFLint and Checkov"
 	@echo "  make k8s-smoke            Render and validate Kubernetes base/dev manifests"
+	@echo "  make k8s-policy           Run Conftest against rendered Kubernetes manifests"
+	@echo "  make k8s-checkov          Run blocking Checkov Kubernetes scan"
+	@echo "  make k8s-ci               Run all Kubernetes render, schema and policy gates"
 	@echo ""
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
@@ -241,7 +249,7 @@ help:
 	@echo "  make observability-demo-traffic Generate demo observability traffic and stream metrics"
 	@echo "  make compose-smoke        Run local smoke test against running stack"
 	@echo "  make streaming-smoke      Run streaming smoke test against broker/API/Prometheus"
-	@echo "  make compose-ci           Build, start, smoke-test, log on failure, cleanup"
+	@echo "  make compose-ci           Fresh-build, start, smoke-test, log on failure, cleanup"
 	@echo "  make compose-down         Stop and remove local stack"
 	@echo ""
 	@echo "Security:"
@@ -252,7 +260,7 @@ help:
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(E2E_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(SBOM_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(E2E_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(SBOM_REPORTS_DIR)" "$(K8S_REPORTS_DIR)" "$(POLICY_REPORTS_DIR)" "$(DB_BACKUP_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -296,7 +304,7 @@ api-type-check: api-install
 	$(API_VENV_PYTHON) -m $(MYPY) --config-file "$(ROOT_DIR)/pyproject.toml"
 
 api-security-lint: api-install ensure-reports-dir
-	$(API_VENV_PYTHON) -m $(BANDIT) --exit-zero -q -r "$(API_DIR)/app" "$(API_DIR)/scripts" -f txt -o "$(ROOT_DIR)/$(API_BANDIT_REPORT)"
+	$(API_VENV_PYTHON) -m $(BANDIT) --severity-level high --confidence-level high -q -r "$(API_DIR)/app" "$(API_DIR)/scripts" -f txt -o "$(ROOT_DIR)/$(API_BANDIT_REPORT)"
 
 api-test: api-install
 	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest
@@ -605,7 +613,6 @@ checkov-report: check-checkov check-checkov-config ensure-iac-reports-dir
 		--config-file "$(CHECKOV_CONFIG)" \
 		--directory "$(INFRA_DIR)" \
 		--framework terraform \
-		--soft-fail \
 		--output cli | tee "$(CHECKOV_REPORT)"
 
 checkov-json: check-checkov check-checkov-config ensure-iac-reports-dir
@@ -613,11 +620,10 @@ checkov-json: check-checkov check-checkov-config ensure-iac-reports-dir
 		--config-file "$(CHECKOV_CONFIG)" \
 		--directory "$(INFRA_DIR)" \
 		--framework terraform \
-		--soft-fail \
 		--output json > "$(CHECKOV_JSON_REPORT)"
 
 checkov-scan: checkov-report checkov-json
-	@echo "Checkov report-only scan completed. Reports saved under $(IAC_REPORTS_DIR)."
+	@echo "Blocking Checkov scan completed. Reports saved under $(IAC_REPORTS_DIR)."
 
 iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-secret-scan tflint-report checkov-scan
 	@echo "IaC scan passed. Reports saved under $(IAC_REPORTS_DIR). Use 'make terraform-plan-dev' separately when AWS credentials are available."
@@ -626,7 +632,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-profile-config docker-runtime-evidence compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke
+.PHONY: docker-build compose-config compose-profile-config docker-runtime-evidence compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke k8s-policy k8s-checkov k8s-ci
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -684,7 +690,27 @@ docker-runtime-evidence: ensure-reports-dir
 
 k8s-smoke: ensure-reports-dir
 	chmod +x "$(KUBERNETES_SMOKE_SCRIPT)"
-	K8S_REPORTS_DIR="$(REPORTS_DIR)/k8s" "$(KUBERNETES_SMOKE_SCRIPT)"
+	K8S_REPORTS_DIR="$(K8S_REPORTS_DIR)" "$(KUBERNETES_SMOKE_SCRIPT)"
+
+k8s-policy: ensure-reports-dir
+	kubectl kustomize "$(K8S_BASE_DIR)" > "$(K8S_REPORTS_DIR)/base-rendered.yaml"
+	kubectl kustomize "$(K8S_DEV_OVERLAY_DIR)" > "$(K8S_REPORTS_DIR)/dev-rendered.yaml"
+	@set -o pipefail; \
+	conftest test \
+		"$(K8S_REPORTS_DIR)/base-rendered.yaml" \
+		"$(K8S_REPORTS_DIR)/dev-rendered.yaml" \
+		--policy policy/conftest | tee "$(POLICY_REPORTS_DIR)/conftest.txt"
+
+k8s-checkov: check-checkov ensure-reports-dir
+	@set -o pipefail; \
+	$(CHECKOV) \
+		--config-file "$(K8S_CHECKOV_CONFIG)" \
+		--directory k8s \
+		--framework kubernetes \
+		--output cli | tee "$(K8S_REPORTS_DIR)/checkov.txt"
+
+k8s-ci: k8s-smoke k8s-policy k8s-checkov
+	@echo "Kubernetes render, schema and policy gates passed."
 
 compose-rebuild-smoke: compose-ci
 
@@ -696,8 +722,12 @@ compose-ci: ensure-reports-dir
 	echo "[compose-ci] Validating Compose config..."; \
 	$(COMPOSE) config; \
 	$(MAKE) compose-profile-config; \
-	echo "[compose-ci] Starting full RetailOps stack..."; \
-	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up --build -d || status=$$?; \
+	echo "[compose-ci] Building full RetailOps stack without cache..."; \
+	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) build --pull --no-cache || status=$$?; \
+	if [[ $$status -eq 0 ]]; then \
+		echo "[compose-ci] Starting full RetailOps stack..."; \
+		RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up -d || status=$$?; \
+	fi; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \

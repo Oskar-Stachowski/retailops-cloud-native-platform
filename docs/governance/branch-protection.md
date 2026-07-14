@@ -26,21 +26,22 @@ Configure only this stable required check once the first successful `Required CI
 
 | Workflow | Required check / job | Why it matters |
 |---|---|---|
-| Required CI | `Required CI / required-result` | Always runs for every PR, every push to `main`, and manual dispatch. It performs path-aware lightweight gates and fails when any required gate fails. |
+| Required CI | `Required CI / required-result` | Always runs for every PR, every push to `main`, and manual dispatch. It calls the existing full domain workflows selected by tested path detection and fails if a required workflow is skipped, cancelled or unsuccessful. |
 
-Do not configure the path-filtered domain workflows as required branch protection checks. They remain useful as deeper CI and evidence workflows, but they intentionally use `pull_request.paths` filters and are not guaranteed to run for every PR.
+Do not configure the path-filtered domain workflows as separate required branch protection checks. `Required CI` invokes those same workflows through `workflow_call`, while their direct path-filtered triggers remain useful for standalone evidence. The stable `required-result` job verifies the expected-versus-actual result of every called workflow.
 
 Optional checks, depending on current sprint scope:
 
 | Workflow | Check | When to require |
 |---|---|---|
-| API CI | `API integration tests`, `API Docker image build` | Optional deep backend evidence; do not mark as branch-protection required while workflow-level path filters remain in use. |
-| Frontend CI | `Frontend tests and lint`, `Build frontend application`, `Build frontend Docker image` | Optional deep frontend evidence; do not mark as branch-protection required while workflow-level path filters remain in use. |
-| Docker Compose CI | `Validate Docker Compose config`, `Build full stack and run smoke tests` | Optional runtime evidence; do not mark as branch-protection required while workflow-level path filters remain in use. |
-| Security CI | Security scan jobs and `Security evidence summary` | Optional DevSecOps evidence; do not use the summary job as the only branch-protection gate. |
-| Data CI | `Synthetic data quality gate` | Optional data evidence; do not mark as branch-protection required while workflow-level path filters remain in use. |
-| Terraform IaC CI | `Terraform fmt, init and validate` | Optional IaC evidence; do not mark as branch-protection required while workflow-level path filters remain in use. |
-| IaC Security CI | `TFLint IaC quality gate`, `Checkov IaC security report` | Optional IaC security evidence; do not mark as branch-protection required while workflow-level path filters remain in use. |
+| API CI | `API integration tests`, `API Docker image build` | Called by Required CI for API/data/shared/unknown changes. |
+| Frontend CI | `Frontend tests and lint`, `Build frontend application`, `Build frontend Docker image` | Called by Required CI for frontend/shared/unknown changes. |
+| Docker Compose CI | `Validate Docker Compose config`, `Build full stack and run smoke tests` | Called by Required CI for application, data, Compose, shared and unknown changes. |
+| Security CI | Security scan jobs and `Security evidence summary` | Called with explicit blocking thresholds for application, Compose, Kubernetes, policy, security, shared and unknown changes. |
+| Data CI | `Synthetic data quality gate` | Called by Required CI for data/shared/unknown changes. |
+| Terraform IaC CI | `Terraform fmt, init and validate` | Called by Required CI for Terraform/shared/unknown changes. |
+| IaC Security CI | `TFLint IaC quality gate`, `Checkov IaC security report` | Called by Required CI together with Terraform validation; Checkov is blocking outside documented exceptions. |
+| Kubernetes Policy CI | `Kustomize, schema and policy gates` | Called for Kubernetes/policy/shared/unknown changes; runs Kustomize, Kubeconform, Conftest and Checkov. |
 | Observability CI | `Validate observability assets` | Require once observability assets are in active scope |
 | Provenance CI | `Build local images and generate provenance attestations` | Require for release branches or signed release candidate evidence, not necessarily every PR |
 | Terraform IaC CI | `Optional dev Terraform plan` | Manual-only; do not require on normal PRs unless safe AWS OIDC credentials are configured |
@@ -74,4 +75,4 @@ Safe claim after this policy and successful workflow runs:
 
 Stronger claim only after GitHub settings screenshot exists:
 
-> Implemented branch protection on `main` with a stable, always-running required GitHub Actions gate that dispatches path-aware checks for API, frontend, Docker Compose, data, and IaC changes.
+> Implemented branch protection on `main` with a stable, always-running required GitHub Actions gate that dispatches full path-aware checks for API, frontend, Docker Compose, data, Terraform, Kubernetes and security changes.

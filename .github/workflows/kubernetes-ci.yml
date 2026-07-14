@@ -1,0 +1,88 @@
+name: Kubernetes Policy CI
+
+on:
+  workflow_call:
+  push:
+    paths:
+      - "k8s/**"
+      - "policy/**"
+      - "security/k8s/**"
+      - "scripts/ci/kubernetes_smoke.sh"
+      - "Makefile"
+      - ".github/actions/**"
+      - ".github/workflows/kubernetes-ci.yml"
+  pull_request:
+    paths:
+      - "k8s/**"
+      - "policy/**"
+      - "security/k8s/**"
+      - "scripts/ci/kubernetes_smoke.sh"
+      - "Makefile"
+      - ".github/actions/**"
+      - ".github/workflows/kubernetes-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kubernetes-policy-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CHECKOV_VERSION: "3.2.520"
+  KUBECONFORM_VERSION: "0.7.0"
+  CONFTEST_VERSION: "0.56.0"
+
+jobs:
+  kubernetes-policy:
+    name: Kustomize, schema and policy gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up kubectl with Kustomize
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.31.0
+
+      - name: Set up Checkov
+        uses: ./.github/actions/setup-python-ci
+        with:
+          install-command: python -m pip install "checkov==${CHECKOV_VERSION}"
+
+      - name: Set up pinned Kubeconform and Conftest wrappers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "${RUNNER_TEMP}/retailops-bin"
+          printf '%s\n' \
+            '#!/usr/bin/env bash' \
+            "exec docker run --rm -i ghcr.io/yannh/kubeconform:v${KUBECONFORM_VERSION} \"\$@\"" \
+            > "${RUNNER_TEMP}/retailops-bin/kubeconform"
+          printf '%s\n' \
+            '#!/usr/bin/env bash' \
+            "exec docker run --rm -v \"\${PWD}:\${PWD}\" -w \"\${PWD}\" openpolicyagent/conftest:v${CONFTEST_VERSION} \"\$@\"" \
+            > "${RUNNER_TEMP}/retailops-bin/conftest"
+          chmod +x \
+            "${RUNNER_TEMP}/retailops-bin/kubeconform" \
+            "${RUNNER_TEMP}/retailops-bin/conftest"
+          echo "${RUNNER_TEMP}/retailops-bin" >> "${GITHUB_PATH}"
+
+      - name: Run Kubernetes render, schema and policy gates
+        run: make k8s-ci
+
+      - name: Upload Kubernetes policy evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: kubernetes-policy-evidence
+          path: |
+            ci-cd/reports/k8s/
+            ci-cd/reports/policy/
+          if-no-files-found: warn
