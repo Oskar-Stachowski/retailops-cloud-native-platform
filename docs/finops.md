@@ -277,6 +277,35 @@ The Enterprise Scorecard defines two key FinOps indicators for this project.
 
 ---
 
+## 9. Reproducible Infracost estimate
+
+The repository keeps the inputs for a small, explicit development estimate at the repository root:
+
+- `infracost.yml` selects `infra/environments/dev` and its committed example variables;
+- `infracost-usage.yml` provides usage assumptions for resources whose cost depends on traffic or stored data.
+
+The usage profile intentionally models only the resources instantiated by the active development root:
+
+- three CloudWatch log groups, each with 1 GB of stored, ingested, and scanned data per month;
+- two ECR repositories, each with 1 GB of stored images.
+
+Run the estimate from the repository root so Infracost can auto-discover `infracost.yml` and resolve `usage_file` relative to the same working directory:
+
+```bash
+infracost auth login
+infracost scan
+infracost inspect --summary
+infracost inspect --group-by resource
+```
+
+Authentication is required for the Infracost pricing service. These commands analyze the Terraform configuration and do not run `terraform apply` or create AWS resources.
+
+The result is an estimate based on `terraform.tfvars.example` and the committed usage assumptions. It is not evidence of current AWS resources, actual billing, or production traffic. Disconnected Terraform modules, including the EKS and node-group modules, remain outside this estimate until the active environment instantiates them.
+
+Generated local output can be kept under `ci-cd/reports/finops/`; that directory's ordinary reports are ignored unless they match an explicitly versioned evidence pattern.
+
+---
+
 ## 10. Relationship to architecture and delivery
 
 This FinOps strategy affects several project areas.

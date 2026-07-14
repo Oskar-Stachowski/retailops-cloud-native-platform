@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+  - name: retailops-dev-aws-foundation
+    path: infra/environments/dev
+    terraform_var_files:
+      - terraform.tfvars.example
+    usage_file: infracost-usage.yml

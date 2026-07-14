@@ -1,0 +1,29 @@
+version: 0.1
+
+# RetailOps dev assumptions.
+# Purpose:
+# - make usage-based resources visible in portfolio evidence,
+# - keep assumptions intentionally small for local-first/dev scope,
+# - avoid implying production traffic.
+
+resource_usage:
+  module.cloudwatch.aws_cloudwatch_log_group.this["api"]:
+    storage_gb: 1
+    monthly_data_ingested_gb: 1
+    monthly_data_scanned_gb: 1
+
+  module.cloudwatch.aws_cloudwatch_log_group.this["frontend"]:
+    storage_gb: 1
+    monthly_data_ingested_gb: 1
+    monthly_data_scanned_gb: 1
+
+  module.cloudwatch.aws_cloudwatch_log_group.this["platform"]:
+    storage_gb: 1
+    monthly_data_ingested_gb: 1
+    monthly_data_scanned_gb: 1
+
+  module.ecr.aws_ecr_repository.this["api"]:
+    storage_gb: 1
+
+  module.ecr.aws_ecr_repository.this["frontend"]:
+    storage_gb: 1
