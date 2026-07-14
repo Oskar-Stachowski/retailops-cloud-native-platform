@@ -32,6 +32,10 @@ When used by an environment and applied intentionally, this module can create:
 - one KMS alias for the EKS secrets key,
 - one CloudWatch log group for EKS control plane logs with explicit retention and KMS encryption by default.
 
+The module-managed KMS key has an explicit policy. Account IAM administration
+is delegated through the account root principal, while CloudWatch Logs use is
+limited to the cluster log group encryption context and caller account.
+
 ## What this module does not create yet
 
 The following items are intentionally out of scope for Commit 13.2:

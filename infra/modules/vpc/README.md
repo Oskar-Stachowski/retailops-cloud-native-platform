@@ -10,7 +10,14 @@ It creates:
 - one Internet Gateway,
 - one public route table with an Internet route,
 - private route tables without NAT Gateway routes,
-- baseline application and database security groups.
+- a restricted default security group with no ingress or egress rules,
+- VPC Flow Logs for accepted and rejected traffic,
+- a short-retention CloudWatch log group encrypted with a dedicated rotating KMS key,
+- a least-privilege service role allowing VPC Flow Logs to write to that log group.
+
+Workload security groups are intentionally not created here. They belong next
+to the compute or database resources that actually attach them; creating
+unattached placeholder groups would provide no enforcement.
 
 ## Cost-control decision
 

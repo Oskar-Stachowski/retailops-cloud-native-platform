@@ -15,6 +15,11 @@ The showcase is intentionally temporary. It proves that the Terraform foundation
 | `aws-console-budget.png` | AWS Console screenshot for budget/cost guardrail. | Optional but recommended |
 | `aws-console-cloudwatch.png` | AWS Console screenshot for CloudWatch log groups. | Optional but recommended |
 
+The committed Terraform graph SVG files are historical Sprint 10 snapshots.
+They describe the infrastructure used during that controlled showcase, not the
+current working tree. Regenerate and relabel them only during a future reviewed
+plan/showcase; do not treat them as current validation evidence.
+
 Raw or semi-raw Terraform command evidence is intentionally stored under `ci-cd/reports/iac/`:
 
 | File | Purpose | Tracking policy |

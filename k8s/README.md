@@ -10,6 +10,7 @@ The current implementation contains the first base manifests:
 - API Deployment and ClusterIP Service,
 - frontend Deployment and ClusterIP Service,
 - nginx Ingress manifests for local host-based routing,
+- default-deny, internal/DNS, and ingress-controller NetworkPolicies,
 - Kustomize base entrypoint.
 
 Helm charts and EKS deployment automation are not implemented yet. Current
@@ -42,6 +43,12 @@ with an nginx rewrite so `/api/health` reaches the FastAPI `/health` endpoint.
 TLS and AWS ALB-specific annotations are intentionally out of scope for this
 local-first manifest set.
 
+The NetworkPolicy baseline selects all RetailOps workload Pods, denies traffic
+by default, permits traffic between RetailOps Pods and DNS queries to CoreDNS,
+and permits the `ingress-nginx` namespace to reach only the API and frontend
+container ports. A different ingress-controller namespace requires an overlay
+patch rather than widening the base policy.
+
 ## Layout
 
 ```text
@@ -58,6 +65,10 @@ k8s/
     |   `-- service.yaml
     |-- ingress/
     |   `-- ingress.yaml
+    |-- network-policies/
+    |   |-- allow-ingress-controller.yaml
+    |   |-- allow-internal-and-dns.yaml
+    |   `-- default-deny.yaml
     |-- namespaces/
     |   `-- retailops.yaml
     `-- kustomization.yaml

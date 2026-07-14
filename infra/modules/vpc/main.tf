@@ -1,3 +1,13 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
+data "aws_region" "current" {}
+
+locals {
+  flow_log_group_name = "/aws/vpc/${var.name_prefix}/flow-logs"
+}
+
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_support   = var.enable_dns_support
@@ -5,6 +15,17 @@ resource "aws_vpc" "this" {
 
   tags = {
     Name = "${var.name_prefix}-network-vpc"
+  }
+}
+
+resource "aws_default_security_group" "this" {
+  vpc_id = aws_vpc.this.id
+
+  ingress = []
+  egress  = []
+
+  tags = {
+    Name = "${var.name_prefix}-network-default-sg-restricted"
   }
 }
 
@@ -79,38 +100,134 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[each.key].id
 }
 
-resource "aws_security_group" "app" {
-  name        = "${var.name_prefix}-network-app-sg"
-  description = "Application baseline security group. No public inbound access."
-  vpc_id      = aws_vpc.this.id
+resource "aws_kms_key" "vpc_flow_logs" {
+  description             = "KMS key for ${var.name_prefix} VPC Flow Logs"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
 
-  egress {
-    description = "Allow internal VPC egress for future application-to-service traffic."
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.vpc_cidr_block]
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableAccountKeyAdministration"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsEncryption"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.id}.${data.aws_partition.current.dns_suffix}"
+        }
+        Action = [
+          "kms:Decrypt*",
+          "kms:Describe*",
+          "kms:Encrypt*",
+          "kms:GenerateDataKey*",
+          "kms:ReEncrypt*",
+        ]
+        Resource = "*"
+        Condition = {
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:${local.flow_log_group_name}"
+          }
+          StringEquals = {
+            "kms:CallerAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+    ]
+  })
 
   tags = {
-    Name = "${var.name_prefix}-network-app-sg"
+    Name = "${var.name_prefix}-network-flow-logs"
   }
 }
 
-resource "aws_security_group" "database" {
-  name        = "${var.name_prefix}-network-db-sg"
-  description = "Database baseline security group. Allows PostgreSQL only from the app security group."
-  vpc_id      = aws_vpc.this.id
+resource "aws_kms_alias" "vpc_flow_logs" {
+  name          = "alias/${var.name_prefix}-network-flow-logs"
+  target_key_id = aws_kms_key.vpc_flow_logs.key_id
+}
 
-  ingress {
-    description     = "Allow PostgreSQL from the application security group."
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.app.id]
-  }
+resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
+  name              = local.flow_log_group_name
+  retention_in_days = var.flow_log_retention_in_days
+  kms_key_id        = aws_kms_key.vpc_flow_logs.arn
 
   tags = {
-    Name = "${var.name_prefix}-network-db-sg"
+    Name = "${var.name_prefix}-network-flow-logs"
   }
+}
+
+resource "aws_iam_role" "vpc_flow_logs" {
+  name = "${var.name_prefix}-network-flow-logs"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowVpcFlowLogsService"
+        Effect = "Allow"
+        Principal = {
+          Service = "vpc-flow-logs.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+    ]
+  })
+
+  tags = {
+    Name = "${var.name_prefix}-network-flow-logs"
+  }
+}
+
+resource "aws_iam_role_policy" "vpc_flow_logs" {
+  name = "${var.name_prefix}-network-flow-logs"
+  role = aws_iam_role.vpc_flow_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "WriteVpcFlowLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Resource = "${aws_cloudwatch_log_group.vpc_flow_logs.arn}:*"
+      },
+      {
+        Sid      = "DescribeVpcFlowLogStreams"
+        Effect   = "Allow"
+        Action   = "logs:DescribeLogStreams"
+        Resource = aws_cloudwatch_log_group.vpc_flow_logs.arn
+      },
+      {
+        Sid      = "DiscoverVpcFlowLogGroup"
+        Effect   = "Allow"
+        Action   = "logs:DescribeLogGroups"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_flow_log" "this" {
+  vpc_id                   = aws_vpc.this.id
+  traffic_type             = "ALL"
+  log_destination_type     = "cloud-watch-logs"
+  log_destination          = aws_cloudwatch_log_group.vpc_flow_logs.arn
+  iam_role_arn             = aws_iam_role.vpc_flow_logs.arn
+  max_aggregation_interval = 60
+
+  tags = {
+    Name = "${var.name_prefix}-network-vpc-flow-log"
+  }
+
+  depends_on = [aws_iam_role_policy.vpc_flow_logs]
 }
