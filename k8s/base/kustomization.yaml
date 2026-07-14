@@ -11,3 +11,6 @@ resources:
   - frontend/deployment.yaml
   - frontend/service.yaml
   - ingress/ingress.yaml
+  - network-policies/default-deny.yaml
+  - network-policies/allow-internal-and-dns.yaml
+  - network-policies/allow-ingress-controller.yaml

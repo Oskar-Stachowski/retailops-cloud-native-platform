@@ -1,6 +1,7 @@
 name: IaC Security CI
 
 on:
+  workflow_call:
   push:
     paths:
       - "infra/**"
@@ -28,6 +29,7 @@ env:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
   TERRAFORM_VERSION: "1.9.8"
+  CHECKOV_VERSION: "3.2.520"
   IAC_REPORT_DIR: "ci-cd/reports/iac"
 
 jobs:
@@ -92,7 +94,7 @@ jobs:
       - name: Set up Python and Checkov
         uses: ./.github/actions/setup-python-ci
         with:
-          install-command: python -m pip install --upgrade checkov
+          install-command: python -m pip install "checkov==${CHECKOV_VERSION}"
 
       - name: Prepare IaC report directory
         run: mkdir -p "${IAC_REPORT_DIR}"
@@ -100,7 +102,7 @@ jobs:
       - name: Run critical IaC guardrail checks
         run: make iac-critical-guardrails
 
-      - name: Run Checkov report-only scan
+      - name: Run blocking Checkov scan
         run: make checkov-report
 
       - name: Run Checkov JSON report

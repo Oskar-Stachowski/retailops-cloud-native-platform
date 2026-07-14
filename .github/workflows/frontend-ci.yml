@@ -1,6 +1,7 @@
 name: Frontend CI
 
 on:
+  workflow_call:
   push:
     paths:
       - "frontend/**"
@@ -135,7 +136,7 @@ jobs:
       - name: Capture frontend image metadata
         if: always()
         working-directory: .
-        run: docker image inspect retailops-frontend:ci > ci-cd/reports/docker/frontend-image-inspect.json || true
+        run: docker image inspect retailops-frontend:ci > ci-cd/reports/docker/frontend-image-inspect.json
 
       - name: Upload frontend image build evidence
         if: always()

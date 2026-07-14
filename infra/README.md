@@ -159,7 +159,7 @@ Recommended next steps:
 - design remote state with S3, DynamoDB locking, KMS encryption, versioning, and least-privilege access,
 - add scheduled drift detection with plan-only credentials,
 - promote selected Checkov findings from report-only to hard gates,
-- add VPC Flow Logs and stronger observability controls,
+- review VPC Flow Logs retention and alerting for production-like environments,
 - add `terraform test` or Terratest module contract checks,
 - publish signed container images to ECR with SBOM/provenance evidence,
 - split future environments only when delivery and approval boundaries justify them.

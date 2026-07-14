@@ -1,6 +1,7 @@
 name: Docker Compose CI
 
 on:
+  workflow_call:
   push:
     paths:
       - "docker-compose.yml"
@@ -85,7 +86,7 @@ jobs:
           docker --version
           docker compose version
 
-      - name: Build, start and smoke-test full stack
+      - name: Fresh-build, start and smoke-test full stack
         run: make compose-ci
 
       - name: Write Docker Compose CI summary

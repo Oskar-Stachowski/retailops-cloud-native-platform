@@ -1,3 +1,9 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
+data "aws_region" "current" {}
+
 locals {
   project_slug = lower(replace(trimspace(var.project_name), "/[^a-zA-Z0-9-]/", "-"))
   env_slug     = lower(replace(trimspace(var.environment), "/[^a-zA-Z0-9-]/", "-"))
@@ -30,6 +36,44 @@ resource "aws_kms_key" "cluster_secrets" {
   description             = "KMS key for ${local.cluster_name} Kubernetes secrets encryption and EKS control plane logs"
   deletion_window_in_days = var.kms_key_deletion_window_in_days
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableAccountKeyAdministration"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsEncryption"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.id}.${data.aws_partition.current.dns_suffix}"
+        }
+        Action = [
+          "kms:Decrypt*",
+          "kms:Describe*",
+          "kms:Encrypt*",
+          "kms:GenerateDataKey*",
+          "kms:ReEncrypt*",
+        ]
+        Resource = "*"
+        Condition = {
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${local.cluster_name}/cluster"
+          }
+          StringEquals = {
+            "kms:CallerAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+    ]
+  })
 
   tags = merge(
     local.common_tags,

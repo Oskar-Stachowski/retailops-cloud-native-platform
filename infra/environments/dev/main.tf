@@ -305,14 +305,14 @@ output "private_subnet_ids" {
   value       = module.vpc.private_subnet_ids
 }
 
-output "app_security_group_id" {
-  description = "ID of the baseline application security group."
-  value       = module.vpc.app_security_group_id
+output "vpc_flow_log_id" {
+  description = "ID of the dev VPC Flow Log."
+  value       = module.vpc.vpc_flow_log_id
 }
 
-output "database_security_group_id" {
-  description = "ID of the baseline database security group."
-  value       = module.vpc.database_security_group_id
+output "vpc_flow_log_group_name" {
+  description = "CloudWatch log group receiving encrypted dev VPC Flow Logs."
+  value       = module.vpc.vpc_flow_log_group_name
 }
 
 output "nat_gateway_enabled" {

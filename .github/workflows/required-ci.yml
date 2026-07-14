@@ -10,6 +10,7 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  security-events: write
 
 concurrency:
   group: required-ci-${{ github.ref }}
@@ -22,14 +23,18 @@ jobs:
     timeout-minutes: 5
 
     outputs:
-      base_sha: ${{ steps.detect.outputs.base_sha }}
-      head_sha: ${{ steps.detect.outputs.head_sha }}
-      frontend: ${{ steps.detect.outputs.frontend }}
+      base_sha: ${{ steps.refs.outputs.base_sha }}
+      head_sha: ${{ steps.refs.outputs.head_sha }}
       api: ${{ steps.detect.outputs.api }}
+      frontend: ${{ steps.detect.outputs.frontend }}
       data: ${{ steps.detect.outputs.data }}
       docker: ${{ steps.detect.outputs.docker }}
-      iac: ${{ steps.detect.outputs.iac }}
-      workflows: ${{ steps.detect.outputs.workflows }}
+      terraform: ${{ steps.detect.outputs.terraform }}
+      kubernetes: ${{ steps.detect.outputs.kubernetes }}
+      security: ${{ steps.detect.outputs.security }}
+      policy: ${{ steps.detect.outputs.policy }}
+      shared: ${{ steps.detect.outputs.shared }}
+      unknown: ${{ steps.detect.outputs.unknown }}
       docs_only: ${{ steps.detect.outputs.docs_only }}
 
     steps:
@@ -39,28 +44,27 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Detect changed paths
-        id: detect
+      - name: Resolve comparison refs
+        id: refs
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
+          EVENT_HEAD_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
 
           empty_tree="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+          head_sha="${EVENT_HEAD_SHA}"
+          base_sha=""
 
-          resolve_fallback_base() {
-            local head="$1"
-            git rev-parse "${head}^" 2>/dev/null || echo "${empty_tree}"
-          }
-
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            base_sha="${{ github.event.pull_request.base.sha }}"
-            head_sha="${{ github.event.pull_request.head.sha }}"
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            base_sha="${{ github.event.before }}"
-            head_sha="${{ github.sha }}"
-          else
-            head_sha="${{ github.sha }}"
-            base_sha="$(resolve_fallback_base "${head_sha}")"
+          if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+            base_sha="${PR_BASE_SHA}"
+            head_sha="${PR_HEAD_SHA}"
+          elif [[ "${EVENT_NAME}" == "push" ]]; then
+            base_sha="${PUSH_BASE_SHA}"
           fi
 
           if [[ -z "${head_sha}" ]] || ! git cat-file -e "${head_sha}^{commit}" 2>/dev/null; then
@@ -68,117 +72,39 @@ jobs:
           fi
 
           if [[ -z "${base_sha}" || "${base_sha}" =~ ^0+$ ]] || ! git cat-file -e "${base_sha}^{commit}" 2>/dev/null; then
-            base_sha="$(resolve_fallback_base "${head_sha}")"
-          fi
-
-          mapfile -t changed_files < <(git diff --name-only "${base_sha}" "${head_sha}")
-
-          frontend=false
-          api=false
-          data=false
-          docker=false
-          iac=false
-          workflows=false
-          docs_only=true
-
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            frontend=true
-            api=true
-            data=true
-            docker=true
-            iac=true
-            workflows=true
-            docs_only=false
-          elif [[ "${#changed_files[@]}" -eq 0 ]]; then
-            docs_only=false
-          else
-            for file in "${changed_files[@]}"; do
-              case "${file}" in
-                frontend/*|Makefile)
-                  frontend=true
-                  ;;
-              esac
-
-              case "${file}" in
-                services/api/*|data/*|events/*|scripts/data/*|ml/*|pyproject.toml|pytest.ini|Makefile)
-                  api=true
-                  ;;
-              esac
-
-              case "${file}" in
-                data/*|events/*|scripts/data/*|services/api/requirements-dev.txt|services/api/tests/test_data_*.py|Makefile|ci-cd/README.md|docs/synthetic-data-profiles.md|docs/evidence/data/*)
-                  data=true
-                  ;;
-              esac
-
-              case "${file}" in
-                docker-compose.yml|docker-compose.*.yml|Dockerfile|*/Dockerfile|.dockerignore|.env.example|Makefile|scripts/*|services/api/*|frontend/*|data/*|events/*|observability/*)
-                  docker=true
-                  ;;
-              esac
-
-              case "${file}" in
-                infra/*|security/iac/*|*.tf|*.tfvars|*.tfvars.example|*/.terraform.lock.hcl|Makefile)
-                  iac=true
-                  ;;
-              esac
-
-              case "${file}" in
-                .github/workflows/*|.github/actions/*)
-                  workflows=true
-                  ;;
-              esac
-
-              case "${file}" in
-                docs/*|*.md|*/README.md|LICENSE)
-                  ;;
-                *)
-                  docs_only=false
-                  ;;
-              esac
-            done
-          fi
-
-          if [[ "${workflows}" == "true" ]]; then
-            frontend=true
-            api=true
-            data=true
-            docker=true
-            iac=true
+            base_sha="$(git rev-parse "${head_sha}^" 2>/dev/null || printf '%s' "${empty_tree}")"
           fi
 
           {
             echo "base_sha=${base_sha}"
             echo "head_sha=${head_sha}"
-            echo "frontend=${frontend}"
-            echo "api=${api}"
-            echo "data=${data}"
-            echo "docker=${docker}"
-            echo "iac=${iac}"
-            echo "workflows=${workflows}"
-            echo "docs_only=${docs_only}"
           } >> "${GITHUB_OUTPUT}"
 
-          {
-            echo "## Required CI path detection"
-            echo ""
-            echo "Base: \`${base_sha}\`"
-            echo "Head: \`${head_sha}\`"
-            echo "Changed files: ${#changed_files[@]}"
-            echo ""
-            echo "| Area | Changed |"
-            echo "|---|---|"
-            echo "| Frontend | ${frontend} |"
-            echo "| API | ${api} |"
-            echo "| Data | ${data} |"
-            echo "| Docker/Compose | ${docker} |"
-            echo "| Infra/IaC | ${iac} |"
-            echo "| Workflows | ${workflows} |"
-            echo "| Docs only | ${docs_only} |"
-          } >> "${GITHUB_STEP_SUMMARY}"
+      - name: Detect required gates
+        id: detect
+        shell: bash
+        env:
+          BASE_SHA: ${{ steps.refs.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.refs.outputs.head_sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+
+          detector_args=(
+            --stdin0
+            --github-output "${GITHUB_OUTPUT}"
+            --summary "${GITHUB_STEP_SUMMARY}"
+          )
+
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            detector_args+=(--all)
+          fi
+
+          git diff --name-only --no-renames -z "${BASE_SHA}" "${HEAD_SHA}" |
+            python3 scripts/ci/detect_required_ci_changes.py "${detector_args[@]}"
 
   repo-hygiene-gate:
-    name: repo-hygiene-gate
+    name: Repository diff hygiene
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: detect-changes
@@ -191,22 +117,15 @@ jobs:
           persist-credentials: false
 
       - name: Validate diff hygiene
-        shell: bash
-        run: |
-          set -euo pipefail
-          git diff --check "${{ needs.detect-changes.outputs.base_sha }}" "${{ needs.detect-changes.outputs.head_sha }}"
+        env:
+          BASE_SHA: ${{ needs.detect-changes.outputs.base_sha }}
+          HEAD_SHA: ${{ needs.detect-changes.outputs.head_sha }}
+        run: git diff --check "${BASE_SHA}" "${HEAD_SHA}"
 
-  frontend-gate:
-    name: frontend-gate
+  contract-gate:
+    name: Required CI contract tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true'
-
-    defaults:
-      run:
-        shell: bash
-        working-directory: frontend
 
     steps:
       - name: Checkout repository
@@ -214,154 +133,58 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js CI toolchain
-        uses: ./.github/actions/setup-node-ci
+      - name: Test path detection matrix
+        run: python3 scripts/ci/test_detect_required_ci_changes.py
 
-      - name: Run lightweight frontend checks
-        run: npm run lint
+      - name: Validate GitHub Actions workflows
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/repo" \
+            -w /repo \
+            rhysd/actionlint:1.7.7 -color
 
   api-gate:
-    name: api-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true'
+    uses: ./.github/workflows/api-ci.yml
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Set up Python CI toolchain
-        uses: ./.github/actions/setup-python-ci
-
-      - name: Run lightweight API checks
-        run: |
-          set -euo pipefail
-          python -m ruff check services/api/app services/api/scripts --config pyproject.toml
-          python -m ruff format --check services/api/app services/api/scripts --config pyproject.toml
+  frontend-gate:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/frontend-ci.yml
 
   data-gate:
-    name: data-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
     needs: detect-changes
     if: needs.detect-changes.outputs.data == 'true'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Set up Python CI toolchain
-        uses: ./.github/actions/setup-python-ci
-
-      - name: Run lightweight data checks
-        run: |
-          set -euo pipefail
-          mkdir -p ci-cd/reports/data docs/evidence/data
-          python scripts/data/validate_data_contracts.py \
-            --contract data/contracts/retailops_seed_dataset.contract.json \
-            --data-dir data/demo \
-            --event-contract events/contracts/retailops-realtime-events.v1.contract.json \
-            --report ci-cd/reports/data/data-contract-report.json
-          python scripts/data/generate_scenario_coverage_report.py \
-            --data-dir data/demo \
-            --json-report ci-cd/reports/data/scenario-coverage-report.json \
-            --markdown-report docs/evidence/data/scenario-coverage-report.md
+    uses: ./.github/workflows/data-ci.yml
+    with:
+      data_profile: small
 
   docker-gate:
-    name: docker-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
     needs: detect-changes
     if: needs.detect-changes.outputs.docker == 'true'
+    uses: ./.github/workflows/docker-ci.yml
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Validate Docker Compose configuration
-        run: make compose-config
-
-  iac-gate:
-    name: iac-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  terraform-validation-gate:
     needs: detect-changes
-    if: needs.detect-changes.outputs.iac == 'true'
+    if: needs.detect-changes.outputs.terraform == 'true'
+    uses: ./.github/workflows/terraform-plan.yml
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.9.8"
-          terraform_wrapper: false
-
-      - name: Run lightweight IaC checks
-        run: make terraform-fmt-check iac-critical-guardrails
-
-  docs-gate:
-    name: docs-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+  iac-security-gate:
     needs: detect-changes
-    if: needs.detect-changes.outputs.docs_only == 'true'
+    if: needs.detect-changes.outputs.terraform == 'true'
+    uses: ./.github/workflows/iac-security.yml
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Validate documentation-only diff hygiene
-        shell: bash
-        run: |
-          set -euo pipefail
-          git diff --check "${{ needs.detect-changes.outputs.base_sha }}" "${{ needs.detect-changes.outputs.head_sha }}"
-
-  workflow-gate:
-    name: workflow-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+  kubernetes-gate:
     needs: detect-changes
-    if: needs.detect-changes.outputs.workflows == 'true'
+    if: needs.detect-changes.outputs.kubernetes == 'true'
+    uses: ./.github/workflows/kubernetes-ci.yml
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Validate GitHub Actions YAML
-        shell: bash
-        run: |
-          set -euo pipefail
-          ruby <<'RUBY'
-          require "yaml"
-
-          files = Dir[
-            ".github/workflows/*.{yml,yaml}",
-            ".github/actions/*/action.{yml,yaml}"
-          ].sort
-
-          abort "No GitHub Actions YAML files found." if files.empty?
-
-          files.each do |file|
-            YAML.load_file(file)
-            puts "YAML OK: #{file}"
-          end
-          RUBY
+  security-gate:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.security == 'true'
+    uses: ./.github/workflows/security-ci.yml
+    secrets: inherit
 
   required-result:
     name: required-result
@@ -370,51 +193,94 @@ jobs:
     needs:
       - detect-changes
       - repo-hygiene-gate
-      - frontend-gate
+      - contract-gate
       - api-gate
+      - frontend-gate
       - data-gate
       - docker-gate
-      - iac-gate
-      - docs-gate
-      - workflow-gate
+      - terraform-validation-gate
+      - iac-security-gate
+      - kubernetes-gate
+      - security-gate
     if: always()
 
     steps:
-      - name: Fail when a required gate failed
+      - name: Verify every required gate ran and passed
         shell: bash
+        env:
+          DETECT_RESULT: ${{ needs.detect-changes.result }}
+          HYGIENE_RESULT: ${{ needs.repo-hygiene-gate.result }}
+          CONTRACT_RESULT: ${{ needs.contract-gate.result }}
+          EXPECTED_API: ${{ needs.detect-changes.outputs.api }}
+          API_RESULT: ${{ needs.api-gate.result }}
+          EXPECTED_FRONTEND: ${{ needs.detect-changes.outputs.frontend }}
+          FRONTEND_RESULT: ${{ needs.frontend-gate.result }}
+          EXPECTED_DATA: ${{ needs.detect-changes.outputs.data }}
+          DATA_RESULT: ${{ needs.data-gate.result }}
+          EXPECTED_DOCKER: ${{ needs.detect-changes.outputs.docker }}
+          DOCKER_RESULT: ${{ needs.docker-gate.result }}
+          EXPECTED_TERRAFORM: ${{ needs.detect-changes.outputs.terraform }}
+          TERRAFORM_RESULT: ${{ needs.terraform-validation-gate.result }}
+          IAC_SECURITY_RESULT: ${{ needs.iac-security-gate.result }}
+          EXPECTED_KUBERNETES: ${{ needs.detect-changes.outputs.kubernetes }}
+          KUBERNETES_RESULT: ${{ needs.kubernetes-gate.result }}
+          EXPECTED_SECURITY: ${{ needs.detect-changes.outputs.security }}
+          SECURITY_RESULT: ${{ needs.security-gate.result }}
+          DOCS_ONLY: ${{ needs.detect-changes.outputs.docs_only }}
         run: |
           set -euo pipefail
-
           failed=false
 
-          check_result() {
-            local job_name="$1"
+          require_success() {
+            local gate="$1"
             local result="$2"
-
-            echo "${job_name}: ${result}"
-
-            case "${result}" in
-              success|skipped)
-                ;;
-              *)
-                failed=true
-                ;;
-            esac
+            echo "${gate}: required=true result=${result}"
+            if [[ "${result}" != "success" ]]; then
+              failed=true
+            fi
           }
 
-          check_result "detect-changes" "${{ needs.detect-changes.result }}"
-          check_result "repo-hygiene-gate" "${{ needs.repo-hygiene-gate.result }}"
-          check_result "frontend-gate" "${{ needs.frontend-gate.result }}"
-          check_result "api-gate" "${{ needs.api-gate.result }}"
-          check_result "data-gate" "${{ needs.data-gate.result }}"
-          check_result "docker-gate" "${{ needs.docker-gate.result }}"
-          check_result "iac-gate" "${{ needs.iac-gate.result }}"
-          check_result "docs-gate" "${{ needs.docs-gate.result }}"
-          check_result "workflow-gate" "${{ needs.workflow-gate.result }}"
+          require_conditional_result() {
+            local gate="$1"
+            local expected="$2"
+            local result="$3"
+
+            echo "${gate}: required=${expected} result=${result}"
+
+            if [[ "${expected}" == "true" ]]; then
+              if [[ "${result}" != "success" ]]; then
+                failed=true
+              fi
+            elif [[ "${expected}" == "false" ]]; then
+              if [[ "${result}" != "skipped" ]]; then
+                failed=true
+              fi
+            else
+              echo "${gate}: invalid required flag '${expected}'"
+              failed=true
+            fi
+          }
+
+          require_success "detect-changes" "${DETECT_RESULT}"
+          require_success "repo-hygiene-gate" "${HYGIENE_RESULT}"
+          require_success "contract-gate" "${CONTRACT_RESULT}"
+          require_conditional_result "api-gate" "${EXPECTED_API}" "${API_RESULT}"
+          require_conditional_result "frontend-gate" "${EXPECTED_FRONTEND}" "${FRONTEND_RESULT}"
+          require_conditional_result "data-gate" "${EXPECTED_DATA}" "${DATA_RESULT}"
+          require_conditional_result "docker-gate" "${EXPECTED_DOCKER}" "${DOCKER_RESULT}"
+          require_conditional_result "terraform-validation-gate" "${EXPECTED_TERRAFORM}" "${TERRAFORM_RESULT}"
+          require_conditional_result "iac-security-gate" "${EXPECTED_TERRAFORM}" "${IAC_SECURITY_RESULT}"
+          require_conditional_result "kubernetes-gate" "${EXPECTED_KUBERNETES}" "${KUBERNETES_RESULT}"
+          require_conditional_result "security-gate" "${EXPECTED_SECURITY}" "${SECURITY_RESULT}"
+
+          if [[ "${EXPECTED_API}${EXPECTED_FRONTEND}${EXPECTED_DATA}${EXPECTED_DOCKER}${EXPECTED_TERRAFORM}${EXPECTED_KUBERNETES}${EXPECTED_SECURITY}" == "falsefalsefalsefalsefalsefalsefalse" && "${DOCS_ONLY}" != "true" ]]; then
+            echo "No domain gate was selected for a non-documentation change."
+            failed=true
+          fi
 
           if [[ "${failed}" == "true" ]]; then
-            echo "One or more Required CI gates failed."
+            echo "Required CI failed: at least one required gate was missing, skipped, cancelled or unsuccessful."
             exit 1
           fi
 
-          echo "Required CI passed."
+          echo "Required CI passed: every selected full gate completed successfully."

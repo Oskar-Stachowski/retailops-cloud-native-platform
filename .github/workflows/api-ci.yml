@@ -1,6 +1,7 @@
 name: API CI
 
 on:
+  workflow_call:
   push:
     paths:
       - "services/api/**"
@@ -88,7 +89,13 @@ jobs:
           python -m ruff check services/api/app services/api/scripts services/api/tests data ml --config pyproject.toml
           python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml --config pyproject.toml
           python -m mypy --config-file pyproject.toml
-          python -m bandit --exit-zero -q -r services/api/app services/api/scripts -f txt -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
+          python -m bandit \
+            --severity-level high \
+            --confidence-level high \
+            -q \
+            -r services/api/app services/api/scripts \
+            -f txt \
+            -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
 
       - name: Generate demo CSV dataset
         working-directory: .
@@ -118,6 +125,7 @@ jobs:
             --cov=app \
             --cov-report=term-missing \
             --cov-branch \
+            --cov-fail-under=80 \
             --cov-report=xml:../../ci-cd/reports/api/coverage.xml
 
       - name: Write API CI summary
@@ -182,7 +190,7 @@ jobs:
 
       - name: Capture API image metadata
         if: always()
-        run: docker image inspect retailops-api:ci > ci-cd/reports/docker/api-image-inspect.json || true
+        run: docker image inspect retailops-api:ci > ci-cd/reports/docker/api-image-inspect.json
 
       - name: Upload API image build evidence
         if: always()

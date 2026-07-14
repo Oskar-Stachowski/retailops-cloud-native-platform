@@ -29,8 +29,9 @@ The current module defines:
 - one private route table per private subnet,
 - public route table associations,
 - private route table associations,
-- baseline application security group,
-- baseline database security group,
+- a restricted VPC default security group with no ingress or egress rules,
+- encrypted VPC Flow Logs for accepted and rejected traffic,
+- a least-privilege IAM role for delivery to CloudWatch Logs,
 - explicit output confirming that NAT Gateway is disabled.
 
 The current module intentionally does not create:
@@ -80,13 +81,16 @@ Public subnets are attached to a public route table with a default route:
 0.0.0.0/0 -> Internet Gateway
 ```
 
-In the Terraform module, public subnets also have:
+In the Terraform module, automatic public IP assignment is disabled even in
+the public subnet tier:
 
 ```text
-map_public_ip_on_launch = true
+map_public_ip_on_launch = false
 ```
 
-This means resources launched directly into public subnets may receive public IP addresses by default.
+Resources therefore do not receive a public IP merely by being launched in a
+public subnet. Any future internet-facing resource must opt in explicitly or use
+a managed entry point such as a load balancer.
 
 In the target architecture, public subnets should be reserved mainly for controlled edge components, such as:
 
@@ -134,41 +138,19 @@ There is one private route table per private subnet. This gives the project flex
 
 ---
 
-## 7. Security group model
+## 7. Security and flow logging model
 
-The baseline module defines two security groups.
+The module explicitly manages the VPC default security group and removes all
+ingress and egress rules from it. Workload security groups are intentionally not
+created until a concrete consumer such as EKS, a load balancer, or RDS exists.
+This avoids unattached placeholder groups and keeps ownership next to the
+resource that will use each group.
 
-### 7.1. Application security group
-
-The application security group is named using the project naming convention:
-
-```text
-retailops-dev-network-app-sg
-```
-
-Current behavior:
-
-- no public inbound access is defined,
-- egress is limited to the VPC CIDR block,
-- intended for future application or service workloads.
-
-This is a conservative baseline. Future commits may add more specific rules when a concrete workload exists.
-
-### 7.2. Database security group
-
-The database security group is named:
-
-```text
-retailops-dev-network-db-sg
-```
-
-Current behavior:
-
-- PostgreSQL inbound traffic on port `5432` is allowed only from the application security group,
-- no public database access is defined,
-- intended for a future RDS or database-related baseline.
-
-This does not create RDS. It only prepares a security boundary for future database resources.
+The VPC records accepted and rejected traffic in a dedicated CloudWatch Logs
+group. The log group uses a customer-managed KMS key with rotation enabled and a
+short, configurable retention period. A service role allows VPC Flow Logs to
+write only to that log group; discovery permissions remain limited to the AWS
+Logs action that does not support resource-level scoping.
 
 ---
 
@@ -202,10 +184,10 @@ Use a low-cost networking baseline now. Add NAT Gateway later only when a future
 | Public subnets | Prepared for public entry points | Load balancers, ingress, optional NAT Gateway. |
 | Private subnets | Prepared, no outbound internet path | EKS nodes, private services, RDS subnet groups. |
 | NAT Gateway | Not created | Add only when private workloads need outbound internet. |
-| Security groups | App and database baseline groups | More workload-specific least-privilege rules. |
+| Security groups | Restricted default group; no unattached workload groups | Add least-privilege groups alongside concrete workloads. |
 | Database | Not created | RDS or another managed database option. |
 | Kubernetes | Not created | EKS with private node groups and controlled ingress. |
-| Observability | Not created at network layer | CloudWatch, Prometheus/Grafana, OpenSearch or equivalent later. |
+| Observability | Encrypted VPC Flow Logs with explicit retention | Add metrics, alerts, dashboards, and reviewed production retention later. |
 
 ---
 
@@ -233,9 +215,11 @@ flowchart TB
                 private_rt_b[Private Route Table B</br>No NAT Gateway]
             end
 
-            app_sg[Application Security Group</br>No public inbound]
-            db_sg[Database Security Group</br>PostgreSQL only from app SG]
+            default_sg[Default Security Group</br>No ingress or egress]
+            flow_logs[VPC Flow Logs</br>Accepted and rejected traffic]
         end
+
+        cw_logs[Encrypted CloudWatch Log Group</br>7-day default retention]
     end
 
     internet --> igw
@@ -246,7 +230,7 @@ flowchart TB
     private_rt_a --> private_a
     private_rt_b --> private_b
 
-    app_sg -->|allowed to reach PostgreSQL 5432| db_sg
+    flow_logs --> cw_logs
 ```
 
 ---
@@ -274,11 +258,8 @@ Expected result for the NAT/EIP check:
 no output
 ```
 
-Expected Terraform plan summary for the current baseline:
-
-```text
-Plan: 15 to add, 0 to change, 0 to destroy.
-```
+The exact plan count is intentionally not hard-coded here. It changes as the
+baseline evolves and must be taken from a fresh, reviewed `terraform plan`.
 
 Expected output signal:
 

@@ -1,6 +1,13 @@
 name: Data CI
 
 on:
+  workflow_call:
+    inputs:
+      data_profile:
+        description: Synthetic data profile to validate.
+        required: false
+        type: string
+        default: small
   push:
     paths:
       - "data/**"
@@ -46,7 +53,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: data-ci-${{ github.ref }}-${{ github.event.inputs.data_profile || 'small' }}
+  group: data-ci-${{ github.ref }}-${{ inputs.data_profile || 'small' }}
   cancel-in-progress: true
 
 jobs:
@@ -56,7 +63,7 @@ jobs:
     timeout-minutes: 20
 
     env:
-      DATA_PROFILE: ${{ github.event.inputs.data_profile || 'small' }}
+      DATA_PROFILE: ${{ inputs.data_profile || 'small' }}
 
     steps:
       - name: Checkout repository

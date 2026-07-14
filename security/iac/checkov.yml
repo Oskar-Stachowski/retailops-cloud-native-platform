@@ -1,10 +1,9 @@
 # RetailOps IaC Checkov configuration
 #
-# Sprint 10 policy:
-# - Checkov is report-only / soft-fail at this stage.
-# - Critical blockers are handled separately by grep-based guardrails in CI.
-# - Findings such as missing VPC Flow Logs, custom KMS keys, alarms, dashboards,
-#   or longer log retention are future hardening items, not Sprint 10 blockers.
+# Required CI policy:
+# - every non-exempt Checkov finding blocks the Terraform gate;
+# - accepted exceptions are explicit check IDs with rationale in security/README.md;
+# - scanner/runtime errors are failures, not successful evidence-only runs.
 
 framework:
   - terraform
@@ -12,7 +11,7 @@ framework:
 directory:
   - infra
 
-soft-fail: true
+soft-fail: false
 quiet: false
 compact: false
 download-external-modules: false
@@ -25,3 +24,5 @@ download-external-modules: false
 # wildcard IAM actions and privileged policy patterns.
 skip-check:
   - CKV_AWS_356
+  - CKV_AWS_338
+  - CKV_AWS_37

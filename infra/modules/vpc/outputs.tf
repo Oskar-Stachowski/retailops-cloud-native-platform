@@ -28,19 +28,19 @@ output "private_route_table_ids" {
   value       = { for key, route_table in aws_route_table.private : key => route_table.id }
 }
 
-output "app_security_group_id" {
-  description = "ID of the baseline application security group."
-  value       = aws_security_group.app.id
-}
-
-output "database_security_group_id" {
-  description = "ID of the baseline database security group."
-  value       = aws_security_group.database.id
-}
-
 output "nat_gateway_enabled" {
   description = "Explicit signal that this low-cost baseline does not create NAT Gateway resources."
   value       = false
+}
+
+output "vpc_flow_log_id" {
+  description = "ID of the VPC Flow Log capturing accepted and rejected traffic."
+  value       = aws_flow_log.this.id
+}
+
+output "vpc_flow_log_group_name" {
+  description = "CloudWatch log group receiving encrypted VPC Flow Logs."
+  value       = aws_cloudwatch_log_group.vpc_flow_logs.name
 }
 
 output "common_tags" {

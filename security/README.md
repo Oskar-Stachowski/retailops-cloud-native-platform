@@ -11,19 +11,25 @@ This directory contains the security and DevSecOps configuration currently used 
 | Python dependency audit | `pip-audit` evidence in Security CI |
 | Frontend dependency audit | `npm audit` evidence in Security CI |
 | Terraform linting | TFLint configuration for IaC quality gates |
-| Terraform policy scanning | Checkov configuration for IaC security reports |
+| Terraform policy scanning | Blocking Checkov gate with documented exceptions |
+| Kubernetes policy scanning | Kubeconform, Conftest and blocking Checkov baseline |
 | Critical IaC guardrails | Makefile and CI checks for IAM users, access keys, AdministratorAccess, and wildcard IAM actions |
 | Repository SBOM | Syft-based `make sbom-repository` target with SPDX, CycloneDX and text snapshots |
 | Build provenance | GitHub Actions provenance workflow for local API/frontend image subjects |
 
 ## Current Policy
 
-Security checks are split into hard gates and evidence-generating reports:
+Required CI uses explicit blocking thresholds:
 
-- Gitleaks and Trivy filesystem scans are blocking checks.
+- Gitleaks blocks any detected secret.
+- Trivy filesystem scanning blocks fixed `HIGH` and `CRITICAL` findings.
+- Trivy image scanning blocks fixed `CRITICAL` findings.
+- `pip-audit` blocks any vulnerability reported for runtime Python dependencies.
+- `npm audit --omit=dev --audit-level=high` blocks high or critical production dependency findings.
+- Bandit blocks high-severity, high-confidence backend findings.
 - TFLint is a blocking IaC quality gate.
-- Checkov is currently report-only, with explicit Makefile guardrails enforcing critical IAM and secret patterns.
-- Dependency audit jobs generate evidence and should be promoted to blocking gates after baseline cleanup.
+- Checkov blocks every Terraform or Kubernetes finding except the check IDs explicitly accepted below.
+- Conftest denies mutable `latest` tags, incomplete resources/probes, privilege escalation and committed runtime Secret manifests.
 
 ## Accepted IaC Exception
 
@@ -31,7 +37,7 @@ Security checks are split into hard gates and evidence-generating reports:
 
 ## Accepted Checkov Findings
 
-Checkov is intentionally kept as a report-only control at this stage. The remaining findings are not automatically remediated unless the change is low-risk for the local developer runtime, AWS cost posture, and portfolio evidence flow.
+Checkov is a hard gate. Only the listed check IDs are excluded from the blocking baseline; scanner failures and every other finding fail Required CI.
 
 The following findings are accepted for now:
 
@@ -40,6 +46,7 @@ The following findings are accepted for now:
 | `CKV_K8S_43` image digest pinning | Accepted for local manifests | The current Kubernetes path uses local portfolio images such as `retailops-api:0.1.0` and `retailops-frontend:0.1.0`. Digest pinning is meaningful only after images are published to a registry and release tags are immutable. | Add registry-backed image publishing, generate SBOM/provenance, then pin deployed release images by digest. |
 | `CKV_K8S_15` `imagePullPolicy: Always` | Accepted for local manifests | `IfNotPresent` supports local `kind` or `minikube` validation with locally built images. Changing to `Always` can break demos when images are not pushed to a remote registry. | Use `Always` only in a registry-backed cloud overlay or release overlay. |
 | `CKV_K8S_40` high UID enforcement | Accepted for third-party local images | Official images such as PostgreSQL, Redpanda, and Nginx have image-specific user and filesystem assumptions. Forcing arbitrary UIDs can break startup or volume permissions. | Validate per-image non-root behavior in a separate hardening sprint before enforcing UIDs globally. |
+| `CKV_K8S_23` root-container admission | Accepted for the same third-party local workloads | PostgreSQL, Redpanda and helper images need workload-specific runtime verification before a blanket container-level UID rule is safe. Conftest still blocks privileged mode and privilege escalation. | Verify each image, then set explicit non-root users and remove this exception. |
 | `CKV_K8S_22` read-only root filesystem | Accepted for stateful/helper workloads | PostgreSQL, Redpanda, migration jobs, and seed jobs may require writable paths beyond mounted data directories. Enforcing read-only root filesystems without runtime testing can break local smoke tests. | Add explicit writable `emptyDir` mounts per workload, then enable read-only root filesystems workload by workload. |
 | `CKV_K8S_35` secrets as files | Accepted for current application contract | The API, jobs, and local Kubernetes overlay currently consume runtime configuration through environment variables. Moving secrets to mounted files requires application/config changes, not only manifest changes. | Introduce file-based secret loading or External Secrets integration in a dedicated runtime configuration change. |
 | `CKV_AWS_338` CloudWatch log retention of at least one year | Accepted for dev-cost posture | The EKS module is portfolio/dev oriented. A 365-day default can increase CloudWatch Logs cost for temporary validation clusters. Short retention is intentional until there is a real production environment. | Use longer retention in a production overlay or make retention environment-specific. |
@@ -52,7 +59,7 @@ Safe Kubernetes hardening that does not change runtime behavior may still be app
 
 ## Future Hardening
 
-- Promote dependency audits to blocking checks for high and critical findings.
+- Remove accepted Checkov exceptions as registry-backed images and hardened workload filesystems become available.
 - Add registry-backed image signing and verification for release images.
 - Add cloud secret storage through AWS Secrets Manager or SSM Parameter Store when a cloud runtime is implemented.
 - Add a threat model and accepted-risk register.
