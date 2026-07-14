@@ -1,6 +1,6 @@
 # Provenance CI Evidence Boundary
 
-Capture date: 2026-05-17  
+Capture date: 2026-05-17
 Source commit reviewed: `38cab9839f2c`
 
 ## Implemented

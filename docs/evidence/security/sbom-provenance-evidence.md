@@ -1,9 +1,9 @@
 # SBOM And Provenance Evidence
 
-Capture date: 2026-05-17  
-Branch: `devops-platform-readiness`  
-Source commit: `38cab9839f2c`  
-Tool: Syft 1.44.0  
+Capture date: 2026-05-17
+Branch: `devops-platform-readiness`
+Source commit: `38cab9839f2c`
+Tool: Syft 1.44.0
 Validation command:
 
 ```bash
