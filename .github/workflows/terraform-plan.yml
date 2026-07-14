@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: terraform-validate
-    if: inputs.run_dev_plan == true
+    if: github.event_name == 'workflow_dispatch' && inputs.run_dev_plan == true
 
     permissions:
       contents: read

@@ -168,7 +168,12 @@ jobs:
   terraform-validation-gate:
     needs: detect-changes
     if: needs.detect-changes.outputs.terraform == 'true'
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/terraform-plan.yml
+    with:
+      run_dev_plan: false
 
   iac-security-gate:
     needs: detect-changes
