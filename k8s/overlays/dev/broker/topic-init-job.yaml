@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: redpanda-topic-init
+  namespace: retailops
   labels:
     app.kubernetes.io/name: redpanda-topic-init
     app.kubernetes.io/part-of: retailops-platform
@@ -18,6 +19,7 @@ spec:
         retailops.io/environment: dev
     spec:
       restartPolicy: Never
+      automountServiceAccountToken: false
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -50,6 +52,9 @@ spec:
               done
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               cpu: 50m

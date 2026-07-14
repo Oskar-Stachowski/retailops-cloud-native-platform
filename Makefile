@@ -29,7 +29,9 @@ IAC_REPORTS_DIR ?= $(REPORTS_DIR)/iac
 DATA_REPORTS_DIR ?= $(REPORTS_DIR)/data
 OBSERVABILITY_REPORTS_DIR ?= $(REPORTS_DIR)/observability
 PERFORMANCE_REPORTS_DIR ?= $(REPORTS_DIR)/performance
+E2E_REPORTS_DIR ?= $(REPORTS_DIR)/e2e
 DOCKER_REPORTS_DIR ?= $(REPORTS_DIR)/docker
+SBOM_REPORTS_DIR ?= $(REPORTS_DIR)/sbom
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
@@ -41,9 +43,18 @@ CHECKOV ?= checkov
 MYPY ?= mypy
 BANDIT ?= bandit
 K6 ?= k6
+SYFT ?= syft
 K6_API_SMOKE_SCRIPT ?= tests/performance/k6/api-smoke.js
 K6_API_SMOKE_TEXT_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke.txt
 K6_API_SMOKE_SUMMARY_REPORT ?= $(PERFORMANCE_REPORTS_DIR)/api-smoke-summary.json
+PLAYWRIGHT ?= $(FRONTEND_DIR)/node_modules/.bin/playwright
+EVIDENCE_GENERATE_TRAFFIC ?= 1
+
+SBOM_SOURCE_NAME ?= retailops-cloud-native-platform
+SBOM_SOURCE_VERSION ?= local
+SBOM_REPOSITORY_SPDX_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbom-spdx-snapshot.json
+SBOM_REPOSITORY_CYCLONEDX_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbom-cyclonedx-snapshot.json
+SBOM_REPOSITORY_SUMMARY_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbom-summary-snapshot.txt
 
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
@@ -71,6 +82,7 @@ API_PORT ?= 8000
 FRONTEND_PORT ?= 3000
 APP_ENV ?= local
 COMPOSE_PROFILES ?= dev
+COMPOSE_CI_PROFILES ?= dev,observability
 
 DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
@@ -189,6 +201,7 @@ help:
 	@echo "  make api-test             Run backend pytest"
 	@echo "  make api-integration-test Run DB-backed backend checks using local Compose DB"
 	@echo "  make performance-smoke    Run k6 API smoke baseline and save p95 evidence"
+	@echo "  make runtime-smoke-evidence Run API smoke, k6 baseline and browser E2E against a running stack"
 	@echo "  make pre-commit-run       Run configured pre-commit hooks against all files"
 	@echo "  make api-migrate          Run Alembic migrations"
 	@echo "  make api-seed             Seed the default local dataset profile (small)"
@@ -202,6 +215,8 @@ help:
 	@echo "  make frontend-test        Run frontend tests"
 	@echo "  make frontend-lint        Run frontend lint"
 	@echo "  make frontend-build       Build frontend"
+	@echo "  make browser-smoke        Run Playwright browser smoke against a running frontend/API stack"
+	@echo "  make evidence-frontend-api Capture connected frontend screenshots and API smoke evidence"
 	@echo ""
 	@echo "Terraform / IaC:"
 	@echo "  make terraform-fmt        Format Terraform files under infra/"
@@ -231,12 +246,13 @@ help:
 	@echo ""
 	@echo "Security:"
 	@echo "  make security-scan        Run local secret, filesystem and image scans"
+	@echo "  make sbom-repository      Generate repository SBOM snapshots with Syft"
 	@echo ""
 
 
 .PHONY: ensure-reports-dir
 ensure-reports-dir:
-	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
+	@mkdir -p "$(REPORTS_DIR)" "$(API_REPORTS_DIR)" "$(SECURITY_REPORTS_DIR)" "$(IAC_REPORTS_DIR)" "$(DATA_REPORTS_DIR)" "$(OBSERVABILITY_REPORTS_DIR)" "$(PERFORMANCE_REPORTS_DIR)" "$(E2E_REPORTS_DIR)" "$(DOCKER_REPORTS_DIR)" "$(SBOM_REPORTS_DIR)" "$(REPORTS_DIR)/k8s" "$(DB_BACKUP_DIR)"
 
 # -------------------------------------------------------------------
 # Dependency installation
@@ -411,6 +427,13 @@ check-k6:
 		exit 1; \
 	}
 
+check-playwright:
+	@test -x "$(PLAYWRIGHT)" || { \
+		echo "ERROR: Playwright is not installed under $(FRONTEND_DIR)."; \
+		echo "Run 'cd $(FRONTEND_DIR) && npm ci' before make browser-smoke."; \
+		exit 1; \
+	}
+
 performance-smoke: check-k6 ensure-reports-dir
 	@set -o pipefail; \
 	API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
@@ -420,11 +443,42 @@ performance-smoke: check-k6 ensure-reports-dir
 	@echo "k6 text report: $(K6_API_SMOKE_TEXT_REPORT)"
 	@echo "k6 summary report: $(K6_API_SMOKE_SUMMARY_REPORT)"
 
+browser-smoke: check-playwright ensure-reports-dir
+	@mkdir -p "$(E2E_REPORTS_DIR)"
+	cd "$(FRONTEND_DIR)" && \
+		FRONTEND_BASE_URL="$${FRONTEND_BASE_URL:-http://localhost:$(FRONTEND_PORT)}" \
+		API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
+		PLAYWRIGHT_BROWSER_CHANNEL="$${PLAYWRIGHT_BROWSER_CHANNEL-chrome}" \
+		"$(NPM)" run e2e
+	@echo "Playwright JUnit report: $(E2E_REPORTS_DIR)/playwright-junit.xml"
+	@echo "Playwright dashboard screenshot: $(E2E_REPORTS_DIR)/dashboard-smoke-snapshot.png"
+
+runtime-smoke-evidence: compose-smoke performance-smoke browser-smoke
+	@echo "Runtime smoke evidence passed: compose API/frontend smoke, k6 API baseline and Playwright browser E2E."
+
+evidence-frontend-api: check-playwright ensure-reports-dir
+	@mkdir -p "$(E2E_REPORTS_DIR)" "docs/evidence/frontend-api"
+	@if [ "$(EVIDENCE_GENERATE_TRAFFIC)" = "1" ]; then \
+		$(MAKE) observability-demo-traffic; \
+	else \
+		echo "Skipping demo traffic generation because EVIDENCE_GENERATE_TRAFFIC=$(EVIDENCE_GENERATE_TRAFFIC)."; \
+	fi
+	cd "$(FRONTEND_DIR)" && \
+		if [ -z "$${PLAYWRIGHT_BROWSER_CHANNEL:-}" ] && [ -z "$${CI:-}" ]; then \
+			export PLAYWRIGHT_BROWSER_CHANNEL=chrome; \
+		fi; \
+		EXPECT_LIVE_OPERATIONS_TRAFFIC="$${EXPECT_LIVE_OPERATIONS_TRAFFIC:-$(EVIDENCE_GENERATE_TRAFFIC)}" \
+		FRONTEND_BASE_URL="$${FRONTEND_BASE_URL:-http://localhost:$(FRONTEND_PORT)}" \
+		API_BASE_URL="$${API_BASE_URL:-http://localhost:$(API_PORT)}" \
+		"$(NPM)" run evidence:frontend-api
+	@echo "Frontend/API screenshots: docs/evidence/frontend-api/"
+	@echo "Frontend/API API smoke report: $(E2E_REPORTS_DIR)/frontend-api-smoke.txt"
+
 # -------------------------------------------------------------------
 # Frontend
 # -------------------------------------------------------------------
 
-.PHONY: frontend-test frontend-lint frontend-build
+.PHONY: frontend-test frontend-lint frontend-build check-playwright browser-smoke runtime-smoke-evidence evidence-frontend-api
 
 frontend-test:
 	cd "$(FRONTEND_DIR)" && "$(NPM)" test
@@ -588,7 +642,7 @@ compose-profile-config: ensure-reports-dir
 	done
 
 compose-up:
-	COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up --build -d
 
 broker-up:
 	COMPOSE_PROFILES=dev $(COMPOSE) up -d redpanda redpanda-init
@@ -603,10 +657,10 @@ observability-up:
 	COMPOSE_PROFILES=observability $(COMPOSE) up --build -d db migrate seed api prometheus grafana
 
 compose-down:
-	$(COMPOSE) down -v --remove-orphans
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans
 
 compose-logs:
-	$(COMPOSE) logs --no-color
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) logs --no-color
 
 compose-smoke:
 	chmod +x "$(SMOKE_SCRIPT)"
@@ -638,12 +692,12 @@ compose-ci: ensure-reports-dir
 	@set -e; \
 	status=0; \
 	echo "[compose-ci] Cleaning previous Compose state..."; \
-	$(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
 	echo "[compose-ci] Validating Compose config..."; \
 	$(COMPOSE) config; \
 	$(MAKE) compose-profile-config; \
 	echo "[compose-ci] Starting full RetailOps stack..."; \
-	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=dev,observability $(COMPOSE) up --build -d || status=$$?; \
+	RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up --build -d || status=$$?; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \
@@ -659,14 +713,14 @@ compose-ci: ensure-reports-dir
 		chmod +x "$(OBSERVABILITY_SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_SMOKE_SCRIPT)" || status=$$?; \
 	fi; \
-	$(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
 	if [[ $$status -ne 0 ]]; then \
 		echo "[compose-ci] Failure detected. Capturing Compose logs..."; \
-		$(COMPOSE) logs --no-color > "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
+		COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) logs --no-color > "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
 		cat "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
 	fi; \
 	echo "[compose-ci] Cleaning Compose stack..."; \
-	$(COMPOSE) down -v --remove-orphans || true; \
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans || true; \
 	exit $$status
 
 # -------------------------------------------------------------------
@@ -674,7 +728,7 @@ compose-ci: ensure-reports-dir
 # These are local/Jenkins helpers. GitHub Actions also runs security-ci.yml.
 # -------------------------------------------------------------------
 
-.PHONY: check-trivy check-gitleaks secret-scan security-fs-scan security-image-scan security-scan
+.PHONY: check-trivy check-gitleaks check-syft secret-scan security-fs-scan security-image-scan sbom-repository security-scan
 
 check-trivy:
 	@command -v trivy >/dev/null 2>&1 || { \
@@ -685,6 +739,12 @@ check-trivy:
 check-gitleaks:
 	@command -v gitleaks >/dev/null 2>&1 || { \
 		echo "ERROR: gitleaks is not installed. Install Gitleaks or run GitHub Actions security-ci."; \
+		exit 1; \
+	}
+
+check-syft:
+	@command -v "$(SYFT)" >/dev/null 2>&1 || { \
+		echo "ERROR: syft is not installed. Install Syft or run a CI workflow that generates SBOM evidence."; \
 		exit 1; \
 	}
 
@@ -715,6 +775,18 @@ security-image-scan: check-trivy ensure-reports-dir docker-build
 		--format table \
 		--output "$(SECURITY_REPORTS_DIR)/trivy-frontend-image.txt" \
 		"$(FRONTEND_IMAGE)"
+
+sbom-repository: check-syft ensure-reports-dir
+	$(SYFT) dir:. \
+		--config security/sbom/syft.yaml \
+		--source-name "$(SBOM_SOURCE_NAME)" \
+		--source-version "$(SBOM_SOURCE_VERSION)" \
+		-o spdx-json="$(SBOM_REPOSITORY_SPDX_SNAPSHOT)" \
+		-o cyclonedx-json="$(SBOM_REPOSITORY_CYCLONEDX_SNAPSHOT)" \
+		-o syft-table="$(SBOM_REPOSITORY_SUMMARY_SNAPSHOT)"
+	@echo "SBOM SPDX snapshot: $(SBOM_REPOSITORY_SPDX_SNAPSHOT)"
+	@echo "SBOM CycloneDX snapshot: $(SBOM_REPOSITORY_CYCLONEDX_SNAPSHOT)"
+	@echo "SBOM summary snapshot: $(SBOM_REPOSITORY_SUMMARY_SNAPSHOT)"
 
 security-scan: secret-scan security-fs-scan security-image-scan
 	@echo "Security scans passed."

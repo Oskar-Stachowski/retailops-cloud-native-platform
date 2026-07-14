@@ -17,7 +17,7 @@ locals {
     Workload    = "platform"
     Module      = "infra/modules/iam_oidc"
     CostCenter  = "portfolio"
-    Lifecycle   = var.lifecycle
+    Lifecycle   = var.resource_lifecycle
   }
 
   cluster_tags = var.cluster_name == null || trimspace(var.cluster_name) == "" ? {} : {

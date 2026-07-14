@@ -58,3 +58,18 @@ output "module_tags" {
   description = "Effective tags applied by this module."
   value       = local.common_tags
 }
+
+output "cluster_secrets_kms_key_arn" {
+  description = "KMS key ARN used by the EKS cluster for Kubernetes secrets encryption."
+  value       = local.cluster_secrets_kms_key_arn
+}
+
+output "cluster_public_endpoint_enabled" {
+  description = "Whether the EKS public API endpoint is enabled. Defaults to false for a private-endpoint-first baseline."
+  value       = var.endpoint_public_access
+}
+
+output "control_plane_log_types" {
+  description = "EKS control plane log types enabled by this module."
+  value       = var.enabled_cluster_log_types
+}

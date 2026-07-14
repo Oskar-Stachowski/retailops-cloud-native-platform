@@ -1,6 +1,6 @@
 # Cosign identity verification policy
 
-Use keyless signing for GitHub Actions releases.
+Use keyless signing for future GitHub Actions registry releases.
 
 Allowed issuer:
 
@@ -28,3 +28,5 @@ Operational rule:
 - sign only immutable image digests;
 - do not sign mutable `latest` tags;
 - archive verification output as CI evidence.
+- do not claim signed release images until this verification command has passed
+  against a real registry image digest.

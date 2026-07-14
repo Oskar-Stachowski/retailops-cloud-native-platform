@@ -122,18 +122,18 @@ variable "endpoint_private_access" {
 }
 
 variable "endpoint_public_access" {
-  description = "Whether the EKS API endpoint is reachable from public networks. Restrict public_access_cidrs before any real apply."
+  description = "Whether the EKS API endpoint is reachable from public networks. Defaults to false so the module is private-endpoint-first and passes the EKS public endpoint Checkov gate."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "public_access_cidrs" {
-  description = "CIDR blocks allowed to reach the public EKS API endpoint. Default is intentionally non-routable for humans and must be overridden with a trusted /32 before real validation."
+  description = "CIDR blocks allowed to reach the public EKS API endpoint when endpoint_public_access=true. Leave empty for private-only clusters."
   type        = list(string)
-  default     = ["127.0.0.1/32"]
+  default     = []
 
   validation {
-    condition     = length(var.public_access_cidrs) > 0 && alltrue([for cidr in var.public_access_cidrs : can(cidrhost(cidr, 0))])
+    condition     = alltrue([for cidr in var.public_access_cidrs : can(cidrhost(cidr, 0))])
     error_message = "public_access_cidrs must contain valid CIDR blocks."
   }
 
@@ -166,9 +166,9 @@ variable "service_ipv4_cidr" {
 }
 
 variable "enabled_cluster_log_types" {
-  description = "EKS control plane log types. Keep empty by default to avoid unnecessary CloudWatch ingestion in early validation."
+  description = "EKS control plane log types. API, audit, and authenticator logs are enabled by default to avoid a silent control-plane baseline and to prevent scanner edge-cases around an empty list."
   type        = list(string)
-  default     = []
+  default     = ["api", "audit", "authenticator"]
 
   validation {
     condition = alltrue([
@@ -185,9 +185,9 @@ variable "enabled_cluster_log_types" {
 }
 
 variable "create_cloudwatch_log_group" {
-  description = "Create the EKS control plane CloudWatch log group with explicit retention. Required when enabled_cluster_log_types is not empty."
+  description = "Create the EKS control plane CloudWatch log group with explicit retention and KMS encryption. Required when enabled_cluster_log_types is not empty."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "cloudwatch_log_retention_in_days" {
@@ -224,14 +224,49 @@ variable "cloudwatch_log_retention_in_days" {
   }
 }
 
-variable "lifecycle" {
+
+variable "create_cluster_secrets_kms_key" {
+  description = "Create a dedicated KMS key for EKS Kubernetes secrets encryption. Set false only when cluster_secrets_kms_key_arn points to an existing customer managed key."
+  type        = bool
+  default     = true
+}
+
+variable "cluster_secrets_kms_key_arn" {
+  description = "Existing customer managed KMS key ARN for EKS Kubernetes secrets encryption. Leave null to let this module create a dedicated key."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.cluster_secrets_kms_key_arn == null || can(regex("^arn:aws[a-zA-Z-]*:kms:[a-z0-9-]+:[0-9]{12}:key/[a-f0-9-]+$", var.cluster_secrets_kms_key_arn))
+    error_message = "cluster_secrets_kms_key_arn must be null or a valid AWS KMS key ARN."
+  }
+}
+
+variable "cloudwatch_log_group_kms_key_id" {
+  description = "Optional KMS key ID or ARN for the EKS control plane CloudWatch log group. Defaults to the EKS secrets encryption key."
+  type        = string
+  default     = null
+}
+
+variable "kms_key_deletion_window_in_days" {
+  description = "Waiting period before deleting the module-managed KMS key. Keep short for temporary portfolio validation clusters."
+  type        = number
+  default     = 7
+
+  validation {
+    condition     = var.kms_key_deletion_window_in_days >= 7 && var.kms_key_deletion_window_in_days <= 30
+    error_message = "kms_key_deletion_window_in_days must be between 7 and 30."
+  }
+}
+
+variable "resource_lifecycle" {
   description = "Cost-control lifecycle tag. Use temporary for short-lived EKS validation clusters."
   type        = string
   default     = "temporary"
 
   validation {
-    condition     = contains(["temporary", "persistent"], var.lifecycle)
-    error_message = "lifecycle must be temporary or persistent."
+    condition     = contains(["temporary", "persistent"], var.resource_lifecycle)
+    error_message = "resource_lifecycle must be temporary or persistent."
   }
 }
 
@@ -239,4 +274,11 @@ variable "tags" {
   description = "Additional tags merged with module defaults. Values here can override default tag values when intentionally needed."
   type        = map(string)
   default     = {}
+}
+
+check "eks_kms_key_source" {
+  assert {
+    condition     = var.create_cluster_secrets_kms_key || var.cluster_secrets_kms_key_arn != null
+    error_message = "Either create_cluster_secrets_kms_key must be true or cluster_secrets_kms_key_arn must point to an existing customer managed KMS key."
+  }
 }

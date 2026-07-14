@@ -91,6 +91,6 @@ output "capacity_assumption_summary" {
     min_size       = var.min_size
     desired_size   = var.desired_size
     max_size       = var.max_size
-    lifecycle      = var.lifecycle
+    lifecycle      = var.resource_lifecycle
   }
 }

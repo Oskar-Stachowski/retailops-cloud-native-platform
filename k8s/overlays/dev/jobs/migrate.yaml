@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: retailops-migrate
+  namespace: retailops
   labels:
     app.kubernetes.io/name: retailops-migrate
     app.kubernetes.io/part-of: retailops-platform

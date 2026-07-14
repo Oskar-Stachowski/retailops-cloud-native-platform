@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redpanda
+  namespace: retailops
   labels:
     app.kubernetes.io/name: redpanda
     app.kubernetes.io/part-of: retailops-platform
@@ -21,6 +22,7 @@ spec:
         app.kubernetes.io/component: broker
         retailops.io/environment: dev
     spec:
+      automountServiceAccountToken: false
       securityContext:
         fsGroup: 101
         seccompProfile:
@@ -101,6 +103,11 @@ spec:
           volumeMounts:
             - name: redpanda-data
               mountPath: /var/lib/redpanda/data
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: redpanda-data
           emptyDir: {}

@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-05-15T08:28:34Z
+# Generated: 2026-05-17T09:25:29Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -93,6 +93,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       │   ├── sprint-10-terraform-destroy.txt
 │       │   ├── sprint-10-terraform-plan-dev.txt
 │       │   ├── sprint-10-terraform-validate.txt
+│       │   ├── terraform-dependency-graph-dev.dot
 │       │   ├── terraform-plan-commit11.txt
 │       │   ├── terraform-plan-commit6.txt
 │       │   ├── terraform-plan-commit8.txt
@@ -102,6 +103,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       │   ├── terraform-validate.txt
 │       │   └── tflint.txt
 │       ├── k8s
+│       │   ├── conftest-local.txt
 │       │   ├── kubernetes-secret-scan-snapshot.txt
 │       │   ├── kubernetes-smoke-snapshot.txt
 │       │   ├── kubernetes-smoke.txt
@@ -122,6 +124,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       ├── performance
 │       │   ├── api-smoke-summary.json
 │       │   └── api-smoke.txt
+│       ├── policy
+│       │   └── README.md
 │       ├── provenance
 │       │   └── README.md
 │       ├── README.md
@@ -129,17 +133,28 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │       │   ├── ruff-all-full.txt
 │       │   ├── ruff-all-report.txt
 │       │   └── ruff-commands.txt
-│       └── security
-│           ├── bandit-api-all.json
-│           ├── bandit-api.txt
-│           ├── gitleaks.json
-│           ├── README.md
-│           ├── trivy-api-image-snapshot.txt
-│           ├── trivy-api-image.txt
-│           ├── trivy-frontend-image-snapshot.txt
-│           ├── trivy-frontend-image.txt
-│           ├── trivy-fs-snapshot.txt
-│           └── trivy-fs.txt
+│       ├── runtime
+│       │   └── README.md
+│       ├── sbom
+│       │   ├── README.md
+│       │   ├── retailops-repository.cdx.json
+│       │   └── retailops-repository.spdx.json
+│       ├── security
+│       │   ├── bandit-api-all.json
+│       │   ├── bandit-api.txt
+│       │   ├── bandit-devsecops.json
+│       │   ├── falco-rules-validation.txt
+│       │   ├── gitleaks.json
+│       │   ├── README.md
+│       │   ├── semgrep-devsecops.json
+│       │   ├── trivy-api-image-snapshot.txt
+│       │   ├── trivy-api-image.txt
+│       │   ├── trivy-frontend-image-snapshot.txt
+│       │   ├── trivy-frontend-image.txt
+│       │   ├── trivy-fs-snapshot.txt
+│       │   └── trivy-fs.txt
+│       └── signing
+│           └── README.md
 ├── data
 │   ├── __init__.py
 │   ├── contracts
@@ -285,7 +300,10 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   │   ├── aws-console-ecr.png
 │   │   │   ├── aws-console-iam.png
 │   │   │   ├── aws-console-vpc.png
-│   │   │   └── README.md
+│   │   │   ├── README.md
+│   │   │   ├── terraform-apply-graph-from-plan-dev.svg
+│   │   │   ├── terraform-dependency-graph-dev.svg
+│   │   │   └── terraform-plan-graph-dev.svg
 │   │   ├── data
 │   │   │   └── scenario-coverage-report.md
 │   │   ├── docker
@@ -468,7 +486,8 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       │                           └── terraform-provider-aws_v5.100.0_x5
 │   │       ├── .terraform.lock.hcl
 │   │       ├── main.tf
-│   │       └── terraform.tfvars.example
+│   │       ├── terraform.tfvars.example
+│   │       └── tfplan
 │   ├── locals.tf
 │   ├── modules
 │   │   ├── budget
@@ -533,6 +552,11 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   └── versions.tf
 ├── Jenkinsfile
 ├── k8s
+│   ├── addons
+│   │   └── external-secrets
+│   │       ├── README.md
+│   │       ├── runtime-secrets.externalsecret.yaml
+│   │       └── secretstore.aws.yaml
 │   ├── base
 │   │   ├── api
 │   │   │   ├── deployment.yaml
@@ -546,8 +570,11 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   ├── ingress
 │   │   │   └── ingress.yaml
 │   │   ├── kustomization.yaml
-│   │   └── namespaces
-│   │       └── retailops.yaml
+│   │   ├── namespaces
+│   │   │   └── retailops.yaml
+│   │   └── serviceaccounts
+│   │       ├── api.yaml
+│   │       └── frontend.yaml
 │   ├── overlays
 │   │   └── dev
 │   │       ├── broker
@@ -577,7 +604,13 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       ├── jobs
 │   │       │   ├── migrate.yaml
 │   │       │   └── seed.yaml
-│   │       └── kustomization.yaml
+│   │       ├── kustomization.yaml
+│   │       ├── secrets
+│   │       │   ├── .gitignore
+│   │       │   ├── runtime-secrets.env
+│   │       │   └── runtime-secrets.env.example
+│   │       ├── secrets.env
+│   │       └── secrets.env.example
 │   └── README.md
 ├── LICENSE
 ├── LOCAL_ADVANCED_ROADMAP
@@ -596,6 +629,7 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   ├── FRONTEND
 │   │   └── retailops-frontend-review.md
 │   ├── README.md
+│   ├── recruiter_and_video_readiness_audit.md
 │   ├── retailops-chatgpt-codex-collaboration-model-with-completion-checklists.md
 │   ├── retailops-production-readiness-audit-summary.md
 │   ├── retailops-production-readiness-checklist-audited.md
@@ -659,6 +693,19 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │       └── stream-alerts.yml
 │   ├── prometheus.yml
 │   └── README.md
+├── policy
+│   ├── conftest
+│   │   └── kubernetes.rego
+│   ├── gatekeeper
+│   │   ├── constraints
+│   │   │   └── retailops-disallow-latest-tag.yaml
+│   │   └── constrainttemplates
+│   │       └── k8sdisallowlatesttag.yaml
+│   ├── kyverno
+│   │   ├── disallow-latest-tag.yaml
+│   │   ├── require-resources-and-probes.yaml
+│   │   └── require-restricted-security-context.yaml
+│   └── README.md
 ├── pyproject.toml
 ├── pytest.ini
 ├── README.md
@@ -681,10 +728,25 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
 │   │   └── .gitkeep
 │   └── README.md
 ├── security
+│   ├── falco
+│   │   ├── README.md
+│   │   └── rules
+│   │       └── retailops_runtime_rules.yaml
 │   ├── iac
 │   │   ├── checkov.yml
 │   │   └── tflint.hcl
-│   └── README.md
+│   ├── provenance
+│   │   └── README.md
+│   ├── README.md
+│   ├── sast
+│   │   ├── README.md
+│   │   └── semgrep.yml
+│   ├── sbom
+│   │   ├── README.md
+│   │   └── syft.yaml
+│   └── signing
+│       ├── cosign-identity-policy.md
+│       └── README.md
 ├── services
 │   ├── api
 │   │   ├── .coverage
@@ -851,4 +913,4 @@ tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.my
     │   └── README.md
     └── README.md
 
-148 directories, 692 files
+168 directories, 734 files

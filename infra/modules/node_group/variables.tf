@@ -260,14 +260,14 @@ variable "force_update_version" {
   default     = false
 }
 
-variable "lifecycle" {
+variable "resource_lifecycle" {
   description = "Cost-control lifecycle tag. Use temporary for short-lived EKS validation node groups."
   type        = string
   default     = "temporary"
 
   validation {
-    condition     = contains(["temporary", "persistent"], var.lifecycle)
-    error_message = "lifecycle must be temporary or persistent."
+    condition     = contains(["temporary", "persistent"], var.resource_lifecycle)
+    error_message = "resource_lifecycle must be temporary or persistent."
   }
 }
 

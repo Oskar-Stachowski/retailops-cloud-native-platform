@@ -56,3 +56,7 @@ secretGenerator:
   - name: retailops-runtime-secrets
     envs:
       - secrets/runtime-secrets.env
+    options:
+      annotations:
+        retailops.io/generated-by: kustomize-secretGenerator
+        retailops.io/secret-source: uncommitted-local-env

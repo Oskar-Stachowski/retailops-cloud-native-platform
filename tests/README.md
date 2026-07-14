@@ -13,6 +13,8 @@ The current MVP testing scope covers three basic validation layers:
 1. **API tests** — verify the FastAPI contract using `pytest` and `TestClient`.
 2. **CI validation** — run tests and Docker image builds in GitHub Actions.
 3. **Runtime smoke test** — verify that the application responds correctly after being started with Docker Compose.
+4. **k6 API performance smoke** — capture a small p95/error-rate baseline for key API endpoints.
+5. **Playwright browser smoke** — verify the frontend renders live backend evidence and can navigate a core data-backed workflow.
 
 At this stage, the main backend contract is the health endpoint:
 
@@ -109,6 +111,20 @@ This confirms that:
 - the API container starts successfully,
 - the API is reachable through the exposed local port,
 - the `/health` endpoint returns the expected contract.
+
+For the recruiter/video-ready runtime evidence path, run the full Compose stack
+and execute both API performance and browser E2E smoke layers:
+
+```bash
+make compose-up
+make runtime-smoke-evidence
+make compose-down
+```
+
+Responsibility split:
+
+- `make performance-smoke` uses k6 for API p95 latency and failed request rate evidence.
+- `make browser-smoke` uses Playwright for frontend/browser behavior through the Compose stack.
 
 ---
 

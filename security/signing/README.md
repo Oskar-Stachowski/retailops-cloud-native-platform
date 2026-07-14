@@ -1,10 +1,12 @@
-# RetailOps image signing implementation
+# RetailOps image signing policy
 
-RetailOps uses Sigstore Cosign for OCI image signing.
+RetailOps documents a Sigstore Cosign policy for future registry-backed OCI
+image signing. No signed release image is claimed until immutable image digests
+exist and `cosign verify` output is captured.
 
-## Implemented release path
+## Intended release path
 
-The workflow `.github/workflows/ecr-release.yml`:
+The future registry-backed release path should:
 
 1. authenticates to AWS with GitHub OIDC;
 2. builds API and frontend images;
@@ -16,9 +18,18 @@ The workflow `.github/workflows/ecr-release.yml`:
 8. generates GitHub provenance and SBOM attestations;
 9. uploads release evidence.
 
+Current implemented adjacent controls:
+
+- repository SBOM snapshots are generated with `make sbom-repository`;
+- `.github/workflows/provenance-ci.yml` generates GitHub build provenance
+  attestations for local image subjects;
+- Cosign identity verification policy is documented in
+  `security/signing/cosign-identity-policy.md`.
+
 ## Required GitHub configuration
 
-Set these repository secrets/variables before running the workflow:
+Set these repository secrets/variables before adding or running a
+registry-backed release workflow:
 
 | Name | Type | Example |
 |---|---|---|
@@ -36,9 +47,9 @@ cosign verify \
   <account-id>.dkr.ecr.eu-central-1.amazonaws.com/retailops-dev-api@sha256:<digest>
 ```
 
-## Evidence
+## Evidence boundary
 
-Expected files after a successful ECR release:
+Expected files after a future successful signed release:
 
 ```text
 ci-cd/reports/signing/cosign-api-verify.txt
@@ -47,3 +58,12 @@ ci-cd/reports/sbom/retailops-api.spdx.json
 ci-cd/reports/sbom/retailops-frontend.spdx.json
 ci-cd/reports/provenance/ecr-release-summary.md
 ```
+
+Safe current claim:
+
+> Cosign signing policy is documented; repository SBOM and local-image
+> provenance evidence exist.
+
+Do not claim:
+
+> RetailOps release images are already signed and verified.
