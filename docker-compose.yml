@@ -229,7 +229,7 @@ services:
 
   security-tools:
     profiles: ["security"]
-    image: aquasec/trivy:0.59.1
+    image: aquasec/trivy:0.71.0
     working_dir: /workspace
     volumes:
       - .:/workspace:ro
