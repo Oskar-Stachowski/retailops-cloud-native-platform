@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 
-FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
 
 LABEL org.opencontainers.image.title="RetailOps Frontend"
 LABEL org.opencontainers.image.description="Nginx-served React/Vite frontend for the RetailOps local runtime"
