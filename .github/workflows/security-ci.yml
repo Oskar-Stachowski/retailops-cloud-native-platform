@@ -145,7 +145,7 @@ jobs:
       - name: Frontend dependency audit report
         run: |
           cd frontend
-          npm audit --omit=dev --audit-level=high --json > "../${REPORT_DIR}/npm-audit.json"
+          npm audit --include=dev --audit-level=high --json > "../${REPORT_DIR}/npm-audit.json"
 
       - name: Upload frontend dependency evidence
         if: always()
