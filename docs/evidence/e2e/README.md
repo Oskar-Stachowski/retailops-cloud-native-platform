@@ -9,6 +9,21 @@ return usable responses.
 
 Implementation and CI history: [PR #38](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/38).
 
+## Verified execution — 2026-09-25
+
+[Required CI run 36138113369](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36138113369)
+passed all 23 jobs for PR head `854d315de3127f5bd0c6a997b064414b6e285d67`.
+The [Compose/browser job](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36138113369/job/108081181578)
+recorded **7 passed in 16.3 seconds**, with one Chromium worker, no retries and
+no skipped journeys. Fresh builds, HTTP/streaming/observability checks and
+cleanup also passed. PR #38 merged as `2154a2f9ee0885bf18ce93373487f547b3dd709f`.
+
+The [docker-compose-ci-evidence artifact](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36138113369/artifacts/10865274684)
+contains the Playwright JUnit report and runtime evidence. It was present and
+unexpired when reviewed; normal retention expires on 2026-10-09. Failure
+screenshots and traces are only expected for failed tests. This tracked
+summary persists after artifact expiry.
+
 ## Critical browser gate
 
 `npm run e2e` runs the `chromium` project: seven behavioral journeys against
@@ -145,5 +160,5 @@ portfolio/runtime proof that the local or CI stack is connected and usable.
 The first [browser CI run](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36137439969)
 proved the new gate blocks failures: four journeys passed and three failed.
 The follow-up fixes also correct a category locator and limit fault injection
-to API fetches so it does not intercept the page document. The PR checks record
-the final validation result; this failed run is retained as diagnostic history.
+to API fetches so it does not intercept the page document. The successful run above validates the fixes; the failed run is retained as
+diagnostic history.

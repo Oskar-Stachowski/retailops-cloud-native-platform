@@ -12,6 +12,7 @@ Use this table as the first stop when reviewing freshness. It records the last c
 
 | Date | Commit SHA | Command run | Expected outcome | Environment | Artifact |
 |---|---|---|---|---|---|
+| 2026-09-25 | PR head `854d315de3127f5bd0c6a997b064414b6e285d67`; merged main `2154a2f` | Required CI run `36138113369` | 23 jobs passed, including seven critical Chromium journeys in 16.3 seconds without retries or skips. | GitHub Actions, demo-seeded PostgreSQL, Docker Compose, Chromium | [Browser validation and artifact](e2e/README.md) |
 | 2026-09-25 | PR head `4d41c93dbcb90e598cbed4f3adc3b785d82d9567`; merged main `44f7404` | Required CI run `36133335007` | All 23 jobs passed; 302 API tests, 83.82% coverage, 36 frontend tests; scans and Compose smoke passed their documented gates. | GitHub Actions, seeded PostgreSQL, Docker Compose | [Dated validation and artifact links](github-actions/2026-09-25-validation.md) |
 | 2026-09-25 | `46218000c78e49edca6ec396bbfa2314a1645be2` | Authenticated GitHub REST `GET .../branches/main` and `GET .../branches/main/protection` | Active PR and status-check protection, administrator enforcement, force pushes and deletion disabled. | GitHub repository settings | [Branch protection snapshot and notes](github/README.md) |
 | 2026-05-18 | `5aedb2bdc7d7` | `make compose-ci` | Backend and frontend images build, Compose stack starts, API/frontend/streaming/observability smoke checks pass, cleanup completes. | Local Docker / Docker Compose | [`docs/evidence/docker/compose-ci-smoke.md`](docker/compose-ci-smoke.md) |
