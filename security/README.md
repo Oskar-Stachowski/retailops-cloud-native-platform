@@ -24,6 +24,7 @@ Required CI uses explicit blocking thresholds:
 - Gitleaks blocks any detected secret.
 - Trivy filesystem scanning blocks fixed `HIGH` and `CRITICAL` findings.
 - Trivy image scanning blocks fixed `CRITICAL` findings.
+- Security CI and the Compose `security-tools` container both pin Trivy `0.74.0`; Docker CI verifies the container starts and records its version.
 - `pip-audit` blocks any vulnerability reported for runtime and development Python dependencies.
 - `npm audit --include=dev --audit-level=high` blocks high or critical findings in both production and development dependencies, including the frontend build toolchain.
 - Bandit blocks high-severity, high-confidence backend findings.

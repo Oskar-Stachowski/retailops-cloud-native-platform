@@ -17,6 +17,7 @@ env:
   API_IMAGE: retailops-api:security
   FRONTEND_IMAGE: retailops-frontend:security
   PIP_AUDIT_VERSION: "2.10.0"
+  TRIVY_VERSION: "v0.74.0"
 
 jobs:
   secret-scan:
@@ -75,6 +76,7 @@ jobs:
       - name: Trivy filesystem scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
+          version: ${{ env.TRIVY_VERSION }}
           scan-type: fs
           scan-ref: .
           severity: CRITICAL,HIGH
@@ -175,6 +177,7 @@ jobs:
       - name: Trivy backend image scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
+          version: ${{ env.TRIVY_VERSION }}
           image-ref: retailops-api:security
           severity: CRITICAL
           ignore-unfixed: true
@@ -210,6 +213,7 @@ jobs:
       - name: Trivy frontend image scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
+          version: ${{ env.TRIVY_VERSION }}
           image-ref: retailops-frontend:security
           severity: CRITICAL
           ignore-unfixed: true
