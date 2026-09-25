@@ -29,6 +29,12 @@ jobs:
       - name: Validate Compose profiles
         run: make compose-profile-config
 
+      - name: Verify security scanner container
+        run: |
+          set -euo pipefail
+          docker compose --profile security run --rm --no-deps security-tools --version \
+            | tee ci-cd/reports/docker/trivy-version.txt
+
       - name: Upload Compose config evidence
         if: always()
         uses: ./.github/actions/upload-ci-evidence
