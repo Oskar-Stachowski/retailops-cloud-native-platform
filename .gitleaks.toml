@@ -6,3 +6,10 @@ description = "Local Grafana demo credentials documented before the secret-scan 
 commits = ["ff31fb8d945acdb60602d5111e3efbea76d333b4"]
 paths = ['''docs/runbooks/observability-runbook\.md''']
 regexes = ['''admin:retailops''']
+
+[[allowlists]]
+description = "Public Git commit IDs used as API image tags in the dated rollback report; not credentials."
+condition = "AND"
+paths = ['''(^|/)docs/evidence/releases/2026-09-25-rollback\.json$''']
+regexTarget = "secret"
+regexes = ['''^sha-(44f7404010b55eba3d9bacd888d2dc7bb9797180|977c776ed7cf80ae2229e1522dba8a44e3827a75)$''']
