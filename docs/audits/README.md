@@ -26,9 +26,12 @@ the current application or AWS environment.
 
 These changes address parts of the audit's CI and scanning findings. They do
 not close the entire portfolio backlog or establish production readiness.
-The authenticated GitHub API reported `main` as unprotected on 2026-09-25;
-the intended settings remain documented in
-[the policy](../governance/branch-protection.md).
+The initial synchronization found `main` unprotected on 2026-09-25.
+Protection was enabled later that day: mandatory PRs, the `required-result`
+check, up-to-date branches, conversation resolution and administrator
+enforcement, with force pushes and deletion disabled. See
+[the active policy](../governance/branch-protection.md) and
+[captured GitHub settings](../evidence/github/README.md).
 
 ## Synchronization scope
 

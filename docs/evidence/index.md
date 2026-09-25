@@ -2,6 +2,8 @@
 
 Last reviewed: 2026-05-18
 
+CI governance evidence refreshed: 2026-09-25. Other evidence retains its original capture dates.
+
 This index maps tracked evidence to what it proves. It avoids treating documentation claims, roadmap diagrams, or target architecture text as proof of implementation.
 
 ## Evidence Refresh Ledger
@@ -10,6 +12,7 @@ Use this table as the first stop when reviewing freshness. It records the last c
 
 | Date | Commit SHA | Command run | Expected outcome | Environment | Artifact |
 |---|---|---|---|---|---|
+| 2026-09-25 | `46218000c78e49edca6ec396bbfa2314a1645be2` | Authenticated GitHub REST `GET .../branches/main` and `GET .../branches/main/protection` | Active PR and status-check protection, administrator enforcement, force pushes and deletion disabled. | GitHub repository settings | [Branch protection snapshot and notes](github/README.md) |
 | 2026-05-18 | `5aedb2bdc7d7` | `make compose-ci` | Backend and frontend images build, Compose stack starts, API/frontend/streaming/observability smoke checks pass, cleanup completes. | Local Docker / Docker Compose | [`docs/evidence/docker/compose-ci-smoke.md`](docker/compose-ci-smoke.md) |
 | 2026-05-18 | `5aedb2bdc7d7` | `make compose-up && make runtime-smoke-evidence && make compose-down` | Running local stack passes API/frontend smoke, k6 API p95 baseline and Playwright browser smoke. | Local Docker / Docker Compose / k6 / Playwright | [`docs/evidence/runtime/local-runtime-smoke.md`](runtime/local-runtime-smoke.md) |
 | 2026-05-12 | `e4d0eb72f6a9c17e5072ca7954e1df03b06f8630` | `cd services/api && PYTHONPATH=. .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8011` | API starts cleanly; `/health` returns `200`; `/openapi.json` is captured. | Local Python / loopback HTTP | [`docs/evidence/api/startup-log.md`](api/startup-log.md) |
@@ -33,7 +36,7 @@ Use the same refresh pattern when an artifact becomes stale:
 | Evidence governance | `docs/evidence/evidence-folder-map.md` | Final evidence structure and expected folder usage are documented. | Documentation | Internal and reviewer-facing | Updated during evidence cleanup. |
 | Evidence governance | `docs/evidence/gitignore-evidence-policy.md` | Repository has explicit rules for tracked versus ignored evidence. | Git hygiene | Internal | Matched against root `.gitignore`. |
 | CI governance | `docs/governance/github-actions-ci.md` | GitHub Actions workflows, composite actions, evidence paths, and known CI boundaries are mapped to the readiness checklist. | GitHub Actions, CI/CD | Reviewer-facing | Added during GitHub Actions CI readiness update. |
-| CI governance | `docs/governance/branch-protection.md` | Expected `main` branch protection settings and required GitHub Actions checks are documented. | GitHub Actions, branch protection | Reviewer-facing | Requires GitHub Settings screenshot before claiming enforcement. |
+| CI governance | `docs/governance/branch-protection.md`, `docs/evidence/github/` | Active `main` protection and the exact required GitHub Actions check are documented with an API snapshot. | GitHub Actions, branch protection | Reviewer-facing | Enabled and independently read back on 2026-09-25, with enforcement for administrators. |
 | API | `docs/evidence/api/README.md` | API evidence folder is indexed for reviewer navigation. | Backend/API | Recruiter-facing | Added for API-001 and API-009 evidence. |
 | API | `docs/evidence/api/startup-log.md` | FastAPI starts under Uvicorn and responds to `/health`. | Backend/API | Recruiter-facing | Captured from local Uvicorn run on `127.0.0.1:8011`. |
 | API | `docs/evidence/api/openapi-snapshot.json` | Running API exposes a concrete OpenAPI schema at `/openapi.json`. | Backend/API | Technical reviewer | Captured with `curl` and formatted with `jq`. |

@@ -13,7 +13,7 @@ This document maps the RetailOps GitHub Actions implementation to the production
 | GHA-003 | Implemented | `.github/workflows/docker-ci.yml` | Validates Compose config/profiles and runs full-stack Compose smoke tests. |
 | GHA-004 | Implemented | `.github/workflows/security-ci.yml` | Runs secret scan, Trivy filesystem scan, dependency audits, image scans, and consolidated evidence summary. |
 | GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize render, Kubeconform schema validation, Conftest and blocking Checkov policy checks. |
-| GHA-008 | Implemented/documented | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/governance/branch-protection.md` | Provides one always-running aggregate, `Required CI / required-result`; still requires a GitHub Settings screenshot before claiming enforcement. |
+| GHA-008 | Implemented and configured | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/evidence/github/README.md` | The aggregate `Required CI / required-result` is required on `main`, including for administrators. Active settings were verified through the GitHub API on 2026-09-25. |
 | GHA-009 | Designed/partly implemented | `.github/workflows/terraform-validation.yml`, `.github/workflows/terraform-plan.yml`, `docs/ADR/IAM delivery access.md` | Required validation is uncredentialed; the separate manual Terraform plan uses GitHub OIDC when the safe AWS role variable exists. |
 | GHA-010 | Implemented | `.github/actions/**` | Composite actions centralize Python setup, Node setup, and CI evidence upload. |
 | GHA-011 | Candidate implemented | `.github/workflows/provenance-ci.yml` | Creates GitHub artifact attestations for locally built API/frontend image subjects. |
@@ -22,7 +22,10 @@ This document maps the RetailOps GitHub Actions implementation to the production
 
 ## Required branch-protection gate
 
-`Required CI / required-result` is the only check that should be configured as required on `main`.
+`Required CI / required-result` is the only required aggregate on `main`.
+Its exact check context is `required-result`, bound to GitHub Actions app ID
+`15368`. Pull requests must be up to date and conversations resolved before
+merge. See [the active policy](branch-protection.md).
 
 The required workflow intentionally does not use workflow-level `paths` filters. It runs for every pull request, every push to `main`, and manual dispatches. A tested Python classifier selects full reusable domain workflows. Shared and unknown paths select every domain gate. A skipped result is valid only when the classifier marked that gate unnecessary; a selected gate must finish with `success`.
 

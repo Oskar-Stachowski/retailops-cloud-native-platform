@@ -1,6 +1,6 @@
 # RetailOps repository structure snapshot
 #
-# Generated: 2026-09-25T10:58:15Z
+# Generated: 2026-09-25T11:32:16Z
 # Purpose: Static repository tree snapshot for documentation/release evidence.
 # Refresh command:
 #   make docs-repo-structure
@@ -252,6 +252,9 @@ git ls-files | tree --fromfile -a --noreport
 │   │   │   ├── products.jpg
 │   │   │   ├── profile.jpg
 │   │   │   └── recommendations.jpg
+│   │   ├── github
+│   │   │   ├── README.md
+│   │   │   └── main-branch-protection.json
 │   │   ├── github-actions
 │   │   │   ├── README.md
 │   │   │   ├── devops-platform-readiness-all-workflows-green.png
