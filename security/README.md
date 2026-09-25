@@ -25,7 +25,7 @@ Required CI uses explicit blocking thresholds:
 - Trivy filesystem scanning blocks fixed `HIGH` and `CRITICAL` findings.
 - Trivy image scanning blocks fixed `CRITICAL` findings.
 - `pip-audit` blocks any vulnerability reported for runtime Python dependencies.
-- `npm audit --omit=dev --audit-level=high` blocks high or critical production dependency findings.
+- `npm audit --include=dev --audit-level=high` blocks high or critical findings in both production and development dependencies, including the frontend build toolchain.
 - Bandit blocks high-severity, high-confidence backend findings.
 - TFLint is a blocking IaC quality gate.
 - Checkov blocks every Terraform or Kubernetes finding except the check IDs explicitly accepted below.
