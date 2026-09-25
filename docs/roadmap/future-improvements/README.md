@@ -24,11 +24,16 @@ records 23 successful Required CI jobs after the dependency and image refresh.
   Terraform foundation and runbooks already exist. Their presence does not
   establish a production deployment or fresh execution of historical evidence.
 
+Critical Chromium coverage is now wired into the Docker gate for dashboard,
+product drill-down, alert/recommendation decisions, read-only access and API
+retry. See the [browser coverage matrix](../../evidence/e2e/README.md). The dated
+September dependency summary above retains its original pre-E2E scope.
+
 ## Next priorities
 
 | Priority | Work | Completion evidence |
 |---:|---|---|
-| 1 | Run critical browser journeys in Required CI: dashboard data, product filters/detail, alert and recommendation decisions, read-only role and recoverable errors. | Playwright results and failure traces from a real seeded API/database stack; no skipped critical journeys. |
+| 1 | Extend browser coverage where product changes require it; add accessibility and cross-browser checks. | Build on the seven critical Chromium journeys and retain traces for failures. |
 | 2 | Exercise database restore and application rollback on an isolated local stack. | Dated recovery run with before/after checks and measured recovery time. |
 | 3 | Define a release/tag policy and publish the same tested image with digest, SBOM and provenance. | One reviewable release linked to its CI run and immutable image identity. Registry/environment selection is a separate deployment decision. |
 | 4 | Exercise Kubernetes workloads on a local cluster before cloud deployment. | Pods, migrations, seed, probes, ingress, runtime smoke and cleanup evidence; current schema/policy checks remain necessary but insufficient. |

@@ -73,8 +73,8 @@ it omits no implementation work.
 
 ## Remaining work
 
-- Make browser journeys for dashboard, product drill-down and workflow decisions
-  part of Required CI; existing browser scripts are manually invoked.
+- Extend the seven Chromium journeys in Required CI with broader accessibility
+  and browser coverage when needed; screenshot capture remains opt-in.
 - Prove recovery and deployment behavior separately from test/build gates.
 - Refresh historical Jenkins, runtime and ML evidence only after a new execution.
 

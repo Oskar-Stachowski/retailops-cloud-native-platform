@@ -645,7 +645,10 @@ export default function ActionQueue() {
                         </td>
                       </tr>
                       {group.items.map((item) => (
-                        <tr key={`${item.queueType}:${item.queueId || item.sourceId}`}>
+                        <tr
+                          key={`${item.queueType}:${item.queueId || item.sourceId}`}
+                          data-testid={`${item.queueType}-${item.queueId || item.sourceId}`}
+                        >
                           <td>
                             <span className="action-queue-item">
                               <strong>{item.queueTitle}</strong>

@@ -43,7 +43,10 @@ can also be started manually for standalone evidence:
 
 Terraform Dev Plan is a separate manual-only workflow and is not part of the
 required merge contract. Observability and provenance remain standalone
-evidence workflows. Playwright is also intentionally excluded from Required CI.
+evidence workflows. Docker Compose CI runs the seven critical Chromium browser
+journeys against its fresh seeded stack before cleanup. Browser failures fail
+the Docker gate and therefore `required-result`. Screenshot evidence capture
+remains a separate opt-in Playwright project.
 
 | Changed area | Full workflows selected by Required CI |
 |---|---|
@@ -80,7 +83,7 @@ Current workflow artifact families:
 | API | `ci-cd/reports/api/coverage.xml`, `ci-cd/reports/security/bandit-api.txt` |
 | Data | `ci-cd/reports/data/**`, `docs/evidence/data/scenario-coverage-report.md` |
 | Frontend | `ci-cd/reports/frontend/test.txt`, `ci-cd/reports/frontend/lint.txt`, `ci-cd/reports/frontend/build.txt` |
-| Docker | `ci-cd/reports/docker-compose-ps.txt`, `ci-cd/reports/docker/**`, `ci-cd/reports/observability/**` |
+| Docker | `ci-cd/reports/docker-compose-ps.txt`, `ci-cd/reports/docker/**`, `ci-cd/reports/observability/**`, `ci-cd/reports/e2e/**` |
 | Security | `ci-cd/reports/security/trivy-fs.txt`, `pip-audit.json`, `npm-audit.json`, image scan reports |
 | IaC | `ci-cd/reports/iac/terraform-validate.txt`, `tflint.txt`, `checkov.txt`, `checkov.json` |
 | Provenance | `ci-cd/reports/provenance/provenance-summary.md` |
