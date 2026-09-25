@@ -52,6 +52,9 @@ jobs:
     env:
       SMOKE_MAX_ATTEMPTS: "45"
       SMOKE_SLEEP_SECONDS: "2"
+      COMPOSE_BROWSER_TESTS: "1"
+      E2E_ALLOW_MUTATIONS: "1"
+      PLAYWRIGHT_BROWSER_CHANNEL: ""
 
     steps:
       - name: Checkout repository
@@ -63,6 +66,13 @@ jobs:
         run: |
           docker --version
           docker compose version
+
+      - name: Set up browser test dependencies
+        uses: ./.github/actions/setup-node-ci
+
+      - name: Install Chromium and system dependencies
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
 
       - name: Fresh-build, start and smoke-test full stack
         run: make compose-ci
@@ -79,6 +89,7 @@ jobs:
             echo "| Compose failure logs | \`ci-cd/reports/docker-compose-logs.txt\` |"
             echo "| Docker profile configs | \`ci-cd/reports/docker/\` |"
             echo "| Observability smoke evidence | \`ci-cd/reports/observability/\` |"
+            echo "| Browser journeys and failure traces | \`ci-cd/reports/e2e/\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload Compose smoke evidence
@@ -91,6 +102,7 @@ jobs:
             ci-cd/reports/docker-compose-logs.txt
             ci-cd/reports/docker/
             ci-cd/reports/observability/
+            ci-cd/reports/e2e/
           if-no-files-found: ignore
 
       - name: Final cleanup

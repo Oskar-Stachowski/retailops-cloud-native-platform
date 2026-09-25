@@ -88,6 +88,7 @@ FRONTEND_PORT ?= 3000
 APP_ENV ?= local
 COMPOSE_PROFILES ?= dev
 COMPOSE_CI_PROFILES ?= dev,observability
+COMPOSE_BROWSER_TESTS ?= 0
 
 DATABASE_URL ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)
 RETAILOPS_BROKER_BOOTSTRAP_SERVERS ?= localhost:$(REDPANDA_KAFKA_PORT)
@@ -459,7 +460,7 @@ browser-smoke: check-playwright ensure-reports-dir
 		PLAYWRIGHT_BROWSER_CHANNEL="$${PLAYWRIGHT_BROWSER_CHANNEL-chrome}" \
 		"$(NPM)" run e2e
 	@echo "Playwright JUnit report: $(E2E_REPORTS_DIR)/playwright-junit.xml"
-	@echo "Playwright dashboard screenshot: $(E2E_REPORTS_DIR)/dashboard-smoke-snapshot.png"
+	@echo "Playwright failure screenshots/traces: $(E2E_REPORTS_DIR)/playwright-artifacts"
 
 runtime-smoke-evidence: compose-smoke performance-smoke browser-smoke
 	@echo "Runtime smoke evidence passed: compose API/frontend smoke, k6 API baseline and Playwright browser E2E."
@@ -742,6 +743,10 @@ compose-ci: ensure-reports-dir
 		echo "[compose-ci] Running observability smoke tests..."; \
 		chmod +x "$(OBSERVABILITY_SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_SMOKE_SCRIPT)" || status=$$?; \
+	fi; \
+	if [[ $$status -eq 0 && "$(COMPOSE_BROWSER_TESTS)" == "1" ]]; then \
+		echo "[compose-ci] Running critical browser journeys..."; \
+		$(MAKE) browser-smoke || status=$$?; \
 	fi; \
 	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
 	if [[ $$status -ne 0 ]]; then \

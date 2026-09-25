@@ -19,6 +19,7 @@ OPEN_STATUSES = (
     "assigned",
     "escalated",
     "proposed",
+    "accepted",
 )
 
 
