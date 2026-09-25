@@ -8,36 +8,6 @@ on:
         required: false
         type: string
         default: small
-  push:
-    paths:
-      - "data/**"
-      - "events/**"
-      - "scripts/data/**"
-      - "services/api/requirements-dev.txt"
-      - "services/api/tests/test_data_generator_cli.py"
-      - "services/api/tests/test_data_contracts.py"
-      - "services/api/tests/test_scenario_coverage.py"
-      - "Makefile"
-      - "ci-cd/README.md"
-      - "docs/synthetic-data-profiles.md"
-      - "docs/evidence/data/**"
-      - ".github/actions/**"
-      - ".github/workflows/data-ci.yml"
-  pull_request:
-    paths:
-      - "data/**"
-      - "events/**"
-      - "scripts/data/**"
-      - "services/api/requirements-dev.txt"
-      - "services/api/tests/test_data_generator_cli.py"
-      - "services/api/tests/test_data_contracts.py"
-      - "services/api/tests/test_scenario_coverage.py"
-      - "Makefile"
-      - "ci-cd/README.md"
-      - "docs/synthetic-data-profiles.md"
-      - "docs/evidence/data/**"
-      - ".github/actions/**"
-      - ".github/workflows/data-ci.yml"
   workflow_dispatch:
     inputs:
       data_profile:
@@ -53,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: data-ci-${{ github.ref }}-${{ inputs.data_profile || 'small' }}
+  group: data-ci-${{ github.workflow }}-${{ github.ref }}-${{ inputs.data_profile || 'small' }}
   cancel-in-progress: true
 
 jobs:

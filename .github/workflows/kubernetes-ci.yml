@@ -2,31 +2,13 @@ name: Kubernetes Policy CI
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "k8s/**"
-      - "policy/**"
-      - "security/k8s/**"
-      - "scripts/ci/kubernetes_smoke.sh"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/kubernetes-ci.yml"
-  pull_request:
-    paths:
-      - "k8s/**"
-      - "policy/**"
-      - "security/k8s/**"
-      - "scripts/ci/kubernetes_smoke.sh"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/kubernetes-ci.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: kubernetes-policy-ci-${{ github.ref }}
+  group: kubernetes-policy-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

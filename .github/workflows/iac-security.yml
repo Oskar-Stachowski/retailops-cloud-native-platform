@@ -2,27 +2,13 @@ name: IaC Security CI
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "infra/**"
-      - "security/iac/**"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/iac-security.yml"
-  pull_request:
-    paths:
-      - "infra/**"
-      - "security/iac/**"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/iac-security.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: iac-security-${{ github.ref }}
+  group: iac-security-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

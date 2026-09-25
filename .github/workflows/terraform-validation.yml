@@ -1,0 +1,49 @@
+name: Terraform Validation CI
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TERRAFORM_VERSION: "1.9.8"
+
+jobs:
+  terraform-validate:
+    name: Terraform fmt, init and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Show Terraform version
+        run: terraform version
+
+      - name: Run local IaC scan
+        run: make terraform-fmt-check terraform-validate
+
+      - name: Upload Terraform validation evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: terraform-validation-evidence
+          path: ci-cd/reports/iac/terraform-validate.txt
+          if-no-files-found: warn

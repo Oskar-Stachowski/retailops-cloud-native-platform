@@ -558,6 +558,7 @@ The project documentation is split into several files and directories:
 - `docs/local-event-broker.md` — local Redpanda broker, consumer runner and streaming smoke checks
 - `docs/runbooks/local-kubernetes-runbook.md` — local Kubernetes validation and run procedure
 - `docs/live-metrics-persistence.md` — persisted live operations read model
+- [Repository audits](docs/audits/README.md) — historical findings, subsequent fixes and synchronization scope
 
 ---
 

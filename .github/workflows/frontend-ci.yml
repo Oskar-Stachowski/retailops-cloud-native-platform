@@ -2,25 +2,13 @@ name: Frontend CI
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "frontend/**"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/frontend-ci.yml"
-  pull_request:
-    paths:
-      - "frontend/**"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/frontend-ci.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: frontend-ci-${{ github.ref }}
+  group: frontend-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

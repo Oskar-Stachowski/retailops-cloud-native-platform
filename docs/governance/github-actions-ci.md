@@ -14,7 +14,7 @@ This document maps the RetailOps GitHub Actions implementation to the production
 | GHA-004 | Implemented | `.github/workflows/security-ci.yml` | Runs secret scan, Trivy filesystem scan, dependency audits, image scans, and consolidated evidence summary. |
 | GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize render, Kubeconform schema validation, Conftest and blocking Checkov policy checks. |
 | GHA-008 | Implemented/documented | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/governance/branch-protection.md` | Provides one always-running aggregate, `Required CI / required-result`; still requires a GitHub Settings screenshot before claiming enforcement. |
-| GHA-009 | Designed/partly implemented | `.github/workflows/terraform-plan.yml`, `docs/ADR/IAM delivery access.md` | Optional Terraform plan uses GitHub OIDC when safe AWS role variable exists. |
+| GHA-009 | Designed/partly implemented | `.github/workflows/terraform-validation.yml`, `.github/workflows/terraform-plan.yml`, `docs/ADR/IAM delivery access.md` | Required validation is uncredentialed; the separate manual Terraform plan uses GitHub OIDC when the safe AWS role variable exists. |
 | GHA-010 | Implemented | `.github/actions/**` | Composite actions centralize Python setup, Node setup, and CI evidence upload. |
 | GHA-011 | Candidate implemented | `.github/workflows/provenance-ci.yml` | Creates GitHub artifact attestations for locally built API/frontend image subjects. |
 
@@ -26,20 +26,21 @@ This document maps the RetailOps GitHub Actions implementation to the production
 
 The required workflow intentionally does not use workflow-level `paths` filters. It runs for every pull request, every push to `main`, and manual dispatches. A tested Python classifier selects full reusable domain workflows. Shared and unknown paths select every domain gate. A skipped result is valid only when the classifier marked that gate unnecessary; a selected gate must finish with `success`.
 
-The reusable domain workflows are:
+The reusable domain workflows are invoked automatically only by Required CI and
+can also be started manually for standalone evidence:
 
 - API CI
 - Frontend CI
 - Docker Compose CI
 - Data CI
 - Security CI
-- Terraform IaC CI
+- Terraform Validation CI
 - IaC Security CI
 - Kubernetes Policy CI
-- Observability CI
-- Provenance CI
 
-Observability and provenance remain standalone evidence workflows and are not part of the required merge contract. Playwright is also intentionally excluded from Required CI.
+Terraform Dev Plan is a separate manual-only workflow and is not part of the
+required merge contract. Observability and provenance remain standalone
+evidence workflows. Playwright is also intentionally excluded from Required CI.
 
 | Changed area | Full workflows selected by Required CI |
 |---|---|

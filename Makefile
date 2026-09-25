@@ -846,9 +846,10 @@ docs-repo-structure:
 		echo '#   make docs-repo-structure'; \
 		echo "#"; \
 		echo "# Note:"; \
+		echo "# Only Git-indexed files are included. Stage new documentation before refreshing."; \
 		echo "# This file is intentionally static and can become stale in active development."; \
 		echo "# Refresh it during release evidence updates or before publishing portfolio documentation."; \
 		echo ""; \
-		echo 'tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"'; \
-		tree -a -I "node_modules|dist|build|coverage|__pycache__|*.pyc|.pytest_cache|.mypy_cache|.ruff_cache|.git|.DS_Store|.venv|venv|env|.env|.env.local"; \
+		echo 'git ls-files | tree --fromfile -a --noreport'; \
+		git ls-files | tree --fromfile -a --noreport; \
 	} > docs/repo-structure.txt

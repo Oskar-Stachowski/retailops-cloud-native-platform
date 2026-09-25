@@ -2,41 +2,13 @@ name: Docker Compose CI
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "docker-compose.yml"
-      - "docker-compose.observability.yml"
-      - "Makefile"
-      - ".env.example"
-      - "scripts/**"
-      - "services/api/**"
-      - "frontend/**"
-      - "data/**"
-      - "events/**"
-      - "observability/**"
-      - ".github/actions/**"
-      - ".github/workflows/docker-ci.yml"
-  pull_request:
-    paths:
-      - "docker-compose.yml"
-      - "docker-compose.observability.yml"
-      - "Makefile"
-      - ".env.example"
-      - "scripts/**"
-      - "services/api/**"
-      - "frontend/**"
-      - "data/**"
-      - "events/**"
-      - "observability/**"
-      - ".github/actions/**"
-      - ".github/workflows/docker-ci.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: docker-compose-ci-${{ github.ref }}
+  group: docker-compose-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

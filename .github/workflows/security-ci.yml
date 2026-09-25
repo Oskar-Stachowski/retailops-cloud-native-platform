@@ -2,32 +2,6 @@ name: Security CI
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "services/api/**"
-      - "frontend/**"
-      - "data/**"
-      - "docker-compose.yml"
-      - "Makefile"
-      - ".env.example"
-      - "scripts/**"
-      - "security/**"
-      - ".gitleaks.toml"
-      - ".github/actions/**"
-      - ".github/workflows/security-ci.yml"
-  pull_request:
-    paths:
-      - "services/api/**"
-      - "frontend/**"
-      - "data/**"
-      - "docker-compose.yml"
-      - "Makefile"
-      - ".env.example"
-      - "scripts/**"
-      - "security/**"
-      - ".gitleaks.toml"
-      - ".github/actions/**"
-      - ".github/workflows/security-ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -35,7 +9,7 @@ permissions:
   security-events: write
 
 concurrency:
-  group: security-ci-${{ github.ref }}
+  group: security-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

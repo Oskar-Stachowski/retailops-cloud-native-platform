@@ -168,7 +168,7 @@ jobs:
   terraform-validation-gate:
     needs: detect-changes
     if: needs.detect-changes.outputs.terraform == 'true'
-    uses: ./.github/workflows/terraform-plan.yml
+    uses: ./.github/workflows/terraform-validation.yml
 
   iac-security-gate:
     needs: detect-changes

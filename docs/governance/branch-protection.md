@@ -8,6 +8,12 @@ The policy is intentionally documented in the repository because GitHub branch p
 
 ## Protected branch
 
+Observed on 2026-09-25 through the authenticated GitHub REST endpoint
+`GET /repos/Oskar-Stachowski/retailops-cloud-native-platform/branches/main`:
+`protected: false`, with required status check enforcement `off` and no
+configured contexts. The table below is the target policy, not the current
+GitHub configuration. Repository synchronization does not change these settings.
+
 | Setting | Expected value |
 |---|---|
 | Protected branch pattern | `main` |
@@ -28,7 +34,7 @@ Configure only this stable required check once the first successful `Required CI
 |---|---|---|
 | Required CI | `Required CI / required-result` | Always runs for every PR, every push to `main`, and manual dispatch. It calls the existing full domain workflows selected by tested path detection and fails if a required workflow is skipped, cancelled or unsuccessful. |
 
-Do not configure the path-filtered domain workflows as separate required branch protection checks. `Required CI` invokes those same workflows through `workflow_call`, while their direct path-filtered triggers remain useful for standalone evidence. The stable `required-result` job verifies the expected-versus-actual result of every called workflow.
+Do not configure domain workflows as separate required branch protection checks. `Required CI` is the only automatic pull-request and `main` push orchestrator; it invokes the full domain workflows through `workflow_call`. Domain workflows remain manually dispatchable for standalone evidence without duplicating or cancelling Required CI jobs. The stable `required-result` job verifies the expected-versus-actual result of every called workflow.
 
 Optional checks, depending on current sprint scope:
 
@@ -39,12 +45,12 @@ Optional checks, depending on current sprint scope:
 | Docker Compose CI | `Validate Docker Compose config`, `Build full stack and run smoke tests` | Called by Required CI for application, data, Compose, shared and unknown changes. |
 | Security CI | Security scan jobs and `Security evidence summary` | Called with explicit blocking thresholds for application, Compose, Kubernetes, policy, security, shared and unknown changes. |
 | Data CI | `Synthetic data quality gate` | Called by Required CI for data/shared/unknown changes. |
-| Terraform IaC CI | `Terraform fmt, init and validate` | Called by Required CI for Terraform/shared/unknown changes. |
+| Terraform Validation CI | `Terraform fmt, init and validate` | Called by Required CI for Terraform/shared/unknown changes. It has read-only repository permissions and no AWS credentials. |
 | IaC Security CI | `TFLint IaC quality gate`, `Checkov IaC security report` | Called by Required CI together with Terraform validation; Checkov is blocking outside documented exceptions. |
 | Kubernetes Policy CI | `Kustomize, schema and policy gates` | Called for Kubernetes/policy/shared/unknown changes; runs Kustomize, Kubeconform, Conftest and Checkov. |
 | Observability CI | `Validate observability assets` | Require once observability assets are in active scope |
 | Provenance CI | `Build local images and generate provenance attestations` | Require for release branches or signed release candidate evidence, not necessarily every PR |
-| Terraform IaC CI | `Optional dev Terraform plan` | Manual-only; do not require on normal PRs unless safe AWS OIDC credentials are configured |
+| Terraform Dev Plan | `Optional dev Terraform plan` | Manual-only; never require on normal PRs. Run only after explicit dispatch confirmation and configuration of the plan-only AWS OIDC role. |
 
 ## Evidence collection
 

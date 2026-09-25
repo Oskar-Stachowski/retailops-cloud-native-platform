@@ -247,10 +247,8 @@ ci-cd/reports/security/trivy-fs.txt
 # Local audit and planning reports
 REPOSITORY_AUDIT.md
 SENIOR_LEVEL_UPGRADE_PLAN.md
-
-# Local audit and planning reports
-REPOSITORY_AUDIT.md
-SENIOR_LEVEL_UPGRADE_PLAN.md
+/!LOCAL_ADVANCED_ROADMAP/
+/!RetailOps_AI_Instrukcje/
 
 # Generated synthetic datasets.
 # Keep the small seed profile versioned for CI/local reproducibility.
