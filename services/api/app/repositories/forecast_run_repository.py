@@ -321,4 +321,4 @@ class ForecastRunRepository:
                 updated_at
             FROM forecast_runs
             {suffix};
-        """
+        """  # noqa: S608 - callers build suffix from fixed filters and allowlisted ordering

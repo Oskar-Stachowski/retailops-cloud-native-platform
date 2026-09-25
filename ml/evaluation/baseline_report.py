@@ -117,7 +117,7 @@ def build_backtest_predictions(
             absolute_error = abs(error)
             squared_error = error * error
             absolute_percentage_error = (
-                absolute_error / actual_units * Decimal("100") if actual_units > 0 else Decimal("0")
+                absolute_error / actual_units * Decimal(100) if actual_units > 0 else Decimal(0)
             )
 
             predictions.append(
@@ -165,9 +165,9 @@ def calculate_metrics(predictions: list[dict[str, object]]) -> dict[str, object]
     mape = sum(percentage_errors) / row_count
     bias = (sum(predicted_units) - sum(actual_units)) / row_count
     wape = (
-        sum(absolute_errors) / sum(actual_units) * Decimal("100")
+        sum(absolute_errors) / sum(actual_units) * Decimal(100)
         if sum(actual_units) > 0
-        else Decimal("0")
+        else Decimal(0)
     )
 
     return {

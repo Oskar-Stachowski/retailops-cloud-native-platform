@@ -61,7 +61,7 @@ def _decimal(value: object) -> Decimal:
     try:
         return Decimal(str(value))
     except InvalidOperation:
-        return Decimal("0")
+        return Decimal(0)
 
 
 def _metric(value: Decimal) -> str:
@@ -70,14 +70,14 @@ def _metric(value: Decimal) -> str:
 
 def _mean(rows: list[dict[str, object]], feature: str) -> Decimal:
     if not rows:
-        return Decimal("0")
+        return Decimal(0)
     return sum(_decimal(row[feature]) for row in rows) / Decimal(len(rows))
 
 
 def _relative_change(reference: Decimal, current: Decimal) -> Decimal:
     denominator = abs(reference)
     if denominator == 0:
-        return Decimal("0") if current == 0 else Decimal("1")
+        return Decimal(0) if current == 0 else Decimal(1)
     return abs(current - reference) / denominator
 
 
@@ -95,11 +95,11 @@ def _max_bucket_share_delta(
 ) -> Decimal:
     buckets = set(reference_distribution) | set(current_distribution)
     if not buckets:
-        return Decimal("0")
+        return Decimal(0)
     return max(
         abs(
-            current_distribution.get(bucket, Decimal("0"))
-            - reference_distribution.get(bucket, Decimal("0"))
+            current_distribution.get(bucket, Decimal(0))
+            - reference_distribution.get(bucket, Decimal(0))
         )
         for bucket in buckets
     )

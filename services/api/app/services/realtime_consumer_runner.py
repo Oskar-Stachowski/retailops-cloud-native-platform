@@ -170,7 +170,8 @@ def build_confluent_kafka_consumer(
     config: RealtimeConsumerRunnerConfig,
 ) -> KafkaConsumerClient:
     try:
-        from confluent_kafka import Consumer
+        # Import here to provide an actionable error when the optional client is absent.
+        from confluent_kafka import Consumer  # noqa: PLC0415
     except ImportError as exc:
         msg = (
             "confluent-kafka is required for the long-running realtime consumer. "

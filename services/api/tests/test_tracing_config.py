@@ -35,6 +35,9 @@ def test_tracing_rejects_unknown_exporter() -> None:
     try:
         configure_tracing(app, settings)
     except ValueError as exc:
-        assert "Unsupported RETAILOPS_OTEL_EXPORTER" in str(exc)
+        assert exc.args == (
+            "Unsupported RETAILOPS_OTEL_EXPORTER value. "
+            "Use 'console' for local smoke tests or 'otlp' for an OTLP collector.",
+        )
     else:
         raise AssertionError("configure_tracing should reject an unsupported exporter")

@@ -113,7 +113,7 @@ jobs:
       - name: Python dependency audit report
         run: |
           pip-audit \
-            -r services/api/requirements.txt \
+            -r services/api/requirements-dev.txt \
             --format json \
             --output "${REPORT_DIR}/pip-audit.json"
 

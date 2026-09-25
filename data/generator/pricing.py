@@ -73,7 +73,7 @@ def generate_promotions(
                 "product_id": product["id"],
                 "name": f"Synthetic promotion for {product['sku']}",
                 "promotion_type": "discount",
-                "discount_percent": money(discount_percent * Decimal("100")),
+                "discount_percent": money(discount_percent * Decimal(100)),
                 "starts_at": iso_date(days_offset=-14 + index % 4),
                 "ends_at": iso_date(days_offset=14 + index % 4),
                 "channel": "all",

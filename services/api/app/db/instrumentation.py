@@ -105,8 +105,10 @@ def render_database_metrics() -> str:
         snapshot = list(_stats.items())
 
     lines = [
-        "# HELP retailops_db_operations_total "
-        "Total database operations by operation, statement type and status.",
+        (
+            "# HELP retailops_db_operations_total "
+            "Total database operations by operation, statement type and status."
+        ),
         "# TYPE retailops_db_operations_total counter",
     ]
     for labels, stats in snapshot:
@@ -119,8 +121,10 @@ def render_database_metrics() -> str:
 
     lines.extend(
         [
-            "# HELP retailops_db_operation_duration_seconds_sum "
-            "Cumulative database operation duration in seconds.",
+            (
+                "# HELP retailops_db_operation_duration_seconds_sum "
+                "Cumulative database operation duration in seconds."
+            ),
             "# TYPE retailops_db_operation_duration_seconds_sum counter",
         ],
     )
@@ -134,8 +138,10 @@ def render_database_metrics() -> str:
 
     lines.extend(
         [
-            "# HELP retailops_db_operation_duration_seconds_max "
-            "Maximum observed database operation duration in seconds.",
+            (
+                "# HELP retailops_db_operation_duration_seconds_max "
+                "Maximum observed database operation duration in seconds."
+            ),
             "# TYPE retailops_db_operation_duration_seconds_max gauge",
         ],
     )

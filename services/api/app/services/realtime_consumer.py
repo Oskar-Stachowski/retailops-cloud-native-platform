@@ -143,7 +143,7 @@ class RealtimeConsumerState:
 
 def build_default_event_handlers() -> dict[str, EventHandler]:
     """Return placeholder handlers for the first consumer skeleton."""
-    return {event_type: _noop_handler for event_type in SUPPORTED_EVENT_TYPES}
+    return dict.fromkeys(SUPPORTED_EVENT_TYPES, _noop_handler)
 
 
 def _noop_handler(event: dict[str, Any]) -> None:
@@ -554,7 +554,7 @@ class RealtimeEventConsumer:
             return value
 
         if value in (None, ""):
-            return Decimal("0")
+            return Decimal(0)
 
         return Decimal(str(value))
 

@@ -158,8 +158,7 @@ def resolve_seed_data_profile() -> str:
     if profile not in SEED_DATA_PROFILES:
         supported = "|".join(SEED_DATA_PROFILES)
         msg = (
-            f"Unsupported RETAILOPS_SEED_DATA_PROFILE '{profile}'. "
-            f"Supported profiles: {supported}."
+            f"Unsupported RETAILOPS_SEED_DATA_PROFILE '{profile}'. Supported profiles: {supported}."
         )
         raise ValueError(msg)
 

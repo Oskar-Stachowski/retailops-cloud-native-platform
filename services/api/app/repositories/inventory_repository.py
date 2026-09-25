@@ -122,7 +122,7 @@ class InventoryRepository:
             {where_clause}
             ORDER BY {sort_column} {direction}, id ASC
             LIMIT %s OFFSET %s;
-        """
+        """  # noqa: S608 - fixed filters and allowlisted ordering; values use bound parameters
         rows = self._fetch_all(query, (*params, limit, offset))
         return [self._map_row_to_inventory_snapshot(row) for row in rows]
 

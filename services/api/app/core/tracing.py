@@ -40,7 +40,7 @@ def _normalize_exporter(value: str) -> str:
     if exporter not in {"console", "otlp"}:
         message = (
             "Unsupported RETAILOPS_OTEL_EXPORTER value. "
-            "Use 'console' for local smoke tests or 'otlp' for an OTLP collector.",
+            "Use 'console' for local smoke tests or 'otlp' for an OTLP collector."
         )
         raise ValueError(message)
 
