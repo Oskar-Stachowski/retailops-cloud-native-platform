@@ -65,3 +65,10 @@ reversibility, broker recovery or rollback of every possible faulty image.
 The Docker Required CI gate runs the same drill with Chromium and retains its
 report/manifests/log and browser failure traces in `docker-compose-ci-evidence`.
 The committed JSON above is the dated local result; it is not a CI capture.
+
+The secret scanner's generic API-key rule initially mistook the two public
+Git-based API image tags in this dated JSON for credentials. The exception in
+`.gitleaks.toml` is assigned only to that rule, this exact evidence path and
+those two literal tag values. A local scan confirmed that the report passes,
+while both a synthetic GitHub token and a synthetic generic API key inserted
+into the same path are still rejected. No real credential was used in that test.

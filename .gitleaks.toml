@@ -9,6 +9,7 @@ regexes = ['''admin:retailops''']
 
 [[allowlists]]
 description = "Public Git commit IDs used as API image tags in the dated rollback report; not credentials."
+targetRules = ["generic-api-key"]
 condition = "AND"
 paths = ['''(^|/)docs/evidence/releases/2026-09-25-rollback\.json$''']
 regexTarget = "secret"
