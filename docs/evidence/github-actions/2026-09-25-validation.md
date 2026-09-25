@@ -61,4 +61,3 @@ Main protection required a successful `required-result` and an up-to-date PR
 before each merge. Superseded Dependabot PRs #21, #22, #31 and #32 were closed.
 The only unique commit in PR #16 was empty; the obsolete PR was closed after
 comparison with current main.
-
