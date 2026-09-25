@@ -77,6 +77,9 @@ jobs:
       - name: Fresh-build, start and smoke-test full stack
         run: make compose-ci
 
+      - name: Verify isolated database recovery
+        run: make db-recovery-drill
+
       - name: Write Docker Compose CI summary
         if: always()
         run: |
@@ -90,6 +93,7 @@ jobs:
             echo "| Docker profile configs | \`ci-cd/reports/docker/\` |"
             echo "| Observability smoke evidence | \`ci-cd/reports/observability/\` |"
             echo "| Browser journeys and failure traces | \`ci-cd/reports/e2e/\` |"
+            echo "| Database recovery report | \`ci-cd/reports/db/recovery/*/report.json\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload Compose smoke evidence
@@ -103,6 +107,8 @@ jobs:
             ci-cd/reports/docker/
             ci-cd/reports/observability/
             ci-cd/reports/e2e/
+            ci-cd/reports/db/recovery/*/report.json
+            ci-cd/reports/db/recovery/*/commands.log
           if-no-files-found: ignore
 
       - name: Final cleanup

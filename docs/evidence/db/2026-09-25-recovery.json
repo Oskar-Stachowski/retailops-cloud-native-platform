@@ -1,0 +1,169 @@
+{
+  "status": "passed",
+  "project": "retailops-recovery-5975b53fd5b9",
+  "started_at": "2026-09-25T13:59:27.068092+00:00",
+  "source_commit": "21e916580f8c1e4604e98d3fb8c249aea94f91c8",
+  "working_tree_dirty": false,
+  "timings_seconds": {
+    "build": 5.7,
+    "database_start": 2.919,
+    "backup": 0.338,
+    "restore": 0.381,
+    "restore_and_verification": 3.643,
+    "total": 23.622
+  },
+  "negative_checks": {
+    "missing_dump": "rejected_target_unchanged",
+    "missing_checksum": "rejected_target_unchanged",
+    "corrupted_dump": "rejected_target_unchanged",
+    "invalid_archive": "rejected_target_unchanged"
+  },
+  "postgres_version": "postgres (PostgreSQL) 16.13",
+  "before": {
+    "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+    "sequence_count": 0,
+    "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "tables": {
+      "alembic_version": {
+        "rows": 1,
+        "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+      },
+      "alerts": {
+        "rows": 4,
+        "sha256": "571dadc432374f5bca112958c373699c6f33d333d65629a43254499aceef09b8"
+      },
+      "anomalies": {
+        "rows": 4,
+        "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+      },
+      "forecast_runs": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "forecasts": {
+        "rows": 6,
+        "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+      },
+      "inventory_snapshots": {
+        "rows": 8,
+        "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+      },
+      "live_metric_observations": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "products": {
+        "rows": 8,
+        "sha256": "4652321b474220224346f4326d77e6597acdda59281dee0c3280a018d22a7e4e"
+      },
+      "realtime_consumer_state": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "realtime_event_log": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "recommendations": {
+        "rows": 4,
+        "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+      },
+      "sales": {
+        "rows": 16,
+        "sha256": "27828d8983acb37a77896330b12ee4a7104ca75defe10cfd08a83c08edd28484"
+      },
+      "users": {
+        "rows": 4,
+        "sha256": "a6cf08cfe29516e65f9e7b42cb3fd3e7ef7faf7265aa322c665c05072bdb94a9"
+      },
+      "workflow_actions": {
+        "rows": 6,
+        "sha256": "7f3291b85679243328ca305173d077357389ce2babbf8b0634a0c92350c20012"
+      },
+      "workflow_audit_log": {
+        "rows": 5,
+        "sha256": "7acec3ea547db14feee4916664f2caf80ff5d7443986f4c8d2f7525efa7125cc"
+      }
+    }
+  },
+  "backup_bytes": 61501,
+  "backup_sha256": "153306693730ca5dbdcd75dfc1ec519abfbf9a877a4562ee94a557b976dc2c74",
+  "restored": {
+    "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+    "sequence_count": 0,
+    "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "tables": {
+      "alembic_version": {
+        "rows": 1,
+        "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+      },
+      "alerts": {
+        "rows": 4,
+        "sha256": "571dadc432374f5bca112958c373699c6f33d333d65629a43254499aceef09b8"
+      },
+      "anomalies": {
+        "rows": 4,
+        "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+      },
+      "forecast_runs": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "forecasts": {
+        "rows": 6,
+        "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+      },
+      "inventory_snapshots": {
+        "rows": 8,
+        "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+      },
+      "live_metric_observations": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "products": {
+        "rows": 8,
+        "sha256": "4652321b474220224346f4326d77e6597acdda59281dee0c3280a018d22a7e4e"
+      },
+      "realtime_consumer_state": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "realtime_event_log": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "recommendations": {
+        "rows": 4,
+        "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+      },
+      "sales": {
+        "rows": 16,
+        "sha256": "27828d8983acb37a77896330b12ee4a7104ca75defe10cfd08a83c08edd28484"
+      },
+      "users": {
+        "rows": 4,
+        "sha256": "a6cf08cfe29516e65f9e7b42cb3fd3e7ef7faf7265aa322c665c05072bdb94a9"
+      },
+      "workflow_actions": {
+        "rows": 6,
+        "sha256": "7f3291b85679243328ca305173d077357389ce2babbf8b0634a0c92350c20012"
+      },
+      "workflow_audit_log": {
+        "rows": 5,
+        "sha256": "7acec3ea547db14feee4916664f2caf80ff5d7443986f4c8d2f7525efa7125cc"
+      }
+    }
+  },
+  "application_checks": {
+    "actions_replayed": 5,
+    "decisions_restored": 3,
+    "health": "passed",
+    "idempotency": "passed",
+    "new_workflow_write": "passed",
+    "product_360": "passed"
+  },
+  "source_unchanged": true,
+  "cleanup": "passed",
+  "finished_at": "2026-09-25T13:59:50.760461+00:00"
+}

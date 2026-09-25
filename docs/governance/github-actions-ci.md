@@ -48,6 +48,11 @@ journeys against its fresh seeded stack before cleanup. Browser failures fail
 the Docker gate and therefore `required-result`. Screenshot evidence capture
 remains a separate opt-in Playwright project.
 
+The same Docker gate also runs `make db-recovery-drill` in a separate disposable
+Compose project. A failed restore, data/history comparison, application check
+or cleanup fails the gate. The report and command log are uploaded with Compose
+evidence; database dumps and raw decision payloads are excluded.
+
 | Changed area | Full workflows selected by Required CI |
 |---|---|
 | API | API, Docker Compose, Security |
