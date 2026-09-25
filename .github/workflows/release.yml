@@ -1,0 +1,192 @@
+name: Verified registry release
+
+on:
+  workflow_dispatch:
+    inputs:
+      previous_ref:
+        description: Full SHA of a CI-verified main commit used as the rollback baseline
+        type: string
+        required: true
+        default: cb0c79848247612bf71fb9ccf63a8ff3847b5ca1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verified-registry-release
+  cancel-in-progress: false
+
+env:
+  RELEASE_DIR: ci-cd/reports/registry
+
+jobs:
+  build-publish:
+    name: Test, scan, publish and attest the same images
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require verified main revisions and a new version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_REF: ${{ inputs.previous_ref }}
+        run: python3 scripts/release/promotion.py preflight --previous-ref "$PREVIOUS_REF" --output ci-cd/reports/release-preflight.json
+      - uses: ./.github/actions/setup-node-ci
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Test release refusal cases
+        run: make release-tests
+      - name: Build once and verify update and rollback
+        env:
+          PREVIOUS_REF: ${{ inputs.previous_ref }}
+        run: python3 scripts/release/drill.py --previous-ref "$PREVIOUS_REF" --keep-images
+      - name: Scan tested images and generate their SBOMs
+        run: |
+          python3 scripts/release/registry.py prepare --report ci-cd/reports/releases/*/report.json --output "$RELEASE_DIR"
+          cp ci-cd/reports/release-preflight.json "$RELEASE_DIR/required-ci.json"
+      - name: Authenticate to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Publish the tested artifacts without rebuilding
+        id: published
+        run: python3 scripts/release/registry.py publish --output "$RELEASE_DIR"
+      - name: Attest previous API
+        uses: ./.github/actions/attest-release-image
+        with:
+          name: ${{ steps.published.outputs.previous_api_name }}
+          digest: ${{ steps.published.outputs.previous_api_digest }}
+          stem: previous-api
+      - name: Attest previous frontend
+        uses: ./.github/actions/attest-release-image
+        with:
+          name: ${{ steps.published.outputs.previous_frontend_name }}
+          digest: ${{ steps.published.outputs.previous_frontend_digest }}
+          stem: previous-frontend
+      - name: Attest candidate API
+        uses: ./.github/actions/attest-release-image
+        with:
+          name: ${{ steps.published.outputs.candidate_api_name }}
+          digest: ${{ steps.published.outputs.candidate_api_digest }}
+          stem: candidate-api
+      - name: Attest candidate frontend
+        uses: ./.github/actions/attest-release-image
+        with:
+          name: ${{ steps.published.outputs.candidate_frontend_name }}
+          digest: ${{ steps.published.outputs.candidate_frontend_digest }}
+          stem: candidate-frontend
+      - name: Sign the manifest binding both source revisions to the image digests
+        id: manifest
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: ci-cd/reports/registry/release-manifest.json
+      - name: Preserve signed manifest bundle
+        env:
+          BUNDLE: ${{ steps.manifest.outputs.bundle-path }}
+        run: cp "$BUNDLE" "$RELEASE_DIR/manifest-provenance.jsonl"
+      - name: Upload publication evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-release
+          path: ci-cd/reports/registry/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Retain diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build-failure
+          path: |
+            ci-cd/reports/releases/*/report.json
+            ci-cd/reports/releases/*/commands.log
+            ci-cd/reports/registry/
+          retention-days: 14
+
+  pull-verify:
+    name: Verify signatures and rollback after fresh registry pulls
+    needs: build-publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+      attestations: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: published-release
+          path: ci-cd/reports/registry
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - uses: ./.github/actions/setup-node-ci
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Verify signed manifests, provenance and SBOMs, then pull exact digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release/registry.py pull --output "$RELEASE_DIR"
+      - name: Exercise pulled images without a build
+        run: |
+          python3 scripts/release/drill.py \
+            --previous-manifest "$RELEASE_DIR/previous-manifest.json" \
+            --candidate-manifest "$RELEASE_DIR/candidate-manifest.json"
+          python3 scripts/release/registry.py complete --output "$RELEASE_DIR" \
+            --report ci-cd/reports/releases/*/report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-release
+          path: ci-cd/reports/registry/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Retain diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-pull-failure
+          path: |
+            ci-cd/reports/releases/*/report.json
+            ci-cd/reports/releases/*/commands.log
+            ci-cd/reports/releases/*/*/failure.png
+            ci-cd/reports/releases/*/*/trace.zip
+          retention-days: 14
+
+  release:
+    name: Publish the verified release and evidence
+    needs: pull-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-release
+          path: ci-cd/reports/registry
+      - name: Create a new annotated tag and publish the release bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release/promotion.py finish --output "$RELEASE_DIR"

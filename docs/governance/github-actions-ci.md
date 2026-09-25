@@ -129,4 +129,7 @@ actionlint
 
 - Branch protection cannot be proven by repository code alone. It needs a GitHub Settings screenshot or exported settings evidence.
 - The optional Terraform plan job needs a safe `AWS_TERRAFORM_PLAN_ROLE_ARN` repository variable and an OIDC role configured in AWS.
-- Provenance is implemented as GitHub artifact attestation evidence for local image subjects. Registry push, SBOM attestation, and deployment admission enforcement remain future maturity steps.
+- The standalone Provenance CI retains its local-image scope. The manual
+  [registry release workflow](releases.md) publishes tested image digests, signs
+  their provenance/SBOMs and verifies them on a fresh runner before promoting a
+  release. Deployment admission enforcement remains a future step.

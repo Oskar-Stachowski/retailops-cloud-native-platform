@@ -101,7 +101,7 @@ class Drill:
         sys.stdout.write(message + "\n")
         sys.stdout.flush()
 
-    def build(self, ref: str, directory: Path) -> dict:
+    def source(self, ref: str, directory: Path) -> dict:
         sha = self.run(["git", "rev-parse", "--verify", ref + "^{commit}"]).strip()
         require(re.fullmatch(r"[a-f0-9]{40}", sha), "Invalid source SHA")
         archive = directory.with_suffix(".tar")
@@ -122,7 +122,7 @@ class Drill:
             source.extractall(directory, filter="data")
         version = self.run(["git", "show", sha + ":VERSION"], allow_failure=True).strip() or "0.1.0"
         require(re.fullmatch(r"\d+\.\d+\.\d+", version), "VERSION must contain MAJOR.MINOR.PATCH")
-        release = {
+        return {
             "manifest_version": 1,
             "source_commit": sha,
             "version": version + "+git." + sha[:12],
@@ -130,6 +130,18 @@ class Drill:
             "images": {},
             "validation": "not_yet_verified",
         }
+
+    def imported(self, manifest: Path, directory: Path) -> dict:
+        release = json.loads(manifest.read_text())
+        source = self.source(release["source_commit"], directory)
+        for key in ("source_commit", "version", "migration"):
+            require(release[key] == source[key], f"Imported manifest differs from source: {key}")
+        self.select(release, directory)
+        return release
+
+    def build(self, ref: str, directory: Path) -> dict:
+        release = self.source(ref, directory)
+        sha = release["source_commit"]
         for component, context in (("api", "services/api"), ("frontend", "frontend")):
             tag = f"{self.project}-{component}:sha-{sha}"
             self.tags.append(tag)
@@ -166,7 +178,15 @@ class Drill:
             image_id = release["images"][component]["image_id"]
             image = json.loads(self.run(["docker", "image", "inspect", image_id]))[0]
             verify_image(image, release, component, image_id)
-            self.env["RELEASE_" + component.upper() + "_IMAGE"] = image_id
+            reference = release["images"][component].get("registry_ref", image_id)
+            if reference != image_id:
+                require(
+                    re.fullmatch(r"[a-z0-9./:_-]+@sha256:[a-f0-9]{64}", reference),
+                    "Registry deployment requires an immutable digest",
+                )
+                registered = json.loads(self.run(["docker", "image", "inspect", reference]))[0]
+                verify_image(registered, release, component, image_id)
+            self.env["RELEASE_" + component.upper() + "_IMAGE"] = reference
         self.env["RELEASE_SOURCE_DIR"] = str(source_dir)
 
     def app(self, *command: str, data: dict | None = None) -> str:
@@ -337,13 +357,21 @@ class Drill:
         self.report["status"] = "passed"
 
 
-def main() -> int:
+def main() -> int:  # noqa: PLR0915 -- one lifecycle owns reporting and cleanup
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--previous-ref", default=BASELINE)
     parser.add_argument("--candidate-ref", default="HEAD")
     parser.add_argument("--report-dir", default="ci-cd/reports/releases")
     parser.add_argument("--build-only", action="store_true")
+    parser.add_argument("--keep-images", action="store_true")
+    parser.add_argument("--previous-manifest", type=Path)
+    parser.add_argument("--candidate-manifest", type=Path)
     args = parser.parse_args()
+    require(
+        bool(args.previous_manifest) == bool(args.candidate_manifest),
+        "Supply both manifests for a build-free drill",
+    )
+    require(not (args.build_only and args.candidate_manifest), "Cannot build imported images")
     report_dir = Path(args.report_dir).resolve() / ("retailops-release-" + uuid4().hex[:12])
     report_dir.mkdir(parents=True)
     started = time.monotonic()
@@ -356,9 +384,17 @@ def main() -> int:
         drill.report["working_tree_dirty"] = bool(drill.run(["git", "status", "--porcelain"]))
         releases = {}
         try:
-            if not args.build_only:
+            if args.candidate_manifest:
+                releases["previous"] = drill.imported(
+                    args.previous_manifest, Path(temp) / "previous"
+                )
+                releases["candidate"] = drill.imported(
+                    args.candidate_manifest, Path(temp) / "candidate"
+                )
+            elif not args.build_only:
                 releases["previous"] = drill.build(args.previous_ref, Path(temp) / "previous")
-            releases["candidate"] = drill.build(args.candidate_ref, Path(temp) / "candidate")
+            if not args.candidate_manifest:
+                releases["candidate"] = drill.build(args.candidate_ref, Path(temp) / "candidate")
             if args.build_only:
                 drill.report["status"] = "built_unverified"
             else:
@@ -386,7 +422,7 @@ def main() -> int:
                         ],
                         stream=True,
                     )
-                if not args.build_only or drill.report["status"] == "failed":
+                if not (args.build_only or args.keep_images) or drill.report["status"] == "failed":
                     for tag in drill.tags:
                         drill.run(
                             ["docker", "image", "rm", tag],

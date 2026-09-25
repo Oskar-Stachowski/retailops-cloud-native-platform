@@ -355,12 +355,14 @@ db-restore: ensure-reports-dir
 db-recovery-drill:
 	python3 scripts/db/recovery-drill.py --report-dir "$(REPORTS_DIR)/db/recovery"
 
-.PHONY: release-build release-drill
+.PHONY: release-build release-drill release-tests
 release-build:
 	python3 scripts/release/drill.py --build-only --report-dir "$(REPORTS_DIR)/releases"
 
-release-drill:
-	python3 scripts/release/test_release.py
+release-tests:
+	python3 -m unittest discover -s scripts/release -p 'test_*.py'
+
+release-drill: release-tests
 	python3 scripts/release/drill.py --report-dir "$(REPORTS_DIR)/releases"
 
 db-readiness-evidence: data-generate data-contracts data-scenario-report
