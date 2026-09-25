@@ -8,31 +8,40 @@ The policy is intentionally documented in the repository because GitHub branch p
 
 ## Protected branch
 
-Observed on 2026-09-25 through the authenticated GitHub REST endpoint
-`GET /repos/Oskar-Stachowski/retailops-cloud-native-platform/branches/main`:
-`protected: false`, with required status check enforcement `off` and no
-configured contexts. The table below is the target policy, not the current
-GitHub configuration. Repository synchronization does not change these settings.
+Enabled and verified on 2026-09-25 through the authenticated GitHub REST
+branch and branch-protection endpoints. `main` reports `protected: true`.
+The [captured settings and verification notes](../evidence/github/README.md)
+record the active configuration below.
 
-| Setting | Expected value |
+| Setting | Active value |
 |---|---|
 | Protected branch pattern | `main` |
 | Merge model | Pull request before merge |
-| Direct pushes to `main` | Disabled for normal development |
+| Direct pushes to `main` | Changes must go through a pull request, including for administrators |
 | Force pushes | Disabled |
 | Branch deletion | Disabled |
-| Required review | At least 1 approving review for portfolio/reviewer mode |
+| Required approvals | 0 for the current solo-maintainer workflow; a pull request is still required |
 | Stale approvals | Dismiss stale approvals when new commits are pushed |
 | Conversation resolution | Required before merge |
-| Administrator bypass | Avoid for normal project work; document any exception |
+| Administrator enforcement | Enabled; no PR bypass allowances |
+| Up-to-date PR branch | Required before merge |
+
+Code-owner review and last-push approval are disabled for the solo-maintainer
+workflow. Enable at least one required approval when a separate reviewer is
+available; the author cannot approve their own pull request.
 
 ## Required status checks
 
-Configure only this stable required check once the first successful `Required CI` run is available:
+Only this stable aggregate check is configured as required:
 
 | Workflow | Required check / job | Why it matters |
 |---|---|---|
-| Required CI | `Required CI / required-result` | Always runs for every PR, every push to `main`, and manual dispatch. It calls the existing full domain workflows selected by tested path detection and fails if a required workflow is skipped, cancelled or unsuccessful. |
+| Required CI | `required-result` from GitHub Actions (app ID `15368`) | Always runs for every PR, every push to `main`, and manual dispatch. It calls the existing full domain workflows selected by tested path detection and fails if a required workflow is skipped, cancelled or unsuccessful. |
+
+The workflow/job label is `Required CI / required-result`, but the exact API
+check context is `required-result`. Requiring the combined display label
+would wait for a different check name. The expected provider is explicitly
+bound to the GitHub Actions app.
 
 Do not configure domain workflows as separate required branch protection checks. `Required CI` is the only automatic pull-request and `main` push orchestrator; it invokes the full domain workflows through `workflow_call`. Domain workflows remain manually dispatchable for standalone evidence without duplicating or cancelling Required CI jobs. The stable `required-result` job verifies the expected-versus-actual result of every called workflow.
 
@@ -60,18 +69,22 @@ For every CI-related portfolio claim, collect at least one of the following:
 - link to a successful GitHub Actions run;
 - downloaded artifact from `ci-cd/reports/**`;
 - screenshot of branch protection settings showing required checks;
+- authenticated API snapshot of branch-protection settings and its capture date;
 - short note in `docs/evidence/index.md` describing what changed and when evidence was refreshed.
 
 ## Reviewer checklist
 
-Before claiming branch protection as implemented:
+Configuration verified on 2026-09-25:
 
-- [ ] `main` is protected in GitHub repository settings.
-- [ ] Pull requests are required before merging.
-- [ ] Direct pushes and force pushes are blocked.
-- [ ] Required checks include only `Required CI / required-result`.
-- [ ] At least one green `Required CI / required-result` run exists.
-- [ ] A screenshot or reviewer-visible note is stored under `docs/evidence/` or referenced in the evidence ledger.
+- [x] `main` is protected in GitHub repository settings.
+- [x] Pull requests are required before merging.
+- [x] Direct pushes, force pushes and branch deletion are disallowed by the active configuration, including for administrators.
+- [x] The only required check context is `required-result` from GitHub Actions.
+- [x] At least one green `Required CI / required-result` run exists.
+- [x] An API snapshot and reviewer-visible note are stored under `docs/evidence/github/` and referenced in the evidence ledger.
+
+These checks record live configuration inspection. No destructive push or
+branch-deletion attempt was made against `main`.
 
 ## CV claim guidance
 
@@ -79,6 +92,6 @@ Safe claim after this policy and successful workflow runs:
 
 > Designed and documented GitHub branch protection and required CI checks for a multi-workflow DevSecOps pipeline.
 
-Stronger claim only after GitHub settings screenshot exists:
+Claim supported by the captured GitHub settings:
 
 > Implemented branch protection on `main` with a stable, always-running required GitHub Actions gate that dispatches full path-aware checks for API, frontend, Docker Compose, data, Terraform, Kubernetes and security changes.
