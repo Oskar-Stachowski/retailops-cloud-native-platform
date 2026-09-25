@@ -46,7 +46,7 @@ jobs:
   compose-smoke:
     name: Build full stack and run smoke tests
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     needs: compose-config
 
     env:
@@ -60,6 +60,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Show Docker versions
@@ -80,6 +81,9 @@ jobs:
       - name: Verify isolated database recovery
         run: make db-recovery-drill
 
+      - name: Verify versioned update and application rollback
+        run: make release-drill
+
       - name: Write Docker Compose CI summary
         if: always()
         run: |
@@ -94,6 +98,7 @@ jobs:
             echo "| Observability smoke evidence | \`ci-cd/reports/observability/\` |"
             echo "| Browser journeys and failure traces | \`ci-cd/reports/e2e/\` |"
             echo "| Database recovery report | \`ci-cd/reports/db/recovery/*/report.json\` |"
+            echo "| Release manifests and rollback report | \`ci-cd/reports/releases/\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload Compose smoke evidence
@@ -109,6 +114,11 @@ jobs:
             ci-cd/reports/e2e/
             ci-cd/reports/db/recovery/*/report.json
             ci-cd/reports/db/recovery/*/commands.log
+            ci-cd/reports/releases/*/report.json
+            ci-cd/reports/releases/*/*-manifest.json
+            ci-cd/reports/releases/*/commands.log
+            ci-cd/reports/releases/*/*/failure.png
+            ci-cd/reports/releases/*/*/trace.zip
           if-no-files-found: ignore
 
       - name: Final cleanup
