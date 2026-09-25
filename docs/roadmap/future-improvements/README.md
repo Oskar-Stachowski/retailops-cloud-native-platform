@@ -32,15 +32,17 @@ September dependency summary above retains its original pre-E2E scope.
 A [dated database recovery drill](../../evidence/db/README.md) now verifies
 backup/restore, all public-table fingerprints, workflow history, idempotent
 replay and post-restore writes in an isolated local project. It also runs in
-the Docker CI gate. Application version rollback remains separate work.
+the Docker CI gate. A [versioned application rollback drill](../../evidence/releases/README.md)
+also verifies image identity, same-schema migration compatibility, update,
+failure detection, rollback and preservation of new-version writes.
 
 ## Next priorities
 
 | Priority | Work | Completion evidence |
 |---:|---|---|
 | 1 | Extend browser coverage where product changes require it; add accessibility and cross-browser checks. | Build on the seven critical Chromium journeys and retain traces for failures. |
-| 2 | Exercise application version rollback and migration compatibility on an isolated local stack; database restore is verified separately. | Dated recovery run with before/after checks and measured recovery time. |
-| 3 | Define a release/tag policy and publish the same tested image with digest, SBOM and provenance. | One reviewable release linked to its CI run and immutable image identity. Registry/environment selection is a separate deployment decision. |
+| 2 | Extend recovery/rollback drills when schema or deployment behavior changes. The current same-schema application rollback and database restore are verified. | Keep dated checks and timings for each supported migration/deployment path. |
+| 3 | Publish the same tested image with registry digest, SBOM and provenance, following the implemented release/tag policy. | One reviewable release linked to its CI run and immutable image identity. Registry/environment selection is a separate deployment decision. |
 | 4 | Exercise Kubernetes workloads on a local cluster before cloud deployment. | Pods, migrations, seed, probes, ingress, runtime smoke and cleanup evidence; current schema/policy checks remain necessary but insufficient. |
 | 5 | Verify Terraform remote state and drift workflow before another AWS showcase. | Reviewed backend/access design, state migration and plan-only drift evidence; refresh cost/cleanup records after any actual cloud run. |
 | 6 | Refresh observability/SLO and Jenkins evidence through actual execution. | Dated metric/alert checks and Jenkins run tied to a commit; preserve older screenshots as historical. |

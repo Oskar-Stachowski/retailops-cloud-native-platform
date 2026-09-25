@@ -53,6 +53,12 @@ Compose project. A failed restore, data/history comparison, application check
 or cleanup fails the gate. The report and command log are uploaded with Compose
 evidence; database dumps and raw decision payloads are excluded.
 
+It also runs `make release-drill`: immutable image manifests, migration refusal
+checks, version update, a controlled API outage and rollback to the original
+images, followed by HTTP, browser and full-data checks. Release JSON/logs and
+browser failure evidence join the same artifact. See the
+[release policy](releases.md) and [rollback runbook](../runbooks/application-rollback.md).
+
 | Changed area | Full workflows selected by Required CI |
 |---|---|
 | API | API, Docker Compose, Security |
