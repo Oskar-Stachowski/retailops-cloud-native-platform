@@ -1,0 +1,55 @@
+# Private disposable database; only the frontend has an ephemeral loopback port.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: recovery
+      POSTGRES_PASSWORD: recovery_disposable_only
+      POSTGRES_DB: source
+    volumes:
+      - release_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recovery -d source"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  api:
+    image: ${RELEASE_API_IMAGE:?Exact API image ID is required}
+    pull_policy: never
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql://recovery:recovery_disposable_only@db:5432/source
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:8000/ready"]
+      interval: 2s
+      timeout: 5s
+      start_period: 1s
+      retries: 30
+  frontend:
+    image: ${RELEASE_FRONTEND_IMAGE:?Exact frontend image ID is required}
+    pull_policy: never
+    ports:
+      - "127.0.0.1::8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:8080/"]
+      interval: 2s
+      timeout: 5s
+      start_period: 1s
+      retries: 30
+  checks:
+    image: ${RELEASE_API_IMAGE:?Exact API image ID is required}
+    pull_policy: never
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql://recovery:recovery_disposable_only@db:5432/source
+      RETAILOPS_SEED_DATA_PROFILE: demo
+      PYTHONPATH: /app
+    volumes:
+      - ${RELEASE_SOURCE_DIR:?Committed source directory is required}/data:/workspace/data:ro
+      - ../db/recovery-checks.py:/recovery/checks.py:ro
+      - ./checks.py:/release/checks.py:ro
+volumes:
+  release_data:

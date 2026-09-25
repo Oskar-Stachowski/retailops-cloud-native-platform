@@ -1,0 +1,553 @@
+{
+  "status": "passed",
+  "project": "retailops-release-84037be319ff",
+  "started_at": "2026-09-25T14:21:50.976515+00:00",
+  "stages": {
+    "previous": {
+      "source_commit": "44f7404010b55eba3d9bacd888d2dc7bb9797180",
+      "images": {
+        "api": {
+          "tag": "retailops-release-84037be319ff-api:sha-44f7404010b55eba3d9bacd888d2dc7bb9797180",
+          "image_id": "sha256:8975229fcb1bfa0cb1f265cb700476946fa99a93a7346acac71cc039dff3d81b",
+          "platform": "linux/arm64"
+        },
+        "frontend": {
+          "tag": "retailops-release-84037be319ff-frontend:sha-44f7404010b55eba3d9bacd888d2dc7bb9797180",
+          "image_id": "sha256:3750d9f1f314984e199943c0b354f487a2863b6c9ee765272d1ac0dd1e000a33",
+          "platform": "linux/arm64"
+        }
+      },
+      "api": {
+        "http_health_readiness": "passed",
+        "decisions": 3,
+        "idempotent_actions": 5,
+        "data_schema_unchanged": true
+      },
+      "browser": {
+        "dashboard": "passed",
+        "product360_decisions": 3,
+        "reload": "passed"
+      },
+      "snapshot": {
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+        "sequence_count": 0,
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "a1c6938e65a21c99b561048e83ed183de23fdd7c1bbca87b0671318842453447"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "666cc6ad9982397c085ace550e34d2ea07abf5d5c36cfdbc025ecb7ef84b7d52"
+          },
+          "realtime_consumer_state": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "realtime_event_log": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "304040b4c8e97b0d1f6e8512f23c88d5204c2ec413dff92245e06e1a06d1577a"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "027019606b16d856fb83fab4326b1d75c6e79b14726b62c9ad3ddef146492aa0"
+          },
+          "workflow_actions": {
+            "rows": 6,
+            "sha256": "0872cce64c145aeb1f698d97d13fbd6b427811d5f86bacd4817b4cd48ceef69f"
+          },
+          "workflow_audit_log": {
+            "rows": 5,
+            "sha256": "3edabfb28494021bc8ab0115fc7a27d4dfd6bf625dbb461bea8c14a6a8bda3cd"
+          }
+        }
+      }
+    },
+    "upgraded": {
+      "source_commit": "977c776ed7cf80ae2229e1522dba8a44e3827a75",
+      "images": {
+        "api": {
+          "tag": "retailops-release-84037be319ff-api:sha-977c776ed7cf80ae2229e1522dba8a44e3827a75",
+          "image_id": "sha256:fa2d22af223ed0a7f4198d9354a1e4bf9edb43f9b194e15cbb540553b732222a",
+          "platform": "linux/arm64"
+        },
+        "frontend": {
+          "tag": "retailops-release-84037be319ff-frontend:sha-977c776ed7cf80ae2229e1522dba8a44e3827a75",
+          "image_id": "sha256:16a1363edcc4e10e6552063e719c94345bc608c4b9b4d7418941cdab4013e276",
+          "platform": "linux/arm64"
+        }
+      },
+      "api": {
+        "http_health_readiness": "passed",
+        "decisions": 3,
+        "idempotent_actions": 5,
+        "data_schema_unchanged": true
+      },
+      "browser": {
+        "dashboard": "passed",
+        "product360_decisions": 3,
+        "reload": "passed"
+      },
+      "snapshot": {
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+        "sequence_count": 0,
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "a1c6938e65a21c99b561048e83ed183de23fdd7c1bbca87b0671318842453447"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "666cc6ad9982397c085ace550e34d2ea07abf5d5c36cfdbc025ecb7ef84b7d52"
+          },
+          "realtime_consumer_state": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "realtime_event_log": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "304040b4c8e97b0d1f6e8512f23c88d5204c2ec413dff92245e06e1a06d1577a"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "027019606b16d856fb83fab4326b1d75c6e79b14726b62c9ad3ddef146492aa0"
+          },
+          "workflow_actions": {
+            "rows": 6,
+            "sha256": "0872cce64c145aeb1f698d97d13fbd6b427811d5f86bacd4817b4cd48ceef69f"
+          },
+          "workflow_audit_log": {
+            "rows": 5,
+            "sha256": "3edabfb28494021bc8ab0115fc7a27d4dfd6bf625dbb461bea8c14a6a8bda3cd"
+          }
+        }
+      }
+    },
+    "rolled_back": {
+      "source_commit": "44f7404010b55eba3d9bacd888d2dc7bb9797180",
+      "images": {
+        "api": {
+          "tag": "retailops-release-84037be319ff-api:sha-44f7404010b55eba3d9bacd888d2dc7bb9797180",
+          "image_id": "sha256:8975229fcb1bfa0cb1f265cb700476946fa99a93a7346acac71cc039dff3d81b",
+          "platform": "linux/arm64"
+        },
+        "frontend": {
+          "tag": "retailops-release-84037be319ff-frontend:sha-44f7404010b55eba3d9bacd888d2dc7bb9797180",
+          "image_id": "sha256:3750d9f1f314984e199943c0b354f487a2863b6c9ee765272d1ac0dd1e000a33",
+          "platform": "linux/arm64"
+        }
+      },
+      "api": {
+        "http_health_readiness": "passed",
+        "decisions": 3,
+        "idempotent_actions": 5,
+        "data_schema_unchanged": true
+      },
+      "browser": {
+        "dashboard": "passed",
+        "product360_decisions": 3,
+        "reload": "passed"
+      },
+      "snapshot": {
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "6dce54fb1701cb4d67ffd4442a6a743fcd4a5d0c30fac72df27728f7d15102aa"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "666cc6ad9982397c085ace550e34d2ea07abf5d5c36cfdbc025ecb7ef84b7d52"
+          },
+          "realtime_consumer_state": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "realtime_event_log": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "304040b4c8e97b0d1f6e8512f23c88d5204c2ec413dff92245e06e1a06d1577a"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "027019606b16d856fb83fab4326b1d75c6e79b14726b62c9ad3ddef146492aa0"
+          },
+          "workflow_actions": {
+            "rows": 7,
+            "sha256": "33aa243dbf57161b65af4e354d692ba887ae9b2a5f91560f43541ce92ec20d3d"
+          },
+          "workflow_audit_log": {
+            "rows": 6,
+            "sha256": "a014793e56cdf0f43372bffcc37c44f3cd5fc67e822bbe43a8ee418bddfa34ad"
+          }
+        },
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "sequence_count": 0,
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+      }
+    }
+  },
+  "timings_seconds": {
+    "upgrade_and_verification": 26.41,
+    "rollback_and_verification": 19.255,
+    "total": 266.07
+  },
+  "negative_checks": {
+    "changed_migration_history": "blocked",
+    "unknown_database_head": "blocked",
+    "api_outage": "HTTP 502 detected"
+  },
+  "ci_run_url": null,
+  "harness_commit": "977c776ed7cf80ae2229e1522dba8a44e3827a75",
+  "working_tree_dirty": false,
+  "before": {
+    "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+    "sequence_count": 0,
+    "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "tables": {
+      "alembic_version": {
+        "rows": 1,
+        "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+      },
+      "alerts": {
+        "rows": 4,
+        "sha256": "a1c6938e65a21c99b561048e83ed183de23fdd7c1bbca87b0671318842453447"
+      },
+      "anomalies": {
+        "rows": 4,
+        "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+      },
+      "forecast_runs": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "forecasts": {
+        "rows": 6,
+        "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+      },
+      "inventory_snapshots": {
+        "rows": 8,
+        "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+      },
+      "live_metric_observations": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "products": {
+        "rows": 8,
+        "sha256": "666cc6ad9982397c085ace550e34d2ea07abf5d5c36cfdbc025ecb7ef84b7d52"
+      },
+      "realtime_consumer_state": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "realtime_event_log": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "recommendations": {
+        "rows": 4,
+        "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+      },
+      "sales": {
+        "rows": 16,
+        "sha256": "304040b4c8e97b0d1f6e8512f23c88d5204c2ec413dff92245e06e1a06d1577a"
+      },
+      "users": {
+        "rows": 4,
+        "sha256": "027019606b16d856fb83fab4326b1d75c6e79b14726b62c9ad3ddef146492aa0"
+      },
+      "workflow_actions": {
+        "rows": 6,
+        "sha256": "0872cce64c145aeb1f698d97d13fbd6b427811d5f86bacd4817b4cd48ceef69f"
+      },
+      "workflow_audit_log": {
+        "rows": 5,
+        "sha256": "3edabfb28494021bc8ab0115fc7a27d4dfd6bf625dbb461bea8c14a6a8bda3cd"
+      }
+    }
+  },
+  "backup_created": true,
+  "after_upgrade_write": {
+    "tables": {
+      "alembic_version": {
+        "rows": 1,
+        "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+      },
+      "alerts": {
+        "rows": 4,
+        "sha256": "6dce54fb1701cb4d67ffd4442a6a743fcd4a5d0c30fac72df27728f7d15102aa"
+      },
+      "anomalies": {
+        "rows": 4,
+        "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+      },
+      "forecast_runs": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "forecasts": {
+        "rows": 6,
+        "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+      },
+      "inventory_snapshots": {
+        "rows": 8,
+        "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+      },
+      "live_metric_observations": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "products": {
+        "rows": 8,
+        "sha256": "666cc6ad9982397c085ace550e34d2ea07abf5d5c36cfdbc025ecb7ef84b7d52"
+      },
+      "realtime_consumer_state": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "realtime_event_log": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "recommendations": {
+        "rows": 4,
+        "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+      },
+      "sales": {
+        "rows": 16,
+        "sha256": "304040b4c8e97b0d1f6e8512f23c88d5204c2ec413dff92245e06e1a06d1577a"
+      },
+      "users": {
+        "rows": 4,
+        "sha256": "027019606b16d856fb83fab4326b1d75c6e79b14726b62c9ad3ddef146492aa0"
+      },
+      "workflow_actions": {
+        "rows": 7,
+        "sha256": "33aa243dbf57161b65af4e354d692ba887ae9b2a5f91560f43541ce92ec20d3d"
+      },
+      "workflow_audit_log": {
+        "rows": 6,
+        "sha256": "a014793e56cdf0f43372bffcc37c44f3cd5fc67e822bbe43a8ee418bddfa34ad"
+      }
+    },
+    "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "sequence_count": 0,
+    "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+  },
+  "after_rollback_write": {
+    "tables": {
+      "alembic_version": {
+        "rows": 1,
+        "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+      },
+      "alerts": {
+        "rows": 4,
+        "sha256": "cd3725e89828531e066c2d340427ab6a64668654e57c85577a31fad179448116"
+      },
+      "anomalies": {
+        "rows": 4,
+        "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+      },
+      "forecast_runs": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "forecasts": {
+        "rows": 6,
+        "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+      },
+      "inventory_snapshots": {
+        "rows": 8,
+        "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+      },
+      "live_metric_observations": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "products": {
+        "rows": 8,
+        "sha256": "666cc6ad9982397c085ace550e34d2ea07abf5d5c36cfdbc025ecb7ef84b7d52"
+      },
+      "realtime_consumer_state": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "realtime_event_log": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "recommendations": {
+        "rows": 4,
+        "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+      },
+      "sales": {
+        "rows": 16,
+        "sha256": "304040b4c8e97b0d1f6e8512f23c88d5204c2ec413dff92245e06e1a06d1577a"
+      },
+      "users": {
+        "rows": 4,
+        "sha256": "027019606b16d856fb83fab4326b1d75c6e79b14726b62c9ad3ddef146492aa0"
+      },
+      "workflow_actions": {
+        "rows": 8,
+        "sha256": "b00e309dd5d994d0c10e4d5359d9ea21cbd6b104c29052d7e2af5ede9ab578ae"
+      },
+      "workflow_audit_log": {
+        "rows": 7,
+        "sha256": "b052a6c648557763517d8357df60c47a0f57178113e0130407f9cea591454173"
+      }
+    },
+    "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "sequence_count": 0,
+    "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+  },
+  "database_head": "6b0f1c2d3e4a",
+  "migration_action": "same-head upgrade check; no downgrade, restore or reseed",
+  "cleanup": "passed",
+  "releases": {
+    "previous": {
+      "manifest_version": 1,
+      "source_commit": "44f7404010b55eba3d9bacd888d2dc7bb9797180",
+      "version": "0.1.0+git.44f7404010b5",
+      "migration": {
+        "head": "6b0f1c2d3e4a",
+        "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+      },
+      "images": {
+        "api": {
+          "tag": "retailops-release-84037be319ff-api:sha-44f7404010b55eba3d9bacd888d2dc7bb9797180",
+          "image_id": "sha256:8975229fcb1bfa0cb1f265cb700476946fa99a93a7346acac71cc039dff3d81b",
+          "platform": "linux/arm64"
+        },
+        "frontend": {
+          "tag": "retailops-release-84037be319ff-frontend:sha-44f7404010b55eba3d9bacd888d2dc7bb9797180",
+          "image_id": "sha256:3750d9f1f314984e199943c0b354f487a2863b6c9ee765272d1ac0dd1e000a33",
+          "platform": "linux/arm64"
+        }
+      },
+      "validation": "local_drill_passed",
+      "ci_run_url": null
+    },
+    "candidate": {
+      "manifest_version": 1,
+      "source_commit": "977c776ed7cf80ae2229e1522dba8a44e3827a75",
+      "version": "0.2.0+git.977c776ed7cf",
+      "migration": {
+        "head": "6b0f1c2d3e4a",
+        "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+      },
+      "images": {
+        "api": {
+          "tag": "retailops-release-84037be319ff-api:sha-977c776ed7cf80ae2229e1522dba8a44e3827a75",
+          "image_id": "sha256:fa2d22af223ed0a7f4198d9354a1e4bf9edb43f9b194e15cbb540553b732222a",
+          "platform": "linux/arm64"
+        },
+        "frontend": {
+          "tag": "retailops-release-84037be319ff-frontend:sha-977c776ed7cf80ae2229e1522dba8a44e3827a75",
+          "image_id": "sha256:16a1363edcc4e10e6552063e719c94345bc608c4b9b4d7418941cdab4013e276",
+          "platform": "linux/arm64"
+        }
+      },
+      "validation": "local_drill_passed",
+      "ci_run_url": null
+    }
+  },
+  "finished_at": "2026-09-25T14:26:17.046529+00:00"
+}

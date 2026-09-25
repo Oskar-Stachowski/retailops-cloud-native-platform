@@ -189,6 +189,8 @@ help:
 	@echo "  make db-backup            Create local PostgreSQL logical backup evidence"
 	@echo "  make db-restore           Restore local PostgreSQL backup evidence"
 	@echo "  make db-recovery-drill    Verify backup/restore in a disposable, isolated database"
+	@echo "  make release-build        Build committed candidate images and a release manifest"
+	@echo "  make release-drill        Verify isolated update, failure detection and rollback"
 	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
 	@echo "  make ml-trained           Train RandomForest demand forecasting model"
@@ -352,6 +354,14 @@ db-restore: ensure-reports-dir
 .PHONY: db-recovery-drill
 db-recovery-drill:
 	python3 scripts/db/recovery-drill.py --report-dir "$(REPORTS_DIR)/db/recovery"
+
+.PHONY: release-build release-drill
+release-build:
+	python3 scripts/release/drill.py --build-only --report-dir "$(REPORTS_DIR)/releases"
+
+release-drill:
+	python3 scripts/release/test_release.py
+	python3 scripts/release/drill.py --report-dir "$(REPORTS_DIR)/releases"
 
 db-readiness-evidence: data-generate data-contracts data-scenario-report
 	@echo "DB readiness evidence generated:"
