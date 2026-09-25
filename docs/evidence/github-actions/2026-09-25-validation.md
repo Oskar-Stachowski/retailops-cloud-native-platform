@@ -53,7 +53,9 @@ This summary remains in Git after raw artifact expiry.
 ## Boundaries and follow-up
 
 This run did not execute Playwright browser journeys. Browser smoke and
-screenshot capture were manually invoked at this revision. It did not deploy
+screenshot capture were manually invoked at this revision. A subsequent
+[verified browser run](../e2e/README.md) added seven journeys to Required CI.
+This dependency-validation run did not deploy
 AWS/EKS, publish release images, validate production authentication, re-run
 Jenkins or refresh the historical ML training snapshot.
 

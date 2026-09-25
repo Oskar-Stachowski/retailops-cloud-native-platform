@@ -6,6 +6,10 @@ The [2026-09-25 validation summary](2026-09-25-validation.md) records the
 dependency refresh, tested revisions, 23 successful Required CI jobs, test
 counts, security thresholds and links to downloadable artifacts.
 
+The subsequent [browser validation](../e2e/README.md) records run `36138113369`:
+all 23 jobs passed, including seven real Chromium journeys. It also documents
+the two user-facing regressions found and fixed by that review.
+
 The merge gate is `required-result`, produced by the domain workflows selected
 by [Required CI](../../../.github/workflows/required-ci.yml). See the
 [CI contract](../../governance/github-actions-ci.md) and
