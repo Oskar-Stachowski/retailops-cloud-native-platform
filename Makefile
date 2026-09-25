@@ -188,6 +188,7 @@ help:
 	@echo "  make data-scenario-report Generate scenario coverage evidence"
 	@echo "  make db-backup            Create local PostgreSQL logical backup evidence"
 	@echo "  make db-restore           Restore local PostgreSQL backup evidence"
+	@echo "  make db-recovery-drill    Verify backup/restore in a disposable, isolated database"
 	@echo "  make ml-features          Generate demand forecasting feature dataset"
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
 	@echo "  make ml-trained           Train RandomForest demand forecasting model"
@@ -347,6 +348,10 @@ db-backup: ensure-reports-dir
 db-restore: ensure-reports-dir
 	@test -n "$(DB_BACKUP_FILE)" || { echo "ERROR: set DB_BACKUP_FILE=path/to/backup.dump"; exit 1; }
 	DB_SERVICE="$(DB_SERVICE)" POSTGRES_USER="$(POSTGRES_USER)" POSTGRES_DB="$(POSTGRES_DB)" COMPOSE="$(COMPOSE)" scripts/db/restore.sh "$(DB_BACKUP_FILE)"
+
+.PHONY: db-recovery-drill
+db-recovery-drill:
+	python3 scripts/db/recovery-drill.py --report-dir "$(REPORTS_DIR)/db/recovery"
 
 db-readiness-evidence: data-generate data-contracts data-scenario-report
 	@echo "DB readiness evidence generated:"

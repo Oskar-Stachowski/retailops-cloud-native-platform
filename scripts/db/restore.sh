@@ -19,15 +19,27 @@ if [[ ! -s "${BACKUP_FILE}" ]]; then
   exit 1
 fi
 
-if [[ -f "${BACKUP_FILE}.sha256" ]]; then
-  if command -v sha256sum >/dev/null 2>&1; then
-    sha256sum --check "${BACKUP_FILE}.sha256"
-  elif command -v shasum >/dev/null 2>&1; then
-    shasum -a 256 --check "${BACKUP_FILE}.sha256"
-  else
-    echo "ERROR: checksum file exists but neither sha256sum nor shasum is available." >&2
-    exit 1
-  fi
+if [[ ! -s "${BACKUP_FILE}.sha256" ]]; then
+  echo "ERROR: a non-empty backup checksum file is required." >&2
+  exit 1
+fi
+# Verify the supplied dump, even when the pair was moved from its original path.
+read -r expected_checksum _ < "${BACKUP_FILE}.sha256"
+if [[ ! "${expected_checksum}" =~ ^[[:xdigit:]]{64}$ ]]; then
+  echo "ERROR: invalid SHA-256 checksum." >&2
+  exit 1
+fi
+if command -v sha256sum >/dev/null 2>&1; then
+  actual_checksum=$(sha256sum "${BACKUP_FILE}")
+elif command -v shasum >/dev/null 2>&1; then
+  actual_checksum=$(shasum -a 256 "${BACKUP_FILE}")
+else
+  echo "ERROR: neither sha256sum nor shasum is available." >&2
+  exit 1
+fi
+if [[ "${actual_checksum%% *}" != "${expected_checksum}" ]]; then
+  echo "ERROR: backup checksum mismatch." >&2
+  exit 1
 fi
 
 if [[ "${DUMP_MODE}" == "local" ]]; then
@@ -40,6 +52,8 @@ if [[ "${DUMP_MODE}" == "local" ]]; then
     exit 1
   }
   pg_restore \
+    --exit-on-error \
+    --single-transaction \
     --clean \
     --if-exists \
     --no-owner \
@@ -50,6 +64,8 @@ else
   ${COMPOSE_CMD} ps "${DB_SERVICE}" >/dev/null
   ${COMPOSE_CMD} exec -T "${DB_SERVICE}" \
     pg_restore \
+      --exit-on-error \
+      --single-transaction \
       --clean \
       --if-exists \
       --no-owner \

@@ -1,0 +1,32 @@
+# Only recovery-drill.py should operate this disposable project.
+# No host ports, existing volumes, .env files or external database URLs.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: recovery
+      POSTGRES_PASSWORD: recovery_disposable_only
+      POSTGRES_DB: source
+    volumes:
+      - recovery_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recovery -d source"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  api:
+    image: ${COMPOSE_PROJECT_NAME}-api
+    build:
+      context: ../../services/api
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql://recovery:recovery_disposable_only@db:5432/source
+      RETAILOPS_SEED_DATA_PROFILE: demo
+      PYTHONPATH: /app
+    volumes:
+      - ../../data:/workspace/data:ro
+      - ./recovery-checks.py:/recovery/checks.py:ro
+
+volumes:
+  recovery_data:
