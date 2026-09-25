@@ -89,11 +89,16 @@ test("read-only demo user cannot mutate workflow through the UI or API", async (
   expect(response.status()).toBe(403);
   const detail = await apiJson(request, `/products/${recommendation.product_id}/360?limit=50`);
   expect(detail.recommendations.find((item) => item.id === recommendation.id).status).toBe("proposed");
+  await page.locator(".user-switcher").getByRole("combobox").selectOption("platform-admin");
+  await expect(row.getByRole("button", { name: "Accept", exact: true })).toBeEnabled();
 });
 
 test("catalog exposes an API failure and Retry restores real backend data", async ({ page }) => {
   const productsURL = (url) => /\/(?:api\/)?products$/.test(url.pathname);
-  await page.route(productsURL, (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { message: "Temporary catalog failure" } }) }));
+  await page.route(productsURL, (route) => {
+    if (route.request().resourceType() !== "fetch") return route.continue();
+    return route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { message: "Temporary catalog failure" } }) });
+  });
   await page.goto("/products");
   await expect(page.getByRole("alert")).toContainText("Temporary catalog failure");
   await page.unroute(productsURL);

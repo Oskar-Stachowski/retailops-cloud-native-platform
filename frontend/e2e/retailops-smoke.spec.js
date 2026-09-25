@@ -28,7 +28,7 @@ test("catalog filters, empty results, reset and Product 360 preserve product ide
   await page.getByRole("button", { name: "Reset filters" }).click();
   await expect(search).toHaveValue("");
   await search.fill(product.sku);
-  await page.getByLabel("Product catalog controls").getByLabel("Category", { exact: true }).selectOption(product.category);
+  await page.locator('select[name="category"]').selectOption(product.category);
   const row = page.getByRole("row").filter({ has: page.getByRole("cell", { name: product.sku, exact: true }) });
   await expect(row).toHaveCount(1);
   await row.getByRole("link", { name: "Open 360" }).click();

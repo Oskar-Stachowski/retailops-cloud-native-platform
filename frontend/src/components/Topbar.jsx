@@ -48,10 +48,9 @@ function Topbar() {
 
     async function loadIdentity() {
       try {
-        const [demoUsers, user, notifications] = await Promise.all([
+        const [demoUsers, user] = await Promise.all([
           getDemoUsers(),
           getCurrentUser({ userId: selectedUserId }),
-          getNotifications({ userId: selectedUserId }),
         ]);
 
         if (!isMounted) {
@@ -60,7 +59,16 @@ function Topbar() {
 
         setUsers(demoUsers);
         setCurrentUser(user);
-        setUnreadCount(notifications?.unread_count || 0);
+        setUnreadCount(0);
+
+        // Optional notifications must not discard a valid user identity.
+        if (hasPermission(user, "notifications:read")) {
+          const notifications = await getNotifications({ userId: selectedUserId })
+            .catch(() => null);
+          if (isMounted) {
+            setUnreadCount(notifications?.unread_count || 0);
+          }
+        }
       } catch {
         if (!isMounted) {
           return;
