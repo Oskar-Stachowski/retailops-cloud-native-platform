@@ -1,91 +1,51 @@
 # Future Improvements Roadmap
 
-This roadmap is a recruiter-facing summary of the most valuable next improvements for RetailOps. It is intentionally short: the goal is to show technical judgment, prioritization, and honesty about what is implemented now versus what should come next.
+Reviewed against main `44f7404010b55eba3d9bacd888d2dc7bb9797180` on 2026-09-25.
+This is a prioritized plan, not implementation evidence. Dated results live in
+[the evidence index](../../evidence/index.md).
 
-This file is not implementation evidence. Current evidence lives in `docs/evidence/index.md`.
+## Completed foundation
 
-## Current Position
+The [September validation summary](../../evidence/github-actions/2026-09-25-validation.md)
+records 23 successful Required CI jobs after the dependency and image refresh.
 
-RetailOps already demonstrates a local-first cloud-native platform foundation:
+- Main requires an up-to-date PR and successful `required-result`; administrators
+  are covered and force pushes/deletion are blocked.
+- API tests, coverage, frontend tests/lint/build, image builds, and Compose
+  API/frontend HTTP, streaming and observability smoke checks run in CI.
+- Runtime and development dependencies are audited. Gitleaks, Trivy, TFLint,
+  Checkov and Kubernetes schema/policy checks are blocking gates with documented
+  thresholds and accepted exceptions.
+- Nginx is on `1.31-alpine`; Compose and CI use Trivy `0.74.0`. The refreshed
+  image scans passed their fixed-CRITICAL gate. This supersedes the old frontend
+  image finding as a current blocker, without erasing its historical snapshot.
+- Coverage and scanner results have dated summaries and run/artifact links.
+- Local ML training/evaluation, repository SBOM snapshots, Kubernetes manifests,
+  Terraform foundation and runbooks already exist. Their presence does not
+  establish a production deployment or fresh execution of historical evidence.
 
-- FastAPI backend with PostgreSQL, migrations, seed data, and tests.
-- React frontend for an operator-facing dashboard.
-- Docker Compose local runtime.
-- GitHub Actions, Jenkinsfile, Makefile-based command contract, and security scanning.
-- Terraform AWS foundation with sanitized showcase evidence.
-- Documentation, ADRs, runbooks, FinOps notes, and evidence indexes.
+## Next priorities
 
-The next improvements should convert this from a strong portfolio platform into a more production-like platform with stronger runtime proof, security posture, and operational evidence.
+| Priority | Work | Completion evidence |
+|---:|---|---|
+| 1 | Run critical browser journeys in Required CI: dashboard data, product filters/detail, alert and recommendation decisions, read-only role and recoverable errors. | Playwright results and failure traces from a real seeded API/database stack; no skipped critical journeys. |
+| 2 | Exercise database restore and application rollback on an isolated local stack. | Dated recovery run with before/after checks and measured recovery time. |
+| 3 | Define a release/tag policy and publish the same tested image with digest, SBOM and provenance. | One reviewable release linked to its CI run and immutable image identity. Registry/environment selection is a separate deployment decision. |
+| 4 | Exercise Kubernetes workloads on a local cluster before cloud deployment. | Pods, migrations, seed, probes, ingress, runtime smoke and cleanup evidence; current schema/policy checks remain necessary but insufficient. |
+| 5 | Verify Terraform remote state and drift workflow before another AWS showcase. | Reviewed backend/access design, state migration and plan-only drift evidence; refresh cost/cleanup records after any actual cloud run. |
+| 6 | Refresh observability/SLO and Jenkins evidence through actual execution. | Dated metric/alert checks and Jenkins run tied to a commit; preserve older screenshots as historical. |
+| 7 | Re-evaluate ML artifacts after dependency/data changes and define model promotion criteria. | New evaluation, model metadata and reproducibility record; historical model binaries retain their original capture dates. |
+| 8 | Add Helm packaging or further deployment automation when a validated runtime requires it. | Lint/render/install/upgrade/rollback evidence for the chosen environment. |
 
-## Priority Roadmap
+## Claim boundaries
 
-| Priority | Improvement | Why it matters | Evidence to collect |
-|---:|---|---|---|
-| 1 | Fix frontend image vulnerabilities and refresh Trivy evidence. | A critical vulnerability snapshot weakens security credibility. | Clean `trivy-frontend-image-snapshot.txt`. |
-| 2 | Add a sanitized Gitleaks evidence summary. | Secret scanning should be visible without committing raw scanner output. | `gitleaks-snapshot.json` or `gitleaks.evidence.md`. |
-| 3 | Add Checkov and TFLint evidence summaries. | Terraform quality gates are stronger when scanner results are visible. | Sanitized Checkov/TFLint snapshots. |
-| 4 | Publish API coverage as a Markdown evidence summary. | Recruiters can understand test strength without opening raw XML. | `api-coverage.evidence.md`. |
-| 5 | Add Docker Compose smoke evidence. | Proves the local platform can start and pass health checks reproducibly. | Compose ps/log summary and smoke result. |
-| 6 | Refresh Jenkins screenshots with branch, commit SHA, and run date. | Current Jenkins screenshots are useful but static. | Dated Jenkins evidence README update. |
-| 7 | Add GitHub Actions evidence screenshots or artifact links. | CI/CD claims become easier to verify quickly. | API, frontend, Docker, security, Terraform workflow evidence. |
-| 8 | Add observability evidence snapshots. | Metrics and dashboards are stronger than observability documentation alone. | Prometheus query snapshots and Grafana screenshots. |
-| 9 | Add Kubernetes manifest validation. | Kubernetes should not be claimed as implemented without validation evidence. | `kubectl --dry-run` or kubeconform output. |
-| 10 | Add Helm chart and lint evidence when deployment packaging matures. | Helm is expected in many DevOps roles and improves deployment story. | `helm lint` and rendered manifest evidence. |
-| 11 | Add remote Terraform state design and migration plan. | Production Terraform needs state locking, encryption, and access control. | ADR plus non-secret backend config example. |
-| 12 | Add scheduled drift detection design. | Shows platform operations maturity beyond one-time IaC plans. | Drift runbook and sample plan-only report. |
-| 13 | Add SBOM/provenance for built images. | Improves supply-chain story and senior-level DevSecOps credibility. | SBOM artifact and CI upload evidence. |
-| 14 | Add release evidence summary generated by CI/Jenkins. | Creates a single reviewable release artifact. | Versioned release evidence Markdown. |
-| 15 | Add rollback runbook and dry-run evidence. | Production platforms must explain recovery, not only deployment. | Rollback checklist and simulated rollback note. |
-| 16 | Add minimal SLO and alert evidence. | Observability becomes operationally meaningful when tied to service health. | SLO doc, alert rule, alert test evidence. |
-| 17 | Add cost review evidence after each AWS showcase. | FinOps claims need proof of cleanup and cost awareness. | Budget/Cost Explorer screenshot or cost note. |
-| 18 | Add data quality evidence as tracked summary. | Data/ML claims are stronger when input quality is measured. | Dataset quality evidence Markdown. |
-| 19 | Add model/data experiment evidence before claiming MLOps. | Prevents overclaiming ML maturity. | Evaluation summary, model card, or experiment note. |
-| 20 | Add a reviewer quickstart script or single command path. | Reduces friction for technical reviewers. | Documented `make reviewer-demo` or equivalent. |
+- Passing image scans does not mean zero vulnerabilities at every severity or
+  for unfixed issues. See [security policy](../../../security/README.md).
+- Current CI proves local-stack behavior and infrastructure validation, not an
+  always-on AWS/EKS environment, cloud release promotion or production MLOps.
+- Demo user switching is not production authentication.
+- Historical screenshots, audits, SBOMs and model snapshots are not fresh runs.
 
-## What Can Be Claimed Now
-
-- Local-first platform engineering foundation.
-- Docker Compose based reproducible runtime.
-- CI/CD quality gates with GitHub Actions and Jenkins pipeline skeleton.
-- Terraform AWS foundation with controlled, sanitized evidence.
-- Security scanning is wired into Makefile and CI workflows.
-- Portfolio-grade documentation, ADRs, runbooks, and evidence indexes.
-
-## What Should Not Be Overclaimed Yet
-
-- Production Kubernetes deployment.
-- Production EKS runtime.
-- Production-grade MLOps.
-- Fully clean container security posture until the frontend image scan is remediated.
-- Always-on AWS production environment.
-- Mature observability until real dashboard/query evidence is captured.
-- Release promotion maturity until Jenkins/GitHub evidence is refreshed with dated runs.
-
-## Recommended Execution Order
-
-1. Security cleanup and scan evidence.
-2. Test and coverage evidence.
-3. Runtime reproducibility evidence.
-4. CI/CD run evidence.
-5. Observability evidence.
-6. Terraform/IaC scanner evidence.
-7. Kubernetes validation evidence.
-8. Helm packaging evidence.
-9. Release and rollback evidence.
-10. MLOps/data evidence.
-
-## Portfolio Rule
-
-Every future claim should be backed by at least one concrete artifact:
-
-- source code,
-- configuration,
-- CI workflow,
-- test result,
-- scanner output,
-- screenshot,
-- runbook,
-- ADR,
-- sanitized evidence snapshot.
-
-If the evidence does not exist yet, describe it as a planned improvement, not an implemented capability.
+Every completed item must link to source/configuration and a dated result.
+Refresh this roadmap when that evidence lands; do not mark work complete from
+plans or diagrams alone.
