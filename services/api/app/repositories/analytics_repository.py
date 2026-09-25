@@ -104,9 +104,9 @@ class AnalyticsRepository:
             select_parts.append("NULL::timestamp AS inventory_updated_at")
 
         query = f"""
-            SELECT {', '.join(select_parts)}
+            SELECT {", ".join(select_parts)}
             FROM products p
-            {' '.join(joins)}
+            {" ".join(joins)}
             ORDER BY units_sold DESC, sku ASC NULLS LAST
             LIMIT %s
         """

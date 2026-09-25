@@ -37,7 +37,7 @@ def generate_inventory_snapshots(
 
     for index, product in enumerate(products):
         values = _inventory_values(product)
-        on_hand, reserved, reorder_point, safety_stock = values
+        on_hand, _reserved, _reorder_point, _safety_stock = values
         warehouse = WAREHOUSES[index % len(WAREHOUSES)]
         unit_of_measure = UNIT_OF_MEASURE[index % len(UNIT_OF_MEASURE)]
         natural_key = f"{product['sku']}-{warehouse}"

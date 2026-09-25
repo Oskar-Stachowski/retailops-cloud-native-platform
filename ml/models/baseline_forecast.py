@@ -68,7 +68,7 @@ def _series_key(row: dict[str, object]) -> tuple[str, str, str]:
 def _prediction_value(rows: list[dict[str, object]]) -> int:
     total = sum(Decimal(str(row[TARGET])) for row in rows)
     average = total / Decimal(len(rows))
-    return int(average.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    return int(average.quantize(Decimal(1), rounding=ROUND_HALF_UP))
 
 
 def _trained_at(rows: list[dict[str, object]]) -> str:

@@ -32,7 +32,7 @@ def iso_date(days_offset: int = 0) -> str:
 
 
 def decimal_str(value: float | Decimal, places: int = 4) -> str:
-    quant = Decimal("1").scaleb(-places)
+    quant = Decimal(1).scaleb(-places)
     return str(Decimal(str(value)).quantize(quant, rounding=ROUND_HALF_UP))
 
 

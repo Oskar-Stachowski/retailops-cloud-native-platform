@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query, status
 
 from app.api.me import to_demo_user_response
 from app.api.schemas import (
@@ -157,8 +157,6 @@ def mark_notification_read(
     )
 
     if matching_notification is None:
-        from fastapi import HTTPException, status
-
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={

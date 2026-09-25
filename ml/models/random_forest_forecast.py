@@ -92,15 +92,15 @@ def _metric(value: Decimal) -> str:
 
 
 def _quantity(value: float | Decimal) -> int:
-    return max(0, int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP)))
+    return max(0, int(Decimal(str(value)).quantize(Decimal(1), rounding=ROUND_HALF_UP)))
 
 
 def _safe_percentage_error(error: Decimal, actual: Decimal) -> Decimal:
-    return error / actual * Decimal("100") if actual > 0 else Decimal("0")
+    return error / actual * Decimal(100) if actual > 0 else Decimal(0)
 
 
 def _mean(values: list[Decimal]) -> Decimal:
-    return sum(values) / Decimal(len(values)) if values else Decimal("0")
+    return sum(values) / Decimal(len(values)) if values else Decimal(0)
 
 
 def build_training_features(
@@ -111,7 +111,7 @@ def build_training_features(
 ) -> dict[str, object]:
     recent_rows = previous_rows[-window_days:] if window_days > 0 else previous_rows
     recent_targets = [_decimal(previous_row[TARGET]) for previous_row in recent_rows]
-    lag_1_units = _decimal(previous_rows[-1][TARGET]) if previous_rows else Decimal("0")
+    lag_1_units = _decimal(previous_rows[-1][TARGET]) if previous_rows else Decimal(0)
     lag_7_units = _decimal(previous_rows[-7][TARGET]) if len(previous_rows) >= 7 else lag_1_units
 
     return {
@@ -128,8 +128,8 @@ def build_training_features(
         "lag_1_units": float(lag_1_units),
         "lag_7_units": float(lag_7_units),
         "rolling_mean_units": float(_mean(recent_targets)),
-        "rolling_min_units": float(min(recent_targets) if recent_targets else Decimal("0")),
-        "rolling_max_units": float(max(recent_targets) if recent_targets else Decimal("0")),
+        "rolling_min_units": float(min(recent_targets) if recent_targets else Decimal(0)),
+        "rolling_max_units": float(max(recent_targets) if recent_targets else Decimal(0)),
         "training_observation_count": len(previous_rows),
         "product_id": str(row["product_id"]),
         "store_id": str(row["store_id"]),
@@ -264,9 +264,7 @@ def calculate_prediction_metrics(
     mape = sum(percentage_errors) / row_count
     bias = (sum(predicted_values) - sum(actual_values)) / row_count
     actual_total = sum(actual_values)
-    wape = (
-        sum(absolute_errors) / actual_total * Decimal("100") if actual_total > 0 else Decimal("0")
-    )
+    wape = sum(absolute_errors) / actual_total * Decimal(100) if actual_total > 0 else Decimal(0)
 
     return {
         "evaluated_rows": len(predictions),
@@ -382,9 +380,9 @@ def build_metrics_report(
     baseline_primary = Decimal(str(baseline_metrics[PRIMARY_METRIC]))
     trained_primary = Decimal(str(trained_metrics[PRIMARY_METRIC]))
     improvement = (
-        (baseline_primary - trained_primary) / baseline_primary * Decimal("100")
+        (baseline_primary - trained_primary) / baseline_primary * Decimal(100)
         if baseline_primary > 0
-        else Decimal("0")
+        else Decimal(0)
     )
 
     train_count = sum(1 for example in examples if example.split == "train")

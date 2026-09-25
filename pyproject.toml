@@ -56,6 +56,14 @@ select = ["ALL"]
       # or repository/service arguments. Refactor these with request/filter objects
       # only when it improves the API shape; do not hide intent just to reduce arity.
       "PLR0913",
+      "PLR0917",
+
+      # Per-file copyright headers are not required by this repository.
+      "CPY001",
+
+      # Preserve existing str/Enum string representations. A StrEnum migration
+      # changes runtime behavior and should be reviewed separately.
+      "UP042",
 
       # The remaining PERF401 cases build verbose event payloads. List comprehensions
       # would be shorter, but less readable. Keep obvious/simple cases fixable in code.

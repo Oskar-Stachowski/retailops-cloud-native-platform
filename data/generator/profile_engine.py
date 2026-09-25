@@ -178,13 +178,13 @@ def _seasonal_pattern(category: str, demand_class: str) -> str:
 
 def _base_daily_sales(demand_class: str, demand_weight: Decimal) -> int:
     base_by_class = {
-        "hero_product": Decimal("64"),
-        "core_product": Decimal("42"),
-        "seasonal": Decimal("24"),
-        "new_product": Decimal("16"),
-        "declining_product": Decimal("18"),
-        "clearance_product": Decimal("15"),
-        "long_tail": Decimal("10"),
+        "hero_product": Decimal(64),
+        "core_product": Decimal(42),
+        "seasonal": Decimal(24),
+        "new_product": Decimal(16),
+        "declining_product": Decimal(18),
+        "clearance_product": Decimal(15),
+        "long_tail": Decimal(10),
     }
     return max(1, int(base_by_class[demand_class] * demand_weight))
 
@@ -710,7 +710,7 @@ def generate_profile_forecasts(
 
         predicted_quantity = max(
             1,
-            int(normal_daily_sales * demand_weight * Decimal("7") * forecast_multiplier),
+            int(normal_daily_sales * demand_weight * Decimal(7) * forecast_multiplier),
         )
         confidence = Decimal("0.82") - Decimal(index % 9) * Decimal("0.015")
 
@@ -768,7 +768,7 @@ def generate_profile_incident_dataset(
 
     for index, product in enumerate(candidate_products):
         total_sales = Decimal(product_sales.get(product["id"], 0))
-        expected_value = Decimal(product["normal_daily_sales"]) * Decimal("14")
+        expected_value = Decimal(product["normal_daily_sales"]) * Decimal(14)
         if product["demand_class"] == "hero_product":
             anomaly_type = "sales_spike"
             alert_type = "stockout_risk"
@@ -776,7 +776,7 @@ def generate_profile_incident_dataset(
         elif product["demand_class"] in {"long_tail", "declining_product"}:
             anomaly_type = "sales_drop"
             alert_type = "sales_drop"
-            actual_value = max(Decimal("1"), total_sales)
+            actual_value = max(Decimal(1), total_sales)
         else:
             anomaly_type = "stale_inventory"
             alert_type = "overstock_risk"

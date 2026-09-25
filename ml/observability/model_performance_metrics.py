@@ -236,8 +236,10 @@ def render_model_performance_metrics(snapshot: dict[str, object]) -> str:
                 "Unix timestamp for the latest generated model performance artifact.",
                 "gauge",
                 [
-                    "retailops_model_artifact_generated_timestamp_seconds"
-                    f"{{{_labels(run_labels)}}} {generated_at}",
+                    (
+                        "retailops_model_artifact_generated_timestamp_seconds"
+                        f"{{{_labels(run_labels)}}} {generated_at}"
+                    ),
                 ],
             ),
         )

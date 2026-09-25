@@ -19,7 +19,7 @@ ALLOWED_DATA_QUALITY_STATUSES = {
 
 def _decimal(value: str | float | Decimal | None) -> Decimal:
     if value is None or value == "":
-        return Decimal("0")
+        return Decimal(0)
     return Decimal(str(value))
 
 

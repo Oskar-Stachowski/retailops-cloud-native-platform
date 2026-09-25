@@ -29,9 +29,9 @@ def _share_top_products(
     top_count = max(1, int(product_count * top_percent))
     top_revenue = sum(
         sorted(revenue_by_product.values(), reverse=True)[:top_count],
-        Decimal("0"),
+        Decimal(0),
     )
-    total_revenue = sum(revenue_by_product.values(), Decimal("0"))
+    total_revenue = sum(revenue_by_product.values(), Decimal(0))
     return str((top_revenue / total_revenue).quantize(Decimal("0.0001")))
 
 

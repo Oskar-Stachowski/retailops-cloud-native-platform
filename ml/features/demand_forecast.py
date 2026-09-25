@@ -81,7 +81,7 @@ def _date(value: object) -> date:
 
 def _decimal(value: object, default: str = "0") -> Decimal:
     raw_value = _text(value)
-    return Decimal(raw_value if raw_value else default)
+    return Decimal(raw_value or default)
 
 
 def _money(value: Decimal) -> str:
@@ -231,7 +231,7 @@ def _build_aggregates(
                 "channel": channel,
                 "units_sold": 0,
                 "latent_units_demand": 0,
-                "sales_revenue": Decimal("0"),
+                "sales_revenue": Decimal(0),
                 "stockout_flag": False,
                 "quality_statuses": [],
             }
@@ -264,16 +264,16 @@ def build_demand_feature_rows(
         product = products_by_id[product_id]
         revenue = aggregate["sales_revenue"]
         units_sold = aggregate["units_sold"]
-        weighted_unit_price = revenue / Decimal(units_sold) if units_sold else Decimal("0")
+        weighted_unit_price = revenue / Decimal(units_sold) if units_sold else Decimal(0)
         list_price = _price_for_date(
             product_id,
             business_date,
             weighted_unit_price,
             tables["price_history"],
         )
-        discount_percent = Decimal("0")
+        discount_percent = Decimal(0)
         if list_price > 0 and weighted_unit_price < list_price:
-            discount_percent = (list_price - weighted_unit_price) / list_price * Decimal("100")
+            discount_percent = (list_price - weighted_unit_price) / list_price * Decimal(100)
         promotion = _active_promotion(
             product_id,
             aggregate["channel"],
