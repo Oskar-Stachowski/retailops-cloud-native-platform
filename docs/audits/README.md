@@ -18,11 +18,17 @@ the current application or AWS environment.
   from the manual AWS OIDC plan workflow and removes duplicate automatic
   triggers from the reusable domain workflows. See
   [the CI contract](../governance/github-actions-ci.md).
+- The first fresh [Required CI run](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36126919676)
+  caught newly reported React Router vulnerabilities in version 7.15.0.
+  React Router and React Router DOM were updated together to 7.18.4.
+  Local frontend validation passed all 36 tests, lint and production build;
+  `npm audit --omit=dev` reported zero vulnerabilities after the update.
 
 These changes address parts of the audit's CI and scanning findings. They do
 not close the entire portfolio backlog or establish production readiness.
-Branch protection enforcement still requires separate GitHub settings
-evidence, as described in [the policy](../governance/branch-protection.md).
+The authenticated GitHub API reported `main` as unprotected on 2026-09-25;
+the intended settings remain documented in
+[the policy](../governance/branch-protection.md).
 
 ## Synchronization scope
 
@@ -40,4 +46,7 @@ release evidence. Curated evidence remains indexed under
 [`docs/evidence/`](../evidence/index.md).
 
 Open Dependabot pull requests are separate dependency upgrades and need their
-own validation. They are not missing local implementation work.
+own validation. They are not missing local implementation work. The targeted
+React Router fix above was necessary to pass the current required security
+gates; broader upgrades, including remaining development dependency findings,
+are outside this synchronization.

@@ -8,6 +8,12 @@ The policy is intentionally documented in the repository because GitHub branch p
 
 ## Protected branch
 
+Observed on 2026-09-25 through the authenticated GitHub REST endpoint
+`GET /repos/Oskar-Stachowski/retailops-cloud-native-platform/branches/main`:
+`protected: false`, with required status check enforcement `off` and no
+configured contexts. The table below is the target policy, not the current
+GitHub configuration. Repository synchronization does not change these settings.
+
 | Setting | Expected value |
 |---|---|
 | Protected branch pattern | `main` |
