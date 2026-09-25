@@ -2,37 +2,13 @@ name: API CI
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "services/api/**"
-      - "data/**"
-      - "events/**"
-      - "scripts/data/**"
-      - "ml/**"
-      - "pyproject.toml"
-      - "pytest.ini"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/api-ci.yml"
-  pull_request:
-    paths:
-      - "services/api/**"
-      - "data/**"
-      - "events/**"
-      - "scripts/data/**"
-      - "ml/**"
-      - "pyproject.toml"
-      - "pytest.ini"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/api-ci.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: api-ci-${{ github.ref }}
+  group: api-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

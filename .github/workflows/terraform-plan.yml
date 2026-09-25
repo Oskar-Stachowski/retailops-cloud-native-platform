@@ -1,25 +1,6 @@
-name: Terraform IaC CI
+name: Terraform Dev Plan
 
 on:
-  workflow_call:
-    inputs:
-      run_dev_plan:
-        description: Run the optional credentialed dev plan.
-        required: false
-        type: boolean
-        default: false
-  push:
-    paths:
-      - "infra/**"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/terraform-plan.yml"
-  pull_request:
-    paths:
-      - "infra/**"
-      - "Makefile"
-      - ".github/actions/**"
-      - ".github/workflows/terraform-plan.yml"
   workflow_dispatch:
     inputs:
       run_dev_plan:
@@ -32,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: terraform-iac-ci-${{ github.ref }}
+  group: terraform-dev-plan-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -41,42 +22,15 @@ env:
   TERRAFORM_VERSION: "1.9.8"
 
 jobs:
-  terraform-validate:
-    name: Terraform fmt, init and validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
-
-      - name: Show Terraform version
-        run: terraform version
-
-      - name: Run local IaC scan
-        run: make terraform-fmt-check terraform-validate
-
-      - name: Upload Terraform validation evidence
-        if: always()
-        uses: ./.github/actions/upload-ci-evidence
-        with:
-          name: terraform-validation-evidence
-          path: ci-cd/reports/iac/terraform-validate.txt
-          if-no-files-found: warn
+  terraform-validation:
+    name: Validate Terraform before planning
+    uses: ./.github/workflows/terraform-validation.yml
 
   terraform-plan-dev:
     name: Optional dev Terraform plan
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: terraform-validate
+    needs: terraform-validation
     if: github.event_name == 'workflow_dispatch' && inputs.run_dev_plan == true
 
     permissions:

@@ -91,7 +91,8 @@ Do not run `terraform apply` or `terraform destroy` as part of routine local val
 
 ## CI/CD
 
-Terraform validation is wired through `.github/workflows/terraform-plan.yml`.
+Required Terraform validation is wired through the uncredentialed reusable
+workflow `.github/workflows/terraform-validation.yml`.
 
 The default CI path runs:
 
@@ -100,9 +101,14 @@ The default CI path runs:
 - `make terraform-validate`,
 - validation evidence upload.
 
-The optional dev plan job is manual-only through `workflow_dispatch`. It uses GitHub OIDC and a repository variable named `AWS_TERRAFORM_PLAN_ROLE_ARN` to assume a plan-only AWS role. The workflow does not contain static AWS credentials and does not run `terraform apply`.
+The separate `.github/workflows/terraform-plan.yml` workflow is manual-only
+through `workflow_dispatch`. It first reuses the validation workflow and runs
+the plan job only after explicit confirmation. The plan uses GitHub OIDC and a
+repository variable named `AWS_TERRAFORM_PLAN_ROLE_ARN` to assume a plan-only
+AWS role. The workflow does not contain static AWS credentials and does not run
+`terraform apply`.
 
-IaC security checks are handled separately by `.github/workflows/iac-security.yml`, using TFLint and Checkov. Checkov is report-only in Sprint 10; critical blockers are enforced through explicit guardrails.
+IaC security checks are handled separately by `.github/workflows/iac-security.yml`, using TFLint, blocking Checkov scans and explicit critical guardrails. Accepted Checkov exceptions are documented in `security/README.md`; findings outside those exceptions fail CI.
 
 ## State and artifacts
 

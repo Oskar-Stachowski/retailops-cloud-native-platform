@@ -72,6 +72,11 @@ class RequiredCIPathDetectionTests(unittest.TestCase):
         self.assertTrue(decision.shared)
         self.assert_gates(["Makefile"], set(GATE_FIELDS))
 
+    def test_workflow_change_runs_every_gate(self) -> None:
+        decision = classify_paths([".github/workflows/api-ci.yml"])
+        self.assertTrue(decision.shared)
+        self.assert_gates([".github/workflows/api-ci.yml"], set(GATE_FIELDS))
+
     def test_unknown_change_runs_every_gate(self) -> None:
         decision = classify_paths(["tools/new-helper.sh"])
         self.assertTrue(decision.unknown)
