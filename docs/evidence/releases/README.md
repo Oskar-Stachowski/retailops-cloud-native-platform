@@ -69,6 +69,8 @@ The committed JSON above is the dated local result; it is not a CI capture.
 The secret scanner's generic API-key rule initially mistook the two public
 Git-based API image tags in this dated JSON for credentials. The exception in
 `.gitleaks.toml` is assigned only to that rule, this exact evidence path and
-those two literal tag values. A local scan confirmed that the report passes,
-while both a synthetic GitHub token and a synthetic generic API key inserted
-into the same path are still rejected. No real credential was used in that test.
+those two literal tag values, using a rule-level allowlist compatible with
+Gitleaks 8.24.3 (the CI action's version) and 8.30.1 (the local version).
+Both versions passed the report and branch-history scans, while rejecting
+both a synthetic GitHub token and a synthetic generic API key inserted into
+the same path. No real credential was used in that test.
