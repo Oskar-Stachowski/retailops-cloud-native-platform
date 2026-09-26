@@ -289,7 +289,9 @@ make compose-ci
 The Compose CI flow checks API health, database readiness, selected DB-backed
 endpoints, the frontend root page, the frontend `/api` proxy, Redpanda topic
 initialization, `/dashboard/live-operations`, `/metrics`, Prometheus target
-health and stream alert rules.
+health and stream alert rules. It uses unique disposable projects, loopback ports,
+images and volumes, and validates a real API outage alert through recovery.
+See the [dated monitoring and Jenkins evidence](docs/evidence/observability/2026-09-26-validation.md).
 
 For a faster check against an already running stack:
 
@@ -467,7 +469,7 @@ Further Kubernetes work includes Helm packaging, production storage, autoscaling
 
 ## Observability
 
-The implemented observability layer provides local API metrics, Prometheus scraping, Grafana dashboards, alert rules, and smoke checks.
+The implemented observability layer provides local API metrics, Prometheus scraping, Grafana dashboards, alert rules, and an automated outage/recovery drill. The [initial scrape SLO](docs/observability/slo.md) defines measurement and coverage requirements; the [dated validation](docs/evidence/observability/2026-09-26-validation.md) proves alert firing and resolution on ARM64 and AMD64. Notification delivery and 30-day compliance are not claimed.
 
 Current and future observability capabilities include:
 

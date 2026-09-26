@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-05-12
 
-Kubernetes flow refreshed: 2026-09-26; other areas retain their original review scope.
+Kubernetes, monitoring and Jenkins evidence refreshed: 2026-09-26; other areas retain their original review scope.
 
 ## Final Structure
 
@@ -21,7 +21,12 @@ docs/evidence/
 ├── docker/
 │   ├── README.md
 │   └── compose-ci-smoke.md
+├── observability/
+│   ├── 2026-09-26-validation.md
+│   └── 2026-09-26-validation.json
 ├── jenkins/
+│   ├── 2026-09-26-validation.md
+│   ├── 2026-09-26-validation.json
 │   ├── README.md
 │   ├── jenkins-stage-view.png
 │   └── jenkins-status-and-artifacts.png
