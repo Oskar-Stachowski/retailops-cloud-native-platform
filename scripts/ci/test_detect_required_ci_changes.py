@@ -56,7 +56,7 @@ class RequiredCIPathDetectionTests(unittest.TestCase):
         self.assert_gates(["docs/runbooks/example.md", "README.md"], set())
 
     def test_terraform_state_automation_runs_iac_gates(self) -> None:
-        self.assert_gates(["scripts/terraform/plan.py"], {"terraform"})
+        self.assert_gates(["scripts/terraform/plan.py"], {"terraform", "security"})
 
     def test_mixed_change_uses_union(self) -> None:
         self.assert_gates(

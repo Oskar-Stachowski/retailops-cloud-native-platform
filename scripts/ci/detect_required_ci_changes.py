@@ -79,6 +79,7 @@ POLICY_PATTERNS = ("policy/**",)
 
 SECURITY_PATTERNS = (
     "security/**",
+    "scripts/terraform/**",
     ".gitleaks.toml",
     ".github/dependabot.yml",
     "services/api/requirements*.txt",
