@@ -14,7 +14,7 @@ concurrency:
 env:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
-  TERRAFORM_VERSION: "1.9.8"
+  TERRAFORM_VERSION: "1.15.1"
 
 jobs:
   terraform-validate:
@@ -40,10 +40,15 @@ jobs:
       - name: Run local IaC scan
         run: make terraform-fmt-check terraform-validate
 
+      - name: Verify state controls and drift classification without AWS
+        run: make terraform-state-test
+
       - name: Upload Terraform validation evidence
         if: always()
         uses: ./.github/actions/upload-ci-evidence
         with:
           name: terraform-validation-evidence
-          path: ci-cd/reports/iac/terraform-validate.txt
+          path: |
+            ci-cd/reports/iac/terraform-validate.txt
+            ci-cd/reports/terraform-state/contract-drill.json
           if-no-files-found: warn

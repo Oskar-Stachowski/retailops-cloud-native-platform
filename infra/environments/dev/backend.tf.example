@@ -1,0 +1,5 @@
+# For an operator-managed checkout only; the plan runner builds this in isolation.
+# Complete the remote-state runbook before enabling or migrating this backend.
+terraform {
+  backend "s3" {}
+}

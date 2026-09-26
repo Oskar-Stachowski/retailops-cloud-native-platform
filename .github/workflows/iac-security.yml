@@ -14,7 +14,7 @@ concurrency:
 env:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
-  TERRAFORM_VERSION: "1.9.8"
+  TERRAFORM_VERSION: "1.15.1"
   CHECKOV_VERSION: "3.2.520"
   IAC_REPORT_DIR: "ci-cd/reports/iac"
 

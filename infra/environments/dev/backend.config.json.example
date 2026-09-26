@@ -1,0 +1,6 @@
+{
+  "bucket": "REPLACE_WITH_RETAILOPS_STATE_BUCKET",
+  "key": "retailops/dev/terraform.tfstate",
+  "region": "eu-central-1",
+  "kms_key_id": "REPLACE_WITH_STATE_KMS_KEY_ARN"
+}

@@ -59,7 +59,7 @@ Optional checks, depending on current sprint scope:
 | Kubernetes Policy CI | `Kustomize, schema and policy gates` | Called for Kubernetes/policy/shared/unknown changes; runs Kustomize, Kubeconform, Conftest and Checkov. |
 | Observability CI | `Validate observability assets` | Require once observability assets are in active scope |
 | Provenance CI | `Build local images and generate provenance attestations` | Require for release branches or signed release candidate evidence, not necessarily every PR |
-| Terraform Dev Plan | `Optional dev Terraform plan` | Manual-only; never require on normal PRs. Run only after explicit dispatch confirmation and configuration of the plan-only AWS OIDC role. |
+| Terraform State and Drift Review | `Guarded dev state and drift review` | Manual-only on main; never required on normal PRs. Uses the configured OIDC role and pinned account; baseline and existing-state drift are distinct modes. |
 
 ## Evidence collection
 

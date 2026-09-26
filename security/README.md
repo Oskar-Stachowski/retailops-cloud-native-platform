@@ -38,6 +38,13 @@ Required CI uses explicit blocking thresholds:
 
 ## Accepted Checkov Findings
 
+The unactivated `infra/state-backend` dev bootstrap has three resource-local
+exceptions: S3 access-log delivery (`CKV_AWS_18`), cross-region replication
+(`CKV_AWS_144`) and event notifications (`CKV2_AWS_62`). No destination/consumer
+is provisioned for these. Versioning, KMS encryption, TLS-only access and public
+access blocking remain mandatory. The [bootstrap notes](../infra/state-backend/README.md)
+record the production review boundary; no repository-wide skips are added.
+
 Checkov is a hard gate. Only the listed check IDs are excluded from the blocking baseline; scanner failures and every other finding fail Required CI.
 
 The following findings are accepted for now:

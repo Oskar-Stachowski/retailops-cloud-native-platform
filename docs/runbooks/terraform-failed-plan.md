@@ -1,5 +1,12 @@
 # Terraform Failed Plan Runbook
 
+Current guarded baseline/drift commands and exit semantics are documented in
+[Terraform drift review](terraform-drift-check.md). Its temporary configuration
+and account/backend checks replace the raw plan capture examples below for
+routine evidence. `init -backend=false` is only static validation; do not use it
+to initialize or troubleshoot a live remote-state review. Follow the
+[remote-state runbook](terraform-remote-state.md) for an existing backend.
+
 **Project:** Cloud-Native RetailOps Platform
 **Workstream:** Terraform / AWS Foundation / Operations
 **Sprint:** Sprint 10 — Terraform and AWS Foundation

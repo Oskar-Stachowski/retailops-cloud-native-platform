@@ -1,0 +1,7 @@
+bucket              = "REPLACE_WITH_RETAILOPS_STATE_BUCKET"
+key                 = "retailops/dev/terraform.tfstate"
+region              = "eu-central-1"
+encrypt             = true
+use_lockfile        = true
+kms_key_id          = "REPLACE_WITH_STATE_KMS_KEY_ARN"
+allowed_account_ids = ["REPLACE_WITH_EXPECTED_ACCOUNT_ID"]

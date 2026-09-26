@@ -1,244 +1,86 @@
-# Terraform Drift Check Runbook
+# Terraform baseline and drift review
 
-**Project:** Cloud-Native RetailOps Platform
-**Workstream:** Terraform / AWS Foundation / Operations
-**Sprint:** Sprint 10 — Terraform and AWS Foundation
-**Commit:** `docs(runbook): add Terraform drift and failed plan runbooks`
+Use `make terraform-plan-dev` for an explicitly empty-state baseline and
+`make terraform-drift` only when an existing S3 state manages real resources.
+Both commands run in a private temporary copy, preserve the working checkout,
+keep locking enabled and never apply a plan. The report contains counts and
+classifications, not raw attributes, outputs, account IDs or resource identifiers.
 
----
+## Prerequisites and commands
 
-## 1. Purpose
-
-This runbook explains how to check whether the real AWS environment has drifted away from the Terraform configuration and state.
-
-Use it when:
-
-- Terraform-managed resources may have been changed manually in AWS,
-- a plan shows unexpected changes,
-- CI reports a plan difference,
-- local Terraform output does not match the expected Sprint 10 baseline,
-- a reviewer asks whether the infrastructure is still aligned with code.
-
-Senior DevOps rule:
-
-> Drift is not automatically a bug, but unmanaged drift is always operational risk.
-
----
-
-## 2. Important Sprint 10 note
-
-Sprint 10 is primarily a foundation and validation sprint.
-
-A drift check is meaningful only after resources were actually created and Terraform state exists.
-
-If the environment has never been applied, `terraform plan` showing resources to create is expected. That is not drift. It means Terraform is comparing configuration against an empty state.
-
----
-
-## 3. What counts as drift
-
-| Situation | Interpretation |
-|---|---|
-| `terraform plan` returns no changes | Configuration, state, and remote resources are aligned. |
-| `terraform plan` wants to update/delete resources that should already match code | Possible drift or intentional code change. |
-| `terraform plan` wants to recreate resources after manual AWS edits | Likely drift. |
-| `terraform plan` wants to create all resources in a never-applied environment | Not drift; expected plan-only baseline behavior. |
-| Terraform cannot read state | State/backend problem, not a drift conclusion. |
-| Terraform cannot authenticate to AWS | Credential problem, not a drift conclusion. |
-
----
-
-## 4. Pre-check checklist
-
-Before running a drift check, confirm:
-
-- [ ] You are on the intended branch.
-- [ ] Your working tree is clean or the local changes are intentional.
-- [ ] You know whether the dev environment has ever been applied.
-- [ ] You know which `terraform.tfvars` file should be used.
-- [ ] AWS credentials are available only if checking real remote resources.
-- [ ] You will not run `terraform apply` as part of this check.
-- [ ] Any saved output will not expose secrets, real account IDs, or private identifiers.
-
----
-
-## 5. Local static validation first
-
-From the repository root:
+Use Terraform 1.10 or newer (CI pins 1.15.1), AWS CLI and Python 3.11+.
+Set the expected account explicitly from the reviewed account configuration:
 
 ```bash
-terraform -chdir=infra/environments/dev fmt -recursive -check -diff
-terraform -chdir=infra/environments/dev init -backend=false -input=false
-terraform -chdir=infra/environments/dev validate
+export AWS_PROFILE=YOUR_RETAILOPS_PROFILE
+export TF_EXPECTED_ACCOUNT_ID=YOUR_REVIEWED_ACCOUNT_ID
+python3 scripts/terraform/inventory.py
+make terraform-plan-dev
 ```
 
-Expected result:
+The inventory reads tagged/named RetailOps foundation resources in eu-central-1
+and account-wide IAM/S3 metadata. It records failures as unverified, not zero,
+and leaves existing roles/resources untouched. It is not an all-region cost audit.
 
-- formatting check passes,
-- provider plugins initialize,
-- configuration is valid.
+The profile must authenticate to that exact account. The provider and, for drift,
+the backend also enforce the account. Environment-injected Terraform CLI flags,
+logging and variable overrides are removed to keep the operation predictable.
+Only tracked Terraform configuration and the dev example inputs are copied.
+The runner currently supports the dev example configuration; different deployment
+inputs require extending this contract before using the runner for that deployment.
 
-If these commands fail, stop and use `docs/runbooks/terraform-failed-plan.md` before diagnosing drift.
-
----
-
-## 6. Save a drift plan
-
-Create a report directory if needed:
+For existing remote state, create ignored
+`infra/environments/dev/backend.config.json` from its `.example` file:
 
 ```bash
-mkdir -p ci-cd/reports/iac
+make terraform-drift
 ```
 
-Run a plan with `-detailed-exitcode` and save output:
+The backend check requires the exact dev key, versioning, KMS encryption,
+public-access block, disabled ACLs, a TLS-only bucket policy and an existing
+KMS-encrypted state object. Missing/denied state and zero managed resources fail.
+S3 state locking requires scoped lock-file writes even for a read-only
+infrastructure plan. See [backend access and migration](terraform-remote-state.md).
 
-```bash
-terraform -chdir=infra/environments/dev plan \
-  -detailed-exitcode \
-  -var-file=terraform.tfvars.example \
-  -no-color \
-  > ci-cd/reports/iac/terraform-drift-check.txt
+## What the result means
 
-DRIFT_EXIT_CODE=$?
-cat ci-cd/reports/iac/terraform-drift-check.txt
-printf "Terraform detailed exit code: %s\n" "$DRIFT_EXIT_CODE"
-```
+| Classification | Meaning | Runner exit |
+|---|---|---:|
+| `baseline_only_no_state` | Plan from an intentionally empty state; not evidence of an existing deployment or no drift. | 0 |
+| `no_drift` | Existing managed state checked; no external, configuration or output changes detected. | 0 |
+| `drift_detected` | Real objects differ from stored state, observed in normal or refresh-only plan JSON. | 2 |
+| `configuration_or_output_changes` | Changes require review, but the plan has no detected external resource drift. | 2 |
+| failed report | Account/backend/authentication/provider error, empty remote state, incomplete plan or failed check. | 1 |
 
-Exit code meaning:
+Terraform's own `-detailed-exitcode` reports 0 for no changes, 2 for changes and 1
+for an error. A code of 2 alone does not distinguish drift from code changes.
+The runner inspects `resource_drift` separately from `resource_changes`, runs both
+normal and refresh-only plans for existing state, and checks that the state was
+not modified during the review. It rejects partial/deferred plans and failing
+check assertions. See [plan semantics](https://developer.hashicorp.com/terraform/cli/commands/plan)
+and the [JSON format](https://developer.hashicorp.com/terraform/internals/json-format).
 
-| Exit code | Meaning | Action |
-|---|---|---|
-| `0` | No changes. | Environment is aligned with state and config. |
-| `1` | Error. | Treat as failed plan, not drift. |
-| `2` | Changes present. | Review whether the changes are expected or drift. |
+Reports are `ci-cd/reports/terraform-state/<run>/report.json`. Temporary plans and
+raw output are not published. Inspect failures in a private operator session;
+do not paste raw state or `terraform show -json` into CI artifacts. A detected
+change is a review result, never a command to run apply automatically.
 
----
+## CI and proof
 
-## 7. Optional binary plan for deeper review
+`make terraform-state-test` runs regression checks, mock-provider backend-control
+tests and an actual local-file Terraform drill. The drill creates a disposable
+file, migrates its local state, modifies the file outside Terraform, then changes
+configuration. It verifies distinct results and unchanged state after plans,
+and removes all temporary files. This proves the classifier with real Terraform;
+it does not prove a live AWS S3 migration or lock collision.
 
-Use this only when you need a stable plan artifact for review.
+Required CI runs these checks without AWS credentials. The separate manual
+`Terraform State and Drift Review` workflow is restricted to `main`, uses the
+existing OIDC role and an explicit `AWS_TERRAFORM_ACCOUNT_ID` repository variable.
+Choose `baseline` or, after backend activation, `drift`. The latter additionally
+requires `TF_BACKEND_CONFIG_JSON`. Only sanitized JSON reports are uploaded.
+There is no scheduled AWS job while no managed deployment/state exists.
 
-```bash
-terraform -chdir=infra/environments/dev plan \
-  -detailed-exitcode \
-  -var-file=terraform.tfvars.example \
-  -out=tfplan \
-  -no-color \
-  > ci-cd/reports/iac/terraform-drift-check-summary.txt
-
-terraform -chdir=infra/environments/dev show \
-  -no-color tfplan \
-  > ci-cd/reports/iac/terraform-drift-check-readable.txt
-```
-
-Do not commit binary plan files unless the team explicitly decides that they are safe and useful. Prefer committing the readable text report after review and redaction.
-
----
-
-## 8. Review checklist for Sprint 10 resources
-
-When the plan shows changes, review these resource groups:
-
-| Resource group | Drift questions |
-|---|---|
-| VPC | Did CIDR, DNS support, or tags change outside Terraform? |
-| Public subnets | Did route table association, public IP behavior, or tags change? |
-| Private subnets | Did CIDR, route tables, or tags change? |
-| Security groups | Did ingress/egress rules change manually? |
-| IAM | Were policies, trust policies, or role attachments changed manually? |
-| ECR | Were scan settings, lifecycle policy, tag mutability, or repositories changed manually? |
-| AWS Budget | Was the limit, notification, or budget name changed manually? |
-| CloudWatch log groups | Was retention changed manually? |
-
----
-
-## 9. Classify the result
-
-Use this table before taking action:
-
-| Plan result | Classification | Next step |
-|---|---|---|
-| Only expected new resources in a never-applied environment | Expected baseline plan | Save plan evidence if needed. Do not call it drift. |
-| Tags changed manually | Low/medium drift | Prefer restoring tags through Terraform. |
-| Security group rule changed manually | Security-sensitive drift | Stop and review before applying. |
-| IAM policy widened manually | Critical drift | Stop, review immediately, and document remediation. |
-| Cost-related resource added manually | FinOps drift | Review cost impact and cleanup. |
-| Terraform wants to destroy an unknown resource | High risk | Stop; verify state and ownership. |
-
----
-
-## 10. Recommended response to drift
-
-Do not immediately run `terraform apply`.
-
-Recommended order:
-
-1. Save the plan output.
-2. Identify whether the change comes from code, state, or manual AWS edits.
-3. Check commit history for intentional Terraform changes.
-4. Check AWS console or AWS CLI only if needed.
-5. Decide whether to:
-   - accept the code change,
-   - revert the manual AWS change,
-   - import an intentionally created resource,
-   - remove an unexpected resource,
-   - update documentation or ADRs.
-6. Get review before any destructive action.
-
----
-
-## 11. Optional AWS CLI discovery
-
-Use tagged resource discovery when AWS credentials are available:
-
-```bash
-aws resourcegroupstaggingapi get-resources \
-  --tag-filters Key=Project,Values=retailops Key=Environment,Values=dev \
-  --region eu-central-1
-```
-
-Review for:
-
-- resources without expected tags,
-- resources outside Terraform scope,
-- resources that should not exist in Sprint 10,
-- always-on services that may create cost.
-
-Do not commit real account IDs or private identifiers from AWS CLI output.
-
----
-
-## 12. Evidence template
-
-Use this template when documenting a drift review.
-
-```markdown
-# Terraform Drift Check Evidence — Sprint 10
-
-Date:
-Operator:
-Branch:
-Terraform environment: infra/environments/dev
-AWS region:
-State available: yes/no
-Resources previously applied: yes/no/unknown
-
-Command run:
-
-Exit code:
-
-Result classification:
-- no changes / expected baseline plan / possible drift / failed plan
-
-Unexpected changes:
-
-Security impact:
-
-Cost impact:
-
-Decision:
-
-Follow-up actions:
-
-Reviewer note:
-```
+For errors, check account selection, credentials, the exact state location and
+provider diagnostics privately. A plan against an empty state does not establish
+that AWS is empty: inventory and state ownership must be reviewed separately.
