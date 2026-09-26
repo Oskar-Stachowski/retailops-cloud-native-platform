@@ -186,9 +186,9 @@ assert_rendered_objects \
   "ConfigMap/retailops-app-config" \
   "Deployment/retailops-api" \
   "Service/retailops-api" \
+  "Service/api" \
   "Deployment/retailops-frontend" \
   "Service/retailops-frontend" \
-  "Ingress/retailops-api" \
   "Ingress/retailops-frontend"
 
 render_manifests "${K8S_DEV_OVERLAY_DIR}" "${dev_render}"
@@ -199,6 +199,8 @@ assert_rendered_objects \
   "${dev_render}" \
   "Deployment/postgres" \
   "Service/postgres" \
+  "PersistentVolumeClaim/postgres-data" \
+  "PersistentVolumeClaim/redpanda-data" \
   "Deployment/redpanda" \
   "Service/redpanda" \
   "Deployment/retailops-realtime-consumer" \

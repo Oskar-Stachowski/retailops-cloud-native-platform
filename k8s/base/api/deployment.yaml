@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: retailops-api:0.1.0
+          image: retailops-api:0.2.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

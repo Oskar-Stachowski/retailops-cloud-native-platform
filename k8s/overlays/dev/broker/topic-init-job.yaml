@@ -33,7 +33,7 @@ spec:
             - |
               set -e
 
-              until rpk -X brokers=redpanda:9092 cluster health | grep -q 'Healthy:.*true'; do
+              until rpk -X admin.hosts=redpanda:9644 cluster health | grep -q 'Healthy:.*true'; do
                 sleep 2
               done
 

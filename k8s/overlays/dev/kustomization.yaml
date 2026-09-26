@@ -11,18 +11,21 @@ resources:
   - consumer/deployment.yaml
   - database/deployment.yaml
   - database/service.yaml
+  - storage.yaml
   - jobs/migrate.yaml
   - jobs/seed.yaml
 
 images:
   - name: retailops-api
-    newTag: 0.1.0
+    newTag: 0.2.1
   - name: retailops-frontend
-    newTag: 0.1.0
+    newTag: 0.2.1
   - name: postgres
     newTag: 16-alpine
+    digest: sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
   - name: redpandadata/redpanda
     newTag: v25.3.6
+    digest: sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
 
 generatorOptions:
   disableNameSuffixHash: true

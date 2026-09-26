@@ -1,453 +1,147 @@
-# Local Kubernetes Runbook
+# Local Kubernetes runtime and rollback
 
-**Project:** Cloud-Native RetailOps Platform  
-**Workstream:** Kubernetes / Local Operations / Deployment Validation  
-**Sprint:** Sprint 13 — Kubernetes Runtime Foundation  
-**Commit:** `docs: add local Kubernetes runbook`
+Use `make k8s-runtime-drill` to build two committed application versions, start
+an isolated kind cluster, exercise RetailOps, and remove the test resources.
+This is the local foundation before RetailOps AI; EKS, Helm and production
+storage remain separate work.
 
----
+## Prerequisites
 
-## 1. Purpose
+- Docker running with at least 4 GiB memory available to its VM.
+- kind **v0.31.0**, kubectl **v1.35.x or v1.36.x**, Ruby, Python 3.11+, Node 22.
+- Git history containing the predecessor `cb0c79848247612bf71fb9ccf63a8ff3847b5ca1`.
+- `npm ci --prefix frontend` and `cd frontend && npx playwright install chromium`.
+- For static checks: Kubeconform, Conftest and Checkov (`make k8s-ci`).
 
-This runbook explains how to validate and run the RetailOps Kubernetes manifests
-on a local Kubernetes cluster such as `kind` or `minikube`.
+On macOS, an installed Google Chrome can be used instead of downloading Chromium:
 
-Use it when:
+```bash
+PLAYWRIGHT_BROWSER_CHANNEL=chrome make k8s-runtime-drill
+```
 
-- Kubernetes manifests changed,
-- a reviewer asks how to run the local K8s path,
-- `make k8s-smoke` fails,
-- a local `kind` or `minikube` deployment needs to be validated,
-- ingress, probes, jobs or the realtime consumer need troubleshooting.
+On Linux/CI:
 
-Local Kubernetes rule:
+```bash
+make k8s-ci
+make k8s-runtime-drill
+```
 
-> Validate manifests first. Apply to a local cluster only after render checks
-> are green.
+The blocking Kubernetes CI workflow runs both the existing manifest/policy gates
+and this actual kind runtime drill. The runtime uses the host's native Linux
+architecture: ARM64 on Apple Silicon, AMD64 on GitHub's Ubuntu runner. Images
+are built once from Git archives, loaded into kind with `imagePullPolicy: Never`,
+and checked against the container runtime's image IDs and source labels.
+The infrastructure images are pinned by OCI digest. With Docker's containerd
+store they are imported for the native platform; classic Docker delegates the
+original digest pull to kubelet because its archive rewrites anonymous image
+references. This avoids kind's [multi-platform archive issue](https://github.com/kubernetes-sigs/kind/issues/4224)
+with Docker's containerd image store. These source builds **are not the signed GHCR artifacts of v0.2.1**, which were
+published for AMD64 only. A native ARM64 registry release is still separate work.
 
-Current runtime scope:
+## What the drill does
+
+1. Generates a unique `retailops-k8s-*` cluster name, temporary kubeconfig and
+   random database credentials. It never selects the user's current context,
+   reads their local runtime secret file, changes `/etc/hosts`, or reuses a cluster.
+2. Installs the digest-pinned Kubernetes 1.35.0 node image, kindnet v1.0.1 with
+   NetworkPolicy enforcement, and Traefik v3.7.13. The infrastructure manifests
+   are in `scripts/kubernetes/`; RetailOps workload policies stay in `k8s/`.
+3. Creates the namespace, Services, ConfigMaps, Secret and PVCs; starts PostgreSQL
+   and Redpanda; waits for migrations, demo seed and all six topic initializations;
+   then starts API, frontend and the realtime consumer.
+4. Verifies NetworkPolicy denial for an unlabelled Pod and a foreign namespace,
+   with an allowed same-Pod control using a direct Service IP. DNS and internal
+   communication are also exercised by the application and streaming path.
+5. Publishes a sales event twice through Kafka, checks one processed database
+   event and three metric rows, and verifies its presence in the live API.
+   This exercises the existing metrics consumer, not a new business event handler.
+6. Writes three business decisions through the deployed frontend/API and replays
+   five idempotent actions. It checks the dashboard and Product 360 in a real
+   browser, including page reloads.
+7. Stops PostgreSQL. `/health` must stay 200 and `/ready` become 503 on the API
+   Pod; the API Service must lose all ready endpoints and ingress must fail.
+   Restarts PostgreSQL on the same PVC and compares the stored data and schema.
+8. Restarts Redpanda, API, frontend and consumer; confirms the broker retained the
+   published event and topics, and the database retained business history.
+9. Updates all application workloads (including consumer/init images), verifies
+   them, and adds a new comment. Stops API to detect HTTP 502/504 through ingress,
+   then deploys the recorded previous images and verifies rollback plus another
+   new write. No rebuild, restore, downgrade or reseed happens during rollback.
+10. Captures reports, removes only the generated cluster and its local test image
+    tags, and records cleanup success/failure. Deleting kind destroys its PVC data.
+
+The predecessor defaults to the reviewed step-2 commit; the candidate defaults
+to committed `HEAD`. The script records whether the working tree was dirty.
+To select specific compatible commits:
+
+```bash
+python3 scripts/kubernetes/drill.py \
+  --previous-ref cb0c79848247612bf71fb9ccf63a8ff3847b5ca1 \
+  --candidate-ref HEAD
+```
+
+Both commits must be distinct, ordered by ancestry, and have exactly the same
+migration history. The live database head must match that contract before
+update/rollback. For schema-changing releases, use a reviewed recovery or
+forward-fix plan; see [database restore](db-restore.md).
+
+## Routing and persistence
 
 ```text
-nginx ingress -> frontend service -> frontend Deployment
-              -> /api rewrite -> API service -> API Deployment
-API / consumer -> PostgreSQL dev Deployment
-consumer       -> Redpanda dev Deployment
-jobs           -> migrations, seed data, topic init
+127.0.0.1:random-port -> kubectl port-forward -> Traefik
+  -> Ingress -> retailops-frontend:80 -> Nginx :8080
+    /            -> React SPA
+    /api/*       -> api:8000 -> RetailOps API -> postgres:5432
+Realtime consumer -> redpanda:9092 and postgres:5432
 ```
 
----
+The base Ingress uses `retailops.local`. The isolated drill adds a hostless rule
+for its loopback-only browser connection; it also requests the named host.
+`api` and `retailops-api` are ClusterIP Services selecting the same API Pods.
+The alias matches the existing release image's Nginx upstream and also makes
+frontend port-forwarding work. API path stripping stays in that tested Nginx
+configuration; no controller-specific rewrite annotation is required.
 
-## 2. Prerequisites
+Ingress NGINX was retired in March 2026; this path uses Traefik instead.
+See the [Kubernetes announcement](https://kubernetes.io/blog/2026/01/29/ingress-nginx-statement/)
+and [Traefik provider documentation](https://doc.traefik.io/traefik/reference/install-configuration/providers/kubernetes/kubernetes-ingress/).
 
-Required for manifest validation:
+The dev overlay uses separate 1 GiB `ReadWriteOnce` PVCs and `Recreate` deployments
+for PostgreSQL and Redpanda. PostgreSQL runs as the Alpine image's UID/GID 70;
+`fsGroup` and a `PGDATA` subdirectory permit initial setup without root capabilities.
+A cluster needs a default StorageClass (kind supplies `standard`). The volumes
+survive Pod replacement, **not deletion of the local cluster or host disk loss**.
+This is single-node development storage, not HA or a substitute for backups.
+
+## Reports and troubleshooting
+
+Each run writes `ci-cd/reports/k8s-runtime/retailops-k8s-*/report.json`, command
+logs, workload logs, resource/events snapshots, and browser traces on failure.
+CI uploads these as `kubernetes-runtime-evidence`. Do not commit raw generated
+secrets, kubeconfigs or full environment logs; curate evidence under
+`docs/evidence/kubernetes/`.
+
+The report compares row fingerprints, schema and sequences for every table
+except `realtime_consumer_state`, whose start/stop counters and timestamps change
+by design. Event history, metric observations and workflow audit rows remain
+in the comparison. Timings describe a tiny demo fixture, not production RTO/RPO.
+
+A failure returns a nonzero exit code. Start with the last command in
+`commands.log`, then `events.txt` and the relevant workload log. Common causes:
+
+- Insufficient Docker memory: check VM allocation before rerunning.
+- Image download errors: restore registry connectivity; do not replace pins with `latest`.
+- Pending PVCs: inspect the cluster's default StorageClass/provisioner.
+- Failed jobs: inspect migration/seed/topic-init status and dependency readiness.
+- Blocked traffic: retain application labels, Traefik namespace and CoreDNS rules;
+  do not bypass NetworkPolicy to make the test pass.
+
+The script cleans up on ordinary failures. If the process is forcibly killed,
+use the **exact generated name and kubeconfig path from its command log**:
 
 ```bash
-kubectl version --client
-ruby --version
-make --version
+kind delete cluster --name retailops-k8s-EXACT_RUN_ID --kubeconfig /EXACT/TEMP/PATH/kubeconfig
 ```
 
-Required for local cluster deployment:
-
-```bash
-docker version
-kind version
-# or:
-minikube version
-```
-
-Required local images:
-
-```text
-retailops-api:0.1.0
-retailops-frontend:0.1.0
-```
-
-Build them locally before applying manifests:
-
-```bash
-docker build -t retailops-api:0.1.0 services/api
-docker build -t retailops-frontend:0.1.0 frontend
-```
-
-The dev overlay creates placeholder local secrets with `change-me` values. Do
-not reuse this overlay as a production database or secret pattern.
-
----
-
-## 3. Fast Validation Without a Cluster
-
-Run the Kubernetes smoke test:
-
-```bash
-make k8s-smoke
-```
-
-The smoke test:
-
-- renders `k8s/base`,
-- renders `k8s/overlays/dev`,
-- parses rendered YAML,
-- checks required Deployments, Services, Jobs and Ingresses,
-- checks probe and resource coverage for deployed workloads,
-- writes a local report to `ci-cd/reports/k8s/kubernetes-smoke.txt`.
-
-The report is ignored by Git by default because it is local and regenerated.
-
-If this fails, inspect the report:
-
-```bash
-cat ci-cd/reports/k8s/kubernetes-smoke.txt
-```
-
-You can also run the underlying render commands directly:
-
-```bash
-kubectl kustomize k8s/base
-kubectl kustomize k8s/overlays/dev
-```
-
----
-
-## 4. Optional Server-Side Dry Run
-
-Use a server-side dry run only when a local cluster is already available:
-
-```bash
-K8S_SMOKE_DRY_RUN=1 make k8s-smoke
-```
-
-This adds:
-
-```bash
-kubectl apply --dry-run=server
-```
-
-Use this after local API server availability is confirmed:
-
-```bash
-kubectl cluster-info
-```
-
----
-
-## 5. Create a Local kind Cluster
-
-Create a cluster:
-
-```bash
-kind create cluster --name retailops
-```
-
-Load local images into the cluster:
-
-```bash
-kind load docker-image retailops-api:0.1.0 --name retailops
-kind load docker-image retailops-frontend:0.1.0 --name retailops
-```
-
-Confirm access:
-
-```bash
-kubectl cluster-info --context kind-retailops
-kubectl get nodes
-```
-
-If using `minikube`, build images inside the minikube Docker environment or load
-them with the equivalent minikube image command:
-
-```bash
-minikube image load retailops-api:0.1.0
-minikube image load retailops-frontend:0.1.0
-```
-
----
-
-## 6. Apply the Dev Overlay
-
-Apply the local dev overlay:
-
-```bash
-kubectl apply -k k8s/overlays/dev
-```
-
-Watch the namespace:
-
-```bash
-kubectl get all -n retailops
-```
-
-Expected workload types:
-
-```text
-Deployment/retailops-api
-Deployment/retailops-frontend
-Deployment/postgres
-Deployment/redpanda
-Deployment/retailops-realtime-consumer
-Job/retailops-migrate
-Job/retailops-seed-demo-data
-Job/redpanda-topic-init
-```
-
-Wait for Deployments:
-
-```bash
-kubectl rollout status deployment/postgres -n retailops
-kubectl rollout status deployment/redpanda -n retailops
-kubectl rollout status deployment/retailops-api -n retailops
-kubectl rollout status deployment/retailops-frontend -n retailops
-kubectl rollout status deployment/retailops-realtime-consumer -n retailops
-```
-
-Check Jobs:
-
-```bash
-kubectl get jobs -n retailops
-kubectl logs job/retailops-migrate -n retailops
-kubectl logs job/retailops-seed-demo-data -n retailops
-kubectl logs job/redpanda-topic-init -n retailops
-```
-
----
-
-## 7. Local Service Validation
-
-Port-forward the API:
-
-```bash
-kubectl port-forward -n retailops service/retailops-api 8000:8000
-```
-
-Check health and readiness from another terminal:
-
-```bash
-curl --silent --show-error http://localhost:8000/health
-curl --silent --show-error http://localhost:8000/ready
-```
-
-Port-forward the frontend:
-
-```bash
-kubectl port-forward -n retailops service/retailops-frontend 3000:80
-```
-
-Check the frontend:
-
-```bash
-curl --silent --show-error --head http://localhost:3000/
-```
-
-Check live operations:
-
-```bash
-curl --silent --show-error \
-  "http://localhost:8000/dashboard/live-operations?window_minutes=15"
-```
-
----
-
-## 8. Local Ingress Validation
-
-The base Ingress assumes:
-
-```text
-ingressClassName: nginx
-host: retailops.local
-```
-
-Install or enable an nginx ingress controller for the local cluster before using
-Ingress. For `minikube`:
-
-```bash
-minikube addons enable ingress
-```
-
-For `kind`, install an nginx ingress controller compatible with kind, then wait
-for the controller Pod to be ready in its namespace.
-
-Map `retailops.local` to the ingress address. For many local setups:
-
-```text
-127.0.0.1 retailops.local
-```
-
-Then test:
-
-```bash
-curl --silent --show-error http://retailops.local/
-curl --silent --show-error http://retailops.local/api/health
-curl --silent --show-error http://retailops.local/api/ready
-```
-
-Expected routing:
-
-| Request | Backend |
-|---|---|
-| `/` | `retailops-frontend` |
-| `/api/health` | `retailops-api` as `/health` |
-| `/api/ready` | `retailops-api` as `/ready` |
-
-TLS and AWS ALB annotations are intentionally out of scope for this local
-manifest set.
-
----
-
-## 9. Realtime Consumer Checks
-
-Check the consumer Pod:
-
-```bash
-kubectl get pods -n retailops -l app.kubernetes.io/name=retailops-realtime-consumer
-kubectl logs -n retailops deployment/retailops-realtime-consumer
-```
-
-Check Redpanda topics:
-
-```bash
-kubectl exec -n retailops deployment/redpanda -- \
-  rpk -X brokers=redpanda:9092 topic list
-```
-
-Expected topics:
-
-```text
-retailops.sales.v1
-retailops.inventory.v1
-retailops.pricing.v1
-retailops.intelligence.v1
-retailops.operations.v1
-retailops.dlq.v1
-```
-
----
-
-## 10. Troubleshooting
-
-### ImagePullBackOff
-
-The local cluster cannot see images from the host Docker daemon.
-
-For kind:
-
-```bash
-kind load docker-image retailops-api:0.1.0 --name retailops
-kind load docker-image retailops-frontend:0.1.0 --name retailops
-```
-
-For minikube:
-
-```bash
-minikube image load retailops-api:0.1.0
-minikube image load retailops-frontend:0.1.0
-```
-
-Then restart the affected Deployment:
-
-```bash
-kubectl rollout restart deployment/retailops-api -n retailops
-kubectl rollout restart deployment/retailops-frontend -n retailops
-```
-
-### API readiness fails
-
-The API readiness probe depends on PostgreSQL.
-
-Check database status:
-
-```bash
-kubectl get pods -n retailops -l app.kubernetes.io/name=postgres
-kubectl logs -n retailops deployment/postgres
-kubectl describe pod -n retailops -l app.kubernetes.io/name=retailops-api
-```
-
-Check migrations:
-
-```bash
-kubectl get job retailops-migrate -n retailops
-kubectl logs job/retailops-migrate -n retailops
-```
-
-### Seed job fails
-
-Check whether migrations completed first:
-
-```bash
-kubectl get jobs -n retailops
-kubectl logs job/retailops-migrate -n retailops
-kubectl logs job/retailops-seed-demo-data -n retailops
-```
-
-### Consumer waits forever
-
-The consumer waits for migrations and Redpanda topics before it starts.
-
-Check:
-
-```bash
-kubectl logs -n retailops deployment/retailops-realtime-consumer -c wait-for-migrations
-kubectl logs -n retailops deployment/retailops-realtime-consumer -c wait-for-redpanda-topics
-kubectl logs job/redpanda-topic-init -n retailops
-```
-
-### Ingress returns 404
-
-Check ingress resources:
-
-```bash
-kubectl get ingress -n retailops
-kubectl describe ingress retailops-api -n retailops
-kubectl describe ingress retailops-frontend -n retailops
-```
-
-Confirm the request uses the expected host:
-
-```bash
-curl --header "Host: retailops.local" http://127.0.0.1/api/health
-```
-
----
-
-## 11. Cleanup
-
-Delete RetailOps resources:
-
-```bash
-kubectl delete -k k8s/overlays/dev
-```
-
-Delete the local kind cluster:
-
-```bash
-kind delete cluster --name retailops
-```
-
-For minikube:
-
-```bash
-minikube delete
-```
-
----
-
-## 12. Evidence Notes
-
-For local evidence, capture command output from:
-
-```bash
-make k8s-smoke
-kubectl get all -n retailops
-kubectl get ingress -n retailops
-kubectl logs job/retailops-migrate -n retailops
-kubectl logs job/retailops-seed-demo-data -n retailops
-```
-
-Store raw local reports under:
-
-```text
-ci-cd/reports/k8s/
-```
-
-Before committing evidence, sanitize local paths, private hostnames, cluster
-names, tokens and any environment-specific values. Prefer short `*-snapshot.txt`
-files or curated notes over full raw logs.
+Do not delete another cluster or run a global Docker prune. Unrelated Docker
+containers and Kubernetes contexts are outside this drill.

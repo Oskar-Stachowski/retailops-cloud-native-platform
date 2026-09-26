@@ -6,7 +6,7 @@ Cloud-Native RetailOps Platform is a DevOps case study project focused on buildi
 
 The platform is designed to improve operational visibility, support sales and inventory decisions, detect business anomalies, and provide a scalable foundation for future AI-driven retail optimization.
 
-The project demonstrates how modern DevOps, cloud-native architecture, Infrastructure as Code, CI/CD, observability, and security practices can be combined into one end-to-end platform. MLOps and Kubernetes are documented as future platform extensions unless marked otherwise in the status matrix below.
+The project demonstrates how modern DevOps, cloud-native architecture, Infrastructure as Code, CI/CD, observability, and security practices can be combined into one end-to-end platform. Production MLOps and EKS remain future platform extensions; local Kubernetes has a repeatable runtime validation path.
 
 <p align="center">
   <img src="GPTimages/Architecture.png" width="90%"/>
@@ -31,7 +31,7 @@ This repository intentionally separates implemented components from target archi
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer deployment; producer/replay E2E is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
-| Kubernetes/EKS | Base manifests started | `k8s/base/`, `k8s/overlays/dev`, `scripts/ci/kubernetes_smoke.sh`; namespace, API/frontend services, local dev PostgreSQL, Redpanda, realtime consumer, migration and seed jobs with probes/resources and local nginx ingress |
+| Local Kubernetes / EKS | Local runtime drill implemented; EKS pending | [Runbook](docs/runbooks/local-kubernetes-runbook.md): kind, Traefik ingress, enforced NetworkPolicy, persistent dev database/broker, jobs, browser checks, restart/update/rollback and cleanup |
 | MLOps/model lifecycle | Local foundation implemented | `ml/`, [MLOps Lifecycle](docs/mlops-lifecycle.md), feature contract, baseline model, evaluation, metadata, batch inference, metrics and drift checks; no production model serving yet |
 
 ---
@@ -183,7 +183,7 @@ Contains data schemas and samples.
 Contains Infrastructure as Code definitions, mainly Terraform modules and environment configurations.
 
 ### `k8s/`
-Contains the Kubernetes runtime scope. The current base includes namespace, shared configuration, API/frontend service manifests and local nginx ingress, plus a dev overlay for local PostgreSQL, Redpanda, realtime consumer, migrations and seed data; Helm charts are not implemented yet.
+Contains the Kubernetes runtime scope. The current base includes namespace, shared configuration, API/frontend Services, Traefik ingress and NetworkPolicies, plus a dev overlay with PostgreSQL/Redpanda PVCs, consumer, migrations and seed data. `make k8s-runtime-drill` exercises the isolated local runtime; Helm and EKS remain future work.
 
 ### `observability/`
 Contains monitoring, logging, dashboard and alerting configuration.
@@ -396,7 +396,7 @@ docker compose logs -f
 ### 📌 Notes
 
 * This is a **local-first platform environment** designed to validate application, data, observability, and delivery behavior without running permanent cloud workloads.
-* AWS Terraform foundation and CI/CD automation are implemented; Kubernetes workload deployment remains future scope beyond the initial API/frontend, dev database/broker, realtime consumer and one-shot job manifests.
+* AWS Terraform foundation and CI/CD automation are implemented. The local Kubernetes drill runs the workloads and verifies persistence/update/rollback; EKS deployment remains future scope.
 * The frontend is an operator dashboard for the local platform, not a public production service.
 
 
@@ -416,7 +416,7 @@ The current delivery workflow automates validation and evidence generation:
 10. Terraform validation and IaC scanning
 11. Security evidence upload
 
-Container registry publishing and workload deployment are future promotion steps, not part of the default CI path.
+Registry publishing uses the verified manual release workflow. Local Kubernetes runtime validation is part of Required CI; cloud workload promotion remains separate.
 
 Evidence entry points:
 
@@ -448,9 +448,9 @@ The foundation intentionally does not create permanent compute workloads, EKS, R
 
 ## Kubernetes Deployment
 
-Kubernetes is a target runtime design. The repository now includes base manifests for namespace, shared runtime configuration, API service, frontend service, local dev PostgreSQL, Redpanda, realtime consumer, migrations and seed data, not a complete deployment path.
+The repository includes a repeatable local kind deployment with namespace/configuration, API/frontend, PostgreSQL and Redpanda PVCs, realtime consumer, migrations and seed jobs. `make k8s-runtime-drill` tests ingress, enforced network policies, browser/API behavior, persistence, restart and same-schema application rollback. See the [local runbook](docs/runbooks/local-kubernetes-runbook.md) for architecture and artifact boundaries.
 
-The future Kubernetes scope is designed to support:
+Further Kubernetes work includes Helm packaging, production storage, autoscaling and EKS. The application architecture supports:
 
 - Backend APIs
 - Frontend services
