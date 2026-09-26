@@ -124,3 +124,12 @@ print('200')
     )
     assert (result.returncode == 0) is recovers, result.stdout + result.stderr
     assert (tmp_path / "target-calls").read_text() == "2"
+
+
+@pytest.mark.parametrize("health,ready", [("unknown", False), ("err", False), ("ok", True)])
+def test_loaded_rule_requires_successful_evaluation(monkeypatch, health, ready):
+    module = load("observability_drill")
+    current = {"name": module.ALERT, "health": health, "state": "inactive"}
+    monkeypatch.setattr(module, "get", lambda url: {"data": {"groups": [{"rules": [current]}]}})
+    assert bool(module.rule_in_state("inactive")) is ready
+    assert module.rule_in_state("firing") is None

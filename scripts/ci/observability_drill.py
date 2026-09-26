@@ -56,9 +56,15 @@ def rule():
         for r in group["rules"]
         if r["name"] == ALERT
     ]
-    if len(matches) != 1 or matches[0]["health"] != "ok":
-        raise RuntimeError("Expected exactly one healthy API outage rule")
+    if len(matches) != 1:
+        raise RuntimeError("Expected exactly one API outage rule")
     return matches[0]
+
+
+def rule_in_state(state):
+    current = rule()
+    # Loaded rules have unknown health until their first scheduled evaluation.
+    return current if current["health"] == "ok" and current["state"] == state else None
 
 
 def main():
@@ -110,7 +116,7 @@ def main():
         report["dashboard_uids"] = sorted(expected)
         report["baseline_rule"] = wait_for(
             "Outage alert is initially inactive",
-            lambda: rule() if rule()["state"] == "inactive" else None,
+            lambda: rule_in_state("inactive"),
         )
         report["baseline_sli"] = wait_for(
             "Baseline scrape SLI recorded",
@@ -121,11 +127,11 @@ def main():
         started = time.monotonic()
         command("stop", "api")
         report["pending_rule"] = wait_for(
-            "Outage alert entered pending", lambda: rule() if rule()["state"] == "pending" else None
+            "Outage alert entered pending", lambda: rule_in_state("pending")
         )
         report["firing_rule"] = wait_for(
             "Outage alert is firing",
-            lambda: rule() if rule()["state"] == "firing" else None,
+            lambda: rule_in_state("firing"),
             seconds=210,
         )
         report["seconds_to_firing"] = round(time.monotonic() - started, 2)
@@ -134,10 +140,10 @@ def main():
         report["outage_sli"] = query("retailops:api_scrape_availability:ratio5m")
         if not report["outage_sli"] or not 0 <= float(report["outage_sli"][0]["value"][1]) < 1:
             raise RuntimeError("Scrape SLI did not reflect outage")
-        command("start", "api")
+        command("up", "-d", "--no-deps", "--no-recreate", "api")
         wait_for("API scrape recovered", lambda: query('up{job="retailops-api"} == 1'))
         report["recovered_rule"] = wait_for(
-            "Outage alert resolved", lambda: rule() if rule()["state"] == "inactive" else None
+            "Outage alert resolved", lambda: rule_in_state("inactive")
         )
         report["recovered_grafana_query"] = query('up{job="retailops-api"} == 1', grafana=True)
         if not report["recovered_grafana_query"]:
@@ -145,7 +151,7 @@ def main():
         report["status"] = "passed"
     finally:
         # Always restore the stopped service; project cleanup belongs to the outer runner.
-        command("start", "api")
+        command("up", "-d", "--no-deps", "--no-recreate", "api")
         report["finished_at"] = datetime.now(timezone.utc).isoformat()
         path.write_text(json.dumps(report, indent=2) + "\n")
 
