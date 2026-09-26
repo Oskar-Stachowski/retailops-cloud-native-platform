@@ -1,7 +1,7 @@
-# Local release identity and promotion policy
+# Release identity and registry promotion policy
 
 `VERSION` contains the platform's next `MAJOR.MINOR.PATCH` version. The current
-candidate line is `0.2.0`. Existing `0.1.0` Docker labels were development labels,
+candidate line is `0.2.1`. Existing `0.1.0` Docker labels were development labels,
 not published Git releases. The API's OpenAPI version and frontend package
 version are separate metadata; the release manifest identifies the platform.
 
@@ -47,7 +47,46 @@ IDs from the previous manifest; it never rebuilds or uses `latest`.
    artifacts, record registry digests, attach SBOM/provenance and retain the
    predecessor. A fresh rebuild is a new artifact requiring verification.
 
-This change establishes local candidate builds and rollback evidence. It does
-not create a public Git release, publish images or deploy a cloud environment.
-The [rollback runbook](../runbooks/application-rollback.md) defines the migration
-boundary and executable drill.
+## Verified GHCR publication
+
+The manually dispatched [release workflow](../../.github/workflows/release.yml)
+publishes `ghcr.io/oskar-stachowski/retailops-cloud-native-platform-api` and
+`ghcr.io/oskar-stachowski/retailops-cloud-native-platform-frontend`. New packages
+use GHCR's default private visibility and the workflow does not change access
+settings. Actions authenticates with its short-lived `GITHUB_TOKEN`.
+
+It requires a clean, current protected-main commit, a new `VERSION`, an ancestor
+predecessor and successful latest Required CI runs on main for both revisions.
+The source pair is built once, exercised through update/failure/rollback, and
+scanned using the repository's fixed-CRITICAL image policy. Trivy 0.74.0 generates
+SPDX SBOMs from those exact images. Only then are the same local image IDs pushed;
+no rebuild occurs between test and publication.
+
+Registry tags include full source SHA, workflow run and attempt. They identify
+publication attempts, are never used for deployment, and are not overwritten by
+a retry. The manifest records the registry manifest digest separately from the
+Docker engine image ID. Both the candidate and freshly built predecessor remain
+in GHCR for the demonstrated rollback. This first release bootstraps a verified
+predecessor; it does not claim to reuse an earlier published release artifact.
+
+GitHub signs provenance and SBOM attestations for all four registry digests, and
+signs the manifest binding their source revisions, migration fingerprints and
+SBOM checksums. The provenance signer/source identifies the release workflow's
+main commit (the harness); the signed manifest and OCI labels identify each
+image's application source, including the older predecessor. No SLSA level or
+reproducible-byte-build claim is made.
+
+A separate fresh runner verifies the manifest, all image/SBOM signatures, exact
+repository/workflow/main source identity, attached SBOM content and checksums.
+It pulls by digest and binds the verified registry identity to the consumer's
+engine-local image ID (which can differ between Docker storage backends), while
+retaining the builder's ID in the report. It repeats the full drill without any image build. Only its
+success permits an annotated `vX.Y.Z` tag and a published GitHub Release. The
+release attaches a durable evidence bundle; intermediate Actions artifacts have
+14-day retention. Failed partial publication is not a verified release.
+
+The current workflow publishes native Linux AMD64 artifacts on GitHub-hosted
+runners. Local ARM64 drill results are a separate platform; these do not establish
+native ARM64 registry release coverage. Cloud deployment is a separate step.
+See the [registry runbook](../runbooks/registry-release.md) and
+[rollback runbook](../runbooks/application-rollback.md).

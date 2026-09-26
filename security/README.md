@@ -15,7 +15,7 @@ This directory contains the security and DevSecOps configuration currently used 
 | Kubernetes policy scanning | Kubeconform, Conftest and blocking Checkov baseline |
 | Critical IaC guardrails | Makefile and CI checks for IAM users, access keys, AdministratorAccess, and wildcard IAM actions |
 | Repository SBOM | Syft-based `make sbom-repository` target with SPDX, CycloneDX and text snapshots |
-| Build provenance | GitHub Actions provenance workflow for local API/frontend image subjects |
+| Build provenance | Local-image provenance workflow plus signed registry-release manifests, image provenance and SPDX SBOM verification before release promotion |
 
 ## Current Policy
 
@@ -61,7 +61,7 @@ Safe Kubernetes hardening that does not change runtime behavior may still be app
 ## Future Hardening
 
 - Remove accepted Checkov exceptions as registry-backed images and hardened workload filesystems become available.
-- Add registry-backed image signing and verification for release images.
+- Extend verified release-image attestations to deployment admission when a deployment runtime exists.
 - Add cloud secret storage through AWS Secrets Manager or SSM Parameter Store when a cloud runtime is implemented.
 - Add a threat model and accepted-risk register.
 - Add runtime detection only when there is a real deployed workload to monitor.

@@ -1,0 +1,39 @@
+name: Attest tested release image
+description: Bind a registry digest to this workflow and its SPDX SBOM.
+inputs:
+  name:
+    description: Full registry repository
+    required: true
+  digest:
+    description: Published manifest digest
+    required: true
+  stem:
+    description: Evidence filename prefix
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Attest build provenance
+      id: provenance
+      uses: actions/attest-build-provenance@v3
+      with:
+        subject-name: ${{ inputs.name }}
+        subject-digest: ${{ inputs.digest }}
+        push-to-registry: true
+    - name: Attest SPDX SBOM
+      id: sbom
+      uses: actions/attest-sbom@v3
+      with:
+        subject-name: ${{ inputs.name }}
+        subject-digest: ${{ inputs.digest }}
+        sbom-path: ci-cd/reports/registry/${{ inputs.stem }}.spdx.json
+        push-to-registry: true
+    - name: Preserve signed bundles
+      shell: bash
+      env:
+        PROVENANCE_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+        SBOM_BUNDLE: ${{ steps.sbom.outputs.bundle-path }}
+        STEM: ${{ inputs.stem }}
+      run: |
+        cp "$PROVENANCE_BUNDLE" "ci-cd/reports/registry/${STEM}-provenance.jsonl"
+        cp "$SBOM_BUNDLE" "ci-cd/reports/registry/${STEM}-sbom.jsonl"
