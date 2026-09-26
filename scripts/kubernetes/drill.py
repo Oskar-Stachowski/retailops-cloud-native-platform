@@ -372,12 +372,12 @@ class KubernetesDrill(Drill):
         try:
             with urlopen(  # noqa: S310 -- generated loopback HTTP origin
                 Request(self.url + path, headers={"Host": "retailops.local"}),  # noqa: S310
-                timeout=5,
+                timeout=15,  # Nginx has a 5s upstream connect timeout.
             ) as response:
                 return response.status
         except HTTPError as error:
             return error.code
-        except URLError:
+        except (URLError, TimeoutError):
             return 0
 
     def until(self, check: object, message: str, timeout: int = 90) -> None:
