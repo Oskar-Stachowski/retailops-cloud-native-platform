@@ -70,6 +70,15 @@ SBOM signature/content, OCI labels and Docker image identity. Imported manifests
 also must match migration fingerprints and version metadata exported from Git.
 There is no fallback to mutable tags or to a local image build.
 
+The pinned scanner emits SPDX 2.3 and verification requires the versioned
+`https://spdx.dev/Document/v2.3` predicate used by GitHub's SBOM action. Other
+document versions are refused until their verification contract is reviewed.
+See [GitHub's SBOM verification instructions](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations#verifying-an-attestation-for-sboms).
+
+Image SBOMs describe packages discovered in the final runtime images. They do
+not claim to enumerate every dependency embedded in compiled frontend bundles;
+the source lockfile and required frontend dependency audit cover that build input.
+
 ## Failure handling
 
 - A failed preflight, runtime drill, vulnerability scan or SBOM generation blocks
