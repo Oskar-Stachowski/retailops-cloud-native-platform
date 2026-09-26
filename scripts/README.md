@@ -18,3 +18,10 @@ local Kustomize manifests.
 an isolated kind cluster, test ingress/policies/streaming, and verify persistent
 data through restart, update and rollback. See the
 [runbook](../docs/runbooks/local-kubernetes-runbook.md).
+
+`scripts/terraform/inventory.py` reads the selected RetailOps account inventory.
+`make terraform-plan-dev` produces an isolated empty-state baseline;
+`make terraform-drift` reviews existing S3 state with account/backend guards.
+Both need `TF_EXPECTED_ACCOUNT_ID`. `make terraform-state-test` tests backend
+controls and real local-file drift/migration without AWS credentials. See the
+[drift runbook](../docs/runbooks/terraform-drift-check.md).

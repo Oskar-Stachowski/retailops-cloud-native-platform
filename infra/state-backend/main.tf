@@ -44,6 +44,16 @@ resource "aws_kms_key" "state" {
   description             = "RetailOps persistent Terraform state encryption"
   enable_key_rotation     = true
   deletion_window_in_days = 30
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "EnableAccountKeyAdministration"
+      Effect    = "Allow"
+      Principal = { AWS = "arn:aws:iam::${var.expected_account_id}:root" }
+      Action    = "kms:*"
+      Resource  = "*"
+    }]
+  })
   lifecycle {
     prevent_destroy = true
   }

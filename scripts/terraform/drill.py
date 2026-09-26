@@ -20,6 +20,8 @@ def main() -> None:  # noqa: PLR0915 -- ordered local integration drill
         "status": "failed",
         "scope": "local_file fixture; no AWS resources or S3 backend",
         "started_at": datetime.now(UTC).isoformat(),
+        "source_commit": run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], env).stdout.strip(),
+        "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
     report_path = ROOT / "ci-cd/reports/terraform-state/contract-drill.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -97,6 +99,10 @@ def main() -> None:  # noqa: PLR0915 -- ordered local integration drill
                 plans_left_state_unchanged=True,
             )
         report["cleanup"] = "passed"
+    except Exception as error:
+        report["status"] = "failed"
+        report["error_type"] = type(error).__name__
+        raise
     finally:
         report["finished_at"] = datetime.now(UTC).isoformat()
         report_path.write_text(json.dumps(report, indent=2) + "\n")
