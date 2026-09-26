@@ -31,7 +31,11 @@ and this actual kind runtime drill. The runtime uses the host's native Linux
 architecture: ARM64 on Apple Silicon, AMD64 on GitHub's Ubuntu runner. Images
 are built once from Git archives, loaded into kind with `imagePullPolicy: Never`,
 and checked against the container runtime's image IDs and source labels.
-These source builds **are not the signed GHCR artifacts of v0.2.1**, which were
+The infrastructure images are pinned by OCI digest. With Docker's containerd
+store they are imported for the native platform; classic Docker delegates the
+original digest pull to kubelet because its archive rewrites anonymous image
+references. This avoids kind's [multi-platform archive issue](https://github.com/kubernetes-sigs/kind/issues/4224)
+with Docker's containerd image store. These source builds **are not the signed GHCR artifacts of v0.2.1**, which were
 published for AMD64 only. A native ARM64 registry release is still separate work.
 
 ## What the drill does

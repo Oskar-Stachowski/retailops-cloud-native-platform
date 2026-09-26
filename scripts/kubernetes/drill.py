@@ -127,6 +127,9 @@ class KubernetesDrill(Drill):
             ],
             stream=True,
         )
+        node = self.get("nodes", "default")["items"][0]
+        self.report["kubernetes"] = node["status"]["nodeInfo"]
+        self.preload_infrastructure()
         self.k("apply", "-f", str(ROOT / "scripts/kubernetes/vendor/kindnet.yaml"))
         self.k("-n", "kube-system", "rollout", "status", "daemonset/kindnet", "--timeout=240s")
         self.k("wait", "--for=condition=Ready", "nodes", "--all", "--timeout=240s")
@@ -136,17 +139,66 @@ class KubernetesDrill(Drill):
         node = self.get("nodes", "default")["items"][0]
         self.report["kubernetes"] = node["status"]["nodeInfo"]
 
-    def preload_data_images(self) -> None:
+    def preload_infrastructure(self) -> None:
         # Pull once into the host cache; later runs need no repeated registry downloads
         # inside fresh nodes. These shared cache tags are deliberately not deleted.
         refs = (
+            "registry.k8s.io/networking/kindnet:v1.0.1@sha256:f54f1d3c78c8c910b8dc7afff75feb437e9fdb48428117be67eec2e1e8d2cdf3",
+            "traefik:v3.7.13@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0",
             "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
             "redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408",
         )
         for ref in refs:
             self.run(["docker", "pull", ref], stream=True)
-            self.run(["kind", "load", "docker-image", "--name", self.project, ref], stream=True)
-        self.report["data_images"] = list(refs)
+            host_image = json.loads(self.run(["docker", "image", "inspect", ref]))[0]
+            if host_image["Id"] != ref.split("@")[1]:
+                # Classic Docker exports a rewritten anonymous manifest for digest-only
+                # references. Let kubelet pull the original digest on those engines.
+                continue
+            # Docker's containerd store exports a multi-platform index with only native
+            # blobs. kind load's --all-platforms would require absent foreign blobs.
+            archive = self.temp / "infrastructure.tar"
+            self.run(["docker", "image", "save", "--output", str(archive), ref], stream=True)
+            node = self.project + "-control-plane"
+            repository, digest = ref.split("@")
+            repository = repository.rsplit(":", 1)[0]
+            if "/" not in repository:
+                repository = "docker.io/library/" + repository
+            elif "." not in repository.split("/")[0]:
+                repository = "docker.io/" + repository
+            command = [
+                "docker",
+                "exec",
+                "--privileged",
+                "-i",
+                node,
+                "ctr",
+                "--namespace=k8s.io",
+                "images",
+                "import",
+                "--local",
+                "--base-name",
+                repository,
+                "--platform",
+                "linux/" + self.report["kubernetes"]["architecture"],
+                "--digests",
+                "--snapshotter=overlayfs",
+                "-",
+            ]
+            self.log.write("$ " + " ".join(command) + " (native image archive on stdin)\n")
+            self.log.flush()
+            with archive.open("rb") as source:
+                subprocess.run(
+                    command,
+                    stdin=source,
+                    stdout=self.log,
+                    stderr=self.log,
+                    env=self.env,
+                    timeout=300,
+                    check=True,
+                )
+            self.run(["docker", "exec", node, "crictl", "inspecti", repository + "@" + digest])
+        self.report["infrastructure_images"] = list(refs)
 
     def render(self) -> list:
         directory = self.temp / "k8s"
@@ -731,7 +783,6 @@ def main() -> int:
             drill.create()
             for release in releases.values():
                 drill.load_images(release)
-            drill.preload_data_images()
             drill.exercise(releases["previous"], releases["candidate"])
         except Exception as error:  # noqa: BLE001 -- report failure after cleanup
             drill.report["error"] = str(error)
