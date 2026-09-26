@@ -1,0 +1,627 @@
+{
+  "date": "2026-09-26",
+  "scope": "Step 5 audit and state/drift preparation; cloud backend activation deferred until a managed deployment is needed",
+  "baseline_report": {
+    "status": "passed",
+    "mode": "baseline",
+    "region": "eu-central-1",
+    "started_at": "2026-09-26T12:44:24.129902+00:00",
+    "source_commit": "e729ee82e72d0934b77c2a632297d92fa02fec04",
+    "working_tree_dirty": false,
+    "harness_sha256": "09ab9ed1a1934de0440d38bd4e4a247fd6445f15432116372759fe43e39a2120",
+    "ci_run_url": null,
+    "scope": "plan only; no apply, refresh, import, state push, migration or resource deletion",
+    "account_verified": true,
+    "terraform_version": "1.15.1",
+    "configuration_sha256": "57ce9f517b7b11a6c9e2da8bcf3db914f546e8e22cef46a16fb1186e73fe7be1",
+    "managed_instances_before": 0,
+    "plans": {
+      "normal": {
+        "terraform_exit_code": 2,
+        "resource_changes": [
+          {
+            "type": "aws_budgets_budget",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_cloudwatch_log_group",
+            "actions": [
+              "create"
+            ],
+            "count": 4
+          },
+          {
+            "type": "aws_default_security_group",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_ecr_lifecycle_policy",
+            "actions": [
+              "create"
+            ],
+            "count": 2
+          },
+          {
+            "type": "aws_ecr_repository",
+            "actions": [
+              "create"
+            ],
+            "count": 2
+          },
+          {
+            "type": "aws_flow_log",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_iam_policy",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_iam_role",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_iam_role_policy",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_internet_gateway",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_kms_alias",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_kms_key",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_route_table",
+            "actions": [
+              "create"
+            ],
+            "count": 3
+          },
+          {
+            "type": "aws_route_table_association",
+            "actions": [
+              "create"
+            ],
+            "count": 4
+          },
+          {
+            "type": "aws_subnet",
+            "actions": [
+              "create"
+            ],
+            "count": 4
+          },
+          {
+            "type": "aws_vpc",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          }
+        ],
+        "resource_drift": [],
+        "output_changes": 24
+      }
+    },
+    "classification": "baseline_only_no_state",
+    "private_artifacts_removed": true,
+    "finished_at": "2026-09-26T12:47:01.780764+00:00"
+  },
+  "inventory_report": {
+    "status": "complete",
+    "captured_at": "2026-09-26T12:44:29.552881+00:00",
+    "region": "eu-central-1",
+    "account_verified": true,
+    "source_commit": "e729ee82e72d0934b77c2a632297d92fa02fec04",
+    "working_tree_dirty": false,
+    "configuration": "RetailOps Project/Name tags and name prefixes; IAM/S3 queries have account-wide scope",
+    "limits": "Not an all-region cost audit. Untagged or differently named resources/state may exist; no bucket objects are read by discovery.",
+    "results": {
+      "tagged_resources": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "vpcs_by_project": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "vpcs_by_name": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "ecr": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "iam_policies": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "iam_roles": {
+        "status": "read",
+        "matching_resources": 1
+      },
+      "application_logs": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "flow_logs": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "budgets": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "kms_aliases": {
+        "status": "read",
+        "matching_resources": 0
+      },
+      "state_buckets": {
+        "status": "read",
+        "matching_resources": 0,
+        "total_buckets_listed": 4
+      }
+    },
+    "roles": [
+      {
+        "role_name": "retailops-dev-github-actions-terraform-plan",
+        "attached_policy_names": [
+          "ReadOnlyAccess"
+        ],
+        "inline_policy_count": 0
+      }
+    ],
+    "harness_sha256": "1ce99de0482de4223c82bf4355374ada1642ab003fa1d7a76d25ede8e4ad7932",
+    "aws_mutations": 0
+  },
+  "identity_cross_check": {
+    "github_plan_role_matches_audited_role": true,
+    "github_account_pin_configured": true,
+    "existing_role_or_permissions_changed": false
+  },
+  "local_state": {
+    "active_state_files_found": 0,
+    "historical_plan_contains_managed_resources": false,
+    "historical_plan_used_for_migration": false
+  },
+  "cloud_state": {
+    "matching_bucket_found": false,
+    "backend_provisioned": false,
+    "state_migrated": false,
+    "live_s3_lock_tested": false
+  },
+  "notes": [
+    "Existing IAM plan role intentionally retained; historical cleanup notes do not imply the whole AWS account is empty.",
+    "11 read-only inventory scopes covered eu-central-1 and account-wide IAM/S3; differently named or untagged resources and other regions were not exhaustively audited.",
+    "The real drift/migration integration test uses a disposable local_file resource, not AWS or S3."
+  ],
+  "status": "audit_and_preparation_verified_cloud_backend_not_activated",
+  "implementation": {
+    "pr": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/47",
+    "head": "3266c80ef96868644697fcf6c0090bd6e9285e99",
+    "tested_merge": "4b86566c68f26654dfa44acf9e59a6cc1c4bae82",
+    "merged_main": "beae2b19abf6a39edb0bc2155baa85a0a887a3d4",
+    "tested_and_merged_tree": "79fd4bb2d2a8b2bc38aef703a58ee6e917fe60b4"
+  },
+  "required_ci": {
+    "id": 36243524269,
+    "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36243524269",
+    "successful_jobs": 24,
+    "jobs": [
+      {
+        "id": 108408427684,
+        "name": "Detect changed areas",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408427829,
+        "name": "Required CI contract tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449105,
+        "name": "Repository diff hygiene",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449352,
+        "name": "iac-security-gate / Checkov IaC security report",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449353,
+        "name": "iac-security-gate / TFLint IaC quality gate",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449363,
+        "name": "docker-gate / Validate Docker Compose config",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449368,
+        "name": "frontend-gate / Frontend tests and lint",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449430,
+        "name": "data-gate / Synthetic data quality gate",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449435,
+        "name": "terraform-validation-gate / Terraform fmt, init and validate",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449448,
+        "name": "kubernetes-gate / Kustomize, schema and policy gates",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449458,
+        "name": "api-gate / API integration tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449467,
+        "name": "security-gate / Frontend image vulnerability scan",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449476,
+        "name": "security-gate / Secret scanning with Gitleaks",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449496,
+        "name": "security-gate / Python dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449510,
+        "name": "security-gate / Filesystem vulnerability scan",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449512,
+        "name": "security-gate / Frontend dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408449556,
+        "name": "security-gate / Backend image vulnerability scan",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408490022,
+        "name": "docker-gate / Build full stack and run smoke tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408496919,
+        "name": "frontend-gate / Build frontend application",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408538914,
+        "name": "frontend-gate / Build frontend Docker image",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408551891,
+        "name": "kubernetes-gate / Local kind runtime, persistence and rollback",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408581424,
+        "name": "security-gate / Security evidence summary",
+        "conclusion": "success"
+      },
+      {
+        "id": 108408667465,
+        "name": "api-gate / API Docker image build",
+        "conclusion": "success"
+      },
+      {
+        "id": 108409680095,
+        "name": "required-result",
+        "conclusion": "success"
+      }
+    ],
+    "regression_tests": 12,
+    "backend_mock_tests": 2,
+    "ci_path_tests": 16,
+    "checkov": {
+      "passed": 117,
+      "failed": 0,
+      "resource_local_skips": 3
+    },
+    "artifact": {
+      "id": 10906029336,
+      "name": "terraform-validation-evidence",
+      "sha256": "e2d624eada6b6abf92075b739919c1eb06a8d8838c8a589d9f3ce5d6d525d21f",
+      "download_checksum_verified": true
+    }
+  },
+  "ci_contract_drill": {
+    "status": "passed",
+    "scope": "local_file fixture; no AWS resources or S3 backend",
+    "started_at": "2026-09-26T12:57:43.812701+00:00",
+    "source_commit": "4b86566c68f26654dfa44acf9e59a6cc1c4bae82",
+    "harness_sha256": "f4fc237b95fda892418aeeb8f3271497a380fa84b5a05424c725039a0baa3dee",
+    "baseline": {
+      "terraform_exit_code": 2,
+      "resource_changes": [
+        {
+          "type": "local_file",
+          "actions": [
+            "create"
+          ],
+          "count": 1
+        }
+      ],
+      "resource_drift": [],
+      "output_changes": 0
+    },
+    "clean": {
+      "terraform_exit_code": 0,
+      "resource_changes": [],
+      "resource_drift": [],
+      "output_changes": 0
+    },
+    "external_change": {
+      "terraform_exit_code": 2,
+      "resource_changes": [],
+      "resource_drift": [
+        {
+          "type": "local_file",
+          "actions": [
+            "delete"
+          ],
+          "count": 1
+        }
+      ],
+      "output_changes": 0
+    },
+    "configuration_change": {
+      "terraform_exit_code": 2,
+      "resource_changes": [
+        {
+          "type": "local_file",
+          "actions": [
+            "delete",
+            "create"
+          ],
+          "count": 1
+        }
+      ],
+      "resource_drift": [],
+      "output_changes": 0
+    },
+    "local_migration_preserved_state": true,
+    "plans_left_state_unchanged": true,
+    "cleanup": "passed",
+    "finished_at": "2026-09-26T12:57:45.552346+00:00"
+  },
+  "oidc_workflow": {
+    "id": 36244078945,
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36244078945",
+    "head_sha": "beae2b19abf6a39edb0bc2155baa85a0a887a3d4",
+    "jobs": [
+      {
+        "id": 108409887394,
+        "name": "Validate Terraform before planning / Terraform fmt, init and validate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108409975901,
+        "name": "Guarded dev state and drift review",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 10907066145,
+        "name": "terraform-dev-plan-evidence",
+        "size_in_bytes": 954,
+        "digest": "sha256:76b515f25da47d3adc3d921e2ad12892f384b55f9d3e0ed85f1ad149b8e4a468"
+      },
+      {
+        "id": 10906274807,
+        "name": "terraform-validation-evidence",
+        "size_in_bytes": 808,
+        "digest": "sha256:e7924d088552aee206d9fb5b8dce22832312f4f40fa76c3933991ac3bb43249d"
+      }
+    ]
+  },
+  "oidc_plan": {
+    "status": "passed",
+    "mode": "baseline",
+    "region": "eu-central-1",
+    "started_at": "2026-09-26T13:07:41.900984+00:00",
+    "source_commit": "beae2b19abf6a39edb0bc2155baa85a0a887a3d4",
+    "working_tree_dirty": false,
+    "harness_sha256": "09ab9ed1a1934de0440d38bd4e4a247fd6445f15432116372759fe43e39a2120",
+    "ci_run_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36244078945",
+    "scope": "plan only; no apply, refresh, import, state push, migration or resource deletion",
+    "account_verified": true,
+    "terraform_version": "1.15.1",
+    "configuration_sha256": "c313e05e0d23b2a4974c85d1f8c35ce7eaadf8987a67a55c394314d9b666ad76",
+    "managed_instances_before": 0,
+    "plans": {
+      "normal": {
+        "terraform_exit_code": 2,
+        "resource_changes": [
+          {
+            "type": "aws_budgets_budget",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_cloudwatch_log_group",
+            "actions": [
+              "create"
+            ],
+            "count": 4
+          },
+          {
+            "type": "aws_default_security_group",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_ecr_lifecycle_policy",
+            "actions": [
+              "create"
+            ],
+            "count": 2
+          },
+          {
+            "type": "aws_ecr_repository",
+            "actions": [
+              "create"
+            ],
+            "count": 2
+          },
+          {
+            "type": "aws_flow_log",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_iam_policy",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_iam_role",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_iam_role_policy",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_internet_gateway",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_kms_alias",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_kms_key",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          },
+          {
+            "type": "aws_route_table",
+            "actions": [
+              "create"
+            ],
+            "count": 3
+          },
+          {
+            "type": "aws_route_table_association",
+            "actions": [
+              "create"
+            ],
+            "count": 4
+          },
+          {
+            "type": "aws_subnet",
+            "actions": [
+              "create"
+            ],
+            "count": 4
+          },
+          {
+            "type": "aws_vpc",
+            "actions": [
+              "create"
+            ],
+            "count": 1
+          }
+        ],
+        "resource_drift": [],
+        "output_changes": 24
+      }
+    },
+    "classification": "baseline_only_no_state",
+    "private_artifacts_removed": true,
+    "finished_at": "2026-09-26T13:07:56.974012+00:00"
+  },
+  "oidc_artifact": {
+    "id": 10907066145,
+    "name": "terraform-dev-plan-evidence",
+    "sha256": "76b515f25da47d3adc3d921e2ad12892f384b55f9d3e0ed85f1ad149b8e4a468",
+    "download_checksum_verified": true
+  },
+  "source_report_sha256": {
+    "local_baseline": "2233592736d0aa27032aaec129abcf69bd57ef6f0db10b3964a78ad14f760b43",
+    "inventory": "760e0cb6328c2ea6a04278eb0cb93ed406293642b35b559f269fd057b4db21a5",
+    "ci_contract_drill": "685565189f715657c5ab0664658f5314ac44309d2535d21ac920214a3b404760",
+    "oidc_plan": "185bb190883f0e0ecb22686a23a322c0ab125996bcaa58f616dd753f10614e96"
+  }
+}

@@ -1,6 +1,6 @@
 # Future Improvements Roadmap
 
-Reviewed against main `aa69c1e25f71e11034666f91057308454ba5d430` on 2026-09-26.
+Reviewed against main `beae2b19abf6a39edb0bc2155baa85a0a887a3d4` on 2026-09-26.
 This is a prioritized plan, not implementation evidence. Dated results live in
 [the evidence index](../../evidence/index.md).
 
@@ -49,6 +49,14 @@ Jobs, streaming deduplication, browser checks, PVC persistence through restarts,
 same-schema update/rollback and cleanup. This uses native source builds, separate
 from the signed registry artifacts above. EKS remains future work.
 
+Step 5 [audited state and implemented guarded plan/drift review](../../evidence/aws/2026-09-26-state-drift.md).
+The current account has no matching managed foundation or state bucket; the
+retained GitHub read-only plan role was verified and preserved. Baseline plans,
+real local-file drift/migration tests and backend configuration checks have dated
+evidence. S3/KMS configuration, scoped lock access and the migration/recovery
+runbook are ready for review at the next cloud activation. No live AWS state was
+migrated, and live S3 locking/recovery remains to be proven then.
+
 ## Next priorities
 
 | Priority | Work | Completion evidence |
@@ -57,7 +65,7 @@ from the signed registry artifacts above. EKS remains future work.
 | 2 | Extend recovery/rollback drills when schema or deployment behavior changes. The current same-schema application rollback and database restore are verified. | Keep dated checks and timings for each supported migration/deployment path. |
 | 3 | Maintain verified registry releases; add selection of retained published predecessors as release history grows. The first release bootstraps a freshly tested predecessor. | Build on the published v0.2.1 evidence and retain exact digests, signed bundles and runtime verification for each release. |
 | 4 | Maintain the completed local Kubernetes gate; extend it when deployment or schema behavior changes. | [ARM64/AMD64 runtime and persistence evidence](../../evidence/kubernetes/2026-09-26-runtime.md), 24 successful CI jobs and automatic cleanup. Cloud deployment and cluster-loss recovery remain separate scope. |
-| 5 | Verify Terraform remote state and drift workflow before another AWS showcase. | Reviewed backend/access design, state migration and plan-only drift evidence; refresh cost/cleanup records after any actual cloud run. |
+| 5 | Maintain the verified account-pinned baseline/drift workflow; activate the prepared S3/KMS backend when a managed deployment is needed. | [State audit and test evidence](../../evidence/aws/2026-09-26-state-drift.md) complete for the current state-less environment. A future cloud activation must add live state migration, lock/recovery and drift evidence. |
 | 6 | Refresh observability/SLO and Jenkins evidence through actual execution. | Dated metric/alert checks and Jenkins run tied to a commit; preserve older screenshots as historical. |
 | 7 | Re-evaluate ML artifacts after dependency/data changes and define model promotion criteria. | New evaluation, model metadata and reproducibility record; historical model binaries retain their original capture dates. |
 | 8 | Add Helm packaging or further deployment automation when a validated runtime requires it. | Lint/render/install/upgrade/rollback evidence for the chosen environment. |

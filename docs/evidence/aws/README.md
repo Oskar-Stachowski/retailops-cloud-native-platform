@@ -1,6 +1,12 @@
 # AWS and Terraform Evidence
 
-This folder stores curated, recruiter-facing evidence from a short, controlled AWS showcase window for the RetailOps Terraform and AWS foundation.
+This folder stores historical AWS showcase evidence and dated reviews of the
+RetailOps Terraform foundation, account inventory and state/drift workflow.
+
+The current [2026-09-26 state review](2026-09-26-state-drift.md) distinguishes
+empty-state baseline planning from live drift. It preserves the existing GitHub
+plan role and prepares an S3/KMS backend without provisioning it. The showcase
+screenshots and cleanup notes below retain their original scope and dates.
 
 The showcase is intentionally temporary. It proves that the Terraform foundation can be planned, applied, inspected in AWS Console, and destroyed without leaving cost-generating resources behind.
 
@@ -8,6 +14,7 @@ The showcase is intentionally temporary. It proves that the Terraform foundation
 
 | File | Purpose | Required before final commit? |
 |---|---|---:|
+| `2026-09-26-state-drift.md`, `2026-09-26-state-drift.json` | Scoped account audit, guarded local/OIDC baseline plans, CI tests and explicit S3 activation limits. | Current dated review |
 | `aws-cleanup-confirmation.md` | Manual cleanup checklist after destroy. | Yes |
 | `aws-console-vpc.png` | AWS Console screenshot for VPC/networking resources. | Optional but recommended |
 | `aws-console-ecr.png` | AWS Console screenshot for ECR repositories. | Optional but recommended |

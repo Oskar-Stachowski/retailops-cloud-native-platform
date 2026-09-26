@@ -26,7 +26,7 @@ This repository intentionally separates implemented components from target archi
 | PostgreSQL demo data | Implemented | `data/demo/`, `data/generator/`, seed scripts |
 | CI/CD quality gates | Implemented | `.github/workflows/`, `Jenkinsfile`, root `Makefile` |
 | Registry releases | Verified v0.2.1 | [GHCR publication, signed SBOM/provenance and fresh-pull rollback](docs/evidence/releases/2026-09-26-registry.md); [release runbook](docs/runbooks/registry-release.md) |
-| Terraform AWS foundation | Implemented foundation only | `infra/environments/dev`, reusable Terraform modules |
+| Terraform AWS foundation | Foundation and guarded plan/drift review implemented; S3 backend prepared | [State/drift audit and validation](docs/evidence/aws/2026-09-26-state-drift.md), `infra/environments/dev`, separate `infra/state-backend`; no active managed cloud deployment |
 | Observability | Implemented for local stack | Prometheus, Grafana provisioning, metrics endpoint, smoke tests |
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer deployment; producer/replay E2E is future work |
