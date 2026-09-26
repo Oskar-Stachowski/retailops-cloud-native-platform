@@ -115,10 +115,12 @@ for metric in "${expected_metrics[@]}"; do
 done
 
 log "Checking Prometheus targets..."
-request_url "${PROMETHEUS_BASE_URL}/api/v1/targets?state=active"
-assert_status "200"
-write_report "prometheus-targets.json" "${request_body}"
-python3 - "${REPORT_DIR}/prometheus-targets.json" <<'PYTHON'
+targets_ready=0
+for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+  request_url "${PROMETHEUS_BASE_URL}/api/v1/targets?state=active"
+  assert_status "200"
+  write_report "prometheus-targets.json" "${request_body}"
+  if python3 - "${REPORT_DIR}/prometheus-targets.json" <<'PYTHON'
 import json
 import sys
 with open(sys.argv[1]) as source:
@@ -128,6 +130,14 @@ for job in ("retailops-api", "prometheus"):
     if not matches or any(target["health"] != "up" for target in matches):
         raise SystemExit(f"Scrape target unhealthy or missing: {job}")
 PYTHON
+  then
+    targets_ready=1
+    break
+  fi
+  log "Waiting for both initial scrapes (${attempt}/${MAX_ATTEMPTS})..."
+  sleep "${SLEEP_SECONDS}"
+done
+[[ "${targets_ready}" == "1" ]] || fail "Required Prometheus targets did not become healthy."
 
 log "Checking Prometheus rules..."
 request_url "${PROMETHEUS_BASE_URL}/api/v1/rules"
