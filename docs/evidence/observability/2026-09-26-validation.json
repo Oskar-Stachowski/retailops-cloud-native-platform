@@ -1,0 +1,623 @@
+{
+  "captured_date": "2026-09-26",
+  "source_head": "5b3fc7ab1dca68e63f3e3f3f91548adbaba51855",
+  "tested_git_tree": "e606760f74d8ab98585fada612f649d0281dc5d4",
+  "implementation_merge": "7188d813dac0023a5daa99b7aa0210b3f823641a",
+  "github_actions": {
+    "run_id": 36251803830,
+    "platform": "linux/amd64",
+    "tested_merge_commit": "ef9b5974f3b360e3f7ff996363727ad54cfa0a64",
+    "artifact_id": 10909856406,
+    "artifact_zip_sha256": "ab4068a087252ad317d298f50af1ec96e146a5bfbe1b4348718418c76003aa6b",
+    "required_jobs": [
+      {
+        "id": 108431109240,
+        "name": "Required CI contract tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431109355,
+        "name": "Detect changed areas",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431145708,
+        "name": "Repository diff hygiene",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146140,
+        "name": "terraform-validation-gate / Terraform fmt, init and validate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146145,
+        "name": "data-gate / Synthetic data quality gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146164,
+        "name": "frontend-gate / Frontend tests and lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146268,
+        "name": "security-gate / Backend image vulnerability scan",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146290,
+        "name": "api-gate / API integration tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146298,
+        "name": "docker-gate / Validate Docker Compose config",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146324,
+        "name": "security-gate / Python dependency audit",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146331,
+        "name": "security-gate / Filesystem vulnerability scan",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146365,
+        "name": "security-gate / Secret scanning with Gitleaks",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146384,
+        "name": "security-gate / Frontend image vulnerability scan",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146386,
+        "name": "security-gate / Frontend dependency audit",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146412,
+        "name": "iac-security-gate / Checkov IaC security report",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146444,
+        "name": "kubernetes-gate / Kustomize, schema and policy gates",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431146459,
+        "name": "iac-security-gate / TFLint IaC quality gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431175251,
+        "name": "docker-gate / Build full stack and run smoke tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431199944,
+        "name": "frontend-gate / Build frontend application",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431238024,
+        "name": "frontend-gate / Build frontend Docker image",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431288094,
+        "name": "security-gate / Security evidence summary",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431294032,
+        "name": "kubernetes-gate / Local kind runtime, persistence and rollback",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108431425428,
+        "name": "api-gate / API Docker image build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 108432544643,
+        "name": "required-result",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "reports": {
+      "raw_incident_sha256": "398b74f6d4b85392a6b0f5703661e71bfd554405a5ab383b489e125c8a744d8c",
+      "raw_runtime_sha256": "e6cf67b369eb9045b70c811b68f7302879abaee252d6c2267b35000b59650710",
+      "runtime": {
+        "source_commit": "ef9b5974f3b360e3f7ff996363727ad54cfa0a64",
+        "started_at": "2026-09-26T15:25:03.634539+00:00",
+        "project": "retailops-ci-fe12115eed07",
+        "status": "passed",
+        "source_dirty": false,
+        "images": {
+          "api": {
+            "tag": "retailops-ci-fe12115eed07-api:test",
+            "id": "sha256:3fc21d940e9e55fbd2f0391d183e1185ab016165d952ffd6afb5427f641fd06a"
+          },
+          "frontend": {
+            "tag": "retailops-ci-fe12115eed07-frontend:test",
+            "id": "sha256:70285eac1213cf34bcd8b6755328c08d69d751faa8fe909649eed06f756eb1e3"
+          }
+        },
+        "cleanup_passed": true,
+        "finished_at": "2026-09-26T15:29:54.008943+00:00"
+      },
+      "incident": {
+        "started_at": "2026-09-26T15:26:19.516693+00:00",
+        "finished_at": "2026-09-26T15:29:35.547771+00:00",
+        "seconds_to_firing": 150.61,
+        "baseline_sli": [
+          {
+            "metric": {
+              "__name__": "retailops:api_scrape_availability:ratio5m",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436394.575,
+              "1"
+            ]
+          }
+        ],
+        "outage_sli": [
+          {
+            "metric": {
+              "__name__": "retailops:api_scrape_availability:ratio5m",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436545.187,
+              "0.18181818181818182"
+            ]
+          }
+        ],
+        "dashboard_uids": [
+          "retailops-api",
+          "retailops-business-operations",
+          "retailops-overview",
+          "retailops-stream-processing"
+        ],
+        "grafana_query": [
+          {
+            "metric": {
+              "__name__": "up",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436379.551,
+              "1"
+            ]
+          }
+        ],
+        "recovered_grafana_query": [
+          {
+            "metric": {
+              "__name__": "up",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436575.432,
+              "1"
+            ]
+          }
+        ]
+      },
+      "metric_sample_counts": {
+        "retailops_api_info": 1,
+        "retailops_db_operations_total": 5,
+        "retailops_stream_metrics_generated_at_seconds": 1
+      },
+      "alert_states": {
+        "baseline": {
+          "state": "inactive",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [],
+          "health": "ok",
+          "evaluationTime": 0.00015715,
+          "lastEvaluation": "2026-09-26T15:26:34.337419154Z",
+          "type": "alerting"
+        },
+        "pending": {
+          "state": "pending",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [
+            {
+              "labels": {
+                "alertname": "RetailOpsApiMetricsTargetDown",
+                "component": "api",
+                "domain": "platform",
+                "instance": "api:8000",
+                "job": "retailops-api",
+                "service": "retailops-api",
+                "severity": "critical"
+              },
+              "annotations": {
+                "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+                "summary": "RetailOps API metrics target is down"
+              },
+              "state": "pending",
+              "activeAt": "2026-09-26T15:27:04.336628592Z",
+              "value": "0e+00"
+            }
+          ],
+          "health": "ok",
+          "evaluationTime": 0.000432474,
+          "lastEvaluation": "2026-09-26T15:27:04.337534059Z",
+          "type": "alerting"
+        },
+        "firing": {
+          "state": "firing",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [
+            {
+              "labels": {
+                "alertname": "RetailOpsApiMetricsTargetDown",
+                "component": "api",
+                "domain": "platform",
+                "instance": "api:8000",
+                "job": "retailops-api",
+                "service": "retailops-api",
+                "severity": "critical"
+              },
+              "annotations": {
+                "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+                "summary": "RetailOps API metrics target is down"
+              },
+              "state": "firing",
+              "activeAt": "2026-09-26T15:27:04.336628592Z",
+              "value": "0e+00"
+            }
+          ],
+          "health": "ok",
+          "evaluationTime": 0.000431479,
+          "lastEvaluation": "2026-09-26T15:29:04.338450699Z",
+          "type": "alerting"
+        },
+        "recovered": {
+          "state": "inactive",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [],
+          "health": "ok",
+          "evaluationTime": 0.000207423,
+          "lastEvaluation": "2026-09-26T15:29:34.337622439Z",
+          "type": "alerting"
+        }
+      }
+    }
+  },
+  "jenkins": {
+    "build": 4,
+    "platform": "linux/arm64 containers on macOS ARM64 agent",
+    "reports": {
+      "raw_incident_sha256": "2e6619c992d3dd4c2000d832f4088d04d39f000042e741c7e5cb33eaf5970895",
+      "raw_runtime_sha256": "c0471f606fcb11965b19a7fd7c2ff481c53f49a558041e16e59981b5430efb53",
+      "runtime": {
+        "source_commit": "5b3fc7ab1dca68e63f3e3f3f91548adbaba51855",
+        "started_at": "2026-09-26T15:27:13.017499+00:00",
+        "project": "retailops-ci-c1b9457aa1f3",
+        "status": "passed",
+        "source_dirty": false,
+        "images": {
+          "api": {
+            "tag": "retailops-ci-c1b9457aa1f3-api:test",
+            "id": "sha256:cbefd830d1f086140e443b0f7ee6ddbfb62502ba470800b18d7af69191d86410"
+          },
+          "frontend": {
+            "tag": "retailops-ci-c1b9457aa1f3-frontend:test",
+            "id": "sha256:9e87f510bf2c54187ca2a04a0548868b643826ad20445dee0de5cdd702dd20d4"
+          }
+        },
+        "cleanup_passed": true,
+        "finished_at": "2026-09-26T15:35:12.832882+00:00"
+      },
+      "incident": {
+        "started_at": "2026-09-26T15:30:43.769738+00:00",
+        "finished_at": "2026-09-26T15:35:06.996299+00:00",
+        "seconds_to_firing": 198.29,
+        "baseline_sli": [
+          {
+            "metric": {
+              "__name__": "retailops:api_scrape_availability:ratio5m",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436646.907,
+              "1"
+            ]
+          }
+        ],
+        "outage_sli": [
+          {
+            "metric": {
+              "__name__": "retailops:api_scrape_availability:ratio5m",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436845.124,
+              "0.15384615384615385"
+            ]
+          }
+        ],
+        "dashboard_uids": [
+          "retailops-api",
+          "retailops-business-operations",
+          "retailops-overview",
+          "retailops-stream-processing"
+        ],
+        "grafana_query": [
+          {
+            "metric": {
+              "__name__": "up",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436643.869,
+              "1"
+            ]
+          }
+        ],
+        "recovered_grafana_query": [
+          {
+            "metric": {
+              "__name__": "up",
+              "component": "api",
+              "instance": "api:8000",
+              "job": "retailops-api",
+              "service": "retailops-api"
+            },
+            "value": [
+              1790436906.594,
+              "1"
+            ]
+          }
+        ]
+      },
+      "metric_sample_counts": {
+        "retailops_api_info": 1,
+        "retailops_db_operations_total": 5,
+        "retailops_stream_metrics_generated_at_seconds": 1
+      },
+      "alert_states": {
+        "baseline": {
+          "state": "inactive",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [],
+          "health": "ok",
+          "evaluationTime": 0.000227083,
+          "lastEvaluation": "2026-09-26T15:30:34.338266797Z",
+          "type": "alerting"
+        },
+        "pending": {
+          "state": "pending",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [
+            {
+              "labels": {
+                "alertname": "RetailOpsApiMetricsTargetDown",
+                "component": "api",
+                "domain": "platform",
+                "instance": "api:8000",
+                "job": "retailops-api",
+                "service": "retailops-api",
+                "severity": "critical"
+              },
+              "annotations": {
+                "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+                "summary": "RetailOps API metrics target is down"
+              },
+              "state": "pending",
+              "activeAt": "2026-09-26T15:31:34.336628592Z",
+              "value": "0e+00"
+            }
+          ],
+          "health": "ok",
+          "evaluationTime": 0.007012583,
+          "lastEvaluation": "2026-09-26T15:31:34.34026913Z",
+          "type": "alerting"
+        },
+        "firing": {
+          "state": "firing",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [
+            {
+              "labels": {
+                "alertname": "RetailOpsApiMetricsTargetDown",
+                "component": "api",
+                "domain": "platform",
+                "instance": "api:8000",
+                "job": "retailops-api",
+                "service": "retailops-api",
+                "severity": "critical"
+              },
+              "annotations": {
+                "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+                "summary": "RetailOps API metrics target is down"
+              },
+              "state": "firing",
+              "activeAt": "2026-09-26T15:31:34.336628592Z",
+              "value": "0e+00"
+            }
+          ],
+          "health": "ok",
+          "evaluationTime": 0.00840375,
+          "lastEvaluation": "2026-09-26T15:34:04.251684422Z",
+          "type": "alerting"
+        },
+        "recovered": {
+          "state": "inactive",
+          "name": "RetailOpsApiMetricsTargetDown",
+          "query": "up{job=\"retailops-api\"} == 0",
+          "duration": 120,
+          "keepFiringFor": 0,
+          "labels": {
+            "component": "api",
+            "domain": "platform",
+            "severity": "critical"
+          },
+          "annotations": {
+            "description": "Prometheus cannot scrape the RetailOps API /metrics endpoint.",
+            "summary": "RetailOps API metrics target is down"
+          },
+          "alerts": [],
+          "health": "ok",
+          "evaluationTime": 0.002556917,
+          "lastEvaluation": "2026-09-26T15:35:04.25038688Z",
+          "type": "alerting"
+        }
+      }
+    }
+  },
+  "observability_ci": {
+    "source_head": "41d19a302c89e7f3500c29614beca4e1cab1b3d9",
+    "scope_unchanged_since_this_run": true,
+    "run_id": 36250641792,
+    "focused_tests_passed": 32,
+    "promtool_rule_tests": "passed",
+    "artifact_id": 10909150302,
+    "artifact_zip_sha256": "fc804ebcb2888290629278c78d9b3d264bb2dc7b36e662c1a164533a5d3ccc85"
+  },
+  "claim_limits": [
+    "local scrape SLI, not user request availability",
+    "short incident drill, not 30-day compliance",
+    "Prometheus firing/resolution, not notification delivery"
+  ]
+}

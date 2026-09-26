@@ -1,6 +1,6 @@
 # Future Improvements Roadmap
 
-Reviewed against main `beae2b19abf6a39edb0bc2155baa85a0a887a3d4` on 2026-09-26.
+Reviewed against main `7188d813dac0023a5daa99b7aa0210b3f823641a` on 2026-09-26.
 This is a prioritized plan, not implementation evidence. Dated results live in
 [the evidence index](../../evidence/index.md).
 
@@ -57,6 +57,13 @@ evidence. S3/KMS configuration, scoped lock access and the migration/recovery
 runbook are ready for review at the next cloud activation. No live AWS state was
 migrated, and live S3 locking/recovery remains to be proven then.
 
+Step 6 [refreshed monitoring and Jenkins through actual execution](../../evidence/observability/2026-09-26-validation.md).
+Isolated ARM64/AMD64 stacks proved ingested metrics, Grafana queries, a real
+two-minute alert hold, firing, recovery/resolution and cleanup. Jenkins ran the
+repository pipeline and archived matching source identity. The local scrape SLO
+has explicit coverage requirements; 30-day compliance and notification delivery
+remain unproven. Historical screenshots are preserved.
+
 ## Next priorities
 
 | Priority | Work | Completion evidence |
@@ -66,7 +73,7 @@ migrated, and live S3 locking/recovery remains to be proven then.
 | 3 | Maintain verified registry releases; add selection of retained published predecessors as release history grows. The first release bootstraps a freshly tested predecessor. | Build on the published v0.2.1 evidence and retain exact digests, signed bundles and runtime verification for each release. |
 | 4 | Maintain the completed local Kubernetes gate; extend it when deployment or schema behavior changes. | [ARM64/AMD64 runtime and persistence evidence](../../evidence/kubernetes/2026-09-26-runtime.md), 24 successful CI jobs and automatic cleanup. Cloud deployment and cluster-loss recovery remain separate scope. |
 | 5 | Maintain the verified account-pinned baseline/drift workflow; activate the prepared S3/KMS backend when a managed deployment is needed. | [State audit and test evidence](../../evidence/aws/2026-09-26-state-drift.md) complete for the current state-less environment. A future cloud activation must add live state migration, lock/recovery and drift evidence. |
-| 6 | Refresh observability/SLO and Jenkins evidence through actual execution. | Dated metric/alert checks and Jenkins run tied to a commit; preserve older screenshots as historical. |
+| 6 | Maintain the completed monitoring incident drill and actual Jenkins validation. Add request SLIs and notification delivery when operational scope requires them. | [Dated ARM64/AMD64 alert and Jenkins evidence](../../evidence/observability/2026-09-26-validation.md); 24 successful CI jobs, explicit SLO limits and historical screenshots preserved. |
 | 7 | Re-evaluate ML artifacts after dependency/data changes and define model promotion criteria. | New evaluation, model metadata and reproducibility record; historical model binaries retain their original capture dates. |
 | 8 | Add Helm packaging or further deployment automation when a validated runtime requires it. | Lint/render/install/upgrade/rollback evidence for the chosen environment. |
 

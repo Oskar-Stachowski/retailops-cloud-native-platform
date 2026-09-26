@@ -4,8 +4,8 @@ This folder stores dated Jenkins execution evidence and historical screenshots.
 
 The current `Jenkinsfile` performs checkout, dependency installation, data quality,
 local CI and a mandatory isolated Compose build/runtime/alert drill. It has no
-cloud deployment stages. Broader security, registry, Terraform and Kubernetes
-checks remain in protected GitHub Required CI. Runtime cleanup is owned by
+cloud deployment stages. Security, Terraform and Kubernetes checks remain in
+protected GitHub Required CI; registry publishing uses its separate controlled workflow. Runtime cleanup is owned by
 `scripts/ci/compose_isolated.py`; Jenkins never tears down the default project.
 
 A trusted local agent needs Git, Make, Python 3.11, Node/npm and Docker Compose.
@@ -14,8 +14,13 @@ checked-out SHA, and archive the curated report allowlist. Keep Jenkins access
 private; these stages execute trusted repository code with Docker access.
 Temporary controller startup follows the [Jenkins WAR instructions](https://www.jenkins.io/doc/book/installing/war-file/).
 
-
 Raw Jenkins release summaries and archived artifacts should continue to be generated under `ci-cd/reports/` by the Jenkins pipeline. Those runtime outputs are ignored by default unless a sanitized snapshot is intentionally created and indexed.
+
+## Current execution
+
+[2026-09-26 successful execution](2026-09-26-validation.md) and its
+[JSON snapshot](2026-09-26-validation.json) record actual stages, source identity,
+artifact hashes and the incident drill. The PNG files below remain historical.
 
 ## Files
 

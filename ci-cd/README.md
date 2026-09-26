@@ -1,533 +1,99 @@
 # CI/CD
 
-This directory contains the CI/CD design, pipeline assets, local release-confidence commands, security gates, and delivery evidence conventions for the RetailOps Cloud-Native AI Platform.
+RetailOps validates local application and infrastructure behavior before cloud
+activation. Protected GitHub Required CI is the merge gate. Jenkins is an
+additional, manually executed local validation pipeline; it does not deploy or
+promote cloud workloads.
 
-RetailOps uses a local-first delivery model. The project proves application, data, Docker, and security behavior locally before introducing AWS, ECR, Terraform, EKS, Helm, and production-style environment promotion.
+## Current ownership
 
----
+| Layer | Responsibility |
+|---|---|
+| `make ci-local` | Data quality/contracts, backend lint/types/security/tests/coverage, frontend tests/lint/build |
+| GitHub Required CI | Required aggregate result over the selected API, frontend, data, Docker, Kubernetes, Terraform and security gates |
+| Docker runtime gate | Isolated build, API/frontend/streaming checks, Grafana/Prometheus incident drill and seven Chromium journeys; database recovery and versioned rollback drills follow |
+| Local Kubernetes gate | Real kind workloads, persistence, network policy, update/rollback and cleanup |
+| Registry release workflow | Controlled publication and verification of signed GHCR release artifacts |
+| Terraform plan/drift workflow | Account-pinned, read-only baseline/plan review; no automatic apply |
+| Jenkins | Fresh checkout, dependency installation, data quality, local CI and mandatory isolated Compose runtime/alert validation |
 
-## 1. Current delivery evidence scope
+Cloud workload deployment, EKS, Helm promotion and production secrets management
+remain future work. The AWS foundation was exercised historically; its current
+state audit and backend activation boundaries are linked from the
+[evidence index](../docs/evidence/index.md).
 
-The current repository keeps CI/CD evidence local-first, with selected sanitized snapshots committed when they are useful for portfolio review.
-
-Evidence freshness is tracked in `docs/evidence/index.md`. When a committed screenshot or snapshot becomes stale, refresh it with the original command path and update the ledger row rather than adding a second undocumented artifact.
-
-Implemented:
-
-- GitHub Actions API CI gate.
-- GitHub Actions frontend CI gate.
-- Docker Compose full-stack smoke test gate.
-- Security CI baseline with secret scanning and vulnerability scanning.
-- Root `Makefile` as the shared command layer for local development, GitHub Actions, and Jenkins.
-- Jenkins release-confidence pipeline skeleton.
-- Disabled placeholder stages for future ECR, Terraform, Kubernetes/EKS, and rollback workflows.
-- Sanitized Terraform showcase snapshots under `ci-cd/reports/iac/`.
-- Curated Jenkins screenshots under `docs/evidence/jenkins/`.
-
-Not implemented yet:
-
-- Real AWS deployment.
-- Amazon ECR push.
-- Terraform apply.
-- Kubernetes/EKS deployment.
-- Helm release and rollback.
-- Production secrets management.
-- Runtime observability stack integration.
-
-The purpose is to prove that a change can be tested, built, smoke-tested, scanned, and prepared as a release candidate without pretending that AWS/Kubernetes infrastructure already exists.
-
----
-
-## 2. Delivery model
-
-RetailOps uses a two-gate CI/CD model:
-
-```text
-Local preflight   -> developer confidence before push
-GitHub Actions    -> PR/main code confidence gate
-Jenkins           -> release confidence and promotion skeleton
-Future runtime    -> Kubernetes/EKS deployment and post-deploy validation
-```
-
-Tool ownership:
-
-| Layer | Tool | Responsibility |
-|---|---|---|
-| Local preflight | `Makefile`, Docker Compose, shell scripts | Fast local checks before push or PR |
-| Code confidence | GitHub Actions | PR/main validation close to the repository |
-| Release confidence | Jenkins | Release-candidate orchestration, evidence, future promotion |
-| Runtime confidence | Docker Compose now, Kubernetes/EKS later | Smoke tests, readiness checks, rollout validation |
-
-Decision rule:
-
-```text
-GitHub Actions protects the codebase before merge.
-Jenkins validates and orchestrates release candidates after merge or release selection.
-```
-
----
-
-## 3. Local command contract
-
-The root `Makefile` is the shared source of truth for repeatable delivery commands.
-
-GitHub Actions and Jenkins should call Make targets instead of duplicating long command sequences in YAML or Groovy.
-
-Common commands:
+## Local commands
 
 | Command | Purpose |
 |---|---|
 | `make install` | Install backend and frontend dependencies |
-| `make ci-local` | Run local code-confidence checks |
-| `make api-type-check` | Run mypy against the curated typed backend modules |
-| `make api-security-lint` | Generate a report-only Bandit scan for backend application and script code |
-| `make data-quality` | Generate a synthetic dataset and fail if `quality_report.json` is not `passed` |
-| `make compose-ci` | Build and run the full Docker Compose stack, then execute smoke tests |
-| `make security-scan` | Run local secret, filesystem, and image security scans |
-| `make docker-build` | Build backend and frontend Docker images |
-| `make compose-config` | Validate Docker Compose configuration |
-| `make compose-down` | Stop and remove local Compose resources |
-
-Recommended local flow before opening a PR:
-
-```bash
-make data-quality
-make ci-local
-make compose-ci
-```
-
-`make ci-local` already includes `make data-quality`; running it separately is
-useful when working specifically on the synthetic data generator.
-
-Recommended local flow before closing Sprint 9 or preparing portfolio evidence:
-
-```bash
-make ci-local
-make compose-ci
-make security-scan
-```
-
-`make security-scan` requires local installations of Trivy and Gitleaks.
-`make compose-ci` runs both the base Compose smoke test and the Sprint 9
-streaming smoke test.
-
----
-
-## 4. GitHub Actions workflows
-
-### 4.1 API CI
-
-File:
-
-```text
-.github/workflows/api-ci.yml
-```
-
-Purpose:
-
-- Start PostgreSQL service.
-- Generate demo CSV data.
-- Run Ruff and mypy as gates, plus a report-only Bandit backend security scan.
-- Run Alembic migrations.
-- Seed demo data.
-- Run backend tests.
-- Build backend Docker image.
-
-This workflow validates that backend changes remain compatible with the database schema, seed process, and Docker build.
-
-### 4.1a Data CI
-
-File:
-
-```text
-.github/workflows/data-ci.yml
-```
-
-Purpose:
-
-- Generate a synthetic data profile.
-- Run the data quality gate through `make data-quality`.
-- Fail when `quality_report.json` is not `passed`.
-- Upload data evidence as a GitHub Actions artifact.
-
-Default PR/push profile:
-
-```text
-small
-```
-
-Manual dispatch can run:
-
-```text
-small
-medium
-```
-
-`medium` is intentionally manual so normal PR checks stay fast.
-
-### 4.2 Frontend CI
-
-File:
-
-```text
-.github/workflows/frontend-ci.yml
-```
-
-Purpose:
-
-- Install frontend dependencies with `npm ci`.
-- Run frontend tests.
-- Run linting.
-- Build the production frontend bundle.
-- Build frontend Docker image.
-
-This workflow validates that UI changes are testable, lint-clean, and production-buildable.
-
-### 4.3 Docker Compose CI
-
-File:
-
-```text
-.github/workflows/docker-ci.yml
-```
-
-Purpose:
-
-- Validate Docker Compose configuration.
-- Build and start the full local stack.
-- Wait for database, migration, seed, API, and frontend services.
-- Run `scripts/ci/compose_smoke.sh`.
-- Upload Compose evidence as a GitHub Actions artifact.
-- Clean up Compose resources after the run.
-
-The smoke test validates:
-
-- `GET /health`
-- `GET /ready`
-- `GET /products`
-- `GET /forecasts`
-- `GET /dashboard/summary`
-- `GET /inventory-risks`
-- frontend root availability
-- frontend proxy `/api/health`
-- frontend proxy `/api/ready`
-
-The evidence is uploaded to the workflow run as an artifact, not committed to the repository.
-
-To refresh reviewer-facing evidence from this workflow locally, rerun `make compose-ci`, replace the curated artifact in `docs/evidence/docker/`, and update the metadata row in `docs/evidence/index.md`.
-
-### 4.4 Security CI
-
-File:
-
-```text
-.github/workflows/security-ci.yml
-```
-
-Purpose:
-
-- Run Gitleaks secret scanning.
-- Run Trivy filesystem vulnerability scanning.
-- Run Python dependency audit as a report.
-- Run frontend dependency audit as a report.
-- Build backend and frontend Docker images.
-- Run Trivy image scans.
-- Upload security reports as GitHub Actions artifacts.
-
-Initial gate policy:
-
-| Finding type | Current behavior |
-|---|---|
-| Secret detected | Fail |
-| Critical/high filesystem vulnerability | Fail |
-| Critical image vulnerability | Fail |
-| Python dependency audit findings | Report-only initially |
-| NPM audit findings | Report-only initially |
-
-This can be tightened later as the project matures.
-
----
-
-## 5. Jenkins release-confidence skeleton
-
-File:
-
-```text
-Jenkinsfile
-```
-
-Sprint 9 Jenkins scope:
-
-- Manual or controlled pipeline execution.
-- Local release-candidate validation.
-- Reuse of Makefile targets.
-- Docker build.
-- Docker Compose smoke test.
-- Optional security scan if tools are installed on the Jenkins agent.
-- Release evidence summary.
-- Archive local reports and pipeline artifacts.
-- Placeholder stages for future ECR, Terraform, EKS, and rollback work.
-
-Default parameters for Sprint 9:
-
-| Parameter | Recommended Sprint 9 value | Meaning |
-|---|---|---|
-| `RUN_COMPOSE_SMOKE` | `true` | Validate full local runtime |
-| `RUN_SECURITY_SCAN` | `false` initially | Enable after Trivy/Gitleaks exist on Jenkins agent |
-| `DEPLOY_TARGET` | `local-only` | Do not deploy to AWS/Kubernetes yet |
-
-Future disabled stages:
-
-- Push to ECR.
-- Terraform plan/apply.
-- Deploy to Kubernetes/EKS.
-- Rollback.
-
-These stages are intentionally not active until the required infrastructure exists.
-
----
-
-## 6. Evidence and reports
-
-Local and CI reports are written under:
-
-```text
-ci-cd/reports/
-```
-
-Typical files:
-
-```text
-ci-cd/reports/docker-compose-ps.txt
-ci-cd/reports/docker-compose-logs.txt
-ci-cd/reports/security/gitleaks.json
-ci-cd/reports/security/trivy-fs.txt
-ci-cd/reports/security/trivy-api-image.txt
-ci-cd/reports/security/trivy-frontend-image.txt
-ci-cd/reports/jenkins-release-evidence.txt
-```
-
-These files are runtime artifacts and should generally not be committed. Curated, sanitized snapshots may be committed when they are intentionally named and indexed.
-
-Current evidence split:
-
-| Location | Purpose | Tracking policy |
-|---|---|---|
-| `docs/evidence/` | Human-readable reviewer evidence, screenshots, curated summaries, indexes. | Tracked when useful and sanitized. |
-| `ci-cd/reports/` | Raw or semi-raw outputs from CI, local tooling, security scanners, Terraform, Docker, Jenkins. | Ignored by default. Tracked only for explicit sanitized snapshots and README/index files. |
-
-See `docs/evidence/gitignore-evidence-policy.md` for the exact policy.
-
-GitHub Actions evidence is stored in the workflow run artifacts section.
-
-Jenkins evidence is archived by the pipeline through `archiveArtifacts`.
-
----
-
-## 7. Security remediation example
-
-During Sprint 9, the frontend runtime image scan detected critical vulnerabilities in the Nginx Alpine runtime image.
-
-Remediation flow:
-
-```text
-Trivy gate detected critical vulnerabilities
--> report was reviewed
--> vulnerable runtime packages were upgraded in the final Nginx image stage
--> frontend image was rebuilt
--> Trivy image scan was rerun
--> scan passed with zero critical findings
-```
-
-This demonstrates the expected DevSecOps workflow:
-
-```text
-gate -> evidence -> remediation -> rescan -> release confidence
-```
-
----
-
-## 8. How to validate Sprint 9 locally
-
-Run:
-
-```bash
-make ci-local
-make compose-ci
-make security-scan
-```
-
-Expected result:
-
-```text
-Local CI preflight passed.
-Compose smoke test passed.
-Streaming smoke test passed.
-Security scans passed.
-```
-
-If these pass locally, push the branch and validate the GitHub Actions workflows.
-
----
-
-## 9. How to validate Sprint 9 in GitHub Actions
-
-After pushing a branch or opening a PR, check:
-
-```text
-GitHub -> Actions
-```
-
-Expected workflow status:
-
-- API CI: pass.
-- Frontend CI: pass.
-- Docker Compose CI: pass.
-- Security CI: pass.
-
-Download artifacts from individual workflow runs when evidence is needed for portfolio documentation or troubleshooting.
-
----
-
-## 10. How to validate Sprint 9 in Jenkins
-
-Create a Jenkins Pipeline job using:
-
-```text
-Pipeline script from SCM
-Script Path: Jenkinsfile
-```
-
-Recommended first run:
-
-```text
-RUN_COMPOSE_SMOKE = true
-RUN_SECURITY_SCAN = false
-DEPLOY_TARGET = local-only
-```
-
-Recommended second run after installing Trivy and Gitleaks on the Jenkins agent:
-
-```text
-RUN_COMPOSE_SMOKE = true
-RUN_SECURITY_SCAN = true
-DEPLOY_TARGET = local-only
-```
-
-Expected Jenkins result:
-
-- Local CI gate passes.
-- Docker images build.
-- Docker Compose smoke test passes.
-- Optional security scan passes.
-- Release evidence summary is archived.
-
----
-
-## 11. Troubleshooting
-
-### Security scan fails but terminal does not show vulnerability details
-
-Check generated reports:
-
-```bash
-cat ci-cd/reports/security/trivy-fs.txt
-cat ci-cd/reports/security/trivy-api-image.txt
-cat ci-cd/reports/security/trivy-frontend-image.txt
-cat ci-cd/reports/security/gitleaks.json
-```
-
-### Compose smoke test fails
-
-Check:
-
-```bash
-docker compose ps
-docker compose logs --no-color
-```
-
-Then rerun:
-
-```bash
-make compose-ci
-```
-
-### Local security scan cannot start
-
-Install required tools:
-
-```bash
-brew install trivy gitleaks
-```
-
-Then rerun:
-
-```bash
-make security-scan
-```
-
-### Jenkins security scan fails immediately
-
-Confirm that Trivy and Gitleaks are installed on the Jenkins agent.
-
-If they are not installed, run Jenkins with:
-
-```text
-RUN_SECURITY_SCAN = false
-```
-
-until the Jenkins agent is prepared.
-
----
-
-## 12. Sprint 9 Definition of Done
-
-Sprint 9 is considered complete when:
-
-- `make ci-local` passes locally.
-- `make compose-ci` passes locally, including base Compose and streaming smoke checks.
-- `make security-scan` passes locally.
-- API CI passes in GitHub Actions.
-- Frontend CI passes in GitHub Actions.
-- Docker Compose CI passes in GitHub Actions.
-- Security CI passes in GitHub Actions.
-- Jenkins pipeline runs successfully in local-only mode.
-- Jenkins archives release evidence.
-- Cloud deployment stages are explicitly marked as disabled/future scope.
-- Reports are stored as artifacts, not committed as normal source files.
-
----
-
-## 13. Future evolution
-
-Future sprints will extend this foundation:
-
-| Future area | Planned maturity |
-|---|---|
-| Terraform | `fmt`, `validate`, `plan`, controlled apply |
-| AWS | IAM, ECR, secrets, networking, cost controls |
-| ECR | Versioned image publishing from Jenkins |
-| EKS | Kubernetes deployment target |
-| Helm | Release packaging and rollback |
-| Observability | Post-deploy metrics, logs, dashboards, alerts |
-| DevSecOps | SBOM, provenance, policy-as-code, stricter vulnerability gates |
-| MLOps | Model evaluation, model promotion, model rollback evidence |
-
-Until those foundations exist, Jenkins remains a local release-confidence pipeline skeleton rather than a real cloud deployment pipeline.
-
----
-
-## GitHub Actions CI governance update
-
-Reviewer-facing CI governance is documented in:
-
-- `docs/governance/github-actions-ci.md`
-- `docs/governance/branch-protection.md`
-
-Reusable GitHub Actions logic is kept intentionally small under:
-
-- `.github/actions/setup-python-ci`
-- `.github/actions/setup-node-ci`
-- `.github/actions/upload-ci-evidence`
-
-CI evidence uploaded by workflows should continue to use the `ci-cd/reports/**` convention. Branch protection is considered documented from repository code, but not fully proven until a GitHub Settings screenshot confirms that the required checks are enabled on `main`.
+| `make ci-local` | Run local code and data checks |
+| `make compose-ci` | Build and test a unique disposable Compose project, then remove its resources |
+| `make observability-smoke` | Inspect an already running development monitoring stack |
+| `make security-scan` | Run local secret, filesystem and image scans; requires the documented scanner toolchain |
+| `make k8s-runtime-drill` | Exercise an isolated local Kubernetes deployment |
+| `make db-recovery-drill` | Verify database backup and restore |
+| `make release-drill` | Verify a versioned update and compatible application rollback |
+
+`make compose-ci` allocates unique images, loopback ports, project and volumes.
+It temporarily stops its own API to validate a real two-minute outage alert.
+Its runner performs scoped cleanup on success and failure. It does not use the
+default development project's volumes. GitHub enables the browser gate with
+`COMPOSE_BROWSER_TESTS=1`; Jenkins runs the HTTP, streaming and monitoring checks.
+
+To inspect a failed run, read `ci-cd/reports/docker-compose-logs.txt`,
+`ci-cd/reports/docker/isolated-runtime.json`, and
+`ci-cd/reports/observability/incident-drill.json`. The disposable stack has already
+been removed; `docker compose logs` without its project would address a different
+stack. Reproduce with `make compose-ci`.
+
+## Jenkins execution
+
+Create a Pipeline job with **Pipeline script from SCM**, select the trusted
+repository revision and use `Jenkinsfile`. A trusted agent needs Git, Make,
+Python 3.11, Node/npm and Docker Compose. The agent executes repository code with
+Docker access. Keep the controller private and authenticated.
+
+The only pipeline parameter is `DATA_PROFILE` (`small` by default, or `medium`).
+Compose validation and the incident drill are mandatory. The old
+`RUN_COMPOSE_SMOKE`, `RUN_SECURITY_SCAN` and `DEPLOY_TARGET` parameters and fake
+cloud deployment stages have been removed. Broader security checks remain in
+protected GitHub Required CI and are not claimed as Jenkins stages.
+
+The pipeline cleans its own workspace before checkout and archives an explicit
+allowlist: its commit/result summary, coverage, data quality reports and the
+runtime/incident reports. It never runs a default-project `docker compose down`.
+A 45-minute timeout, serial builds and retention of 20 builds are configured.
+
+The [dated Jenkins run](../docs/evidence/jenkins/2026-09-26-validation.md) records
+an actual execution, stage results, source identity and archived artifact hashes.
+Older screenshots remain historical.
+
+## GitHub governance and security
+
+[CI governance](../docs/governance/github-actions-ci.md) and
+[main protection](../docs/governance/branch-protection.md) describe the required
+`required-result`, up-to-date PR policy and protection of administrators.
+The classifier and its contract tests run even for documentation-only PRs.
+Unknown/shared paths select all implementation gates; documentation changes
+retain the aggregate merge check without rebuilding unchanged application code.
+
+Security thresholds and accepted exceptions are defined in
+[the security policy](../security/README.md), rather than duplicated here.
+Dependency audits, secret scanning, image/filesystem scanning, IaC checks and
+Kubernetes policy checks have blocking gates. A passing scan is not a guarantee
+of zero unfixed or lower-severity findings.
+
+## Evidence contract
+
+Generated reports belong under `ci-cd/reports/` and are ignored by default.
+GitHub uploads workflow artifacts; Jenkins archives its allowlist. Promote only
+reviewed, sanitized snapshots under `docs/evidence/`, recording UTC time, exact
+commit, command/run, result and limits. Preserve historical screenshots with
+their original context. The [evidence index](../docs/evidence/index.md) is the
+entry point; [report policy](reports/README.md) describes raw outputs.
+
+The [monitoring validation](../docs/evidence/observability/2026-09-26-validation.md)
+checks real samples, Grafana queries, alert firing and resolution. Its
+[local scrape SLO](../docs/observability/slo.md) is explicitly separate from user
+request availability, 30-day compliance and notification delivery.

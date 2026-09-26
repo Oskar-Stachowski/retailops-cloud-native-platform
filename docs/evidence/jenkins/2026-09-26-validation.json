@@ -1,0 +1,135 @@
+{
+  "number": 4,
+  "result": "SUCCESS",
+  "duration": 624717,
+  "timestamp": 1790436292014,
+  "artifacts": [
+    {
+      "displayPath": "coverage.xml",
+      "fileName": "coverage.xml",
+      "relativePath": "ci-cd/reports/api/coverage.xml",
+      "sha256": "59118ca23775aac3db49d46e6d5826cb8cf3e7eb03c071405869adba023cbd73"
+    },
+    {
+      "displayPath": "data-contract-report.json",
+      "fileName": "data-contract-report.json",
+      "relativePath": "ci-cd/reports/data/data-contract-report.json",
+      "sha256": "193b4fbebc0968ebfc4ef517e4a39afa958cc4307ed80f7e64df23d61b70df5b"
+    },
+    {
+      "displayPath": "quality_report.json",
+      "fileName": "quality_report.json",
+      "relativePath": "ci-cd/reports/data/generated/small/quality_report.json",
+      "sha256": "ae8bfa06b47a80dae6a6eaddad99f317a70865bdb47b2a99a54d9db5d4db056f"
+    },
+    {
+      "displayPath": "realism_report.json",
+      "fileName": "realism_report.json",
+      "relativePath": "ci-cd/reports/data/generated/small/realism_report.json",
+      "sha256": "f177901b52cb66fcbb02d42c52db4ef9a710671b8b39cb1ba5d2b988ed83e3cb"
+    },
+    {
+      "displayPath": "scenario-coverage-report.json",
+      "fileName": "scenario-coverage-report.json",
+      "relativePath": "ci-cd/reports/data/scenario-coverage-report.json",
+      "sha256": "01d4f6f6e3b1ebae706dace48f7249366418666d6b31193430e338a50cee0202"
+    },
+    {
+      "displayPath": "isolated-runtime.json",
+      "fileName": "isolated-runtime.json",
+      "relativePath": "ci-cd/reports/docker/isolated-runtime.json",
+      "sha256": "c0471f606fcb11965b19a7fd7c2ff481c53f49a558041e16e59981b5430efb53"
+    },
+    {
+      "displayPath": "jenkins-release-evidence.txt",
+      "fileName": "jenkins-release-evidence.txt",
+      "relativePath": "ci-cd/reports/jenkins-release-evidence.txt",
+      "sha256": "59bbabd4ba809a769ef0cb6e0527bcc16c952b3b6073dd3bd1687fc52974016f"
+    },
+    {
+      "displayPath": "incident-drill.json",
+      "fileName": "incident-drill.json",
+      "relativePath": "ci-cd/reports/observability/incident-drill.json",
+      "sha256": "2e6619c992d3dd4c2000d832f4088d04d39f000042e741c7e5cb33eaf5970895"
+    }
+  ],
+  "stages": [
+    {
+      "name": "Checkout",
+      "status": "SUCCESS",
+      "durationMillis": 50694
+    },
+    {
+      "name": "Agent Toolchain",
+      "status": "SUCCESS",
+      "durationMillis": 924
+    },
+    {
+      "name": "Install Dependencies",
+      "status": "SUCCESS",
+      "durationMillis": 24094
+    },
+    {
+      "name": "Data Quality Gate",
+      "status": "SUCCESS",
+      "durationMillis": 2722
+    },
+    {
+      "name": "Local CI Gate",
+      "status": "SUCCESS",
+      "durationMillis": 57810
+    },
+    {
+      "name": "Isolated Build, Runtime and Alert Drill",
+      "status": "SUCCESS",
+      "durationMillis": 480510
+    },
+    {
+      "name": "Declarative: Post Actions",
+      "status": "SUCCESS",
+      "durationMillis": 1354
+    }
+  ],
+  "controller_scope": "disposable loopback-only native controller; original Jenkins home unchanged",
+  "jenkins_version": "2.555.1",
+  "plugins": [
+    {
+      "name": "git",
+      "version": "5.10.1"
+    },
+    {
+      "name": "pipeline-model-definition",
+      "version": "2.2277.v00573e73ddf1"
+    },
+    {
+      "name": "workflow-cps",
+      "version": "4315.va_e456c4e7f4f"
+    },
+    {
+      "name": "workflow-job",
+      "version": "1571.1580.v18e46842c125"
+    }
+  ],
+  "started_at_utc": "2026-09-26T15:24:52.014000+00:00",
+  "source_commit": "5b3fc7ab1dca68e63f3e3f3f91548adbaba51855",
+  "git_tree": "e606760f74d8ab98585fada612f649d0281dc5d4",
+  "pipeline_summary": {
+    "scope": "local-validation",
+    "build_number": "4",
+    "source_commit": "5b3fc7ab1dca68e63f3e3f3f91548adbaba51855",
+    "result": "SUCCESS",
+    "data_profile": "small",
+    "compose_and_alert_drill": "mandatory",
+    "security_gate": "separate-protected-github-required-ci"
+  },
+  "tests": {
+    "backend_passed": 271,
+    "backend_skipped": 40,
+    "backend_coverage_percent_rounded": 76,
+    "frontend_tests_lint_build": "passed",
+    "data_quality_contracts_scenarios": "passed",
+    "browser_journeys": "not enabled in Jenkins; seven passed in GitHub Required CI"
+  },
+  "controller_stopped_after_capture": true,
+  "runtime_cleanup_verified": true
+}
