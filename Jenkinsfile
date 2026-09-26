@@ -25,6 +25,10 @@ pipeline {
             steps {
                 deleteDir()
                 checkout scm
+                script {
+                    // Explicit checkout does not always export Git plugin variables.
+                    env.GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                }
             }
         }
         stage('Agent Toolchain') {
