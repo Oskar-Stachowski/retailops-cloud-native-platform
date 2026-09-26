@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: frontend
-          image: retailops-frontend:0.1.0
+          image: retailops-frontend:0.2.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

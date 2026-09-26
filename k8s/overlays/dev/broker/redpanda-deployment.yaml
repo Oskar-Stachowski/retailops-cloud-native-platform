@@ -10,6 +10,8 @@ metadata:
     retailops.io/environment: dev
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: redpanda
@@ -31,7 +33,7 @@ spec:
         - name: redpanda
           image: redpandadata/redpanda:v25.3.6
           imagePullPolicy: IfNotPresent
-          command:
+          args:
             - redpanda
             - start
             - --smp
@@ -110,4 +112,5 @@ spec:
                 - ALL
       volumes:
         - name: redpanda-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: redpanda-data

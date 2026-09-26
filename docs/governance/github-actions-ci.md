@@ -12,7 +12,7 @@ This document maps the RetailOps GitHub Actions implementation to the production
 | GHA-002 | Implemented | `.github/workflows/frontend-ci.yml` | Runs frontend tests, lint, production build, and frontend image build. |
 | GHA-003 | Implemented | `.github/workflows/docker-ci.yml` | Validates Compose config/profiles and runs full-stack Compose smoke tests. |
 | GHA-004 | Implemented | `.github/workflows/security-ci.yml` | Runs secret scan, Trivy filesystem scan, dependency audits, image scans, and consolidated evidence summary. |
-| GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize render, Kubeconform schema validation, Conftest and blocking Checkov policy checks. |
+| GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize, Kubeconform, Conftest and blocking Checkov, followed by an isolated kind deployment with browser/API, NetworkPolicy, streaming, persistence and rollback checks. |
 | GHA-008 | Implemented and configured | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/evidence/github/README.md` | The aggregate `Required CI / required-result` is required on `main`, including for administrators. Active settings were verified through the GitHub API on 2026-09-25. |
 | GHA-009 | Designed/partly implemented | `.github/workflows/terraform-validation.yml`, `.github/workflows/terraform-plan.yml`, `docs/ADR/IAM delivery access.md` | Required validation is uncredentialed; the separate manual Terraform plan uses GitHub OIDC when the safe AWS role variable exists. |
 | GHA-010 | Implemented | `.github/actions/**` | Composite actions centralize Python setup, Node setup, and CI evidence upload. |

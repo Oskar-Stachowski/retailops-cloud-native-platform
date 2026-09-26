@@ -234,6 +234,7 @@ help:
 	@echo "  make tflint-report        Run TFLint only against infra/ and save report"
 	@echo "  make checkov-scan         Run blocking Checkov IaC scan"
 	@echo "  make iac-scan             Run Terraform validation, guardrails, TFLint and Checkov"
+	@echo "  make k8s-runtime-drill    Verify isolated kind runtime, persistence, update and rollback"
 	@echo "  make k8s-smoke            Render and validate Kubernetes base/dev manifests"
 	@echo "  make k8s-policy           Run Conftest against rendered Kubernetes manifests"
 	@echo "  make k8s-checkov          Run blocking Checkov Kubernetes scan"
@@ -875,3 +876,7 @@ docs-repo-structure:
 		echo 'git ls-files | tree --fromfile -a --noreport'; \
 		git ls-files | tree --fromfile -a --noreport; \
 	} > docs/repo-structure.txt
+
+.PHONY: k8s-runtime-drill
+k8s-runtime-drill:
+	python3 scripts/kubernetes/drill.py

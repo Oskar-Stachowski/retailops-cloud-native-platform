@@ -68,3 +68,47 @@ jobs:
             ci-cd/reports/k8s/
             ci-cd/reports/policy/
           if-no-files-found: warn
+
+  kubernetes-runtime:
+    name: Local kind runtime, persistence and rollback
+    needs: kubernetes-policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.35.0
+
+      - name: Install pinned kind
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 https://kind.sigs.k8s.io/dl/v0.31.0/kind-linux-amd64 -o /tmp/kind
+          cd /tmp
+          echo "eb244cbafcc157dff60cf68693c14c9a75c4e6e6fedaf9cd71c58117cb93e3fa  kind" | sha256sum -c -
+          chmod +x kind
+          sudo install kind /usr/local/bin/kind
+
+      - name: Set up browser dependencies
+        uses: ./.github/actions/setup-node-ci
+
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Exercise isolated Kubernetes runtime
+        run: make k8s-runtime-drill
+
+      - name: Upload Kubernetes runtime evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: kubernetes-runtime-evidence
+          path: ci-cd/reports/k8s-runtime/
+          if-no-files-found: warn

@@ -57,7 +57,7 @@ spec:
               memory: 128Mi
       containers:
         - name: migrate
-          image: retailops-api:0.1.0
+          image: retailops-api:0.2.1
           imagePullPolicy: IfNotPresent
           command:
             - alembic

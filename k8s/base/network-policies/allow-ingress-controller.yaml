@@ -13,7 +13,6 @@ spec:
       - key: app.kubernetes.io/name
         operator: In
         values:
-          - retailops-api
           - retailops-frontend
   policyTypes:
     - Ingress
@@ -21,9 +20,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: ingress-nginx
+              kubernetes.io/metadata.name: traefik
       ports:
-        - protocol: TCP
-          port: 8000
         - protocol: TCP
           port: 8080

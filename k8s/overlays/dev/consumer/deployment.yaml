@@ -33,7 +33,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: wait-for-migrations
-          image: retailops-api:0.1.0
+          image: retailops-api:0.2.1
           imagePullPolicy: IfNotPresent
           command:
             - python
@@ -108,7 +108,7 @@ spec:
               memory: 128Mi
       containers:
         - name: realtime-consumer
-          image: retailops-api:0.1.0
+          image: retailops-api:0.2.1
           imagePullPolicy: IfNotPresent
           command:
             - python
