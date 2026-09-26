@@ -10,10 +10,47 @@ from unittest.mock import MagicMock, patch
 
 from drill import Drill
 from promotion import passed_main_run
-from registry import NAMESPACE, publication_contract, ready_report, registry_reference
+from registry import (
+    NAMESPACE,
+    consumer_image,
+    publication_contract,
+    ready_report,
+    registry_reference,
+)
 
 
 class PromotionTests(unittest.TestCase):
+    def test_registry_digest_binds_different_engine_ids_without_accepting_wrong_image(self) -> None:
+        reference = NAMESPACE + "-api@sha256:" + "e" * 64
+        image = {
+            "image_id": "sha256:" + "a" * 64,
+            "registry_ref": reference,
+            "platform": "linux/amd64",
+        }
+        release = {"source_commit": "c" * 40, "version": "0.2.1"}
+        inspected = {
+            "Id": "sha256:" + "b" * 64,
+            "RepoDigests": [reference],
+            "Os": "linux",
+            "Architecture": "amd64",
+            "Config": {
+                "Labels": {
+                    "org.opencontainers.image.revision": release["source_commit"],
+                    "org.opencontainers.image.version": release["version"],
+                    "io.retailops.component": "api",
+                }
+            },
+        }
+        rebound = consumer_image(image, inspected, release, "api")
+        self.assertEqual(rebound["build_image_id"], image["image_id"])
+        self.assertEqual(rebound["image_id"], inspected["Id"])
+        for changed in (
+            {"RepoDigests": [NAMESPACE + "-api@sha256:" + "f" * 64]},
+            {"Architecture": "arm64"},
+        ):
+            with self.assertRaises(RuntimeError):
+                consumer_image(image, {**inspected, **changed}, release, "api")
+
     def test_newer_failed_or_running_ci_attempt_blocks_older_success(self) -> None:
         passed = {
             "head_sha": "a" * 40,

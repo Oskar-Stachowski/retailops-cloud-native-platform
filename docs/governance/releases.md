@@ -78,7 +78,9 @@ reproducible-byte-build claim is made.
 
 A separate fresh runner verifies the manifest, all image/SBOM signatures, exact
 repository/workflow/main source identity, attached SBOM content and checksums.
-It pulls by digest and repeats the full drill without any image build. Only its
+It pulls by digest and binds the verified registry identity to the consumer's
+engine-local image ID (which can differ between Docker storage backends), while
+retaining the builder's ID in the report. It repeats the full drill without any image build. Only its
 success permits an annotated `vX.Y.Z` tag and a published GitHub Release. The
 release attaches a durable evidence bundle; intermediate Actions artifacts have
 14-day retention. Failed partial publication is not a verified release.

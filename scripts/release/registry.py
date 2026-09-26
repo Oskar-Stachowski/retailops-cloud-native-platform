@@ -136,6 +136,17 @@ def registry_reference(repository: str, registry_digest: str) -> str:
     return repository + "@" + registry_digest
 
 
+def consumer_image(image: dict, inspected: dict, release: dict, component: str) -> dict:
+    # Docker's classic and containerd stores may expose different engine-local IDs.
+    # The registry digest identifies the portable artifact; bind it to this engine.
+    require(image["registry_ref"] in inspected.get("RepoDigests", []), "Pulled digest differs")
+    require(
+        inspected["Os"] + "/" + inspected["Architecture"] == image["platform"], "Wrong platform"
+    )
+    verify_image(inspected, release, component, inspected["Id"])
+    return {**image, "build_image_id": image["image_id"], "image_id": inspected["Id"]}
+
+
 def publish(output: Path) -> None:
     manifest = read(output / "release-manifest.json")
     require(
@@ -238,7 +249,7 @@ def pull(output: Path) -> None:
         # On a fresh runner no local release build is available; pull only the signed digest.
         run(["docker", "pull", "--platform", image["platform"], reference])
         inspected = json.loads(run(["docker", "image", "inspect", reference]))[0]
-        verify_image(inspected, release, component, image["image_id"])
+        release["images"][component] = consumer_image(image, inspected, release, component)
     for role in ROLES:
         write(output / (role + "-manifest.json"), manifest["releases"][role])
     write(
@@ -264,10 +275,21 @@ def complete(output: Path, report_path: Path) -> None:
         "Missing signature/pull check",
     )
     for role in ROLES:
+        consumed = read(output / (role + "-manifest.json"))
         for component in COMPONENTS:
+            signed_image = manifest["releases"][role]["images"][component]
+            runtime_image = consumed["images"][component]
             require(
-                report["releases"][role]["images"][component]
-                == manifest["releases"][role]["images"][component],
+                runtime_image["build_image_id"] == signed_image["image_id"],
+                "Build identity changed",
+            )
+            require(
+                {key: runtime_image[key] for key in signed_image if key != "image_id"}
+                == {key: value for key, value in signed_image.items() if key != "image_id"},
+                "Consumer changed the signed image contract",
+            )
+            require(
+                report["releases"][role]["images"][component] == runtime_image,
                 "Runtime tested a different image",
             )
     shutil.copyfile(report_path, output / "registry-drill.json")
