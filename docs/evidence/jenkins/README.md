@@ -1,6 +1,19 @@
 # Jenkins Evidence
 
-This folder stores curated Jenkins screenshots that are useful for portfolio and technical review.
+This folder stores dated Jenkins execution evidence and historical screenshots.
+
+The current `Jenkinsfile` performs checkout, dependency installation, data quality,
+local CI and a mandatory isolated Compose build/runtime/alert drill. It has no
+cloud deployment stages. Broader security, registry, Terraform and Kubernetes
+checks remain in protected GitHub Required CI. Runtime cleanup is owned by
+`scripts/ci/compose_isolated.py`; Jenkins never tears down the default project.
+
+A trusted local agent needs Git, Make, Python 3.11, Node/npm and Docker Compose.
+Run a Pipeline from SCM using this repository's `Jenkinsfile`, record the exact
+checked-out SHA, and archive the curated report allowlist. Keep Jenkins access
+private; these stages execute trusted repository code with Docker access.
+Temporary controller startup follows the [Jenkins WAR instructions](https://www.jenkins.io/doc/book/installing/war-file/).
+
 
 Raw Jenkins release summaries and archived artifacts should continue to be generated under `ci-cd/reports/` by the Jenkins pipeline. Those runtime outputs are ignored by default unless a sanitized snapshot is intentionally created and indexed.
 
@@ -8,8 +21,8 @@ Raw Jenkins release summaries and archived artifacts should continue to be gener
 
 | File | What it proves | Audience | Validation note |
 |---|---|---|---|
-| `jenkins-stage-view.png` | Jenkins stage view existed for the release-confidence pipeline. | Recruiter-facing | Static screenshot; refresh after the next representative Jenkins run. |
-| `jenkins-status-and-artifacts.png` | Jenkins status and artifact archive view existed. | Recruiter-facing | Static screenshot; refresh after the next representative Jenkins run. |
+| `jenkins-stage-view.png` | Jenkins stage view existed for the release-confidence pipeline. | Recruiter-facing | Historical screenshot; not evidence of the current commit. |
+| `jenkins-status-and-artifacts.png` | Jenkins status and artifact archive view existed. | Recruiter-facing | Historical screenshot; not evidence of the current commit. |
 
 ## Evidence Flow
 

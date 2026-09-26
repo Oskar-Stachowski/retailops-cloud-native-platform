@@ -120,7 +120,3 @@ jobs:
             ci-cd/reports/releases/*/*/failure.png
             ci-cd/reports/releases/*/*/trace.zip
           if-no-files-found: ignore
-
-      - name: Final cleanup
-        if: always()
-        run: docker compose down -v --remove-orphans || true

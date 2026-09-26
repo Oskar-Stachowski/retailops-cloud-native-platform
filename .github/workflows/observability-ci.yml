@@ -19,6 +19,9 @@ on:
       - "services/api/tests/test_stream_observability.py"
       - "services/api/requirements-dev.txt"
       - "scripts/ci/observability_smoke.sh"
+      - "scripts/ci/observability_drill.py"
+      - "scripts/ci/compose_isolated.py"
+      - "services/api/tests/test_observability_runtime.py"
       - "scripts/dev/observability_demo_traffic.sh"
       - ".github/actions/**"
       - ".github/workflows/observability-ci.yml"
@@ -40,6 +43,9 @@ on:
       - "services/api/tests/test_stream_observability.py"
       - "services/api/requirements-dev.txt"
       - "scripts/ci/observability_smoke.sh"
+      - "scripts/ci/observability_drill.py"
+      - "scripts/ci/compose_isolated.py"
+      - "services/api/tests/test_observability_runtime.py"
       - "scripts/dev/observability_demo_traffic.sh"
       - ".github/actions/**"
       - ".github/workflows/observability-ci.yml"
@@ -86,6 +92,12 @@ jobs:
             prom/prometheus:v3.7.3 \
             -c '/bin/promtool check rules /etc/prometheus/rules/*.yml' 2>&1 | tee ci-cd/reports/observability/prometheus-rules-check.txt
 
+      - name: Test alert transitions and SLI semantics
+        run: |
+          docker run --rm --entrypoint=/bin/promtool \
+            -v "${PWD}/observability/prometheus:/work:ro" \
+            prom/prometheus:v3.7.3 test rules /work/tests/outage.yml
+
       - name: Set up Python CI toolchain
         uses: ./.github/actions/setup-python-ci
 
@@ -93,6 +105,7 @@ jobs:
         run: |
           set -euo pipefail
           PYTHONPATH=services/api pytest \
+            services/api/tests/test_observability_runtime.py \
             services/api/tests/test_prometheus_configuration.py \
             services/api/tests/test_prometheus_alert_rules.py \
             services/api/tests/test_grafana_provisioning.py \

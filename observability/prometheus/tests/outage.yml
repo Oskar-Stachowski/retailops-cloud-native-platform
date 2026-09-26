@@ -1,0 +1,45 @@
+rule_files:
+  - ../rules/stream-alerts.yml
+  - ../rules/slo-recording.yml
+evaluation_interval: 15s
+tests:
+  - name: outage holds for two minutes and resolves after recovery
+    interval: 30s
+    input_series:
+      - series: 'up{job="retailops-api",instance="api:8000"}'
+        values: '1 1 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 2m30s
+        alertname: RetailOpsApiMetricsTargetDown
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: RetailOpsApiMetricsTargetDown
+        exp_alerts:
+          - exp_labels:
+              job: retailops-api
+              instance: api:8000
+              severity: critical
+              domain: platform
+              component: api
+            exp_annotations:
+              summary: RetailOps API metrics target is down
+              description: Prometheus cannot scrape the RetailOps API /metrics endpoint.
+      - eval_time: 3m30s
+        alertname: RetailOpsApiMetricsTargetDown
+        exp_alerts: []
+    promql_expr_test:
+      - expr: retailops:api_scrape_availability:ratio5m
+        eval_time: 3m
+        exp_samples:
+          - labels: 'retailops:api_scrape_availability:ratio5m{job="retailops-api",instance="api:8000"}'
+            value: 0.2857142857142857
+      - expr: retailops:api_scrape_availability:ratio5m
+        eval_time: 8m
+        exp_samples:
+          - labels: 'retailops:api_scrape_availability:ratio5m{job="retailops-api",instance="api:8000"}'
+            value: 1
+  - name: absent data is unknown rather than perfect availability
+    promql_expr_test:
+      - expr: retailops:api_scrape_availability:ratio30d
+        eval_time: 30m
+        exp_samples: []
