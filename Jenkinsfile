@@ -46,10 +46,10 @@ pipeline {
             steps { sh 'make install' }
         }
         stage('Data Quality Gate') {
-            steps { sh 'make data-quality DATA_PROFILE="${DATA_PROFILE}"' }
+            steps { sh 'make data-quality DATA_PROFILE="${DATA_PROFILE:-small}"' }
         }
         stage('Local CI Gate') {
-            steps { sh 'make ci-local DATA_PROFILE="${DATA_PROFILE}"' }
+            steps { sh 'make ci-local DATA_PROFILE="${DATA_PROFILE:-small}"' }
         }
         stage('Isolated Build, Runtime and Alert Drill') {
             steps { sh 'make compose-ci' }
@@ -63,7 +63,7 @@ pipeline {
 build_number=${env.BUILD_NUMBER}
 source_commit=${env.GIT_COMMIT}
 result=${currentBuild.currentResult}
-data_profile=${params.DATA_PROFILE}
+data_profile=${params.DATA_PROFILE ?: 'small'}
 compose_and_alert_drill=mandatory
 security_gate=separate-protected-github-required-ci
 """
