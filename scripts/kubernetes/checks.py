@@ -111,7 +111,7 @@ def streaming() -> dict:
                 "WHERE consumer_name='retailops-realtime-consumer'"
             ).fetchone()
             count = conn.execute(
-                "SELECT count(*) FROM realtime_metric_observations WHERE event_id=%s", (event_id,)
+                "SELECT count(*) FROM live_metric_observations WHERE event_id=%s", (event_id,)
             ).fetchone()[0]
         if row == ("processed",) and state and state[0] >= 1 and count == 3:
             live = api("/dashboard/live-operations?window_minutes=15")
