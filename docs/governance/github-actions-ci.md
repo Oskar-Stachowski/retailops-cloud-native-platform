@@ -14,7 +14,7 @@ This document maps the RetailOps GitHub Actions implementation to the production
 | GHA-004 | Implemented | `.github/workflows/security-ci.yml` | Runs secret scan, Trivy filesystem scan, dependency audits, image scans, and consolidated evidence summary. |
 | GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize, Kubeconform, Conftest and blocking Checkov, followed by an isolated kind deployment with browser/API, NetworkPolicy, streaming, persistence and rollback checks. |
 | GHA-008 | Implemented and configured | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/evidence/github/README.md` | The aggregate `Required CI / required-result` is required on `main`, including for administrators. Active settings were verified through the GitHub API on 2026-09-25. |
-| GHA-009 | Designed/partly implemented | `.github/workflows/terraform-validation.yml`, `.github/workflows/terraform-plan.yml`, `docs/ADR/IAM delivery access.md` | Required validation is uncredentialed; the separate manual Terraform plan uses GitHub OIDC when the safe AWS role variable exists. |
+| GHA-009 | Implemented plan path; S3 activation pending | `.github/workflows/terraform-validation.yml`, `.github/workflows/terraform-plan.yml`, `scripts/terraform/` | Required CI verifies backend controls and real local drift/migration without AWS. Manual main-only OIDC plans pin the account, distinguish baseline from existing-state drift and upload sanitized summaries. The prepared S3/KMS backend is not deployed. |
 | GHA-010 | Implemented | `.github/actions/**` | Composite actions centralize Python setup, Node setup, and CI evidence upload. |
 | GHA-011 | Candidate implemented | `.github/workflows/provenance-ci.yml` | Creates GitHub artifact attestations for locally built API/frontend image subjects. |
 
@@ -41,7 +41,7 @@ can also be started manually for standalone evidence:
 - IaC Security CI
 - Kubernetes Policy CI
 
-Terraform Dev Plan is a separate manual-only workflow and is not part of the
+Terraform State and Drift Review is a separate manual-only workflow and is not part of the
 required merge contract. Observability and provenance remain standalone
 evidence workflows. Docker Compose CI runs the seven critical Chromium browser
 journeys against its fresh seeded stack before cleanup. Browser failures fail

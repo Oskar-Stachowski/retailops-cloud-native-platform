@@ -18,9 +18,12 @@ The Terraform code is designed for safe local validation and controlled showcase
 
 ```text
 infra/
-├── backend.tf.example
+├── state-backend/           # persistent S3/KMS bootstrap, not deployed
 ├── environments/
 │   └── dev/
+│       ├── backend.tf.example
+│       ├── backend.s3.tfbackend.example
+│       ├── backend.config.json.example
 │       ├── main.tf
 │       └── terraform.tfvars.example
 ├── modules/
@@ -84,7 +87,7 @@ make iac-scan
 Create a dev plan only when safe AWS credentials are intentionally available:
 
 ```bash
-make terraform-plan-dev
+TF_EXPECTED_ACCOUNT_ID=YOUR_REVIEWED_ACCOUNT_ID make terraform-plan-dev
 ```
 
 Do not run `terraform apply` or `terraform destroy` as part of routine local validation or CI. Those commands are reserved for a short, controlled showcase window with evidence capture and cleanup.
@@ -101,12 +104,12 @@ The default CI path runs:
 - `make terraform-validate`,
 - validation evidence upload.
 
-The separate `.github/workflows/terraform-plan.yml` workflow is manual-only
-through `workflow_dispatch`. It first reuses the validation workflow and runs
-the plan job only after explicit confirmation. The plan uses GitHub OIDC and a
-repository variable named `AWS_TERRAFORM_PLAN_ROLE_ARN` to assume a plan-only
-AWS role. The workflow does not contain static AWS credentials and does not run
-`terraform apply`.
+The separate `.github/workflows/terraform-plan.yml` workflow is manual-only on
+protected `main`. It uses GitHub OIDC with `AWS_TERRAFORM_PLAN_ROLE_ARN` and the
+explicit `AWS_TERRAFORM_ACCOUNT_ID`. Select an empty-state `baseline` or a `drift`
+review of existing state (`TF_BACKEND_CONFIG_JSON` required). It publishes only
+sanitized summaries and never applies a plan. Required CI also runs
+`make terraform-state-test` without AWS credentials.
 
 IaC security checks are handled separately by `.github/workflows/iac-security.yml`, using TFLint, blocking Checkov scans and explicit critical guardrails. Accepted Checkov exceptions are documented in `security/README.md`; findings outside those exceptions fail CI.
 
@@ -118,7 +121,12 @@ Sprint 10 uses local Terraform initialization with:
 terraform -chdir=infra/environments/dev init -backend=false -input=false
 ```
 
-`backend.tf.example` is only a template for a future S3/DynamoDB remote state design. Do not rename or copy it to `backend.tf` until state ownership, locking, encryption, naming, and access controls are approved.
+Backend examples now live beside the dev entry point. The separate
+[`state-backend`](state-backend/README.md) root prepares private versioned S3
+with KMS encryption and native S3 locking. It has not been deployed. Follow the
+[remote-state runbook](../docs/runbooks/terraform-remote-state.md) for ownership,
+activation and migration. The [drift runbook](../docs/runbooks/terraform-drift-check.md)
+distinguishes missing state, baseline plans, configuration changes and external drift.
 
 Do not commit Terraform local artifacts:
 
@@ -162,8 +170,8 @@ ci-cd/reports/iac/
 
 Recommended next steps:
 
-- design remote state with S3, DynamoDB locking, KMS encryption, versioning, and least-privilege access,
-- add scheduled drift detection with plan-only credentials,
+- activate and verify the prepared S3/KMS backend when a managed cloud deployment is needed,
+- schedule the guarded drift workflow after remote state and scoped lock permissions exist,
 - promote selected Checkov findings from report-only to hard gates,
 - review VPC Flow Logs retention and alerting for production-like environments,
 - add `terraform test` or Terratest module contract checks,

@@ -59,6 +59,7 @@ SBOM_REPOSITORY_SUMMARY_SNAPSHOT ?= $(SBOM_REPORTS_DIR)/retailops-repository-sbo
 INFRA_DIR ?= infra
 TERRAFORM_DIR ?= $(INFRA_DIR)/environments/dev
 TERRAFORM_VAR_FILE ?= terraform.tfvars.example
+TERRAFORM_BACKEND_CONFIG ?= infra/environments/dev/backend.config.json
 
 TFLINT_CONFIG ?= $(ROOT_DIR)/security/iac/tflint.hcl
 CHECKOV_CONFIG ?= $(ROOT_DIR)/security/iac/checkov.yml
@@ -230,7 +231,9 @@ help:
 	@echo "Terraform / IaC:"
 	@echo "  make terraform-fmt        Format Terraform files under infra/"
 	@echo "  make terraform-validate   Initialize Terraform locally and validate dev"
-	@echo "  make terraform-plan-dev   Create a dev Terraform plan report"
+	@echo "  make terraform-plan-dev   Review an isolated baseline (TF_EXPECTED_ACCOUNT_ID required)"
+	@echo "  make terraform-drift      Review existing S3 state and infrastructure drift"
+	@echo "  make terraform-state-test Test state controls and real local drift without AWS"
 	@echo "  make tflint-report        Run TFLint only against infra/ and save report"
 	@echo "  make checkov-scan         Run blocking Checkov IaC scan"
 	@echo "  make iac-scan             Run Terraform validation, guardrails, TFLint and Checkov"
@@ -582,11 +585,20 @@ terraform-validate: terraform-init-local
 	@set -o pipefail; \
 	$(TERRAFORM) -chdir="$(TERRAFORM_DIR)" validate -no-color | tee "$(TERRAFORM_VALIDATE_REPORT)"
 
-terraform-plan-dev: terraform-init-local
-	@set -o pipefail; \
-	$(TERRAFORM) -chdir="$(TERRAFORM_DIR)" plan \
-		-var-file="$(TERRAFORM_VAR_FILE)" \
-		-no-color | tee "$(TERRAFORM_PLAN_REPORT)"
+.PHONY: terraform-drift terraform-state-test
+
+terraform-plan-dev: check-terraform
+	python3 scripts/terraform/plan.py --mode baseline --terraform "$(TERRAFORM)"
+
+terraform-drift: check-terraform
+	python3 scripts/terraform/plan.py --mode drift --terraform "$(TERRAFORM)" --backend-config "$(TERRAFORM_BACKEND_CONFIG)"
+
+terraform-state-test: check-terraform
+	python3 scripts/terraform/test_plan.py
+	$(TERRAFORM) -chdir=infra/state-backend init -backend=false -input=false -lockfile=readonly
+	$(TERRAFORM) -chdir=infra/state-backend validate -no-color
+	$(TERRAFORM) -chdir=infra/state-backend test -no-color
+	python3 scripts/terraform/drill.py
 
 tflint-init: check-tflint check-tflint-config
 	$(TFLINT) --init --config "$(TFLINT_CONFIG)"

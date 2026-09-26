@@ -1,25 +1,33 @@
-name: Terraform Dev Plan
+name: Terraform State and Drift Review
 
 on:
   workflow_dispatch:
     inputs:
       run_dev_plan:
-        description: "Run terraform plan for dev. Requires safe AWS credentials configured for this workflow. This workflow never runs terraform apply."
+        description: "Run a read-only infrastructure plan on main using the configured AWS role."
         required: true
         type: boolean
         default: false
+      mode:
+        description: "Baseline has no state; drift requires the configured existing S3 state."
+        required: true
+        type: choice
+        options:
+          - baseline
+          - drift
+        default: baseline
 
 permissions:
   contents: read
 
 concurrency:
-  group: terraform-dev-plan-${{ github.ref }}
-  cancel-in-progress: true
+  group: terraform-state-dev
+  cancel-in-progress: false
 
 env:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
-  TERRAFORM_VERSION: "1.9.8"
+  TERRAFORM_VERSION: "1.15.1"
 
 jobs:
   terraform-validation:
@@ -27,7 +35,7 @@ jobs:
     uses: ./.github/workflows/terraform-validation.yml
 
   terraform-plan-dev:
-    name: Optional dev Terraform plan
+    name: Guarded dev state and drift review
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: terraform-validation
@@ -38,6 +46,13 @@ jobs:
       id-token: write
 
     steps:
+      - name: Require the protected main branch and pinned account
+        env:
+          EXPECTED_ACCOUNT: ${{ vars.AWS_TERRAFORM_ACCOUNT_ID }}
+        run: |
+          test "${GITHUB_REF}" = "refs/heads/main"
+          [[ "${EXPECTED_ACCOUNT}" =~ ^[0-9]{12}$ ]]
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
@@ -55,17 +70,38 @@ jobs:
           role-to-assume: ${{ vars.AWS_TERRAFORM_PLAN_ROLE_ARN }}
           aws-region: eu-central-1
           role-session-name: retailops-terraform-plan
+          allowed-account-ids: ${{ vars.AWS_TERRAFORM_ACCOUNT_ID }}
+          mask-aws-account-id: true
 
       - name: Verify AWS credentials are available without printing account details
         run: aws sts get-caller-identity >/dev/null
 
-      - name: Create dev Terraform plan report
-        run: make terraform-plan-dev
+      - name: Review baseline or existing remote state
+        env:
+          PLAN_MODE: ${{ inputs.mode }}
+          TF_EXPECTED_ACCOUNT_ID: ${{ vars.AWS_TERRAFORM_ACCOUNT_ID }}
+          TF_BACKEND_CONFIG_JSON: ${{ vars.TF_BACKEND_CONFIG_JSON }}
+        run: |
+          umask 077
+          args=(--mode "${PLAN_MODE}")
+          if [[ "${PLAN_MODE}" = "drift" ]]; then
+            config_path="${RUNNER_TEMP}/retailops-backend.config.json"
+            export RETAILOPS_BACKEND_CONFIG_PATH="${config_path}"
+            python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          config = json.loads(os.environ["TF_BACKEND_CONFIG_JSON"])
+          Path(os.environ["RETAILOPS_BACKEND_CONFIG_PATH"]).write_text(json.dumps(config))
+          PY
+            args+=(--backend-config "${config_path}")
+            trap 'rm -f "${config_path}"' EXIT
+          fi
+          python3 scripts/terraform/plan.py "${args[@]}"
 
       - name: Upload Terraform plan evidence
         if: always()
         uses: ./.github/actions/upload-ci-evidence
         with:
           name: terraform-dev-plan-evidence
-          path: ci-cd/reports/iac/terraform-plan-dev.txt
+          path: ci-cd/reports/terraform-state/**/report.json
           if-no-files-found: warn

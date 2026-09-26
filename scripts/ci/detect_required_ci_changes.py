@@ -65,6 +65,7 @@ DOCKER_PATTERNS = (
 
 TERRAFORM_PATTERNS = (
     "infra/**",
+    "scripts/terraform/**",
     "infracost.yml",
     "infracost-usage.yml",
     "security/iac/**",
