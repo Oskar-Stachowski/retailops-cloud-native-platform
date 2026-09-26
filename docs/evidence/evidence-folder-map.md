@@ -2,6 +2,8 @@
 
 Last reviewed: 2026-05-12
 
+Kubernetes flow refreshed: 2026-09-26; other areas retain their original review scope.
+
 ## Final Structure
 
 ```text
@@ -23,6 +25,9 @@ docs/evidence/
 │   ├── README.md
 │   ├── jenkins-stage-view.png
 │   └── jenkins-status-and-artifacts.png
+├── kubernetes/
+│   ├── 2026-09-26-runtime.md
+│   └── 2026-09-26-runtime.json
 ├── gptimages-index.md
 ├── gitignore-evidence-policy.md
 ├── evidence-folder-map.md
@@ -47,6 +52,7 @@ ci-cd/reports/
 | `docs/evidence/aws/` | Human-readable AWS/Terraform showcase screenshots and cleanup notes. | Sanitized console screenshots and cleanup notes. | Full raw Terraform logs, account IDs, ARNs, console URLs. |
 | `docs/evidence/docker/` | Docker build and Compose smoke evidence. | Sanitized build and smoke summaries. | Full raw Compose logs, large runtime dumps, local-only container state. |
 | `docs/evidence/jenkins/` | Curated Jenkins UI screenshots and notes. | Screenshot evidence with no secrets or private URLs. | Raw Jenkins logs unless sanitized. |
+| `docs/evidence/kubernetes/` | Dated kind runtime, persistence and rollback evidence. | Curated results, source/image hashes and data fingerprints. | Secrets, kubeconfigs, raw logs or machine identifiers. |
 | `ci-cd/reports/` | Raw or semi-raw generated reports from automation. | README files and explicit sanitized snapshots. | Volatile local logs, coverage XML, generated datasets, raw scanner dumps. |
 | `ci-cd/reports/iac/` | Terraform, Checkov, TFLint, drift, and IaC report outputs. | Sanitized snapshots and report README. | Terraform state, binary plans, `.terraform/`, unsanitized plan/apply logs. |
 | `ci-cd/reports/security/` | Trivy, Gitleaks, dependency audit outputs. | Sanitized snapshots and report README. | Unsanitized secret scan outputs and non-snapshot scanner files. |
@@ -133,16 +139,21 @@ flowchart LR
     FUTURE --> INDEX[docs/evidence/index.md]
 ```
 
-## Kubernetes and Helm Evidence Flow
+## Kubernetes Evidence Flow
 
 ```mermaid
 flowchart LR
-    K8S[k8s manifests] --> VALIDATE[future kubeconform or kubectl dry-run]
-    HELM[future Helm chart] --> LINT[future helm lint]
-    VALIDATE --> REPORTS[ci-cd/reports/kubernetes future]
-    LINT --> REPORTS
-    REPORTS --> INDEX[docs/evidence/index.md]
+    K8S[k8s manifests] --> VALIDATE[Kustomize, schemas and policies]
+    K8S --> KIND[Isolated kind runtime drill]
+    VALIDATE --> STATIC[ci-cd/reports/k8s]
+    KIND --> RUNTIME[ci-cd/reports/k8s-runtime ignored]
+    RUNTIME --> ARTIFACT[GitHub Actions artifact]
+    RUNTIME --> CURATED[docs/evidence/kubernetes]
+    STATIC --> INDEX[docs/evidence/index.md]
+    CURATED --> INDEX
 ```
+
+Helm packaging and installation evidence remain future work.
 
 ## MLOps and GenAI Evidence Flow
 

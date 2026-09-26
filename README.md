@@ -31,7 +31,7 @@ This repository intentionally separates implemented components from target archi
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |
 | Event streaming | Partially implemented | Redpanda topics, event contracts, replay data, live metrics read model, local K8s broker and consumer deployment; producer/replay E2E is future work |
 | Cloud workload deployment | Designed only | AWS architecture docs and Terraform foundation; no permanent app runtime is deployed |
-| Local Kubernetes / EKS | Local runtime drill implemented; EKS pending | [Runbook](docs/runbooks/local-kubernetes-runbook.md): kind, Traefik ingress, enforced NetworkPolicy, persistent dev database/broker, jobs, browser checks, restart/update/rollback and cleanup |
+| Local Kubernetes / EKS | Local runtime verified on ARM64 and AMD64; EKS pending | [Dated evidence](docs/evidence/kubernetes/2026-09-26-runtime.md): kind, Traefik ingress, enforced NetworkPolicy, persistent dev database/broker, jobs, browser checks, restart/update/rollback and cleanup; [runbook](docs/runbooks/local-kubernetes-runbook.md) |
 | MLOps/model lifecycle | Local foundation implemented | `ml/`, [MLOps Lifecycle](docs/mlops-lifecycle.md), feature contract, baseline model, evaluation, metadata, batch inference, metrics and drift checks; no production model serving yet |
 
 ---

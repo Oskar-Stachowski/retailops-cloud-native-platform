@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-05-18
 
-CI governance and dependency validation evidence refreshed: 2026-09-25. Other evidence retains its original capture dates.
+CI governance and dependency validation evidence refreshed: 2026-09-25. Registry and local Kubernetes evidence added: 2026-09-26. Other evidence retains its original capture dates.
 
 This index maps tracked evidence to what it proves. It avoids treating documentation claims, roadmap diagrams, or target architecture text as proof of implementation.
 
@@ -12,6 +12,7 @@ Use this table as the first stop when reviewing freshness. It records the last c
 
 | Date | Commit SHA | Command run | Expected outcome | Environment | Artifact |
 |---|---|---|---|---|---|
+| 2026-09-26 | Local `344919494015f086b333c0c2e1a4f875e8e68d94`; CI test merge `423a1eab57eb584840260cd01fe2c9066ae0728f`; merged main `aa69c1e25f71e11034666f91057308454ba5d430` | `make k8s-runtime-drill`; Required CI run `36240218438` | All 24 CI jobs and five runtime stages passed; jobs, ingress, NetworkPolicy, streaming deduplication, PVC retention, readiness, browser checks, update/rollback and cleanup verified. | Separate local ARM64 and GitHub-hosted AMD64 kind clusters, demo data | [Kubernetes runtime report](kubernetes/2026-09-26-runtime.md) |
 | 2026-09-26 | `d8897822b6c2cbabcc14ee34fd7985b863aea8bd` | Verified registry release run `36227222222` | Exact tested images published to GHCR; signed manifest, four provenance and four SPDX attestations verified; fresh-runner digest pulls and rollback passed; annotated v0.2.1 and durable evidence published. | GitHub-hosted Linux AMD64, two isolated demo DB drills, Chromium | [Registry release report](releases/2026-09-26-registry.md) |
 | 2026-09-25 | `977c776ed7cf80ae2229e1522dba8a44e3827a75` | `PLAYWRIGHT_BROWSER_CHANNEL=chrome make release-drill` | Baseline/update/rollback passed HTTP, browser and data checks; HTTP 502 fault detected; new-version write preserved; migration refusals and cleanup passed. | Isolated local Docker, ARM64, demo data, Chrome | [Versioned rollback report](releases/README.md) |
 | 2026-09-25 | `21e916580f8c1e4604e98d3fb8c249aea94f91c8` | `make db-recovery-drill` | 15 tables / 66 rows identical after restore; three decisions and five idempotent actions retained; four invalid backup cases rejected; cleanup passed. | Isolated local Docker project, PostgreSQL 16.13, demo fixture | [Database recovery report](db/README.md) |
@@ -69,6 +70,7 @@ Use the same refresh pattern when an artifact becomes stale:
 | AWS/Terraform raw report | `ci-cd/reports/iac/sprint-10-terraform-apply.txt` | Sanitized apply evidence for the temporary AWS showcase. | Terraform, AWS | Reviewer-facing raw snapshot | Sanitized summary; account identifiers removed. |
 | AWS/Terraform raw report | `ci-cd/reports/iac/sprint-10-terraform-destroy.txt` | Sanitized destroy evidence for the temporary AWS showcase. | Terraform, AWS, FinOps | Reviewer-facing raw snapshot | Sanitized summary; account identifiers removed. |
 | Kubernetes raw report | `ci-cd/reports/k8s/kubernetes-smoke-snapshot.txt` | Base and dev Kustomize manifests render, parse, pass kubeconform validation, and include expected workload resources. | Kubernetes | Reviewer-facing raw snapshot | Captured from `make k8s-smoke`. |
+| Kubernetes runtime | `docs/evidence/kubernetes/2026-09-26-runtime.md`, `2026-09-26-runtime.json` | Actual local deployment, persistent data through restarts/update/rollback, ingress, enforced NetworkPolicy, streaming and browser behavior. | Kubernetes, release, recovery | Technical reviewer | Clean ARM64/AMD64 runs and all 24 CI jobs passed on 2026-09-26; source/report hashes and image identities retained. |
 | Kubernetes raw report | `ci-cd/reports/k8s/kubernetes-secret-scan-snapshot.txt` | Kubernetes manifests and secret examples were scanned with Gitleaks and no leaks were found. | Kubernetes, Security | Reviewer-facing raw snapshot | Captured from `gitleaks detect --source k8s --no-git --redact --verbose`. |
 | Jenkins | `docs/evidence/jenkins/README.md` | Jenkins evidence is indexed and separated from raw pipeline reports. | Jenkins, CI/CD | Recruiter-facing | Added during evidence cleanup. |
 | Jenkins | `docs/evidence/jenkins/jenkins-stage-view.png` | Jenkins pipeline stage view existed for release-confidence evidence. | Jenkins, CI/CD | Recruiter-facing | Static screenshot; should be refreshed after next successful Jenkins run. |
