@@ -1,0 +1,860 @@
+{
+  "captured_date": "2026-09-26",
+  "status": "passed",
+  "implementation_pr": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/45",
+  "pr_head": "344919494015f086b333c0c2e1a4f875e8e68d94",
+  "merged_main": "aa69c1e25f71e11034666f91057308454ba5d430",
+  "tested_pr_merge": "423a1eab57eb584840260cd01fe2c9066ae0728f",
+  "tested_and_merged_tree": "fe1e5634911bb25b695f7d496876259405310122",
+  "required_ci": {
+    "run_id": 36240218438,
+    "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36240218438",
+    "successful_jobs": 24,
+    "jobs": [
+      {
+        "id": 108399233252,
+        "name": "Required CI contract tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399233438,
+        "name": "Detect changed areas",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250424,
+        "name": "Repository diff hygiene",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250574,
+        "name": "data-gate / Synthetic data quality gate",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250602,
+        "name": "terraform-validation-gate / Terraform fmt, init and validate",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250653,
+        "name": "frontend-gate / Frontend tests and lint",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250660,
+        "name": "docker-gate / Validate Docker Compose config",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250668,
+        "name": "iac-security-gate / TFLint IaC quality gate",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250687,
+        "name": "security-gate / Frontend dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250693,
+        "name": "kubernetes-gate / Kustomize, schema and policy gates",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250721,
+        "name": "security-gate / Backend image vulnerability scan",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250729,
+        "name": "api-gate / API integration tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250733,
+        "name": "security-gate / Secret scanning with Gitleaks",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250756,
+        "name": "security-gate / Filesystem vulnerability scan",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250762,
+        "name": "security-gate / Frontend image vulnerability scan",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250782,
+        "name": "iac-security-gate / Checkov IaC security report",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399250808,
+        "name": "security-gate / Python dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399287200,
+        "name": "docker-gate / Build full stack and run smoke tests",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399296743,
+        "name": "frontend-gate / Build frontend application",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399325027,
+        "name": "frontend-gate / Build frontend Docker image",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399353735,
+        "name": "kubernetes-gate / Local kind runtime, persistence and rollback",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399365593,
+        "name": "security-gate / Security evidence summary",
+        "conclusion": "success"
+      },
+      {
+        "id": 108399481516,
+        "name": "api-gate / API Docker image build",
+        "conclusion": "success"
+      },
+      {
+        "id": 108400453384,
+        "name": "required-result",
+        "conclusion": "success"
+      }
+    ],
+    "artifact": {
+      "id": 10905534017,
+      "name": "kubernetes-runtime-evidence",
+      "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36240218438/artifacts/10905534017",
+      "zip_sha256": "3be3d0c970796e21288a36b3bafe1014545a32a2e31b952e9d998165523efb2f",
+      "download_checksum_verified": true
+    }
+  },
+  "curation": "Extracted successful reports only. Omitted machine identifiers, Pod UUIDs, random test image tags and raw logs. Retained source/report/script hashes, runtime image identities, checks and data fingerprints. API and browser outcomes are in stages; builder-only validation placeholders are omitted.",
+  "runs": {
+    "local_arm64": {
+      "status": "passed",
+      "started_at": "2026-09-26T11:53:41.256682+00:00",
+      "finished_at": "2026-09-26T12:02:07.919801+00:00",
+      "harness_commit": "344919494015f086b333c0c2e1a4f875e8e68d94",
+      "working_tree_dirty": false,
+      "harness_sha256": {
+        "scripts/kubernetes/checks.py": "eae9f8acb432a16fe10fc44e614ca75ae56734b43c5e20e1277a70e52a44bdbe",
+        "scripts/kubernetes/drill.py": "28fdc51f8d4ada7c8a794f819dc568d84a846b45b738890d6d5677fcf519e98b"
+      },
+      "image_mode": "native source builds; not the published AMD64 registry artifacts",
+      "snapshot_excludes": [
+        "realtime_consumer_state (restart timestamps/counters)"
+      ],
+      "node_image": "kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f",
+      "infrastructure_images": [
+        "registry.k8s.io/networking/kindnet:v1.0.1@sha256:f54f1d3c78c8c910b8dc7afff75feb437e9fdb48428117be67eec2e1e8d2cdf3",
+        "traefik:v3.7.13@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0",
+        "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+        "redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408"
+      ],
+      "jobs": {
+        "redpanda-topic-init": 1,
+        "retailops-migrate": 1,
+        "retailops-seed-demo-data": 1
+      },
+      "network_policy": {
+        "foreign_namespace_direct_ip": "blocked",
+        "unlabelled_pod": "blocked",
+        "retailops_pod": "allowed",
+        "cni": "kindnet v1.0.1"
+      },
+      "streaming": {
+        "event_id": "8c81b85a-e584-472c-9bb9-876d84712638",
+        "deliveries": 2,
+        "stored_events": 1,
+        "metric_rows": 3,
+        "broker_message_retained_after_restart": true
+      },
+      "database_restart": {
+        "direct_health": 200,
+        "direct_ready": 503,
+        "ready_api_endpoints_during_outage": 0,
+        "new_pod_same_pvc": true
+      },
+      "negative_checks": {
+        "api_outage": "HTTP 504 detected through ingress"
+      },
+      "database_head": "6b0f1c2d3e4a",
+      "migration_action": "one initial migration/seed; same-history rollout; no downgrade/restore/reseed",
+      "timings_seconds": {
+        "upgrade_and_verification": 41.22,
+        "rollback_and_verification": 44.416,
+        "total": 506.711
+      },
+      "cleanup": "passed",
+      "source_report_sha256": "35fdb6b85e4a70daa54b608385664e4a09c2db6ab4e5c4d9e185b0248218f68a",
+      "environment": {
+        "architecture": "arm64",
+        "kubeletVersion": "v1.35.0",
+        "containerRuntimeVersion": "containerd://2.2.0",
+        "operatingSystem": "linux",
+        "osImage": "Debian GNU/Linux 12 (bookworm)"
+      },
+      "releases": {
+        "previous": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "version": "0.2.0+git.cb0c79848247",
+          "migration": {
+            "head": "6b0f1c2d3e4a",
+            "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+          },
+          "images": {
+            "api": {
+              "image_id": "sha256:897a36cdd872b4f720994a0103530c89a311e8bae5bb5164bafdb452a42e30b8",
+              "cri_image_id": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5",
+              "platform": "linux/arm64"
+            },
+            "frontend": {
+              "image_id": "sha256:3459d14ec175c60b5f97ad818e563296efa52db0bda66c49e50ab696c1751177",
+              "cri_image_id": "sha256:05eb6ca43cd6c358081c264a43e718be2c5c196908daf535f0a8c714fee7f3b0",
+              "platform": "linux/arm64"
+            }
+          }
+        },
+        "candidate": {
+          "source_commit": "344919494015f086b333c0c2e1a4f875e8e68d94",
+          "version": "0.2.1+git.344919494015",
+          "migration": {
+            "head": "6b0f1c2d3e4a",
+            "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+          },
+          "images": {
+            "api": {
+              "image_id": "sha256:5b9c9f80bb2db63052d5c2fa4ca1ca3ea9604949536f820c33f01f1e0a3b0c81",
+              "cri_image_id": "sha256:905097ab589ad8fadab678ca1019f5bdef86e430fd7ffee5d7782292934f7603",
+              "platform": "linux/arm64"
+            },
+            "frontend": {
+              "image_id": "sha256:aac552f2307721c5a4e28809d327b78fa7c2eac30c19437bedf6a9d811b13296",
+              "cri_image_id": "sha256:09a7ffa259f596f849fdeee4dad76489caafe6a02855164407462200ba5f3c76",
+              "platform": "linux/arm64"
+            }
+          }
+        }
+      },
+      "stages": {
+        "previous": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5",
+            "retailops-frontend": "sha256:05eb6ca43cd6c358081c264a43e718be2c5c196908daf535f0a8c714fee7f3b0",
+            "retailops-realtime-consumer": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5"
+          }
+        },
+        "database_restarted": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5",
+            "retailops-frontend": "sha256:05eb6ca43cd6c358081c264a43e718be2c5c196908daf535f0a8c714fee7f3b0",
+            "retailops-realtime-consumer": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5"
+          }
+        },
+        "workloads_restarted": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5",
+            "retailops-frontend": "sha256:05eb6ca43cd6c358081c264a43e718be2c5c196908daf535f0a8c714fee7f3b0",
+            "retailops-realtime-consumer": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5"
+          }
+        },
+        "upgraded": {
+          "source_commit": "344919494015f086b333c0c2e1a4f875e8e68d94",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:905097ab589ad8fadab678ca1019f5bdef86e430fd7ffee5d7782292934f7603",
+            "retailops-frontend": "sha256:09a7ffa259f596f849fdeee4dad76489caafe6a02855164407462200ba5f3c76",
+            "retailops-realtime-consumer": "sha256:905097ab589ad8fadab678ca1019f5bdef86e430fd7ffee5d7782292934f7603"
+          }
+        },
+        "rolled_back": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 72,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5",
+            "retailops-frontend": "sha256:05eb6ca43cd6c358081c264a43e718be2c5c196908daf535f0a8c714fee7f3b0",
+            "retailops-realtime-consumer": "sha256:60ada3f945b3e1e9f09ec3bbfbe087ac907300e6e9fcb9fa2a183163cd9bc1e5"
+          }
+        }
+      },
+      "initial_snapshot": {
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "fa21888b53a7b10463343b25e100993390832664fe8437f36ddb497e8fb3054c"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 3,
+            "sha256": "a572851078938e8357908376bef5a18e20aec79f8d006b2e3a66835ae4facf29"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "2af8fd715902bcbd75834b4d094937841a844250d83d0adbcb6020a5f498e881"
+          },
+          "realtime_event_log": {
+            "rows": 1,
+            "sha256": "629582c3b248ae8a53e8a1ff7610686d3475cf33fff4246f43e62cca60a46e7c"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "7dc7e3253f6a759b9ffcb4e33a5ccfd82139c979d7c15c0e096f27f5d987e421"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "795926788aac7d9a00cc9f2219ff19ab86b95fe18478c9a6323cd643f3ca3f8e"
+          },
+          "workflow_actions": {
+            "rows": 6,
+            "sha256": "fd06338f21c8b1f2ace628dcc7a2c940c76b3c339df9d130eea7cc7d273f7ce6"
+          },
+          "workflow_audit_log": {
+            "rows": 5,
+            "sha256": "c621350206c9111ccb6032524d89cfd9f86a2443d635d4794ceb93f7033ddb42"
+          }
+        },
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "sequence_count": 0,
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+      },
+      "final_snapshot": {
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "bb2ef44958fc6f1d701610c0e35284e00f704ca18be9cc51f43b7bbfdc416145"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 3,
+            "sha256": "a572851078938e8357908376bef5a18e20aec79f8d006b2e3a66835ae4facf29"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "2af8fd715902bcbd75834b4d094937841a844250d83d0adbcb6020a5f498e881"
+          },
+          "realtime_event_log": {
+            "rows": 1,
+            "sha256": "629582c3b248ae8a53e8a1ff7610686d3475cf33fff4246f43e62cca60a46e7c"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "7dc7e3253f6a759b9ffcb4e33a5ccfd82139c979d7c15c0e096f27f5d987e421"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "795926788aac7d9a00cc9f2219ff19ab86b95fe18478c9a6323cd643f3ca3f8e"
+          },
+          "workflow_actions": {
+            "rows": 8,
+            "sha256": "140790c0608d40ec98f7e98579d4ceb19598b3a089c43a1b75fab5677c2299c5"
+          },
+          "workflow_audit_log": {
+            "rows": 7,
+            "sha256": "b16b140533d9fb02249b776175d8192e70c2bf160cff249bd965ae10307415b8"
+          }
+        },
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "sequence_count": 0,
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+      },
+      "broker_topics": [
+        "retailops.dlq.v1",
+        "retailops.intelligence.v1",
+        "retailops.inventory.v1",
+        "retailops.operations.v1",
+        "retailops.pricing.v1",
+        "retailops.sales.v1"
+      ]
+    },
+    "ci_amd64": {
+      "status": "passed",
+      "started_at": "2026-09-26T11:55:11.744985+00:00",
+      "finished_at": "2026-09-26T12:02:23.110281+00:00",
+      "harness_commit": "423a1eab57eb584840260cd01fe2c9066ae0728f",
+      "working_tree_dirty": false,
+      "harness_sha256": {
+        "scripts/kubernetes/checks.py": "eae9f8acb432a16fe10fc44e614ca75ae56734b43c5e20e1277a70e52a44bdbe",
+        "scripts/kubernetes/drill.py": "28fdc51f8d4ada7c8a794f819dc568d84a846b45b738890d6d5677fcf519e98b"
+      },
+      "image_mode": "native source builds; not the published AMD64 registry artifacts",
+      "snapshot_excludes": [
+        "realtime_consumer_state (restart timestamps/counters)"
+      ],
+      "node_image": "kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f",
+      "infrastructure_images": [
+        "registry.k8s.io/networking/kindnet:v1.0.1@sha256:f54f1d3c78c8c910b8dc7afff75feb437e9fdb48428117be67eec2e1e8d2cdf3",
+        "traefik:v3.7.13@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0",
+        "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+        "redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408"
+      ],
+      "jobs": {
+        "redpanda-topic-init": 1,
+        "retailops-migrate": 1,
+        "retailops-seed-demo-data": 1
+      },
+      "network_policy": {
+        "foreign_namespace_direct_ip": "blocked",
+        "unlabelled_pod": "blocked",
+        "retailops_pod": "allowed",
+        "cni": "kindnet v1.0.1"
+      },
+      "streaming": {
+        "event_id": "4b772f8e-7beb-46c3-a9d4-28ac296630a9",
+        "deliveries": 2,
+        "stored_events": 1,
+        "metric_rows": 3,
+        "broker_message_retained_after_restart": true
+      },
+      "database_restart": {
+        "direct_health": 200,
+        "direct_ready": 503,
+        "ready_api_endpoints_during_outage": 0,
+        "new_pod_same_pvc": true
+      },
+      "negative_checks": {
+        "api_outage": "HTTP 504 detected through ingress"
+      },
+      "database_head": "6b0f1c2d3e4a",
+      "migration_action": "one initial migration/seed; same-history rollout; no downgrade/restore/reseed",
+      "timings_seconds": {
+        "upgrade_and_verification": 33.071,
+        "rollback_and_verification": 34.477,
+        "total": 431.366
+      },
+      "cleanup": "passed",
+      "source_report_sha256": "327abfbde3f5d5b8d5c5a14e785bcc68106148b621e5dcaaeee6db2a7ceeaa77",
+      "environment": {
+        "architecture": "amd64",
+        "kubeletVersion": "v1.35.0",
+        "containerRuntimeVersion": "containerd://2.2.0",
+        "operatingSystem": "linux",
+        "osImage": "Debian GNU/Linux 12 (bookworm)"
+      },
+      "releases": {
+        "previous": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "version": "0.2.0+git.cb0c79848247",
+          "migration": {
+            "head": "6b0f1c2d3e4a",
+            "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+          },
+          "images": {
+            "api": {
+              "image_id": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053",
+              "cri_image_id": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053",
+              "platform": "linux/amd64"
+            },
+            "frontend": {
+              "image_id": "sha256:9db76a948106ad72595440d889419d6eb97a1c51527f4b5783b538156e3d773f",
+              "cri_image_id": "sha256:9db76a948106ad72595440d889419d6eb97a1c51527f4b5783b538156e3d773f",
+              "platform": "linux/amd64"
+            }
+          }
+        },
+        "candidate": {
+          "source_commit": "423a1eab57eb584840260cd01fe2c9066ae0728f",
+          "version": "0.2.1+git.423a1eab57eb",
+          "migration": {
+            "head": "6b0f1c2d3e4a",
+            "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+          },
+          "images": {
+            "api": {
+              "image_id": "sha256:4ab4add0f258e87c5193dcf47ef2bdd72b0e9cf8c78946df68d0783bbbd3e933",
+              "cri_image_id": "sha256:4ab4add0f258e87c5193dcf47ef2bdd72b0e9cf8c78946df68d0783bbbd3e933",
+              "platform": "linux/amd64"
+            },
+            "frontend": {
+              "image_id": "sha256:a7b60c1702dab84516ece3d7ba28e705833b5e0b72b8f82eb501c5137f6109fc",
+              "cri_image_id": "sha256:a7b60c1702dab84516ece3d7ba28e705833b5e0b72b8f82eb501c5137f6109fc",
+              "platform": "linux/amd64"
+            }
+          }
+        }
+      },
+      "stages": {
+        "previous": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053",
+            "retailops-frontend": "sha256:9db76a948106ad72595440d889419d6eb97a1c51527f4b5783b538156e3d773f",
+            "retailops-realtime-consumer": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053"
+          }
+        },
+        "database_restarted": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053",
+            "retailops-frontend": "sha256:9db76a948106ad72595440d889419d6eb97a1c51527f4b5783b538156e3d773f",
+            "retailops-realtime-consumer": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053"
+          }
+        },
+        "workloads_restarted": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053",
+            "retailops-frontend": "sha256:9db76a948106ad72595440d889419d6eb97a1c51527f4b5783b538156e3d773f",
+            "retailops-realtime-consumer": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053"
+          }
+        },
+        "upgraded": {
+          "source_commit": "423a1eab57eb584840260cd01fe2c9066ae0728f",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 70,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:4ab4add0f258e87c5193dcf47ef2bdd72b0e9cf8c78946df68d0783bbbd3e933",
+            "retailops-frontend": "sha256:a7b60c1702dab84516ece3d7ba28e705833b5e0b72b8f82eb501c5137f6109fc",
+            "retailops-realtime-consumer": "sha256:4ab4add0f258e87c5193dcf47ef2bdd72b0e9cf8c78946df68d0783bbbd3e933"
+          }
+        },
+        "rolled_back": {
+          "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+          "api": {
+            "http_health_readiness": "passed",
+            "decisions": 3,
+            "idempotent_actions": 5,
+            "data_schema_unchanged": true
+          },
+          "browser": {
+            "dashboard": "passed",
+            "product360_decisions": 3,
+            "reload": "passed"
+          },
+          "compared_tables": 14,
+          "compared_rows": 72,
+          "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a",
+          "running_image_ids": {
+            "retailops-api": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053",
+            "retailops-frontend": "sha256:9db76a948106ad72595440d889419d6eb97a1c51527f4b5783b538156e3d773f",
+            "retailops-realtime-consumer": "sha256:1c2921146b99e6e0b89efe2b9c82d93cb8c38066fa0dcdd571078f79d21c8053"
+          }
+        }
+      },
+      "initial_snapshot": {
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "81f8467b0debc2b51bcd68787990504d320ba444856a9ef5cdf7f9243a36322c"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 3,
+            "sha256": "d4b0e37d319dd5c9dc03b62c574f8f5afac64a5c623870bed483b8e7b7099efb"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "d23c27cc6d9f79466de12dd9d88f68b379d6de366ec58e876f03ad973b467c36"
+          },
+          "realtime_event_log": {
+            "rows": 1,
+            "sha256": "1ba5c7ea6b74eb86532839ad0f941450137fbff0e4616d2058cbaba3a65bfcd7"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "a2fecad6101db2a0efa067035404f5de3d9d4bb1aa30ee5cc6b91cd74c4e6a79"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "c042c98aa35a6db638729c978ec3480977058eb1bf6eb1fff6be62cc37bc94e3"
+          },
+          "workflow_actions": {
+            "rows": 6,
+            "sha256": "5dbfdbfd079def2cb34678b134a93fa51a979423d09adefa7c53003e166c7735"
+          },
+          "workflow_audit_log": {
+            "rows": 5,
+            "sha256": "502cc89d3900830915d734e2735150462c357fdf7cb15c118342f84140c2b96d"
+          }
+        },
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "sequence_count": 0,
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+      },
+      "final_snapshot": {
+        "tables": {
+          "alembic_version": {
+            "rows": 1,
+            "sha256": "6b4b1a521fa727c25860c9f006a9acff51235626b0316d4cd3cd4f14f1019401"
+          },
+          "alerts": {
+            "rows": 4,
+            "sha256": "b92bf3f144ffec67b836832303c2bb272780c54717c47bdd98299a38332fc4a9"
+          },
+          "anomalies": {
+            "rows": 4,
+            "sha256": "1b7ee3f91aa4ce6f7a7480567e79b25fb1400ce4d66e86ce8f690774f4164c2d"
+          },
+          "forecast_runs": {
+            "rows": 0,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "forecasts": {
+            "rows": 6,
+            "sha256": "88b13c075db21777e1e4fe37cd4a74ea2bdc24e5cf543bd71d2c499e14cebcb6"
+          },
+          "inventory_snapshots": {
+            "rows": 8,
+            "sha256": "cac4cde787ae6af377c6fe73d49eac04b0583831bb1c4ff8076b6f1b7f449115"
+          },
+          "live_metric_observations": {
+            "rows": 3,
+            "sha256": "d4b0e37d319dd5c9dc03b62c574f8f5afac64a5c623870bed483b8e7b7099efb"
+          },
+          "products": {
+            "rows": 8,
+            "sha256": "d23c27cc6d9f79466de12dd9d88f68b379d6de366ec58e876f03ad973b467c36"
+          },
+          "realtime_event_log": {
+            "rows": 1,
+            "sha256": "1ba5c7ea6b74eb86532839ad0f941450137fbff0e4616d2058cbaba3a65bfcd7"
+          },
+          "recommendations": {
+            "rows": 4,
+            "sha256": "dff4fbe3fc5e48e36d17822b940ff750c0abf53516037724656e79139d3f9a23"
+          },
+          "sales": {
+            "rows": 16,
+            "sha256": "a2fecad6101db2a0efa067035404f5de3d9d4bb1aa30ee5cc6b91cd74c4e6a79"
+          },
+          "users": {
+            "rows": 4,
+            "sha256": "c042c98aa35a6db638729c978ec3480977058eb1bf6eb1fff6be62cc37bc94e3"
+          },
+          "workflow_actions": {
+            "rows": 8,
+            "sha256": "6a9809ab06c06dbef289135cd267d56e8ab5329c6eafcedbd7707167add276f7"
+          },
+          "workflow_audit_log": {
+            "rows": 7,
+            "sha256": "2093db29ee3b393092dbe00d5b99778748902225e36e55b0076e55271b51130f"
+          }
+        },
+        "sequences_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "sequence_count": 0,
+        "schema_sha256": "86aaff2b50a373ec89718194d54bcafc24935f39be268f49d0569b6fb729b74a"
+      },
+      "broker_topics": [
+        "retailops.dlq.v1",
+        "retailops.intelligence.v1",
+        "retailops.inventory.v1",
+        "retailops.operations.v1",
+        "retailops.pricing.v1",
+        "retailops.sales.v1"
+      ]
+    }
+  },
+  "boundaries": [
+    "Single-node local development storage; PVC data does not survive kind cluster deletion or host loss.",
+    "Native source-built images, not the signed AMD64 GHCR v0.2.1 artifacts; no ARM64 registry release is claimed.",
+    "Previous and candidate application source trees are identical under services/api and frontend. This verifies deployment mechanics and persistence for the same migration history, not future business-code or schema-change compatibility.",
+    "Only realtime_consumer_state row fingerprints are excluded because its restart counters and timestamps change. Schema and sequences remain checked; this fixture has zero sequences.",
+    "Small demo fixture; timings are not production RTO/RPO.",
+    "No EKS, Helm release, production authentication, HA or RetailOps AI implementation is established."
+  ]
+}

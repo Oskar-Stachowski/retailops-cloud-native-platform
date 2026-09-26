@@ -5,6 +5,10 @@ an isolated kind cluster, exercise RetailOps, and remove the test resources.
 This is the local foundation before RetailOps AI; EKS, Helm and production
 storage remain separate work.
 
+The [2026-09-26 evidence](../evidence/kubernetes/2026-09-26-runtime.md) records
+successful clean ARM64 and AMD64 runs, all five stages and cleanup, with exact
+source/image identities, data fingerprints and measured timings.
+
 ## Prerequisites
 
 - Docker running with at least 4 GiB memory available to its VM.
@@ -121,10 +125,11 @@ CI uploads these as `kubernetes-runtime-evidence`. Do not commit raw generated
 secrets, kubeconfigs or full environment logs; curate evidence under
 `docs/evidence/kubernetes/`.
 
-The report compares row fingerprints, schema and sequences for every table
-except `realtime_consumer_state`, whose start/stop counters and timestamps change
-by design. Event history, metric observations and workflow audit rows remain
-in the comparison. Timings describe a tiny demo fixture, not production RTO/RPO.
+The report compares row fingerprints for every table except
+`realtime_consumer_state`, whose start/stop counters and timestamps change by
+design. Schema and sequence checks still cover the whole database. Event history,
+metric observations and workflow audit rows remain in the row comparison.
+Timings describe a tiny demo fixture, not production RTO/RPO.
 
 A failure returns a nonzero exit code. Start with the last command in
 `commands.log`, then `events.txt` and the relevant workload log. Common causes:

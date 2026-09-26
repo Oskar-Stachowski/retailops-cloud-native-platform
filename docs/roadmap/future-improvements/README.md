@@ -1,6 +1,6 @@
 # Future Improvements Roadmap
 
-Reviewed against main `44f7404010b55eba3d9bacd888d2dc7bb9797180` on 2026-09-25.
+Reviewed against main `aa69c1e25f71e11034666f91057308454ba5d430` on 2026-09-26.
 This is a prioritized plan, not implementation evidence. Dated results live in
 [the evidence index](../../evidence/index.md).
 
@@ -42,6 +42,13 @@ GHCR, verifies signed image provenance/SPDX SBOMs on a fresh runner, and repeats
 the rollback drill after digest pulls. An annotated tag and durable evidence
 bundle are published only after that verification succeeds.
 
+Step 4, [local Kubernetes runtime](../../evidence/kubernetes/2026-09-26-runtime.md),
+is now verified on ARM64 and AMD64. All 24 Required CI jobs passed, including
+actual kind startup, Traefik ingress, enforced NetworkPolicy, migration/seed/topic
+Jobs, streaming deduplication, browser checks, PVC persistence through restarts,
+same-schema update/rollback and cleanup. This uses native source builds, separate
+from the signed registry artifacts above. EKS remains future work.
+
 ## Next priorities
 
 | Priority | Work | Completion evidence |
@@ -49,7 +56,7 @@ bundle are published only after that verification succeeds.
 | 1 | Extend browser coverage where product changes require it; add accessibility and cross-browser checks. | Build on the seven critical Chromium journeys and retain traces for failures. |
 | 2 | Extend recovery/rollback drills when schema or deployment behavior changes. The current same-schema application rollback and database restore are verified. | Keep dated checks and timings for each supported migration/deployment path. |
 | 3 | Maintain verified registry releases; add selection of retained published predecessors as release history grows. The first release bootstraps a freshly tested predecessor. | Build on the published v0.2.1 evidence and retain exact digests, signed bundles and runtime verification for each release. |
-| 4 | Exercise Kubernetes workloads on a local cluster before cloud deployment. | Pods, migrations, seed, probes, ingress, runtime smoke and cleanup evidence; current schema/policy checks remain necessary but insufficient. |
+| 4 | Maintain the completed local Kubernetes gate; extend it when deployment or schema behavior changes. | [ARM64/AMD64 runtime and persistence evidence](../../evidence/kubernetes/2026-09-26-runtime.md), 24 successful CI jobs and automatic cleanup. Cloud deployment and cluster-loss recovery remain separate scope. |
 | 5 | Verify Terraform remote state and drift workflow before another AWS showcase. | Reviewed backend/access design, state migration and plan-only drift evidence; refresh cost/cleanup records after any actual cloud run. |
 | 6 | Refresh observability/SLO and Jenkins evidence through actual execution. | Dated metric/alert checks and Jenkins run tied to a commit; preserve older screenshots as historical. |
 | 7 | Re-evaluate ML artifacts after dependency/data changes and define model promotion criteria. | New evaluation, model metadata and reproducibility record; historical model binaries retain their original capture dates. |
