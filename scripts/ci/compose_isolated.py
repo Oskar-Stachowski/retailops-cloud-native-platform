@@ -19,6 +19,7 @@ def main():
         "COMPOSE_PROJECT_NAME": project,
         "COMPOSE_CI_PROFILES": "dev,observability",
         "COMPOSE_PROFILES": "dev,observability",
+        "COMPOSE_BROWSER_TESTS": os.environ.get("COMPOSE_BROWSER_TESTS", "0"),
         "HOST_BIND": "127.0.0.1",
         "API_IMAGE": project + "-api:test",
         "FRONTEND_IMAGE": project + "-frontend:test",

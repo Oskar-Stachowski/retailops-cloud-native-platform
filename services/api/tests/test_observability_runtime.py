@@ -15,16 +15,21 @@ def load(name):
     return module
 
 
-@pytest.mark.parametrize("project,command", [
-    ("retailops-cloud-native-platform", "docker compose"),
-    ("retailops-ci-test", "docker compose -p another-project"),
-    ("retailops-ci-test", "docker compose"),
-])
+@pytest.mark.parametrize(
+    "project,command",
+    [
+        ("retailops-cloud-native-platform", "docker compose"),
+        ("retailops-ci-test", "docker compose -p another-project"),
+        ("retailops-ci-test", "docker compose"),
+    ],
+)
 def test_fault_injection_refuses_unowned_project(monkeypatch, project, command):
     module = load("observability_drill")
     monkeypatch.setenv("COMPOSE_PROJECT_NAME", project)
     monkeypatch.setenv("COMPOSE", command)
-    monkeypatch.setattr(module.subprocess, "run", lambda *args, **kwargs: pytest.fail("must not mutate Docker"))
+    monkeypatch.setattr(
+        module.subprocess, "run", lambda *args, **kwargs: pytest.fail("must not mutate Docker")
+    )
     with pytest.raises(RuntimeError, match="explicit disposable"):
         module.main()
 
@@ -34,8 +39,13 @@ def test_failed_runtime_cleans_only_its_own_project(monkeypatch, tmp_path):
     module.ROOT = tmp_path
     monkeypatch.setenv("COMPOSE_PROJECT_NAME", "developer-project")
     monkeypatch.setenv("COMPOSE_FILE", "developer-compose.yml")
+    monkeypatch.setenv("COMPOSE_BROWSER_TESTS", "1")
     monkeypatch.setattr(module.signal, "signal", lambda *args: None)
-    monkeypatch.setattr(module.subprocess, "check_output", lambda args, **kwargs: "" if "status" in args else "a" * 40)
+    monkeypatch.setattr(
+        module.subprocess,
+        "check_output",
+        lambda args, **kwargs: "" if "status" in args else "a" * 40,
+    )
     calls = []
 
     def run(args, **kwargs):
@@ -52,6 +62,7 @@ def test_failed_runtime_cleans_only_its_own_project(monkeypatch, tmp_path):
     assert report["cleanup_passed"]
     project = report["project"]
     assert project.startswith("retailops-ci-")
+    assert "COMPOSE_BROWSER_TESTS=1" in calls[0][0]
     for args, kwargs in calls:
         assert "developer-project" not in " ".join(args)
         assert "COMPOSE_FILE" not in kwargs["env"]
