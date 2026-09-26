@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-05-18
 
-CI governance and dependency validation evidence refreshed: 2026-09-25. Registry and local Kubernetes evidence added: 2026-09-26. Other evidence retains its original capture dates.
+CI governance and dependency validation evidence refreshed: 2026-09-25. Registry, local Kubernetes and Terraform state/drift evidence added: 2026-09-26. Other evidence retains its original capture dates.
 
 This index maps tracked evidence to what it proves. It avoids treating documentation claims, roadmap diagrams, or target architecture text as proof of implementation.
 
@@ -12,6 +12,7 @@ Use this table as the first stop when reviewing freshness. It records the last c
 
 | Date | Commit SHA | Command run | Expected outcome | Environment | Artifact |
 |---|---|---|---|---|---|
+| 2026-09-26 | Local `e729ee82e72d0934b77c2a632297d92fa02fec04`; PR head `3266c80ef96868644697fcf6c0090bd6e9285e99`; merged main `beae2b19abf6a39edb0bc2155baa85a0a887a3d4` | Account inventory, guarded baseline, `make terraform-state-test`; Required CI `36243524269`; OIDC workflow `36244078945` | Baseline distinguished from drift, state/account guards, local migration and out-of-band drift checks, 24 CI jobs; S3 backend remains unactivated. | AWS eu-central-1 inventory and plan only; local ARM64 and CI AMD64 Terraform tests | [Terraform state/drift report](aws/2026-09-26-state-drift.md) |
 | 2026-09-26 | Local `344919494015f086b333c0c2e1a4f875e8e68d94`; CI test merge `423a1eab57eb584840260cd01fe2c9066ae0728f`; merged main `aa69c1e25f71e11034666f91057308454ba5d430` | `make k8s-runtime-drill`; Required CI run `36240218438` | All 24 CI jobs and five runtime stages passed; jobs, ingress, NetworkPolicy, streaming deduplication, PVC retention, readiness, browser checks, update/rollback and cleanup verified. | Separate local ARM64 and GitHub-hosted AMD64 kind clusters, demo data | [Kubernetes runtime report](kubernetes/2026-09-26-runtime.md) |
 | 2026-09-26 | `d8897822b6c2cbabcc14ee34fd7985b863aea8bd` | Verified registry release run `36227222222` | Exact tested images published to GHCR; signed manifest, four provenance and four SPDX attestations verified; fresh-runner digest pulls and rollback passed; annotated v0.2.1 and durable evidence published. | GitHub-hosted Linux AMD64, two isolated demo DB drills, Chromium | [Registry release report](releases/2026-09-26-registry.md) |
 | 2026-09-25 | `977c776ed7cf80ae2229e1522dba8a44e3827a75` | `PLAYWRIGHT_BROWSER_CHANNEL=chrome make release-drill` | Baseline/update/rollback passed HTTP, browser and data checks; HTTP 502 fault detected; new-version write preserved; migration refusals and cleanup passed. | Isolated local Docker, ARM64, demo data, Chrome | [Versioned rollback report](releases/README.md) |
@@ -59,6 +60,7 @@ Use the same refresh pattern when an artifact becomes stale:
 | ML/MLOps | `docs/evidence/ml/random-forest-v1/predictions.csv` | Time-based holdout predictions include trained model, baseline prediction, and actual values. | ML, MLOps | Technical reviewer | 991 evaluated holdout rows plus header. |
 | ML/MLOps | `docs/evidence/ml/random-forest-v1/feature_importance.csv` | RandomForest feature importance report exists for model interpretability evidence. | ML, MLOps | Technical reviewer | Top features include `unit_price`, `rolling_mean_units`, `lag_1_units`. |
 | AWS/Terraform | `docs/evidence/aws/README.md` | AWS showcase evidence is indexed and linked to raw Terraform snapshots. | Terraform, AWS, FinOps | Recruiter-facing | Updated after moving raw Terraform reports to `ci-cd/reports/iac/`. |
+| AWS/Terraform state | `docs/evidence/aws/2026-09-26-state-drift.md`, `2026-09-26-state-drift.json` | Scoped account inventory, guarded baseline/OIDC planning, tested drift classification and prepared backend controls. | Terraform, state, CI/CD | Technical reviewer | 2026-09-26; no active state or matching bucket found, so no live AWS migration or no-drift claim. |
 | AWS/Terraform | `docs/evidence/aws/aws-cleanup-confirmation.md` | Temporary AWS showcase resources were destroyed and cleanup was documented. | Terraform, AWS, FinOps | Recruiter-facing | Linked to tracked destroy snapshot. |
 | AWS/Terraform | `docs/evidence/aws/aws-console-vpc.png` | AWS Console screenshot for VPC/networking resources. | AWS networking | Recruiter-facing | Static screenshot; freshness depends on original capture. |
 | AWS/Terraform | `docs/evidence/aws/aws-console-ecr.png` | AWS Console screenshot for ECR repositories. | AWS ECR, CI/CD target | Recruiter-facing | Static screenshot; freshness depends on original capture. |

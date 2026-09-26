@@ -1,5 +1,10 @@
 # AWS Showcase Cleanup Confirmation - Sprint 10
 
+Historical showcase result. The [2026-09-26 account/state review](2026-09-26-state-drift.md)
+found the separately retained GitHub OIDC plan role and no matching foundation
+resources or state bucket in the reviewed scope. This document does not claim
+that the entire AWS account, unrelated resources or all regions are empty.
+
 ## Scope
 
 A short controlled AWS showcase was executed for Sprint 10 Terraform and AWS Foundation evidence.
