@@ -25,6 +25,7 @@ This repository intentionally separates implemented components from target archi
 | Frontend operator UI | Implemented | `frontend/src/`, Nginx runtime image, frontend CI |
 | PostgreSQL demo data | Implemented | `data/demo/`, `data/generator/`, seed scripts |
 | CI/CD quality gates | Implemented | `.github/workflows/`, `Jenkinsfile`, root `Makefile` |
+| Registry releases | Verified v0.2.1 | [GHCR publication, signed SBOM/provenance and fresh-pull rollback](docs/evidence/releases/2026-09-26-registry.md); [release runbook](docs/runbooks/registry-release.md) |
 | Terraform AWS foundation | Implemented foundation only | `infra/environments/dev`, reusable Terraform modules |
 | Observability | Implemented for local stack | Prometheus, Grafana provisioning, metrics endpoint, smoke tests |
 | Security automation | Implemented for scanning and IaC guardrails | Gitleaks, Trivy, pip-audit, npm audit, TFLint, Checkov |

@@ -24,9 +24,11 @@ Equivalent authenticated CLI invocation:
 gh workflow run release.yml --ref main -f previous_ref=<full-main-commit-SHA>
 ```
 
-No permanent PAT or registry secret is needed by Actions. New packages default
-to private. An external machine needs GitHub Packages read access and Docker
-authentication to pull them; do not paste tokens into commands, logs or files
+No permanent PAT or registry secret is needed by Actions. The workflow preserves
+package access settings. The [v0.2.1 images](../evidence/releases/2026-09-26-registry.md)
+were verified as anonymously readable. If a package is private, an external
+machine needs GitHub Packages read access and Docker authentication to pull it;
+do not paste tokens into commands, logs or files
 tracked by Git. Use `docker login ghcr.io --password-stdin` with an appropriately
 scoped credential supplied through your normal secret-handling mechanism.
 

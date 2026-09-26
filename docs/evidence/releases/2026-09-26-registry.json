@@ -1,0 +1,140 @@
+{
+  "captured_date": "2026-09-26",
+  "version": "v0.2.1",
+  "status": "published_and_verified",
+  "source_commit": "d8897822b6c2cbabcc14ee34fd7985b863aea8bd",
+  "release_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/releases/tag/v0.2.1",
+  "workflow_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36227222222",
+  "required_ci": {
+    "previous": {
+      "id": 36150480814,
+      "head_sha": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36150480814"
+    },
+    "candidate": {
+      "id": 36226915162,
+      "head_sha": "d8897822b6c2cbabcc14ee34fd7985b863aea8bd",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36226915162"
+    }
+  },
+  "manifest_sha256": "8ea60f4ee101dfbd865f7fd740347c1b777665085fb3f23bfe5bef1fc897b321",
+  "evidence_archive": {
+    "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/releases/download/v0.2.1/retailops-v0.2.1-evidence.tar.gz",
+    "sha256": "910dec69c886778c26564c161be952a01aeb37c0610b3464af0c902a60371daf",
+    "files": 27,
+    "all_internal_checksums_verified": true
+  },
+  "platform": "linux/amd64",
+  "images": [
+    {
+      "role": "previous",
+      "component": "api",
+      "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+      "repository": "ghcr.io/oskar-stachowski/retailops-cloud-native-platform-api",
+      "registry_digest": "sha256:7c6a6c00458e39b113a0416e8dc39317114fed33e04a212075a4b284830a9713",
+      "sbom_sha256": "44be0f6ffa46ad0a245e0f9ef6f1dafe2479992f473be7c882e53ee931f950fe",
+      "fixed_critical_findings": 0
+    },
+    {
+      "role": "previous",
+      "component": "frontend",
+      "source_commit": "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1",
+      "repository": "ghcr.io/oskar-stachowski/retailops-cloud-native-platform-frontend",
+      "registry_digest": "sha256:6acb7d10d13dcb1b282637c48bec843d6854c8eef65e9ac485d8a40bc3ae0142",
+      "sbom_sha256": "7603da7b44b796edeb05df08ed1f80d4d10761bba2bb6c5d2d605f673c017b22",
+      "fixed_critical_findings": 0
+    },
+    {
+      "role": "candidate",
+      "component": "api",
+      "source_commit": "d8897822b6c2cbabcc14ee34fd7985b863aea8bd",
+      "repository": "ghcr.io/oskar-stachowski/retailops-cloud-native-platform-api",
+      "registry_digest": "sha256:e2db8be04c60ff3a31796226e31d1c130b443776466b9120d5f758d714bc42b1",
+      "sbom_sha256": "64cc5568a7e674acd65402d8a03ef06b966a2c90facadc5a0eb816113673e2ba",
+      "fixed_critical_findings": 0
+    },
+    {
+      "role": "candidate",
+      "component": "frontend",
+      "source_commit": "d8897822b6c2cbabcc14ee34fd7985b863aea8bd",
+      "repository": "ghcr.io/oskar-stachowski/retailops-cloud-native-platform-frontend",
+      "registry_digest": "sha256:8ac5c01d993590b316d6db5c09d508225f81edcedaaca8af4bf0d878cadd0bb9",
+      "sbom_sha256": "4623eaae75d2a0337b59899fdb7e89972a70f0000c4f5581db334bfeefd90e98",
+      "fixed_critical_findings": 0
+    }
+  ],
+  "verification": {
+    "signed_manifest": true,
+    "image_provenance_signatures": 4,
+    "sbom_signatures": 4,
+    "sbom_predicate": "https://spdx.dev/Document/v2.3",
+    "fresh_runner_digest_pulls": true,
+    "no_rebuild_after_publication": true,
+    "stages": [
+      "previous",
+      "upgraded",
+      "rolled_back"
+    ],
+    "tables": 15,
+    "rows_before": 66,
+    "rows_after_upgrade_write": 68,
+    "rows_after_rollback_write": 70,
+    "negative_checks": {
+      "changed_migration_history": "blocked",
+      "unknown_database_head": "blocked",
+      "api_outage": "HTTP 502 detected"
+    },
+    "migration_head": "6b0f1c2d3e4a",
+    "cleanup": "passed"
+  },
+  "timings_seconds": {
+    "build_side": {
+      "upgrade_and_verification": 18.923,
+      "rollback_and_verification": 16.513,
+      "total": 118.377
+    },
+    "registry_side": {
+      "upgrade_and_verification": 19.34,
+      "rollback_and_verification": 17.066,
+      "total": 74.684
+    }
+  },
+  "anonymous_manifest_checks": [
+    {
+      "role": "previous",
+      "component": "api",
+      "http_status": 200,
+      "digest_verified": true
+    },
+    {
+      "role": "previous",
+      "component": "frontend",
+      "http_status": 200,
+      "digest_verified": true
+    },
+    {
+      "role": "candidate",
+      "component": "api",
+      "http_status": 200,
+      "digest_verified": true
+    },
+    {
+      "role": "candidate",
+      "component": "frontend",
+      "http_status": 200,
+      "digest_verified": true
+    }
+  ],
+  "earlier_blocked_attempt": {
+    "workflow_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36226179735",
+    "reason": "Verifier requested an unversioned SPDX predicate; attest-sbom emitted the versioned SPDX 2.3 predicate. Fixed in PR 43.",
+    "release_or_version_tag_created": false
+  },
+  "boundaries": [
+    "Small demo fixture; timings are not production RTO/RPO.",
+    "Predecessor is freshly built from a reviewed main commit, not a previously published release artifact.",
+    "Registry artifacts are Linux AMD64; local ARM64 tests are separate.",
+    "Runtime-image SBOMs do not claim a complete inventory of dependencies embedded in compiled frontend bundles.",
+    "No cloud deployment, production authentication or deployment admission is established."
+  ]
+}
