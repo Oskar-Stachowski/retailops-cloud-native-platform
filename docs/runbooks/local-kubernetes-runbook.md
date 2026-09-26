@@ -64,7 +64,7 @@ published for AMD64 only. A native ARM64 registry release is still separate work
 8. Restarts Redpanda, API, frontend and consumer; confirms the broker retained the
    published event and topics, and the database retained business history.
 9. Updates all application workloads (including consumer/init images), verifies
-   them, and adds a new comment. Stops API to detect HTTP 502 through ingress,
+   them, and adds a new comment. Stops API to detect HTTP 502/504 through ingress,
    then deploys the recorded previous images and verifies rollback plus another
    new write. No rebuild, restore, downgrade or reseed happens during rollback.
 10. Captures reports, removes only the generated cluster and its local test image

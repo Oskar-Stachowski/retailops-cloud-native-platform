@@ -691,8 +691,11 @@ class KubernetesDrill(Drill):
             "app.kubernetes.io/name=retailops-api",
             "--timeout=120s",
         )
-        require(self.http("/api/ready") == 502, "Injected API outage was not detected")
-        self.report["negative_checks"]["api_outage"] = "HTTP 502 detected through ingress"
+        outage_status = self.http("/api/ready")
+        require(outage_status in {502, 504}, "Injected API outage was not detected")
+        self.report["negative_checks"]["api_outage"] = (
+            f"HTTP {outage_status} detected through ingress"
+        )
         compatible(candidate, previous, self.check("head"))
         tick = time.monotonic()
         self.rollout(objects, previous)
