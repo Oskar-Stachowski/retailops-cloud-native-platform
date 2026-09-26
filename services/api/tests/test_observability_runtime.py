@@ -1,6 +1,8 @@
 import importlib.util
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -69,3 +71,56 @@ def test_failed_runtime_cleans_only_its_own_project(monkeypatch, tmp_path):
     down = [args for args, _ in calls if "down" in args]
     assert len(down) == 1
     assert down[0][down[0].index("-p") + 1] == project
+
+
+@pytest.mark.parametrize("recovers", [False, True])
+def test_smoke_requires_api_scrape_and_allows_initial_scrape_delay(tmp_path, recovers):
+    # No network: simulate Prometheus becoming ready before the first API scrape.
+    fake_curl = tmp_path / "curl"
+    fake_curl.write_text(
+        f"#!{sys.executable}\n"
+        + """
+import json
+import os
+import sys
+from pathlib import Path
+url = sys.argv[-1]
+body = {}
+if url.endswith('/metrics'):
+    body = 'retailops_api_info retailops_db_operations_total retailops_stream_metrics_generated_at_seconds'
+elif '/targets?' in url:
+    count = Path('target-calls')
+    calls = int(count.read_text()) + 1 if count.exists() else 1
+    count.write_text(str(calls))
+    healthy = os.environ['RECOVERS'] == 'yes' and calls > 1
+    body = {'data': {'activeTargets': [
+        {'labels': {'job': 'prometheus'}, 'health': 'up'},
+        {'labels': {'job': 'retailops-api'}, 'health': 'up' if healthy else 'down'}]}}
+elif url.endswith('/rules'):
+    body = ['RetailOpsApiMetricsTargetDown', 'RetailOpsApiInfoMissing', 'RetailOpsDatabaseOperationsMissing', 'RetailOpsStreamEventsStale', 'RetailOpsStreamDeadLetterEventsIncreasing']
+elif '/datasources/' in url:
+    body = {'type': 'prometheus'}
+elif '/search?' in url:
+    body = ['RetailOps Overview', 'RetailOps API', 'RetailOps Business Operations', 'RetailOps Stream Processing']
+print(json.dumps(body, separators=(',', ':')))
+print('200')
+"""
+    )
+    fake_curl.chmod(0o755)
+    env = dict(
+        os.environ,
+        PATH=str(tmp_path) + os.pathsep + os.environ["PATH"],
+        RECOVERS="yes" if recovers else "no",
+        SMOKE_SLEEP_SECONDS="0",
+        SMOKE_MAX_ATTEMPTS="2",
+        OBSERVABILITY_REPORTS_DIR=str(tmp_path / "reports"),
+    )
+    result = subprocess.run(
+        ["bash", str(ROOT / "scripts/ci/observability_smoke.sh")],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert (result.returncode == 0) is recovers, result.stdout + result.stderr
+    assert (tmp_path / "target-calls").read_text() == "2"
