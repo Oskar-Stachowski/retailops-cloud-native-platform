@@ -16,10 +16,20 @@ from registry import (
     publication_contract,
     ready_report,
     registry_reference,
+    sbom_predicate,
 )
 
 
 class PromotionTests(unittest.TestCase):
+    def test_spdx_23_uses_the_versioned_github_attestation_predicate(self) -> None:
+        # Regression from the actual attest-sbom@v3 bundle in release run 36226179735.
+        self.assertEqual(
+            sbom_predicate({"spdxVersion": "SPDX-2.3"}), "https://spdx.dev/Document/v2.3"
+        )
+        for version in ("SPDX-2.2", "SPDX-3.0", "", None):
+            with self.assertRaisesRegex(RuntimeError, "Unsupported SPDX version"):
+                sbom_predicate({"spdxVersion": version})
+
     def test_registry_digest_binds_different_engine_ids_without_accepting_wrong_image(self) -> None:
         reference = NAMESPACE + "-api@sha256:" + "e" * 64
         image = {

@@ -22,6 +22,11 @@ WORKFLOW = REPOSITORY + "/.github/workflows/release.yml"
 TRIVY = "aquasec/trivy:0.74.0"
 
 
+def sbom_predicate(document: dict) -> str:
+    require(document.get("spdxVersion") == "SPDX-2.3", "Unsupported SPDX version")
+    return "https://spdx.dev/Document/v2.3"
+
+
 def run(command: list[str]) -> str:
     result = subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE, timeout=900)
     return result.stdout
@@ -113,7 +118,7 @@ def prepare(report_path: Path, output: Path) -> None:
         sbom = stem + ".spdx.json"
         run([*scanner, "--format", "spdx-json", "--output", "/reports/" + sbom, image["image_id"]])
         document = read(output / sbom)
-        require(document.get("spdxVersion", "").startswith("SPDX-2."), "Invalid SPDX document")
+        sbom_predicate(document)
         require(bool(document.get("packages")), "Empty image SBOM")
         image["sbom"] = {"file": sbom, "sha256": digest(output / sbom)}
     manifest = {
@@ -236,7 +241,7 @@ def pull(output: Path) -> None:
             "oci://" + reference,
             output / (stem + "-sbom.jsonl"),
             manifest,
-            "https://spdx.dev/Document",
+            sbom_predicate(read(output / image["sbom"]["file"])),
         )
         require(
             any(
