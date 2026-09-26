@@ -723,6 +723,21 @@ class KubernetesDrill(Drill):
                         self.report_dir
                         / ("resources.txt" if args[1].startswith("pods") else "events.txt")
                     ).write_text(content)
+                for namespace, workload in (
+                    ("traefik", "deployment/traefik"),
+                    ("kube-system", "daemonset/kindnet"),
+                ):
+                    (self.report_dir / (namespace + ".log")).write_text(
+                        self.k(
+                            "-n",
+                            namespace,
+                            "logs",
+                            workload,
+                            "--all-containers",
+                            "--tail=50",
+                            allow_failure=True,
+                        )
+                    )
                 for name in ("postgres", "redpanda", *WORKLOADS):
                     (self.report_dir / (name + ".log")).write_text(
                         self.k(

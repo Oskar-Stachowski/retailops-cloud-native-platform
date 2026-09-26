@@ -48,6 +48,9 @@ kind: ClusterRole
 metadata:
   name: retailops-drill-traefik-classes
 rules:
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [get, list, watch]
   - apiGroups: [networking.k8s.io]
     resources: [ingressclasses]
     verbs: [get, list, watch]
