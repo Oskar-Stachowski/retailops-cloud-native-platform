@@ -36,13 +36,19 @@ the Docker CI gate. A [versioned application rollback drill](../../evidence/rele
 also verifies image identity, same-schema migration compatibility, update,
 failure detection, rollback and preservation of new-version writes.
 
+[Release v0.2.1](../../evidence/releases/2026-09-26-registry.md), verified on
+2026-09-26, now publishes the same tested Linux AMD64 API/frontend artifacts to
+GHCR, verifies signed image provenance/SPDX SBOMs on a fresh runner, and repeats
+the rollback drill after digest pulls. An annotated tag and durable evidence
+bundle are published only after that verification succeeds.
+
 ## Next priorities
 
 | Priority | Work | Completion evidence |
 |---:|---|---|
 | 1 | Extend browser coverage where product changes require it; add accessibility and cross-browser checks. | Build on the seven critical Chromium journeys and retain traces for failures. |
 | 2 | Extend recovery/rollback drills when schema or deployment behavior changes. The current same-schema application rollback and database restore are verified. | Keep dated checks and timings for each supported migration/deployment path. |
-| 3 | Publish the same tested image with registry digest, SBOM and provenance, following the implemented release/tag policy. | One reviewable release linked to its CI run and immutable image identity. Registry/environment selection is a separate deployment decision. |
+| 3 | Maintain verified registry releases; add selection of retained published predecessors as release history grows. The first release bootstraps a freshly tested predecessor. | Build on the published v0.2.1 evidence and retain exact digests, signed bundles and runtime verification for each release. |
 | 4 | Exercise Kubernetes workloads on a local cluster before cloud deployment. | Pods, migrations, seed, probes, ingress, runtime smoke and cleanup evidence; current schema/policy checks remain necessary but insufficient. |
 | 5 | Verify Terraform remote state and drift workflow before another AWS showcase. | Reviewed backend/access design, state migration and plan-only drift evidence; refresh cost/cleanup records after any actual cloud run. |
 | 6 | Refresh observability/SLO and Jenkins evidence through actual execution. | Dated metric/alert checks and Jenkins run tied to a commit; preserve older screenshots as historical. |

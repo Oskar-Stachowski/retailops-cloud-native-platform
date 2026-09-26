@@ -1,5 +1,9 @@
 # Versioned application rollback evidence
 
+Published registry release evidence: [v0.2.1, 2026-09-26](2026-09-26-registry.md),
+including verified signatures and a fresh-runner digest-pull rollback. The
+remainder of this page preserves the earlier local drill capture.
+
 Verified locally on 2026-09-25 from clean harness commit
 `977c776ed7cf80ae2229e1522dba8a44e3827a75` using:
 

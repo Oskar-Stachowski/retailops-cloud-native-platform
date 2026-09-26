@@ -1,7 +1,7 @@
 # Release identity and registry promotion policy
 
-`VERSION` contains the platform's next `MAJOR.MINOR.PATCH` version. The current
-candidate line is `0.2.1`. Existing `0.1.0` Docker labels were development labels,
+`VERSION` contains the platform's `MAJOR.MINOR.PATCH` version. The current
+release line is `0.2.1`. Existing `0.1.0` Docker labels were development labels,
 not published Git releases. The API's OpenAPI version and frontend package
 version are separate metadata; the release manifest identifies the platform.
 
@@ -51,9 +51,10 @@ IDs from the previous manifest; it never rebuilds or uses `latest`.
 
 The manually dispatched [release workflow](../../.github/workflows/release.yml)
 publishes `ghcr.io/oskar-stachowski/retailops-cloud-native-platform-api` and
-`ghcr.io/oskar-stachowski/retailops-cloud-native-platform-frontend`. New packages
-use GHCR's default private visibility and the workflow does not change access
-settings. Actions authenticates with its short-lived `GITHUB_TOKEN`.
+`ghcr.io/oskar-stachowski/retailops-cloud-native-platform-frontend`. The workflow
+preserves package access settings. Anonymous digest reads of both packages were
+verified for [v0.2.1](../evidence/releases/2026-09-26-registry.md).
+Actions authenticates with its short-lived `GITHUB_TOKEN`.
 
 It requires a clean, current protected-main commit, a new `VERSION`, an ancestor
 predecessor and successful latest Required CI runs on main for both revisions.
