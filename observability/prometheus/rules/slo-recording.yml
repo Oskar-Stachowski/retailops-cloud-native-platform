@@ -1,0 +1,10 @@
+# Diagnostic SLI only: scrape success does not measure successful user requests.
+groups:
+  - name: retailops-scrape-sli
+    rules:
+      - record: retailops:api_scrape_availability:ratio5m
+        expr: avg_over_time(up{job="retailops-api"}[5m])
+      - record: retailops:api_scrape_availability:ratio30d
+        expr: avg_over_time(up{job="retailops-api"}[30d])
+      - record: retailops:api_scrape_samples:count30d
+        expr: count_over_time(up{job="retailops-api"}[30d])

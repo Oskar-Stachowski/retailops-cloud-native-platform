@@ -32,9 +32,9 @@ services:
     profiles: ["dev"]
     build:
       context: ./frontend
-    image: retailops-frontend:0.1.0
+    image: ${FRONTEND_IMAGE:-retailops-frontend:0.1.0}
     ports:
-      - "${FRONTEND_PORT:-3000}:8080"
+      - "${HOST_BIND:-0.0.0.0}:${FRONTEND_PORT:-3000}:8080"
     depends_on:
       api:
         condition: service_healthy
@@ -43,9 +43,9 @@ services:
     profiles: ["dev", "observability", "test"]
     build:
       context: ./services/api
-    image: retailops-api:0.1.0
+    image: ${API_IMAGE:-retailops-api:0.1.0}
     ports:
-      - "${API_PORT:-8000}:8000"
+      - "${HOST_BIND:-0.0.0.0}:${API_PORT:-8000}:8000"
     environment:
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
@@ -60,10 +60,11 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=35d
       - --web.console.libraries=/usr/share/prometheus/console_libraries
       - --web.console.templates=/usr/share/prometheus/consoles
     ports:
-      - "${PROMETHEUS_PORT:-9090}:9090"
+      - "${HOST_BIND:-0.0.0.0}:${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./observability/prometheus/rules:/etc/prometheus/rules:ro
@@ -90,7 +91,7 @@ services:
     profiles: ["observability"]
     image: grafana/grafana:12.4.3
     ports:
-      - "${GRAFANA_PORT:-3001}:3000"
+      - "${HOST_BIND:-0.0.0.0}:${GRAFANA_PORT:-3001}:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-retailops}
@@ -143,8 +144,8 @@ services:
       - --mode
       - dev-container
     ports:
-      - "${REDPANDA_KAFKA_PORT:-19092}:19092"
-      - "${REDPANDA_ADMIN_PORT:-19644}:9644"
+      - "${HOST_BIND:-0.0.0.0}:${REDPANDA_KAFKA_PORT:-19092}:19092"
+      - "${HOST_BIND:-0.0.0.0}:${REDPANDA_ADMIN_PORT:-19644}:9644"
     volumes:
       - redpanda_data:/var/lib/redpanda/data
     healthcheck:
@@ -183,7 +184,7 @@ services:
   #   docker compose build api
   migrate:
     profiles: ["dev", "observability", "test"]
-    image: retailops-api:0.1.0
+    image: ${API_IMAGE:-retailops-api:0.1.0}
     command: ["alembic", "upgrade", "head"]
     environment:
       APP_ENV: ${APP_ENV:-local}
@@ -195,7 +196,7 @@ services:
 
   seed:
     profiles: ["dev", "observability", "test"]
-    image: retailops-api:0.1.0
+    image: ${API_IMAGE:-retailops-api:0.1.0}
     command: ["python", "scripts/seed_demo_data.py"]
     environment:
       APP_ENV: ${APP_ENV:-local}
@@ -218,7 +219,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-retailops}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-retailops}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${HOST_BIND:-0.0.0.0}:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

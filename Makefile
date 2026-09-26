@@ -745,11 +745,14 @@ k8s-ci: k8s-smoke k8s-policy k8s-checkov
 
 compose-rebuild-smoke: compose-ci
 
-compose-ci: ensure-reports-dir
+compose-ci:
+	python3 scripts/ci/compose_isolated.py
+
+# Only compose_isolated.py owns the disposable project used by this target.
+compose-ci-internal: ensure-reports-dir
 	@set -e; \
+	[[ "$${COMPOSE_PROJECT_NAME:-}" == retailops-ci-* ]] || { echo "Use make compose-ci for an isolated runtime"; exit 1; }; \
 	status=0; \
-	echo "[compose-ci] Cleaning previous Compose state..."; \
-	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans >/dev/null 2>&1 || true; \
 	echo "[compose-ci] Validating Compose config..."; \
 	$(COMPOSE) config; \
 	$(MAKE) compose-profile-config; \
@@ -774,6 +777,9 @@ compose-ci: ensure-reports-dir
 		chmod +x "$(OBSERVABILITY_SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" OBSERVABILITY_REPORTS_DIR="$(OBSERVABILITY_REPORTS_DIR)" "$(OBSERVABILITY_SMOKE_SCRIPT)" || status=$$?; \
 	fi; \
+	if [[ $$status -eq 0 ]]; then \
+		API_BASE_URL="http://localhost:$(API_PORT)" PROMETHEUS_BASE_URL="http://localhost:$(PROMETHEUS_PORT)" GRAFANA_BASE_URL="http://localhost:$(GRAFANA_PORT)" COMPOSE="$(COMPOSE)" python3 scripts/ci/observability_drill.py || status=$$?; \
+	fi; \
 	if [[ $$status -eq 0 && "$(COMPOSE_BROWSER_TESTS)" == "1" ]]; then \
 		echo "[compose-ci] Running critical browser journeys..."; \
 		$(MAKE) browser-smoke || status=$$?; \
@@ -784,8 +790,6 @@ compose-ci: ensure-reports-dir
 		COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) logs --no-color > "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
 		cat "$(REPORTS_DIR)/docker-compose-logs.txt" || true; \
 	fi; \
-	echo "[compose-ci] Cleaning Compose stack..."; \
-	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans || true; \
 	exit $$status
 
 # -------------------------------------------------------------------

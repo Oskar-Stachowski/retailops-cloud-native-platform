@@ -1,6 +1,6 @@
 # Observability
 
-This directory will contain observability assets for the RetailOps Platform.
+This directory contains the local metrics, dashboards and alert rules for RetailOps.
 
 Current status: `Implemented` for local Prometheus metrics, Grafana provisioning, alert rules, and smoke checks. `Target` for centralized logging, distributed tracing, and cloud runtime observability.
 
@@ -11,6 +11,11 @@ Planned MVP / target responsibilities:
 - define alerting rules,
 - document logging and tracing assumptions,
 - support operational visibility for APIs, infrastructure, data pipelines, and ML components.
+
+The [local scrape SLO definition and incident drill](../docs/observability/slo.md)
+explain the measured signal, observation coverage and remaining limits.
+`make compose-ci` runs the full stack in a unique disposable project, verifies
+alert firing and recovery, and removes only its own resources.
 
 Operational troubleshooting steps live in
 [`docs/runbooks/observability-runbook.md`](../docs/runbooks/observability-runbook.md).

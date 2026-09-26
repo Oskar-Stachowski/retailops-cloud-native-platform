@@ -1,3 +1,11 @@
+> Current automated validation: `make compose-ci` uses isolated ports, images,
+> database and monitoring volumes, then verifies API outage → pending → firing
+> → recovery using the unchanged two-minute alert. See the [SLI/SLO definition](../observability/slo.md).
+> Inspect `incident-drill.json` and `isolated-runtime.json` under `ci-cd/reports/`.
+> The manual commands below operate on your development stack; do not run a
+> fault drill against shared services. Prometheus alert evaluation is local;
+> external notification delivery is not configured.
+
 # Observability Runbook
 
 **Project:** Cloud-Native RetailOps Platform
