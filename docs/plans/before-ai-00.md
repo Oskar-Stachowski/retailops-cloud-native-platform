@@ -10,11 +10,6 @@ Sam [etap AI 00](ai/etapy/00-audyt.md) jest audytem i **nie ma formalnych
 zależności**. Można rozpocząć go wcześniej; nie wymaga zamknięcia wszystkich
 ustaleń poniżej.
 
-## Poprawki zalecane przed intensywnym testowaniem
-
-- [ ] **OPS-05: bezpieczna diagnostyka** — brak haseł i pełnego `DATABASE_URL`
-  w komunikatach oraz raportach testów.
-
 ## Pozostały zakres
 
 Problemy potwierdzania offsetów i ACK/DLQ (OPS-03), przypinania zależności

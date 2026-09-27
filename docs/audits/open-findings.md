@@ -26,15 +26,6 @@ zapisie do mechanizmu odtwarzania błędów. Testy rzeczywistego brokera obejmuj
 błędny payload, awarię DB/handlera, restart, ponowienie i deduplikację; wykazują
 brak utraty zdarzenia.
 
-### OPS-05 · P2 · Diagnostyka testów może ujawnić hasło do bazy
-
-**Dowód:** `_db_unavailable_reason` w
-[conftest.py](../../services/api/tests/conftest.py) umieszcza pełne
-`DATABASE_URL` oraz tekst wyjątku w komunikacie skip/fail. URL może zawierać hasło.
-
-**Kryterium zamknięcia:** komunikat podaje bezpieczny powód niedostępności bez
-sekretów; test negatywny potwierdza brak hasła i pełnego URL w logach oraz raporcie.
-
 ### OPS-06 · P2 · Zależności builda i workflow są wskazywane ruchomymi tagami
 
 **Dowód:** [Dockerfile API](../../services/api/Dockerfile) i
