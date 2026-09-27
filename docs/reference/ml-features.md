@@ -20,19 +20,23 @@ są wersjonowane razem z kodem.
 
 ## Granica czasu i pochodzenie
 
-W aktualnej ocenie kroczącej origin dla targetu dnia `D` to koniec dnia `D-1`
-w UTC. Kalendarz dnia `D`, identyfikatory serii oraz kategoria i marka produktu
-ze statycznego katalogu generatora są wejściami znanymi w tym origin. Lagi i
-okna RF korzystają tylko z obserwacji wcześniejszych niż `D`, dla których
-`observation_available_at` nie jest późniejsze niż origin. To maksimum czasu
+W ocenie RF origin jest o `23:59:59 UTC` dnia poprzedzającego pierwszy target.
+Rekord dostępny później, nawet przed północą, nie wchodzi do tej prognozy.
+Wszystkie dni horyzontu używają tej
+samej historii. Kalendarz targetu, identyfikatory serii oraz kategoria i marka
+produktu ze statycznego katalogu generatora są znane w origin. Lagi i okna RF
+odnoszą się do dat kalendarzowych względem origin; brak dnia ma osobny wskaźnik.
+Historia obejmuje tylko obserwacje dostępne najpóźniej w origin. Dla pojedynczego
+wiersza kontraktu reguła `previous_day_end_utc` oznacza najwcześniejszy możliwy
+origin jednodniowy; dłuższy horyzont może mieć wcześniejszy origin.
+`observation_available_at` to maksimum czasu
 ingestii sprzedaży i utworzenia zamówienia składających się na dany agregat;
 gdy rekord sprzedaży nie ma czasu ingestii, używany jest `sold_at`. Taką samą
 granicę stosuje baseline w ocenie RF. `units_sold` oraz
 wyprowadzony z niego `observation_status` są etykietami. `generated_at` jest
 metadanym wykonania, nie dowodem dostępności źródła w historycznym origin.
 `observation_available_at` jest metadanym dostępności etykiety, nie cechą RF.
-Manifest wymienia pola wejściowe, etykiety i metadane dostępności osobno oraz podaje
-`forecast_origin_rule=previous_day_end_utc`.
+Manifest wymienia pola wejściowe, etykiety i metadane dostępności osobno.
 
 Wiersz powstaje wyłącznie z jawnego rekordu sprzedaży połączonego z zamówieniem.
 Suma `quantity=0` daje `observation_status=observed_zero`; dodatnia suma daje
@@ -41,8 +45,11 @@ wartości `quantity` jest błędem. Obecny generator nie dostarcza wersjonowaneg
 asortymentu, kalendarza otwarcia sklepów ani watermarku kompletności. Dlatego
 nie da się wiarygodnie zaklasyfikować nieobecnego wiersza jako zera, zamknięcia,
 nieaktywności lub brakujących zdarzeń. Manifest deklaruje
-`complete_daily_panel=false`; zbudowanie pełnego panelu i pokrycia jest częścią
-[protokołu oceny](../plans/ml-evaluation.md).
+`complete_daily_panel=false`: sam zbiór cech nie jest panelem. Osobny
+[protokół oceny RF](../guides/ml.md) buduje pełny panel tylko dla profili
+syntetycznych, przy jawnej deklaracji ich kompletności i statycznego asortymentu.
+Nie wolno przenosić tego założenia na fixture `demo` ani zewnętrzne dane bez
+wersjonowanego potwierdzenia kompletności, otwarcia i asortymentu.
 
 Historia cen i promocje generatora nie dokumentują jednoznacznie wersji znanej
 w każdym origin. Zrealizowana cena, przychód, rabat, stockout i prawda symulatora
@@ -61,12 +68,13 @@ Przywrócenie takich cech wymaga mapowania fulfillment i wiarygodnego ledgeru.
 
 ## Zakres obecnej oceny
 
-Zmiana schematu `1.0` → `2.0`, RF `random-forest-v1` → `random-forest-v2`
+Zmiana schematu `1.0` → `2.0`, RF `random-forest-v1` → `random-forest-v3`
 oraz baseline `baseline-moving-average-v1` → `baseline-moving-average-v2`
 oddziela nowe przebiegi od [historycznego snapshotu](../evidence/ml/random-forest-v1/README.md).
-Obecny backtest RF nadal czyta fakty z wcześniejszych dni holdoutu przy kolejnych
-origin. Nie jest sprawdzeniem zamrożonej prognozy całego siedmiodniowego
-horyzontu; tę zmianę obejmuje [kolejny krok planu](../plans/before-ai-00.md).
+RF ocenia trzy chronologiczne okna walidacyjne oraz odłożony końcowy test, każdy
+z jednym origin na cały horyzont. Wynik ma osobne pokrycie i pominięcia. Osobny
+`make ml-evaluate` pozostaje kroczącym backtestem samego baseline i nie służy
+do porównania z RF.
 
 `dataset_id` zawiera profil, zakres dat i seed. Pełną konfigurację, logiczne
 sumy danych i kod wiąże [tożsamość eksperymentu](../guides/ml.md), a nie sam

@@ -22,6 +22,7 @@ from ml.models.random_forest_forecast import (
     MODEL_ARTIFACT_FILENAME,
     MODEL_CARD_FILENAME,
     MODEL_METADATA_FILENAME,
+    PANEL_FILENAME,
     PREDICTIONS_FILENAME,
     RandomForestForecastConfig,
     baseline_prediction_for_row,
@@ -137,14 +138,14 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
     config = RandomForestForecastConfig(
         dataset=DatasetGenerationConfig(
             profile="small",
-            days=8,
+            days=42,
             products=8,
             stores=2,
             warehouses=2,
             seed=42,
         ),
         window_days=7,
-        holdout_days=2,
+        horizon_days=7,
         n_estimators=12,
         random_state=42,
         output_dir=tmp_path,
@@ -160,6 +161,7 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
     model_card = (tmp_path / MODEL_CARD_FILENAME).read_text(encoding="utf-8")
 
     assert (tmp_path / MODEL_ARTIFACT_FILENAME).exists()
+    assert (tmp_path / PANEL_FILENAME).exists()
     assert predictions
     assert feature_importance
     assert metrics["model_name"] == "retailops-demand-random-forest"
@@ -173,10 +175,16 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
     manifest = json.loads((tmp_path / RUN_MANIFEST_FILENAME).read_text(encoding="utf-8"))
     assert metrics["experiment_id"] == manifest["experiment_id"]
     assert metadata["model_id"] == manifest["model_id"]
-    assert metrics["evaluation_scope"] == "legacy_rolling_holdout_exploratory_only"
-    assert inputs["dataset"]["effective_config"]["days"] == 8
+    assert metrics["evaluation_scope"] == "synthetic_fixed_origin_horizon_v1"
+    assert [fold["split"] for fold in metrics["temporal_protocol"]["folds"]] == [
+        "validation_1", "validation_2", "validation_3", "test",
+    ]
+    assert {row["horizon_day"] for row in predictions} == {str(day) for day in range(1, 8)}
+    assert inputs["dataset"]["effective_config"]["days"] == 42
     assert inputs["model"]["n_estimators"] == 12
     assert inputs["features"]["row_count"] == metrics["feature_row_count"]
+    assert inputs["features"]["panel_row_count"] == metrics["temporal_protocol"]["panel_rows"]
+    assert manifest["panel_logical_sha256"] == inputs["features"]["panel_logical_sha256"]
     assert inputs["source"]["git_commit"]
     assert inputs["environment"]["dependencies"]["scikit-learn"]
     assert manifest["model_id"] == "sha256:" + file_sha256(tmp_path / MODEL_ARTIFACT_FILENAME)
@@ -193,17 +201,17 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
 
 def test_random_forest_run_identity_is_unique_and_experiment_identity_tracks_inputs(tmp_path) -> None:
     dataset = DatasetGenerationConfig(
-        profile="small", days=8, products=8, stores=2, warehouses=2, seed=42,
+        profile="small", days=42, products=8, stores=2, warehouses=2, seed=42,
     )
     config = RandomForestForecastConfig(
-        dataset=dataset, window_days=7, holdout_days=2, n_estimators=12,
+        dataset=dataset, window_days=7, horizon_days=7, n_estimators=12,
         output_root=tmp_path,
     )
     first = train_random_forest_forecast_model(config)
     repeated = train_random_forest_forecast_model(config)
     changed = train_random_forest_forecast_model(
         RandomForestForecastConfig(
-            dataset=dataset, window_days=7, holdout_days=2, n_estimators=20,
+            dataset=dataset, window_days=7, horizon_days=7, n_estimators=20,
             output_root=tmp_path,
         ),
     )

@@ -11,27 +11,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 
 ## ML — do poprawy przed następną oceną modelu
 
-### ML-02 · P1 · Protokół nie weryfikuje prognozy całego horyzontu z jednego origin
-
-**Dowód:** `build_supervised_examples` w
-[modelu RF](../../ml/models/random_forest_forecast.py) przekazuje wszystkie
-wcześniejsze wiersze serii, także rzeczywiste wyniki wcześniejszych dni holdoutu.
-`horizon_days` jest parametrem konfiguracji, lecz nie steruje tym treningiem ani
-oceną. Kod wykonuje ocenę kroczącą, a nie zamrożoną prognozę siedmiodniową.
-`lag_7` oznacza siódmą wcześniejszą obserwację, a `window_days` liczbę wierszy;
-baseline w tym samym pliku filtruje okno po datach. Przy brakujących dniach są
-to różne zakresy historii. [Generator cech](../../ml/features/demand_forecast.py)
-tworzy wiersze z agregatów sprzedaży, bez pełnego kalendarza serii.
-Nieobecnych kombinacji nie da się jeszcze sklasyfikować jako brak danych,
-zamknięty sklep lub nieaktywny asortyment.
-
-**Kryterium zamknięcia:** oddzielnie nazwane i przetestowane protokoły dla
-stałego origin i oceny kroczącej; model i baseline mają tę samą granicę wiedzy
-oraz zbiór ocenianych rekordów. Lagi i okna odnoszą się do dat kalendarzowych,
-z jawnym rozróżnieniem brakujących danych i zerowej sprzedaży. Raport zawiera
-origin, horyzont, pokrycie, pominięcia, chronologiczne okna walidacji i odłożony
-test, którego nie używa się do strojenia.
-
 ### ML-03 · P1 · Nieokreślone metryki są raportowane jako zero
 
 **Dowód:** `calculate_prediction_metrics` i `_safe_percentage_error` w

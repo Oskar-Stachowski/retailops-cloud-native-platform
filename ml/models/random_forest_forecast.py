@@ -17,6 +17,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
 
+from data.generator.common import BASE_DATE
 from data.generator.main import DatasetGenerationConfig, build_dataset
 from data.generator.manifest import GENERATOR_VERSION, build_dataset_manifest
 from data.generator.profile_engine import profile_defaults
@@ -43,7 +44,7 @@ from ml.features.demand_forecast import SCHEMA_VERSION as FEATURE_SCHEMA_VERSION
 from ml.models.baseline_forecast import _prediction_value
 
 MODEL_NAME = "retailops-demand-random-forest"
-MODEL_VERSION = "random-forest-v2"
+MODEL_VERSION = "random-forest-v3"
 MODEL_TYPE = "sklearn_random_forest_regressor"
 MODEL_ARTIFACT_FILENAME = "random_forest_model.joblib"
 METRICS_FILENAME = "metrics.json"
@@ -51,10 +52,12 @@ PREDICTIONS_FILENAME = "predictions.csv"
 FEATURE_IMPORTANCE_FILENAME = "feature_importance.csv"
 MODEL_METADATA_FILENAME = "model_metadata.json"
 MODEL_CARD_FILENAME = "model_card.md"
-EVALUATION_SCOPE = "legacy_rolling_holdout_exploratory_only"
-DEFAULT_HOLDOUT_DAYS = 7
+PANEL_FILENAME = "daily_panel.csv"
+EVALUATION_SCOPE = "synthetic_fixed_origin_horizon_v1"
 DEFAULT_WINDOW_DAYS = 28
 DEFAULT_HORIZON_DAYS = 7
+DEFAULT_MIN_HISTORY_OBSERVATIONS = 7
+DEFAULT_VALIDATION_WINDOWS = 3
 DEFAULT_N_ESTIMATORS = 80
 DEFAULT_RANDOM_STATE = 42
 PRIMARY_METRIC = "wape"
@@ -63,7 +66,10 @@ PREDICTION_COLUMNS = [
     "model_name",
     "model_version",
     "dataset_id",
+    "split",
+    "origin",
     "forecast_date",
+    "horizon_day",
     "product_id",
     "store_id",
     "channel",
@@ -81,11 +87,12 @@ PREDICTION_COLUMNS = [
 @dataclass(frozen=True)
 class RandomForestForecastConfig:
     dataset: DatasetGenerationConfig = field(
-        default_factory=lambda: DatasetGenerationConfig(profile="demo"),
+        default_factory=lambda: DatasetGenerationConfig(profile="small"),
     )
     window_days: int = DEFAULT_WINDOW_DAYS
     horizon_days: int = DEFAULT_HORIZON_DAYS
-    holdout_days: int = DEFAULT_HOLDOUT_DAYS
+    min_history_observations: int = DEFAULT_MIN_HISTORY_OBSERVATIONS
+    validation_windows: int = DEFAULT_VALIDATION_WINDOWS
     n_estimators: int = DEFAULT_N_ESTIMATORS
     random_state: int = DEFAULT_RANDOM_STATE
     output_dir: Path | None = None
@@ -133,32 +140,47 @@ def build_training_features(
     previous_rows: list[dict[str, object]],
     *,
     window_days: int,
+    origin: date | None = None,
 ) -> dict[str, object]:
+    if window_days <= 0:
+        msg = "window_days must be a positive integer."
+        raise ValueError(msg)
     forecast_date = _row_date(row)
+    origin_date = origin or forecast_date
+    if origin_date > forecast_date:
+        msg = "Forecast origin cannot be after the target date."
+        raise ValueError(msg)
     history = sorted(
         (
             previous_row
             for previous_row in previous_rows
-            if observation_known_at_origin(previous_row, forecast_date)
+            if observation_known_at_origin(previous_row, origin_date)
         ),
         key=_row_date,
     )
-    recent_rows = history[-window_days:] if window_days > 0 else history
+    window_start = origin_date - timedelta(days=window_days)
+    recent_rows = [
+        previous_row for previous_row in history if _row_date(previous_row) >= window_start
+    ]
     recent_targets = [_decimal(previous_row[TARGET]) for previous_row in recent_rows]
-    lag_1_units = _decimal(history[-1][TARGET]) if history else Decimal(0)
-    lag_7_units = _decimal(history[-7][TARGET]) if len(history) >= 7 else lag_1_units
+    history_by_date = {_row_date(previous_row): previous_row for previous_row in history}
+    lag_1 = history_by_date.get(origin_date - timedelta(days=1))
+    lag_7 = history_by_date.get(origin_date - timedelta(days=7))
 
     return {
         "day_of_week": int(row["day_of_week"]),
         "is_weekend": int(bool(row["is_weekend"])),
         "week_of_year": int(row["week_of_year"]),
         "month": int(row["month"]),
-        "lag_1_units": float(lag_1_units),
-        "lag_7_units": float(lag_7_units),
+        "horizon_day": (forecast_date - origin_date).days + 1,
+        "lag_1_units": float(_decimal(lag_1[TARGET])) if lag_1 else 0.0,
+        "lag_1_available": int(lag_1 is not None),
+        "lag_7_units": float(_decimal(lag_7[TARGET])) if lag_7 else 0.0,
+        "lag_7_available": int(lag_7 is not None),
         "rolling_mean_units": float(_mean(recent_targets)),
         "rolling_min_units": float(min(recent_targets) if recent_targets else Decimal(0)),
         "rolling_max_units": float(max(recent_targets) if recent_targets else Decimal(0)),
-        "training_observation_count": len(history),
+        "training_observation_count": len(recent_rows),
         "product_id": str(row["product_id"]),
         "store_id": str(row["store_id"]),
         "channel": str(row["channel"]),
@@ -173,6 +195,7 @@ def build_supervised_examples(
     holdout_days: int,
     window_days: int,
 ) -> list[SupervisedExample]:
+    """Legacy rolling one-step helper; the RF training job uses fixed origins."""
     if holdout_days <= 0:
         msg = "holdout_days must be a positive integer."
         raise ValueError(msg)
@@ -323,6 +346,7 @@ def build_predictions(
     *,
     window_days: int,
 ) -> list[dict[str, object]]:
+    """Legacy rolling prediction helper retained for exploratory callers."""
     test_examples = [example for example in examples if example.split == "test"]
     if not test_examples:
         return []
@@ -378,6 +402,44 @@ def build_predictions(
     return prediction_rows
 
 
+def fixed_prediction_rows(
+    rows: list[dict[str, object]],
+    dataset_id: str,
+) -> list[dict[str, object]]:
+    predictions: list[dict[str, object]] = []
+    for row in rows:
+        actual = _decimal(row["actual_units"])
+        predicted = _decimal(row["predicted_units"])
+        baseline = _decimal(row["baseline_predicted_units"])
+        error = predicted - actual
+        baseline_error = baseline - actual
+        predictions.append(
+            {
+                "model_name": MODEL_NAME,
+                "model_version": MODEL_VERSION,
+                "dataset_id": dataset_id,
+                "split": row["split"],
+                "origin": row["origin"],
+                "forecast_date": row["forecast_date"],
+                "horizon_day": row["horizon_day"],
+                "product_id": row["product_id"],
+                "store_id": row["store_id"],
+                "channel": row["channel"],
+                "predicted_units": int(predicted),
+                "baseline_predicted_units": int(baseline),
+                "actual_units": int(actual),
+                "absolute_error": _metric(abs(error)),
+                "baseline_absolute_error": _metric(abs(baseline_error)),
+                "squared_error": _metric(error * error),
+                "absolute_percentage_error": _metric(_safe_percentage_error(abs(error), actual)),
+                "baseline_absolute_percentage_error": _metric(
+                    _safe_percentage_error(abs(baseline_error), actual),
+                ),
+            },
+        )
+    return predictions
+
+
 def build_feature_importance_rows(model: Pipeline) -> list[dict[str, object]]:
     vectorizer = model.named_steps["features"]
     regressor = model.named_steps["model"]
@@ -417,8 +479,10 @@ def reproduction_command(config: RandomForestForecastConfig) -> str:
         str(config.window_days),
         "--horizon-days",
         str(config.horizon_days),
-        "--holdout-days",
-        str(config.holdout_days),
+        "--min-history-observations",
+        str(config.min_history_observations),
+        "--validation-windows",
+        str(config.validation_windows),
         "--n-estimators",
         str(config.n_estimators),
         "--random-state",
@@ -436,6 +500,7 @@ def build_experiment_inputs(
     config: RandomForestForecastConfig,
     tables: dict[str, list[dict[str, str]]],
     feature_rows: list[dict[str, object]],
+    panel_rows: list[dict[str, object]],
     source: dict[str, object],
     environment: dict[str, object],
 ) -> dict[str, object]:
@@ -483,6 +548,8 @@ def build_experiment_inputs(
             "date_end": max(feature_dates) if feature_dates else "",
             "row_count": len(feature_rows),
             "logical_sha256": logical_rows_sha256(feature_rows),
+            "panel_row_count": len(panel_rows),
+            "panel_logical_sha256": logical_rows_sha256(panel_rows),
         },
         "model": {
             "model_name": MODEL_NAME,
@@ -496,7 +563,8 @@ def build_experiment_inputs(
             "vectorizer_parameters": pipeline.named_steps["features"].get_params(),
             "window_days": config.window_days,
             "horizon_days": config.horizon_days,
-            "holdout_days": config.holdout_days,
+            "min_history_observations": config.min_history_observations,
+            "validation_windows": config.validation_windows,
         },
         "evaluation_scope": EVALUATION_SCOPE,
         "reproduction_command": reproduction_command(config),
@@ -506,13 +574,20 @@ def build_experiment_inputs(
 def build_metrics_report(
     config: RandomForestForecastConfig,
     feature_rows: list[dict[str, object]],
-    examples: list[SupervisedExample],
+    temporal_report: dict[str, object],
     predictions: list[dict[str, object]],
     feature_importance_rows: list[dict[str, object]],
 ) -> dict[str, object]:
-    trained_metrics = calculate_prediction_metrics(predictions, prediction_field="predicted_units")
+    final_predictions = [row for row in predictions if row["split"] == "test"]
+    if not final_predictions:
+        msg = "Final test has no evaluable rows."
+        raise ValueError(msg)
+    final_fold = next(fold for fold in temporal_report["folds"] if fold["split"] == "test")
+    trained_metrics = calculate_prediction_metrics(
+        final_predictions, prediction_field="predicted_units"
+    )
     baseline_metrics = calculate_prediction_metrics(
-        predictions,
+        final_predictions,
         prediction_field="baseline_predicted_units",
     )
     model_status = model_status_from_metrics(trained_metrics, baseline_metrics)
@@ -524,8 +599,8 @@ def build_metrics_report(
         else Decimal(0)
     )
 
-    train_count = sum(1 for example in examples if example.split == "train")
-    test_count = sum(1 for example in examples if example.split == "test")
+    train_count = final_fold["training_examples"]
+    test_count = len(final_predictions)
     feature_dates = [str(row["date"]) for row in feature_rows]
 
     return {
@@ -537,14 +612,17 @@ def build_metrics_report(
         "primary_metric": PRIMARY_METRIC,
         "primary_metric_improvement_percent": _metric(improvement),
         "baseline_model_name": "retailops-demand-baseline-moving-average",
-        "evaluation_type": "legacy_rolling_holdout",
+        "evaluation_type": "fixed_origin_horizon",
         "evaluation_scope": EVALUATION_SCOPE,
+        "temporal_protocol": temporal_report,
         "profile": config.dataset.profile,
         "seed": config.dataset.seed,
         "random_state": config.random_state,
         "n_estimators": config.n_estimators,
         "window_days": config.window_days,
-        "holdout_days": config.holdout_days,
+        "horizon_days": config.horizon_days,
+        "validation_windows": config.validation_windows,
+        "test_coverage": final_fold["coverage"],
         "feature_dataset_id": str(feature_rows[0]["dataset_id"]) if feature_rows else "",
         "feature_grain": GRAIN,
         "target": TARGET,
@@ -590,6 +668,7 @@ def build_model_metadata(metrics_report: dict[str, object]) -> dict[str, object]
             "model": MODEL_ARTIFACT_FILENAME,
             "metrics": METRICS_FILENAME,
             "predictions": PREDICTIONS_FILENAME,
+            "daily_panel": PANEL_FILENAME,
             "feature_importance": FEATURE_IMPORTANCE_FILENAME,
             "model_card": MODEL_CARD_FILENAME,
         },
@@ -634,8 +713,8 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "## Data",
             "",
             "The model trains on deterministic RetailOps synthetic demand forecast features.",
-            "The split is time-based: older rows are used for training and the latest holdout",
-            "window is used for evaluation.",
+            "Three chronological validation windows precede a held-out final test.",
+            "Each window forecasts the full horizon from one frozen origin.",
             "",
             "## Features",
             "",
@@ -659,8 +738,8 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "",
             "- The data is synthetic and local-first.",
             "- The model is trained for offline evaluation, not production online serving.",
-            "- Holdout evaluation uses known historical lag values in a rolling backtest.",
-            "- Candidate status in this legacy protocol does not admit the model for use.",
+            "- The panel's open/active/completeness evidence is a synthetic generator declaration.",
+            "- Candidate status still lacks the complete admission policy; it does not admit the model for use.",
             "- There is no automated approval workflow, rollback automation, or retraining scheduler yet.",
             "",
             "## Next Improvements",
@@ -678,6 +757,7 @@ def write_trained_model_artifacts(
     model: Pipeline,
     metrics_report: dict[str, object],
     predictions: list[dict[str, object]],
+    panel_rows: list[dict[str, object]],
     feature_importance_rows: list[dict[str, object]],
     experiment_inputs: dict[str, object],
     source_paths: list[Path],
@@ -716,6 +796,11 @@ def write_trained_model_artifacts(
         writer.writeheader()
         writer.writerows(predictions)
 
+    with (output_dir / PANEL_FILENAME).open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=list(panel_rows[0]) if panel_rows else [])
+        writer.writeheader()
+        writer.writerows(panel_rows)
+
     with (output_dir / FEATURE_IMPORTANCE_FILENAME).open(
         "w",
         newline="",
@@ -729,6 +814,7 @@ def write_trained_model_artifacts(
         MODEL_ARTIFACT_FILENAME,
         METRICS_FILENAME,
         PREDICTIONS_FILENAME,
+        PANEL_FILENAME,
         FEATURE_IMPORTANCE_FILENAME,
         MODEL_METADATA_FILENAME,
         MODEL_CARD_FILENAME,
@@ -744,6 +830,7 @@ def write_trained_model_artifacts(
             "evaluation_scope": EVALUATION_SCOPE,
             "artifact_sha256": artifact_checksums(output_dir, artifact_names),
             "predictions_logical_sha256": logical_rows_sha256(predictions),
+            "panel_logical_sha256": logical_rows_sha256(panel_rows),
         },
     )
 
@@ -751,8 +838,24 @@ def write_trained_model_artifacts(
 def train_random_forest_forecast_model(
     config: RandomForestForecastConfig,
 ) -> dict[str, object]:
+    from ml.evaluation.fixed_origin import (
+        FixedOriginConfig,
+        build_daily_panel,
+        evaluate_fixed_origin,
+    )
+
     if config.output_dir is not None and config.output_root is not None:
         msg = "Choose either output_dir or output_root, not both."
+        raise ValueError(msg)
+    if config.dataset.profile == "demo":
+        msg = "The demo fixture has no complete daily panel evidence."
+        raise ValueError(msg)
+    defaults = profile_defaults(config.dataset.profile)
+    days = config.dataset.days or defaults.days
+    products = config.dataset.products or defaults.products
+    stores = config.dataset.stores or defaults.stores
+    if days * products * stores > 100_000:
+        msg = "Daily panel exceeds 100000 rows; use a bounded profile."
         raise ValueError(msg)
     run_id = uuid.uuid4().hex
     output_dir = (
@@ -768,41 +871,49 @@ def train_random_forest_forecast_model(
     environment = environment_identity()
     tables = build_dataset(config.dataset)
     feature_rows = build_demand_feature_rows(tables, config.dataset)
-    experiment_inputs = build_experiment_inputs(config, tables, feature_rows, source, environment)
-    experiment_id = "rf-" + canonical_sha256(experiment_inputs)[:20]
-    examples = build_supervised_examples(
-        feature_rows,
-        holdout_days=config.holdout_days,
+    date_start = BASE_DATE - timedelta(days=days - 1)
+    protocol_config = FixedOriginConfig(
+        dataset=config.dataset,
+        horizon_days=config.horizon_days,
         window_days=config.window_days,
-    )
-    train_examples = [example for example in examples if example.split == "train"]
-    test_examples = [example for example in examples if example.split == "test"]
-    if not train_examples:
-        msg = "Not enough historical rows to train the random forest model."
-        raise ValueError(msg)
-    if not test_examples:
-        msg = "Not enough holdout rows to evaluate the random forest model."
-        raise ValueError(msg)
-
-    model = build_random_forest_pipeline(
+        min_history_observations=config.min_history_observations,
+        validation_windows=config.validation_windows,
         n_estimators=config.n_estimators,
         random_state=config.random_state,
     )
-    model.fit(
-        [example.features for example in train_examples],
-        [example.target for example in train_examples],
-    )
-    predictions = build_predictions(
-        model,
-        examples,
+    panel_rows = build_daily_panel(
         feature_rows,
-        window_days=config.window_days,
+        tables["products"],
+        tables["stores"],
+        date_start=date_start,
+        date_end=BASE_DATE,
+        max_panel_rows=protocol_config.max_panel_rows,
+        assume_synthetic_complete=True,
+    )
+    experiment_inputs = build_experiment_inputs(
+        config,
+        tables,
+        feature_rows,
+        panel_rows,
+        source,
+        environment,
+    )
+    experiment_id = "rf-" + canonical_sha256(experiment_inputs)[:20]
+    temporal_report, temporal_predictions, model = evaluate_fixed_origin(
+        panel_rows,
+        date_start=date_start,
+        date_end=BASE_DATE,
+        config=protocol_config,
+    )
+    predictions = fixed_prediction_rows(
+        temporal_predictions,
+        str(feature_rows[0]["dataset_id"]) if feature_rows else "",
     )
     feature_importance_rows = build_feature_importance_rows(model)
     metrics_report = build_metrics_report(
         config,
         feature_rows,
-        examples,
+        temporal_report,
         predictions,
         feature_importance_rows,
     )
@@ -812,6 +923,7 @@ def train_random_forest_forecast_model(
         MODEL_ARTIFACT_FILENAME,
         METRICS_FILENAME,
         PREDICTIONS_FILENAME,
+        PANEL_FILENAME,
         FEATURE_IMPORTANCE_FILENAME,
         MODEL_METADATA_FILENAME,
         MODEL_CARD_FILENAME,
@@ -824,6 +936,7 @@ def train_random_forest_forecast_model(
         model,
         metrics_report,
         predictions,
+        panel_rows,
         feature_importance_rows,
         experiment_inputs,
         source_paths,
@@ -837,7 +950,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Train and evaluate RetailOps RandomForest demand forecast model.",
     )
-    parser.add_argument("--profile", choices=("demo", "small", "medium", "large"), default="demo")
+    parser.add_argument("--profile", choices=("small", "medium", "large"), default="small")
     parser.add_argument("--days", type=int)
     parser.add_argument("--products", type=int)
     parser.add_argument("--stores", type=int)
@@ -845,7 +958,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--window-days", type=int, default=DEFAULT_WINDOW_DAYS)
     parser.add_argument("--horizon-days", type=int, default=DEFAULT_HORIZON_DAYS)
-    parser.add_argument("--holdout-days", type=int, default=DEFAULT_HOLDOUT_DAYS)
+    parser.add_argument(
+        "--min-history-observations", type=int, default=DEFAULT_MIN_HISTORY_OBSERVATIONS
+    )
+    parser.add_argument("--validation-windows", type=int, default=DEFAULT_VALIDATION_WINDOWS)
     parser.add_argument("--n-estimators", type=int, default=DEFAULT_N_ESTIMATORS)
     parser.add_argument("--random-state", type=int, default=DEFAULT_RANDOM_STATE)
     output_group = parser.add_mutually_exclusive_group()
@@ -866,7 +982,8 @@ def config_from_args(args: argparse.Namespace) -> RandomForestForecastConfig:
         ),
         window_days=args.window_days,
         horizon_days=args.horizon_days,
-        holdout_days=args.holdout_days,
+        min_history_observations=args.min_history_observations,
+        validation_windows=args.validation_windows,
         n_estimators=args.n_estimators,
         random_state=args.random_state,
         output_dir=args.output_dir,

@@ -4,20 +4,9 @@
 
 Celem jest świeży, odtwarzalny eksperyment ML, wiarygodne metryki i uzasadniona decyzja `candidate` albo `rejected`. Rzetelne odrzucenie modelu jest poprawnym wynikiem; nie wymaga dalszego strojenia w celu wymuszenia sukcesu.
 
-Zacznij od protokołu oceny i kompletnego panelu kwalifikujących się serii. Obecny [kontrakt cech 2.0](../reference/ml-features.md) usuwa informacje niedostępne w jednodniowym origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów. Kolejny trening oceniający jakość ma sens dopiero po sprawdzeniu granic czasu całego horyzontu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
+Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów i ocenę całego horyzontu na syntetycznym panelu. Dalsza praca dotyczy metryk, polityki dopuszczenia i użycia ocenionego artefaktu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
 
-## 1. Protokół oceny
-
-- Zdefiniować osobno prognozę siedmiu dni z jednego origin i ewentualny eksperyment rolling one-step.
-- Przygotować co najmniej trzy chronologiczne okna walidacyjne oraz końcowy odłożony test, niewykorzystywany do strojenia.
-- Model i baseline oceniać na tych samych kwalifikujących się rekordach i z tą samą granicą dostępnej wiedzy.
-- Zbudować pełny panel obowiązujących serii z jawną kompletnością źródeł; odróżnić zero obserwowane od braku zdarzeń, zamknięcia sklepu i nieaktywnego asortymentu. Nie zakładać zera bez dowodu dostępności i kompletności.
-- Ustalić kalendarzowe lagi i okna; obecna implementacja liczy poprzednie obserwacje.
-- Raportować pokrycie, pominięcia, daty, origin, horyzont i liczebności. Ustalić obsługę nowych produktów oraz niewystarczającej historii.
-
-**Odbiór:** przebieg odpowiada planowanemu sposobowi użycia; nie ma losowego mieszania przyszłości z przeszłością ani aktualizowania zamrożonej prognozy późniejszymi actuals.
-
-## 2. Kontrolowane treningi i analiza wyników
+## 1. Kontrolowane treningi i analiza wyników
 
 - Zacząć od `small`, kontrolować czas i pamięć; obecna wektoryzacja jest gęsta.
 - Porównać uzgodnione warianty Random Forest ze średnią ruchomą i, przy wystarczającej historii, sezonowym modelem naiwnym.
@@ -27,7 +16,7 @@ Zacznij od protokołu oceny i kompletnego panelu kwalifikujących się serii. Ob
 
 **Odbiór:** świeży raport, porównywalne warianty, odtworzony wynik oraz jawne ograniczenia danych syntetycznych.
 
-## 3. Polityka dopuszczenia
+## 2. Polityka dopuszczenia
 
 Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzoną polityką ani istniejącą implementacją**. Przed eksperymentem skonfrontować je z [kontraktami profili i bramek AI](ai/kontrakty/profile-i-bramki.md), zapisać politykę właściwą dla lokalnego kroku i rozstrzygnąć różnice. Nie zmieniać progów po zobaczeniu wyniku.
 
@@ -48,7 +37,7 @@ Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzon
 
 **Odbiór:** decyzja `candidate`/`rejected` ma odtwarzalne uzasadnienie i nie daje się obejść samym ręcznym ustawieniem statusu w ścieżce dopuszczonych modeli.
 
-## 4. Użycie dokładnie ocenionego artefaktu
+## 3. Użycie dokładnie ocenionego artefaktu
 
 - Spiąć minimalną ścieżkę lokalną: zapis modelu → odczyt → batch predictions → metadata → raport metryk.
 - Każdy wynik ma wskazywać ten sam model, dataset i eksperyment. Wykluczyć ciche przełączenie na baseline lub niejawny retraining.
@@ -58,7 +47,7 @@ Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzon
 
 **Odbiór:** odczytany model jest dokładnie ocenionym artefaktem, a prognozy i metryki mają spójne pochodzenie.
 
-## 5. CI, dowody i aktualizacja main
+## 4. CI, dowody i aktualizacja main
 
 - Dodać małą deterministyczną kontrolę do CI i znaczące testy negatywne: leakage, pusta ocena, niezgodna identity, obejście blokady promocji.
 - Pełniejszą ocenę zapisywać jako osobny przebieg z artefaktami.

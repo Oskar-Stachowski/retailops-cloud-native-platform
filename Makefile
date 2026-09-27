@@ -131,7 +131,8 @@ ML_TRAINED_PROFILE ?= small
 ML_TRAINED_OUTPUT_ROOT ?= ci-cd/reports/ml/experiments/$(ML_TRAINED_PROFILE)
 ML_TRAINED_WINDOW_DAYS ?= 28
 ML_TRAINED_HORIZON_DAYS ?= 7
-ML_TRAINED_HOLDOUT_DAYS ?= 7
+ML_TRAINED_MIN_HISTORY_OBSERVATIONS ?= 7
+ML_TRAINED_VALIDATION_WINDOWS ?= 3
 ML_TRAINED_N_ESTIMATORS ?= 80
 ML_EVALUATION_PROFILE ?= small
 ML_EVALUATION_OUTPUT_DIR ?= data/synthetic/$(ML_EVALUATION_PROFILE)/reports/demand_baseline
@@ -386,7 +387,7 @@ ml-baseline: api-install
 	@echo "Model manifest: $(ML_BASELINE_OUTPUT_DIR)/model_manifest.json"
 
 ml-trained: api-install
-	$(API_VENV_PYTHON) -m ml.models.random_forest_forecast --profile "$(ML_TRAINED_PROFILE)" --window-days "$(ML_TRAINED_WINDOW_DAYS)" --horizon-days "$(ML_TRAINED_HORIZON_DAYS)" --holdout-days "$(ML_TRAINED_HOLDOUT_DAYS)" --n-estimators "$(ML_TRAINED_N_ESTIMATORS)" --output-root "$(ML_TRAINED_OUTPUT_ROOT)"
+	$(API_VENV_PYTHON) -m ml.models.random_forest_forecast --profile "$(ML_TRAINED_PROFILE)" --window-days "$(ML_TRAINED_WINDOW_DAYS)" --horizon-days "$(ML_TRAINED_HORIZON_DAYS)" --min-history-observations "$(ML_TRAINED_MIN_HISTORY_OBSERVATIONS)" --validation-windows "$(ML_TRAINED_VALIDATION_WINDOWS)" --n-estimators "$(ML_TRAINED_N_ESTIMATORS)" --output-root "$(ML_TRAINED_OUTPUT_ROOT)"
 
 ml-evaluate: api-install
 	$(API_VENV_PYTHON) -m ml.evaluation.baseline_report --profile "$(ML_EVALUATION_PROFILE)" --window-days "$(ML_EVALUATION_WINDOW_DAYS)" --holdout-days "$(ML_EVALUATION_HOLDOUT_DAYS)" --output-dir "$(ML_EVALUATION_OUTPUT_DIR)"

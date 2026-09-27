@@ -4,7 +4,7 @@ import argparse
 import csv
 import json
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -75,8 +75,14 @@ def _utc_timestamp(value: object) -> datetime:
     return timestamp.astimezone(UTC)
 
 
+def forecast_origin_utc(first_target_date: date) -> datetime:
+    return datetime.combine(first_target_date, datetime.min.time(), tzinfo=UTC) - timedelta(
+        seconds=1,
+    )
+
+
 def observation_known_at_origin(row: dict[str, object], forecast_date: date) -> bool:
-    origin = datetime.combine(forecast_date, datetime.min.time(), tzinfo=UTC)
+    origin = forecast_origin_utc(forecast_date)
     return (
         _date(row["date"]) < forecast_date
         and _utc_timestamp(
