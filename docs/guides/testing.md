@@ -42,12 +42,15 @@ na danych przeznaczonych do testów. `compose-ci`, `db-recovery-drill`,
 `release-drill` i `k8s-runtime-drill` mają własne izolowane środowiska i sprzątają
 utworzone zasoby.
 
-Sam `test_seed_data.py` generuje CSV w katalogu tymczasowym Pytest, tworzy osobną
-bazę o losowej nazwie na serwerze wskazanym przez `DATABASE_URL`, uruchamia w niej
-migracje i seed, a po teście usuwa bazę także przy niepowodzeniu. Konto bazy musi
-mieć uprawnienie `CREATEDB`. Test nie zmienia bazy wskazanej przez `DATABASE_URL`
-ani śledzonego `data/demo`. Cel `make api-integration-test` nadal jawnie ładuje
-demo do wskazanej bazy przed uruchomieniem całego zestawu testów.
+Sam `test_seed_data.py` generuje CSV w katalogu tymczasowym Pytest i tworzy bazę
+o losowej nazwie na serwerze wskazanym przez `DATABASE_URL`; sprząta ją także
+przy niepowodzeniu. Konto bazy musi mieć uprawnienie `CREATEDB`. Śledzone
+`data/demo` pozostaje bez zmian. Izolacja bazy ma jednak otwartą lukę
+[OPS-04](../audits/open-findings.md): parametr `dbname` w query URL może
+skierować migracje i seed do bazy źródłowej. Do poprawki używaj wyłącznie
+serwera przeznaczonego do testów, bez wartościowych danych.
+Cel `make api-integration-test` nadal jawnie ładuje demo do wskazanej bazy
+przed uruchomieniem całego zestawu testów.
 
 ## Scenariusze przeglądarkowe
 

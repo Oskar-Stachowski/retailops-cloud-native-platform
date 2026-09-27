@@ -1,0 +1,136 @@
+{
+  "source_commit": "4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4",
+  "observed_on_utc": "2026-09-27",
+  "saved_at_utc": "2026-09-27T14:58:23.902349+00:00",
+  "method": "Read-only GitHub REST: refs, pulls 53-57, check-runs for PR heads and source_commit, open pulls, main protection",
+  "branches": {
+    "main": "4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4",
+    "prep/before-ai-00": "4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4"
+  },
+  "pull_requests": [
+    {
+      "number": 53,
+      "title": "ml: verify fixed-origin RF assessment and artifact lineage",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/53",
+      "merged": true,
+      "merged_at": "2026-09-27T11:48:43Z",
+      "merge_commit_sha": "eb5e49c4fc57a8a58aeb646d4edd4e7087df9b66"
+    },
+    {
+      "number": 54,
+      "title": "ops: preserve Compose data on routine restart",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/54",
+      "merged": true,
+      "merged_at": "2026-09-27T13:11:47Z",
+      "merge_commit_sha": "a03d08684094f3c18cce4d950c2e8fa1902a6728"
+    },
+    {
+      "number": 55,
+      "title": "ops: confine local demo Compose ports to loopback",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/55",
+      "merged": true,
+      "merged_at": "2026-09-27T14:06:18Z",
+      "merge_commit_sha": "9f914cd51c795eb8dd6a69a5cedd3c4cef505f54"
+    },
+    {
+      "number": 56,
+      "title": "ops: isolate seed tests from project data and developer database",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/56",
+      "merged": true,
+      "merged_at": "2026-09-27T14:25:48Z",
+      "merge_commit_sha": "2ad7d4b650af467de31dd73b67bc8c1de59aa857"
+    },
+    {
+      "number": 57,
+      "title": "ops: redact database availability diagnostics in pytest",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/57",
+      "merged": true,
+      "merged_at": "2026-09-27T14:43:05Z",
+      "merge_commit_sha": "4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4"
+    }
+  ],
+  "checks": {
+    "c064fe3e981b2cac513ce54700930748a7edc39c": {
+      "check_count": 25,
+      "unfinished_or_unsuccessful": [],
+      "required_result": [
+        {
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36315787767/job/108613124860"
+        }
+      ]
+    },
+    "8b6746510c5ffc94dc1053825c28f55d58eb5575": {
+      "check_count": 25,
+      "unfinished_or_unsuccessful": [],
+      "required_result": [
+        {
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36320641880/job/108625043016"
+        }
+      ]
+    },
+    "2ec78507c1d658f25cb3290900ca13146ee8f7eb": {
+      "check_count": 27,
+      "unfinished_or_unsuccessful": [],
+      "required_result": [
+        {
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36323822360/job/108633956225"
+        }
+      ]
+    },
+    "346f0433fbb0d07a8beab84f2e2aede9d184bdd1": {
+      "check_count": 21,
+      "unfinished_or_unsuccessful": [],
+      "required_result": [
+        {
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36325373703/job/108638295622"
+        }
+      ]
+    },
+    "e1798b5e518e6c7de351bf50b800c598748c243a": {
+      "check_count": 21,
+      "unfinished_or_unsuccessful": [],
+      "required_result": [
+        {
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36326434965/job/108641264977"
+        }
+      ]
+    },
+    "4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4": {
+      "check_count": 21,
+      "unfinished_or_unsuccessful": [],
+      "required_result": [
+        {
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36326933047/job/108642705854"
+        }
+      ]
+    }
+  },
+  "open_prs": [],
+  "main_protection": {
+    "required_status_checks": [
+      "required-result"
+    ],
+    "strict": true,
+    "pull_request_required": true,
+    "required_approving_review_count": 0,
+    "enforce_admins": true
+  }
+}
