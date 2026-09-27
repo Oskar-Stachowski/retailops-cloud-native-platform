@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import shlex
 import sys
 import uuid
+import zipfile
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, timedelta
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 import joblib
@@ -43,6 +45,7 @@ from ml.features.demand_forecast import (
 )
 from ml.features.demand_forecast import SCHEMA_VERSION as FEATURE_SCHEMA_VERSION
 from ml.models.baseline_forecast import _prediction_value
+from ml.policy.forecast_admission import evaluate_forecast_admission, load_policy
 
 MODEL_NAME = "retailops-demand-random-forest"
 MODEL_VERSION = "random-forest-v3"
@@ -285,32 +288,6 @@ def calculate_prediction_metrics(
     prediction_field: str,
 ) -> dict[str, object]:
     return calculate_forecast_metrics(predictions, prediction_field=prediction_field)
-
-
-def model_status_from_metrics(
-    trained_metrics: dict[str, object],
-    baseline_metrics: dict[str, object],
-    *,
-    primary_metric: str = PRIMARY_METRIC,
-) -> str:
-    if (
-        trained_metrics.get("status") != "evaluable"
-        or baseline_metrics.get("status") != "evaluable"
-        or trained_metrics.get("evaluated_rows", 0) != baseline_metrics.get("evaluated_rows", 0)
-        or not isinstance(trained_metrics.get("evaluated_rows"), int)
-        or trained_metrics["evaluated_rows"] <= 0
-    ):
-        return "rejected"
-    try:
-        trained_value = Decimal(str(trained_metrics[primary_metric]))
-        baseline_value = Decimal(str(baseline_metrics[primary_metric]))
-    except (KeyError, InvalidOperation, TypeError, ValueError):
-        return "rejected"
-    if not trained_value.is_finite() or not baseline_value.is_finite():
-        return "rejected"
-    if trained_value < 0 or baseline_value < 0:
-        return "rejected"
-    return "candidate" if trained_value < baseline_value else "rejected"
 
 
 def build_predictions(
@@ -567,7 +544,6 @@ def build_metrics_report(
         final_predictions,
         prediction_field="baseline_predicted_units",
     )
-    model_status = model_status_from_metrics(trained_metrics, baseline_metrics)
     baseline_value = baseline_metrics[PRIMARY_METRIC]
     trained_value = trained_metrics[PRIMARY_METRIC]
     improvement = None
@@ -583,12 +559,11 @@ def build_metrics_report(
     test_count = len(final_predictions)
     feature_dates = [str(row["date"]) for row in feature_rows]
 
-    return {
+    report = {
         "report_name": "retailops-trained-demand-forecast-evaluation",
         "model_name": MODEL_NAME,
         "model_version": MODEL_VERSION,
         "model_type": MODEL_TYPE,
-        "model_status": model_status,
         "primary_metric": PRIMARY_METRIC,
         "primary_metric_improvement_percent": improvement,
         "baseline_model_name": "retailops-demand-baseline-moving-average",
@@ -625,9 +600,25 @@ def build_metrics_report(
             MODEL_CARD_FILENAME,
         ],
     }
+    decision = evaluate_forecast_admission(report, predictions)
+    report["admission_decision"] = decision
+    report["model_status"] = decision["status"]
+    return report
 
 
 def build_model_metadata(metrics_report: dict[str, object]) -> dict[str, object]:
+    decision = metrics_report["admission_decision"]
+    _, policy_sha256 = load_policy()
+    if (
+        metrics_report["model_status"] != decision["status"]
+        or decision["policy_sha256"] != policy_sha256
+        or (
+            decision["status"] == "candidate"
+            and any(check["status"] != "passed" for check in decision["checks"])
+        )
+    ):
+        msg = "Model status must match the admission decision."
+        raise ValueError(msg)
     return {
         "model_name": metrics_report["model_name"],
         "model_version": metrics_report["model_version"],
@@ -637,6 +628,7 @@ def build_model_metadata(metrics_report: dict[str, object]) -> dict[str, object]
         "model_id": metrics_report["model_id"],
         "evaluation_scope": metrics_report["evaluation_scope"],
         "status": metrics_report["model_status"],
+        "admission_decision": decision,
         "primary_metric": metrics_report["primary_metric"],
         "primary_metric_improvement_percent": metrics_report["primary_metric_improvement_percent"],
         "feature_dataset_id": metrics_report["feature_dataset_id"],
@@ -674,6 +666,11 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
     ]
     improvement = metrics_report["primary_metric_improvement_percent"]
     improvement_text = f"{improvement}%" if improvement is not None else "n/a"
+    decision = metrics_report["admission_decision"]
+    check_lines = [
+        f"- `{check['check_id']}`: `{check['status']}` — {check['reason']}"
+        for check in decision["checks"]
+    ]
 
     return "\n".join(
         [
@@ -691,6 +688,11 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             f"- Evaluation scope: `{metrics_report['evaluation_scope']}`",
             f"- Primary metric: `{metrics_report['primary_metric']}`",
             f"- Primary metric improvement: `{improvement_text}`",
+            f"- Admission policy: `{decision['policy_version']}`",
+            "",
+            "## Admission Checks",
+            "",
+            *check_lines,
             "",
             "## Data",
             "",
@@ -724,7 +726,7 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "- The data is synthetic and local-first.",
             "- The model is trained for offline evaluation, not production online serving.",
             "- The panel's open/active/completeness evidence is a synthetic generator declaration.",
-            "- Candidate status still lacks the complete admission policy; it does not admit the model for use.",
+            "- Candidate status permits only further local synthetic validation, not serving or production release.",
             "- There is no automated approval workflow, rollback automation, or retraining scheduler yet.",
             "",
             "## Next Improvements",
@@ -735,6 +737,72 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "",
         ],
     )
+
+
+def _source_snapshot_matches(
+    repo_root: Path,
+    source_paths: list[Path],
+    source_hashes: dict[str, str],
+    archive_path: Path,
+) -> bool:
+    try:
+        with zipfile.ZipFile(archive_path) as archive:
+            return bool(source_paths) and all(
+                hashlib.sha256(
+                    archive.read(path.relative_to(repo_root).as_posix()),
+                ).hexdigest()
+                == source_hashes[path.relative_to(repo_root).as_posix()]
+                for path in source_paths
+            )
+    except (KeyError, OSError, zipfile.BadZipFile):
+        return False
+
+
+def _artifact_roundtrip_matches(
+    model: Pipeline,
+    artifact_path: Path,
+    panel_rows: list[dict[str, object]],
+    predictions: list[dict[str, object]],
+    metrics_report: dict[str, object],
+) -> bool:
+    from ml.evaluation.fixed_origin import _history
+
+    try:
+        final_predictions = [row for row in predictions if row["split"] == "test"]
+        if not final_predictions:
+            return False
+        final_fold = next(
+            fold for fold in metrics_report["temporal_protocol"]["folds"] if fold["split"] == "test"
+        )
+        origin = date.fromisoformat(str(final_fold["target_start"]))
+        rows_by_series: dict[tuple[str, str, str], list[dict[str, object]]] = defaultdict(list)
+        panel_by_key: dict[tuple[str, str, str, str], dict[str, object]] = {}
+        for row in panel_rows:
+            series_key = _series_key(row)
+            rows_by_series[series_key].append(row)
+            panel_by_key[(str(row["date"]), *series_key)] = row
+        features = []
+        for prediction in final_predictions:
+            series_key = _series_key(prediction)
+            target = panel_by_key[(str(prediction["forecast_date"]), *series_key)]
+            history = _history(
+                rows_by_series[series_key], origin, int(metrics_report["window_days"])
+            )
+            features.append(
+                build_training_features(
+                    target,
+                    history,
+                    window_days=int(metrics_report["window_days"]),
+                    origin=origin,
+                ),
+            )
+        expected = [int(row["predicted_units"]) for row in final_predictions]
+        reloaded = joblib.load(artifact_path)
+        return [_quantity(value) for value in model.predict(features)] == expected and [
+            _quantity(value) for value in reloaded.predict(features)
+        ] == expected
+    except (KeyError, OSError, StopIteration, TypeError, ValueError):
+        return False
 
 
 def write_trained_model_artifacts(
@@ -763,6 +831,24 @@ def write_trained_model_artifacts(
     json_file(output_dir / INPUT_MANIFEST_FILENAME, experiment_inputs)
     joblib.dump(model, output_dir / MODEL_ARTIFACT_FILENAME)
     metrics_report["model_id"] = "sha256:" + file_sha256(output_dir / MODEL_ARTIFACT_FILENAME)
+    reproduction_evidence = {
+        "source_snapshot": _source_snapshot_matches(
+            repo_root,
+            source_paths,
+            source_hashes,
+            output_dir / SOURCE_ARCHIVE_FILENAME,
+        ),
+        "artifact_roundtrip": _artifact_roundtrip_matches(
+            model,
+            output_dir / MODEL_ARTIFACT_FILENAME,
+            panel_rows,
+            predictions,
+            metrics_report,
+        ),
+    }
+    decision = evaluate_forecast_admission(metrics_report, predictions, reproduction_evidence)
+    metrics_report["admission_decision"] = decision
+    metrics_report["model_status"] = decision["status"]
     (output_dir / METRICS_FILENAME).write_text(
         json.dumps(metrics_report, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

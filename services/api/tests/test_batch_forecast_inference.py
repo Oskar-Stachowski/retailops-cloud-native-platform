@@ -70,7 +70,7 @@ def test_batch_inference_manifest_links_model_metadata_and_forecast_counts(tmp_p
             window_days=7,
             horizon_days=2,
             holdout_days=2,
-            status="candidate",
+            status="experimental",
             output_dir=tmp_path / "metadata",
             model_output_dir=tmp_path / "model",
             evaluation_output_dir=tmp_path / "evaluation",
@@ -82,7 +82,7 @@ def test_batch_inference_manifest_links_model_metadata_and_forecast_counts(tmp_p
     manifest = build_batch_inference_manifest(config, metadata, predictions, api_rows)
 
     assert manifest["model_version"] == MODEL_VERSION
-    assert manifest["model_status"] == "candidate"
+    assert manifest["model_status"] == "experimental"
     assert manifest["feature_dataset_id"] == metadata["feature_dataset_id"]
     assert manifest["batch_prediction_count"] == len(predictions)
     assert manifest["api_forecast_count"] == len(api_rows)
@@ -103,7 +103,7 @@ def test_batch_inference_job_writes_predictions_api_forecasts_and_manifest(tmp_p
         window_days=7,
         horizon_days=2,
         holdout_days=2,
-        model_status="candidate",
+        model_status="experimental",
         output_dir=output_dir,
         metadata_output_dir=tmp_path / "metadata",
         model_output_dir=tmp_path / "model",

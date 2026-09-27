@@ -40,7 +40,7 @@ def test_model_performance_metrics_render_prometheus_text() -> None:
     }
     model_metadata = {
         "model_id": "model-1",
-        "status": "candidate",
+        "status": "experimental",
     }
     batch_manifest = {
         "run_key": "v1:dataset-1:batch-inference",
@@ -60,10 +60,10 @@ def test_model_performance_metrics_render_prometheus_text() -> None:
     metrics_text = render_model_performance_metrics(snapshot)
 
     assert "# TYPE retailops_model_info gauge" in metrics_text
-    assert 'model_status="candidate"' in metrics_text
+    assert 'model_status="experimental"' in metrics_text
     assert (
         'retailops_model_evaluation_mae{feature_dataset_id="dataset-1",model_name='
-        '"retailops-demand-baseline",model_status="candidate",model_version="v1",profile="small"}'
+        '"retailops-demand-baseline",model_status="experimental",model_version="v1",profile="small"}'
         " 4.2500"
     ) in metrics_text
     assert "retailops_model_evaluation_mape_percent" in metrics_text
@@ -94,7 +94,7 @@ def test_model_performance_metrics_job_writes_snapshot_and_prometheus_artifact(t
         window_days=7,
         horizon_days=2,
         holdout_days=2,
-        model_status="candidate",
+        model_status="experimental",
         output_dir=output_dir,
         metadata_output_dir=tmp_path / "metadata",
         model_output_dir=tmp_path / "model",
@@ -111,7 +111,7 @@ def test_model_performance_metrics_job_writes_snapshot_and_prometheus_artifact(t
     )
 
     assert written_snapshot["model_version"] == snapshot["model_version"]
-    assert written_snapshot["model_status"] == "candidate"
+    assert written_snapshot["model_status"] == "experimental"
     assert written_snapshot["evaluation"]["evaluated_rows"] > 0
     assert written_snapshot["evaluation"]["mape_evaluated_rows"] <= written_snapshot["evaluation"]["evaluated_rows"]
     assert "retailops_model_evaluation_rmse" in metrics_text

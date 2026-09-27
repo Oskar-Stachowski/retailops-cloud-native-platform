@@ -51,7 +51,7 @@ def test_model_metadata_captures_lineage_metrics_and_artifacts(tmp_path) -> None
             window_days=7,
             horizon_days=2,
             holdout_days=2,
-            status="candidate",
+            status="experimental",
             model_output_dir=model_output_dir,
             evaluation_output_dir=evaluation_output_dir,
         ),
@@ -61,7 +61,7 @@ def test_model_metadata_captures_lineage_metrics_and_artifacts(tmp_path) -> None
 
     assert metadata["metadata_schema_version"] == "1.0"
     assert metadata["model_id"]
-    assert metadata["status"] == "candidate"
+    assert metadata["status"] == "experimental"
     assert metadata["feature_dataset_id"] == model_manifest["feature_dataset_id"]
     assert metadata["evaluation"]["metrics"] == evaluation_report["metrics"]
     assert metadata["training"]["forecast_row_count"] == model_manifest["forecast_row_count"]
@@ -69,12 +69,13 @@ def test_model_metadata_captures_lineage_metrics_and_artifacts(tmp_path) -> None
     assert metadata["artifacts"]["evaluation_report"].endswith("evaluation_report.json")
 
 
-def test_model_metadata_rejects_unknown_status(tmp_path) -> None:
+@pytest.mark.parametrize("status", ["production", "candidate", "approved"])
+def test_model_metadata_rejects_unearned_status(tmp_path, status: str) -> None:
     with pytest.raises(ValueError, match="Unsupported model status"):
         generate_and_persist_model_metadata(
             ModelMetadataConfig(
                 dataset=DatasetGenerationConfig(profile="demo"),
-                status="production",
+                status=status,
                 output_dir=tmp_path,
             ),
         )
@@ -90,7 +91,7 @@ def test_model_registry_upserts_by_model_version_and_dataset(tmp_path) -> None:
     }
     second = {
         **first,
-        "status": "candidate",
+        "status": "rejected",
         "created_at": "2026-05-13T01:00:00Z",
     }
 
@@ -100,9 +101,20 @@ def test_model_registry_upserts_by_model_version_and_dataset(tmp_path) -> None:
     metadata = json.loads((tmp_path / MODEL_METADATA_FILENAME).read_text(encoding="utf-8"))
     registry_lines = (tmp_path / MODEL_REGISTRY_FILENAME).read_text(encoding="utf-8").splitlines()
 
-    assert metadata["status"] == "candidate"
+    assert metadata["status"] == "rejected"
     assert len(registry_lines) == 1
-    assert json.loads(registry_lines[0])["status"] == "candidate"
+    assert json.loads(registry_lines[0])["status"] == "rejected"
+
+
+@pytest.mark.parametrize("status", ["candidate", "approved"])
+def test_registry_refuses_direct_status_override(tmp_path, status: str) -> None:
+    with pytest.raises(ValueError, match="Unsupported model status"):
+        persist_model_metadata(tmp_path, {
+            "model_name": "baseline", "model_version": "v1",
+            "feature_dataset_id": "dataset", "status": status,
+        })
+    assert not (tmp_path / MODEL_METADATA_FILENAME).exists()
+    assert not (tmp_path / MODEL_REGISTRY_FILENAME).exists()
 
 
 def test_model_metadata_job_writes_metadata_registry_and_upstream_artifacts(tmp_path) -> None:

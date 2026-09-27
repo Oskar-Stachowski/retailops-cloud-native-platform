@@ -30,7 +30,7 @@ BATCH_MANIFEST_FILENAME = "batch_inference_manifest.json"
 DEFAULT_WINDOW_DAYS = 28
 DEFAULT_HORIZON_DAYS = 7
 DEFAULT_HOLDOUT_DAYS = 7
-DEFAULT_MODEL_STATUS = "candidate"
+DEFAULT_MODEL_STATUS = "experimental"
 FORECAST_METHOD = "retailops-baseline-demand-model"
 BATCH_PREDICTION_COLUMNS = [
     "forecast_id",

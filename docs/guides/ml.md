@@ -7,8 +7,9 @@ Uruchomienie wszystkich poleceń `make ml-*` nie sprawdza jednego artefaktu
 Random Forest od treningu do użycia.
 
 Najbliższą pracę opisuje [plan poprawnej oceny ML](../plans/ml-evaluation.md).
-[Otwarte ustalenia](../audits/open-findings.md) zawierają potwierdzone ograniczenia
-dopuszczania modeli i spójności artefaktów.
+[Lokalna polityka dopuszczenia RF](../reference/ml-admission-policy.md) opisuje
+statusy i bramki; [otwarte ustalenia](../audits/open-findings.md) obejmują
+spójność ścieżki artefaktów.
 
 ## Polecenia i artefakty
 
@@ -115,10 +116,12 @@ pokazuje zapisane identyfikatory i sumy.
   pochodzenie i ograniczenia. Targetem jest obserwowana sprzedaż `units_sold`;
   brak wiersza cech nie oznacza zera. Dopiero jawna syntetyczna deklaracja
   kompletności pozwala sklasyfikować go w panelu oceny jako `complete_zero`.
-- Status RF `candidate` wymaga ocenialnego WAPE niższego od baseline.
-  Nie stanowi pełnej polityki dopuszczenia.
-- Status rejestru baseline jest parametrem CLI. `approved` jest dozwoloną
-  wartością tekstową, a nie wynikiem wdrożonego procesu zatwierdzania.
+- Status RF `candidate` wymaga przejścia wszystkich warunków wersjonowanej
+  polityki lokalnej. Wynik każdego warunku jest w `admission_decision` raportu,
+  metadanych i karty modelu; `candidate` nie oznacza serving ani produkcji.
+- Status rejestru baseline pozostaje parametrem CLI ograniczonym do
+  `experimental`, `rejected` i `retraining_required`; nie da się nim nadać
+  `candidate` ani `approved`.
 - `api_forecasts.csv` jest plikiem zgodnym kształtem z rekordami prognoz API.
   Moduł batch nie zapisuje go automatycznie do PostgreSQL. Dane prognoz seed/API
   i artefakt zapisany przez batch mają osobne ścieżki zasilania.

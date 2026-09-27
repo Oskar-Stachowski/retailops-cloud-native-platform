@@ -11,22 +11,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 
 ## ML — do poprawy przed następną oceną modelu
 
-### ML-04 · P1 · Status modelu nie wynika z pełnej polityki dopuszczenia
-
-**Dowód:** `model_status_from_metrics` w
-[modelu RF](../../ml/models/random_forest_forecast.py) nadaje `candidate` po
-dowolnej poprawie WAPE względem baseline. Nie sprawdza pokrycia, stabilności,
-segmentów, odtwarzalności ani ważności protokołu. W
-[rejestrze metadanych](../../ml/metadata/model_registry.py) status, także
-`approved`, pochodzi z argumentu użytkownika; `_validate_status` sprawdza
-wyłącznie przynależność do listy dozwolonych nazw.
-
-**Kryterium zamknięcia:** wersjonowana polityka ustalona przed oceną zapisuje
-wynik i uzasadnienie każdego warunku. Progi muszą wynikać z uzgodnionego kontraktu,
-nie z dopasowania do uzyskanego wyniku. Ścieżka dopuszczania weryfikuje dowody
-i blokuje ręczne obejście decyzji. `candidate` oznacza zgodę na dalszą lokalną
-walidację; poprawne `rejected` jest pełnoprawnym wynikiem eksperymentu.
-
 ### ML-05 · P1 · Batch, metadata i metryki nie używają ocenionego artefaktu RF
 
 **Dowód:** [batch inference](../../ml/inference/batch_forecast.py) wywołuje

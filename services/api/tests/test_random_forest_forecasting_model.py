@@ -27,11 +27,11 @@ from ml.models.random_forest_forecast import (
     RandomForestForecastConfig,
     baseline_prediction_for_row,
     build_metrics_report,
+    build_model_metadata,
     build_random_forest_pipeline,
     build_supervised_examples,
     build_training_features,
     calculate_prediction_metrics,
-    model_status_from_metrics,
     train_random_forest_forecast_model,
 )
 
@@ -119,41 +119,6 @@ def test_late_historical_sale_is_not_available_to_model_or_baseline() -> None:
     )
 
 
-def test_random_forest_model_status_requires_primary_metric_improvement() -> None:
-    metrics = {"status": "evaluable", "evaluated_rows": 2}
-    assert (
-        model_status_from_metrics(
-            {**metrics, "wape": "8.0000"},
-            {**metrics, "wape": "10.0000"},
-        )
-        == "candidate"
-    )
-    assert (
-        model_status_from_metrics(
-            {**metrics, "wape": "12.0000"},
-            {**metrics, "wape": "10.0000"},
-        )
-        == "rejected"
-    )
-
-
-@pytest.mark.parametrize("invalid_wape", [None, "", "NaN", "Infinity", "-1"])
-def test_random_forest_model_status_rejects_invalid_primary_metric(invalid_wape: object) -> None:
-    baseline = {"status": "evaluable", "evaluated_rows": 1, "wape": "10.0000"}
-    trained = {"status": "evaluable", "evaluated_rows": 1, "wape": invalid_wape}
-    assert model_status_from_metrics(trained, baseline) == "rejected"
-
-
-def test_random_forest_model_status_rejects_non_evaluable_and_mismatched_rows() -> None:
-    baseline = {"status": "evaluable", "evaluated_rows": 1, "wape": "10.0000"}
-    assert model_status_from_metrics(
-        {"status": "not_evaluable", "evaluated_rows": 1, "wape": None}, baseline,
-    ) == "rejected"
-    assert model_status_from_metrics(
-        {"status": "evaluable", "evaluated_rows": 0, "wape": "0.0000"}, baseline,
-    ) == "rejected"
-
-
 def test_random_forest_report_rejects_zero_denominator() -> None:
     report = build_metrics_report(
         RandomForestForecastConfig(),
@@ -208,6 +173,14 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
     assert metrics["trained_model_metrics"]["evaluated_rows"] == metrics["test_row_count"]
     assert metadata["status"] in {"candidate", "rejected"}
     assert metadata["status"] == metrics_report["model_status"]
+    assert metadata["admission_decision"] == metrics["admission_decision"]
+    assert {check["check_id"] for check in metrics["admission_decision"]["checks"]} == {
+        "protocol", "coverage", "final_quality", "stability", "segments", "reproduction",
+    }
+    assert next(
+        check for check in metrics["admission_decision"]["checks"]
+        if check["check_id"] == "reproduction"
+    )["status"] == "passed"
     assert Decimal(str(metrics["trained_model_metrics"]["wape"])) >= 0
     assert "Baseline Comparison" in model_card
     inputs = json.loads((tmp_path / INPUT_MANIFEST_FILENAME).read_text(encoding="utf-8"))
@@ -225,6 +198,7 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
     assert inputs["features"]["panel_row_count"] == metrics["temporal_protocol"]["panel_rows"]
     assert manifest["panel_logical_sha256"] == inputs["features"]["panel_logical_sha256"]
     assert inputs["source"]["git_commit"]
+    assert "ml/policy/forecast_admission_v1.json" in inputs["source"]["source_files_sha256"]
     assert inputs["environment"]["dependencies"]["scikit-learn"]
     assert manifest["model_id"] == "sha256:" + file_sha256(tmp_path / MODEL_ARTIFACT_FILENAME)
     for name, checksum in manifest["artifact_sha256"].items():
@@ -236,6 +210,10 @@ def test_random_forest_training_job_writes_artifacts_and_baseline_comparison(tmp
 
     with pytest.raises(FileExistsError, match="refusing to overwrite"):
         train_random_forest_forecast_model(config)
+
+    tampered = {**metrics_report, "model_status": "candidate" if metadata["status"] != "candidate" else "rejected"}
+    with pytest.raises(ValueError, match="admission decision"):
+        build_model_metadata(tampered)
 
 
 def test_random_forest_run_identity_is_unique_and_experiment_identity_tracks_inputs(tmp_path) -> None:

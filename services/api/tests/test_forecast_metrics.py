@@ -7,7 +7,6 @@ from ml.evaluation.fixed_origin import _metrics as fold_metrics
 from ml.models.random_forest_forecast import (
     calculate_prediction_metrics,
     fixed_prediction_rows,
-    model_status_from_metrics,
 )
 
 
@@ -26,7 +25,6 @@ def test_zero_actual_overforecast_is_visible_but_percentage_metrics_are_undefine
     assert metrics["zero_actual_rows"] == 1
     assert metrics["zero_actual_overforecast_units"] == "100.0000"
     assert metrics["mae"] == "100.0000"
-    assert model_status_from_metrics(metrics, metrics) == "rejected"
 
 
 @pytest.mark.parametrize("calculator", [
@@ -58,7 +56,6 @@ def test_empty_evaluation_has_no_successful_metric(calculator) -> None:
     assert metrics["evaluated_rows"] == 0
     assert metrics["wape"] is None
     assert metrics["mae"] is None
-    assert model_status_from_metrics(metrics, metrics) == "rejected"
 
 
 @pytest.mark.parametrize("actual,predicted", [

@@ -4,7 +4,7 @@
 
 Celem jest świeży, odtwarzalny eksperyment ML, wiarygodne metryki i uzasadniona decyzja `candidate` albo `rejected`. Rzetelne odrzucenie modelu jest poprawnym wynikiem; nie wymaga dalszego strojenia w celu wymuszenia sukcesu.
 
-Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów, poprawne metryki i ocenę całego horyzontu na syntetycznym panelu. Dalsza praca dotyczy polityki dopuszczenia i użycia ocenionego artefaktu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
+Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów, poprawne metryki i ocenę całego horyzontu na syntetycznym panelu. [Lokalna polityka dopuszczenia](../reference/ml-admission-policy.md) określa sprawdzaną decyzję RF. Dalsza praca dotyczy użycia ocenionego artefaktu i świeżego odbioru eksperymentu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
 
 ## 1. Kontrolowane treningi i analiza wyników
 
@@ -16,27 +16,7 @@ Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje nie
 
 **Odbiór:** świeży raport, porównywalne warianty, odtworzony wynik oraz jawne ograniczenia danych syntetycznych.
 
-## 2. Polityka dopuszczenia
-
-Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzoną polityką ani istniejącą implementacją**. Przed eksperymentem skonfrontować je z [kontraktami profili i bramek AI](ai/kontrakty/profile-i-bramki.md), zapisać politykę właściwą dla lokalnego kroku i rozstrzygnąć różnice. Nie zmieniać progów po zobaczeniu wyniku.
-
-| Warunek | Propozycja |
-|---|---|
-| Dane i czas | Kontrakt spełniony, brak leakage i duplikatów |
-| Pokrycie | Wynik dla wszystkich kwalifikujących się rekordów; pominięcia z uzasadnieniem |
-| Jakość | WAPE co najmniej 5% względnie lepsze od ustalonego baseline na końcowym teście |
-| Stabilność | Przewaga w co najmniej dwóch z trzech okien walidacyjnych |
-| Segmenty | MAE nie gorsze o więcej niż 5% w wcześniej wybranych segmentach o ustalonej minimalnej liczebności |
-| Reprodukcja | Zgodne wyniki powtórzenia oraz test zapisu/odczytu modelu |
-| Drift | `failed` blokuje; `warning` wymaga jawnego uzasadnienia dalszej decyzji |
-
-- Zapisać decyzję i wynik każdego warunku w formacie maszynowym.
-- Ustalić granicę statusów: `candidate` dopuszcza dalszą lokalną walidację; nie oznacza produkcyjnej gotowości.
-- Proste kontrole driftu na syntetycznych seedach potwierdzają mechanizm kontroli; nie dowodzą odporności na rzeczywisty drift produkcyjny.
-
-**Odbiór:** decyzja `candidate`/`rejected` ma odtwarzalne uzasadnienie i nie daje się obejść samym ręcznym ustawieniem statusu w ścieżce dopuszczonych modeli.
-
-## 3. Użycie dokładnie ocenionego artefaktu
+## 2. Użycie dokładnie ocenionego artefaktu
 
 - Spiąć minimalną ścieżkę lokalną: zapis modelu → odczyt → batch predictions → metadata → raport metryk.
 - Każdy wynik ma wskazywać ten sam model, dataset i eksperyment. Wykluczyć ciche przełączenie na baseline lub niejawny retraining.
@@ -46,7 +26,7 @@ Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzon
 
 **Odbiór:** odczytany model jest dokładnie ocenionym artefaktem, a prognozy i metryki mają spójne pochodzenie.
 
-## 4. CI, dowody i aktualizacja main
+## 3. CI, dowody i aktualizacja main
 
 - Dodać małą deterministyczną kontrolę do CI i znaczące testy negatywne: leakage, pusta ocena, niezgodna identity, obejście blokady promocji.
 - Pełniejszą ocenę zapisywać jako osobny przebieg z artefaktami.
