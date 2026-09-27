@@ -5,7 +5,7 @@ import csv
 import json
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from pathlib import Path
 
 from data.generator.main import (
@@ -14,7 +14,7 @@ from data.generator.main import (
 )
 from data.generator.manifest import GENERATOR_VERSION
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "2.0"
 DATASET_NAME = "retailops-demand-forecast-features"
 FEATURE_SCHEMA = "demand_forecast_features.schema.json"
 FEATURE_FILENAME = "features.csv"
@@ -23,11 +23,8 @@ GRAIN = ["date", "product_id", "store_id", "channel"]
 TARGET = "units_sold"
 SOURCE_ARTIFACTS = [
     "sales.csv",
+    "orders.csv",
     "products.csv",
-    "stores.csv",
-    "price_history.csv",
-    "promotions.csv",
-    "inventory_snapshots.csv",
 ]
 FEATURE_COLUMNS = [
     "schema_version",
@@ -38,23 +35,14 @@ FEATURE_COLUMNS = [
     "store_id",
     "channel",
     "units_sold",
-    "latent_units_demand",
-    "sales_revenue",
-    "unit_price",
-    "discount_percent",
-    "promotion_active",
-    "promotion_type",
-    "stockout_flag",
-    "inventory_on_hand",
-    "inventory_reserved",
+    "observation_status",
+    "observation_available_at",
     "category",
     "brand",
-    "product_status",
     "day_of_week",
     "is_weekend",
     "week_of_year",
     "month",
-    "data_quality_status",
     "generated_at",
 ]
 
@@ -79,31 +67,30 @@ def _date(value: object) -> date:
     return date.fromisoformat(_text(value)[:10])
 
 
-def _decimal(value: object, default: str = "0") -> Decimal:
-    raw_value = _text(value)
-    return Decimal(raw_value or default)
+def _utc_timestamp(value: object) -> datetime:
+    timestamp = datetime.fromisoformat(_text(value))
+    if timestamp.tzinfo is None:
+        msg = "Source availability timestamp must include a timezone."
+        raise ValueError(msg)
+    return timestamp.astimezone(UTC)
 
 
-def _money(value: Decimal) -> str:
-    return str(value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
-
-
-def _ratio(value: Decimal) -> str:
-    return str(value.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP))
-
-
-def _bool(value: object) -> bool:
-    return _text(value).lower() in {"1", "true", "yes"}
+def observation_known_at_origin(row: dict[str, object], forecast_date: date) -> bool:
+    origin = datetime.combine(forecast_date, datetime.min.time(), tzinfo=UTC)
+    return (
+        _date(row["date"]) < forecast_date
+        and _utc_timestamp(
+            row["observation_available_at"],
+        )
+        <= origin
+    )
 
 
 def _feature_generated_at(tables: dict[str, list[dict[str, object]]]) -> str:
-    candidates: list[str] = []
-    for sale in tables["sales"]:
-        candidates.append(_text(sale.get("ingested_at")) or _text(sale.get("sold_at")))
-    for snapshot in tables["inventory_snapshots"]:
-        candidates.append(_text(snapshot.get("ingested_at")) or _text(snapshot.get("recorded_at")))
-
-    return max(value for value in candidates if value)
+    candidates = [
+        _text(sale.get("ingested_at")) or _text(sale.get("sold_at")) for sale in tables["sales"]
+    ]
+    return max(candidates) if candidates else datetime.now(UTC).isoformat()
 
 
 def _dataset_id(
@@ -115,95 +102,6 @@ def _dataset_id(
     date_start = min(dates) if dates else "empty"
     date_end = max(dates) if dates else "empty"
     return f"{DATASET_NAME}-{profile}-{date_start}-{date_end}-seed{seed}"
-
-
-def _active_promotion(
-    product_id: str,
-    channel: str,
-    business_date: date,
-    promotions: list[dict[str, object]],
-) -> dict[str, object] | None:
-    for promotion in promotions:
-        promotion_channel = _text(promotion.get("channel"))
-        if _text(promotion.get("product_id")) != product_id:
-            continue
-        if promotion_channel not in {"all", channel}:
-            continue
-        if _text(promotion.get("status")) != "active":
-            continue
-        if _date(promotion["starts_at"]) <= business_date <= _date(promotion["ends_at"]):
-            return promotion
-    return None
-
-
-def _price_for_date(
-    product_id: str,
-    business_date: date,
-    fallback: Decimal,
-    price_history: list[dict[str, object]],
-) -> Decimal:
-    candidates = [
-        price_point
-        for price_point in price_history
-        if _text(price_point.get("product_id")) == product_id
-        and _date(price_point["valid_from"]) <= business_date
-        and (
-            not _text(price_point.get("valid_to"))
-            or business_date <= _date(price_point["valid_to"])
-        )
-    ]
-    if not candidates:
-        return fallback
-
-    current_prices = [
-        price_point
-        for price_point in candidates
-        if _text(price_point.get("price_type")) == "regular"
-    ]
-    selected = current_prices[0] if current_prices else candidates[0]
-    return _decimal(selected["price"], default=str(fallback))
-
-
-def _inventory_for_date(
-    product_id: str,
-    business_date: date,
-    inventory_snapshots: list[dict[str, object]],
-) -> dict[str, object] | None:
-    candidates = [
-        snapshot
-        for snapshot in inventory_snapshots
-        if _text(snapshot.get("product_id")) == product_id
-        and _date(snapshot["recorded_at"]) <= business_date
-    ]
-    if not candidates:
-        candidates = [
-            snapshot
-            for snapshot in inventory_snapshots
-            if _text(snapshot.get("product_id")) == product_id
-        ]
-    if not candidates:
-        return None
-
-    return max(candidates, key=lambda snapshot: _text(snapshot["recorded_at"]))
-
-
-def _quality_status(statuses: list[str]) -> str:
-    normalized = {status for status in statuses if status}
-    if not normalized or normalized == {"ok"}:
-        return "passed"
-    if "failed" in normalized:
-        return "failed"
-    return "warning"
-
-
-def _promotion_type(value: str) -> str:
-    return {
-        "discount": "percentage_discount",
-        "percentage_discount": "percentage_discount",
-        "bundle": "bundle",
-        "clearance": "clearance",
-        "seasonal": "seasonal",
-    }.get(value, "none")
 
 
 def _build_aggregates(
@@ -219,9 +117,19 @@ def _build_aggregates(
         store_id = _text(order["store_id"])
         channel = _text(sale["channel"])
         key = (business_date, product_id, store_id, channel)
-        quantity = int(_decimal(sale["quantity"]))
-        latent_demand = int(_decimal(sale.get("latent_demand"), default=str(quantity)))
-        revenue = _decimal(sale["total_amount"])
+        raw_quantity = _text(sale.get("quantity"))
+        if not raw_quantity:
+            msg = f"Missing sale quantity for {key}; unknown is not zero."
+            raise ValueError(msg)
+        quantity_value = Decimal(raw_quantity)
+        quantity = int(quantity_value)
+        if quantity_value != quantity or quantity < 0:
+            msg = f"Sale quantity must be a nonnegative integer for {key}."
+            raise ValueError(msg)
+        available_at = max(
+            _utc_timestamp(sale.get("ingested_at") or sale["sold_at"]),
+            _utc_timestamp(order.get("created_at") or order["ordered_at"]),
+        )
 
         if key not in aggregates:
             aggregates[key] = {
@@ -230,20 +138,15 @@ def _build_aggregates(
                 "store_id": store_id,
                 "channel": channel,
                 "units_sold": 0,
-                "latent_units_demand": 0,
-                "sales_revenue": Decimal(0),
-                "stockout_flag": False,
-                "quality_statuses": [],
+                "observation_available_at": available_at,
             }
 
         aggregate = aggregates[key]
         aggregate["units_sold"] += quantity
-        aggregate["latent_units_demand"] += latent_demand
-        aggregate["sales_revenue"] += revenue
-        aggregate["stockout_flag"] = aggregate["stockout_flag"] or _bool(
-            sale.get("stockout_flag"),
+        aggregate["observation_available_at"] = max(
+            aggregate["observation_available_at"],
+            available_at,
         )
-        aggregate["quality_statuses"].append(_text(sale.get("data_quality_status")) or "ok")
 
     return aggregates
 
@@ -262,32 +165,7 @@ def build_demand_feature_rows(
         business_date = _date(aggregate["date"])
         product_id = aggregate["product_id"]
         product = products_by_id[product_id]
-        revenue = aggregate["sales_revenue"]
-        units_sold = aggregate["units_sold"]
-        weighted_unit_price = revenue / Decimal(units_sold) if units_sold else Decimal(0)
-        list_price = _price_for_date(
-            product_id,
-            business_date,
-            weighted_unit_price,
-            tables["price_history"],
-        )
-        discount_percent = Decimal(0)
-        if list_price > 0 and weighted_unit_price < list_price:
-            discount_percent = (list_price - weighted_unit_price) / list_price * Decimal(100)
-        promotion = _active_promotion(
-            product_id,
-            aggregate["channel"],
-            business_date,
-            tables["promotions"],
-        )
-        if promotion:
-            discount_percent = max(discount_percent, _decimal(promotion["discount_percent"]))
-        inventory = _inventory_for_date(
-            product_id,
-            business_date,
-            tables["inventory_snapshots"],
-        )
-        inventory_on_hand = int(_decimal(inventory["stock_quantity"])) if inventory else 0
+        units_sold = int(aggregate["units_sold"])
         iso_calendar = business_date.isocalendar()
 
         rows.append(
@@ -300,25 +178,14 @@ def build_demand_feature_rows(
                 "store_id": aggregate["store_id"],
                 "channel": aggregate["channel"],
                 "units_sold": units_sold,
-                "latent_units_demand": aggregate["latent_units_demand"],
-                "sales_revenue": _money(revenue),
-                "unit_price": _money(weighted_unit_price),
-                "discount_percent": _ratio(discount_percent),
-                "promotion_active": promotion is not None,
-                "promotion_type": _promotion_type(
-                    _text(promotion.get("promotion_type")) if promotion else ""
-                ),
-                "stockout_flag": bool(aggregate["stockout_flag"]) or inventory_on_hand <= 0,
-                "inventory_on_hand": inventory_on_hand,
-                "inventory_reserved": 0,
+                "observation_status": "observed_zero" if units_sold == 0 else "observed_positive",
+                "observation_available_at": aggregate["observation_available_at"].isoformat(),
                 "category": _text(product["category"]),
                 "brand": _text(product["brand"]),
-                "product_status": _text(product["status"]),
                 "day_of_week": business_date.isoweekday(),
                 "is_weekend": business_date.isoweekday() in {6, 7},
                 "week_of_year": iso_calendar.week,
                 "month": business_date.month,
-                "data_quality_status": _quality_status(aggregate["quality_statuses"]),
                 "generated_at": generated_at,
             },
         )
@@ -350,6 +217,23 @@ def build_feature_manifest(
         "formats": ["csv"],
         "row_count": len(rows),
         "source_artifacts": SOURCE_ARTIFACTS,
+        "forecast_origin_rule": "previous_day_end_utc",
+        "available_at_origin_fields": [
+            "date",
+            "product_id",
+            "store_id",
+            "channel",
+            "category",
+            "brand",
+            "day_of_week",
+            "is_weekend",
+            "week_of_year",
+            "month",
+        ],
+        "label_fields": ["units_sold", "observation_status"],
+        "observation_availability_field": "observation_available_at",
+        "inventory_ready": False,
+        "complete_daily_panel": False,
         "quality_report": "quality_report.json",
         "generator_version": GENERATOR_VERSION,
         "seed": config.seed,

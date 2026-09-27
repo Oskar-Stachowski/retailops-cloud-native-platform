@@ -11,24 +11,20 @@ ustaleń poniżej.
 
 ## Ocena ML — główny pakiet przygotowawczy
 
-1. [ ] **Identyfikacja eksperymentów** — osobne wersje przebiegów, zapis kodu,
-   danych, parametrów, zależności i sum kontrolnych.
-2. [ ] **Poprawne cechy** — usunięcie informacji z przyszłości, poprawne
-   przypisanie zapasu do lokalizacji oraz rozróżnienie zerowej sprzedaży
-   i brakujących danych. Cechy bez wiarygodnej dostępności w chwili prognozy
-   należy wyłączyć.
-3. [ ] **Poprawna ocena czasowa** — kalendarzowe lagi, prognoza całego horyzontu
-   z jednego momentu, chronologiczna walidacja i osobny test końcowy. Model
-   i baseline muszą korzystać z tej samej dostępnej wiedzy i ocenianych rekordów.
-4. [ ] **Poprawne metryki** — zerowy mianownik lub brak danych nie mogą
+1. [ ] **Poprawna ocena czasowa** — pełny panel kwalifikujących się serii,
+   z jawnym rozróżnieniem zamknięcia sklepu, nieaktywnego asortymentu i braku
+   danych; kalendarzowe lagi, prognoza całego horyzontu z jednego momentu,
+   chronologiczna walidacja i osobny test końcowy. Model i baseline muszą
+   korzystać z tej samej dostępnej wiedzy i ocenianych rekordów.
+2. [ ] **Poprawne metryki** — zerowy mianownik lub brak danych nie mogą
    oznaczać idealnego wyniku ani pozwalać na pozytywną decyzję o modelu.
-5. [ ] **Zasady dopuszczania modelu** — ustalone przed eksperymentem kryteria
+3. [ ] **Zasady dopuszczania modelu** — ustalone przed eksperymentem kryteria
    jakości, stabilności i odtwarzalności oraz uzasadniona decyzja `candidate`
    albo `rejected`, której nie można obejść ręcznym ustawieniem statusu.
-6. [ ] **Spójna ścieżka modelu** — batch, metadane i metryki korzystają
+4. [ ] **Spójna ścieżka modelu** — batch, metadane i metryki korzystają
    z dokładnie ocenionego artefaktu RF, bez cichego przełączenia na baseline
    lub ponownego treningu.
-7. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
+5. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
    wyniku, testy negatywne w CI, datowany raport i zmiany na `main` przez PR.
    Rzetelne odrzucenie modelu również może zakończyć ten pakiet.
 

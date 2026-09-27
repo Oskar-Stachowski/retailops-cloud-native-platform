@@ -11,7 +11,12 @@ from pathlib import Path
 
 from data.generator.main import DatasetGenerationConfig, build_dataset
 from data.generator.manifest import GENERATOR_VERSION
-from ml.features.demand_forecast import GRAIN, TARGET, build_demand_feature_rows
+from ml.features.demand_forecast import (
+    GRAIN,
+    TARGET,
+    build_demand_feature_rows,
+    observation_known_at_origin,
+)
 from ml.models.baseline_forecast import (
     MODEL_NAME,
     MODEL_VERSION,
@@ -105,7 +110,9 @@ def build_backtest_predictions(
             forecast_date = _row_date(holdout_row)
             train_start = forecast_date - timedelta(days=window_days)
             training_rows = [
-                row for row in series_rows if train_start <= _row_date(row) < forecast_date
+                row
+                for row in series_rows
+                if train_start <= _row_date(row) and observation_known_at_origin(row, forecast_date)
             ]
             if not training_rows:
                 skipped_rows += 1

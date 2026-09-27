@@ -128,7 +128,7 @@ ML_BASELINE_OUTPUT_DIR ?= data/synthetic/$(ML_BASELINE_PROFILE)/models/demand_ba
 ML_BASELINE_WINDOW_DAYS ?= 28
 ML_BASELINE_HORIZON_DAYS ?= 7
 ML_TRAINED_PROFILE ?= small
-ML_TRAINED_OUTPUT_DIR ?= data/synthetic/$(ML_TRAINED_PROFILE)/models/demand_random_forest
+ML_TRAINED_OUTPUT_ROOT ?= ci-cd/reports/ml/experiments/$(ML_TRAINED_PROFILE)
 ML_TRAINED_WINDOW_DAYS ?= 28
 ML_TRAINED_HORIZON_DAYS ?= 7
 ML_TRAINED_HOLDOUT_DAYS ?= 7
@@ -386,11 +386,7 @@ ml-baseline: api-install
 	@echo "Model manifest: $(ML_BASELINE_OUTPUT_DIR)/model_manifest.json"
 
 ml-trained: api-install
-	$(API_VENV_PYTHON) -m ml.models.random_forest_forecast --profile "$(ML_TRAINED_PROFILE)" --window-days "$(ML_TRAINED_WINDOW_DAYS)" --horizon-days "$(ML_TRAINED_HORIZON_DAYS)" --holdout-days "$(ML_TRAINED_HOLDOUT_DAYS)" --n-estimators "$(ML_TRAINED_N_ESTIMATORS)" --output-dir "$(ML_TRAINED_OUTPUT_DIR)"
-	@echo "Trained model artifact: $(ML_TRAINED_OUTPUT_DIR)/random_forest_model.joblib"
-	@echo "Trained model metrics: $(ML_TRAINED_OUTPUT_DIR)/metrics.json"
-	@echo "Trained model predictions: $(ML_TRAINED_OUTPUT_DIR)/predictions.csv"
-	@echo "Trained model metadata: $(ML_TRAINED_OUTPUT_DIR)/model_metadata.json"
+	$(API_VENV_PYTHON) -m ml.models.random_forest_forecast --profile "$(ML_TRAINED_PROFILE)" --window-days "$(ML_TRAINED_WINDOW_DAYS)" --horizon-days "$(ML_TRAINED_HORIZON_DAYS)" --holdout-days "$(ML_TRAINED_HOLDOUT_DAYS)" --n-estimators "$(ML_TRAINED_N_ESTIMATORS)" --output-root "$(ML_TRAINED_OUTPUT_ROOT)"
 
 ml-evaluate: api-install
 	$(API_VENV_PYTHON) -m ml.evaluation.baseline_report --profile "$(ML_EVALUATION_PROFILE)" --window-days "$(ML_EVALUATION_WINDOW_DAYS)" --holdout-days "$(ML_EVALUATION_HOLDOUT_DAYS)" --output-dir "$(ML_EVALUATION_OUTPUT_DIR)"

@@ -3,8 +3,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import shlex
+import sys
+import uuid
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
@@ -15,12 +18,32 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline
 
 from data.generator.main import DatasetGenerationConfig, build_dataset
-from data.generator.manifest import GENERATOR_VERSION
-from ml.features.demand_forecast import GRAIN, TARGET, build_demand_feature_rows
+from data.generator.manifest import GENERATOR_VERSION, build_dataset_manifest
+from data.generator.profile_engine import profile_defaults
+from ml.experiments.identity import (
+    INPUT_MANIFEST_FILENAME,
+    RUN_MANIFEST_FILENAME,
+    SOURCE_ARCHIVE_FILENAME,
+    artifact_checksums,
+    canonical_sha256,
+    environment_identity,
+    file_sha256,
+    json_file,
+    logical_rows_sha256,
+    source_identity,
+    write_source_archive,
+)
+from ml.features.demand_forecast import (
+    GRAIN,
+    TARGET,
+    build_demand_feature_rows,
+    observation_known_at_origin,
+)
+from ml.features.demand_forecast import SCHEMA_VERSION as FEATURE_SCHEMA_VERSION
 from ml.models.baseline_forecast import _prediction_value
 
 MODEL_NAME = "retailops-demand-random-forest"
-MODEL_VERSION = "random-forest-v1"
+MODEL_VERSION = "random-forest-v2"
 MODEL_TYPE = "sklearn_random_forest_regressor"
 MODEL_ARTIFACT_FILENAME = "random_forest_model.joblib"
 METRICS_FILENAME = "metrics.json"
@@ -28,6 +51,7 @@ PREDICTIONS_FILENAME = "predictions.csv"
 FEATURE_IMPORTANCE_FILENAME = "feature_importance.csv"
 MODEL_METADATA_FILENAME = "model_metadata.json"
 MODEL_CARD_FILENAME = "model_card.md"
+EVALUATION_SCOPE = "legacy_rolling_holdout_exploratory_only"
 DEFAULT_HOLDOUT_DAYS = 7
 DEFAULT_WINDOW_DAYS = 28
 DEFAULT_HORIZON_DAYS = 7
@@ -65,6 +89,7 @@ class RandomForestForecastConfig:
     n_estimators: int = DEFAULT_N_ESTIMATORS
     random_state: int = DEFAULT_RANDOM_STATE
     output_dir: Path | None = None
+    output_root: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -109,18 +134,21 @@ def build_training_features(
     *,
     window_days: int,
 ) -> dict[str, object]:
-    recent_rows = previous_rows[-window_days:] if window_days > 0 else previous_rows
+    forecast_date = _row_date(row)
+    history = sorted(
+        (
+            previous_row
+            for previous_row in previous_rows
+            if observation_known_at_origin(previous_row, forecast_date)
+        ),
+        key=_row_date,
+    )
+    recent_rows = history[-window_days:] if window_days > 0 else history
     recent_targets = [_decimal(previous_row[TARGET]) for previous_row in recent_rows]
-    lag_1_units = _decimal(previous_rows[-1][TARGET]) if previous_rows else Decimal(0)
-    lag_7_units = _decimal(previous_rows[-7][TARGET]) if len(previous_rows) >= 7 else lag_1_units
+    lag_1_units = _decimal(history[-1][TARGET]) if history else Decimal(0)
+    lag_7_units = _decimal(history[-7][TARGET]) if len(history) >= 7 else lag_1_units
 
     return {
-        "unit_price": float(_decimal(row["unit_price"])),
-        "discount_percent": float(_decimal(row["discount_percent"])),
-        "promotion_active": int(bool(row["promotion_active"])),
-        "stockout_flag": int(bool(row["stockout_flag"])),
-        "inventory_on_hand": int(row["inventory_on_hand"]),
-        "inventory_reserved": int(row["inventory_reserved"]),
         "day_of_week": int(row["day_of_week"]),
         "is_weekend": int(bool(row["is_weekend"])),
         "week_of_year": int(row["week_of_year"]),
@@ -130,14 +158,12 @@ def build_training_features(
         "rolling_mean_units": float(_mean(recent_targets)),
         "rolling_min_units": float(min(recent_targets) if recent_targets else Decimal(0)),
         "rolling_max_units": float(max(recent_targets) if recent_targets else Decimal(0)),
-        "training_observation_count": len(previous_rows),
+        "training_observation_count": len(history),
         "product_id": str(row["product_id"]),
         "store_id": str(row["store_id"]),
         "channel": str(row["channel"]),
-        "promotion_type": str(row["promotion_type"]),
         "category": str(row["category"]),
         "brand": str(row["brand"]),
-        "product_status": str(row["product_status"]),
     }
 
 
@@ -217,11 +243,14 @@ def baseline_prediction_for_row(
     training_rows = [
         candidate
         for candidate in series_rows
-        if train_start <= _row_date(candidate) < forecast_date
+        if train_start <= _row_date(candidate)
+        and observation_known_at_origin(candidate, forecast_date)
     ]
     if not training_rows:
         training_rows = [
-            candidate for candidate in series_rows if _row_date(candidate) < forecast_date
+            candidate
+            for candidate in series_rows
+            if observation_known_at_origin(candidate, forecast_date)
         ]
     return max(0, _prediction_value(training_rows)) if training_rows else 0
 
@@ -364,6 +393,116 @@ def build_feature_importance_rows(model: Pipeline) -> list[dict[str, object]]:
     return sorted(rows, key=lambda row: Decimal(str(row["importance"])), reverse=True)
 
 
+def default_trained_model_output_root(profile: str) -> Path:
+    repo_root = Path(__file__).resolve().parents[2]
+    return repo_root / "ci-cd" / "reports" / "ml" / "experiments" / profile
+
+
+def reproduction_command(config: RandomForestForecastConfig) -> str:
+    dataset = config.dataset
+    output_root = config.output_root or (
+        config.output_dir.parent
+        if config.output_dir is not None
+        else default_trained_model_output_root(dataset.profile)
+    )
+    args = [
+        sys.executable,
+        "-m",
+        "ml.models.random_forest_forecast",
+        "--profile",
+        dataset.profile,
+        "--seed",
+        str(dataset.seed),
+        "--window-days",
+        str(config.window_days),
+        "--horizon-days",
+        str(config.horizon_days),
+        "--holdout-days",
+        str(config.holdout_days),
+        "--n-estimators",
+        str(config.n_estimators),
+        "--random-state",
+        str(config.random_state),
+    ]
+    for name in ("days", "products", "stores", "warehouses"):
+        value = getattr(dataset, name)
+        if value is not None:
+            args.extend((f"--{name}", str(value)))
+    args.extend(("--output-root", str(output_root)))
+    return shlex.join(args)
+
+
+def build_experiment_inputs(
+    config: RandomForestForecastConfig,
+    tables: dict[str, list[dict[str, str]]],
+    feature_rows: list[dict[str, object]],
+    source: dict[str, object],
+    environment: dict[str, object],
+) -> dict[str, object]:
+    dataset_manifest = build_dataset_manifest(config.dataset, tables)  # type: ignore[arg-type]
+    defaults = (
+        profile_defaults(config.dataset.profile) if config.dataset.profile != "demo" else None
+    )
+    effective_config: dict[str, object] = (
+        {
+            "days": config.dataset.days or defaults.days,
+            "products": config.dataset.products or defaults.products,
+            "stores": config.dataset.stores or defaults.stores,
+            "warehouses": config.dataset.warehouses or defaults.warehouses,
+            "seed": config.dataset.seed,
+        }
+        if defaults is not None
+        else {"mode": "fixed_demo_fixture", "seed_effective": False}
+    )
+    dataset_hashes = {name: logical_rows_sha256(rows) for name, rows in sorted(tables.items())}
+    feature_dates = [str(row["date"]) for row in feature_rows]
+    pipeline = build_random_forest_pipeline(
+        n_estimators=config.n_estimators,
+        random_state=config.random_state,
+    )
+    return {
+        "source": source,
+        "environment": environment,
+        "dataset": {
+            "requested_config": asdict(config.dataset),
+            "effective_config": effective_config,
+            "schema_version": dataset_manifest["schema_version"],
+            "generator_version": dataset_manifest["generator_version"],
+            "date_start": dataset_manifest["date_start"],
+            "date_end": dataset_manifest["date_end"],
+            "row_counts": dataset_manifest["row_counts"],
+            "table_logical_sha256": dataset_hashes,
+            "logical_sha256": canonical_sha256(dataset_hashes),
+        },
+        "features": {
+            "dataset_id": str(feature_rows[0]["dataset_id"]) if feature_rows else "",
+            "schema_version": FEATURE_SCHEMA_VERSION,
+            "grain": GRAIN,
+            "target": TARGET,
+            "date_start": min(feature_dates) if feature_dates else "",
+            "date_end": max(feature_dates) if feature_dates else "",
+            "row_count": len(feature_rows),
+            "logical_sha256": logical_rows_sha256(feature_rows),
+        },
+        "model": {
+            "model_name": MODEL_NAME,
+            "model_version": MODEL_VERSION,
+            "model_type": MODEL_TYPE,
+            "n_estimators": config.n_estimators,
+            "random_state": config.random_state,
+            "min_samples_leaf": 2,
+            "n_jobs": 1,
+            "estimator_parameters": pipeline.named_steps["model"].get_params(),
+            "vectorizer_parameters": pipeline.named_steps["features"].get_params(),
+            "window_days": config.window_days,
+            "horizon_days": config.horizon_days,
+            "holdout_days": config.holdout_days,
+        },
+        "evaluation_scope": EVALUATION_SCOPE,
+        "reproduction_command": reproduction_command(config),
+    }
+
+
 def build_metrics_report(
     config: RandomForestForecastConfig,
     feature_rows: list[dict[str, object]],
@@ -398,7 +537,8 @@ def build_metrics_report(
         "primary_metric": PRIMARY_METRIC,
         "primary_metric_improvement_percent": _metric(improvement),
         "baseline_model_name": "retailops-demand-baseline-moving-average",
-        "evaluation_type": "time_based_holdout",
+        "evaluation_type": "legacy_rolling_holdout",
+        "evaluation_scope": EVALUATION_SCOPE,
         "profile": config.dataset.profile,
         "seed": config.dataset.seed,
         "random_state": config.random_state,
@@ -434,6 +574,10 @@ def build_model_metadata(metrics_report: dict[str, object]) -> dict[str, object]
         "model_name": metrics_report["model_name"],
         "model_version": metrics_report["model_version"],
         "model_type": metrics_report["model_type"],
+        "experiment_id": metrics_report["experiment_id"],
+        "run_id": metrics_report["run_id"],
+        "model_id": metrics_report["model_id"],
+        "evaluation_scope": metrics_report["evaluation_scope"],
         "status": metrics_report["model_status"],
         "primary_metric": metrics_report["primary_metric"],
         "primary_metric_improvement_percent": metrics_report["primary_metric_improvement_percent"],
@@ -477,9 +621,13 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             f"- Model: `{metrics_report['model_name']}`",
             f"- Version: `{metrics_report['model_version']}`",
             f"- Type: `{metrics_report['model_type']}`",
+            f"- Experiment ID: `{metrics_report['experiment_id']}`",
+            f"- Run ID: `{metrics_report['run_id']}`",
+            f"- Model ID: `{metrics_report['model_id']}`",
             f"- Status: `{metrics_report['model_status']}`",
             f"- Feature dataset: `{metrics_report['feature_dataset_id']}`",
             f"- Evaluation method: `{metrics_report['evaluation_type']}`",
+            f"- Evaluation scope: `{metrics_report['evaluation_scope']}`",
             f"- Primary metric: `{metrics_report['primary_metric']}`",
             f"- Primary metric improvement: `{metrics_report['primary_metric_improvement_percent']}%`",
             "",
@@ -492,7 +640,9 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "## Features",
             "",
             "The feature set combines calendar fields, product/store/channel identifiers,",
-            "pricing and promotion fields, inventory signals, and lag/rolling demand features.",
+            "stable product descriptors, and historical lag/rolling sales known at origin.",
+            "Realized prices, promotions without known-at timestamps, stockout, inventory,",
+            "simulator truth and current product status are excluded.",
             "",
             "## Baseline Comparison",
             "",
@@ -510,6 +660,7 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "- The data is synthetic and local-first.",
             "- The model is trained for offline evaluation, not production online serving.",
             "- Holdout evaluation uses known historical lag values in a rolling backtest.",
+            "- Candidate status in this legacy protocol does not admit the model for use.",
             "- There is no automated approval workflow, rollback automation, or retraining scheduler yet.",
             "",
             "## Next Improvements",
@@ -522,20 +673,31 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
     )
 
 
-def default_trained_model_output_dir(profile: str) -> Path:
-    repo_root = Path(__file__).resolve().parents[2]
-    return repo_root / "data" / "synthetic" / profile / "models" / "demand_random_forest"
-
-
 def write_trained_model_artifacts(
     output_dir: Path,
     model: Pipeline,
     metrics_report: dict[str, object],
     predictions: list[dict[str, object]],
     feature_importance_rows: list[dict[str, object]],
+    experiment_inputs: dict[str, object],
+    source_paths: list[Path],
+    source_hashes: dict[str, str],
 ) -> None:
+    if output_dir.exists() and any(output_dir.iterdir()):
+        msg = f"Output directory is not empty; refusing to overwrite experiment: {output_dir}"
+        raise FileExistsError(msg)
     output_dir.mkdir(parents=True, exist_ok=True)
+    repo_root = Path(__file__).resolve().parents[2]
+    if any(
+        file_sha256(path) != source_hashes[path.relative_to(repo_root).as_posix()]
+        for path in source_paths
+    ):
+        msg = "Experiment source changed during training; refusing to publish the run."
+        raise RuntimeError(msg)
+    write_source_archive(repo_root, source_paths, output_dir / SOURCE_ARCHIVE_FILENAME)
+    json_file(output_dir / INPUT_MANIFEST_FILENAME, experiment_inputs)
     joblib.dump(model, output_dir / MODEL_ARTIFACT_FILENAME)
+    metrics_report["model_id"] = "sha256:" + file_sha256(output_dir / MODEL_ARTIFACT_FILENAME)
     (output_dir / METRICS_FILENAME).write_text(
         json.dumps(metrics_report, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -563,12 +725,51 @@ def write_trained_model_artifacts(
         writer.writeheader()
         writer.writerows(feature_importance_rows)
 
+    artifact_names = [
+        MODEL_ARTIFACT_FILENAME,
+        METRICS_FILENAME,
+        PREDICTIONS_FILENAME,
+        FEATURE_IMPORTANCE_FILENAME,
+        MODEL_METADATA_FILENAME,
+        MODEL_CARD_FILENAME,
+        INPUT_MANIFEST_FILENAME,
+        SOURCE_ARCHIVE_FILENAME,
+    ]
+    json_file(
+        output_dir / RUN_MANIFEST_FILENAME,
+        {
+            "experiment_id": metrics_report["experiment_id"],
+            "run_id": metrics_report["run_id"],
+            "model_id": metrics_report["model_id"],
+            "evaluation_scope": EVALUATION_SCOPE,
+            "artifact_sha256": artifact_checksums(output_dir, artifact_names),
+            "predictions_logical_sha256": logical_rows_sha256(predictions),
+        },
+    )
+
 
 def train_random_forest_forecast_model(
     config: RandomForestForecastConfig,
 ) -> dict[str, object]:
+    if config.output_dir is not None and config.output_root is not None:
+        msg = "Choose either output_dir or output_root, not both."
+        raise ValueError(msg)
+    run_id = uuid.uuid4().hex
+    output_dir = (
+        config.output_dir
+        or (config.output_root or default_trained_model_output_root(config.dataset.profile))
+        / run_id
+    )
+    if output_dir.exists() and any(output_dir.iterdir()):
+        msg = f"Output directory is not empty; refusing to overwrite experiment: {output_dir}"
+        raise FileExistsError(msg)
+    repo_root = Path(__file__).resolve().parents[2]
+    source, source_paths, source_hashes = source_identity(repo_root)
+    environment = environment_identity()
     tables = build_dataset(config.dataset)
     feature_rows = build_demand_feature_rows(tables, config.dataset)
+    experiment_inputs = build_experiment_inputs(config, tables, feature_rows, source, environment)
+    experiment_id = "rf-" + canonical_sha256(experiment_inputs)[:20]
     examples = build_supervised_examples(
         feature_rows,
         holdout_days=config.holdout_days,
@@ -605,14 +806,30 @@ def train_random_forest_forecast_model(
         predictions,
         feature_importance_rows,
     )
-    output_dir = config.output_dir or default_trained_model_output_dir(config.dataset.profile)
+    metrics_report["experiment_id"] = experiment_id
+    metrics_report["run_id"] = run_id
+    metrics_report["artifacts"] = [
+        MODEL_ARTIFACT_FILENAME,
+        METRICS_FILENAME,
+        PREDICTIONS_FILENAME,
+        FEATURE_IMPORTANCE_FILENAME,
+        MODEL_METADATA_FILENAME,
+        MODEL_CARD_FILENAME,
+        INPUT_MANIFEST_FILENAME,
+        SOURCE_ARCHIVE_FILENAME,
+        RUN_MANIFEST_FILENAME,
+    ]
     write_trained_model_artifacts(
         output_dir,
         model,
         metrics_report,
         predictions,
         feature_importance_rows,
+        experiment_inputs,
+        source_paths,
+        source_hashes,
     )
+    metrics_report["output_dir"] = str(output_dir)
     return metrics_report
 
 
@@ -631,7 +848,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--holdout-days", type=int, default=DEFAULT_HOLDOUT_DAYS)
     parser.add_argument("--n-estimators", type=int, default=DEFAULT_N_ESTIMATORS)
     parser.add_argument("--random-state", type=int, default=DEFAULT_RANDOM_STATE)
-    parser.add_argument("--output-dir", type=Path)
+    output_group = parser.add_mutually_exclusive_group()
+    output_group.add_argument("--output-dir", type=Path)
+    output_group.add_argument("--output-root", type=Path)
     return parser.parse_args()
 
 
@@ -651,13 +870,13 @@ def config_from_args(args: argparse.Namespace) -> RandomForestForecastConfig:
         n_estimators=args.n_estimators,
         random_state=args.random_state,
         output_dir=args.output_dir,
+        output_root=args.output_root,
     )
 
 
 def main() -> None:
     config = config_from_args(parse_args())
     metrics_report = train_random_forest_forecast_model(config)
-    output_dir = config.output_dir or default_trained_model_output_dir(config.dataset.profile)
 
     print(  # noqa: T201 - CLI output
         "RetailOps trained demand forecast model generated: "
@@ -665,7 +884,10 @@ def main() -> None:
         f"({metrics_report['primary_metric']} improvement "
         f"{metrics_report['primary_metric_improvement_percent']}%)",
     )
-    print(f"Output directory: {output_dir}")  # noqa: T201 - CLI output
+    print(f"Experiment ID: {metrics_report['experiment_id']}")  # noqa: T201 - CLI output
+    print(f"Run ID: {metrics_report['run_id']}")  # noqa: T201 - CLI output
+    print(f"Model ID: {metrics_report['model_id']}")  # noqa: T201 - CLI output
+    print(f"Output directory: {metrics_report['output_dir']}")  # noqa: T201 - CLI output
 
 
 if __name__ == "__main__":

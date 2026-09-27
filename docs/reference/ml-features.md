@@ -1,69 +1,74 @@
 # Kontrakt cech prognozy sprzedaży
 
-Ten dokument opisuje aktualny format i implementację
-[ml/features/demand_forecast.py](../../ml/features/demand_forecast.py).
-Generowanie cech, baseline, trening RF i raportowanie są zaimplementowane;
-instrukcja uruchomienia jest w [ML](../guides/ml.md).
+Aktualny format tworzy [generator cech](../../ml/features/demand_forecast.py).
+Polecenia uruchomienia opisuje [instrukcja ML](../guides/ml.md).
 
 | Właściwość | Wartość |
 |---|---|
 | Nazwa datasetu | `retailops-demand-forecast-features` |
-| Wersja schematu | `1.0` |
+| Wersja schematu | `2.0` |
 | Ziarno | `date`, `product_id`, `store_id`, `channel` |
-| Target | `units_sold` — obserwowana sprzedaż |
+| Target | `units_sold` — zaobserwowana liczba sprzedanych sztuk |
 | Pliki | `features.csv`, `feature_manifest.json` |
 | Domyślny katalog | `data/synthetic/<profile>/features/demand_forecast/` |
 
-Schematy i przykłady pozostają przy kodzie:
-[row schema](../../ml/contracts/demand_forecast_features.schema.json),
-[manifest schema](../../ml/contracts/demand_forecast_feature_manifest.schema.json),
-[przykład wierszy](../../ml/contracts/demand_forecast_features.example.jsonl)
-i [przykład manifestu](../../ml/contracts/demand_forecast_feature_manifest.example.json).
-Kanały to `store`, `online`, `marketplace` i `wholesale`.
+[Schemat wiersza](../../ml/contracts/demand_forecast_features.schema.json),
+[schemat manifestu](../../ml/contracts/demand_forecast_feature_manifest.schema.json),
+[przykład wiersza](../../ml/contracts/demand_forecast_features.example.jsonl)
+i [przykład manifestu](../../ml/contracts/demand_forecast_feature_manifest.example.json)
+są wersjonowane razem z kodem.
 
-## Pola i rzeczywiste pochodzenie
+## Granica czasu i pochodzenie
 
-| Grupa | Pola | Budowanie w obecnej implementacji |
-|---|---|---|
-| Identyfikacja | `schema_version`, `dataset_id`, `feature_row_id`, `generated_at` | Nazwa/profil/zakres dat/seed, klucz wiersza i czasy źródeł |
-| Ziarno | `date`, `product_id`, `store_id`, `channel` | Sprzedaż połączona z zamówieniem przez `order_reference` |
-| Sprzedaż | `units_sold`, `sales_revenue`, `unit_price` | Suma ilości i przychodu; cena to przychód podzielony przez ilość |
-| Cena i promocja | `discount_percent`, `promotion_active`, `promotion_type` | Porównanie z historią cen i dopasowanie aktywnej promocji |
-| Zapas | `stockout_flag`, `inventory_on_hand`, `inventory_reserved` | Flagi sprzedaży i dopasowany snapshot zapasu |
-| Produkt | `category`, `brand`, `product_status` | Rekord produktu |
-| Kalendarz | `day_of_week`, `is_weekend`, `week_of_year`, `month` | Data biznesowa wiersza |
-| Diagnostyka | `latent_units_demand`, `data_quality_status` | Prawda symulatora i statusy źródłowej sprzedaży |
+W aktualnej ocenie kroczącej origin dla targetu dnia `D` to koniec dnia `D-1`
+w UTC. Kalendarz dnia `D`, identyfikatory serii oraz kategoria i marka produktu
+ze statycznego katalogu generatora są wejściami znanymi w tym origin. Lagi i
+okna RF korzystają tylko z obserwacji wcześniejszych niż `D`, dla których
+`observation_available_at` nie jest późniejsze niż origin. To maksimum czasu
+ingestii sprzedaży i utworzenia zamówienia składających się na dany agregat;
+gdy rekord sprzedaży nie ma czasu ingestii, używany jest `sold_at`. Taką samą
+granicę stosuje baseline w ocenie RF. `units_sold` oraz
+wyprowadzony z niego `observation_status` są etykietami. `generated_at` jest
+metadanym wykonania, nie dowodem dostępności źródła w historycznym origin.
+`observation_available_at` jest metadanym dostępności etykiety, nie cechą RF.
+Manifest wymienia pola wejściowe, etykiety i metadane dostępności osobno oraz podaje
+`forecast_origin_rule=previous_day_end_utc`.
 
-Generator emituje również pola, które są opcjonalne w JSON Schema: m.in.
-`latent_units_demand`, `promotion_type`, `inventory_reserved`, `product_status`,
-`week_of_year`, `month` i `data_quality_status`. Nie są to zapowiedzi kolejnego
-commitu. Jawny builder wejścia RF wybiera podzbiór cech; obecność pola w CSV
-nie oznacza, że wolno użyć go do prognozy.
+Wiersz powstaje wyłącznie z jawnego rekordu sprzedaży połączonego z zamówieniem.
+Suma `quantity=0` daje `observation_status=observed_zero`; dodatnia suma daje
+`observed_positive`. Brak rekordu nie tworzy wiersza o zerowym targetcie, a brak
+wartości `quantity` jest błędem. Obecny generator nie dostarcza wersjonowanego
+asortymentu, kalendarza otwarcia sklepów ani watermarku kompletności. Dlatego
+nie da się wiarygodnie zaklasyfikować nieobecnego wiersza jako zera, zamknięcia,
+nieaktywności lub brakujących zdarzeń. Manifest deklaruje
+`complete_daily_panel=false`; zbudowanie pełnego panelu i pokrycia jest częścią
+[protokołu oceny](../plans/ml-evaluation.md).
 
-## Ograniczenia kontraktu v1
+Historia cen i promocje generatora nie dokumentują jednoznacznie wersji znanej
+w każdym origin. Zrealizowana cena, przychód, rabat, stockout i prawda symulatora
+z dnia targetu są wynikami dnia. Żadne z tych pól nie trafia do zbioru cech ani
+do wejścia RF. Bieżący `product_status` także nie jest historycznie wersjonowany
+i pozostaje wyłączony. Kategoria i marka są w obecnym generatorze stałe przez
+cały okres; po dopuszczeniu ich zmian źródło będzie wymagać wersji z czasem
+dostępności.
 
-Wiersze powstają z istniejących rekordów sprzedaży. Builder nie uzupełnia pełnej
-siatki dni, produktów, sklepów i kanałów. Brak wiersza nie jest jawnym zerem
-sprzedaży. Zrealizowana cena i stockout tego samego dnia opisują wynik dnia,
-więc nie są automatycznie cechami dostępnymi przed jego rozpoczęciem.
+Snapshoty zapasu dotyczą magazynów (`warehouse_code`), podczas gdy grain
+prognozy używa `store_id`. Brakuje mapowania sklepu i kanału do miejsca zapasu
+obowiązującego w danym czasie. Zapas nie jest dopasowywany po samym produkcie,
+nie ma fallbacku do późniejszego snapshotu i nie jest zamieniany na pozorne zero.
+Nie ma żadnej cechy zależnej od zapasu; manifest deklaruje `inventory_ready=false`.
+Przywrócenie takich cech wymaga mapowania fulfillment i wiarygodnego ledgeru.
 
-Dopasowanie zapasu odbywa się po produkcie; przy braku wcześniejszego snapshotu
-kod dopuszcza późniejszy. `latent_units_demand` jest informacją symulatora,
-a nie obserwowanym targetem do dowolnego zastosowania. Granice dostępności danych
-i lokalizacji wymagają poprawek opisanych w [audycie](../audits/open-findings.md).
+## Zakres obecnej oceny
 
-`dataset_id` zawiera profil, zakres dat i seed. Nie jest skrótem całej treści
-ani pełnej konfiguracji; zmiana liczby produktów może pozostawić ten sam ID.
-Manifest podaje liczebność, źródła, wersję generatora i datę wykonania, lecz samo
-jego istnienie nie zapewnia niezmiennego, jednoznacznego pochodzenia eksperymentu.
-Referencja `quality_report.json` nie oznacza, że job cech kopiuje ten raport do
-katalogu cech — zapisuje dwa pliki wymienione powyżej.
+Zmiana schematu `1.0` → `2.0`, RF `random-forest-v1` → `random-forest-v2`
+oraz baseline `baseline-moving-average-v1` → `baseline-moving-average-v2`
+oddziela nowe przebiegi od [historycznego snapshotu](../evidence/ml/random-forest-v1/README.md).
+Obecny backtest RF nadal czyta fakty z wcześniejszych dni holdoutu przy kolejnych
+origin. Nie jest sprawdzeniem zamrożonej prognozy całego siedmiodniowego
+horyzontu; tę zmianę obejmuje [kolejny krok planu](../plans/before-ai-00.md).
 
-## Zmiany i zgodność
-
-Zmiana ziarna, targetu, typu wymaganego pola lub usunięcie pola wymaga jawnej
-wersji kontraktu i aktualizacji konsumentów. Schemat ma `additionalProperties=false`,
-więc także nowe pola wymagają aktualizacji schematu. Nowe eksperymenty powinny
-wiązać wynik z kodem, pełną konfiguracją i treścią danych, zgodnie z
-[planem oceny ML](../plans/ml-evaluation.md). Docelowy kontrakt osobnego serwisu
-AI znajduje się w [planie AI](../plans/ai/kontrakty/dane-i-czas.md).
+`dataset_id` zawiera profil, zakres dat i seed. Pełną konfigurację, logiczne
+sumy danych i kod wiąże [tożsamość eksperymentu](../guides/ml.md), a nie sam
+identyfikator datasetu. Manifest może wskazywać `quality_report.json` bez
+kopiowania tego pliku do katalogu cech.

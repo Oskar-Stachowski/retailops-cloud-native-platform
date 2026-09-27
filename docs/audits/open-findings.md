@@ -1,30 +1,15 @@
 # Otwarte ustalenia audytowe
 
 Przegląd kodu: **27.09.2026**, baza `d7e8725bfb517595d2cefda4d6011f2db70b2aed`.
-Poniżej są wyłącznie problemy potwierdzone w źródłach. To przegląd statyczny;
-nie wykonano nowego treningu, testów runtime ani audytu kont zewnętrznych.
+Poniżej są wyłącznie problemy potwierdzone w źródłach. Ocena ich zakresu
+opiera się na przeglądzie statycznym; test tożsamości RF nie weryfikuje jakości
+prognoz ani kont zewnętrznych.
 
 **P1** oznacza ryzyko utraty danych, naruszenia granicy dostępu lub niewiarygodnej
 oceny modelu. **P2** oznacza problem odtwarzalności, izolacji lub diagnostyki.
 Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyjnej.
 
 ## ML — do poprawy przed następną oceną modelu
-
-### ML-01 · P1 · Cechy korzystają z informacji niedostępnych w chwili prognozy
-
-**Dowód:** [budowanie cech](../../ml/features/demand_forecast.py) wylicza
-`unit_price` z przychodu i sprzedaży prognozowanego dnia, a `stockout_flag`
-z jego zdarzeń sprzedażowych. `_inventory_for_date` przy braku wcześniejszego
-snapshotu wybiera późniejszy; dopasowuje zapas tylko po produkcie, bez lokalizacji.
-[Random Forest](../../ml/models/random_forest_forecast.py),
-`build_training_features`, używa ceny, rabatu, stockout i zapasu z tego wiersza.
-Wynik takiego backtestu nie potwierdza jakości prognozy dostępnej przed tym dniem.
-
-**Kryterium zamknięcia:** jawny origin i kontrakt dostępności każdej cechy;
-wyłączenie informacji o późniejszych wynikach, brak fallbacku do przyszłości
-oraz poprawne dopasowanie lokalizacji. Cechy zapasu bez wiarygodnego kontraktu
-pozostają wyłączone. Testy wykazują, że zmiana faktów po origin nie zmienia cech
-ani zamrożonej prognozy. Target pozostaje obserwowaną sprzedażą.
 
 ### ML-02 · P1 · Protokół nie weryfikuje prognozy całego horyzontu z jednego origin
 
@@ -37,6 +22,8 @@ oceną. Kod wykonuje ocenę kroczącą, a nie zamrożoną prognozę siedmiodniow
 baseline w tym samym pliku filtruje okno po datach. Przy brakujących dniach są
 to różne zakresy historii. [Generator cech](../../ml/features/demand_forecast.py)
 tworzy wiersze z agregatów sprzedaży, bez pełnego kalendarza serii.
+Nieobecnych kombinacji nie da się jeszcze sklasyfikować jako brak danych,
+zamknięty sklep lub nieaktywny asortyment.
 
 **Kryterium zamknięcia:** oddzielnie nazwane i przetestowane protokoły dla
 stałego origin i oceny kroczącej; model i baseline mają tę samą granicę wiedzy
@@ -90,20 +77,6 @@ potwierdza użycia jednego modelu od treningu do prognoz i monitoringu.
 bez niejawnego ponownego treningu ani przełączenia na baseline. Model, dataset,
 eksperyment, prognozy i metryki mają wspólną zweryfikowaną tożsamość. Test
 porównuje prognozy przed zapisem i po odczycie oraz odrzuca niezgodny artefakt.
-
-### ML-06 · P2 · Wersja modelu i ścieżka wyjściowa nie identyfikują eksperymentu
-
-**Dowód:** [model RF](../../ml/models/random_forest_forecast.py) ma stałą
-`MODEL_VERSION = "random-forest-v1"`, domyślnie 80 drzew i jedną ścieżkę
-wyjściową dla profilu. `write_trained_model_artifacts` nadpisuje pliki, a
-metadata nie zapisują commit SHA, wersji środowiska ani hashy danych/modelu.
-Różne konfiguracje i wykonania mogą nosić tę samą nazwę wersji.
-
-**Kryterium zamknięcia:** unikalna tożsamość przebiegu i artefaktu, konfiguracja,
-rewizja kodu, kontrakt/dataset, wersje zależności oraz sumy kontrolne. Ponowne
-wykonanie nie zastępuje dowodu innego eksperymentu. Zapisana procedura pozwala
-odtworzyć prognozy w ustalonej tolerancji; zgodność binarna i logiczna są
-raportowane osobno.
 
 ## Runtime i bezpieczeństwo
 

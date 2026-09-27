@@ -4,39 +4,20 @@
 
 Celem jest świeży, odtwarzalny eksperyment ML, wiarygodne metryki i uzasadniona decyzja `candidate` albo `rejected`. Rzetelne odrzucenie modelu jest poprawnym wynikiem; nie wymaga dalszego strojenia w celu wymuszenia sukcesu.
 
-Zacznij od tożsamości eksperymentu, dostępności cech w chwili prognozy i protokołu oceny (punkty 1–3). Kolejny trening ma sens dopiero po sprawdzeniu tych granic. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
+Zacznij od protokołu oceny i kompletnego panelu kwalifikujących się serii. Obecny [kontrakt cech 2.0](../reference/ml-features.md) usuwa informacje niedostępne w jednodniowym origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów. Kolejny trening oceniający jakość ma sens dopiero po sprawdzeniu granic czasu całego horyzontu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
 
-## 1. Punkt odniesienia i tożsamość eksperymentu
-
-- Zapisać commit/stan kodu, konfigurację danych i generatora, zakres dat, seed, parametry modelu, wersję kontraktu oraz wersje Pythona i zależności.
-- Nadać nowemu przebiegowi i modelowi osobną tożsamość. Zachować historyczny katalog `random-forest-v1`.
-- Rozdzielić odtworzenie konfiguracji 20 drzew, wpływ poprawek cech/protokołu i wariant 80 drzew. Starego protokołu nie używać do dopuszczenia nowego modelu.
-- Zapisać polecenie odtworzenia i sumy kontrolne; rozróżnić integralność bajtów artefaktu od powtarzalności logicznych danych i prognoz.
-
-**Odbiór:** inna osoba potrafi odtworzyć warunki eksperymentu i przypisać każdy wynik do kodu, danych i środowiska.
-
-## 2. Dostępność cech i kontrakt danych
-
-- Ustalić origin prognozy oraz dostępność każdego źródła w tym momencie.
-- Zrealizowaną cenę przyszłego dnia zastąpić zatwierdzoną ceną planowaną znaną w origin albo wyłączyć cechę. Tak samo rozliczyć promocje i stockout.
-- Wyłączyć cechy zapasu, które nie spełniają kontraktu. Pakiet AI przewiduje pierwszy forecasting bez takich cech do czasu wiarygodnego ledgeru; nie rozszerzać automatycznie tego zadania na budowę całego ledgeru.
-- Usunąć fallback do przyszłego snapshotu i sprawdzić poprawność lokalizacji zapasu.
-- Rozróżnić zerową sprzedaż, brak danych, zamknięcie sklepu i nieaktywny asortyment. Ustalić kalendarzowe lagi oraz okna.
-- Zachować granicę między obserwowanymi faktami a prawdą symulatora; latentny popyt i etykiety nie trafiają do cech runtime.
-- Dodać testy: zmiana faktów dostępnych po origin nie zmienia cech ani zamrożonej prognozy; brak historii nie powoduje użycia przyszłości.
-
-**Odbiór:** jawny kontrakt dostępności, testy granic czasu i brak użycia przyszłych outcomes. Target to obserwowana sprzedaż; nie deklarować prognozy niezaspokojonego popytu.
-
-## 3. Protokół oceny
+## 1. Protokół oceny
 
 - Zdefiniować osobno prognozę siedmiu dni z jednego origin i ewentualny eksperyment rolling one-step.
 - Przygotować co najmniej trzy chronologiczne okna walidacyjne oraz końcowy odłożony test, niewykorzystywany do strojenia.
 - Model i baseline oceniać na tych samych kwalifikujących się rekordach i z tą samą granicą dostępnej wiedzy.
+- Zbudować pełny panel obowiązujących serii z jawną kompletnością źródeł; odróżnić zero obserwowane od braku zdarzeń, zamknięcia sklepu i nieaktywnego asortymentu. Nie zakładać zera bez dowodu dostępności i kompletności.
+- Ustalić kalendarzowe lagi i okna; obecna implementacja liczy poprzednie obserwacje.
 - Raportować pokrycie, pominięcia, daty, origin, horyzont i liczebności. Ustalić obsługę nowych produktów oraz niewystarczającej historii.
 
 **Odbiór:** przebieg odpowiada planowanemu sposobowi użycia; nie ma losowego mieszania przyszłości z przeszłością ani aktualizowania zamrożonej prognozy późniejszymi actuals.
 
-## 4. Kontrolowane treningi i analiza wyników
+## 2. Kontrolowane treningi i analiza wyników
 
 - Zacząć od `small`, kontrolować czas i pamięć; obecna wektoryzacja jest gęsta.
 - Porównać uzgodnione warianty Random Forest ze średnią ruchomą i, przy wystarczającej historii, sezonowym modelem naiwnym.
@@ -46,7 +27,7 @@ Zacznij od tożsamości eksperymentu, dostępności cech w chwili prognozy i pro
 
 **Odbiór:** świeży raport, porównywalne warianty, odtworzony wynik oraz jawne ograniczenia danych syntetycznych.
 
-## 5. Polityka dopuszczenia
+## 3. Polityka dopuszczenia
 
 Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzoną polityką ani istniejącą implementacją**. Przed eksperymentem skonfrontować je z [kontraktami profili i bramek AI](ai/kontrakty/profile-i-bramki.md), zapisać politykę właściwą dla lokalnego kroku i rozstrzygnąć różnice. Nie zmieniać progów po zobaczeniu wyniku.
 
@@ -67,7 +48,7 @@ Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzon
 
 **Odbiór:** decyzja `candidate`/`rejected` ma odtwarzalne uzasadnienie i nie daje się obejść samym ręcznym ustawieniem statusu w ścieżce dopuszczonych modeli.
 
-## 6. Użycie dokładnie ocenionego artefaktu
+## 4. Użycie dokładnie ocenionego artefaktu
 
 - Spiąć minimalną ścieżkę lokalną: zapis modelu → odczyt → batch predictions → metadata → raport metryk.
 - Każdy wynik ma wskazywać ten sam model, dataset i eksperyment. Wykluczyć ciche przełączenie na baseline lub niejawny retraining.
@@ -77,7 +58,7 @@ Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzon
 
 **Odbiór:** odczytany model jest dokładnie ocenionym artefaktem, a prognozy i metryki mają spójne pochodzenie.
 
-## 7. CI, dowody i aktualizacja main
+## 5. CI, dowody i aktualizacja main
 
 - Dodać małą deterministyczną kontrolę do CI i znaczące testy negatywne: leakage, pusta ocena, niezgodna identity, obejście blokady promocji.
 - Pełniejszą ocenę zapisywać jako osobny przebieg z artefaktami.

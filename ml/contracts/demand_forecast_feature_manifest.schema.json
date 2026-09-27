@@ -18,6 +18,12 @@
     "formats",
     "row_count",
     "source_artifacts",
+    "forecast_origin_rule",
+    "available_at_origin_fields",
+    "label_fields",
+    "observation_availability_field",
+    "inventory_ready",
+    "complete_daily_panel",
     "generated_at"
   ],
   "properties": {
@@ -31,7 +37,7 @@
     },
     "schema_version": {
       "type": "string",
-      "const": "1.0"
+      "const": "2.0"
     },
     "feature_schema": {
       "type": "string",
@@ -88,6 +94,18 @@
       "minItems": 1,
       "uniqueItems": true
     },
+    "forecast_origin_rule": {"type": "string", "const": "previous_day_end_utc"},
+    "available_at_origin_fields": {
+      "type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true
+    },
+    "label_fields": {
+      "type": "array", "items": {"type": "string"}, "const": ["units_sold", "observation_status"]
+    },
+    "observation_availability_field": {
+      "type": "string", "const": "observation_available_at"
+    },
+    "inventory_ready": {"type": "boolean", "const": false},
+    "complete_daily_panel": {"type": "boolean", "const": false},
     "quality_report": {
       "type": "string"
     },

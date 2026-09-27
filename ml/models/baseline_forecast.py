@@ -19,10 +19,11 @@ from ml.features.demand_forecast import (
     GRAIN,
     TARGET,
     build_demand_feature_rows,
+    observation_known_at_origin,
 )
 
 MODEL_NAME = "retailops-demand-baseline-moving-average"
-MODEL_VERSION = "baseline-moving-average-v1"
+MODEL_VERSION = "baseline-moving-average-v2"
 FORECAST_FILENAME = "baseline_forecasts.csv"
 MODEL_MANIFEST_FILENAME = "model_manifest.json"
 DEFAULT_WINDOW_DAYS = 28
@@ -109,9 +110,15 @@ def build_baseline_forecasts(
         product_id, store_id, channel = key
         series_rows = sorted(rows_by_series[key], key=_row_date)
         cutoff_start = feature_date_end_value - timedelta(days=window_days - 1)
-        window_rows = [row for row in series_rows if _row_date(row) >= cutoff_start]
+        forecast_date_value = feature_date_end_value + timedelta(days=1)
+        known_rows = [
+            row for row in series_rows if observation_known_at_origin(row, forecast_date_value)
+        ]
+        if not known_rows:
+            continue
+        window_rows = [row for row in known_rows if _row_date(row) >= cutoff_start]
         if not window_rows:
-            window_rows = series_rows[-1:]
+            window_rows = known_rows[-1:]
         predicted_units = max(0, _prediction_value(window_rows))
 
         for horizon_offset in range(1, horizon_days + 1):
