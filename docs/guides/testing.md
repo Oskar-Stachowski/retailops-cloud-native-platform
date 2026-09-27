@@ -32,7 +32,10 @@ do endpointu `/health`.
 Testy oznaczone `integration_db` mogą zostać pominięte, gdy baza jest niedostępna.
 Zmienna `REQUIRE_DB_TESTS=1` zamienia ten przypadek w błąd; używa jej CI i cel
 `api-integration-test`. Sam zielony wynik lokalnego Pytest bez bazy nie potwierdza
-integracji z PostgreSQL. Próg coverage w `pyproject.toml` wynosi 70%.
+integracji z PostgreSQL. Komunikaty o niedostępności bazy podają tylko stałą
+kategorię przyczyny, bez pełnego `DATABASE_URL` i treści wyjątku. Dotyczy to
+zarówno wyjścia Pytest, jak i raportu JUnit XML. Próg coverage w `pyproject.toml`
+wynosi 70%.
 
 `api-integration-test` oraz testy workflow zmieniają wskazaną bazę. Uruchamiaj je
 na danych przeznaczonych do testów. `compose-ci`, `db-recovery-drill`,

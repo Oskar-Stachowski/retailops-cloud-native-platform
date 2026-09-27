@@ -26,7 +26,15 @@ def _db_unavailable_reason(database_url: str | None) -> str | None:
             cursor.execute("SELECT 1")
             cursor.fetchone()
     except psycopg.Error as exc:
-        return f"database is unavailable for DATABASE_URL={database_url!r}: {exc}"
+        # Database errors may echo connection parameters. Keep only fixed,
+        # actionable categories in pytest output and generated reports.
+        if exc.sqlstate == "28P01":
+            return "database authentication failed"
+        if exc.sqlstate == "3D000":
+            return "configured database does not exist"
+        if exc.sqlstate == "42501":
+            return "database access denied"
+        return "database connection or readiness query failed"
 
     return None
 
@@ -67,7 +75,12 @@ def assessed_rf_run_dir(tmp_path):
     train_random_forest_forecast_model(
         RandomForestForecastConfig(
             dataset=DatasetGenerationConfig(
-                profile="small", days=42, products=8, stores=2, warehouses=2, seed=42,
+                profile="small",
+                days=42,
+                products=8,
+                stores=2,
+                warehouses=2,
+                seed=42,
             ),
             window_days=7,
             horizon_days=7,

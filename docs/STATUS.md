@@ -31,7 +31,6 @@ MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/
 
 ## Punkt wznowienia
 
-Najbliższe poprawki lokalne opisuje [lista przed AI 00](plans/before-ai-00.md):
-bezpieczna diagnostyka testów. [Audyt](audits/open-findings.md) zawiera także
-pozostałe otwarte problemy aplikacji i narzędzi operacyjnych wraz z kryteriami
-weryfikacji.
+Pozostały zakres operacyjny przed rozbudową AI opisują
+[lista przed AI 00](plans/before-ai-00.md) i [otwarte ustalenia](audits/open-findings.md).
+Żadne z nich nie jest formalnym warunkiem rozpoczęcia audytu AI 00.
