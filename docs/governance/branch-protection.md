@@ -45,7 +45,7 @@ bound to the GitHub Actions app.
 
 Do not configure domain workflows as separate required branch protection checks. `Required CI` is the only automatic pull-request and `main` push orchestrator; it invokes the full domain workflows through `workflow_call`. Domain workflows remain manually dispatchable for standalone evidence without duplicating or cancelling Required CI jobs. The stable `required-result` job verifies the expected-versus-actual result of every called workflow.
 
-Optional checks, depending on current sprint scope:
+Domain and manual workflows:
 
 | Workflow | Check | When to require |
 |---|---|---|
@@ -57,7 +57,7 @@ Optional checks, depending on current sprint scope:
 | Terraform Validation CI | `Terraform fmt, init and validate` | Called by Required CI for Terraform/shared/unknown changes. It has read-only repository permissions and no AWS credentials. |
 | IaC Security CI | `TFLint IaC quality gate`, `Checkov IaC security report` | Called by Required CI together with Terraform validation; Checkov is blocking outside documented exceptions. |
 | Kubernetes Policy CI | `Kustomize, schema and policy gates` | Called for Kubernetes/policy/shared/unknown changes; runs Kustomize, Kubeconform, Conftest and Checkov. |
-| Observability CI | `Validate observability assets` | Require once observability assets are in active scope |
+| Observability CI | `Validate observability assets` | Standalone workflow; the Docker Required CI gate separately validates monitoring runtime |
 | Provenance CI | `Build local images and generate provenance attestations` | Require for release branches or signed release candidate evidence, not necessarily every PR |
 | Terraform State and Drift Review | `Guarded dev state and drift review` | Manual-only on main; never required on normal PRs. Uses the configured OIDC role and pinned account; baseline and existing-state drift are distinct modes. |
 
@@ -70,28 +70,4 @@ For every CI-related portfolio claim, collect at least one of the following:
 - downloaded artifact from `ci-cd/reports/**`;
 - screenshot of branch protection settings showing required checks;
 - authenticated API snapshot of branch-protection settings and its capture date;
-- short note in `docs/evidence/index.md` describing what changed and when evidence was refreshed.
-
-## Reviewer checklist
-
-Configuration verified on 2026-09-25:
-
-- [x] `main` is protected in GitHub repository settings.
-- [x] Pull requests are required before merging.
-- [x] Direct pushes, force pushes and branch deletion are disallowed by the active configuration, including for administrators.
-- [x] The only required check context is `required-result` from GitHub Actions.
-- [x] At least one green `Required CI / required-result` run exists.
-- [x] An API snapshot and reviewer-visible note are stored under `docs/evidence/github/` and referenced in the evidence ledger.
-
-These checks record live configuration inspection. No destructive push or
-branch-deletion attempt was made against `main`.
-
-## CV claim guidance
-
-Safe claim after this policy and successful workflow runs:
-
-> Designed and documented GitHub branch protection and required CI checks for a multi-workflow DevSecOps pipeline.
-
-Claim supported by the captured GitHub settings:
-
-> Implemented branch protection on `main` with a stable, always-running required GitHub Actions gate that dispatches full path-aware checks for API, frontend, Docker Compose, data, Terraform, Kubernetes and security changes.
+- short note in `docs/evidence/README.md` describing what changed and when evidence was refreshed.

@@ -1,8 +1,8 @@
 # Versioned application rollback evidence
 
 Published registry release evidence: [v0.2.1, 2026-09-26](2026-09-26-registry.md),
-including verified signatures and a fresh-runner digest-pull rollback. The
-remainder of this page preserves the earlier local drill capture.
+including verified signatures and a fresh-runner digest-pull rollback.
+This page records the separate local ARM64 drill.
 
 Verified locally on 2026-09-25 from clean harness commit
 `977c776ed7cf80ae2229e1522dba8a44e3827a75` using:
@@ -69,12 +69,3 @@ reversibility, broker recovery or rollback of every possible faulty image.
 The Docker Required CI gate runs the same drill with Chromium and retains its
 report/manifests/log and browser failure traces in `docker-compose-ci-evidence`.
 The committed JSON above is the dated local result; it is not a CI capture.
-
-The secret scanner's generic API-key rule initially mistook the two public
-Git-based API image tags in this dated JSON for credentials. The exception in
-`.gitleaks.toml` is assigned only to that rule, this exact evidence path and
-those two literal tag values, using a rule-level allowlist compatible with
-Gitleaks 8.24.3 (the CI action's version) and 8.30.1 (the local version).
-Both versions passed the report and branch-history scans, while rejecting
-both a synthetic GitHub token and a synthetic generic API key inserted into
-the same path. No real credential was used in that test.

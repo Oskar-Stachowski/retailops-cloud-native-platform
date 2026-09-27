@@ -47,4 +47,4 @@ push, force push or deletion test was attempted against `main`.
 The [GitHub branch settings](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/settings/branches)
 are the live source of truth. Re-capture the API response after policy
 changes and update [the policy](../../governance/branch-protection.md) and
-[evidence ledger](../index.md).
+[evidence ledger](../README.md).

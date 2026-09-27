@@ -1,56 +1,32 @@
-# RetailOps Evidence
+# Dowody weryfikacji
 
-This directory contains curated, human-readable evidence for reviewers, recruiters, and production-readiness audits.
+Indeks przeglądany 2026-09-27. Poniżej znajdują się ostatnie zachowane wyniki
+potrzebne do opisania obecnych możliwości projektu. Każdy raport dotyczy
+konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
-It is intentionally separate from `ci-cd/reports/`, which stores raw or semi-raw tool output from CI/CD, Terraform, security scanners, Docker, Jenkins, and local validation commands.
-
-## Structure
-
-| Path | Purpose | Audience |
+| Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| `docs/evidence/index.md` | Main evidence inventory with proof, project area, audience, and validation notes. | Recruiter and technical reviewer |
-| `docs/evidence/api/` | API startup and OpenAPI schema evidence. | Recruiter and technical reviewer |
-| `docs/evidence/aws/` | Curated AWS/Terraform showcase screenshots and cleanup notes. | Recruiter and technical reviewer |
-| `docs/evidence/docker/` | Docker build and Compose smoke evidence. | Recruiter and technical reviewer |
-| `docs/evidence/e2e/` | Browser/API evidence capture instructions and claim boundary. | Recruiter and technical reviewer |
-| `docs/evidence/frontend-api/` | Generated Playwright screenshots from connected frontend pages. | Recruiter and technical reviewer |
-| `docs/evidence/runtime/` | k6 API smoke and Playwright browser smoke evidence against the local Compose stack. | Recruiter and technical reviewer |
-| `docs/evidence/kubernetes/` | Dated local kind runtime, persistence, update/rollback and cleanup results, with curated machine-readable evidence. | Recruiter and technical reviewer |
-| `docs/evidence/security/` | Curated security, SBOM and supply-chain evidence. | Recruiter and technical reviewer |
-| `docs/evidence/ml/` | Local trained ML model evidence, metrics, model card, and artifact checksums. | Recruiter and technical reviewer |
-| `docs/evidence/jenkins/` | Jenkins UI screenshots and release-confidence evidence notes. | Recruiter and technical reviewer |
-| `docs/evidence/gptimages-index.md` | Inventory of generated architecture images and their usage status. | Maintainer |
-| `docs/evidence/gitignore-evidence-policy.md` | Rules for what evidence should be tracked or ignored. | Maintainer |
-| `docs/evidence/evidence-folder-map.md` | Evidence folder map and Mermaid flow diagrams. | Maintainer and reviewer |
-| `docs/evidence/evidence-cleanup-report.md` | Record of the evidence cleanup and remaining risks. | Maintainer |
+| Monitoring | 2026-09-26 | [ARM64/AMD64](observability/2026-09-26-validation.md): próbki, Grafana, pending/firing/resolution alertu; 24 zadania Required CI. |
+| Jenkins | 2026-09-26 | [Rzeczywisty build](jenkins/2026-09-26-validation.md): checkout, lokalne kontrole i izolowana próba runtime; bez cloud deploy. |
+| Kubernetes | 2026-09-26 | [Runtime kind](kubernetes/2026-09-26-runtime.md): NetworkPolicy, jobs, PVC, przeglądarka, restart i rollback. |
+| Terraform/AWS | 2026-09-26 | [State i drift](aws/2026-09-26-state-drift.md): inwentaryzacja i plan, testy lokalnego state, backend S3/KMS bez aktywacji. |
+| Rejestr i wydanie | 2026-09-26 | [GHCR v0.2.1](releases/2026-09-26-registry.md): podpisane SBOM/provenance i rollback po pobraniu digestów na świeżym runnerze. |
+| Odtwarzanie bazy | 2026-09-25 | [Recovery](db/README.md): zawartość i schemat, idempotentne operacje oraz zapis po restore. |
+| Lokalny rollback ARM64 | 2026-09-25 | [Próba wersjonowana](releases/README.md): zachowanie danych przy zgodnym schemacie. |
+| Testy przeglądarkowe | 2026-09-25; także w późniejszych próbach CI | [Macierz E2E](e2e/README.md): siedem ścieżek Chromium i instrukcja opcjonalnych zrzutów. |
+| Zależności i kontrole CI | 2026-09-25 | [Raport kontroli](github-actions/2026-09-25-validation.md): konkretne rewizje, skany i progi. Bieżący zakres pipeline opisuje [CI/CD](../guides/ci-cd.md). |
+| Ochrona main | 2026-09-25 | [Ustawienia GitHub](github/README.md): zapis konfiguracji wymaganych PR i required-result. |
+| Dane demonstracyjne | 2026-09-27 | [Scenariusze](data/scenario-coverage-report.md): wynik kontraktów dla wybranego zestawu danych. |
+| Model Random Forest | 2026-05-13 według metadanych | [Ostatni dostępny artefakt](ml/README.md): punkt odniesienia do ponownej oceny, bez kwalifikacji do wdrożenia. |
 
-## Evidence Flow
+Daty danych uczących nie są datami treningu. Wyniki ML sprzed poprawienia
+protokołu oceny nie stanowią potwierdzenia jakości prognozy z ustalonego origin.
+Aktualne ograniczenia i plan: [ML](../guides/ml.md), [audyt](../audits/open-findings.md).
 
-```mermaid
-flowchart LR
-    DEV[Local validation] --> RAW[ci-cd/reports]
-    CI[GitHub Actions and Jenkins] --> RAW
-    AWS[AWS/Terraform showcase] --> RAW
-    RAW --> CURATED[docs/evidence]
-    GPT[GPTimages] --> DOCS[README, case study, docs]
-    CURATED --> REVIEW[Recruiter and technical review]
-    DOCS --> REVIEW
-```
+Opcjonalne nowe zrzuty można wygenerować do `frontend-api/` według instrukcji
+E2E. Zakres testów opisuje raport, a nie sama obecność obrazu. Zapisuj datę
+i rewizję każdego nowego capture.
 
-## Tracking Rules
-
-- Commit curated screenshots, sanitized summaries, evidence indexes, and small reviewer-facing reports.
-- Keep local logs, coverage XML, generated datasets, raw scanner JSON, Terraform state, binary plans, `.terraform/`, caches, virtualenvs, and `node_modules/` out of Git.
-- Commit raw tool output only when it is deliberately sanitized, small, named as a snapshot, and linked from an evidence index.
-- Do not claim a capability as implemented based only on diagrams or roadmap text. Link to source code, config, CI workflow, test, report, screenshot, or a validation command.
-
-## Entry Points
-
-- Main evidence inventory: `docs/evidence/index.md`
-- Folder map: `docs/evidence/evidence-folder-map.md`
-- Cleanup report: `docs/evidence/evidence-cleanup-report.md`
-- Raw report policy: `ci-cd/reports/README.md`
-
-## Refresh Rule
-
-When a tracked artifact is refreshed, update `docs/evidence/index.md` with the capture date, commit SHA, command, expected outcome, environment, and artifact link so reviewers can check freshness without opening every file.
+Nowe surowe wyniki narzędzi trafiają do ignorowanego `ci-cd/reports/`.
+Sposób promowania małego, oczyszczonego dowodu i aktualizacji tego indeksu:
+[zasady dokumentacji](../guides/documentation.md).

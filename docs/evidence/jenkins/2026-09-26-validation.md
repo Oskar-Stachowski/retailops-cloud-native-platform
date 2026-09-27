@@ -24,13 +24,6 @@ stopped after collecting evidence. It is not a permanently running CI service.
 | Isolated Build, Runtime and Alert Drill | SUCCESS; API/frontend HTTP, streaming, monitoring, real outage and recovery |
 | Archive artifacts | SUCCESS; 8 allowlisted artifacts, fingerprinting enabled |
 
-The earlier first-build attempt exposed missing shell parameter initialization;
-a later attempt exposed the initial rule-evaluation timing assumption. Archive
-review also found a missing SHA in the short summary after build 3;
-this final run explicitly records the checked-out commit, matching both runtime
-reports. Those issues were fixed and checked before this successful run. Failed
-runtime runs also executed scoped cleanup. No earlier failed build is represented as success.
-
 See the [monitoring evidence](../observability/2026-09-26-validation.md) for the
 198.29-second stop-to-firing observation, complete alert transition and recovered
 Grafana query. GitHub tested a synthetic PR merge with the **same Git tree** and
@@ -45,8 +38,7 @@ revision and `DATA_PROFILE=small` on an agent with Git, Make, Python 3.11,
 Node/npm and Docker Compose. Record the actual checkout SHA and final build API
 result. Review the archived commit summary, `isolated-runtime.json` and
 `incident-drill.json`; require `passed`, clean source and successful cleanup.
-Full setup and ownership are in [the CI/CD guide](../../../ci-cd/README.md).
+Full setup and ownership are in [the CI/CD guide](../../guides/ci-cd.md).
 
-The two older PNG screenshots remain unchanged as historical material. This
-snapshot is dated execution evidence, not a screenshot refresh or proof of a
-production Jenkins service, production SLO compliance or alert delivery.
+This snapshot records a dated local execution; it does not prove a production
+Jenkins service, production SLO compliance or alert delivery.

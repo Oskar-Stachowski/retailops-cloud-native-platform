@@ -7,8 +7,8 @@ workflows.
 
 | Path | Purpose |
 | --- | --- |
-| `random-forest-v1/` | Evidence snapshot for the trained demand forecasting RandomForest model. |
+| [random-forest-v1](random-forest-v1/README.md) | Latest retained model artifact; its evaluation has known limitations and requires reassessment before qualification. |
 
-These files are reviewer-facing evidence. They are separate from ignored
-generated outputs under `data/synthetic/` and raw CI output under
-`ci-cd/reports/`.
+These files are reviewer-facing evidence with their original execution dates.
+Raw CI output remains under ignored `ci-cd/reports/`. The `small` dataset is
+versioned; larger generated datasets are ignored. See [data profiles](../../reference/data-profiles.md).

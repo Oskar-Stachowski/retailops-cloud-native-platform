@@ -1,6 +1,6 @@
 # RetailOps scenario coverage report
 
-Generated at: `2026-05-14T07:17:25.739867+00:00`
+Generated at: `2026-09-27T06:57:22.817042+00:00`
 Data directory: `data/demo`
 Status: **PASSED**
 
