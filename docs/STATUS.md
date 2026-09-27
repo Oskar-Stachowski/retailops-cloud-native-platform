@@ -1,9 +1,13 @@
 # Aktualny status RetailOps
 
-Aktualizacja dokumentacji i kodu: **2026-09-27**. Bazowy przegląd audytowy
-odnosił się do `d7e8725bfb517595d2cefda4d6011f2db70b2aed`.
-Ten przegląd nie jest nowym uruchomieniem aplikacji, CI ani audytem konta AWS.
-Daty, rewizje i zakres wykonanych prób podaje [indeks dowodów](evidence/README.md).
+Aktualizacja dokumentacji i kodu: **2026-09-27**. Ostatni
+[audyt przygotowań AI](evidence/pre-ai-00/2026-09-27-readiness.md) obejmuje
+przegląd i 103 testy na `4da25cb` oraz
+[weryfikację izolacji seeda](evidence/pre-ai-00/2026-09-27-seed-isolation.md)
+na kodzie `667f349`: 27 testów bez DB, pięć przebiegów po 10 testów z DB
+i próbę sprzątania po błędzie. Odczytane zielone CI dotyczy `4da25cb`;
+nowsze commity lokalne mają opisaną walidację lokalną. Nie jest to nowy odbiór
+pełnego runtime ani konta AWS. Zakres pozostałych prób: [indeks dowodów](evidence/README.md).
 
 ## Dostępne możliwości
 
@@ -31,6 +35,8 @@ MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/
 
 ## Punkt wznowienia
 
-Pozostały zakres operacyjny przed rozbudową AI opisują
-[lista przed AI 00](plans/before-ai-00.md) i [otwarte ustalenia](audits/open-findings.md).
-Żadne z nich nie jest formalnym warunkiem rozpoczęcia audytu AI 00.
+Można rozpocząć instrukcję **AI 00**; sam etap nadal jest do wykonania.
+Nie ma otwartych prac wymaganych przed jego rozpoczęciem.
+[Lista przed AI 00](plans/before-ai-00.md) i [otwarte ustalenia](audits/open-findings.md)
+przypisują pozostałe warunki do właściwych etapów. Historyczne wersje danych,
+streaming, rzeczywiste auth i serving wymagają ich własnych bramek odbioru.

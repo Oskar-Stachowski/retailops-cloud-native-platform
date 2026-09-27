@@ -23,7 +23,7 @@ Odtwarzać wyszukiwanie wiedzy po zatwierdzonym korpusie Markdown i przedstawia�
 - Sekrety, `.env`, raw transactions, simulation truth, arbitrary URL i ścieżka poza allowlistą są odrzucane. Adversarial corpus jest osobnym fixture testowym i nie trafia do zwykłego indeksu produkcyjnego.
 - Różny wymiar embeddingu, zmiana modelu bez reindex, niekompletny indeks i nieprzechodzący golden set blokują aktywację. Przerwanie joba zostawia stary indeks aktywny. Równoczesne read i swap nie mieszają wersji; rollback odtwarza poprzedni manifest.
 - Recall@k/MRR i citation correctness raportuj na prawdziwych etykietach golden set; fake embeddings dowodzą deterministyczności i działania ścieżek, nie jakości semantycznego wyszukiwania.
-- Pytania „czy EKS jest wdrożony?” lub „czy RF działa w batch?” nie dostają twierdzenia o wdrożeniu na podstawie `specified`; właściwy historyczny dowód mówi, że batch w sprawdzonym commicie korzystał z moving average.
+- Pytania „czy EKS jest wdrożony?” lub „czy RF działa w batch?” wymagają dowodu dla wskazanej rewizji, nie statusu `specified`. Obecny batch RF jest zweryfikowany diagnostycznie offline i zachowuje `rejected`; nie dowodzi serving ani wdrożenia EKS. Historyczna odpowiedź dla rewizji sprzed migracji batcha może wskazywać moving average, ale nie może zastąpić aktualnego stanu.
 - Prompt injection w źródle nie może zmienić narzędzi, roli ani limitów; cache i retrieval nie ujawniają dokumentu niedozwolonego dla principal.
 
 ## Artefakty i Definition of Done

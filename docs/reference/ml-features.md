@@ -38,6 +38,13 @@ metadanym wykonania, nie dowodem dostępności źródła w historycznym origin.
 `observation_available_at` jest metadanym dostępności etykiety, nie cechą RF.
 Manifest wymienia pola wejściowe, etykiety i metadane dostępności osobno.
 
+Agregat zachowuje tylko najnowszą sumę i jej dostępność, bez wcześniejszych
+wersji. Spóźniona sprzedaż historycznego dnia może przez to usunąć wcześniej
+znaną obserwację z cech starego origin. Obecna ocena syntetyczna ma ingestie
+w tym samym dniu; nie potwierdza odtwarzania historii z późniejszymi korektami.
+To otwarte ograniczenie [ML-07](../audits/open-findings.md), do usunięcia
+przed odbiorem takiej historii w AI 02–04.
+
 Wiersz powstaje wyłącznie z jawnego rekordu sprzedaży połączonego z zamówieniem.
 Suma `quantity=0` daje `observation_status=observed_zero`; dodatnia suma daje
 `observed_positive`. Brak rekordu nie tworzy wiersza o zerowym targetcie, a brak

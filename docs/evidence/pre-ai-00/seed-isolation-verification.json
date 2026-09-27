@@ -1,0 +1,107 @@
+{
+  "code_commit": "667f3494c9f69f4fee3283aca577c408e89fa545",
+  "integration_executed_at_utc": "2026-09-27T15:10:42.512139+00:00",
+  "environment": {
+    "python": "3.11.15",
+    "platform": "macOS arm64",
+    "pytest": "9.0.3",
+    "postgres_local_image_id": "sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50"
+  },
+  "source_sha256": {
+    "services/api/tests/test_seed_data.py": "10d803ff48d0ab441351e1ccde8cc336bd8f0ddbeb3687a353eb9e97ddaeab8d",
+    "services/api/tests/test_seed_database_isolation.py": "1e98710938f817dd6284066d3211d5d6cb553d7c1eef1201d45e3b1c4b360adf"
+  },
+  "source_database_sha256_before_and_after": "913144961ced0250d8e32d83be6b902ac3d824c0bdaffc6a3cdefd2cbfa5791f",
+  "source_database_checksum_method": "pg_dump --no-owner --no-privileges; omit generated restrict/unrestrict lines; SHA256 of schema and data",
+  "tracked_demo_files_verified_unchanged": 19,
+  "test_results": {
+    "duplicate-encoded": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "encoded-options": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "intentional-failure": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "plain": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "query-repeat": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "query": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "unit": {
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "integration_cases": [
+    {
+      "case": "plain",
+      "exit_code": 0,
+      "source_database_unchanged": true,
+      "tracked_demo_unchanged": true,
+      "temporary_databases_remaining": 0
+    },
+    {
+      "case": "query",
+      "exit_code": 0,
+      "source_database_unchanged": true,
+      "tracked_demo_unchanged": true,
+      "temporary_databases_remaining": 0
+    },
+    {
+      "case": "query-repeat",
+      "exit_code": 0,
+      "source_database_unchanged": true,
+      "tracked_demo_unchanged": true,
+      "temporary_databases_remaining": 0
+    },
+    {
+      "case": "duplicate-encoded",
+      "exit_code": 0,
+      "source_database_unchanged": true,
+      "tracked_demo_unchanged": true,
+      "temporary_databases_remaining": 0
+    },
+    {
+      "case": "encoded-options",
+      "exit_code": 0,
+      "source_database_unchanged": true,
+      "tracked_demo_unchanged": true,
+      "temporary_databases_remaining": 0
+    },
+    {
+      "case": "intentional-failure",
+      "expected_exit_code": 1,
+      "source_database_unchanged": true,
+      "tracked_demo_unchanged": true,
+      "temporary_databases_remaining": 0
+    }
+  ],
+  "task_postgres_container_removed": true,
+  "developer_database_used": false
+}
