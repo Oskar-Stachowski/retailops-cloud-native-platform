@@ -12,8 +12,6 @@ ustaleń poniżej.
 
 ## Poprawki zalecane przed intensywnym testowaniem
 
-- [ ] **OPS-04: izolacja testów seeda** — katalog tymczasowy i osobna baza,
-  bez modyfikowania danych projektu ani bazy deweloperskiej.
 - [ ] **OPS-05: bezpieczna diagnostyka** — brak haseł i pełnego `DATABASE_URL`
   w komunikatach oraz raportach testów.
 
