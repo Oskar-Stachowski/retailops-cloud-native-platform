@@ -142,7 +142,10 @@ pokazuje zapisane identyfikatory i sumy.
   `candidate` ani `approved`.
 - `api_forecasts.csv` jest plikiem zgodnym kształtem z rekordami prognoz API.
   Moduł batch nie zapisuje go automatycznie do PostgreSQL. Dane prognoz seed/API
-  i artefakt zapisany przez batch mają osobne ścieżki zasilania.
+  i artefakt zapisany przez batch mają osobne ścieżki zasilania. Obecny schemat
+  bazy nie dopuszcza metody RF w ograniczeniu tabeli `forecasts`; import tych
+  prognoz wymaga osobnej migracji i procedury wdrożenia obejmującej zmianę
+  schematu. Nie jest częścią lokalnej ścieżki oceny odrzuconego modelu.
 - Pole `confidence_level` w eksporcie batch jest heurystyką liczby obserwacji,
   nie skalibrowanym prawdopodobieństwem ani przedziałem predykcji.
 - Plik `.prom` nie oznacza zbierania tych metryk przez działający Prometheus.
