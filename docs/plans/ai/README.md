@@ -1,10 +1,12 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: po audycie 00; następny etap 01. Aktualizacja: 27.09.2026.**
+**Status: etap 01 w realizacji. Aktualizacja: 27.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
-[Backlog](backlog.md) podaje otwarte warunki oraz pierwsze małe PR-y 01/02.
-Etapy 01–17 opisują rozwój do wdrożenia; nie potwierdzają istnienia nowych
-komponentów ani zatwierdzenia kosztów lub infrastruktury.
+[Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
+pakiet, settings, CLI, lockfile i lokalne kontrole. Następny zakres to bazowy serwis HTTP.
+[Backlog](backlog.md) podaje pozostałą pracę 01 i pierwszy mały PR 02.
+Pozostała część 01 oraz etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
+istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.
 
@@ -12,7 +14,7 @@ Czytaj kolejno tę mapę, [architekturę](architektura.md) i plik właściwego [
 
 ## Cel i podział pracy
 
-**RetailOps** pozostaje właścicielem danych operacyjnych, generatora, API i interfejsu sklepowego. **RetailOps AI Intelligence** będzie osobnym repozytorium i serwisem odpowiedzialnym za przetwarzanie danych, modele, predykcje, RAG i agenta. Repozytoria komunikują się przez wersjonowane pliki, API i zdarzenia; mają oddzielne bazy danych.
+**RetailOps** pozostaje właścicielem danych operacyjnych, generatora, API i interfejsu sklepowego. **RetailOps AI Intelligence** ma osobne lokalne repozytorium z fundamentem pakietu. Docelowy serwis będzie odpowiedzialny za przetwarzanie danych, modele, predykcje, RAG i agenta. Repozytoria komunikują się przez wersjonowane pliki, API i zdarzenia; mają oddzielne bazy danych.
 
 Efektem końcowym będzie system, który prognozuje sprzedaż, wykrywa anomalie, ocenia ryzyko braku zapasu oraz wyjaśnia wyniki przy pomocy agenta korzystającego z danych i cytowanych dokumentów. Całość ma mieć powtarzalne eksperymenty, kontrolowane wdrożenia, monitoring, rollback i dowody działania.
 

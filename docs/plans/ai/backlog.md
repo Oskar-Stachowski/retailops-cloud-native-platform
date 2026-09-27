@@ -1,38 +1,42 @@
 # Najbliższe prace po audycie AI 00
 
 Baza: [pomiary na `cbf28b2`](../../evidence/ai/00/README.md), 27.09.2026.
-**Następny etap: [01 — fundament](etapy/01-fundament-projektu.md).**
+**Etap 01 w realizacji; następny zakres: bazowy serwis HTTP.**
+[Fundament repo i pakietu](../../evidence/ai/01/README.md) istnieje w osobnym
+lokalnym repo `retailops-ai-intelligence`.
 Ten plik zawiera otwartą pracę, a [audyt](../../audits/open-findings.md)
-dowody błędów i kryteria ich zamknięcia. Etapy 01–17 pozostają do implementacji;
+dowody błędów i kryteria ich zamknięcia. Etap 01 pozostaje częściowy, 02–17 są planowane;
 brak nowej funkcji z planu nie jest sam w sobie błędem istniejącego demo.
 
-## Pierwszy mały PR etapu 01
+## Następny mały PR etapu 01
 
-**Repo:** osobne `retailops-ai-intelligence`; najpierw ustalić lokalizację albo utworzyć
-lokalny projekt. Odczyt oczekiwanego repo zwrócił 404, nie znaleziono checkoutu obok RetailOps.
+**Repo:** osobne `retailops-ai-intelligence` obok RetailOps, branch
+`ai/implementation`. Kod fundamentu: `e03d7df`; uzupełnione dowody: `5da5fdc`.
+Bieżące możliwości opisuje `docs/STATUS.md` w repo AI. Repo pozostaje lokalne;
+publikacja, zdalne CI i ochrona gałęzi wymagają osobnego wykonania.
 
-Zakres: ADR granic i pierwszego wariantu forecast-only, importowalny pakiet
-`src/retailops_ai`, jedna wspierana wersja Python i jeden manager z lockfile,
-typed settings, minimalne CLI oraz CI lint/type/package/test/secret scan.
-Wersję Python wybrać po sprawdzeniu kompatybilności z planowanym środowiskiem
-scikit-learn i TensorFlow. README/status opisują rzeczywiście dostępny zakres.
-Generator, frontend i operacyjna baza pozostają własnością RetailOps.
+Zakres: rzeczywisty serwis `GET /health`, `/ready`, `/version`, `/metrics`.
+Przy implementacji wydziel API/domenę/adapters/pipelines w istniejącym pakiecie,
+wykorzystując jego settings, CLI i lockfile.
 
 **Odbiór tego PR:**
 
-- Czysty checkout i instalacja z lockfile dają import pakietu oraz działające CLI
-  z `--help`; brak konfiguracji daje kontrolowany błąd bez sekretów.
-- ADR wskazuje source ownership, oddzielne persistence AI/MLflow, pierwszy handoff
-  przez pliki i target `observed_sales_units`; nie wymaga inventory ani brokera.
-- CI uruchamia kontrole nowego pakietu; celowo błędny kontrakt/test blokuje wynik.
-  Zewnętrzne actions są przypięte do SHA (OPS-06 stosowane od początku nowego repo).
-- Bezpieczne `.env.example`, zasady PR/security i decyzja licencji są jawne;
-  nie ma pozornych komend treningu, endpointów predykcyjnych ani deploy.
+- Health potwierdza działający proces, a readiness sprawdza wymagane zależności
+  konkretnej roli i pogarsza się przy ich awarii. Opcjonalny LLM nie blokuje
+  funkcji ML, które go nie wymagają.
+- Logi JSON, correlation ID, propagacja trace i wspólny kontrakt błędów mają
+  testy; błędne wejścia nie ujawniają sekretów ani wartości konfiguracji.
+- Version zwraca bezpieczne metadane wersji, metryki mają określoną granicę
+  dostępu, a sposób nasłuchiwania i uprawnienia endpointów są jawne.
+- Testy HTTP i provider fakes nie wymagają AWS. Istniejące CI obejmuje nowy kod.
+  Dokumentacja opisuje faktycznie dostępne funkcje serwisu.
 
-Pozostała część **tego samego etapu 01**: health/ready/version/metrics, correlation
-i error contract, jawne migracje, AI Postgres/MLflow, lokalny Compose z persistence,
-wykonywalne wersje kontraktów, auth dla własnych endpointów oraz próby restartu/awarii DB.
-Pierwszy mały PR nie jest odbiorem całego etapu 01.
+Pozostała część **tego samego etapu 01**: jawne migracje, oddzielne persistence
+AI Postgres/MLflow, lokalny Compose z wolumenami i próbami restartu/awarii DB,
+wykonywalne wersje kontraktów danych oraz auth dla własnych endpointów.
+Po publikacji repo należy wykonać zdalne CI i ustawić ochronę gałęzi z wymaganym
+`required-result`; lokalna walidacja workflow nie potwierdza tych ustawień.
+Odbiór fundamentu pakietu nie jest odbiorem całego etapu 01.
 
 ## Pierwszy mały PR etapu 02
 

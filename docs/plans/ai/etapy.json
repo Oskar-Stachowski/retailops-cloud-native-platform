@@ -22,7 +22,12 @@
         "00"
       ],
       "path": "etapy/01-fundament-projektu.md",
-      "status": "planned"
+      "status": "in_progress",
+      "evidence": "../../evidence/ai/01/README.md",
+      "implementation_repository": "retailops-ai-intelligence",
+      "implementation_commit": "e03d7df5200f75526a2e7c711bf502ddce97dd9a",
+      "evidence_commit": "5da5fdc04e8e44510a489c0f0cc45557cf87e15d",
+      "next_scope": "Bazowy serwis HTTP i warstwy aplikacji; następnie persistence, Compose, kontrakty i zdalne CI."
     },
     {
       "id": "02",
