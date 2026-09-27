@@ -3,10 +3,14 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+from collections.abc import Iterator
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
+from uuid import uuid4
 
 import psycopg
 import pytest
+from psycopg import sql
 
 API_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = API_ROOT.parents[1]
@@ -27,9 +31,17 @@ EXPECTED_CSV_FILES = [f"{table_name}.csv" for table_name in EXPECTED_ROW_COUNTS]
 pytestmark = pytest.mark.integration_db
 
 
-def run_generator() -> None:
+def run_generator(data_dir: Path) -> None:
     subprocess.run(  # noqa: S603 - command uses fixed Python executable arguments
-        [sys.executable, "-m", "data.generator.main"],
+        [
+            sys.executable,
+            "-m",
+            "data.generator.main",
+            "--profile",
+            "demo",
+            "--output-dir",
+            str(data_dir),
+        ],
         cwd=REPO_ROOT,
         shell=False,
         check=True,
@@ -38,13 +50,32 @@ def run_generator() -> None:
     )
 
 
-def run_seed(database_url: str) -> None:
+def _api_env(database_url: str) -> dict[str, str]:
     env = os.environ.copy()
     env["DATABASE_URL"] = database_url
-    env["RETAILOPS_DEMO_DATA_DIR"] = str(REPO_ROOT / "data" / "demo")
     env["PYTHONPATH"] = os.pathsep.join(
         str(path) for path in (API_ROOT, REPO_ROOT, env.get("PYTHONPATH")) if path
     )
+    return env
+
+
+def run_migrations(database_url: str) -> None:
+    subprocess.run(  # noqa: S603 - command uses fixed Python executable arguments
+        [sys.executable, "-m", "alembic", "upgrade", "head"],
+        cwd=API_ROOT,
+        env=_api_env(database_url),
+        shell=False,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+
+
+def run_seed(database_url: str, data_dir: Path) -> None:
+    env = _api_env(database_url)
+    env["RETAILOPS_SEED_DATA_PROFILE"] = "demo"
+    env["RETAILOPS_SEED_DATA_DIR"] = str(data_dir)
+    env.pop("RETAILOPS_DEMO_DATA_DIR", None)
 
     subprocess.run(  # noqa: S603 - command uses fixed Python executable arguments
         [sys.executable, "scripts/seed_demo_data.py"],
@@ -58,9 +89,38 @@ def run_seed(database_url: str) -> None:
 
 
 @pytest.fixture(scope="module", autouse=True)
-def prepared_demo_dataset(database_url: str) -> None:
-    run_generator()
-    run_seed(database_url)
+def prepared_demo_dataset(database_url: str, tmp_path_factory: pytest.TempPathFactory) -> Path:
+    data_dir = tmp_path_factory.mktemp("seed-demo")
+    run_generator(data_dir)
+    run_migrations(database_url)
+    run_seed(database_url, data_dir)
+    return data_dir
+
+
+@pytest.fixture(scope="module")
+def database_url() -> Iterator[str]:
+    source_url = os.getenv("DATABASE_URL")
+    if not source_url:
+        pytest.fail("DATABASE_URL is required to create an isolated seed test database")
+
+    parsed = urlsplit(source_url)
+    if parsed.scheme != "postgresql":
+        pytest.fail("Seed tests require a PostgreSQL URL")
+
+    name = f"retailops_seed_test_{uuid4().hex}"
+    maintenance_url = urlunsplit(parsed._replace(path="/postgres"))
+    isolated_url = urlunsplit(parsed._replace(path=f"/{name}"))
+
+    with psycopg.connect(maintenance_url, autocommit=True) as connection:
+        connection.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
+
+    try:
+        yield isolated_url
+    finally:
+        with psycopg.connect(maintenance_url, autocommit=True) as connection:
+            connection.execute(
+                sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name))
+            )
 
 
 def fetch_one(database_url: str, query: str, params: tuple = ()):
@@ -75,17 +135,15 @@ def fetch_all(database_url: str, query: str, params: tuple = ()):
         return cur.fetchall()
 
 
-def test_generator_produces_expected_csv_files() -> None:
-    data_dir = REPO_ROOT / "data" / "demo"
-
+def test_generator_produces_expected_csv_files(prepared_demo_dataset: Path) -> None:
     for filename in EXPECTED_CSV_FILES:
-        csv_path = data_dir / filename
+        csv_path = prepared_demo_dataset / filename
         assert csv_path.exists(), f"Missing generated CSV file: {csv_path}"
         assert csv_path.read_text(encoding="utf-8").splitlines()[0]
 
 
-def test_seed_script_is_idempotent(database_url: str) -> None:
-    run_seed(database_url)
+def test_seed_script_is_idempotent(database_url: str, prepared_demo_dataset: Path) -> None:
+    run_seed(database_url, prepared_demo_dataset)
     first_counts = {
         table_name: fetch_one(
             database_url,
@@ -94,7 +152,7 @@ def test_seed_script_is_idempotent(database_url: str) -> None:
         for table_name in EXPECTED_ROW_COUNTS
     }
 
-    run_seed(database_url)
+    run_seed(database_url, prepared_demo_dataset)
     second_counts = {
         table_name: fetch_one(
             database_url,

@@ -26,18 +26,6 @@ zapisie do mechanizmu odtwarzania błędów. Testy rzeczywistego brokera obejmuj
 błędny payload, awarię DB/handlera, restart, ponowienie i deduplikację; wykazują
 brak utraty zdarzenia.
 
-### OPS-04 · P2 · Test seeda zapisuje do danych projektu
-
-**Dowód:** automatyczna fixture w
-[test_seed_data.py](../../services/api/tests/test_seed_data.py) uruchamia
-generator bez `--output-dir`, a potem odczytuje `data/demo` i seeduje wskazane
-`DATABASE_URL`. [Generator](../../data/generator/main.py) używa domyślnie
-śledzonego katalogu `data/demo`. Test nie izoluje wyjścia generatora.
-
-**Kryterium zamknięcia:** generator pracuje w katalogu tymczasowym, seed
-korzysta z tego samego katalogu i izolowanej bazy. Powtórne uruchomienie oraz
-błąd testu nie zmieniają śledzonych danych ani bazy deweloperskiej.
-
 ### OPS-05 · P2 · Diagnostyka testów może ujawnić hasło do bazy
 
 **Dowód:** `_db_unavailable_reason` w
