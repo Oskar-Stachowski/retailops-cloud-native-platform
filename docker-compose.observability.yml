@@ -14,9 +14,6 @@ services:
   migrate:
     profiles: ["observability"]
 
-  seed:
-    profiles: ["observability"]
-
   api:
     profiles: ["observability"]
 
