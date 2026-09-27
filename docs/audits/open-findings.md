@@ -11,20 +11,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 
 ## Runtime i bezpieczeństwo
 
-### OPS-02 · P1 · Demo auth jest połączone z domyślnym nasłuchem na wszystkich interfejsach
-
-**Dowód:** [model użytkowników](../../services/api/app/auth/roles.py) wybiera
-tożsamość na podstawie `user_id`, a bez niego `platform-admin`.
-[Compose](../../docker-compose.yml) publikuje porty API i frontendu z
-`HOST_BIND` domyślnie równym `0.0.0.0`. Dostępny klient może wybrać rolę
-administratora; to nie jest uwierzytelnienie rzeczywistego użytkownika.
-
-**Kryterium zamknięcia dla lokalnego demo:** domyślny bind do loopback i
-technicznie egzekwowana granica lokalnego dostępu. Przed udostępnieniem innym
-użytkownikom wymagane jest rzeczywiste uwierzytelnienie, walidacja tożsamości,
-domyślna odmowa oraz testy 401/403 i dozwolonych operacji. Do czasu poprawki
-lokalne uruchomienie wymaga `HOST_BIND=127.0.0.1`.
-
 ### OPS-03 · P1 · Consumer zatwierdza offset także po błędzie przetwarzania
 
 **Dowód:** `_handle_message` w

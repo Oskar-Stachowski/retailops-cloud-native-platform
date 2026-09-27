@@ -665,6 +665,7 @@ docker-build:
 
 compose-config:
 	$(COMPOSE) config
+	COMPOSE="$(COMPOSE)" python3 scripts/ci/check_compose_local_boundary.py
 
 compose-profile-config: ensure-reports-dir
 	@for profile in $(COMPOSE_PROFILE_SET); do \
@@ -761,6 +762,10 @@ compose-ci-internal: ensure-reports-dir
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Starting full RetailOps stack..."; \
 		RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up -d || status=$$?; \
+	fi; \
+	if [[ $$status -eq 0 ]]; then \
+		echo "[compose-ci] Checking actual published host addresses..."; \
+		COMPOSE="$(COMPOSE)" COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) python3 scripts/ci/check_compose_local_boundary.py --runtime || status=$$?; \
 	fi; \
 	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Explicitly loading disposable demo data..."; \

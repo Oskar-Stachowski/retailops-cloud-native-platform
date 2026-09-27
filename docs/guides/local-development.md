@@ -15,9 +15,10 @@ Utwórz lokalną konfigurację, jeśli `.env` jeszcze nie istnieje:
 cp .env.example .env
 ```
 
-W `.env` ustaw `HOST_BIND=127.0.0.1`, aby porty usług były dostępne
-tylko na tym komputerze. Na pierwsze uruchomienie wybierz
-`RETAILOPS_SEED_DATA_PROFILE=demo`, korzystający z małego zestawu w repozytorium. Plik przykładowy zawiera lokalne dane demonstracyjne;
+Compose przypina wszystkie publikowane porty do `127.0.0.1`; zmiana
+`HOST_BIND` w `.env` nie wystawia ich na inne interfejsy. Na pierwsze
+uruchomienie wybierz `RETAILOPS_SEED_DATA_PROFILE=demo`, korzystający z małego
+zestawu w repozytorium. Plik przykładowy zawiera lokalne dane demonstracyjne;
 nie służy do konfiguracji publicznego środowiska.
 
 ```bash
@@ -53,6 +54,19 @@ więc jego ponowne wykonanie usuwa wcześniejsze zmiany w tych danych.
 
 Porty i lokalne dane logowania są konfigurowane przez `.env`. Przy jego
 niezmienionych wartościach przykładowych Grafana używa `admin` / `retailops`.
+Przełączanie użytkowników w panelu służy wyłącznie do demonstracji uprawnień,
+nie potwierdza tożsamości. Tego Compose nie używaj do udostępniania aplikacji
+innym użytkownikom; opis granicy znajduje się w [instrukcji bezpieczeństwa](../security/demo-auth-boundary.md).
+
+Przed startem można sprawdzić wszystkie profile i nakładkę monitoringu:
+
+```bash
+make compose-config
+```
+
+Kontrola odrzuca każdy port publikowany poza loopback, także przy próbie
+`HOST_BIND=0.0.0.0`. `make compose-ci` sprawdza również adresy faktycznie
+opublikowanych portów w izolowanym uruchomieniu.
 
 ## Sprawdzenie i codzienna obsługa
 

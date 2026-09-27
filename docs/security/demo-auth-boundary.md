@@ -12,6 +12,7 @@ This is intentional portfolio scaffolding, not production authentication.
 - Explicit permissions such as `workflow:write` and `notifications:write`.
 - FastAPI checks that block unauthorized demo users from selected workflow and notification mutations.
 - Identity endpoints that expose the local mock boundary through `GET /me` and `GET /me/permissions`.
+- Local Docker Compose publishes frontend, API, database, broker and monitoring ports only on `127.0.0.1`. The bind address is fixed in Compose, including its observability overlay, and checked in CI.
 
 ## What does not exist yet
 
@@ -23,6 +24,12 @@ This is intentional portfolio scaffolding, not production authentication.
 - Production RBAC or ABAC policy engine.
 - Tenant isolation.
 - IAM integration.
+
+The demo identity can be selected by `user_id`; without a selection the API
+uses `platform-admin`. Anyone who can reach the local API can therefore act as
+that demo user. Do not forward these ports or use this Compose stack on a shared
+host. Before any deployment reachable by other users, add verified identity,
+default-deny authorization and tests for 401, 403 and permitted operations.
 
 ## Safe wording
 
@@ -46,6 +53,8 @@ Unsafe wording:
 ## Validation
 
 ```bash
+make compose-config
+make compose-ci
 cd services/api
 PYTHONPATH=. pytest tests/test_demo_auth_boundary_readiness.py tests/test_notifications_api.py
 ```

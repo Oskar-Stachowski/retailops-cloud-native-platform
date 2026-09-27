@@ -23,8 +23,8 @@ Daty, rewizje i zakres wykonanych prób podaje [indeks dowodów](evidence/README
 ## Zakres użycia
 
 Projekt służy do lokalnego demo i weryfikacji praktyk DevOps. Przełączanie
-`user_id` nie jest uwierzytelnianiem. Przy uruchamianiu używaj loopback zgodnie
-z [instrukcją](guides/local-development.md).
+`user_id` nie jest uwierzytelnianiem. Lokalny Compose przypina publikowane
+porty do loopback zgodnie z [instrukcją](guides/local-development.md).
 
 Nie ma potwierdzonego produkcyjnego wdrożenia AWS/EKS, produkcyjnego model serving,
 MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/ai/README.md).
@@ -32,6 +32,6 @@ MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/
 ## Punkt wznowienia
 
 Najbliższe poprawki lokalne opisuje [lista przed AI 00](plans/before-ai-00.md):
-granica demo auth, izolacja testów seeda i bezpieczna
-diagnostyka. [Audyt](audits/open-findings.md) zawiera także pozostałe otwarte
-problemy aplikacji i narzędzi operacyjnych wraz z kryteriami weryfikacji.
+izolacja testów seeda i bezpieczna diagnostyka. [Audyt](audits/open-findings.md)
+zawiera także pozostałe otwarte problemy aplikacji i narzędzi operacyjnych wraz
+z kryteriami weryfikacji.

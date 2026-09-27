@@ -2,21 +2,22 @@
 #
 # This Docker Compose file is intended for local development, portfolio demos,
 # and CI smoke validation only. It intentionally exposes service ports on the
-# host and uses simple default credentials to keep the local setup reproducible.
+# host loopback and uses simple default credentials to keep the local setup reproducible.
 #
 # Image tags in this local stack are intentionally pinned to explicit versions,
 # not digests. For production-style delivery, prefer digest-pinned images in
 # deployment manifests and CI promotion steps.
 #
 # Do not use this file as a production deployment template.
-# Non-local environments must override APP_ENV and inject credentials through
-# a secret manager or protected CI/CD environment variables.
+# Non-local environments require a separate deployment configuration with real
+# authentication and secrets from a secret manager.
 
 # Local-only host port exposure
 # -----------------------------
-# The services below publish ports to the host so a reviewer can run and inspect
-# the full platform locally: frontend, API, PostgreSQL, Redpanda, Prometheus,
-# and Grafana.
+# The services below publish ports only on 127.0.0.1 so a reviewer can run and
+# inspect the full platform locally: frontend, API, PostgreSQL, Redpanda,
+# Prometheus, and Grafana. This address is intentionally not configurable here:
+# demo user selection is not authentication.
 #
 # This is not a production networking model.
 #
@@ -34,7 +35,7 @@ services:
       context: ./frontend
     image: ${FRONTEND_IMAGE:-retailops-frontend:0.1.0}
     ports:
-      - "${HOST_BIND:-0.0.0.0}:${FRONTEND_PORT:-3000}:8080"
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:8080"
     depends_on:
       api:
         condition: service_healthy
@@ -45,7 +46,7 @@ services:
       context: ./services/api
     image: ${API_IMAGE:-retailops-api:0.1.0}
     ports:
-      - "${HOST_BIND:-0.0.0.0}:${API_PORT:-8000}:8000"
+      - "127.0.0.1:${API_PORT:-8000}:8000"
     environment:
       APP_ENV: ${APP_ENV:-local}
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
@@ -64,7 +65,7 @@ services:
       - --web.console.libraries=/usr/share/prometheus/console_libraries
       - --web.console.templates=/usr/share/prometheus/consoles
     ports:
-      - "${HOST_BIND:-0.0.0.0}:${PROMETHEUS_PORT:-9090}:9090"
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./observability/prometheus/rules:/etc/prometheus/rules:ro
@@ -91,7 +92,7 @@ services:
     profiles: ["observability"]
     image: grafana/grafana:12.4.3
     ports:
-      - "${HOST_BIND:-0.0.0.0}:${GRAFANA_PORT:-3001}:3000"
+      - "127.0.0.1:${GRAFANA_PORT:-3001}:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-retailops}
@@ -144,8 +145,8 @@ services:
       - --mode
       - dev-container
     ports:
-      - "${HOST_BIND:-0.0.0.0}:${REDPANDA_KAFKA_PORT:-19092}:19092"
-      - "${HOST_BIND:-0.0.0.0}:${REDPANDA_ADMIN_PORT:-19644}:9644"
+      - "127.0.0.1:${REDPANDA_KAFKA_PORT:-19092}:19092"
+      - "127.0.0.1:${REDPANDA_ADMIN_PORT:-19644}:9644"
     volumes:
       - redpanda_data:/var/lib/redpanda/data
     healthcheck:
@@ -217,7 +218,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-retailops}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-retailops}
     ports:
-      - "${HOST_BIND:-0.0.0.0}:${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
