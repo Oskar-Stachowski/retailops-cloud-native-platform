@@ -6,7 +6,8 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| Gotowość do AI 00 | 2026-09-27 | [Audyt przygotowań](pre-ai-00/2026-09-27-readiness.md): 103 testy, integralność RF i CI rewizji `4da25cb`; [izolacja seeda](pre-ai-00/2026-09-27-seed-isolation.md) na kodzie `667f349`: 27 testów, pięć przebiegów DB i sprzątanie po błędzie. Brak otwartych warunków przed rozpoczęciem AI 00. |
+| Audyt AI 00 | 2026-09-27 | [Stan wyjściowy `cbf28b2`](ai/00/README.md): dwa `small`, kontrast 100/20, dane/ML/event/API, 138 testów, RF reload i CI źródłowego SHA. Następny etap 01; źródło wymaga poprawek w 02. |
+| Izolacja seeda | 2026-09-27 | [Próby PostgreSQL](pre-ai-00/2026-09-27-seed-isolation.md) na kodzie `667f349`: 27 testów bez DB, pięć przebiegów DB i sprzątanie po błędzie; osobny zakres wobec audytu AI 00. |
 | Monitoring | 2026-09-26 | [ARM64/AMD64](observability/2026-09-26-validation.md): próbki, Grafana, pending/firing/resolution alertu; 24 zadania Required CI. |
 | Jenkins | 2026-09-26 | [Rzeczywisty build](jenkins/2026-09-26-validation.md): checkout, lokalne kontrole i izolowana próba runtime; bez cloud deploy. |
 | Kubernetes | 2026-09-26 | [Runtime kind](kubernetes/2026-09-26-runtime.md): NetworkPolicy, jobs, PVC, przeglądarka, restart i rollback. |

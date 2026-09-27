@@ -1,0 +1,44 @@
+{
+  "observed_at_utc": "2026-09-27T15:45:42.949893+00:00",
+  "packages": {
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "evidence_checksums_verified": 12,
+  "runs": [
+    {
+      "run_id": "4d88f7e8e1334360afc0d662b1375b68",
+      "training_source_commit": "97a4aa6c899fe7c9eb77cb057608a265b06ff980",
+      "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+      "status": "rejected",
+      "panel_rows": 9000,
+      "prediction_rows": 2800,
+      "artifact_count": 9,
+      "model_roundtrip_verified": true
+    },
+    {
+      "run_id": "fa1ca9c081db41e1b2d5788d757b7272",
+      "training_source_commit": "97a4aa6c899fe7c9eb77cb057608a265b06ff980",
+      "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+      "status": "rejected",
+      "panel_rows": 9000,
+      "prediction_rows": 2800,
+      "artifact_count": 9,
+      "model_roundtrip_verified": true
+    }
+  ],
+  "scope": "reload and diagnostic batch, no training, no publication or API/database writes",
+  "batch": {
+    "rows": 700,
+    "model_ids": [
+      "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab"
+    ],
+    "run_ids": [
+      "4d88f7e8e1334360afc0d662b1375b68"
+    ],
+    "saved_manifest_identity_matches": true,
+    "status": "rejected"
+  }
+}

@@ -1,0 +1,453 @@
+{
+  "events": {
+    "count": 49856,
+    "by_type": {
+      "alert_created": 20,
+      "anomaly_detected": 20,
+      "forecast_generated": 350,
+      "inventory_snapshot_recorded": 1300,
+      "order_created": 9000,
+      "price_changed": 300,
+      "promotion_ended": 100,
+      "promotion_started": 100,
+      "replenishment_completed": 100,
+      "return_completed": 2388,
+      "sale_completed": 17429,
+      "stock_changed": 18729,
+      "workflow_action_performed": 20
+    },
+    "generator_consumer_routing_equal": true,
+    "consumer_accepted_envelopes": 49856,
+    "types_missing_from_registry": [
+      "replenishment_completed",
+      "return_completed"
+    ],
+    "emitted_topics_missing_from_registry": [
+      "retailops.intelligence.v1"
+    ],
+    "registry_topics_not_emitted": [
+      "retailops.ml.v1",
+      "retailops.orders.v1"
+    ],
+    "compose_topics": [
+      "retailops.dlq.v1",
+      "retailops.intelligence.v1",
+      "retailops.inventory.v1",
+      "retailops.operations.v1",
+      "retailops.pricing.v1",
+      "retailops.sales.v1"
+    ],
+    "emitted_topics_not_initialized": [],
+    "malformed_envelopes_accepted": {
+      "missing_topic": true,
+      "wrong_topic": true,
+      "unsupported_version": true,
+      "empty_payload": true
+    },
+    "reused_ids_with_changed_payload_100_vs_20": 8501,
+    "changed_payload_types": {
+      "forecast_generated": 133,
+      "inventory_snapshot_recorded": 247,
+      "order_created": 1800,
+      "replenishment_completed": 19,
+      "return_completed": 108,
+      "sale_completed": 2973,
+      "stock_changed": 3221
+    },
+    "id_scope_note": "Separate generated snapshots, not duplicates within one snapshot; IDs lack snapshot/version scope."
+  },
+  "ack_failure_probes": {
+    "invalid_json": {
+      "synchronous_commits": 1,
+      "record_event_log_attempts": 0,
+      "failed_events": 0,
+      "dead_letter_counter": 0,
+      "database_is_mock": true,
+      "durability_verified": false
+    },
+    "handler_failure": {
+      "synchronous_commits": 1,
+      "record_event_log_attempts": 2,
+      "failed_events": 1,
+      "dead_letter_counter": 1,
+      "database_is_mock": true,
+      "durability_verified": false
+    },
+    "database_and_quarantine_failure": {
+      "synchronous_commits": 1,
+      "record_event_log_attempts": 1,
+      "failed_events": 1,
+      "dead_letter_counter": 1,
+      "database_is_mock": true,
+      "durability_verified": false
+    }
+  },
+  "forecast_projection_probe": {
+    "status": "processed",
+    "repository_methods_called": [
+      "is_event_processed",
+      "record_event_log",
+      "replace_metric_observations",
+      "upsert_consumer_state"
+    ],
+    "default_handler_names": [
+      "_noop_handler"
+    ],
+    "scope": "Real consumer, mock metric repository; no domain DB or broker."
+  },
+  "openapi": {
+    "sha256_canonical_json": "e691b8da3d6f9d62b18f1d858892f817d12642b0db481895e5cf332ed50e3571",
+    "version": "3.1.0",
+    "api_info": {
+      "title": "RetailOps API",
+      "description": "Backend API for the RetailOps cloud-native AI platform.",
+      "version": "0.1.0"
+    },
+    "paths": {
+      "/products": {
+        "query_parameters": [
+          "category",
+          "limit",
+          "offset",
+          "search",
+          "sort_by",
+          "sort_order",
+          "status"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "ProductListResponse",
+        "response_fields": [
+          "items",
+          "pagination"
+        ],
+        "item_fields": [
+          "brand",
+          "category",
+          "created_at",
+          "id",
+          "name",
+          "sku",
+          "status",
+          "updated_at"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      },
+      "/sales": {
+        "query_parameters": [
+          "channel",
+          "currency",
+          "limit",
+          "offset",
+          "product_id",
+          "sold_from",
+          "sold_to",
+          "sort_by",
+          "sort_order"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "SaleListResponse",
+        "response_fields": [
+          "items",
+          "pagination"
+        ],
+        "item_fields": [
+          "channel",
+          "created_at",
+          "currency",
+          "id",
+          "product_id",
+          "quantity",
+          "sold_at",
+          "total_amount",
+          "unit_price"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      },
+      "/inventory-snapshots": {
+        "query_parameters": [
+          "limit",
+          "offset",
+          "product_id",
+          "recorded_from",
+          "recorded_to",
+          "sort_by",
+          "sort_order",
+          "unit_of_measure",
+          "warehouse_code"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "InventorySnapshotListResponse",
+        "response_fields": [
+          "items",
+          "pagination"
+        ],
+        "item_fields": [
+          "created_at",
+          "id",
+          "ingested_at",
+          "product_id",
+          "recorded_at",
+          "stock_quantity",
+          "unit_of_measure",
+          "warehouse_code"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      },
+      "/forecasts": {
+        "query_parameters": [
+          "date_from",
+          "date_to",
+          "limit",
+          "method",
+          "offset",
+          "product_id",
+          "sort_by",
+          "sort_order",
+          "status"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "ForecastListResponse",
+        "response_fields": [
+          "items",
+          "pagination"
+        ],
+        "item_fields": [
+          "confidence_level",
+          "forecast_period_end",
+          "forecast_period_start",
+          "generated_at",
+          "id",
+          "method",
+          "predicted_quantity",
+          "product_category",
+          "product_id",
+          "product_name",
+          "product_sku",
+          "status",
+          "unit_of_measure"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      },
+      "/forecast-runs": {
+        "query_parameters": [
+          "feature_dataset_id",
+          "limit",
+          "model_version",
+          "offset",
+          "sort_by",
+          "sort_order",
+          "status"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "ForecastRunListResponse",
+        "response_fields": [
+          "items",
+          "pagination"
+        ],
+        "item_fields": [
+          "artifacts",
+          "completed_at",
+          "created_at",
+          "evaluated_rows",
+          "feature_dataset_id",
+          "feature_dataset_name",
+          "feature_grain",
+          "feature_row_count",
+          "forecast_row_count",
+          "holdout_days",
+          "horizon_days",
+          "id",
+          "metrics",
+          "model_name",
+          "model_type",
+          "model_version",
+          "profile",
+          "run_key",
+          "seed",
+          "skipped_rows",
+          "started_at",
+          "status",
+          "target",
+          "updated_at",
+          "window_days"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      },
+      "/inventory-risks": {
+        "query_parameters": [
+          "category",
+          "limit",
+          "offset",
+          "risk_status",
+          "sort_by",
+          "sort_order"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "StockRiskListResponse",
+        "response_fields": [
+          "items",
+          "pagination"
+        ],
+        "item_fields": [
+          "category",
+          "current_stock",
+          "forecast_quantity",
+          "inventory_updated_at",
+          "name",
+          "product_id",
+          "risk_status",
+          "sku"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      },
+      "/notifications": {
+        "query_parameters": [
+          "limit",
+          "offset",
+          "user_id"
+        ],
+        "limit": {
+          "type": "integer",
+          "maximum": 100,
+          "minimum": 1,
+          "description": "Maximum number of notifications to return.",
+          "default": 50,
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of visible notifications to skip.",
+          "default": 0,
+          "title": "Offset"
+        },
+        "response_model": "NotificationListResponse",
+        "response_fields": [
+          "items",
+          "pagination",
+          "total_count",
+          "unread_count",
+          "user"
+        ],
+        "item_fields": [
+          "action_url",
+          "category",
+          "created_at",
+          "id",
+          "message",
+          "read_at",
+          "severity",
+          "status",
+          "target_role",
+          "title"
+        ],
+        "invalid_limit_status": 422,
+        "invalid_offset_status": 422
+      }
+    },
+    "identity": {
+      "http_status": 200,
+      "user": {
+        "id": "platform-admin",
+        "login": "platform.admin",
+        "display_name": "Platform Admin",
+        "email": "platform.admin@retailops.local",
+        "role": "platform_admin",
+        "team": "Platform Engineering",
+        "business_area": "Platform Governance",
+        "permissions": [
+          "platform:admin",
+          "dashboard:read",
+          "products:read",
+          "forecasts:read",
+          "inventory:read",
+          "workflow:read",
+          "workflow:write",
+          "notifications:read",
+          "notifications:write"
+        ]
+      },
+      "auth_mode": "local_mock",
+      "scope_boundary": "Sprint 7 uses mock identity only. It does not implement real login, JWT validation, SSO, sessions or production RBAC enforcement."
+    },
+    "scope": "OpenAPI generated from app plus validation-only HTTP requests in TestClient; no successful list DB queries."
+  }
+}

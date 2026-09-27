@@ -85,4 +85,4 @@ Lokalne logi i JUnit: `ci-cd/reports/pre-ai-00-seed-isolation/` (ignorowane
 przez Git). Mały JSON powyżej zachowuje wyniki potrzebne do tego twierdzenia,
 bez URL ani poświadczeń. To walidacja lokalna konkretnej poprawki, nie wynik
 nowego GitHub Actions ani odbiór całej aplikacji. Pełną decyzję i warunki
-dalszych etapów opisuje [audyt gotowości](2026-09-27-readiness.md).
+dalszych etapów opisuje [audyt AI 00](../ai/00/README.md).

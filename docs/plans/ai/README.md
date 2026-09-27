@@ -1,6 +1,10 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: propozycja dalszego rozwoju, do wdrożenia. Aktualizacja dokumentacji: 27.09.2026.** Ten katalog opisuje projekt osobnego serwisu AI i wymagania jego przyszłych etapów. Nie potwierdza wdrożenia komponentów ani zatwierdzenia nowych kosztów lub infrastruktury.
+**Status: po audycie 00; następny etap 01. Aktualizacja: 27.09.2026.**
+[Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
+[Backlog](backlog.md) podaje otwarte warunki oraz pierwsze małe PR-y 01/02.
+Etapy 01–17 opisują rozwój do wdrożenia; nie potwierdzają istnienia nowych
+komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.
 
@@ -16,7 +20,7 @@ Efektem końcowym będzie system, który prognozuje sprzedaż, wykrywa anomalie,
 
 | Krok | Co zrobić | Główny rezultat | Gdzie |
 |---|---|---|---|
-| [00](etapy/00-audyt.md) | Ustal aktualny stan repo i potwierdź problemy z przeglądu. | Lista istniejących funkcji, błędów i prac, przypięta do commitu. | Oba repo |
+| [00](etapy/00-audyt.md) | Stan wyjściowy na `cbf28b2`: [raport](../../evidence/ai/00/README.md). | Pomiary, istniejące funkcje i [backlog](backlog.md). | RetailOps; inwentaryzacja dostępności AI |
 | [01](etapy/01-fundament-projektu.md) | Ustal granice systemu, kontrakty i uruchom szkielet AI. | Działająca aplikacja bazowa, konfiguracja, lokalne zależności i podstawowe CI. | Oba repo |
 | [02](etapy/02-dane-sprzedazowe.md) | Napraw generator i uporządkuj dane sprzedaży, cen, promocji i lokalizacji. | Spójny panel dzienny, poprawna chronologia i rozdzielenie danych od prawdy symulatora. | RetailOps |
 | [03](etapy/03-snapshot-curated.md) | Zbuduj eksport, importer i oczyszczoną warstwę danych. | Niezmienny snapshot z identyfikatorami, kontrolą integralności i bramkami jakości. | Oba repo |
