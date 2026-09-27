@@ -72,7 +72,7 @@ def source_files(repo_root: Path) -> list[Path]:
 def source_identity(repo_root: Path) -> tuple[dict[str, object], list[Path], dict[str, str]]:
     paths = source_files(repo_root)
     checksums = {path.relative_to(repo_root).as_posix(): file_sha256(path) for path in paths}
-    git_commit = subprocess.run(  # noqa: S603 - fixed git command, no shell
+    git_commit = subprocess.run(
         ["git", "rev-parse", "HEAD"],  # noqa: S607 - git from project PATH
         cwd=repo_root,
         capture_output=True,

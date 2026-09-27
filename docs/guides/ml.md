@@ -5,7 +5,8 @@ wytrenowany Random Forest i porównanie z baseline. `ml-metadata`, `ml-inference
 i `ml-metrics` odczytują wskazany przebieg RF; osobne `ml-baseline` i
 `ml-evaluate` pozostają ścieżką porównawczą.
 
-[Plan oceny ML](../plans/ml-evaluation.md) obejmuje świeży eksperyment i odbiór.
+[Raport świeżej oceny RF](../evidence/ml/fixed-origin-rf-2026-09-27/README.md)
+zawiera porównanie modeli i decyzję `rejected`.
 [Lokalna polityka dopuszczenia RF](../reference/ml-admission-policy.md) opisuje
 statusy i bramki.
 
@@ -121,7 +122,9 @@ sumę prognoz. Odtwarzając wynik, użyj zapisanego środowiska i polecenia z
 `experiment_inputs.json`, sprawdź sumy bajtowe artefaktów, a zgodność prognoz
 oceń osobno. Identyczny hash prognoz w tym samym środowisku jest silniejszym
 dowodem niż sama integralność pliku; na innym środowisku dopuszczalną tolerancję
-trzeba ustalić przed eksperymentem.
+trzeba ustalić przed eksperymentem. Bezwzględna ścieżka interpretera jest częścią
+`reproduction_command`, więc dwa osobne venv mogą dać różne `experiment_id`
+przy identycznych danych, parametrach, modelu i prognozach.
 [Próba identyfikacji 20/80 drzew i powtórzenia](../evidence/ml/experiment-identity-2026-09-27.md)
 pokazuje zapisane identyfikatory i sumy.
 
@@ -150,19 +153,23 @@ pokazuje zapisane identyfikatory i sumy.
   Domyślne seedy 42/43 oraz progi 0,10/0,25 sprawdzają mechanizm na danych
   syntetycznych. Wynik nie jest automatycznie spięty z promocją RF.
 
-## Dostępny artefakt modelu
+## Ostatni wynik i starszy artefakt
+
+[Ocena z 27.09.2026](../evidence/ml/fixed-origin-rf-2026-09-27/README.md)
+porównała 20 i 80 drzew, średnią ruchomą oraz sezonowy model naiwny na tych
+samych rekordach. Wariant 80 drzew powtórzono w drugim świeżym venv z
+identycznymi prognozami. Na odłożonym teście RF osiągnął WAPE 159,8564%,
+a średnia ruchoma 148,1966%; lokalna decyzja to `rejected`. Pełne surowe
+artefakty są w ignorowanym `ci-cd/reports/ml/experiments/`, a mały zestaw
+dowodowy i jego sumy kontrolne w raporcie.
 
 Historyczny [snapshot Random Forest v1](../evidence/ml/random-forest-v1/README.md)
 ma w metadanych `created_at=2026-05-13T05:22:58.789845+00:00`. Używa 20 drzew,
 profilu `small` i seeda 42. Data danych treningowych nie jest datą treningu.
 Zapisane metryki oraz `candidate` dotyczą tamtego przebiegu i jego ograniczonego
-protokołu; nie są świeżym dowodem dopuszczalności modelu. Nowe przebiegi nie
-nadpisują tego snapshotu. Bieżący kod RF ma wersję `random-forest-v3` i
-osobne `experiment_id` dla różnych konfiguracji. [Próba tożsamości](../evidence/ml/experiment-identity-2026-09-27.md)
-została wykonana jeszcze z cechami 1.0; jej wyniki nie mierzą wpływu obecnej
-poprawki. Warianty 20 i 80 drzew mają osobne `experiment_id`;
-ich metryk nie należy przedstawiać jako skutku jednej zmiany bez kontrolowanego
-porównania. Aktualny raport ma `evaluation_scope=synthetic_fixed_origin_horizon_v1`.
+protokołu; nie są dowodem dopuszczalności obecnego modelu. Bieżący kod RF ma
+wersję `random-forest-v3`. [Wcześniejsza próba tożsamości](../evidence/ml/experiment-identity-2026-09-27.md)
+używała jeszcze cech 1.0 i nie stanowi porównywalnej oceny jakości.
 
 ## Sprawdzenie zmian
 

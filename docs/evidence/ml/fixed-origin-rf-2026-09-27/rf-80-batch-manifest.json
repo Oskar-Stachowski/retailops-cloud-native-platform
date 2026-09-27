@@ -1,0 +1,26 @@
+{
+  "api_forecast_count": 140,
+  "api_forecasts_logical_sha256": "07efb59fd0c630d211298eec1164b0a27ecaba4bbf549791485fa0c01731d181",
+  "artifacts": [
+    "batch_predictions.csv",
+    "api_forecasts.csv",
+    "batch_inference_manifest.json"
+  ],
+  "batch_prediction_count": 700,
+  "experiment_id": "rf-a2161d63d4f37f978620",
+  "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+  "forecast_date_end": "2026-05-07",
+  "forecast_date_start": "2026-05-01",
+  "generated_at": "2026-09-27T11:03:52.900127+00:00",
+  "job_name": "retailops-demand-rf-batch-inference",
+  "metadata_output_dir": "ci-cd/reports/ml/acceptance/metadata",
+  "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+  "model_name": "retailops-demand-random-forest",
+  "model_status": "rejected",
+  "model_version": "random-forest-v3",
+  "origin": "2026-04-30T23:59:59+00:00",
+  "predictions_logical_sha256": "ef4e345b522e69e5dcfa00d48ef068805f7d253a3dbefeacc8cfc10f06b08cac",
+  "run_id": "4d88f7e8e1334360afc0d662b1375b68",
+  "run_key": "4d88f7e8e1334360afc0d662b1375b68:sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab:batch-inference",
+  "source_run_manifest_sha256": "30ae07009e475250023bcf73a9b0a1d158a796611a7073acf2a82234387954ba"
+}

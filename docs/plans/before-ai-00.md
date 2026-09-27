@@ -2,18 +2,13 @@
 
 Aktualizacja: **2026-09-27**. To skrócona lista otwartych prac w istniejącym
 RetailOps przed planowanym przejściem do rozbudowy AI. Szczegółowe kryteria
-odbioru zawierają [plan oceny ML](ml-evaluation.md) i
-[otwarte ustalenia audytowe](../audits/open-findings.md).
+odbioru zawierają [otwarte ustalenia audytowe](../audits/open-findings.md).
+[Ocena ML](../evidence/ml/fixed-origin-rf-2026-09-27/README.md) ma osobny
+datowany raport i decyzję `rejected`.
 
 Sam [etap AI 00](ai/etapy/00-audyt.md) jest audytem i **nie ma formalnych
 zależności**. Można rozpocząć go wcześniej; nie wymaga zamknięcia wszystkich
 ustaleń poniżej.
-
-## Ocena ML — główny pakiet przygotowawczy
-
-1. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
-   wyniku, testy negatywne w CI, datowany raport i zmiany na `main` przez PR.
-   Rzetelne odrzucenie modelu również może zakończyć ten pakiet.
 
 ## Poprawki zalecane przed intensywnym testowaniem
 

@@ -765,7 +765,7 @@ def _artifact_roundtrip_matches(
     predictions: list[dict[str, object]],
     metrics_report: dict[str, object],
 ) -> bool:
-    from ml.evaluation.fixed_origin import _history
+    from ml.evaluation.fixed_origin import _history  # noqa: PLC0415 - avoid circular import
 
     try:
         final_predictions = [row for row in predictions if row["split"] == "test"]
@@ -909,7 +909,7 @@ def write_trained_model_artifacts(
 def train_random_forest_forecast_model(
     config: RandomForestForecastConfig,
 ) -> dict[str, object]:
-    from ml.evaluation.fixed_origin import (
+    from ml.evaluation.fixed_origin import (  # noqa: PLC0415 - avoid circular import
         FixedOriginConfig,
         build_daily_panel,
         evaluate_fixed_origin,

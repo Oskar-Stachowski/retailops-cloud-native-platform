@@ -4,7 +4,7 @@
 
 ## Cel
 
-Potwierdź, które zadania są nadal potrzebne, na aktualnym commicie i bez nadpisywania wcześniejszej pracy. Uwzględnij wyniki [planu oceny ML](../../ml-evaluation.md), jeśli został już wykonany. Poniższa lista określa kontrole do przeprowadzenia, nie wyniki nowego audytu.
+Potwierdź, które zadania są nadal potrzebne, na aktualnym commicie i bez nadpisywania wcześniejszej pracy. Uwzględnij [lokalną ocenę ML](../../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i jej ograniczenia. Poniższa lista określa kontrole do przeprowadzenia, nie wyniki nowego audytu.
 
 ## Małe zadania / PR-y
 

@@ -77,7 +77,7 @@ def _protocol_check(
                 for (first_start, first_end), (next_start, next_end) in pairwise(dates)
             )
             valid = valid and all(int(fold["training_examples"]) > 0 for fold in folds)
-            counts = {split: 0 for split in expected_splits}
+            counts = dict.fromkeys(expected_splits, 0)
             keys: set[tuple[object, ...]] = set()
             for row in predictions:
                 split = str(row["split"])

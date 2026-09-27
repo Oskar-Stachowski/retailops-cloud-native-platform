@@ -1,0 +1,1284 @@
+{
+  "reproduction": {
+    "assessed_metrics_equal_except_run_identity_and_timestamp": true,
+    "exact_integer_prediction_tolerance": 0,
+    "experiment_id": "rf-1030e5414b3c0d72bd34",
+    "inputs_equal_except_interpreter_path": true,
+    "matched": true,
+    "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+    "predictions_logical_sha256": "51b4900aaa2456e81a4ee7986694f95bad6186d1f62134621ffcc06433e8ba5f",
+    "run_id": "fa1ca9c081db41e1b2d5788d757b7272"
+  },
+  "seasonal_comparison": {
+    "folds": [
+      {
+        "evaluated_rows": 700,
+        "same_row_comparison": {
+          "moving_average": {
+            "bias": "-9.5886",
+            "evaluated_rows": 700,
+            "mae": "57.9857",
+            "mape": "74.7452",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "208.7043",
+            "status": "evaluable",
+            "wape": "123.4564",
+            "zero_actual_overforecast_units": "15392.0000",
+            "zero_actual_rows": 476
+          },
+          "rf": {
+            "bias": "-3.8771",
+            "evaluated_rows": 700,
+            "mae": "55.5143",
+            "mape": "70.8649",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "193.2227",
+            "status": "evaluable",
+            "wape": "118.1945",
+            "zero_actual_overforecast_units": "15900.0000",
+            "zero_actual_rows": 476
+          },
+          "rows": 700,
+          "seasonal_naive_7_day": {
+            "bias": "-14.1557",
+            "evaluated_rows": 700,
+            "mae": "72.3986",
+            "mape": "128.0593",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "264.9868",
+            "status": "evaluable",
+            "wape": "154.1426",
+            "zero_actual_overforecast_units": "18994.0000",
+            "zero_actual_rows": 476
+          }
+        },
+        "seasonal_eligible_rows": 700,
+        "split": "validation_1"
+      },
+      {
+        "evaluated_rows": 700,
+        "same_row_comparison": {
+          "moving_average": {
+            "bias": "-14.9757",
+            "evaluated_rows": 700,
+            "mae": "60.7843",
+            "mape": "69.3996",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "209.8623",
+            "status": "evaluable",
+            "wape": "111.7036",
+            "zero_actual_overforecast_units": "15260.0000",
+            "zero_actual_rows": 472
+          },
+          "rf": {
+            "bias": "-6.5543",
+            "evaluated_rows": 700,
+            "mae": "60.5714",
+            "mape": "74.0302",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "194.1914",
+            "status": "evaluable",
+            "wape": "111.3124",
+            "zero_actual_overforecast_units": "16629.0000",
+            "zero_actual_rows": 472
+          },
+          "rows": 700,
+          "seasonal_naive_7_day": {
+            "bias": "-7.4471",
+            "evaluated_rows": 700,
+            "mae": "89.9700",
+            "mape": "122.8351",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "321.4640",
+            "status": "evaluable",
+            "wape": "165.3383",
+            "zero_actual_overforecast_units": "27465.0000",
+            "zero_actual_rows": 472
+          }
+        },
+        "seasonal_eligible_rows": 700,
+        "split": "validation_2"
+      },
+      {
+        "evaluated_rows": 700,
+        "same_row_comparison": {
+          "moving_average": {
+            "bias": "-4.8029",
+            "evaluated_rows": 700,
+            "mae": "61.9257",
+            "mape": "78.1666",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "202.8364",
+            "status": "evaluable",
+            "wape": "128.4157",
+            "zero_actual_overforecast_units": "18170.0000",
+            "zero_actual_rows": 481
+          },
+          "rf": {
+            "bias": "12.9257",
+            "evaluated_rows": 700,
+            "mae": "69.4371",
+            "mape": "76.2632",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "205.9958",
+            "status": "evaluable",
+            "wape": "143.9922",
+            "zero_actual_overforecast_units": "25234.0000",
+            "zero_actual_rows": 481
+          },
+          "rows": 700,
+          "seasonal_naive_7_day": {
+            "bias": "6.1929",
+            "evaluated_rows": 700,
+            "mae": "88.5357",
+            "mape": "153.6089",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "314.3656",
+            "status": "evaluable",
+            "wape": "183.5970",
+            "zero_actual_overforecast_units": "31165.0000",
+            "zero_actual_rows": 481
+          }
+        },
+        "seasonal_eligible_rows": 700,
+        "split": "validation_3"
+      },
+      {
+        "evaluated_rows": 700,
+        "same_row_comparison": {
+          "moving_average": {
+            "bias": "8.9929",
+            "evaluated_rows": 700,
+            "mae": "54.2357",
+            "mape": "81.4125",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "143.8100",
+            "status": "evaluable",
+            "wape": "148.1966",
+            "zero_actual_overforecast_units": "19128.0000",
+            "zero_actual_rows": 478
+          },
+          "rf": {
+            "bias": "25.2171",
+            "evaluated_rows": 700,
+            "mae": "58.5029",
+            "mape": "80.4038",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "154.4301",
+            "status": "evaluable",
+            "wape": "159.8564",
+            "zero_actual_overforecast_units": "23621.0000",
+            "zero_actual_rows": 478
+          },
+          "rows": 700,
+          "seasonal_naive_7_day": {
+            "bias": "11.6257",
+            "evaluated_rows": 700,
+            "mae": "76.3429",
+            "mape": "140.0394",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "272.1963",
+            "status": "evaluable",
+            "wape": "208.6033",
+            "zero_actual_overforecast_units": "28958.0000",
+            "zero_actual_rows": 478
+          }
+        },
+        "seasonal_eligible_rows": 700,
+        "split": "test"
+      }
+    ],
+    "test_segments": {
+      "category": {
+        "Beauty": {
+          "moving_average": {
+            "bias": "5.5857",
+            "evaluated_rows": 70,
+            "mae": "45.2429",
+            "mape": "82.4442",
+            "mape_coverage": "0.4143",
+            "mape_evaluated_rows": 29,
+            "rmse": "78.6739",
+            "status": "evaluable",
+            "wape": "137.0402",
+            "zero_actual_overforecast_units": "1432.0000",
+            "zero_actual_rows": 41
+          },
+          "rf": {
+            "bias": "14.1571",
+            "evaluated_rows": 70,
+            "mae": "43.6429",
+            "mape": "69.4740",
+            "mape_coverage": "0.4143",
+            "mape_evaluated_rows": 29,
+            "rmse": "78.6014",
+            "status": "evaluable",
+            "wape": "132.1939",
+            "zero_actual_overforecast_units": "1738.0000",
+            "zero_actual_rows": 41
+          },
+          "rows": 70,
+          "seasonal_naive_7_day": {
+            "bias": "8.0000",
+            "evaluated_rows": 70,
+            "mae": "65.9143",
+            "mape": "211.4279",
+            "mape_coverage": "0.4143",
+            "mape_evaluated_rows": 29,
+            "rmse": "136.8527",
+            "status": "evaluable",
+            "wape": "199.6538",
+            "zero_actual_overforecast_units": "1262.0000",
+            "zero_actual_rows": 41
+          }
+        },
+        "Electronics": {
+          "moving_average": {
+            "bias": "54.0762",
+            "evaluated_rows": 105,
+            "mae": "162.7238",
+            "mape": "90.6731",
+            "mape_coverage": "0.3238",
+            "mape_evaluated_rows": 34,
+            "rmse": "306.4728",
+            "status": "evaluable",
+            "wape": "171.9086",
+            "zero_actual_overforecast_units": "9718.0000",
+            "zero_actual_rows": 71
+          },
+          "rf": {
+            "bias": "97.1619",
+            "evaluated_rows": 105,
+            "mae": "177.1810",
+            "mape": "93.9540",
+            "mape_coverage": "0.3238",
+            "mape_evaluated_rows": 34,
+            "rmse": "339.1911",
+            "status": "evaluable",
+            "wape": "187.1818",
+            "zero_actual_overforecast_units": "11372.0000",
+            "zero_actual_rows": 71
+          },
+          "rows": 105,
+          "seasonal_naive_7_day": {
+            "bias": "72.2667",
+            "evaluated_rows": 105,
+            "mae": "231.0476",
+            "mape": "188.7120",
+            "mape_coverage": "0.3238",
+            "mape_evaluated_rows": 34,
+            "rmse": "618.3217",
+            "status": "evaluable",
+            "wape": "244.0889",
+            "zero_actual_overforecast_units": "15606.0000",
+            "zero_actual_rows": 71
+          }
+        },
+        "Fashion": {
+          "moving_average": {
+            "bias": "6.7333",
+            "evaluated_rows": 105,
+            "mae": "32.5810",
+            "mape": "85.6985",
+            "mape_coverage": "0.3048",
+            "mape_evaluated_rows": 32,
+            "rmse": "69.2718",
+            "status": "evaluable",
+            "wape": "139.2348",
+            "zero_actual_overforecast_units": "1754.0000",
+            "zero_actual_rows": 73
+          },
+          "rf": {
+            "bias": "29.6190",
+            "evaluated_rows": 105,
+            "mae": "39.7143",
+            "mape": "116.4635",
+            "mape_coverage": "0.3048",
+            "mape_evaluated_rows": 32,
+            "rmse": "84.8933",
+            "status": "evaluable",
+            "wape": "169.7192",
+            "zero_actual_overforecast_units": "2457.0000",
+            "zero_actual_rows": 73
+          },
+          "rows": 105,
+          "seasonal_naive_7_day": {
+            "bias": "4.8381",
+            "evaluated_rows": 105,
+            "mae": "50.9714",
+            "mape": "95.8144",
+            "mape_coverage": "0.3048",
+            "mape_evaluated_rows": 32,
+            "rmse": "135.5443",
+            "status": "evaluable",
+            "wape": "217.8266",
+            "zero_actual_overforecast_units": "2906.0000",
+            "zero_actual_rows": 73
+          }
+        },
+        "Grocery": {
+          "moving_average": {
+            "bias": "-0.8857",
+            "evaluated_rows": 105,
+            "mae": "52.3524",
+            "mape": "68.8636",
+            "mape_coverage": "0.2571",
+            "mape_evaluated_rows": 27,
+            "rmse": "113.8913",
+            "status": "evaluable",
+            "wape": "143.4873",
+            "zero_actual_overforecast_units": "2630.0000",
+            "zero_actual_rows": 78
+          },
+          "rf": {
+            "bias": "15.3048",
+            "evaluated_rows": 105,
+            "mae": "57.4000",
+            "mape": "52.8801",
+            "mape_coverage": "0.2571",
+            "mape_evaluated_rows": 27,
+            "rmse": "115.4834",
+            "status": "evaluable",
+            "wape": "157.3218",
+            "zero_actual_overforecast_units": "3756.0000",
+            "zero_actual_rows": 78
+          },
+          "rows": 105,
+          "seasonal_naive_7_day": {
+            "bias": "-0.6952",
+            "evaluated_rows": 105,
+            "mae": "64.3524",
+            "mape": "135.7321",
+            "mape_coverage": "0.2571",
+            "mape_evaluated_rows": 27,
+            "rmse": "170.8774",
+            "status": "evaluable",
+            "wape": "176.3769",
+            "zero_actual_overforecast_units": "3309.0000",
+            "zero_actual_rows": 78
+          }
+        },
+        "Home Improvement": {
+          "moving_average": {
+            "bias": "-7.0286",
+            "evaluated_rows": 105,
+            "mae": "64.7048",
+            "mape": "71.2121",
+            "mape_coverage": "0.3429",
+            "mape_evaluated_rows": 36,
+            "rmse": "147.3831",
+            "status": "evaluable",
+            "wape": "115.7608",
+            "zero_actual_overforecast_units": "2498.0000",
+            "zero_actual_rows": 69
+          },
+          "rf": {
+            "bias": "8.7810",
+            "evaluated_rows": 105,
+            "mae": "66.5333",
+            "mape": "74.3222",
+            "mape_coverage": "0.3429",
+            "mape_evaluated_rows": 36,
+            "rmse": "137.4534",
+            "status": "evaluable",
+            "wape": "119.0322",
+            "zero_actual_overforecast_units": "2928.0000",
+            "zero_actual_rows": 69
+          },
+          "rows": 105,
+          "seasonal_naive_7_day": {
+            "bias": "-7.1429",
+            "evaluated_rows": 105,
+            "mae": "94.4190",
+            "mape": "99.9590",
+            "mape_coverage": "0.3429",
+            "mape_evaluated_rows": 36,
+            "rmse": "224.7320",
+            "status": "evaluable",
+            "wape": "168.9215",
+            "zero_actual_overforecast_units": "4521.0000",
+            "zero_actual_rows": 69
+          }
+        },
+        "Pet Care": {
+          "moving_average": {
+            "bias": "0.2286",
+            "evaluated_rows": 70,
+            "mae": "5.7714",
+            "mape": "86.7889",
+            "mape_coverage": "0.3571",
+            "mape_evaluated_rows": 25,
+            "rmse": "8.4903",
+            "status": "evaluable",
+            "wape": "141.7544",
+            "zero_actual_overforecast_units": "185.0000",
+            "zero_actual_rows": 45
+          },
+          "rf": {
+            "bias": "0.9857",
+            "evaluated_rows": 70,
+            "mae": "5.7000",
+            "mape": "84.8062",
+            "mape_coverage": "0.3571",
+            "mape_evaluated_rows": 25,
+            "rmse": "8.6561",
+            "status": "evaluable",
+            "wape": "140.0000",
+            "zero_actual_overforecast_units": "205.0000",
+            "zero_actual_rows": 45
+          },
+          "rows": 70,
+          "seasonal_naive_7_day": {
+            "bias": "-0.3429",
+            "evaluated_rows": 70,
+            "mae": "7.0000",
+            "mape": "131.3539",
+            "mape_coverage": "0.3571",
+            "mape_evaluated_rows": 25,
+            "rmse": "12.3624",
+            "status": "evaluable",
+            "wape": "171.9298",
+            "zero_actual_overforecast_units": "219.0000",
+            "zero_actual_rows": 45
+          }
+        },
+        "Sports": {
+          "moving_average": {
+            "bias": "2.3714",
+            "evaluated_rows": 70,
+            "mae": "12.6286",
+            "mape": "82.6370",
+            "mape_coverage": "0.2857",
+            "mape_evaluated_rows": 20,
+            "rmse": "16.1926",
+            "status": "evaluable",
+            "wape": "170.0000",
+            "zero_actual_overforecast_units": "494.0000",
+            "zero_actual_rows": 50
+          },
+          "rf": {
+            "bias": "5.6143",
+            "evaluated_rows": 70,
+            "mae": "13.9857",
+            "mape": "81.3649",
+            "mape_coverage": "0.2857",
+            "mape_evaluated_rows": 20,
+            "rmse": "17.7116",
+            "status": "evaluable",
+            "wape": "188.2692",
+            "zero_actual_overforecast_units": "645.0000",
+            "zero_actual_rows": 50
+          },
+          "rows": 70,
+          "seasonal_naive_7_day": {
+            "bias": "2.8571",
+            "evaluated_rows": 70,
+            "mae": "16.6571",
+            "mape": "129.5598",
+            "mape_coverage": "0.2857",
+            "mape_evaluated_rows": 20,
+            "rmse": "30.0152",
+            "status": "evaluable",
+            "wape": "224.2308",
+            "zero_actual_overforecast_units": "645.0000",
+            "zero_actual_rows": 50
+          }
+        },
+        "Toys": {
+          "moving_average": {
+            "bias": "2.4000",
+            "evaluated_rows": 70,
+            "mae": "10.1714",
+            "mape": "84.8445",
+            "mape_coverage": "0.2714",
+            "mape_evaluated_rows": 19,
+            "rmse": "12.7929",
+            "status": "evaluable",
+            "wape": "175.3695",
+            "zero_actual_overforecast_units": "417.0000",
+            "zero_actual_rows": 51
+          },
+          "rf": {
+            "bias": "5.1143",
+            "evaluated_rows": 70,
+            "mae": "10.4571",
+            "mape": "55.9370",
+            "mape_coverage": "0.2714",
+            "mape_evaluated_rows": 19,
+            "rmse": "13.7332",
+            "status": "evaluable",
+            "wape": "180.2956",
+            "zero_actual_overforecast_units": "520.0000",
+            "zero_actual_rows": 51
+          },
+          "rows": 70,
+          "seasonal_naive_7_day": {
+            "bias": "1.8429",
+            "evaluated_rows": 70,
+            "mae": "12.6714",
+            "mape": "122.9861",
+            "mape_coverage": "0.2714",
+            "mape_evaluated_rows": 19,
+            "rmse": "23.0065",
+            "status": "evaluable",
+            "wape": "218.4729",
+            "zero_actual_overforecast_units": "490.0000",
+            "zero_actual_rows": 51
+          }
+        }
+      },
+      "channel": {
+        "marketplace": {
+          "moving_average": {
+            "bias": "15.9000",
+            "evaluated_rows": 140,
+            "mae": "77.1143",
+            "mape": "72.2669",
+            "mape_coverage": "0.2643",
+            "mape_evaluated_rows": 37,
+            "rmse": "183.8228",
+            "status": "evaluable",
+            "wape": "155.1595",
+            "zero_actual_overforecast_units": "5959.0000",
+            "zero_actual_rows": 103
+          },
+          "rf": {
+            "bias": "33.5857",
+            "evaluated_rows": 140,
+            "mae": "80.3857",
+            "mape": "62.9076",
+            "mape_coverage": "0.2643",
+            "mape_evaluated_rows": 37,
+            "rmse": "197.2716",
+            "status": "evaluable",
+            "wape": "161.7419",
+            "zero_actual_overforecast_units": "6965.0000",
+            "zero_actual_rows": 103
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "23.3571",
+            "evaluated_rows": 140,
+            "mae": "117.8286",
+            "mape": "114.7377",
+            "mape_coverage": "0.2643",
+            "mape_evaluated_rows": 37,
+            "rmse": "397.3992",
+            "status": "evaluable",
+            "wape": "237.0796",
+            "zero_actual_overforecast_units": "9486.0000",
+            "zero_actual_rows": 103
+          }
+        },
+        "online": {
+          "moving_average": {
+            "bias": "6.1321",
+            "evaluated_rows": 280,
+            "mae": "42.4821",
+            "mape": "78.0445",
+            "mape_coverage": "0.2929",
+            "mape_evaluated_rows": 82,
+            "rmse": "118.4326",
+            "status": "evaluable",
+            "wape": "149.7545",
+            "zero_actual_overforecast_units": "6162.0000",
+            "zero_actual_rows": 198
+          },
+          "rf": {
+            "bias": "17.6821",
+            "evaluated_rows": 280,
+            "mae": "44.9821",
+            "mape": "63.9221",
+            "mape_coverage": "0.2929",
+            "mape_evaluated_rows": 82,
+            "rmse": "125.3335",
+            "status": "evaluable",
+            "wape": "158.5673",
+            "zero_actual_overforecast_units": "7680.0000",
+            "zero_actual_rows": 198
+          },
+          "rows": 280,
+          "seasonal_naive_7_day": {
+            "bias": "5.9607",
+            "evaluated_rows": 280,
+            "mae": "54.8036",
+            "mape": "134.2452",
+            "mape_coverage": "0.2929",
+            "mape_evaluated_rows": 82,
+            "rmse": "173.3415",
+            "status": "evaluable",
+            "wape": "193.1890",
+            "zero_actual_overforecast_units": "7788.0000",
+            "zero_actual_rows": 198
+          }
+        },
+        "store": {
+          "moving_average": {
+            "bias": "4.5143",
+            "evaluated_rows": 140,
+            "mae": "60.4714",
+            "mape": "72.8311",
+            "mape_coverage": "0.2429",
+            "mape_evaluated_rows": 34,
+            "rmse": "163.9001",
+            "status": "evaluable",
+            "wape": "142.1662",
+            "zero_actual_overforecast_units": "4171.0000",
+            "zero_actual_rows": 106
+          },
+          "rf": {
+            "bias": "24.2071",
+            "evaluated_rows": 140,
+            "mae": "67.8500",
+            "mape": "59.3896",
+            "mape_coverage": "0.2429",
+            "mape_evaluated_rows": 34,
+            "rmse": "173.6685",
+            "status": "evaluable",
+            "wape": "159.5130",
+            "zero_actual_overforecast_units": "5731.0000",
+            "zero_actual_rows": 106
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "1.5571",
+            "evaluated_rows": 140,
+            "mae": "81.7286",
+            "mape": "98.6734",
+            "mape_coverage": "0.2429",
+            "mape_evaluated_rows": 34,
+            "rmse": "299.1028",
+            "status": "evaluable",
+            "wape": "192.1411",
+            "zero_actual_overforecast_units": "5830.0000",
+            "zero_actual_rows": 106
+          }
+        },
+        "wholesale": {
+          "moving_average": {
+            "bias": "12.2857",
+            "evaluated_rows": 140,
+            "mae": "48.6286",
+            "mape": "94.5478",
+            "mape_coverage": "0.4929",
+            "mape_evaluated_rows": 69,
+            "rmse": "121.2437",
+            "status": "evaluable",
+            "wape": "142.9651",
+            "zero_actual_overforecast_units": "2836.0000",
+            "zero_actual_rows": 71
+          },
+          "rf": {
+            "bias": "32.9286",
+            "evaluated_rows": 140,
+            "mae": "54.3143",
+            "mape": "119.7274",
+            "mape_coverage": "0.4929",
+            "mape_evaluated_rows": 69,
+            "rmse": "136.9287",
+            "status": "evaluable",
+            "wape": "159.6808",
+            "zero_actual_overforecast_units": "3245.0000",
+            "zero_actual_rows": 71
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "21.2929",
+            "evaluated_rows": 140,
+            "mae": "72.5500",
+            "mape": "180.8761",
+            "mape_coverage": "0.4929",
+            "mape_evaluated_rows": 69,
+            "rmse": "250.9401",
+            "status": "evaluable",
+            "wape": "213.2927",
+            "zero_actual_overforecast_units": "5854.0000",
+            "zero_actual_rows": 71
+          }
+        }
+      },
+      "store_id": {
+        "173ee44c-0459-54cb-b9a6-01f9b422e02f": {
+          "moving_average": {
+            "bias": "12.2857",
+            "evaluated_rows": 140,
+            "mae": "48.6286",
+            "mape": "94.5478",
+            "mape_coverage": "0.4929",
+            "mape_evaluated_rows": 69,
+            "rmse": "121.2437",
+            "status": "evaluable",
+            "wape": "142.9651",
+            "zero_actual_overforecast_units": "2836.0000",
+            "zero_actual_rows": 71
+          },
+          "rf": {
+            "bias": "32.9286",
+            "evaluated_rows": 140,
+            "mae": "54.3143",
+            "mape": "119.7274",
+            "mape_coverage": "0.4929",
+            "mape_evaluated_rows": 69,
+            "rmse": "136.9287",
+            "status": "evaluable",
+            "wape": "159.6808",
+            "zero_actual_overforecast_units": "3245.0000",
+            "zero_actual_rows": 71
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "21.2929",
+            "evaluated_rows": 140,
+            "mae": "72.5500",
+            "mape": "180.8761",
+            "mape_coverage": "0.4929",
+            "mape_evaluated_rows": 69,
+            "rmse": "250.9401",
+            "status": "evaluable",
+            "wape": "213.2927",
+            "zero_actual_overforecast_units": "5854.0000",
+            "zero_actual_rows": 71
+          }
+        },
+        "2761a8b7-f541-58d3-a24a-a69e1ad6ee09": {
+          "moving_average": {
+            "bias": "15.9000",
+            "evaluated_rows": 140,
+            "mae": "77.1143",
+            "mape": "72.2669",
+            "mape_coverage": "0.2643",
+            "mape_evaluated_rows": 37,
+            "rmse": "183.8228",
+            "status": "evaluable",
+            "wape": "155.1595",
+            "zero_actual_overforecast_units": "5959.0000",
+            "zero_actual_rows": 103
+          },
+          "rf": {
+            "bias": "33.5857",
+            "evaluated_rows": 140,
+            "mae": "80.3857",
+            "mape": "62.9076",
+            "mape_coverage": "0.2643",
+            "mape_evaluated_rows": 37,
+            "rmse": "197.2716",
+            "status": "evaluable",
+            "wape": "161.7419",
+            "zero_actual_overforecast_units": "6965.0000",
+            "zero_actual_rows": 103
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "23.3571",
+            "evaluated_rows": 140,
+            "mae": "117.8286",
+            "mape": "114.7377",
+            "mape_coverage": "0.2643",
+            "mape_evaluated_rows": 37,
+            "rmse": "397.3992",
+            "status": "evaluable",
+            "wape": "237.0796",
+            "zero_actual_overforecast_units": "9486.0000",
+            "zero_actual_rows": 103
+          }
+        },
+        "a2ac838d-a4ad-5054-9aad-660428b4817c": {
+          "moving_average": {
+            "bias": "3.6214",
+            "evaluated_rows": 140,
+            "mae": "34.5786",
+            "mape": "82.3115",
+            "mape_coverage": "0.2857",
+            "mape_evaluated_rows": 40,
+            "rmse": "89.8342",
+            "status": "evaluable",
+            "wape": "133.8772",
+            "zero_actual_overforecast_units": "2294.0000",
+            "zero_actual_rows": 100
+          },
+          "rf": {
+            "bias": "16.7071",
+            "evaluated_rows": 140,
+            "mae": "36.2357",
+            "mape": "54.0454",
+            "mape_coverage": "0.2857",
+            "mape_evaluated_rows": 40,
+            "rmse": "91.5662",
+            "status": "evaluable",
+            "wape": "140.2931",
+            "zero_actual_overforecast_units": "3191.0000",
+            "zero_actual_rows": 100
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "2.4143",
+            "evaluated_rows": 140,
+            "mae": "46.2143",
+            "mape": "145.6328",
+            "mape_coverage": "0.2857",
+            "mape_evaluated_rows": 40,
+            "rmse": "150.5901",
+            "status": "evaluable",
+            "wape": "178.9270",
+            "zero_actual_overforecast_units": "3038.0000",
+            "zero_actual_rows": 100
+          }
+        },
+        "ba4881fd-78b5-5016-847d-8066d661bcfa": {
+          "moving_average": {
+            "bias": "8.6429",
+            "evaluated_rows": 140,
+            "mae": "50.3857",
+            "mape": "73.9808",
+            "mape_coverage": "0.3000",
+            "mape_evaluated_rows": 42,
+            "rmse": "141.3591",
+            "status": "evaluable",
+            "wape": "163.0229",
+            "zero_actual_overforecast_units": "3868.0000",
+            "zero_actual_rows": 98
+          },
+          "rf": {
+            "bias": "18.6571",
+            "evaluated_rows": 140,
+            "mae": "53.7286",
+            "mape": "73.3285",
+            "mape_coverage": "0.3000",
+            "mape_evaluated_rows": 42,
+            "rmse": "151.7649",
+            "status": "evaluable",
+            "wape": "173.8387",
+            "zero_actual_overforecast_units": "4489.0000",
+            "zero_actual_rows": 98
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "9.5071",
+            "evaluated_rows": 140,
+            "mae": "63.3929",
+            "mape": "123.3998",
+            "mape_coverage": "0.3000",
+            "mape_evaluated_rows": 42,
+            "rmse": "193.4352",
+            "status": "evaluable",
+            "wape": "205.1075",
+            "zero_actual_overforecast_units": "4750.0000",
+            "zero_actual_rows": 98
+          }
+        },
+        "c1ca292a-ed5d-5123-9067-da1959a33604": {
+          "moving_average": {
+            "bias": "4.5143",
+            "evaluated_rows": 140,
+            "mae": "60.4714",
+            "mape": "72.8311",
+            "mape_coverage": "0.2429",
+            "mape_evaluated_rows": 34,
+            "rmse": "163.9001",
+            "status": "evaluable",
+            "wape": "142.1662",
+            "zero_actual_overforecast_units": "4171.0000",
+            "zero_actual_rows": 106
+          },
+          "rf": {
+            "bias": "24.2071",
+            "evaluated_rows": 140,
+            "mae": "67.8500",
+            "mape": "59.3896",
+            "mape_coverage": "0.2429",
+            "mape_evaluated_rows": 34,
+            "rmse": "173.6685",
+            "status": "evaluable",
+            "wape": "159.5130",
+            "zero_actual_overforecast_units": "5731.0000",
+            "zero_actual_rows": 106
+          },
+          "rows": 140,
+          "seasonal_naive_7_day": {
+            "bias": "1.5571",
+            "evaluated_rows": 140,
+            "mae": "81.7286",
+            "mape": "98.6734",
+            "mape_coverage": "0.2429",
+            "mape_evaluated_rows": 34,
+            "rmse": "299.1028",
+            "status": "evaluable",
+            "wape": "192.1411",
+            "zero_actual_overforecast_units": "5830.0000",
+            "zero_actual_rows": 106
+          }
+        }
+      }
+    }
+  },
+  "selected_variant": "rf_80",
+  "selection_rule": "Lower mean WAPE across three validation windows; final test excluded.",
+  "variants": {
+    "rf_20": {
+      "admission_checks": {
+        "coverage": "passed",
+        "final_quality": "failed",
+        "protocol": "passed",
+        "reproduction": "passed",
+        "segments": "failed",
+        "stability": "failed"
+      },
+      "environment": {
+        "dependencies": {
+          "joblib": "1.6.0",
+          "numpy": "2.4.6",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.17.1",
+          "threadpoolctl": "3.7.0"
+        },
+        "implementation": "CPython",
+        "machine": "arm64",
+        "python": "3.11.15",
+        "system": "Darwin"
+      },
+      "experiment_id": "rf-889a71d100b5ef5c44bd",
+      "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+      "folds": [
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "-9.5886",
+            "evaluated_rows": 700,
+            "mae": "57.9857",
+            "mape": "74.7452",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "208.7043",
+            "status": "evaluable",
+            "wape": "123.4564",
+            "zero_actual_overforecast_units": "15392.0000",
+            "zero_actual_rows": 476
+          },
+          "origin": "2026-04-02T23:59:59+00:00",
+          "rf": {
+            "bias": "-1.8014",
+            "evaluated_rows": 700,
+            "mae": "58.4986",
+            "mape": "76.8056",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "199.0560",
+            "status": "evaluable",
+            "wape": "124.5483",
+            "zero_actual_overforecast_units": "17248.0000",
+            "zero_actual_rows": 476
+          },
+          "split": "validation_1",
+          "target_end": "2026-04-09",
+          "target_start": "2026-04-03"
+        },
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "-14.9757",
+            "evaluated_rows": 700,
+            "mae": "60.7843",
+            "mape": "69.3996",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "209.8623",
+            "status": "evaluable",
+            "wape": "111.7036",
+            "zero_actual_overforecast_units": "15260.0000",
+            "zero_actual_rows": 472
+          },
+          "origin": "2026-04-09T23:59:59+00:00",
+          "rf": {
+            "bias": "-4.1129",
+            "evaluated_rows": 700,
+            "mae": "61.8643",
+            "mape": "73.8077",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "191.6780",
+            "status": "evaluable",
+            "wape": "113.6883",
+            "zero_actual_overforecast_units": "17294.0000",
+            "zero_actual_rows": 472
+          },
+          "split": "validation_2",
+          "target_end": "2026-04-16",
+          "target_start": "2026-04-10"
+        },
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "-4.8029",
+            "evaluated_rows": 700,
+            "mae": "61.9257",
+            "mape": "78.1666",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "202.8364",
+            "status": "evaluable",
+            "wape": "128.4157",
+            "zero_actual_overforecast_units": "18170.0000",
+            "zero_actual_rows": 481
+          },
+          "origin": "2026-04-16T23:59:59+00:00",
+          "rf": {
+            "bias": "11.8771",
+            "evaluated_rows": 700,
+            "mae": "69.0114",
+            "mape": "75.6379",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "208.0247",
+            "status": "evaluable",
+            "wape": "143.1094",
+            "zero_actual_overforecast_units": "25002.0000",
+            "zero_actual_rows": 481
+          },
+          "split": "validation_3",
+          "target_end": "2026-04-23",
+          "target_start": "2026-04-17"
+        },
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "8.9929",
+            "evaluated_rows": 700,
+            "mae": "54.2357",
+            "mape": "81.4125",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "143.8100",
+            "status": "evaluable",
+            "wape": "148.1966",
+            "zero_actual_overforecast_units": "19128.0000",
+            "zero_actual_rows": 478
+          },
+          "origin": "2026-04-23T23:59:59+00:00",
+          "rf": {
+            "bias": "25.7014",
+            "evaluated_rows": 700,
+            "mae": "60.4329",
+            "mape": "81.5759",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "164.6710",
+            "status": "evaluable",
+            "wape": "165.1300",
+            "zero_actual_overforecast_units": "23699.0000",
+            "zero_actual_rows": 478
+          },
+          "split": "test",
+          "target_end": "2026-04-30",
+          "target_start": "2026-04-24"
+        }
+      ],
+      "model_id": "sha256:1b8d99db2f607418dc480b2b9f04d2f4a750e3fb47973d9965f419249e05daca",
+      "n_estimators": 20,
+      "predictions_logical_sha256": "b8ac77b229ee4fc6ae516daf137a7a109693739e44044362e341b42f129334a4",
+      "run_id": "d0d250f4951d44abbbaad1b358002f80",
+      "run_manifest_sha256": "d1c62e682abe1ac002939ca6a12bf708c9f8d20f4e7ab0e24360ae65da3cf509",
+      "source_git_commit": "97a4aa6c899fe7c9eb77cb057608a265b06ff980",
+      "source_tree_sha256": "1d8d69d94d27f34c5a23d424e952d292ce378d7bfe992aaa4aba71f64d85a38f",
+      "source_worktree_changes": [],
+      "status": "rejected",
+      "validation_mean_wape": "127.1153333333333333333333333"
+    },
+    "rf_80": {
+      "admission_checks": {
+        "coverage": "passed",
+        "final_quality": "failed",
+        "protocol": "passed",
+        "reproduction": "passed",
+        "segments": "failed",
+        "stability": "passed"
+      },
+      "environment": {
+        "dependencies": {
+          "joblib": "1.6.0",
+          "numpy": "2.4.6",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.17.1",
+          "threadpoolctl": "3.7.0"
+        },
+        "implementation": "CPython",
+        "machine": "arm64",
+        "python": "3.11.15",
+        "system": "Darwin"
+      },
+      "experiment_id": "rf-a2161d63d4f37f978620",
+      "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+      "folds": [
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "-9.5886",
+            "evaluated_rows": 700,
+            "mae": "57.9857",
+            "mape": "74.7452",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "208.7043",
+            "status": "evaluable",
+            "wape": "123.4564",
+            "zero_actual_overforecast_units": "15392.0000",
+            "zero_actual_rows": 476
+          },
+          "origin": "2026-04-02T23:59:59+00:00",
+          "rf": {
+            "bias": "-3.8771",
+            "evaluated_rows": 700,
+            "mae": "55.5143",
+            "mape": "70.8649",
+            "mape_coverage": "0.3200",
+            "mape_evaluated_rows": 224,
+            "rmse": "193.2227",
+            "status": "evaluable",
+            "wape": "118.1945",
+            "zero_actual_overforecast_units": "15900.0000",
+            "zero_actual_rows": 476
+          },
+          "split": "validation_1",
+          "target_end": "2026-04-09",
+          "target_start": "2026-04-03"
+        },
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "-14.9757",
+            "evaluated_rows": 700,
+            "mae": "60.7843",
+            "mape": "69.3996",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "209.8623",
+            "status": "evaluable",
+            "wape": "111.7036",
+            "zero_actual_overforecast_units": "15260.0000",
+            "zero_actual_rows": 472
+          },
+          "origin": "2026-04-09T23:59:59+00:00",
+          "rf": {
+            "bias": "-6.5543",
+            "evaluated_rows": 700,
+            "mae": "60.5714",
+            "mape": "74.0302",
+            "mape_coverage": "0.3257",
+            "mape_evaluated_rows": 228,
+            "rmse": "194.1914",
+            "status": "evaluable",
+            "wape": "111.3124",
+            "zero_actual_overforecast_units": "16629.0000",
+            "zero_actual_rows": 472
+          },
+          "split": "validation_2",
+          "target_end": "2026-04-16",
+          "target_start": "2026-04-10"
+        },
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "-4.8029",
+            "evaluated_rows": 700,
+            "mae": "61.9257",
+            "mape": "78.1666",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "202.8364",
+            "status": "evaluable",
+            "wape": "128.4157",
+            "zero_actual_overforecast_units": "18170.0000",
+            "zero_actual_rows": 481
+          },
+          "origin": "2026-04-16T23:59:59+00:00",
+          "rf": {
+            "bias": "12.9257",
+            "evaluated_rows": 700,
+            "mae": "69.4371",
+            "mape": "76.2632",
+            "mape_coverage": "0.3129",
+            "mape_evaluated_rows": 219,
+            "rmse": "205.9958",
+            "status": "evaluable",
+            "wape": "143.9922",
+            "zero_actual_overforecast_units": "25234.0000",
+            "zero_actual_rows": 481
+          },
+          "split": "validation_3",
+          "target_end": "2026-04-23",
+          "target_start": "2026-04-17"
+        },
+        {
+          "coverage": "1.0000",
+          "eligible_rows": 700,
+          "evaluated_rows": 700,
+          "moving_average": {
+            "bias": "8.9929",
+            "evaluated_rows": 700,
+            "mae": "54.2357",
+            "mape": "81.4125",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "143.8100",
+            "status": "evaluable",
+            "wape": "148.1966",
+            "zero_actual_overforecast_units": "19128.0000",
+            "zero_actual_rows": 478
+          },
+          "origin": "2026-04-23T23:59:59+00:00",
+          "rf": {
+            "bias": "25.2171",
+            "evaluated_rows": 700,
+            "mae": "58.5029",
+            "mape": "80.4038",
+            "mape_coverage": "0.3171",
+            "mape_evaluated_rows": 222,
+            "rmse": "154.4301",
+            "status": "evaluable",
+            "wape": "159.8564",
+            "zero_actual_overforecast_units": "23621.0000",
+            "zero_actual_rows": 478
+          },
+          "split": "test",
+          "target_end": "2026-04-30",
+          "target_start": "2026-04-24"
+        }
+      ],
+      "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+      "n_estimators": 80,
+      "predictions_logical_sha256": "51b4900aaa2456e81a4ee7986694f95bad6186d1f62134621ffcc06433e8ba5f",
+      "run_id": "4d88f7e8e1334360afc0d662b1375b68",
+      "run_manifest_sha256": "30ae07009e475250023bcf73a9b0a1d158a796611a7073acf2a82234387954ba",
+      "source_git_commit": "97a4aa6c899fe7c9eb77cb057608a265b06ff980",
+      "source_tree_sha256": "1d8d69d94d27f34c5a23d424e952d292ce378d7bfe992aaa4aba71f64d85a38f",
+      "source_worktree_changes": [],
+      "status": "rejected",
+      "validation_mean_wape": "124.4997"
+    }
+  }
+}

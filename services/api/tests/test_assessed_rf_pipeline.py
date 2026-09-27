@@ -16,7 +16,11 @@ from ml.inference.batch_forecast import (
 )
 from ml.metadata.model_registry import MODEL_METADATA_FILENAME
 from ml.metadata.verified_rf import persist_verified_rf_metadata
-from ml.models.random_forest_forecast import MODEL_ARTIFACT_FILENAME, PREDICTIONS_FILENAME
+from ml.models.random_forest_forecast import (
+    METRICS_FILENAME,
+    MODEL_ARTIFACT_FILENAME,
+    PREDICTIONS_FILENAME,
+)
 from ml.observability.model_performance_metrics import (
     MODEL_PERFORMANCE_SNAPSHOT_FILENAME,
     ModelPerformanceMetricsConfig,
@@ -138,3 +142,36 @@ def test_tampered_batch_predictions_cannot_feed_performance_snapshot(
         writer.writerows(rows)
     with pytest.raises(ValueError, match="Batch artifacts"):
         load_verified_batch_manifest(output_dir, load_assessed_run(assessed_rf_run_dir))
+
+
+def test_rehashed_wrong_model_identity_is_rejected(assessed_rf_run_dir) -> None:
+    metrics_path = assessed_rf_run_dir / METRICS_FILENAME
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    metrics["model_id"] = "sha256:wrong-model"
+    metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+    manifest_path = assessed_rf_run_dir / RUN_MANIFEST_FILENAME
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["artifact_sha256"][METRICS_FILENAME] = file_sha256(metrics_path)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="model identity mismatch"):
+        load_assessed_run(assessed_rf_run_dir)
+
+
+def test_rehashed_status_override_cannot_promote_model(assessed_rf_run_dir) -> None:
+    metrics_path = assessed_rf_run_dir / METRICS_FILENAME
+    metadata_path = assessed_rf_run_dir / MODEL_METADATA_FILENAME
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metrics["model_status"] = "approved"
+    metadata["status"] = "approved"
+    metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+    manifest_path = assessed_rf_run_dir / RUN_MANIFEST_FILENAME
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["artifact_sha256"][METRICS_FILENAME] = file_sha256(metrics_path)
+    manifest["artifact_sha256"][MODEL_METADATA_FILENAME] = file_sha256(metadata_path)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="model status mismatch"):
+        load_assessed_run(assessed_rf_run_dir)

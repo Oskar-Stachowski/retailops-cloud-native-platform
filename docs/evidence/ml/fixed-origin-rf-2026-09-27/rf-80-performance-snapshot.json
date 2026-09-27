@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "metadata_model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+    "metadata_output_dir": "ci-cd/reports/ml/acceptance/metadata",
+    "source_run_manifest_sha256": "30ae07009e475250023bcf73a9b0a1d158a796611a7073acf2a82234387954ba"
+  },
+  "batch_inference": {
+    "api_forecast_count": 140,
+    "batch_prediction_count": 700,
+    "forecast_date_end": "2026-05-07",
+    "forecast_date_start": "2026-05-01",
+    "run_key": "4d88f7e8e1334360afc0d662b1375b68:sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab:batch-inference"
+  },
+  "evaluation": {
+    "bias": "25.2171",
+    "evaluated_rows": 700,
+    "evaluation_date_end": "2026-04-30",
+    "evaluation_date_start": "2026-04-24",
+    "feature_row_count": 2891,
+    "mae": "58.5029",
+    "mape": "80.4038",
+    "mape_coverage": "0.3171",
+    "mape_evaluated_rows": 222,
+    "rmse": "154.4301",
+    "skipped_rows": 0,
+    "status": "evaluable",
+    "type": "fixed_origin_horizon",
+    "wape": "159.8564",
+    "zero_actual_overforecast_units": "23621.0000",
+    "zero_actual_rows": 478
+  },
+  "experiment_id": "rf-a2161d63d4f37f978620",
+  "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+  "generated_at": "2026-09-27T11:03:52.900127+00:00",
+  "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+  "model_name": "retailops-demand-random-forest",
+  "model_status": "rejected",
+  "model_version": "random-forest-v3",
+  "profile": "small",
+  "run_id": "4d88f7e8e1334360afc0d662b1375b68",
+  "snapshot_name": "retailops-demand-model-performance"
+}

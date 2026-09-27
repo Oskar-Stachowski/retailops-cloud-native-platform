@@ -2,7 +2,7 @@
 
 **Status: propozycja dalszego rozwoju, do wdrożenia. Aktualizacja dokumentacji: 27.09.2026.** Ten katalog opisuje projekt osobnego serwisu AI i wymagania jego przyszłych etapów. Nie potwierdza wdrożenia komponentów ani zatwierdzenia nowych kosztów lub infrastruktury.
 
-Najbliższa praca w istniejącym RetailOps to [poprawna ocena ML i zasady dopuszczania modeli](../ml-evaluation.md). Ten plan przygotowawczy jest odrębny od etapu AI 07, który dotyczy anomalii. Wyniki poprawek ML należy wykorzystać przy rozpoczęciu rozbudowy AI, aby nie powtarzać tych samych zmian.
+Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.
 
 Czytaj kolejno tę mapę, [architekturę](architektura.md) i plik właściwego [etapu](etapy/00-audyt.md). Wspólne wymagania opisują [dane i czas](kontrakty/dane-i-czas.md), [profile i bramki](kontrakty/profile-i-bramki.md), [ML/API](kontrakty/ml-api-lifecycle.md) oraz [integracja i agent](kontrakty/integracja-agent.md). [Runbook docelowy](runbooki/operacje-i-awarie.md) i [szablony kart](szablony/karty-i-evidence.md) są materiałami pomocniczymi. [Rejestr zależności](etapy.json) zawiera tę samą numerację 00–17.
 
