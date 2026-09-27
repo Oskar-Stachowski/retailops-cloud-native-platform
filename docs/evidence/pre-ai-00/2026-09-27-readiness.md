@@ -1,20 +1,25 @@
 # Audyt przygotowań do AI 00 — 27.09.2026
 
-**Decyzja: można rozpocząć instrukcję AI 00. Nie wszystkie przygotowania są
-w pełni zamknięte i nie ma jeszcze zgody na serving ani odbioru dalszych etapów.**
-Najbliższa poprawka to OPS-04: parametr połączenia `dbname` może ominąć
-izolację bazy testu seeda. Audyt AI 00 można prowadzić bez uruchamiania tego
-testu na serwerze z wartościowymi danymi.
+**Decyzja: można rozpocząć instrukcję AI 00. Nie ma otwartych prac wymaganych
+przed jej rozpoczęciem.** Dalsze etapy zachowują własne warunki odbioru;
+przygotowanie nie oznacza dopuszczenia modelu do serving.
 
 ## Rewizja, zakres i dowody
 
-Badano `prep/before-ai-00` na
+Przegląd przygotowań objął `prep/before-ai-00` na
 `4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4`, przy czystym worktree. Odczyt
 GitHub z 2026-09-27 UTC potwierdził ten sam SHA na `origin/main` i
 `origin/prep/before-ai-00`. Porównanie objęło historię przygotowań od
 `35b5586`, pierwotne siedem kroków ML i cztery pilne zadania OPS, aktualny
 kod oraz instrukcje AI 00–17. Zależności 18 instrukcji zgadzają się z
 `etapy.json` i nie tworzą cyklu.
+
+Aktualna decyzja uwzględnia także kod
+`667f3494c9f69f4fee3283aca577c408e89fa545` i
+[weryfikację izolacji seeda](2026-09-27-seed-isolation.md): 27 testów bez DB,
+pięć przebiegów po 10 testów z PostgreSQL i oczekiwany błąd sprawdzający
+sprzątanie. Te zmiany są zapisane lokalnie na branchu; poniższy odczyt CI
+dotyczy wcześniejszego `4da25cb`, nie nowych commitów.
 
 W tym audycie wykonano **103 ukierunkowane testy lokalne**, sprawdzenie
 konfiguracji Compose, integralności zapisanych artefaktów oraz dwie
@@ -34,11 +39,12 @@ Nie znaleziono otwartych PR-ów. Ochrona `main` wymaga PR i `required-result`,
 ma strict checks oraz obejmuje administratorów. Mały zapis odczytu:
 [github-verification.json](github-verification.json).
 
-To odczyt wykonanych workflow, nie nowy lokalny test runtime. Nie uruchamiano
-seeda, migracji ani zapisu do rzeczywistej bazy, nowego stosu Docker,
-Kubernetes lub AWS. Nie wykonywano ponownego treningu kampanii RF ani całej
-instrukcji AI 00. Jej podwójna generacja małego zestawu, pełny audyt generatora,
-kontraktów i backlog pozostają do wykonania.
+Odczyt workflow nie zastępuje nowej lokalnej próby pełnego runtime.
+Weryfikacja seeda użyła osobnego kontenera PostgreSQL bez trwałego wolumenu,
+usuniętego po testach. Nie dotykała bazy deweloperskiej. Nie uruchamiano
+Kubernetes ani AWS, ponownego treningu kampanii RF ani całej instrukcji AI 00.
+Jej podwójna generacja małego zestawu, pełny audyt generatora, kontraktów
+i backlog pozostają do wykonania.
 
 ## Co potwierdzają przygotowania
 
@@ -51,33 +57,29 @@ kontraktów i backlog pozostają do wykonania.
 | Wynik eksperymentu | RF80 ma WAPE 159,8564% wobec 148,1966% średniej ruchomej i status `rejected`. To poprawny wynik przygotowań, bez kwalifikacji do serving. Szczegóły: [ocena RF](../ml/fixed-origin-rf-2026-09-27/README.md). |
 | Trwałość i lokalny dostęp | Zwykły `compose-down` zachowuje wolumeny; seed jest osobnym profilem. Sprawdzono konfigurację podstawową i nakładkę observability: siedem publikowanych portów pozostaje na `127.0.0.1`, również przy próbie nadpisania `HOST_BIND`. |
 | Diagnostyka testów DB | Trzy testy preflight potwierdzają stałe komunikaty bez sekretów w terminalu i JUnit, dla skip oraz fail. To zakres diagnostyki Pytest, nie globalny filtr wyjątków aplikacji. |
+| Izolacja seeda | Parametry query nie nadpisują izolowanej bazy; fixture kontroluje faktyczne `current_database()`. Baza źródłowa, jej schemat i 19 śledzonych plików demo zachowały sumy kontrolne we wszystkich pięciu przebiegach oraz po wymuszonym błędzie. |
 
 ## Otwarte problemy i kolejność dalszych prac
 
 Aktualne kryteria zamknięcia są wyłącznie w
 [otwartych ustaleniach](../../audits/open-findings.md).
 
-1. **OPS-04, P1 — niepełna izolacja seeda.** Fixture zmienia ścieżkę URI,
-   zachowując query `dbname`. Psycopg oraz SQLAlchemy wybierają przez to bazę
-   źródłową. Seed zawiera `TRUNCATE`. Poprawić przed poleganiem na izolacji
-   testów na serwerze z wartościowymi danymi. Reprodukcja poniżej nie otwiera
-   połączeń; nie stwierdzono utraty danych podczas audytu.
-2. **ML-07, P2 — brak wersji dziennych agregatów.** Dodanie późniejszej
+1. **ML-07, P2 — brak wersji dziennych agregatów.** Dodanie późniejszej
    sprzedaży historycznego dnia przesuwa dostępność całej sumy i zmienia
    wcześniejsze cechy. To konkretny warunek odbioru AI 02–04. Aktualny
    syntetyczny generator opóźnia zdarzenia najwyżej do 21:00 tego samego dnia,
    a zapisany panel RF ma zero obserwacji dostępnych dopiero następnego dnia.
    Ustalenie nie unieważnia tej oceny RF i nie blokuje AI 00.
-3. **OPS-03 i OPS-07** pozostają warunkami odbioru streamingu w AI 10:
+2. **OPS-03 i OPS-07** pozostają warunkami odbioru streamingu w AI 10:
    trwałość ACK/DLQ oraz zgodność kontraktu, generatora i consumera.
-4. **OPS-06** pozostaje warunkiem odtwarzalnych wydań: przypięte actions
+3. **OPS-06** pozostaje warunkiem odtwarzalnych wydań: przypięte actions
    i obrazy. W nowym repo stosować od AI 01; istniejące ścieżki uporządkować
    przed wydaniami i wdrożeniami AI 14–15.
 
 Podczas audytu poprawiono w instrukcjach architektury i AI 04 nieaktualne
 stwierdzenie, że obecny batch używa średniej ruchomej, oraz uściślono przykład
 historycznej odpowiedzi RAG w AI 11. Obecny batch jest diagnostycznym batchem
-RF. Instrukcja testów opisuje ograniczenie OPS-04, a kontrakt cech — ML-07.
+RF. Instrukcja testów opisuje izolację seeda, a kontrakt cech — ograniczenie ML-07.
 
 ## Co oznacza zgoda na rozpoczęcie AI
 
@@ -125,6 +127,7 @@ COMPOSE='docker compose --env-file /dev/null' \
 ```
 
 Zielony test consumera potwierdza obecne zachowanie, także commit po błędnym
-JSON; nie jest dowodem zamknięcia OPS-03. Pełne testy seeda z DB nie były tu
-uruchamiane. Reprodukcje OPS-04 i ML-07 wraz z poleceniami weryfikacji
-artefaktów: [reproductions.md](reproductions.md).
+JSON; nie jest dowodem zamknięcia OPS-03. Oddzielna
+[weryfikacja seeda](2026-09-27-seed-isolation.md) podaje polecenia i wyniki
+testów DB. Reprodukcja ML-07 wraz z poleceniami weryfikacji artefaktów:
+[reproductions.md](reproductions.md).

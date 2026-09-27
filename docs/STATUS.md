@@ -1,11 +1,13 @@
 # Aktualny status RetailOps
 
 Aktualizacja dokumentacji i kodu: **2026-09-27**. Ostatni
-[audyt przygotowań AI](evidence/pre-ai-00/2026-09-27-readiness.md) dotyczy
-`4da25cba4acd721ce88cb5c07ac7bec23cc8f0f4`: 103 ukierunkowane testy lokalne,
-przegląd kodu i odczyt wyników CI. Nie obejmuje nowej lokalnej próby pełnego
-runtime ani audytu konta AWS. Daty, rewizje i zakres pozostałych prób podaje
-[indeks dowodów](evidence/README.md).
+[audyt przygotowań AI](evidence/pre-ai-00/2026-09-27-readiness.md) obejmuje
+przegląd i 103 testy na `4da25cb` oraz
+[weryfikację izolacji seeda](evidence/pre-ai-00/2026-09-27-seed-isolation.md)
+na kodzie `667f349`: 27 testów bez DB, pięć przebiegów po 10 testów z DB
+i próbę sprzątania po błędzie. Odczytane zielone CI dotyczy `4da25cb`;
+nowsze commity lokalne mają opisaną walidację lokalną. Nie jest to nowy odbiór
+pełnego runtime ani konta AWS. Zakres pozostałych prób: [indeks dowodów](evidence/README.md).
 
 ## Dostępne możliwości
 
@@ -34,8 +36,7 @@ MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/
 ## Punkt wznowienia
 
 Można rozpocząć instrukcję **AI 00**; sam etap nadal jest do wykonania.
-Najbliższa poprawka RetailOps to OPS-04: query `dbname` może skierować seed
-testowy do bazy źródłowej mimo losowej nazwy w ścieżce URL.
+Nie ma otwartych prac wymaganych przed jego rozpoczęciem.
 [Lista przed AI 00](plans/before-ai-00.md) i [otwarte ustalenia](audits/open-findings.md)
 przypisują pozostałe warunki do właściwych etapów. Historyczne wersje danych,
 streaming, rzeczywiste auth i serving wymagają ich własnych bramek odbioru.

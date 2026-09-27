@@ -1,29 +1,9 @@
 # Reprodukcje audytu przygotowań AI
 
 Dotyczą rewizji i środowisk z [raportu 27.09.2026](2026-09-27-readiness.md).
-Polecenia wykonuje się z root repo. Przykładowy URL zawiera wyłącznie fikcyjne
-dane; pierwsze dwa przypadki działają w pamięci, bez bazy i zapisu datasetu.
-
-## OPS-04: wybór bazy po zmianie ścieżki URL
-
-```bash
-PYTHONDONTWRITEBYTECODE=1 services/api/.venv/bin/python - <<'PY'
-from urllib.parse import urlsplit, urlunsplit
-from psycopg.conninfo import conninfo_to_dict
-from sqlalchemy.dialects.postgresql.psycopg import PGDialect_psycopg
-from sqlalchemy.engine import make_url
-
-source = "postgresql://demo:placeholder@127.0.0.1/retailops?dbname=retailops"
-isolated = urlunsplit(urlsplit(source)._replace(path="/retailops_seed_test_probe"))
-print("URI path:", urlsplit(isolated).path)
-print("psycopg dbname:", conninfo_to_dict(isolated)["dbname"])
-_, params = PGDialect_psycopg().create_connect_args(make_url(isolated))
-print("SQLAlchemy psycopg dialect dbname:", params["dbname"])
-PY
-```
-
-Wynik: ścieżka `/retailops_seed_test_probe`, ale obydwa sterowniki wybierają
-`retailops`. Nie wykonano połączenia ani `TRUNCATE`.
+Polecenia wykonuje się z root repo. Reprodukcja ML-07 działa w pamięci,
+bez bazy i zapisu datasetu. Kontrole seeda mają osobny
+[raport weryfikacji](2026-09-27-seed-isolation.md).
 
 ## ML-07: zmiana historii po dodaniu późniejszego zdarzenia
 

@@ -45,10 +45,14 @@ utworzone zasoby.
 Sam `test_seed_data.py` generuje CSV w katalogu tymczasowym Pytest i tworzy bazę
 o losowej nazwie na serwerze wskazanym przez `DATABASE_URL`; sprząta ją także
 przy niepowodzeniu. Konto bazy musi mieć uprawnienie `CREATEDB`. Śledzone
-`data/demo` pozostaje bez zmian. Izolacja bazy ma jednak otwartą lukę
-[OPS-04](../audits/open-findings.md): parametr `dbname` w query URL może
-skierować migracje i seed do bazy źródłowej. Do poprawki używaj wyłącznie
-serwera przeznaczonego do testów, bez wartościowych danych.
+`data/demo` i baza źródłowa pozostają bez zmian. Budowanie URL usuwa wszystkie
+parametry `dbname` z query, także powtórzone i zakodowane, zachowując inne
+opcje połączenia. Fixture sprawdza `current_database()` na połączeniu
+administracyjnym przed CREATE/DROP oraz na połączeniu testowym przed
+udostępnieniem URL migracjom i seedowi. Niezgodność przerywa przygotowanie.
+[Weryfikacja z 27.09.2026](../evidence/pre-ai-00/2026-09-27-seed-isolation.md)
+obejmuje zachowanie zawartości i schematu bazy źródłowej, powtórzenie oraz
+sprzątanie po wymuszonym błędzie.
 Cel `make api-integration-test` nadal jawnie ładuje demo do wskazanej bazy
 przed uruchomieniem całego zestawu testów.
 
