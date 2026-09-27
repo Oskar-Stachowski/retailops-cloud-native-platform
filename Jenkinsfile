@@ -74,7 +74,7 @@ security_gate=separate-protected-github-required-ci
             }
             // Compose runner cleans only its own project, even after failure.
             archiveArtifacts(
-                artifacts: 'ci-cd/reports/jenkins-release-evidence.txt,ci-cd/reports/api/coverage.xml,ci-cd/reports/data/*report.json,ci-cd/reports/data/generated/*/*report.json,ci-cd/reports/docker/isolated-runtime.json,ci-cd/reports/observability/incident-drill.json',
+                artifacts: 'ci-cd/reports/jenkins-release-evidence.txt,ci-cd/reports/api/coverage.xml,ci-cd/reports/data/*report.json,ci-cd/reports/data/generated/*/*report.json,ci-cd/reports/docker/isolated-runtime.json,ci-cd/reports/docker/compose-persistence.json,ci-cd/reports/observability/incident-drill.json',
                 allowEmptyArchive: false,
                 fingerprint: true
             )

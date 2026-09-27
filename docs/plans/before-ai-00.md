@@ -12,8 +12,6 @@ ustaleń poniżej.
 
 ## Poprawki zalecane przed intensywnym testowaniem
 
-- [ ] **OPS-01: zachowanie danych** — zatrzymywanie i ponowne uruchamianie
-  Compose bez kasowania wolumenów i ponownego seeda; osobna operacja resetu.
 - [ ] **OPS-02: granica lokalnego demo** — domyślny dostęp przez loopback,
   ponieważ przełączanie użytkowników demo nie jest uwierzytelnieniem.
 - [ ] **OPS-04: izolacja testów seeda** — katalog tymczasowy i osobna baza,

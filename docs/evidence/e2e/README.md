@@ -78,6 +78,10 @@ accessibility and performance checks remain separate work.
 make compose-up
 ```
 
+For a new, empty project, load the demo data once with `make compose-seed` as
+described in the [local setup guide](../../guides/local-development.md). Running
+it again replaces application tables.
+
 Default runtime URLs:
 
 - `FRONTEND_BASE_URL=http://localhost:3000`

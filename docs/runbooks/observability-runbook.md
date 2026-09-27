@@ -56,6 +56,6 @@ nie jest SLO żądań użytkowników ani dowodem 30 dni dostępności.
 docker compose --profile dev --profile observability stop
 ```
 
-`make observability-up` uruchamia także migracje i seed; nie jest neutralnym
-restartem samego monitoringu. `make compose-down` usuwa wolumeny przez `-v`.
+`make observability-up` uruchamia także migracje, ale nie seeduje bazy.
+`make compose-down` zachowuje wolumeny; `make compose-reset` je usuwa.
 Pełny cykl start/stop opisuje [instrukcja lokalna](../guides/local-development.md).

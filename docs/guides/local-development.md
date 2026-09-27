@@ -22,16 +22,20 @@ nie służy do konfiguracji publicznego środowiska.
 
 ```bash
 make compose-up
+make compose-seed
 ```
 
 Odpowiednik bez Make:
 
 ```bash
 COMPOSE_PROFILES=dev,observability docker compose up --build -d
+COMPOSE_PROFILES=seed docker compose run --rm --no-deps seed
 ```
 
-Compose uruchamia PostgreSQL, migracje Alembic, ładowanie danych, API, frontend,
-Redpandę z inicjalizacją tematów oraz Prometheus i Grafanę. Profil danych
+Compose uruchamia PostgreSQL, migracje Alembic, API, frontend,
+Redpandę z inicjalizacją tematów oraz Prometheus i Grafanę. Dane ładujesz
+osobnym poleceniem `compose-seed` tylko dla nowej bazy lub świadomego ponownego
+importu. Profil danych
 `RETAILOPS_SEED_DATA_PROFILE=small` jest domyślny; `demo` daje mniejszy zbiór do
 szybkiej demonstracji. Zadanie `seed` odtwarza zawartość tabel aplikacyjnych,
 więc jego ponowne wykonanie usuwa wcześniejsze zmiany w tych danych.
@@ -67,27 +71,37 @@ więc nie dowodzi przepływu producent → broker → konsument. Szczegóły:
 Aby obejrzeć logi:
 
 ```bash
-docker compose --profile dev --profile observability logs --tail=100 api seed migrate
+docker compose --profile dev --profile observability logs --tail=100 api migrate
 ```
 
-Zatrzymaj i później wznów istniejące kontenery bez ponownego ładowania danych:
+Zatrzymaj projekt i później uruchom go ponownie bez ponownego ładowania danych:
 
 ```bash
-docker compose --profile dev --profile observability stop
-docker compose --profile dev --profile observability start db redpanda api frontend prometheus grafana
+make compose-down
+make compose-up
 ```
 
-Aby usunąć kontenery, zachowując nazwane wolumeny:
+`compose-down` usuwa kontenery i sieć projektu, ale zachowuje nazwane wolumeny
+PostgreSQL, Redpandy, Prometheusa i Grafany. `compose-up` wykonuje migracje,
+lecz nie uruchamia seeda. Odpowiednik zatrzymania bez Make:
 
 ```bash
 docker compose --profile dev --profile observability down --remove-orphans
 ```
 
-Kolejne `up` odtworzy zadanie `seed`, które ponownie załaduje dane aplikacji.
-`make compose-down` wykonuje dodatkowo `down -v`: usuwa także wolumeny bazy,
-brokera i monitoringu. Używaj go wyłącznie do zamierzonego wyczyszczenia lokalnego
-środowiska. Przy własnym `COMPOSE_PROJECT_NAME` zachowaj tę samą nazwę projektu
-we wszystkich poleceniach.
+Jawny reset całego projektu usuwa również te wolumeny. Po nim uruchom usługi
+i załaduj dane od nowa:
+
+```bash
+make compose-reset
+make compose-up
+make compose-seed
+```
+
+Sam `compose-seed` też zastępuje tabele aplikacyjne. Przy własnym
+`COMPOSE_PROJECT_NAME` zachowaj tę samą nazwę projektu we wszystkich
+poleceniach. `make db-down` zachowuje wolumeny; `make db-reset-seed-small`
+i `make db-reset-seed-medium` wykonują jawny reset przed importem.
 
 ## Praca nad kodem
 

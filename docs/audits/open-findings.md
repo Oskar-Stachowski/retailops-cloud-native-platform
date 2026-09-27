@@ -11,19 +11,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 
 ## Runtime i bezpieczeństwo
 
-### OPS-01 · P1 · Zwykłe zatrzymanie Compose usuwa wolumeny
-
-**Dowód:** target `compose-down` w [Makefile](../../Makefile) wykonuje
-`docker compose down -v --remove-orphans`. Usuwa więc dane wolumenów danego
-projektu, mimo nazwy sugerującej samo zatrzymanie.
-
-**Kryterium zamknięcia:** zwykłe `compose-down` zachowuje wolumeny; usuwanie
-danych ma osobny, jednoznaczny target resetu. Zwykłe ponowne uruchomienie nie
-seeduje ponownie bazy. Weryfikacja zapisuje rekord, zatrzymuje i uruchamia ten
-sam projekt oraz potwierdza zachowanie rekordu. Do czasu poprawki zatrzymuj
-stack przez `docker compose --profile dev --profile observability stop`;
-[instrukcja lokalna](../guides/local-development.md) opisuje wznowienie bez seeda.
-
 ### OPS-02 · P1 · Demo auth jest połączone z domyślnym nasłuchem na wszystkich interfejsach
 
 **Dowód:** [model użytkowników](../../services/api/app/auth/roles.py) wybiera

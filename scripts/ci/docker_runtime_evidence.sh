@@ -3,7 +3,7 @@ set -euo pipefail
 
 COMPOSE="${COMPOSE:-docker compose}"
 DOCKER_REPORTS_DIR="${DOCKER_REPORTS_DIR:-ci-cd/reports/docker}"
-COMPOSE_PROFILE_SET="${COMPOSE_PROFILE_SET:-dev test observability security}"
+COMPOSE_PROFILE_SET="${COMPOSE_PROFILE_SET:-dev test observability security seed}"
 API_IMAGE="${API_IMAGE:-retailops-api:0.1.0}"
 FRONTEND_IMAGE="${FRONTEND_IMAGE:-retailops-frontend:0.1.0}"
 
