@@ -124,7 +124,12 @@ def test_evaluation_metrics_include_error_and_bias() -> None:
     )
 
     assert metrics == {
+        "status": "evaluable",
         "evaluated_rows": 2,
+        "mape_evaluated_rows": 2,
+        "mape_coverage": "1.0000",
+        "zero_actual_rows": 0,
+        "zero_actual_overforecast_units": "0.0000",
         "mae": "2.0000",
         "rmse": "2.0000",
         "mape": "20.0000",

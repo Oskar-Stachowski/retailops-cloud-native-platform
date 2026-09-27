@@ -25,7 +25,12 @@ def test_model_performance_metrics_render_prometheus_text() -> None:
         "evaluation_date_start": "2026-05-01",
         "evaluation_date_end": "2026-05-07",
         "metrics": {
+            "status": "evaluable",
             "evaluated_rows": 98,
+            "mape_evaluated_rows": 80,
+            "mape_coverage": "0.8163",
+            "zero_actual_rows": 18,
+            "zero_actual_overforecast_units": "42.0000",
             "mae": "4.2500",
             "rmse": "5.5000",
             "mape": "12.7500",
@@ -62,9 +67,17 @@ def test_model_performance_metrics_render_prometheus_text() -> None:
         " 4.2500"
     ) in metrics_text
     assert "retailops_model_evaluation_mape_percent" in metrics_text
+    assert "retailops_model_evaluation_mape_coverage" in metrics_text
+    assert "retailops_model_evaluation_zero_actual_overforecast_units" in metrics_text
     assert "retailops_model_evaluation_wape_percent" in metrics_text
     assert "retailops_model_api_forecasts_total" in metrics_text
     assert "retailops_model_artifact_generated_timestamp_seconds" in metrics_text
+
+    snapshot["evaluation"]["wape"] = None
+    snapshot["evaluation"]["mape"] = None
+    undefined_text = render_model_performance_metrics(snapshot)
+    assert "retailops_model_evaluation_wape_percent" not in undefined_text
+    assert "retailops_model_evaluation_mape_percent" not in undefined_text
 
 
 def test_model_performance_metrics_job_writes_snapshot_and_prometheus_artifact(tmp_path) -> None:
@@ -100,5 +113,6 @@ def test_model_performance_metrics_job_writes_snapshot_and_prometheus_artifact(t
     assert written_snapshot["model_version"] == snapshot["model_version"]
     assert written_snapshot["model_status"] == "candidate"
     assert written_snapshot["evaluation"]["evaluated_rows"] > 0
+    assert written_snapshot["evaluation"]["mape_evaluated_rows"] <= written_snapshot["evaluation"]["evaluated_rows"]
     assert "retailops_model_evaluation_rmse" in metrics_text
     assert "retailops_model_batch_predictions_total" in metrics_text

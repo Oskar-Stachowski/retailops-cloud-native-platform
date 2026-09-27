@@ -8,7 +8,7 @@ Random Forest od treningu do użycia.
 
 Najbliższą pracę opisuje [plan poprawnej oceny ML](../plans/ml-evaluation.md).
 [Otwarte ustalenia](../audits/open-findings.md) zawierają potwierdzone ograniczenia
-metryk, dopuszczania modeli i spójności artefaktów.
+dopuszczania modeli i spójności artefaktów.
 
 ## Polecenia i artefakty
 
@@ -79,6 +79,18 @@ Lagi `1`/`7` odnoszą się do dat kalendarzowych względem origin; brak dnia ma
 osobny wskaźnik dostępności. Okno średniej obejmuje określoną liczbę dni,
 a serie z niewystarczającą historią są pomijane i liczone w pokryciu.
 
+Raporty RF, kroczącego baseline i poszczególnych okien używają tych samych zasad
+metryk. WAPE jest `null`, a status metryk `not_evaluable`, gdy nie ma rekordów
+lub suma `actual_units` wynosi zero. MAPE liczy tylko rekordy ze ściśle dodatnim
+`actual_units`; `mape_evaluated_rows` i `mape_coverage` pokazują jego liczebność
+i udział we wszystkich ocenianych rekordach. Dla samych zer MAPE też jest `null`.
+MAE, RMSE, bias, liczba zer oraz `zero_actual_overforecast_units` pozostają
+widoczne, jeśli są rekordy. Wierszowy błąd procentowy w CSV jest pusty dla
+zerowego actual. Brak ocenialnego WAPE, pusty zbiór lub nieprawidłowa wartość
+nie pozwalają nadać RF statusu `candidate`; dane niefinitywne, ujemne lub
+brakujące przerywają obliczenie metryk. W eksporcie Prometheus nieokreślony
+WAPE/MAPE nie tworzy próbki o wartości zero.
+
 `experiment_inputs.json` zawiera commit i sumy plików źródłowych (wraz ze stanem
 worktree), żądaną i efektywną konfigurację generatora, daty i liczności danych,
 logiczne sumy tabel, cech i panelu, kontrakt, parametry modelu, rzeczywiste wersje
@@ -103,7 +115,7 @@ pokazuje zapisane identyfikatory i sumy.
   pochodzenie i ograniczenia. Targetem jest obserwowana sprzedaż `units_sold`;
   brak wiersza cech nie oznacza zera. Dopiero jawna syntetyczna deklaracja
   kompletności pozwala sklasyfikować go w panelu oceny jako `complete_zero`.
-- Status RF `candidate` wynika wyłącznie z niższego WAPE od baseline.
+- Status RF `candidate` wymaga ocenialnego WAPE niższego od baseline.
   Nie stanowi pełnej polityki dopuszczenia.
 - Status rejestru baseline jest parametrem CLI. `approved` jest dozwoloną
   wartością tekstową, a nie wynikiem wdrożonego procesu zatwierdzania.

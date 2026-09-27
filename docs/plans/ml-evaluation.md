@@ -4,7 +4,7 @@
 
 Celem jest świeży, odtwarzalny eksperyment ML, wiarygodne metryki i uzasadniona decyzja `candidate` albo `rejected`. Rzetelne odrzucenie modelu jest poprawnym wynikiem; nie wymaga dalszego strojenia w celu wymuszenia sukcesu.
 
-Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów i ocenę całego horyzontu na syntetycznym panelu. Dalsza praca dotyczy metryk, polityki dopuszczenia i użycia ocenionego artefaktu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
+Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów, poprawne metryki i ocenę całego horyzontu na syntetycznym panelu. Dalsza praca dotyczy polityki dopuszczenia i użycia ocenionego artefaktu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
 
 ## 1. Kontrolowane treningi i analiza wyników
 
@@ -31,7 +31,6 @@ Poniższe liczby są **propozycją do oceny przed eksperymentem, nie zatwierdzon
 | Drift | `failed` blokuje; `warning` wymaga jawnego uzasadnienia dalszej decyzji |
 
 - Zapisać decyzję i wynik każdego warunku w formacie maszynowym.
-- Brak ocenialnych danych, zerowy mianownik i nieprawidłowe metryki oznaczają brak podstaw do pozytywnej decyzji, nie idealny wynik.
 - Ustalić granicę statusów: `candidate` dopuszcza dalszą lokalną walidację; nie oznacza produkcyjnej gotowości.
 - Proste kontrole driftu na syntetycznych seedach potwierdzają mechanizm kontroli; nie dowodzą odporności na rzeczywisty drift produkcyjny.
 

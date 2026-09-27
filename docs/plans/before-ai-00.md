@@ -11,15 +11,13 @@ ustaleń poniżej.
 
 ## Ocena ML — główny pakiet przygotowawczy
 
-1. [ ] **Poprawne metryki** — zerowy mianownik lub brak danych nie mogą
-   oznaczać idealnego wyniku ani pozwalać na pozytywną decyzję o modelu.
-2. [ ] **Zasady dopuszczania modelu** — ustalone przed eksperymentem kryteria
+1. [ ] **Zasady dopuszczania modelu** — ustalone przed eksperymentem kryteria
    jakości, stabilności i odtwarzalności oraz uzasadniona decyzja `candidate`
    albo `rejected`, której nie można obejść ręcznym ustawieniem statusu.
-3. [ ] **Spójna ścieżka modelu** — batch, metadane i metryki korzystają
+2. [ ] **Spójna ścieżka modelu** — batch, metadane i metryki korzystają
    z dokładnie ocenionego artefaktu RF, bez cichego przełączenia na baseline
    lub ponownego treningu.
-4. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
+3. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
    wyniku, testy negatywne w CI, datowany raport i zmiany na `main` przez PR.
    Rzetelne odrzucenie modelu również może zakończyć ten pakiet.
 

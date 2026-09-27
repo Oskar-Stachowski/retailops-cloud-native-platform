@@ -11,21 +11,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 
 ## ML — do poprawy przed następną oceną modelu
 
-### ML-03 · P1 · Nieokreślone metryki są raportowane jako zero
-
-**Dowód:** `calculate_prediction_metrics` i `_safe_percentage_error` w
-[modelu RF](../../ml/models/random_forest_forecast.py) oraz `calculate_metrics`
-w [ocenie baseline](../../ml/evaluation/baseline_report.py) zwracają WAPE równe
-zero przy zerowej sumie actuals. MAPE przypisuje zerowy błąd procentowy rekordom
-z actual równym zero i uwzględnia je w średniej. Dodatnia błędna prognoza na
-samych zerach może więc otrzymać WAPE i MAPE równe zero.
-
-**Kryterium zamknięcia:** WAPE przy zerowym mianowniku ma `null` i status
-`not_evaluable`; MAPE obejmuje jawnie określone dodatnie actuals i podaje pokrycie.
-Raport zachowuje MAE i nadmiarową prognozę na zerach. Pusty zbiór, nieprawidłowe
-wartości i brak ocenialnej metryki nie pozwalają przejść bramki jakości.
-Test obejmuje m.in. actual `[0]`, prediction `[100]`.
-
 ### ML-04 · P1 · Status modelu nie wynika z pełnej polityki dopuszczenia
 
 **Dowód:** `model_status_from_metrics` w

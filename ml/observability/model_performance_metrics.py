@@ -104,7 +104,12 @@ def build_model_performance_snapshot(
         "feature_dataset_id": evaluation_report["feature_dataset_id"],
         "evaluation": {
             "type": evaluation_report["evaluation_type"],
+            "status": metrics["status"],
             "evaluated_rows": metrics["evaluated_rows"],
+            "mape_evaluated_rows": metrics["mape_evaluated_rows"],
+            "mape_coverage": metrics["mape_coverage"],
+            "zero_actual_rows": metrics["zero_actual_rows"],
+            "zero_actual_overforecast_units": metrics["zero_actual_overforecast_units"],
             "skipped_rows": evaluation_report["skipped_rows"],
             "mae": metrics["mae"],
             "rmse": metrics["rmse"],
@@ -194,6 +199,14 @@ def render_model_performance_metrics(snapshot: dict[str, object]) -> str:
         "retailops_model_evaluation_mape_percent": (
             "Mean absolute percentage error for the latest model evaluation.",
             "mape",
+        ),
+        "retailops_model_evaluation_mape_coverage": (
+            "Fraction of evaluated rows with strictly positive actual units.",
+            "mape_coverage",
+        ),
+        "retailops_model_evaluation_zero_actual_overforecast_units": (
+            "Overforecast units on rows with zero actual demand.",
+            "zero_actual_overforecast_units",
         ),
         "retailops_model_evaluation_bias": (
             "Average signed forecast bias for the latest model evaluation.",

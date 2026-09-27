@@ -9,7 +9,7 @@ import uuid
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path
 
 import joblib
@@ -21,6 +21,7 @@ from data.generator.common import BASE_DATE
 from data.generator.main import DatasetGenerationConfig, build_dataset
 from data.generator.manifest import GENERATOR_VERSION, build_dataset_manifest
 from data.generator.profile_engine import profile_defaults
+from ml.evaluation.metrics import calculate_forecast_metrics
 from ml.experiments.identity import (
     INPUT_MANIFEST_FILENAME,
     RUN_MANIFEST_FILENAME,
@@ -127,8 +128,8 @@ def _quantity(value: float | Decimal) -> int:
     return max(0, int(Decimal(str(value)).quantize(Decimal(1), rounding=ROUND_HALF_UP)))
 
 
-def _safe_percentage_error(error: Decimal, actual: Decimal) -> Decimal:
-    return error / actual * Decimal(100) if actual > 0 else Decimal(0)
+def _percentage_error(error: Decimal, actual: Decimal) -> str:
+    return _metric(error / actual * Decimal(100)) if actual > 0 else ""
 
 
 def _mean(values: list[Decimal]) -> Decimal:
@@ -283,49 +284,7 @@ def calculate_prediction_metrics(
     *,
     prediction_field: str,
 ) -> dict[str, object]:
-    if not predictions:
-        return {
-            "evaluated_rows": 0,
-            "mae": "",
-            "rmse": "",
-            "mape": "",
-            "bias": "",
-            "wape": "",
-        }
-
-    row_count = Decimal(len(predictions))
-    absolute_errors: list[Decimal] = []
-    squared_errors: list[Decimal] = []
-    percentage_errors: list[Decimal] = []
-    actual_values: list[Decimal] = []
-    predicted_values: list[Decimal] = []
-
-    for row in predictions:
-        actual = _decimal(row["actual_units"])
-        predicted = _decimal(row[prediction_field])
-        error = predicted - actual
-        absolute_error = abs(error)
-        actual_values.append(actual)
-        predicted_values.append(predicted)
-        absolute_errors.append(absolute_error)
-        squared_errors.append(error * error)
-        percentage_errors.append(_safe_percentage_error(absolute_error, actual))
-
-    mae = sum(absolute_errors) / row_count
-    rmse = (sum(squared_errors) / row_count).sqrt()
-    mape = sum(percentage_errors) / row_count
-    bias = (sum(predicted_values) - sum(actual_values)) / row_count
-    actual_total = sum(actual_values)
-    wape = sum(absolute_errors) / actual_total * Decimal(100) if actual_total > 0 else Decimal(0)
-
-    return {
-        "evaluated_rows": len(predictions),
-        "mae": _metric(mae),
-        "rmse": _metric(rmse),
-        "mape": _metric(mape),
-        "bias": _metric(bias),
-        "wape": _metric(wape),
-    }
+    return calculate_forecast_metrics(predictions, prediction_field=prediction_field)
 
 
 def model_status_from_metrics(
@@ -334,8 +293,23 @@ def model_status_from_metrics(
     *,
     primary_metric: str = PRIMARY_METRIC,
 ) -> str:
-    trained_value = Decimal(str(trained_metrics[primary_metric]))
-    baseline_value = Decimal(str(baseline_metrics[primary_metric]))
+    if (
+        trained_metrics.get("status") != "evaluable"
+        or baseline_metrics.get("status") != "evaluable"
+        or trained_metrics.get("evaluated_rows", 0) != baseline_metrics.get("evaluated_rows", 0)
+        or not isinstance(trained_metrics.get("evaluated_rows"), int)
+        or trained_metrics["evaluated_rows"] <= 0
+    ):
+        return "rejected"
+    try:
+        trained_value = Decimal(str(trained_metrics[primary_metric]))
+        baseline_value = Decimal(str(baseline_metrics[primary_metric]))
+    except (KeyError, InvalidOperation, TypeError, ValueError):
+        return "rejected"
+    if not trained_value.is_finite() or not baseline_value.is_finite():
+        return "rejected"
+    if trained_value < 0 or baseline_value < 0:
+        return "rejected"
     return "candidate" if trained_value < baseline_value else "rejected"
 
 
@@ -390,11 +364,13 @@ def build_predictions(
                 "absolute_error": _metric(absolute_error),
                 "baseline_absolute_error": _metric(baseline_absolute_error),
                 "squared_error": _metric(error * error),
-                "absolute_percentage_error": _metric(
-                    _safe_percentage_error(absolute_error, Decimal(actual_units)),
+                "absolute_percentage_error": _percentage_error(
+                    absolute_error,
+                    Decimal(actual_units),
                 ),
-                "baseline_absolute_percentage_error": _metric(
-                    _safe_percentage_error(baseline_absolute_error, Decimal(actual_units)),
+                "baseline_absolute_percentage_error": _percentage_error(
+                    baseline_absolute_error,
+                    Decimal(actual_units),
                 ),
             },
         )
@@ -431,9 +407,10 @@ def fixed_prediction_rows(
                 "absolute_error": _metric(abs(error)),
                 "baseline_absolute_error": _metric(abs(baseline_error)),
                 "squared_error": _metric(error * error),
-                "absolute_percentage_error": _metric(_safe_percentage_error(abs(error), actual)),
-                "baseline_absolute_percentage_error": _metric(
-                    _safe_percentage_error(abs(baseline_error), actual),
+                "absolute_percentage_error": _percentage_error(abs(error), actual),
+                "baseline_absolute_percentage_error": _percentage_error(
+                    abs(baseline_error),
+                    actual,
                 ),
             },
         )
@@ -591,13 +568,16 @@ def build_metrics_report(
         prediction_field="baseline_predicted_units",
     )
     model_status = model_status_from_metrics(trained_metrics, baseline_metrics)
-    baseline_primary = Decimal(str(baseline_metrics[PRIMARY_METRIC]))
-    trained_primary = Decimal(str(trained_metrics[PRIMARY_METRIC]))
-    improvement = (
-        (baseline_primary - trained_primary) / baseline_primary * Decimal(100)
-        if baseline_primary > 0
-        else Decimal(0)
-    )
+    baseline_value = baseline_metrics[PRIMARY_METRIC]
+    trained_value = trained_metrics[PRIMARY_METRIC]
+    improvement = None
+    if baseline_value is not None and trained_value is not None:
+        baseline_primary = Decimal(str(baseline_value))
+        trained_primary = Decimal(str(trained_value))
+        if baseline_primary > 0:
+            improvement = _metric(
+                (baseline_primary - trained_primary) / baseline_primary * Decimal(100),
+            )
 
     train_count = final_fold["training_examples"]
     test_count = len(final_predictions)
@@ -610,7 +590,7 @@ def build_metrics_report(
         "model_type": MODEL_TYPE,
         "model_status": model_status,
         "primary_metric": PRIMARY_METRIC,
-        "primary_metric_improvement_percent": _metric(improvement),
+        "primary_metric_improvement_percent": improvement,
         "baseline_model_name": "retailops-demand-baseline-moving-average",
         "evaluation_type": "fixed_origin_horizon",
         "evaluation_scope": EVALUATION_SCOPE,
@@ -692,6 +672,8 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
         for row in top_features[:10]
         if isinstance(row, dict)
     ]
+    improvement = metrics_report["primary_metric_improvement_percent"]
+    improvement_text = f"{improvement}%" if improvement is not None else "n/a"
 
     return "\n".join(
         [
@@ -708,7 +690,7 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             f"- Evaluation method: `{metrics_report['evaluation_type']}`",
             f"- Evaluation scope: `{metrics_report['evaluation_scope']}`",
             f"- Primary metric: `{metrics_report['primary_metric']}`",
-            f"- Primary metric improvement: `{metrics_report['primary_metric_improvement_percent']}%`",
+            f"- Primary metric improvement: `{improvement_text}`",
             "",
             "## Data",
             "",
@@ -727,6 +709,9 @@ def build_model_card(metrics_report: dict[str, object]) -> str:
             "",
             f"- Trained WAPE: `{trained_metrics['wape']}`",
             f"- Baseline WAPE: `{baseline_metrics['wape']}`",
+            f"- Metric status: `{trained_metrics['status']}`",
+            f"- MAPE coverage: `{trained_metrics['mape_evaluated_rows']}/{trained_metrics['evaluated_rows']}`",
+            f"- Overforecast on zero actuals (units): `{trained_metrics['zero_actual_overforecast_units']}`",
             f"- Trained MAE: `{trained_metrics['mae']}`",
             f"- Baseline MAE: `{baseline_metrics['mae']}`",
             "",
@@ -995,11 +980,13 @@ def main() -> None:
     config = config_from_args(parse_args())
     metrics_report = train_random_forest_forecast_model(config)
 
+    improvement = metrics_report["primary_metric_improvement_percent"]
+    improvement_text = f"{improvement}%" if improvement is not None else "n/a"
     print(  # noqa: T201 - CLI output
         "RetailOps trained demand forecast model generated: "
         f"{metrics_report['model_status']} "
         f"({metrics_report['primary_metric']} improvement "
-        f"{metrics_report['primary_metric_improvement_percent']}%)",
+        f"{improvement_text})",
     )
     print(f"Experiment ID: {metrics_report['experiment_id']}")  # noqa: T201 - CLI output
     print(f"Run ID: {metrics_report['run_id']}")  # noqa: T201 - CLI output

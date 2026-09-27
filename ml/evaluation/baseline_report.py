@@ -11,6 +11,7 @@ from pathlib import Path
 
 from data.generator.main import DatasetGenerationConfig, build_dataset
 from data.generator.manifest import GENERATOR_VERSION
+from ml.evaluation.metrics import calculate_forecast_metrics
 from ml.features.demand_forecast import (
     GRAIN,
     TARGET,
@@ -124,7 +125,7 @@ def build_backtest_predictions(
             absolute_error = abs(error)
             squared_error = error * error
             absolute_percentage_error = (
-                absolute_error / actual_units * Decimal(100) if actual_units > 0 else Decimal(0)
+                _metric(absolute_error / actual_units * Decimal(100)) if actual_units > 0 else ""
             )
 
             predictions.append(
@@ -140,7 +141,7 @@ def build_backtest_predictions(
                     "actual_units": int(actual_units),
                     "absolute_error": _moneyish(absolute_error),
                     "squared_error": _moneyish(squared_error),
-                    "absolute_percentage_error": _metric(absolute_percentage_error),
+                    "absolute_percentage_error": absolute_percentage_error,
                     "training_rows": len(training_rows),
                     "baseline_window_days": window_days,
                 },
@@ -150,41 +151,7 @@ def build_backtest_predictions(
 
 
 def calculate_metrics(predictions: list[dict[str, object]]) -> dict[str, object]:
-    if not predictions:
-        return {
-            "evaluated_rows": 0,
-            "mae": "",
-            "rmse": "",
-            "mape": "",
-            "bias": "",
-            "wape": "",
-        }
-
-    row_count = Decimal(len(predictions))
-    absolute_errors = [Decimal(str(row["absolute_error"])) for row in predictions]
-    squared_errors = [Decimal(str(row["squared_error"])) for row in predictions]
-    actual_units = [Decimal(str(row["actual_units"])) for row in predictions]
-    predicted_units = [Decimal(str(row["predicted_units"])) for row in predictions]
-    percentage_errors = [Decimal(str(row["absolute_percentage_error"])) for row in predictions]
-
-    mae = sum(absolute_errors) / row_count
-    rmse = (sum(squared_errors) / row_count).sqrt()
-    mape = sum(percentage_errors) / row_count
-    bias = (sum(predicted_units) - sum(actual_units)) / row_count
-    wape = (
-        sum(absolute_errors) / sum(actual_units) * Decimal(100)
-        if sum(actual_units) > 0
-        else Decimal(0)
-    )
-
-    return {
-        "evaluated_rows": len(predictions),
-        "mae": _metric(mae),
-        "rmse": _metric(rmse),
-        "mape": _metric(mape),
-        "bias": _metric(bias),
-        "wape": _metric(wape),
-    }
+    return calculate_forecast_metrics(predictions, prediction_field="predicted_units")
 
 
 def build_evaluation_report(
@@ -242,12 +209,15 @@ def build_evaluation_summary(report: dict[str, object]) -> str:
             f"- Feature dataset: `{report['feature_dataset_id']}`",
             f"- Evaluation window: `{report['evaluation_date_start']}` to `{report['evaluation_date_end']}`",
             f"- Evaluated rows: `{metrics['evaluated_rows']}`",
+            f"- Metric status: `{metrics['status']}`",
             f"- Skipped rows: `{report['skipped_rows']}`",
             f"- MAE: `{metrics['mae']}`",
             f"- RMSE: `{metrics['rmse']}`",
             f"- MAPE: `{metrics['mape']}`",
+            f"- MAPE coverage: `{metrics['mape_evaluated_rows']}/{metrics['evaluated_rows']}`",
             f"- Bias: `{metrics['bias']}`",
             f"- WAPE: `{metrics['wape']}`",
+            f"- Overforecast on zero actuals (units): `{metrics['zero_actual_overforecast_units']}`",
             "",
             "This report is a deterministic local baseline evaluation artifact. It is not a model promotion decision.",
             "",

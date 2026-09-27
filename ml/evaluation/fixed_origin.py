@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 from data.generator.common import BASE_DATE
 from data.generator.main import DatasetGenerationConfig, build_dataset
 from data.generator.profile_engine import profile_defaults
+from ml.evaluation.metrics import calculate_forecast_metrics
 from ml.experiments.identity import logical_rows_sha256
 from ml.features.demand_forecast import (
     build_demand_feature_rows,
@@ -310,18 +311,7 @@ def _metric(value: Decimal) -> str:
 
 
 def _metrics(predictions: list[dict[str, object]], prediction_field: str) -> dict[str, object]:
-    if not predictions:
-        return {"status": "not_evaluable", "mae": None, "wape": None, "bias": None}
-    actual = [Decimal(str(row["actual_units"])) for row in predictions]
-    predicted = [Decimal(str(row[prediction_field])) for row in predictions]
-    errors = [guess - truth for guess, truth in zip(predicted, actual, strict=True)]
-    denominator = sum(actual)
-    return {
-        "status": "evaluable" if denominator > 0 else "not_evaluable",
-        "mae": _metric(sum(map(abs, errors)) / Decimal(len(errors))),
-        "wape": _metric(sum(map(abs, errors)) / denominator * 100) if denominator > 0 else None,
-        "bias": _metric(sum(errors) / Decimal(len(errors))),
-    }
+    return calculate_forecast_metrics(predictions, prediction_field=prediction_field)
 
 
 def evaluate_fixed_origin(  # noqa: PLR0912 - explicit fold eligibility and coverage branches
