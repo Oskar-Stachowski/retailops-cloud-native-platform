@@ -43,7 +43,7 @@ def request(
         headers={"Content-Type": "application/json"},
     )
     try:
-        with urlopen(req, timeout=4) as response:  # noqa: S310 -- controlled cluster services
+        with urlopen(req, timeout=10) as response:  # noqa: S310 -- controlled cluster services
             return response.status, response.read().decode()
     except HTTPError as error:
         return error.code, error.read().decode()
