@@ -1,8 +1,8 @@
 # Najbliższe prace po audycie AI 00
 
 Baza: [pomiary na `cbf28b2`](../../evidence/ai/00/README.md), 27.09.2026.
-**Etap 01 w realizacji; następny zakres: bazowy serwis HTTP.**
-[Fundament repo i pakietu](../../evidence/ai/01/README.md) istnieje w osobnym
+**Etap 01 w realizacji; następny zakres: persistence, migracje i Compose.**
+[Pakiet i bazowy HTTP](../../evidence/ai/01/README.md) działają w osobnym
 lokalnym repo `retailops-ai-intelligence`.
 Ten plik zawiera otwartą pracę, a [audyt](../../audits/open-findings.md)
 dowody błędów i kryteria ich zamknięcia. Etap 01 pozostaje częściowy, 02–17 są planowane;
@@ -11,32 +11,37 @@ brak nowej funkcji z planu nie jest sam w sobie błędem istniejącego demo.
 ## Następny mały PR etapu 01
 
 **Repo:** osobne `retailops-ai-intelligence` obok RetailOps, branch
-`ai/implementation`. Kod fundamentu: `e03d7df`; uzupełnione dowody: `5da5fdc`.
-Bieżące możliwości opisuje `docs/STATUS.md` w repo AI. Repo pozostaje lokalne;
-publikacja, zdalne CI i ochrona gałęzi wymagają osobnego wykonania.
+`ai/implementation`. HTTP: `e6c7888`; dowody czystego checkoutu/wheel: `7d67530`.
+Bieżące możliwości i uruchomienie opisują `docs/STATUS.md` oraz
+`docs/http-service.md` w repo AI. Repo pozostaje lokalne.
 
-Zakres: rzeczywisty serwis `GET /health`, `/ready`, `/version`, `/metrics`.
-Przy implementacji wydziel API/domenę/adapters/pipelines w istniejącym pakiecie,
-wykorzystując jego settings, CLI i lockfile.
+Zakres: PostgreSQL dla AI, oddzielna baza i użytkownik MLflow, jawne migracje
+Alembic oraz lokalny Compose API/Postgres/MLflow z trwałymi wolumenami.
+Zarejestruj rzeczywistą sondę DB w mechanizmie readiness; obecna rola foundation
+sprawdza tylko startup i nie potwierdza gotowości bazy ani predykcji.
 
 **Odbiór tego PR:**
 
-- Health potwierdza działający proces, a readiness sprawdza wymagane zależności
-  konkretnej roli i pogarsza się przy ich awarii. Opcjonalny LLM nie blokuje
-  funkcji ML, które go nie wymagają.
-- Logi JSON, correlation ID, propagacja trace i wspólny kontrakt błędów mają
-  testy; błędne wejścia nie ujawniają sekretów ani wartości konfiguracji.
-- Version zwraca bezpieczne metadane wersji, metryki mają określoną granicę
-  dostępu, a sposób nasłuchiwania i uprawnienia endpointów są jawne.
-- Testy HTTP i provider fakes nie wymagają AWS. Istniejące CI obejmuje nowy kod.
-  Dokumentacja opisuje faktycznie dostępne funkcje serwisu.
+- Własność i uprawnienia AI/MLflow są rozdzielone od operacyjnej bazy RetailOps.
+  Metadata i duże artefakty mają jawne miejsca zapisu; sekrety są poza Git/logami.
+- Migracje mają wersję, są uruchamiane jawnie i nie konkurują ze startem każdego
+  procesu API. Nie zastępuj ich samym create_all przy uruchomieniu serwera.
+- Rzeczywiste `make compose-up/compose-down` uruchamiają i zatrzymują usługi.
+  Porty hosta pozostają lokalne; zasady bind/Host są świadomie dostosowane
+  do kontrolowanej sieci Compose. Nie powstaje drugi broker RetailOps.
+- Zapisane dane przetrwają restart usług. Odłączenie rzeczywistej DB pogarsza
+  readiness do 503, health pozostaje 200, a po powrocie DB gotowość wraca.
+  Raport rozróżnia provider fakes od prób rzeczywistych usług.
+- Konfiguracja, migracje, Compose i nowe testy wchodzą do wymaganych kontroli.
+  Instrukcja obejmuje pierwsze uruchomienie, migrację i bezpieczne zatrzymanie;
+  usunięcie wolumenów nie jest domyślnym shutdown.
 
-Pozostała część **tego samego etapu 01**: jawne migracje, oddzielne persistence
-AI Postgres/MLflow, lokalny Compose z wolumenami i próbami restartu/awarii DB,
-wykonywalne wersje kontraktów danych oraz auth dla własnych endpointów.
+Pozostała część **tego samego etapu 01**: wykonywalne wersje kontraktów
+dataset/feature/label/prediction/run/tool oraz uprawnienia pierwszych endpointów
+aplikacyjnych. Obecny token metryk nie jest systemem tożsamości użytkowników AI.
 Po publikacji repo należy wykonać zdalne CI i ustawić ochronę gałęzi z wymaganym
 `required-result`; lokalna walidacja workflow nie potwierdza tych ustawień.
-Odbiór fundamentu pakietu nie jest odbiorem całego etapu 01.
+Cały etap 01 pozostaje otwarty.
 
 ## Pierwszy mały PR etapu 02
 

@@ -2,18 +2,18 @@
 
 **Repo:** oba; nowe komponenty w AI. **Zależność:** 00. **Rezultat:** działający fundament lokalny bez deklaracji gotowych modeli.
 
-**Stan bieżący:** osobne lokalne repo `retailops-ai-intelligence` zawiera zasady,
-ADR-y, pakiet Python, settings, CLI, lockfile i podstawowe CI.
-[Dowody fundamentu](../../../evidence/ai/01/README.md) obejmują lokalne kontrole.
+**Stan bieżący:** osobne lokalne repo `retailops-ai-intelligence` zawiera pakiet,
+settings, CLI i bazowy serwis HTTP w warstwach api/domain/pipelines/adapters.
+Działają health/ready/version/metrics, logi JSON, kontekst W3C i bezpieczne błędy.
+[Dowody](../../../evidence/ai/01/README.md) obejmują 62 testy, rzeczywisty proces
+na loopback oraz uruchomienie z wheel; nie obejmują DB/MLflow ani zdalnego CI.
 Cały etap jest `in_progress`; poniżej pozostaje zakres do wykonania.
 
 Przeczytaj [architekturę](../architektura.md) i wspólne kontrakty w `../kontrakty/`. Model danych/ziarno/availability uzgodnij przed implementacją pipeline’ów; pełne zdarzenia zostaną uruchomione w 10.
 
 ## Praca w małych PR-ach
 
-2. **Warstwy aplikacji.** Przy dodawaniu rzeczywistych funkcji wydziel API/domenę/adapters/pipelines w istniejącym pakiecie `src/retailops_ai`. Zachowaj jeden lockfile, typed settings i wspólny kod komend/jobs.
-3. **Serwis bazowy.** Dodaj `GET /health`, `/ready`, `/version`, `/metrics`; correlation ID, logi JSON, trace propagation i wspólny error contract. Health oznacza działający proces, readiness wymagane zależności konkretnej roli. Brak Bedrock nie wyłącza odczytu poprawnych predykcji ML.
-4. **Persistence.** Dodaj PostgreSQL dla AI, migracje Alembic, oddzielną bazę i użytkownika MLflow; pgvector tylko w bazie AI. Zaplanuj rozdzielenie metadata od dużych artefaktów. Migracje są jawne, nie uruchamiane konkurencyjnie przy starcie każdego poda.
+4. **Persistence.** Dodaj rzeczywistą sondę DB do istniejącego mechanizmu readiness. Dodaj PostgreSQL dla AI, migracje Alembic, oddzielną bazę i użytkownika MLflow; pgvector tylko w bazie AI. Zaplanuj rozdzielenie metadata od dużych artefaktów. Migracje są jawne, nie uruchamiane konkurencyjnie przy starcie każdego poda.
 5. **Compose.** Postaw API/Postgres/MLflow z lokalnymi wolumenami i health checks. Provider fakes pozwalają wykonać testy bez AWS. Nowy Compose nie definiuje drugiego brokera RetailOps. Pełne external networking oraz event worker wymagane w10; opcjonalny worker nie jest konieczny do pierwszego zdrowego serwisu.
 6. **Wspólne kontrakty.** Nadaj wersje dataset/feature/label/prediction/run/tool schemas; wzory w tym pakiecie przełóż na wykonywalne modele i fixtures w repo. Zapisz semantykę braków, zer, czasu i source ownership. Event schema inventory jeszcze nie oznacza działającego streamingu.
 7. **Rozwój CI i zabezpieczeń.** Rozszerz istniejące lint/type/package/test/docs/contracts i secret scan na nowe komponenty bez pomijania ich ścieżek. Po publikacji repo wykonaj zdalne CI i ustaw ochronę gałęzi z wymaganym `required-result`. Własne endpointy administracyjne od początku mają granicę dostępu. Sekrety poza Git i logami. Używaj ról o ograniczonym zakresie, nie demo admina RetailOps jako domyślnej tożsamości agenta.

@@ -25,9 +25,9 @@
       "status": "in_progress",
       "evidence": "../../evidence/ai/01/README.md",
       "implementation_repository": "retailops-ai-intelligence",
-      "implementation_commit": "e03d7df5200f75526a2e7c711bf502ddce97dd9a",
-      "evidence_commit": "5da5fdc04e8e44510a489c0f0cc45557cf87e15d",
-      "next_scope": "Bazowy serwis HTTP i warstwy aplikacji; następnie persistence, Compose, kontrakty i zdalne CI."
+      "implementation_commit": "e6c78886be9ef151417ee7e5fc91cc817e1bec40",
+      "evidence_commit": "7d67530ca574e4acf60405c22fdde1ec59f1f174",
+      "next_scope": "Persistence AI/MLflow, migracje i Compose; następnie kontrakty danych, auth oraz zdalne CI."
     },
     {
       "id": "02",

@@ -1,41 +1,46 @@
-# Fundament repozytorium AI — pierwszy zakres etapu 01
+# Fundament AI 01 — pakiet i serwis HTTP
 
-Data: **2026-09-27**. Pierwszy zakres etapu 01; cały etap pozostaje
-`in_progress`. Źródło planu i poprzedniego audytu w RetailOps: `8a9e620`.
+Data: **2026-09-27**. Aktualny zakres to lokalny pakiet i diagnostyka HTTP;
+cały etap 01 pozostaje `in_progress`. Źródło planu tego zakresu w RetailOps:
+`c89da89`, baza repo AI: `5da5fdc`.
 
 ## Repo i wersje
 
 Repo lokalne: `/Users/oskarstachowski/retailops-ai-intelligence`,
-obok RetailOps, branch `ai/implementation`. Nie ma skonfigurowanego remote
-ani publikacji na GitHub.
+obok RetailOps, branch `ai/implementation`. Brak remote i publikacji na GitHub.
 
 | Commit w repo AI | Zakres |
 |---|---|
-| `e03d7df5200f75526a2e7c711bf502ddce97dd9a` | Repo, MIT, ADR-y i zasady, pakiet/settings/CLI, kontrakt metadanych, lockfile, testy i workflow Required CI. |
-| `5da5fdc04e8e44510a489c0f0cc45557cf87e15d` | Dowody odtworzenia na czystym checkout, prób blokad i instalacji wheel. |
+| `e6c78886be9ef151417ee7e5fc91cc817e1bec40` | Bazowy HTTP, warstwy api/domain/pipelines/adapters, kontrole zależności, bezpieczne błędy, logi, trace i metryki; kontrakty i 62 testy. |
+| `7d67530ca574e4acf60405c22fdde1ec59f1f174` | Dowody czystego checkoutu, blokady błędnego kontraktu i działania HTTP z zainstalowanej paczki wheel. |
 
-Pełne komendy, wyniki, sumy artefaktów i ograniczenia są w repo AI:
-`docs/evidence/01-foundation.md` oraz `docs/evidence/01-foundation.json`.
-Bieżącą instrukcję uruchomienia zawiera tam `docs/development.md`, a aktualne
-możliwości `docs/STATUS.md`. Ten wpis wskazuje dowody między repozytoriami.
+Pełne komendy, wyniki i sumy kodu/artefaktów są w repo AI:
+`docs/evidence/01-http.md` oraz `docs/evidence/01-http.json`.
+Bieżące uruchomienie i ograniczenia opisują `docs/http-service.md`,
+`docs/development.md` oraz `docs/STATUS.md`. Ten wpis wskazuje dowody
+między repozytoriami; nie tworzy drugiej instrukcji obsługi.
 
-## Weryfikacja lokalna
+## Weryfikacja
 
-- macOS ARM64, Python **3.11.15**, uv **0.12.19**, instalacja z `uv.lock`.
-- Świeży clone i nowe środowisko, `uv sync --locked` z uprzednio pobranego cache,
-  następnie `make ci-local`: **22 testy**, Ruff/format, Mypy strict, dokumentacja,
-  build wheel/sdist oraz skany Gitleaks historii i katalogu.
-- Kontrolowane błędy kontraktu, zmiana zależności bez aktualizacji lockfile
-  oraz syntetyczny nieaktywny token dawały exit 1 odpowiedniej kontroli.
-  Pliki po próbach przywrócono; checkout pozostał czysty.
-- Wheel zainstalowany w osobnym środowisku runtime: CLI/import poza checkoutem
-  korzystały z site-packages, `uv pip check` potwierdziło zgodność zależności.
-- Actionlint zweryfikował workflow. Actions są przypięte do pełnych SHA;
-  testy bramek obejmują pominięcia, ignorowanie błędów i filtry ścieżek.
-- Po instalacji w docelowym katalogu ponowne `make check`: **22 passed in 1.90s**,
-  pozostałe kontrole bez błędów; CLI `config-check --env-file .env.example`
-  potwierdziło poprawną konfigurację. Repo pozostało czyste.
+- macOS ARM64, Python **3.11.15**, uv **0.12.19**, przypięte zależności.
+- Czysty checkout `e6c7888` i nowe venv z lockfile oraz lokalnego cache:
+  `make ci-local` — **62 passed in 2.82s**, bez pominięć, Ruff/format, Mypy strict
+  (18 plików), kontrakty, dokumentacja, build i skany sekretów.
+- Wymagana awaria/timeout → readiness 503; opcjonalna → 200 degraded.
+  Health nie sonduje providerów. Są to próby na fakes, nie na rzeczywistej DB.
+- Testy sprawdzają izolację równoczesnych żądań, W3C parent/child i przekazanie
+  kontekstu, chronione metryki, ograniczone etykiety i brak wartości wejściowych
+  w błędach/logach. Wyłączony SDK tracingu nie wyłącza HTTP.
+- Rzeczywisty proces na loopback obsłużył cztery endpointy i zakończył lifespan.
+  Próba została powtórzona z wheel w osobnym środowisku runtime, poza checkoutem;
+  import pochodził z site-packages, a `uv pip check` potwierdziło zależności.
+- Po przeniesieniu commitów do docelowego repo odtworzono venv z lockfile:
+  test rzeczywistego procesu i test dotenv przeszły (2 passed in 0.94s),
+  config-check i linki były poprawne, branch i worktree pozostały czyste.
+- Celowo błędny schemat health dał exit 1 testu kontraktu. Plik przywrócono,
+  checkout pozostał czysty. Actionlint potwierdził workflow.
 
-Nie uruchomiono GitHub Actions ani ochrony gałęzi. Nie jest to odbiór HTTP,
-PostgreSQL/MLflow, modeli, brokera ani AWS. Następny zakres i pozostałe kryteria:
-[backlog](../../../plans/ai/backlog.md).
+Readiness roli foundation oznacza obecnie zakończony startup, bez deklaracji
+gotowości bazy/modelu. Lokalny bind i token metryk nie są auth przyszłego API AI.
+Nie wykonano zdalnego CI, ochrony gałęzi, DB/MLflow, trwałego restartu, modeli,
+eksportu OTLP ani AWS. Następny zakres: [persistence i Compose](../../../plans/ai/backlog.md).

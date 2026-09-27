@@ -22,7 +22,7 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 | Monitoring | Metryki API/DB/stream, Prometheus, Grafana i próba rzeczywistego firing/resolution alertu. SLO dotyczy scrape metryk; brak dowodu dostępności żądań użytkownika przez 30 dni i dostarczania powiadomień. |
 | Jenkins | Rzeczywiste lokalne wykonanie pipeline z 2026-09-26; dodatkowa walidacja, bez wdrażania do chmury. |
 | ML | Lokalna generacja cech, ocena RF z trzema oknami walidacyjnymi i odłożonym testem całego horyzontu oraz zweryfikowana ścieżka artefaktu do batchu, metadanych i metryk. [Ocena z 27.09.2026](evidence/ml/fixed-origin-rf-2026-09-27/README.md) odrzuciła RF wobec średniej ruchomej; brak kwalifikacji do serving. |
-| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym lokalnym repo: ADR-y, pakiet/settings/CLI, lockfile i podstawowe CI; 22 testy oraz próby blokad. Etap 01 pozostaje częściowy, zdalne CI nie było uruchomione. Źródło nie spełnia jeszcze kontraktu danych AI 02–03. |
+| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym lokalnym repo: pakiet/CLI, bazowy HTTP, bezpieczne błędy, logi JSON i telemetry; 62 testy oraz próby procesu i wheel. Etap 01 pozostaje częściowy: DB/MLflow i zdalne CI są przed nami. Źródło nie spełnia jeszcze kontraktu danych AI 02–03. |
 
 ## Zakres użycia
 
@@ -36,7 +36,7 @@ MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/
 ## Punkt wznowienia
 
 Kontynuujemy **[AI 01 — fundament projektu](plans/ai/etapy/01-fundament-projektu.md)**:
-następny zakres to bazowy serwis HTTP w osobnym repo AI.
+następny zakres to persistence AI/MLflow, migracje i lokalny Compose w repo AI.
 [Backlog](plans/ai/backlog.md) określa pozostałą pracę 01 i pierwszy mały PR 02.
 DATA-01–05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
 historii przed odbiorem cech i forecastingu. Inventory, streaming, auth oraz

@@ -3,7 +3,8 @@
 **Status: etap 01 w realizacji. Aktualizacja: 27.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
-pakiet, settings, CLI, lockfile i lokalne kontrole. Następny zakres to bazowy serwis HTTP.
+pakiet, settings, CLI i bazowy serwis HTTP. Następny zakres to persistence,
+migracje i Compose.
 [Backlog](backlog.md) podaje pozostałą pracę 01 i pierwszy mały PR 02.
 Pozostała część 01 oraz etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
@@ -14,7 +15,7 @@ Czytaj kolejno tę mapę, [architekturę](architektura.md) i plik właściwego [
 
 ## Cel i podział pracy
 
-**RetailOps** pozostaje właścicielem danych operacyjnych, generatora, API i interfejsu sklepowego. **RetailOps AI Intelligence** ma osobne lokalne repozytorium z fundamentem pakietu. Docelowy serwis będzie odpowiedzialny za przetwarzanie danych, modele, predykcje, RAG i agenta. Repozytoria komunikują się przez wersjonowane pliki, API i zdarzenia; mają oddzielne bazy danych.
+**RetailOps** pozostaje właścicielem danych operacyjnych, generatora, API i interfejsu sklepowego. **RetailOps AI Intelligence** ma osobne lokalne repozytorium z pakietem i serwisem diagnostycznym HTTP. Docelowy serwis będzie odpowiedzialny za przetwarzanie danych, modele, predykcje, RAG i agenta. Repozytoria komunikują się przez wersjonowane pliki, API i zdarzenia; mają oddzielne bazy danych.
 
 Efektem końcowym będzie system, który prognozuje sprzedaż, wykrywa anomalie, ocenia ryzyko braku zapasu oraz wyjaśnia wyniki przy pomocy agenta korzystającego z danych i cytowanych dokumentów. Całość ma mieć powtarzalne eksperymenty, kontrolowane wdrożenia, monitoring, rollback i dowody działania.
 
