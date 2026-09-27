@@ -4,8 +4,9 @@ import os
 import subprocess
 import sys
 from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import parse_qsl, quote, urlencode, urlsplit, urlunsplit
 from uuid import uuid4
 
 import psycopg
@@ -97,30 +98,61 @@ def prepared_demo_dataset(database_url: str, tmp_path_factory: pytest.TempPathFa
     return data_dir
 
 
+def database_url_for_name(source_url: str, name: str) -> str:
+    """Replace every database selector while preserving other connection options."""
+    parsed = urlsplit(source_url)
+    if parsed.scheme != "postgresql" or parsed.fragment:
+        pytest.fail("Seed tests require a PostgreSQL URL without a fragment")
+
+    # libpq and SQLAlchemy let query dbname override the path. Decode keys before
+    # filtering so duplicate and percent-encoded selectors cannot survive.
+    query = [
+        (key, value)
+        for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+        if key.lower() != "dbname"
+    ]
+    return urlunsplit(
+        parsed._replace(path=f"/{quote(name, safe='')}", query=urlencode(query, quote_via=quote))
+    )
+
+
+def require_database(connection: psycopg.Connection, expected_name: str) -> None:
+    if connection.execute("SELECT current_database()").fetchone() != (expected_name,):
+        pytest.fail("Seed test connection selected an unexpected database", pytrace=False)
+
+
+@contextmanager
+def isolated_seed_database(source_url: str) -> Iterator[str]:
+    name = f"retailops_seed_test_{uuid4().hex}"
+    maintenance_url = database_url_for_name(source_url, "postgres")
+    isolated_url = database_url_for_name(source_url, name)
+
+    with psycopg.connect(maintenance_url, autocommit=True) as connection:
+        require_database(connection, "postgres")
+        connection.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
+
+    try:
+        # Migrations and seed only receive the URL after checking the server's
+        # actual selection, not merely the database name written in that URL.
+        with psycopg.connect(isolated_url) as connection:
+            require_database(connection, name)
+        yield isolated_url
+    finally:
+        with psycopg.connect(maintenance_url, autocommit=True) as connection:
+            require_database(connection, "postgres")
+            connection.execute(
+                sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name))
+            )
+
+
 @pytest.fixture(scope="module")
 def database_url() -> Iterator[str]:
     source_url = os.getenv("DATABASE_URL")
     if not source_url:
         pytest.fail("DATABASE_URL is required to create an isolated seed test database")
 
-    parsed = urlsplit(source_url)
-    if parsed.scheme != "postgresql":
-        pytest.fail("Seed tests require a PostgreSQL URL")
-
-    name = f"retailops_seed_test_{uuid4().hex}"
-    maintenance_url = urlunsplit(parsed._replace(path="/postgres"))
-    isolated_url = urlunsplit(parsed._replace(path=f"/{name}"))
-
-    with psycopg.connect(maintenance_url, autocommit=True) as connection:
-        connection.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
-
-    try:
+    with isolated_seed_database(source_url) as isolated_url:
         yield isolated_url
-    finally:
-        with psycopg.connect(maintenance_url, autocommit=True) as connection:
-            connection.execute(
-                sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name))
-            )
 
 
 def fetch_one(database_url: str, query: str, params: tuple = ()):
