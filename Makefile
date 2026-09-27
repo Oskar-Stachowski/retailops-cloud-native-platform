@@ -103,7 +103,7 @@ OBSERVABILITY_SMOKE_SCRIPT ?= ./scripts/ci/observability_smoke.sh
 OBSERVABILITY_DEMO_TRAFFIC_SCRIPT ?= ./scripts/dev/observability_demo_traffic.sh
 KUBERNETES_SMOKE_SCRIPT ?= ./scripts/ci/kubernetes_smoke.sh
 DOCKER_RUNTIME_EVIDENCE_SCRIPT ?= ./scripts/ci/docker_runtime_evidence.sh
-COMPOSE_PROFILE_SET ?= dev test observability security
+COMPOSE_PROFILE_SET ?= dev test observability security seed
 
 DATA_PROFILE ?= small
 RETAILOPS_SEED_DATA_PROFILE ?= small
@@ -239,9 +239,10 @@ help:
 	@echo "Docker / Compose:"
 	@echo "  make docker-build         Build backend and frontend images"
 	@echo "  make compose-config       Validate default Docker Compose config"
-	@echo "  make compose-profile-config Validate dev/test/observability/security Compose profiles"
+	@echo "  make compose-profile-config Validate dev/test/observability/security/seed Compose profiles"
 	@echo "  make docker-runtime-evidence Capture profile and non-root runtime evidence"
-	@echo "  make compose-up           Start full local dev stack"
+	@echo "  make compose-up           Start full local dev stack without reloading data"
+	@echo "  make compose-seed         Explicitly reload application tables from the selected profile"
 	@echo "  make broker-up            Start local Redpanda broker and create topics"
 	@echo "  make broker-topics        List local Redpanda topics"
 	@echo "  make realtime-consumer    Run local long-running realtime consumer"
@@ -251,7 +252,8 @@ help:
 	@echo "  make compose-smoke        Run local smoke test against running stack"
 	@echo "  make streaming-smoke      Run streaming smoke test against broker/API/Prometheus"
 	@echo "  make compose-ci           Fresh-build, start, smoke-test, log on failure, cleanup"
-	@echo "  make compose-down         Stop and remove local stack"
+	@echo "  make compose-down         Stop and remove local containers, keeping volumes"
+	@echo "  make compose-reset        Remove local containers and all project volumes"
 	@echo ""
 	@echo "Security:"
 	@echo "  make security-scan        Run local secret, filesystem and image scans"
@@ -320,7 +322,7 @@ db-up:
 	$(COMPOSE) up -d db
 
 db-down:
-	$(COMPOSE) down -v --remove-orphans
+	$(COMPOSE) down --remove-orphans
 
 data-generate: api-install
 	$(API_VENV_PYTHON) -m data.generator.main
@@ -426,14 +428,14 @@ api-seed-medium: api-install
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_SEED_DATA_PROFILE=medium .venv/bin/python scripts/seed_demo_data.py
 
 db-reset-seed-small:
-	$(MAKE) db-down
+	$(MAKE) compose-reset
 	$(MAKE) db-up
 	sleep 3
 	$(MAKE) api-migrate
 	$(MAKE) api-seed-small
 
 db-reset-seed-medium:
-	$(MAKE) db-down
+	$(MAKE) compose-reset
 	$(MAKE) db-up
 	sleep 3
 	$(MAKE) api-migrate
@@ -655,7 +657,7 @@ iac-scan: terraform-fmt-check terraform-validate iac-critical-guardrails iac-sec
 # Docker / Compose
 # -------------------------------------------------------------------
 
-.PHONY: docker-build compose-config compose-profile-config docker-runtime-evidence compose-up compose-down compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke k8s-policy k8s-checkov k8s-ci
+.PHONY: docker-build compose-config compose-profile-config docker-runtime-evidence compose-up compose-seed compose-down compose-reset compose-logs compose-smoke streaming-smoke observability-smoke observability-demo-traffic compose-rebuild-smoke compose-ci broker-up broker-topics realtime-consumer observability-up k8s-smoke k8s-policy k8s-checkov k8s-ci
 
 docker-build:
 	docker build -t "$(API_IMAGE)" "$(API_DIR)"
@@ -673,6 +675,9 @@ compose-profile-config: ensure-reports-dir
 compose-up:
 	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up --build -d
 
+compose-seed:
+	COMPOSE_PROFILES=seed $(COMPOSE) run --rm --no-deps seed
+
 broker-up:
 	COMPOSE_PROFILES=dev $(COMPOSE) up -d redpanda redpanda-init
 
@@ -683,10 +688,13 @@ realtime-consumer:
 	cd "$(API_DIR)" && PYTHONPATH=. DATABASE_URL="$(DATABASE_URL)" RETAILOPS_BROKER_BOOTSTRAP_SERVERS="$(RETAILOPS_BROKER_BOOTSTRAP_SERVERS)" .venv/bin/python scripts/run_realtime_consumer.py
 
 observability-up:
-	COMPOSE_PROFILES=observability $(COMPOSE) up --build -d db migrate seed api prometheus grafana
+	COMPOSE_PROFILES=observability $(COMPOSE) up --build -d db migrate api prometheus grafana
 
 compose-down:
-	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down -v --remove-orphans
+	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) down --remove-orphans
+
+compose-reset:
+	COMPOSE_PROFILES=dev,observability,test,security,seed $(COMPOSE) down --volumes --remove-orphans
 
 compose-logs:
 	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) logs --no-color
@@ -755,6 +763,10 @@ compose-ci-internal: ensure-reports-dir
 		RETAILOPS_SEED_DATA_PROFILE=demo COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) up -d || status=$$?; \
 	fi; \
 	if [[ $$status -eq 0 ]]; then \
+		echo "[compose-ci] Explicitly loading disposable demo data..."; \
+		RETAILOPS_SEED_DATA_PROFILE=demo $(MAKE) compose-seed || status=$$?; \
+	fi; \
+	if [[ $$status -eq 0 ]]; then \
 		echo "[compose-ci] Running smoke tests..."; \
 		chmod +x "$(SMOKE_SCRIPT)"; \
 		API_BASE_URL="http://localhost:$(API_PORT)" FRONTEND_BASE_URL="http://localhost:$(FRONTEND_PORT)" "$(SMOKE_SCRIPT)" || status=$$?; \
@@ -775,6 +787,10 @@ compose-ci-internal: ensure-reports-dir
 	if [[ $$status -eq 0 && "$(COMPOSE_BROWSER_TESTS)" == "1" ]]; then \
 		echo "[compose-ci] Running critical browser journeys..."; \
 		$(MAKE) browser-smoke || status=$$?; \
+	fi; \
+	if [[ $$status -eq 0 ]]; then \
+		echo "[compose-ci] Checking data survives normal down/up..."; \
+		python3 scripts/ci/compose_persistence_check.py || status=$$?; \
 	fi; \
 	COMPOSE_PROFILES=$(COMPOSE_CI_PROFILES) $(COMPOSE) ps > "$(REPORTS_DIR)/docker-compose-ps.txt" || true; \
 	if [[ $$status -ne 0 ]]; then \
@@ -859,7 +875,7 @@ security-scan: secret-scan security-fs-scan security-image-scan
 .PHONY: clean
 clean:
 	rm -rf "$(REPORTS_DIR)"
-	$(COMPOSE) down -v --remove-orphans || true
+	$(MAKE) compose-down || true
 
 # -------------------------------------------------------------------
 # repo-structure

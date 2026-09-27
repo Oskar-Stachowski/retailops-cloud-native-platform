@@ -95,9 +95,11 @@ testami. Nie kieruj go do bazy z danymi, które chcesz zachować.
 
 Do zwykłego zatrzymania używaj procedury z
 [przewodnika lokalnego](local-development.md#sprawdzenie-i-codzienna-obsługa).
-`make compose-down` i `make db-down` usuwają wolumeny projektu. Po usunięciu
-kontenerów i następnym `up` zadanie seed ponownie załaduje dane, nawet jeśli sam
-wolumen bazy został zachowany.
+`make compose-down` i `make db-down` zachowują wolumeny projektu. Następne
+`make compose-up` uruchamia migracje, ale nie ładuje danych ponownie. Jedynie
+jawne `make compose-seed` zastępuje tabele aplikacyjne, a `make compose-reset`
+usuwa wszystkie nazwane wolumeny tego projektu. Procedura pierwszego startu
+i resetu jest w [przewodniku lokalnym](local-development.md).
 
 ```bash
 make db-backup

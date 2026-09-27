@@ -51,7 +51,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-retailops}:${POSTGRES_PASSWORD:-retailops}@db:5432/${POSTGRES_DB:-retailops}
       RETAILOPS_BROKER_BOOTSTRAP_SERVERS: ${RETAILOPS_BROKER_BOOTSTRAP_SERVERS:-redpanda:9092}
     depends_on:
-      seed:
+      migrate:
         condition: service_completed_successfully
 
   prometheus:
@@ -195,7 +195,8 @@ services:
     restart: "no"
 
   seed:
-    profiles: ["dev", "observability", "test"]
+    # Explicit operation: reimports demo tables and must never run during a normal up.
+    profiles: ["seed"]
     image: ${API_IMAGE:-retailops-api:0.1.0}
     command: ["python", "scripts/seed_demo_data.py"]
     environment:
@@ -206,9 +207,6 @@ services:
       RETAILOPS_SEED_DATA_DIR: ${RETAILOPS_SEED_DATA_DIR:-}
     volumes:
       - ./data:/workspace/data:ro
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
     restart: "no"
 
   db:
