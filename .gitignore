@@ -212,43 +212,9 @@ __marimo__/
 .DS_Store
 *.pyc
 
-# CI/CD local reports and pipeline artifacts
-#
-# Default policy:
-# - volatile local reports stay ignored,
-# - curated evidence snapshots can be tracked when intentionally named
-#   `*-snapshot.*`, `sprint-*-*.txt`, or documented with README/index files,
-# - large generated datasets, logs and coverage outputs stay ignored.
+# Generated CI/CD results are local scratch output.
+# Human-readable instructions and reviewed current evidence live in docs/.
 ci-cd/reports/**
-!ci-cd/reports/
-!ci-cd/reports/**/
-!ci-cd/reports/.gitkeep
-!ci-cd/reports/**/README.md
-!ci-cd/reports/**/*.evidence.md
-!ci-cd/reports/**/*-snapshot.txt
-!ci-cd/reports/**/*-snapshot.json
-!ci-cd/reports/iac/sprint-*-terraform-*.txt
-ci-cd/reports/api/
-ci-cd/reports/data/generated/
-ci-cd/reports/observability/
-ci-cd/reports/ruff/
-ci-cd/reports/**/.gitkeep
-ci-cd/reports/**/*.log
-ci-cd/reports/docker-compose-logs.txt
-ci-cd/reports/iac/checkov.*
-ci-cd/reports/iac/terraform-plan-*.txt
-ci-cd/reports/iac/terraform-validate.txt
-ci-cd/reports/iac/tflint.txt
-ci-cd/reports/security/gitleaks.json
-ci-cd/reports/security/trivy-api-image.txt
-ci-cd/reports/security/trivy-frontend-image.txt
-ci-cd/reports/security/trivy-fs.txt
-
-# Local audit and planning reports
-REPOSITORY_AUDIT.md
-SENIOR_LEVEL_UPGRADE_PLAN.md
-/!LOCAL_ADVANCED_ROADMAP/
-/!RetailOps_AI_Instrukcje/
 
 # Generated synthetic datasets.
 # Keep the small seed profile versioned for CI/local reproducibility.

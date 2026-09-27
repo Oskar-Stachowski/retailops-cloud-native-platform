@@ -1,24 +1,24 @@
 # GitHub Actions CI Governance
 
-## Scope
+## Current workflow responsibilities
 
-This document maps the RetailOps GitHub Actions implementation to the production-readiness checklist for GitHub Actions CI.
+| Workflow | Purpose |
+|---|---|
+| `required-ci.yml` | Selects full domain gates and produces the stable required result. |
+| `api-ci.yml` | Backend lint/types/security, data validation, migrations, seed, DB-backed tests/coverage and image build. |
+| `frontend-ci.yml` | Frontend tests, lint, production build and image build. |
+| `data-ci.yml` | Synthetic data quality, contracts and business scenario checks. |
+| `docker-ci.yml` | Isolated Compose, seven Chromium journeys, monitoring incident, DB recovery and application rollback. |
+| `security-ci.yml` | Secrets, Trivy filesystem/images, Python/npm dependency audits and scan summary. |
+| `kubernetes-ci.yml` | Render/schema/policy checks and real kind runtime, persistence, network and rollback checks. |
+| `terraform-validation.yml`, `iac-security.yml` | Credential-free Terraform validation, state tests, TFLint and Checkov. |
+| `terraform-plan.yml` | Manual protected-main OIDC baseline/drift review, account pinning and sanitized reports; no apply. |
+| `observability-ci.yml` | Standalone configuration, rule and focused observability checks. |
+| `provenance-ci.yml` | Standalone attestations for locally built image subjects. |
+| `release.yml` | Manual tested GHCR publication, signatures, fresh-runner verification and release promotion. |
 
-## Implemented workflow coverage
-
-| ID | Status after patch | Evidence path / workflow | Notes |
-|---|---|---|---|
-| GHA-001 | Implemented | `.github/workflows/api-ci.yml` | Runs backend quality gates, data validation, migrations, seed, DB-backed tests, coverage, and API image build. |
-| GHA-002 | Implemented | `.github/workflows/frontend-ci.yml` | Runs frontend tests, lint, production build, and frontend image build. |
-| GHA-003 | Implemented | `.github/workflows/docker-ci.yml` | Validates Compose config/profiles and runs full-stack Compose smoke tests. |
-| GHA-004 | Implemented | `.github/workflows/security-ci.yml` | Runs secret scan, Trivy filesystem scan, dependency audits, image scans, and consolidated evidence summary. |
-| GHA-005 | Implemented | `.github/workflows/kubernetes-ci.yml` | Runs Kustomize, Kubeconform, Conftest and blocking Checkov, followed by an isolated kind deployment with browser/API, NetworkPolicy, streaming, persistence and rollback checks. |
-| GHA-008 | Implemented and configured | `.github/workflows/required-ci.yml`, `scripts/ci/detect_required_ci_changes.py`, `docs/evidence/github/README.md` | The aggregate `Required CI / required-result` is required on `main`, including for administrators. Active settings were verified through the GitHub API on 2026-09-25. |
-| GHA-009 | Implemented plan path; S3 activation pending | `.github/workflows/terraform-validation.yml`, `.github/workflows/terraform-plan.yml`, `scripts/terraform/` | Required CI verifies backend controls and real local drift/migration without AWS. Manual main-only OIDC plans pin the account, distinguish baseline from existing-state drift and upload sanitized summaries. The prepared S3/KMS backend is not deployed. |
-| GHA-010 | Implemented | `.github/actions/**` | Composite actions centralize Python setup, Node setup, and CI evidence upload. |
-| GHA-011 | Candidate implemented | `.github/workflows/provenance-ci.yml` | Creates GitHub artifact attestations for locally built API/frontend image subjects. |
-
-## Composite action contract
+The definitions live in [.github/workflows](../../.github/workflows/).
+Shared setup and evidence-upload actions are described below.
 
 ## Required branch-protection gate
 

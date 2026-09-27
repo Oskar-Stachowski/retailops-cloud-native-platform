@@ -1,7 +1,14 @@
 # RandomForest Demand Forecast Evidence
 
-This folder is a tracked evidence snapshot for the local trained RetailOps
-demand forecasting model.
+Ostatni dostępny artefakt lokalnego modelu Random Forest. Metadane podają
+`created_at=2026-05-13T05:22:58.789845+00:00`; daty datasetu poniżej oznaczają
+zakres danych, nie datę wykonania treningu.
+
+**Ten wynik nie kwalifikuje modelu do wdrożenia.** Obecny przegląd wykazał
+problemy dostępności cech w czasie, protokołu holdout i metryk. Status
+`candidate` w artefakcie jest wynikiem starej, minimalnej reguły porównania WAPE.
+Zestaw zachowano jako punkt odniesienia do [ponownej oceny](../../../plans/ml-evaluation.md).
+Nie wykonano nowego treningu przy porządkowaniu dokumentacji.
 
 ## Validation Command
 
@@ -56,12 +63,11 @@ Model status: `candidate`
 | `predictions.csv` | Time-based holdout predictions with actuals and baseline predictions. |
 | `feature_importance.csv` | RandomForest feature importance report. |
 | `model_metadata.json` | Local model metadata/status snapshot. |
-| `model_card.md` | Generated model card for this version. |
+| [model_card.md](model_card.md) | Generated model card for this version; interpret with the limitations above. |
 | `checksums.sha256` | SHA-256 checksums for evidence integrity. |
 
 ## Interpretation
 
-This is real local ML evidence: the model is trained from RetailOps feature rows
-and compared against the moving-average baseline on a time-based holdout split.
-It is not a production serving deployment and does not imply MLflow, feature
-store, KServe, retraining automation, or cloud model registry maturity.
+Wartości powyżej opisują zapisany eksperyment, nie poprawną ocenę prognozy
+z jednego origin. Nie wykorzystuj ich do wyboru modelu przed poprawieniem
+[otwartych ustaleń ML](../../../audits/open-findings.md).

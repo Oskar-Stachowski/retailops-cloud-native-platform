@@ -40,7 +40,7 @@ Unsafe wording:
 2. Validate JWT issuer, audience, expiry and signature at API boundary.
 3. Map claims to internal roles and permissions.
 4. Move policy evaluation out of query parameters and into authenticated principal context.
-5. Add audit logs for privileged workflow mutations.
+5. Bind existing workflow audit logs to the authenticated principal.
 6. Add negative tests for expired, malformed and wrong-audience tokens.
 
 ## Validation

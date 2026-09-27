@@ -1,189 +1,44 @@
-# Local Runtime Troubleshooting Runbook
+# Diagnostyka lokalnego Compose
 
-**Project:** RetailOps — Cloud-Native AI Platform
-**Scope:** Docker Compose, local runtime reproducibility, profile validation and smoke evidence
+Punkt startowy: [uruchomienie lokalne](../guides/local-development.md).
+Poniższe polecenia dotyczą własnego środowiska deweloperskiego. Zachowaj jego
+`COMPOSE_PROJECT_NAME`, profile i porty z `.env`.
 
----
-
-## 1. Purpose
-
-Use this runbook when the local Docker runtime does not start, a reviewer asks
-how to reproduce the demo, or Docker evidence has to be refreshed for the
-production-readiness checklist.
-
-The local runtime is intentionally not a production deployment. It is a
-reviewer-friendly stack for API, frontend, PostgreSQL, Redpanda, Prometheus and
-Grafana validation.
-
----
-
-## 2. Profiles
-
-| Profile | Purpose | Typical command |
-|---|---|---|
-| `dev` | API, frontend, DB, seed data and broker for local product demo. | `COMPOSE_PROFILES=dev docker compose up --build -d` |
-| `observability` | API, DB, Prometheus, Grafana and broker signals for metrics evidence. | `make observability-up` |
-| `test` | DB/API-compatible Compose rendering for DB-backed checks and CI validation. | `COMPOSE_PROFILES=test docker compose config` |
-| `security` | Containerized security tooling entry point for local scan experiments. | `COMPOSE_PROFILES=security docker compose config` |
-
-The default Makefile profile is `dev`, while the full local reviewer stack uses
-`dev,observability` so the existing smoke tests can validate frontend, API,
-streaming, Prometheus and Grafana in one run.
-
----
-
-## 3. Golden path
-
-From the repository root:
+## Sprawdź usługi i zależności
 
 ```bash
-cp .env.example .env
-make compose-profile-config
-make compose-up
-make compose-smoke
-make streaming-smoke
-make observability-smoke
-make docker-runtime-evidence
+docker compose --profile dev --profile observability ps -a
+docker compose --profile dev --profile observability logs --tail=100 db migrate seed api frontend
+curl --fail http://localhost:8000/health
+curl --fail http://localhost:8000/ready
+curl --fail http://localhost:3000/api/health
 ```
 
-Expected evidence outputs:
+| Objaw | Co sprawdzić |
+|---|---|
+| Zajęty port | Sprawdź proces zajmujący dany port; ustaw wolny `API_PORT`, `FRONTEND_PORT`, `POSTGRES_PORT`, `PROMETHEUS_PORT` lub `GRAFANA_PORT` w `.env`. |
+| API nie jest gotowe | Logi bazy, migracji i seeda; dane połączenia muszą odpowiadać uruchomionej bazie. |
+| Seed kończy się błędem | Wybrany profil i pliki CSV. Na pierwsze demo wybierz `RETAILOPS_SEED_DATA_PROFILE=demo`; patrz [baza](../guides/database.md). |
+| Frontend nie widzi API | Sprawdź `/api/health` przez Nginx oraz proxy `/api` w Vite. Używaj `VITE_API_BASE_URL=/api`. |
+| `/` API zwraca 404 | To nie jest endpoint zdrowia. Użyj `/health`, `/ready` lub `/docs`. |
+| Live Operations jest puste | Sam broker nie tworzy zdarzeń. Sprawdź [konsumenta i ruch demonstracyjny](../guides/streaming.md). |
+| Brak metryk lub dashboardów | [Runbook monitoringu](observability-runbook.md). |
 
-```text
-ci-cd/reports/docker-compose-ps.txt
-ci-cd/reports/docker-compose-logs.txt
-ci-cd/reports/docker/compose-profile-dev.yml
-ci-cd/reports/docker/compose-profile-test.yml
-ci-cd/reports/docker/compose-profile-observability.yml
-ci-cd/reports/docker/compose-profile-security.yml
-ci-cd/reports/docker/image-users.txt
-ci-cd/reports/observability/api-metrics.txt
-ci-cd/reports/observability/prometheus-targets.json
-ci-cd/reports/observability/grafana-dashboards.json
-```
-
-Cleanup:
+Nie usuwaj wolumenów jako pierwszego kroku diagnostyki. `make compose-down`
+wykonuje `down -v` i usuwa dane. Do zwykłego zatrzymania służy:
 
 ```bash
-make compose-down
+docker compose --profile dev --profile observability stop
 ```
 
-`make compose-down` removes local volumes. Use it when you want a clean,
-reproducible run.
+Ponowne wykonanie zadania seed nadpisuje tabele demonstracyjne; restartuj
+samą usługę, jeżeli nie zamierzasz odtwarzać danych.
 
----
+## Nieudana próba CI
 
-## 4. Port matrix
-
-| Service | Default host port | Health check |
-|---|---:|---|
-| Frontend | `3000` | `curl http://localhost:3000/` |
-| API | `8000` | `curl http://localhost:8000/ready` |
-| PostgreSQL | `5432` | `docker compose exec db pg_isready -U retailops -d retailops` |
-| Redpanda Kafka | `19092` | `docker compose exec redpanda rpk cluster health` |
-| Redpanda Admin | `19644` | `curl http://localhost:19644/v1/status/ready` |
-| Prometheus | `9090` | `curl http://localhost:9090/-/ready` |
-| Grafana | `3001` | `curl http://localhost:3001/api/health` |
-
-If a port is busy, override it in `.env`, for example:
-
-```bash
-API_PORT=8010
-FRONTEND_PORT=3010
-POSTGRES_PORT=55432
-PROMETHEUS_PORT=9091
-GRAFANA_PORT=3002
-```
-
----
-
-## 5. Common failures
-
-### Port already allocated
-
-Symptom:
-
-```text
-Bind for 0.0.0.0:5432 failed: port is already allocated
-```
-
-Fix:
-
-```bash
-lsof -i :5432
-POSTGRES_PORT=55432 make compose-up
-```
-
-### API does not become ready
-
-Check DB and migration/seed jobs:
-
-```bash
-docker compose ps
-docker compose logs --no-color db migrate seed api
-curl --silent --show-error http://localhost:8000/ready
-```
-
-If local state is corrupted, reset volumes:
-
-```bash
-make compose-down
-make compose-up
-```
-
-### Frontend cannot reach API
-
-Check the Nginx proxy path:
-
-```bash
-curl --silent --show-error http://localhost:3000/api/health
-curl --silent --show-error http://localhost:3000/api/ready
-```
-
-Then inspect frontend logs:
-
-```bash
-docker compose logs --no-color frontend
-```
-
-### Prometheus target is down
-
-Check that the observability profile is active and the API metrics endpoint is
-reachable from the host:
-
-```bash
-COMPOSE_PROFILES=observability docker compose config
-curl --silent --show-error http://localhost:8000/metrics
-curl --silent --show-error "http://localhost:9090/api/v1/targets?state=active"
-```
-
-### Grafana dashboard is missing
-
-Check provisioning files and restart Grafana:
-
-```bash
-docker compose exec -T grafana ls -la /var/lib/grafana-dashboards
-docker compose restart grafana
-make observability-smoke
-```
-
----
-
-## 6. Non-root runtime evidence
-
-Build and inspect the images used by Compose:
-
-```bash
-make docker-runtime-evidence
-cat ci-cd/reports/docker/image-users.txt
-```
-
-Expected result:
-
-```text
-retailops-api:0.1.0 user=appuser expected=appuser
-retailops-frontend:0.1.0 user=101:101 expected=101:101
-```
-
-This supports the CV-safe claim that the application containers run as non-root
-where practical. Database, broker, Prometheus and Grafana use vendor images and
-are documented as local-only dependencies.
+`make compose-ci` uruchamia odrębny projekt i usuwa jego zasoby po zakończeniu.
+Sprawdź `ci-cd/reports/docker-compose-logs.txt`,
+`ci-cd/reports/docker/isolated-runtime.json` oraz
+`ci-cd/reports/observability/incident-drill.json`.
+Polecenie `docker compose logs` bez nazwy tego projektu nie odtworzy jego logów.
+Warunki powtórzenia próby: [testowanie](../guides/testing.md).

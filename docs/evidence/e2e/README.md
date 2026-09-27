@@ -148,17 +148,3 @@ from a clean local or CI run.
 This evidence does not prove production scale, accessibility completeness,
 cross-browser compatibility, or pixel-perfect UI stability. It is a practical
 portfolio/runtime proof that the local or CI stack is connected and usable.
-
-## Regressions found during this review
-
-- Accepted recommendations were excluded from pending dashboard queries, hiding
-  the Resolve action after reload. Accepted records now remain in the queue.
-- A viewer without notification permission received a 403 that discarded the
-  topbar identity and emptied the user switcher after reload. Identity loading
-  is now independent of optional notifications and honors their permission.
-
-The first [browser CI run](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36137439969)
-proved the new gate blocks failures: four journeys passed and three failed.
-The follow-up fixes also correct a category locator and limit fault injection
-to API fetches so it does not intercept the page document. The successful run above validates the fixes; the failed run is retained as
-diagnostic history.

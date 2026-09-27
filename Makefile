@@ -876,22 +876,7 @@ clean:
 .PHONY: docs-repo-structure
 
 docs-repo-structure:
-	@{ \
-		echo "# RetailOps repository structure snapshot"; \
-		echo "#"; \
-		echo "# Generated: $$(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
-		echo "# Purpose: Static repository tree snapshot for documentation/release evidence."; \
-		echo "# Refresh command:"; \
-		echo '#   make docs-repo-structure'; \
-		echo "#"; \
-		echo "# Note:"; \
-		echo "# Only Git-indexed files are included. Stage new documentation before refreshing."; \
-		echo "# This file is intentionally static and can become stale in active development."; \
-		echo "# Refresh it during release evidence updates or before publishing portfolio documentation."; \
-		echo ""; \
-		echo 'git ls-files | tree --fromfile -a --noreport'; \
-		git ls-files | tree --fromfile -a --noreport; \
-	} > docs/repo-structure.txt
+	@git ls-files | tree --fromfile -a --noreport
 
 .PHONY: k8s-runtime-drill
 k8s-runtime-drill:

@@ -47,4 +47,4 @@ API metric scrapes over 30 days, with explicit sample coverage and monitoring-ga
 requirements. This short run proves signal mechanics, not production or
 30-day compliance. There is no Alertmanager/notification receiver; no external
 notification was sent. Request-level SLOs, centralized logs and end-to-end
-tracing remain separate work. Existing historical screenshots were preserved.
+tracing remain separate work.

@@ -34,7 +34,7 @@ rule "terraform_typed_variables" {
 }
 
 # Documentation rules are useful, but not yet a blocking gate for Sprint 10.
-# We already keep module README files and will tighten variable documentation later.
+# Module reference documentation lives under docs/reference/terraform/.
 rule "terraform_documented_variables" {
   enabled = false
 }

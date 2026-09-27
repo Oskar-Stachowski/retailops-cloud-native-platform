@@ -33,7 +33,7 @@ merged, main was `44f7404010b55eba3d9bacd888d2dc7bb9797180`.
 
 The API run also recorded one Starlette TestClient deprecation warning about
 httpx. It did not fail the tests. Scan thresholds and accepted Checkov
-exceptions are documented in [Security](../../../security/README.md).
+exceptions are documented in [Security](../../security/controls.md).
 Passing image scans does not mean zero findings at every severity or for
 unfixed vulnerabilities.
 
@@ -58,8 +58,3 @@ screenshot capture were manually invoked at this revision. A subsequent
 This dependency-validation run did not deploy
 AWS/EKS, publish release images, validate production authentication, re-run
 Jenkins or refresh the historical ML training snapshot.
-
-Main protection required a successful `required-result` and an up-to-date PR
-before each merge. Superseded Dependabot PRs #21, #22, #31 and #32 were closed.
-The only unique commit in PR #16 was empty; the obsolete PR was closed after
-comparison with current main.

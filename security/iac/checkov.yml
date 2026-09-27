@@ -2,7 +2,7 @@
 #
 # Required CI policy:
 # - every non-exempt Checkov finding blocks the Terraform gate;
-# - accepted exceptions are explicit check IDs with rationale in security/README.md;
+# - accepted exceptions are explicit check IDs with rationale in docs/security/controls.md;
 # - scanner/runtime errors are failures, not successful evidence-only runs.
 
 framework:

@@ -1,0 +1,193 @@
+{
+  "version": "1.1",
+  "date": "2026-09-27",
+  "stages": [
+    {
+      "id": "00",
+      "slug": "audyt",
+      "title": "Ustal stan wyjściowy",
+      "repo": "oba",
+      "depends_on": [],
+      "path": "etapy/00-audyt.md"
+    },
+    {
+      "id": "01",
+      "slug": "fundament-projektu",
+      "title": "Ustal architekturę i uruchom szkielet AI",
+      "repo": "oba",
+      "depends_on": [
+        "00"
+      ],
+      "path": "etapy/01-fundament-projektu.md"
+    },
+    {
+      "id": "02",
+      "slug": "dane-sprzedazowe",
+      "title": "Napraw generator i dane sprzedażowe",
+      "repo": "RetailOps",
+      "depends_on": [
+        "01"
+      ],
+      "path": "etapy/02-dane-sprzedazowe.md"
+    },
+    {
+      "id": "03",
+      "slug": "snapshot-curated",
+      "title": "Zbuduj snapshot, importer i curated",
+      "repo": "oba",
+      "depends_on": [
+        "02"
+      ],
+      "path": "etapy/03-snapshot-curated.md"
+    },
+    {
+      "id": "04",
+      "slug": "forecasting",
+      "title": "Zbuduj poprawny forecasting",
+      "repo": "AI",
+      "depends_on": [
+        "03"
+      ],
+      "path": "etapy/04-forecasting.md"
+    },
+    {
+      "id": "05",
+      "slug": "mlflow-serving",
+      "title": "Uruchom MLflow, batch i API",
+      "repo": "AI",
+      "depends_on": [
+        "04"
+      ],
+      "path": "etapy/05-mlflow-serving.md"
+    },
+    {
+      "id": "06",
+      "slug": "inventory-ledger",
+      "title": "Zbuduj spójny zapas i dostawy",
+      "repo": "RetailOps",
+      "depends_on": [
+        "03"
+      ],
+      "path": "etapy/06-inventory-ledger.md"
+    },
+    {
+      "id": "07",
+      "slug": "anomalie-dq",
+      "title": "Dodaj anomalie, błędy danych i detekcję",
+      "repo": "oba",
+      "depends_on": [
+        "04",
+        "05",
+        "06"
+      ],
+      "path": "etapy/07-anomalie-dq.md"
+    },
+    {
+      "id": "08",
+      "slug": "stockout-risk",
+      "title": "Zbuduj model ryzyka stockout",
+      "repo": "AI",
+      "depends_on": [
+        "04",
+        "05",
+        "06"
+      ],
+      "path": "etapy/08-stockout-risk.md"
+    },
+    {
+      "id": "09",
+      "slug": "tensorflow-robustness",
+      "title": "Porównaj TensorFlow i zamknij ewaluację ML",
+      "repo": "AI",
+      "depends_on": [
+        "07",
+        "08"
+      ],
+      "path": "etapy/09-tensorflow-robustness.md"
+    },
+    {
+      "id": "10",
+      "slug": "integracja-retailops",
+      "title": "Połącz REST, zdarzenia i wyniki w RetailOps",
+      "repo": "oba",
+      "depends_on": [
+        "07",
+        "08"
+      ],
+      "path": "etapy/10-integracja-retailops.md"
+    },
+    {
+      "id": "11",
+      "slug": "rag",
+      "title": "Zbuduj wersjonowaną wiedzę i RAG",
+      "repo": "AI",
+      "depends_on": [
+        "01"
+      ],
+      "path": "etapy/11-rag.md"
+    },
+    {
+      "id": "12",
+      "slug": "agent-bedrock",
+      "title": "Uruchom agenta read-only na Bedrock",
+      "repo": "AI",
+      "depends_on": [
+        "10",
+        "11"
+      ],
+      "path": "etapy/12-agent-bedrock.md"
+    },
+    {
+      "id": "13",
+      "slug": "monitoring-security",
+      "title": "Zamknij monitoring, drift i bezpieczeństwo",
+      "repo": "oba",
+      "depends_on": [
+        "09",
+        "12"
+      ],
+      "path": "etapy/13-monitoring-security.md"
+    },
+    {
+      "id": "14",
+      "slug": "helm-kind",
+      "title": "Uruchom system przez Helm na kind",
+      "repo": "oba",
+      "depends_on": [
+        "13"
+      ],
+      "path": "etapy/14-helm-kind.md"
+    },
+    {
+      "id": "15",
+      "slug": "cicd-gitops",
+      "title": "Zamknij CI/CD i GitOps",
+      "repo": "AI",
+      "depends_on": [
+        "14"
+      ],
+      "path": "etapy/15-cicd-gitops.md"
+    },
+    {
+      "id": "16",
+      "slug": "aws",
+      "title": "Przygotuj Terraform i wykonaj pokaz AWS",
+      "repo": "oba",
+      "depends_on": [
+        "15"
+      ],
+      "path": "etapy/16-aws.md"
+    },
+    {
+      "id": "17",
+      "slug": "odbior-portfolio",
+      "title": "Odbierz cały projekt i przygotuj portfolio",
+      "repo": "oba",
+      "depends_on": [
+        "16"
+      ],
+      "path": "etapy/17-odbior-portfolio.md"
+    }
+  ],
+  "status": "proposed"
+}

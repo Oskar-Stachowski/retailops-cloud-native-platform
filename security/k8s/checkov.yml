@@ -12,7 +12,7 @@ quiet: false
 compact: true
 download-external-modules: false
 
-# Accepted local-runtime exceptions are documented in security/README.md.
+# Accepted local-runtime exceptions are documented in docs/security/controls.md.
 skip-check:
   - CKV_K8S_15
   - CKV_K8S_22
