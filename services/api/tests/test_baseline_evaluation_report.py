@@ -29,6 +29,7 @@ def test_backtest_predictions_use_prior_rows_only() -> None:
             "store_id": "store-1",
             "channel": "store",
             "units_sold": 4,
+            "observation_available_at": "2026-04-01T12:00:00Z",
             "generated_at": "2026-04-04T00:00:00Z",
         },
         {
@@ -38,6 +39,7 @@ def test_backtest_predictions_use_prior_rows_only() -> None:
             "store_id": "store-1",
             "channel": "store",
             "units_sold": 6,
+            "observation_available_at": "2026-04-02T12:00:00Z",
             "generated_at": "2026-04-04T00:00:00Z",
         },
         {
@@ -47,6 +49,7 @@ def test_backtest_predictions_use_prior_rows_only() -> None:
             "store_id": "store-1",
             "channel": "store",
             "units_sold": 10,
+            "observation_available_at": "2026-04-03T12:00:00Z",
             "generated_at": "2026-04-04T00:00:00Z",
         },
     ]
@@ -63,6 +66,28 @@ def test_backtest_predictions_use_prior_rows_only() -> None:
     assert predictions[0]["predicted_units"] == 5
     assert predictions[0]["actual_units"] == 10
     assert predictions[0]["training_rows"] == 2
+
+
+def test_backtest_excludes_prior_observation_delivered_after_origin() -> None:
+    rows = [
+        {
+            "dataset_id": "dataset-1", "date": "2026-04-01", "product_id": "product-1",
+            "store_id": "store-1", "channel": "store", "units_sold": 100,
+            "observation_available_at": "2026-04-03T12:00:00Z",
+        },
+        {
+            "dataset_id": "dataset-1", "date": "2026-04-02", "product_id": "product-1",
+            "store_id": "store-1", "channel": "store", "units_sold": 2,
+            "observation_available_at": "2026-04-02T12:00:00Z",
+        },
+    ]
+
+    predictions, skipped = build_backtest_predictions(
+        rows, window_days=7, holdout_days=1,
+    )
+
+    assert predictions == []
+    assert skipped == 1
 
 
 @pytest.mark.parametrize("window_days,holdout_days", [(0, 1), (1, 0)])
@@ -99,7 +124,12 @@ def test_evaluation_metrics_include_error_and_bias() -> None:
     )
 
     assert metrics == {
+        "status": "evaluable",
         "evaluated_rows": 2,
+        "mape_evaluated_rows": 2,
+        "mape_coverage": "1.0000",
+        "zero_actual_rows": 0,
+        "zero_actual_overforecast_units": "0.0000",
         "mae": "2.0000",
         "rmse": "2.0000",
         "mape": "20.0000",

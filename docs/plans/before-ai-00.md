@@ -2,35 +2,13 @@
 
 Aktualizacja: **2026-09-27**. To skrócona lista otwartych prac w istniejącym
 RetailOps przed planowanym przejściem do rozbudowy AI. Szczegółowe kryteria
-odbioru zawierają [plan oceny ML](ml-evaluation.md) i
-[otwarte ustalenia audytowe](../audits/open-findings.md).
+odbioru zawierają [otwarte ustalenia audytowe](../audits/open-findings.md).
+[Ocena ML](../evidence/ml/fixed-origin-rf-2026-09-27/README.md) ma osobny
+datowany raport i decyzję `rejected`.
 
 Sam [etap AI 00](ai/etapy/00-audyt.md) jest audytem i **nie ma formalnych
 zależności**. Można rozpocząć go wcześniej; nie wymaga zamknięcia wszystkich
 ustaleń poniżej.
-
-## Ocena ML — główny pakiet przygotowawczy
-
-1. [ ] **Identyfikacja eksperymentów** — osobne wersje przebiegów, zapis kodu,
-   danych, parametrów, zależności i sum kontrolnych.
-2. [ ] **Poprawne cechy** — usunięcie informacji z przyszłości, poprawne
-   przypisanie zapasu do lokalizacji oraz rozróżnienie zerowej sprzedaży
-   i brakujących danych. Cechy bez wiarygodnej dostępności w chwili prognozy
-   należy wyłączyć.
-3. [ ] **Poprawna ocena czasowa** — kalendarzowe lagi, prognoza całego horyzontu
-   z jednego momentu, chronologiczna walidacja i osobny test końcowy. Model
-   i baseline muszą korzystać z tej samej dostępnej wiedzy i ocenianych rekordów.
-4. [ ] **Poprawne metryki** — zerowy mianownik lub brak danych nie mogą
-   oznaczać idealnego wyniku ani pozwalać na pozytywną decyzję o modelu.
-5. [ ] **Zasady dopuszczania modelu** — ustalone przed eksperymentem kryteria
-   jakości, stabilności i odtwarzalności oraz uzasadniona decyzja `candidate`
-   albo `rejected`, której nie można obejść ręcznym ustawieniem statusu.
-6. [ ] **Spójna ścieżka modelu** — batch, metadane i metryki korzystają
-   z dokładnie ocenionego artefaktu RF, bez cichego przełączenia na baseline
-   lub ponownego treningu.
-7. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
-   wyniku, testy negatywne w CI, datowany raport i zmiany na `main` przez PR.
-   Rzetelne odrzucenie modelu również może zakończyć ten pakiet.
 
 ## Poprawki zalecane przed intensywnym testowaniem
 

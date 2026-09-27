@@ -1,0 +1,453 @@
+{
+  "admission_decision": {
+    "checks": [
+      {
+        "check_id": "protocol",
+        "reason": "Chronological, disjoint folds and identical scored rows for RF and baseline.",
+        "sample_size": 2800,
+        "status": "passed",
+        "threshold": [
+          "validation_1",
+          "validation_2",
+          "validation_3",
+          "test"
+        ],
+        "value": "fixed_origin_test"
+      },
+      {
+        "check_id": "coverage",
+        "reason": "All eligible rows scored in every fold.",
+        "sample_size": 2800,
+        "status": "passed",
+        "threshold": "1.0000",
+        "value": [
+          [
+            700,
+            700
+          ],
+          [
+            700,
+            700
+          ],
+          [
+            700,
+            700
+          ],
+          [
+            700,
+            700
+          ]
+        ]
+      },
+      {
+        "check_id": "final_quality",
+        "reason": "Final-test WAPE improvement is insufficient or undefined.",
+        "sample_size": 700,
+        "status": "failed",
+        "threshold": "5.0000",
+        "value": "-7.867791838679159980728302809"
+      },
+      {
+        "check_id": "stability",
+        "reason": "RF beats baseline in enough validation windows.",
+        "sample_size": 3,
+        "status": "passed",
+        "threshold": 2,
+        "value": 2
+      },
+      {
+        "check_id": "segments",
+        "reason": "A store or channel segment lacks rows or exceeds the MAE limit.",
+        "sample_size": 700,
+        "status": "failed",
+        "threshold": {
+          "max_mae_regression_percent": "5.0000",
+          "min_rows": 20
+        },
+        "value": [
+          {
+            "baseline_mae": "77.1143",
+            "field": "channel",
+            "passed": true,
+            "rows": 140,
+            "trained_mae": "80.3857",
+            "value": "marketplace"
+          },
+          {
+            "baseline_mae": "42.4821",
+            "field": "channel",
+            "passed": false,
+            "rows": 280,
+            "trained_mae": "44.9821",
+            "value": "online"
+          },
+          {
+            "baseline_mae": "60.4714",
+            "field": "channel",
+            "passed": false,
+            "rows": 140,
+            "trained_mae": "67.8500",
+            "value": "store"
+          },
+          {
+            "baseline_mae": "48.6286",
+            "field": "channel",
+            "passed": false,
+            "rows": 140,
+            "trained_mae": "54.3143",
+            "value": "wholesale"
+          },
+          {
+            "baseline_mae": "48.6286",
+            "field": "store_id",
+            "passed": false,
+            "rows": 140,
+            "trained_mae": "54.3143",
+            "value": "173ee44c-0459-54cb-b9a6-01f9b422e02f"
+          },
+          {
+            "baseline_mae": "77.1143",
+            "field": "store_id",
+            "passed": true,
+            "rows": 140,
+            "trained_mae": "80.3857",
+            "value": "2761a8b7-f541-58d3-a24a-a69e1ad6ee09"
+          },
+          {
+            "baseline_mae": "34.5786",
+            "field": "store_id",
+            "passed": true,
+            "rows": 140,
+            "trained_mae": "36.2357",
+            "value": "a2ac838d-a4ad-5054-9aad-660428b4817c"
+          },
+          {
+            "baseline_mae": "50.3857",
+            "field": "store_id",
+            "passed": false,
+            "rows": 140,
+            "trained_mae": "53.7286",
+            "value": "ba4881fd-78b5-5016-847d-8066d661bcfa"
+          },
+          {
+            "baseline_mae": "60.4714",
+            "field": "store_id",
+            "passed": false,
+            "rows": 140,
+            "trained_mae": "67.8500",
+            "value": "c1ca292a-ed5d-5123-9067-da1959a33604"
+          }
+        ]
+      },
+      {
+        "check_id": "reproduction",
+        "reason": "Source snapshot and saved model reproduce evaluated final-test predictions.",
+        "sample_size": 2800,
+        "status": "passed",
+        "threshold": [
+          "source_snapshot",
+          "artifact_roundtrip"
+        ],
+        "value": {
+          "artifact_roundtrip": true,
+          "source_snapshot": true
+        }
+      }
+    ],
+    "policy_sha256": "d064b991acc35b47fd0ed4ba87cfb749c961f25b197441945279aed7c32e172e",
+    "policy_version": "retailops-forecast-local-v1",
+    "reason": "One or more required local checks did not pass.",
+    "status": "rejected",
+    "use_case": "synthetic_local_forecast_validation"
+  },
+  "artifacts": [
+    "random_forest_model.joblib",
+    "metrics.json",
+    "predictions.csv",
+    "daily_panel.csv",
+    "feature_importance.csv",
+    "model_metadata.json",
+    "model_card.md",
+    "experiment_inputs.json",
+    "experiment_source.zip",
+    "run_manifest.json"
+  ],
+  "baseline_metrics": {
+    "bias": "8.9929",
+    "evaluated_rows": 700,
+    "mae": "54.2357",
+    "mape": "81.4125",
+    "mape_coverage": "0.3171",
+    "mape_evaluated_rows": 222,
+    "rmse": "143.8100",
+    "status": "evaluable",
+    "wape": "148.1966",
+    "zero_actual_overforecast_units": "19128.0000",
+    "zero_actual_rows": 478
+  },
+  "baseline_model_name": "retailops-demand-baseline-moving-average",
+  "evaluation_scope": "synthetic_fixed_origin_horizon_v1",
+  "evaluation_type": "fixed_origin_horizon",
+  "experiment_id": "rf-a2161d63d4f37f978620",
+  "feature_dataset_id": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+  "feature_date_end": "2026-04-30",
+  "feature_date_start": "2026-01-31",
+  "feature_grain": [
+    "date",
+    "product_id",
+    "store_id",
+    "channel"
+  ],
+  "feature_row_count": 2891,
+  "generated_at": "2026-09-27T10:54:49.325661+00:00",
+  "generator_version": "0.1.0",
+  "horizon_days": 7,
+  "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+  "model_name": "retailops-demand-random-forest",
+  "model_status": "rejected",
+  "model_type": "sklearn_random_forest_regressor",
+  "model_version": "random-forest-v3",
+  "n_estimators": 80,
+  "primary_metric": "wape",
+  "primary_metric_improvement_percent": "-7.8678",
+  "profile": "small",
+  "random_state": 42,
+  "report_name": "retailops-trained-demand-forecast-evaluation",
+  "run_id": "4d88f7e8e1334360afc0d662b1375b68",
+  "seed": 42,
+  "target": "units_sold",
+  "temporal_protocol": {
+    "business_timezone": "UTC",
+    "date_end": "2026-04-30",
+    "date_start": "2026-01-31",
+    "final_test_split": "test",
+    "folds": [
+      {
+        "baseline_metrics": {
+          "bias": "-9.5886",
+          "evaluated_rows": 700,
+          "mae": "57.9857",
+          "mape": "74.7452",
+          "mape_coverage": "0.3200",
+          "mape_evaluated_rows": 224,
+          "rmse": "208.7043",
+          "status": "evaluable",
+          "wape": "123.4564",
+          "zero_actual_overforecast_units": "15392.0000",
+          "zero_actual_rows": 476
+        },
+        "coverage": "1.0000",
+        "eligible_rows": 700,
+        "evaluated_rows": 700,
+        "model_metrics": {
+          "bias": "-3.8771",
+          "evaluated_rows": 700,
+          "mae": "55.5143",
+          "mape": "70.8649",
+          "mape_coverage": "0.3200",
+          "mape_evaluated_rows": 224,
+          "rmse": "193.2227",
+          "status": "evaluable",
+          "wape": "118.1945",
+          "zero_actual_overforecast_units": "15900.0000",
+          "zero_actual_rows": 476
+        },
+        "origin": "2026-04-02T23:59:59+00:00",
+        "panel_rows": 700,
+        "skipped": {},
+        "split": "validation_1",
+        "target_end": "2026-04-09",
+        "target_start": "2026-04-03",
+        "training_examples": 4900
+      },
+      {
+        "baseline_metrics": {
+          "bias": "-14.9757",
+          "evaluated_rows": 700,
+          "mae": "60.7843",
+          "mape": "69.3996",
+          "mape_coverage": "0.3257",
+          "mape_evaluated_rows": 228,
+          "rmse": "209.8623",
+          "status": "evaluable",
+          "wape": "111.7036",
+          "zero_actual_overforecast_units": "15260.0000",
+          "zero_actual_rows": 472
+        },
+        "coverage": "1.0000",
+        "eligible_rows": 700,
+        "evaluated_rows": 700,
+        "model_metrics": {
+          "bias": "-6.5543",
+          "evaluated_rows": 700,
+          "mae": "60.5714",
+          "mape": "74.0302",
+          "mape_coverage": "0.3257",
+          "mape_evaluated_rows": 228,
+          "rmse": "194.1914",
+          "status": "evaluable",
+          "wape": "111.3124",
+          "zero_actual_overforecast_units": "16629.0000",
+          "zero_actual_rows": 472
+        },
+        "origin": "2026-04-09T23:59:59+00:00",
+        "panel_rows": 700,
+        "skipped": {},
+        "split": "validation_2",
+        "target_end": "2026-04-16",
+        "target_start": "2026-04-10",
+        "training_examples": 5600
+      },
+      {
+        "baseline_metrics": {
+          "bias": "-4.8029",
+          "evaluated_rows": 700,
+          "mae": "61.9257",
+          "mape": "78.1666",
+          "mape_coverage": "0.3129",
+          "mape_evaluated_rows": 219,
+          "rmse": "202.8364",
+          "status": "evaluable",
+          "wape": "128.4157",
+          "zero_actual_overforecast_units": "18170.0000",
+          "zero_actual_rows": 481
+        },
+        "coverage": "1.0000",
+        "eligible_rows": 700,
+        "evaluated_rows": 700,
+        "model_metrics": {
+          "bias": "12.9257",
+          "evaluated_rows": 700,
+          "mae": "69.4371",
+          "mape": "76.2632",
+          "mape_coverage": "0.3129",
+          "mape_evaluated_rows": 219,
+          "rmse": "205.9958",
+          "status": "evaluable",
+          "wape": "143.9922",
+          "zero_actual_overforecast_units": "25234.0000",
+          "zero_actual_rows": 481
+        },
+        "origin": "2026-04-16T23:59:59+00:00",
+        "panel_rows": 700,
+        "skipped": {},
+        "split": "validation_3",
+        "target_end": "2026-04-23",
+        "target_start": "2026-04-17",
+        "training_examples": 6300
+      },
+      {
+        "baseline_metrics": {
+          "bias": "8.9929",
+          "evaluated_rows": 700,
+          "mae": "54.2357",
+          "mape": "81.4125",
+          "mape_coverage": "0.3171",
+          "mape_evaluated_rows": 222,
+          "rmse": "143.8100",
+          "status": "evaluable",
+          "wape": "148.1966",
+          "zero_actual_overforecast_units": "19128.0000",
+          "zero_actual_rows": 478
+        },
+        "coverage": "1.0000",
+        "eligible_rows": 700,
+        "evaluated_rows": 700,
+        "model_metrics": {
+          "bias": "25.2171",
+          "evaluated_rows": 700,
+          "mae": "58.5029",
+          "mape": "80.4038",
+          "mape_coverage": "0.3171",
+          "mape_evaluated_rows": 222,
+          "rmse": "154.4301",
+          "status": "evaluable",
+          "wape": "159.8564",
+          "zero_actual_overforecast_units": "23621.0000",
+          "zero_actual_rows": 478
+        },
+        "origin": "2026-04-23T23:59:59+00:00",
+        "panel_rows": 700,
+        "skipped": {},
+        "split": "test",
+        "target_end": "2026-04-30",
+        "target_start": "2026-04-24",
+        "training_examples": 7000
+      }
+    ],
+    "horizon_days": 7,
+    "min_history_observations": 7,
+    "model_version": "random-forest-v3",
+    "origin_rule": "previous_day_23_59_59_utc",
+    "panel_rows": 9000,
+    "panel_status_counts": {
+      "complete_zero": 6109,
+      "observed_positive": 2891
+    },
+    "protocol_version": "synthetic_fixed_origin_v1",
+    "source_evidence": "synthetic_profile_completeness_assumption_v1",
+    "test_used_for_selection": false,
+    "validation_windows": 3,
+    "window_days": 28
+  },
+  "test_coverage": "1.0000",
+  "test_row_count": 700,
+  "top_features": [
+    {
+      "feature": "rolling_max_units",
+      "importance": "0.2359"
+    },
+    {
+      "feature": "rolling_mean_units",
+      "importance": "0.1824"
+    },
+    {
+      "feature": "day_of_week",
+      "importance": "0.1678"
+    },
+    {
+      "feature": "horizon_day",
+      "importance": "0.1123"
+    },
+    {
+      "feature": "lag_1_units",
+      "importance": "0.0931"
+    },
+    {
+      "feature": "lag_7_units",
+      "importance": "0.0695"
+    },
+    {
+      "feature": "week_of_year",
+      "importance": "0.0642"
+    },
+    {
+      "feature": "product_id=576f0781-3104-5d50-92f3-befe834a6fa6",
+      "importance": "0.0145"
+    },
+    {
+      "feature": "month",
+      "importance": "0.0104"
+    },
+    {
+      "feature": "training_observation_count",
+      "importance": "0.0094"
+    }
+  ],
+  "trained_model_metrics": {
+    "bias": "25.2171",
+    "evaluated_rows": 700,
+    "mae": "58.5029",
+    "mape": "80.4038",
+    "mape_coverage": "0.3171",
+    "mape_evaluated_rows": 222,
+    "rmse": "154.4301",
+    "status": "evaluable",
+    "wape": "159.8564",
+    "zero_actual_overforecast_units": "23621.0000",
+    "zero_actual_rows": 478
+  },
+  "training_row_count": 7000,
+  "validation_windows": 3,
+  "window_days": 28
+}

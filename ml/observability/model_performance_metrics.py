@@ -2,24 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
-from data.generator.main import DatasetGenerationConfig
-from ml.evaluation.baseline_report import (
-    EVALUATION_REPORT_FILENAME,
-    default_evaluation_output_dir,
-)
+from ml.experiments.assessed_run import load_assessed_run
 from ml.inference.batch_forecast import (
-    BATCH_MANIFEST_FILENAME,
-    DEFAULT_HOLDOUT_DAYS,
-    DEFAULT_HORIZON_DAYS,
-    DEFAULT_MODEL_STATUS,
-    DEFAULT_WINDOW_DAYS,
     BatchInferenceConfig,
     default_batch_output_dir,
+    load_verified_batch_manifest,
     run_batch_inference,
 )
 from ml.metadata.model_registry import (
@@ -33,17 +25,9 @@ MODEL_PERFORMANCE_SNAPSHOT_FILENAME = "model_performance_snapshot.json"
 
 @dataclass(frozen=True)
 class ModelPerformanceMetricsConfig:
-    dataset: DatasetGenerationConfig = field(
-        default_factory=lambda: DatasetGenerationConfig(profile="demo"),
-    )
-    window_days: int = DEFAULT_WINDOW_DAYS
-    horizon_days: int = DEFAULT_HORIZON_DAYS
-    holdout_days: int = DEFAULT_HOLDOUT_DAYS
-    model_status: str = DEFAULT_MODEL_STATUS
+    experiment_dir: Path
     output_dir: Path | None = None
     metadata_output_dir: Path | None = None
-    model_output_dir: Path | None = None
-    evaluation_output_dir: Path | None = None
     inference_output_dir: Path | None = None
 
 
@@ -90,30 +74,70 @@ def build_model_performance_snapshot(
     model_metadata: dict[str, object],
     batch_manifest: dict[str, object],
 ) -> dict[str, object]:
-    metrics = evaluation_report.get("metrics")
+    metrics = evaluation_report.get("trained_model_metrics")
     if not isinstance(metrics, dict):
-        msg = "evaluation_report metrics must be a dictionary."
+        msg = "assessed RF metrics must be a dictionary."
         raise TypeError(msg)
+    for key, metadata_key in (
+        ("experiment_id", "experiment_id"),
+        ("run_id", "run_id"),
+        ("model_id", "model_id"),
+        ("feature_dataset_id", "feature_dataset_id"),
+    ):
+        if not (evaluation_report[key] == model_metadata[metadata_key] == batch_manifest[key]):
+            msg = f"Performance identity mismatch: {key}."
+            raise ValueError(msg)
+    if not (
+        evaluation_report["model_status"]
+        == model_metadata["status"]
+        == batch_manifest["model_status"]
+    ):
+        msg = "Performance model status mismatch."
+        raise ValueError(msg)
+    if not (
+        evaluation_report["model_name"]
+        == model_metadata["model_name"]
+        == batch_manifest["model_name"]
+        and evaluation_report["model_version"]
+        == model_metadata["model_version"]
+        == batch_manifest["model_version"]
+    ):
+        msg = "Performance model family mismatch."
+        raise ValueError(msg)
+    if model_metadata["source_run_manifest_sha256"] != batch_manifest["source_run_manifest_sha256"]:
+        msg = "Performance source run manifest mismatch."
+        raise ValueError(msg)
+    final_fold = next(
+        fold for fold in evaluation_report["temporal_protocol"]["folds"] if fold["split"] == "test"
+    )
 
     return {
         "snapshot_name": "retailops-demand-model-performance",
         "model_name": evaluation_report["model_name"],
         "model_version": evaluation_report["model_version"],
         "model_status": model_metadata["status"],
+        "experiment_id": evaluation_report["experiment_id"],
+        "run_id": evaluation_report["run_id"],
+        "model_id": evaluation_report["model_id"],
         "profile": evaluation_report["profile"],
         "feature_dataset_id": evaluation_report["feature_dataset_id"],
         "evaluation": {
             "type": evaluation_report["evaluation_type"],
+            "status": metrics["status"],
             "evaluated_rows": metrics["evaluated_rows"],
-            "skipped_rows": evaluation_report["skipped_rows"],
+            "mape_evaluated_rows": metrics["mape_evaluated_rows"],
+            "mape_coverage": metrics["mape_coverage"],
+            "zero_actual_rows": metrics["zero_actual_rows"],
+            "zero_actual_overforecast_units": metrics["zero_actual_overforecast_units"],
+            "skipped_rows": final_fold["eligible_rows"] - final_fold["evaluated_rows"],
             "mae": metrics["mae"],
             "rmse": metrics["rmse"],
             "mape": metrics["mape"],
             "bias": metrics["bias"],
             "wape": metrics["wape"],
             "feature_row_count": evaluation_report["feature_row_count"],
-            "evaluation_date_start": evaluation_report["evaluation_date_start"],
-            "evaluation_date_end": evaluation_report["evaluation_date_end"],
+            "evaluation_date_start": final_fold["target_start"],
+            "evaluation_date_end": final_fold["target_end"],
         },
         "batch_inference": {
             "run_key": batch_manifest["run_key"],
@@ -125,6 +149,7 @@ def build_model_performance_snapshot(
         "artifacts": {
             "metadata_model_id": model_metadata["model_id"],
             "metadata_output_dir": batch_manifest["metadata_output_dir"],
+            "source_run_manifest_sha256": batch_manifest["source_run_manifest_sha256"],
         },
         "generated_at": batch_manifest["generated_at"],
     }
@@ -156,6 +181,9 @@ def render_model_performance_metrics(snapshot: dict[str, object]) -> str:
         "model_name": snapshot["model_name"],
         "model_version": snapshot["model_version"],
         "model_status": snapshot["model_status"],
+        "experiment_id": snapshot["experiment_id"],
+        "model_id": snapshot["model_id"],
+        "run_id": snapshot["run_id"],
         "profile": snapshot["profile"],
         "feature_dataset_id": snapshot["feature_dataset_id"],
     }
@@ -194,6 +222,14 @@ def render_model_performance_metrics(snapshot: dict[str, object]) -> str:
         "retailops_model_evaluation_mape_percent": (
             "Mean absolute percentage error for the latest model evaluation.",
             "mape",
+        ),
+        "retailops_model_evaluation_mape_coverage": (
+            "Fraction of evaluated rows with strictly positive actual units.",
+            "mape_coverage",
+        ),
+        "retailops_model_evaluation_zero_actual_overforecast_units": (
+            "Overforecast units on rows with zero actual demand.",
+            "zero_actual_overforecast_units",
         ),
         "retailops_model_evaluation_bias": (
             "Average signed forecast bias for the latest model evaluation.",
@@ -266,76 +302,47 @@ def write_model_performance_artifacts(
 def generate_model_performance_metrics(
     config: ModelPerformanceMetricsConfig,
 ) -> dict[str, object]:
+    run = load_assessed_run(config.experiment_dir)
+    profile = str(run.metrics["profile"])
+    inference_dir = config.inference_output_dir or default_batch_output_dir(profile)
+    metadata_dir = config.metadata_output_dir or default_metadata_output_dir(profile)
+    output_dir = config.output_dir or default_metrics_output_dir(profile)
+    if output_dir.resolve().is_relative_to(run.directory):
+        msg = "Metrics output must not modify the assessed experiment."
+        raise ValueError(msg)
     run_batch_inference(
         BatchInferenceConfig(
-            dataset=config.dataset,
-            window_days=config.window_days,
-            horizon_days=config.horizon_days,
-            holdout_days=config.holdout_days,
-            model_status=config.model_status,
-            output_dir=config.inference_output_dir,
-            metadata_output_dir=config.metadata_output_dir,
-            model_output_dir=config.model_output_dir,
-            evaluation_output_dir=config.evaluation_output_dir,
+            experiment_dir=config.experiment_dir,
+            output_dir=inference_dir,
+            metadata_output_dir=metadata_dir,
         ),
     )
-    metadata_dir = config.metadata_output_dir or default_metadata_output_dir(config.dataset.profile)
-    evaluation_dir = config.evaluation_output_dir or default_evaluation_output_dir(
-        config.dataset.profile,
-    )
-    inference_dir = config.inference_output_dir or default_batch_output_dir(config.dataset.profile)
-
     snapshot = build_model_performance_snapshot(
-        _load_json(evaluation_dir / EVALUATION_REPORT_FILENAME),
+        run.metrics,
         _load_json(metadata_dir / MODEL_METADATA_FILENAME),
-        _load_json(inference_dir / BATCH_MANIFEST_FILENAME),
+        load_verified_batch_manifest(inference_dir, run),
     )
     metrics_text = render_model_performance_metrics(snapshot)
-    output_dir = config.output_dir or default_metrics_output_dir(config.dataset.profile)
     write_model_performance_artifacts(output_dir, snapshot, metrics_text)
     return snapshot
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate RetailOps model performance metrics for Prometheus textfile ingestion.",
+        description="Generate performance metrics from one assessed RF experiment.",
     )
-    parser.add_argument("--profile", choices=("demo", "small", "medium", "large"), default="demo")
-    parser.add_argument("--days", type=int)
-    parser.add_argument("--products", type=int)
-    parser.add_argument("--stores", type=int)
-    parser.add_argument("--warehouses", type=int)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--window-days", type=int, default=DEFAULT_WINDOW_DAYS)
-    parser.add_argument("--horizon-days", type=int, default=DEFAULT_HORIZON_DAYS)
-    parser.add_argument("--holdout-days", type=int, default=DEFAULT_HOLDOUT_DAYS)
-    parser.add_argument("--model-status", default=DEFAULT_MODEL_STATUS)
+    parser.add_argument("--experiment-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--metadata-output-dir", type=Path)
-    parser.add_argument("--model-output-dir", type=Path)
-    parser.add_argument("--evaluation-output-dir", type=Path)
     parser.add_argument("--inference-output-dir", type=Path)
     return parser.parse_args()
 
 
 def config_from_args(args: argparse.Namespace) -> ModelPerformanceMetricsConfig:
     return ModelPerformanceMetricsConfig(
-        dataset=DatasetGenerationConfig(
-            profile=args.profile,
-            days=args.days,
-            products=args.products,
-            stores=args.stores,
-            warehouses=args.warehouses,
-            seed=args.seed,
-        ),
-        window_days=args.window_days,
-        horizon_days=args.horizon_days,
-        holdout_days=args.holdout_days,
-        model_status=args.model_status,
+        experiment_dir=args.experiment_dir,
         output_dir=args.output_dir,
         metadata_output_dir=args.metadata_output_dir,
-        model_output_dir=args.model_output_dir,
-        evaluation_output_dir=args.evaluation_output_dir,
         inference_output_dir=args.inference_output_dir,
     )
 
@@ -343,7 +350,7 @@ def config_from_args(args: argparse.Namespace) -> ModelPerformanceMetricsConfig:
 def main() -> None:
     config = config_from_args(parse_args())
     snapshot = generate_model_performance_metrics(config)
-    output_dir = config.output_dir or default_metrics_output_dir(config.dataset.profile)
+    output_dir = config.output_dir or default_metrics_output_dir(str(snapshot["profile"]))
 
     print(  # noqa: T201 - CLI output
         "RetailOps model performance metrics generated: "

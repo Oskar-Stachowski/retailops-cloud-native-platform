@@ -4,6 +4,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+from data.generator.main import DatasetGenerationConfig, build_dataset
+from ml.features.demand_forecast import (
+    FEATURE_COLUMNS,
+    build_demand_feature_rows,
+    build_feature_manifest,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CONTRACT_DIR = REPO_ROOT / "ml" / "contracts"
@@ -73,3 +80,24 @@ def test_manifest_example_matches_declared_contract_fields() -> None:
     assert manifest["feature_schema"] == schema["properties"]["feature_schema"]["const"]
     assert manifest["grain"] == EXPECTED_GRAIN
     assert manifest["target"] == EXPECTED_TARGET
+
+
+def test_generated_feature_rows_and_manifest_match_declared_contract() -> None:
+    config = DatasetGenerationConfig(
+        profile="small", days=3, products=5, stores=2, warehouses=2,
+    )
+    rows = build_demand_feature_rows(build_dataset(config), config)
+    manifest = build_feature_manifest(config, rows)
+    feature_schema = load_json(FEATURE_SCHEMA_PATH)
+    manifest_schema = load_json(MANIFEST_SCHEMA_PATH)
+
+    assert rows
+    assert set(FEATURE_COLUMNS) == set(feature_schema["properties"])
+    assert set(feature_schema["required"]) == set(FEATURE_COLUMNS)
+    assert all(set(row) == set(FEATURE_COLUMNS) for row in rows)
+    assert set(manifest) == set(manifest_schema["properties"])
+    assert set(manifest_schema["required"]).issubset(manifest)
+    assert manifest["schema_version"] == feature_schema["properties"]["schema_version"]["const"]
+    assert set(manifest["available_at_origin_fields"]).isdisjoint(manifest["label_fields"])
+    assert manifest["observation_availability_field"] == "observation_available_at"
+    assert manifest["observation_availability_field"] not in manifest["available_at_origin_fields"]

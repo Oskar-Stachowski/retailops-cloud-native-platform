@@ -21,7 +21,7 @@ w [indeksie dowodów](evidence/README.md).
 | Najbliższa praca i rozwój AI | [Przygotowanie przed AI 00](plans/before-ai-00.md), [plan prac](plans/README.md) |
 | Uruchomienie i rozwój aplikacji | [Lokalnie](guides/local-development.md), [frontend](guides/frontend.md), [backend](guides/backend.md) |
 | Dane, baza i streaming | [Generator](guides/data.md), [baza](guides/database.md), [broker](guides/streaming.md) |
-| Uczenie maszynowe | [Obecna implementacja](guides/ml.md), [plan poprawy oceny](plans/ml-evaluation.md) |
+| Uczenie maszynowe | [Obecna implementacja](guides/ml.md), [ostatnia ocena](evidence/ml/fixed-origin-rf-2026-09-27/README.md) |
 | Testy i dostarczanie zmian | [Testy](guides/testing.md), [CI/CD i Jenkins](guides/ci-cd.md), [wydania](governance/releases.md) |
 | Infrastruktura | [Terraform/AWS](guides/infrastructure.md), [Kubernetes](guides/kubernetes.md), [plan aktywacji AWS](plans/aws-activation.md) |
 | Monitoring | [Instrukcja](guides/observability.md), [SLO](observability/slo.md), [tracing](observability/api-tracing.md) |

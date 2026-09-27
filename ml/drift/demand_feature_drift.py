@@ -22,26 +22,15 @@ DEFAULT_CURRENT_SEED = 43
 DEFAULT_WARNING_THRESHOLD = Decimal("0.1000")
 DEFAULT_FAILURE_THRESHOLD = Decimal("0.2500")
 NUMERIC_FEATURES = [
-    "units_sold",
-    "latent_units_demand",
-    "sales_revenue",
-    "unit_price",
-    "discount_percent",
-    "inventory_on_hand",
-    "inventory_reserved",
+    "day_of_week",
+    "week_of_year",
+    "month",
 ]
 CATEGORICAL_FEATURES = [
     "channel",
-    "promotion_active",
-    "promotion_type",
-    "stockout_flag",
     "category",
     "brand",
-    "product_status",
-    "day_of_week",
     "is_weekend",
-    "month",
-    "data_quality_status",
 ]
 
 

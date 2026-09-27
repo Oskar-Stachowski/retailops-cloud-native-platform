@@ -1,7 +1,7 @@
 # Aktualny status RetailOps
 
-Przegląd dokumentacji i kodu: **2026-09-27**, punkt odniesienia
-`d7e8725bfb517595d2cefda4d6011f2db70b2aed`.
+Aktualizacja dokumentacji i kodu: **2026-09-27**. Bazowy przegląd audytowy
+odnosił się do `d7e8725bfb517595d2cefda4d6011f2db70b2aed`.
 Ten przegląd nie jest nowym uruchomieniem aplikacji, CI ani audytem konta AWS.
 Daty, rewizje i zakres wykonanych prób podaje [indeks dowodów](evidence/README.md).
 
@@ -18,7 +18,7 @@ Daty, rewizje i zakres wykonanych prób podaje [indeks dowodów](evidence/README
 | Terraform | Kod fundamentu AWS, kontrolowany plan/drift i przygotowany backend S3/KMS. Ostatni spis z 2026-09-26 nie znalazł pasującego wdrożenia ani bucketu state; rola OIDC do planu była obecna. |
 | Monitoring | Metryki API/DB/stream, Prometheus, Grafana i próba rzeczywistego firing/resolution alertu. SLO dotyczy scrape metryk; brak dowodu dostępności żądań użytkownika przez 30 dni i dostarczania powiadomień. |
 | Jenkins | Rzeczywiste lokalne wykonanie pipeline z 2026-09-26; dodatkowa walidacja, bez wdrażania do chmury. |
-| ML | Lokalna generacja cech, średnia ruchoma, Random Forest, ewaluacja, batch i metadane. Obecny protokół wymaga poprawy dostępności cech w czasie i zasad dopuszczania modeli. |
+| ML | Lokalna generacja cech, ocena RF z trzema oknami walidacyjnymi i odłożonym testem całego horyzontu oraz zweryfikowana ścieżka artefaktu do batchu, metadanych i metryk. [Ocena z 27.09.2026](evidence/ml/fixed-origin-rf-2026-09-27/README.md) odrzuciła RF wobec średniej ruchomej; brak kwalifikacji do serving. |
 
 ## Zakres użycia
 
@@ -31,7 +31,7 @@ MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/
 
 ## Punkt wznowienia
 
-Najbliższy zaplanowany obszar to [poprawa oceny ML](plans/ml-evaluation.md),
-zaczynając od kontraktu dostępności cech w momencie prognozy.
-[Audyt](audits/open-findings.md) zawiera także nadal otwarte problemy aplikacji
-i narzędzi operacyjnych wraz z kryteriami weryfikacji poprawek.
+Najbliższe poprawki lokalne opisuje [lista przed AI 00](plans/before-ai-00.md):
+zachowanie danych Compose, granica demo auth, izolacja testów seeda i bezpieczna
+diagnostyka. [Audyt](audits/open-findings.md) zawiera także pozostałe otwarte
+problemy aplikacji i narzędzi operacyjnych wraz z kryteriami weryfikacji.

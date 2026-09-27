@@ -1,0 +1,19 @@
+{
+  "artifact_sha256": {
+    "daily_panel.csv": "7e9f1e376f05c6949bf4e09fa0820fdee48cd07036f9a440cac19ff203ccb445",
+    "experiment_inputs.json": "ded06f5418f4160c4a4b8fb3e6e93886a7f79d19c4c62092ae33480d37e68603",
+    "experiment_source.zip": "64e21782b8a2d146393eb8289090cc4d5e2e61f405b7eda675dd9e3b7990058e",
+    "feature_importance.csv": "5a60a250b3c70413be907553438d6010010f16e2421013e4000ac173b295c9b9",
+    "metrics.json": "6679b1fdf3e376ef978d46732507bbe239376ad75d64d052cd523832e8680f4f",
+    "model_card.md": "c0613261ace64f2ed6c8e4a44f5cb4ccc59410d941ed6f833657f3ade2855ef8",
+    "model_metadata.json": "f7418034a52321c322f7ef4f5ccf8270191e9ebdad179bd3a36defa3a6c8faf6",
+    "predictions.csv": "9ffd163a3dca3a8eff22e20d144d938282ea5feba3f26b35b47e7b28c0d295cc",
+    "random_forest_model.joblib": "571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab"
+  },
+  "evaluation_scope": "synthetic_fixed_origin_horizon_v1",
+  "experiment_id": "rf-1030e5414b3c0d72bd34",
+  "model_id": "sha256:571d1b303e2fe1c11b31ea88b79c100d1e6497d3447cd2e995435192a60667ab",
+  "panel_logical_sha256": "8870fa6c5b51f832bae23539404d6b4352e50d839418124e39c8f1e32304f833",
+  "predictions_logical_sha256": "51b4900aaa2456e81a4ee7986694f95bad6186d1f62134621ffcc06433e8ba5f",
+  "run_id": "fa1ca9c081db41e1b2d5788d757b7272"
+}

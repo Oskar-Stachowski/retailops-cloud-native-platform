@@ -51,6 +51,7 @@ def test_baseline_forecast_uses_recent_window_average() -> None:
             "store_id": "store-1",
             "channel": "store",
             "units_sold": 2,
+            "observation_available_at": "2026-04-01T12:00:00Z",
             "generated_at": "2026-04-03T00:00:00Z",
         },
         {
@@ -60,6 +61,7 @@ def test_baseline_forecast_uses_recent_window_average() -> None:
             "store_id": "store-1",
             "channel": "store",
             "units_sold": 8,
+            "observation_available_at": "2026-04-02T12:00:00Z",
             "generated_at": "2026-04-03T00:00:00Z",
         },
     ]
@@ -69,6 +71,29 @@ def test_baseline_forecast_uses_recent_window_average() -> None:
     assert [row["forecast_date"] for row in forecasts] == ["2026-04-03", "2026-04-04"]
     assert {row["predicted_units"] for row in forecasts} == {8}
     assert {row["training_rows"] for row in forecasts} == {1}
+
+
+def test_baseline_forecast_excludes_late_observation() -> None:
+    feature_rows = [
+        {
+            "dataset_id": "dataset-1", "date": "2026-04-01", "product_id": "product-1",
+            "store_id": "store-1", "channel": "store", "units_sold": 2,
+            "observation_available_at": "2026-04-01T12:00:00Z",
+            "generated_at": "2026-04-03T00:00:00Z",
+        },
+        {
+            "dataset_id": "dataset-1", "date": "2026-04-02", "product_id": "product-1",
+            "store_id": "store-1", "channel": "store", "units_sold": 100,
+            "observation_available_at": "2026-04-03T12:00:00Z",
+            "generated_at": "2026-04-03T12:00:00Z",
+        },
+    ]
+
+    forecasts = build_baseline_forecasts(feature_rows, horizon_days=1, window_days=7)
+
+    assert len(forecasts) == 1
+    assert forecasts[0]["predicted_units"] == 2
+    assert forecasts[0]["training_rows"] == 1
 
 
 @pytest.mark.parametrize("window_days,horizon_days", [(0, 1), (1, 0)])

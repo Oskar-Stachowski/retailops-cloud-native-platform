@@ -62,8 +62,8 @@ jobs:
         working-directory: .
         run: |
           set -euo pipefail
-          python -m ruff check services/api/app services/api/scripts services/api/tests data ml --config pyproject.toml
-          python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml --config pyproject.toml
+          python -m ruff check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
+          python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
           python -m mypy --config-file pyproject.toml
           python -m bandit \
             --severity-level high \
@@ -72,6 +72,18 @@ jobs:
             -r services/api/app services/api/scripts \
             -f txt \
             -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
+
+      - name: Verify fixed-origin ML assessment contract
+        working-directory: .
+        run: |
+          set -euo pipefail
+          mkdir -p ci-cd/reports/ml/ci
+          python -m pytest -q \
+            services/api/tests/test_assessed_rf_pipeline.py \
+            services/api/tests/test_forecast_admission_policy.py \
+            services/api/tests/test_fixed_origin_evaluation.py::test_future_holdout_outcomes_cannot_change_frozen_predictions \
+            services/api/tests/test_model_metadata_registry.py::test_registry_refuses_direct_status_override \
+            | tee ci-cd/reports/ml/ci/assessment-tests.txt
 
       - name: Generate demo CSV dataset
         working-directory: .
@@ -117,6 +129,7 @@ jobs:
             echo "| Bandit report | \`ci-cd/reports/security/bandit-api.txt\` |"
             echo "| Data contract report | \`ci-cd/reports/data/data-contract-report.json\` |"
             echo "| Scenario coverage report | \`ci-cd/reports/data/scenario-coverage-report.json\` |"
+            echo "| ML assessment contract tests | \`ci-cd/reports/ml/ci/assessment-tests.txt\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload API coverage evidence
@@ -144,6 +157,14 @@ jobs:
             ci-cd/reports/data/data-contract-report.json
             ci-cd/reports/data/scenario-coverage-report.json
             docs/evidence/data/scenario-coverage-report.md
+          if-no-files-found: warn
+
+      - name: Upload ML assessment test evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: ml-assessment-contract-evidence
+          path: ci-cd/reports/ml/ci/assessment-tests.txt
           if-no-files-found: warn
 
   api-image-build:

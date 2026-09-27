@@ -6,7 +6,7 @@
 | Dane aplikacji | [Model danych](data-model.md), [workflow i role](business-workflows.md) |
 | Dane syntetyczne | [Profile](data-profiles.md), [kontrakty danych](data-contracts.md) |
 | Streaming | [Zdarzenia](events.md), [trwałość metryk](live-metrics-persistence.md) |
-| ML | [Kontrakt cech](ml-features.md) |
+| ML | [Kontrakt cech](ml-features.md), [lokalna polityka dopuszczenia RF](ml-admission-policy.md) |
 | Konwencje | [Nazwy i tagi](conventions.md) |
 | Terraform | [Mapa modułów](../guides/infrastructure.md), [backend state](terraform-state-backend.md) |
 | Zależności kind | [Przypięte manifesty kindnet](kindnet-vendor.md) |

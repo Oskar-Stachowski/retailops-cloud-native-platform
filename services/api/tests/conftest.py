@@ -3,6 +3,12 @@ import os
 import psycopg
 import pytest
 
+from data.generator.main import DatasetGenerationConfig
+from ml.models.random_forest_forecast import (
+    RandomForestForecastConfig,
+    train_random_forest_forecast_model,
+)
+
 
 def _requires_db(item: pytest.Item) -> bool:
     return item.get_closest_marker("integration_db") is not None
@@ -53,3 +59,20 @@ def database_url() -> str:
         pytest.fail("DATABASE_URL is required for this integration DB test", pytrace=False)
 
     return value
+
+
+@pytest.fixture
+def assessed_rf_run_dir(tmp_path):
+    directory = tmp_path / "assessed_rf"
+    train_random_forest_forecast_model(
+        RandomForestForecastConfig(
+            dataset=DatasetGenerationConfig(
+                profile="small", days=42, products=8, stores=2, warehouses=2, seed=42,
+            ),
+            window_days=7,
+            horizon_days=7,
+            n_estimators=8,
+            output_dir=directory,
+        ),
+    )
+    return directory

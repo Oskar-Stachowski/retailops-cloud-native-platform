@@ -7,7 +7,7 @@ zakres danych, nie datę wykonania treningu.
 **Ten wynik nie kwalifikuje modelu do wdrożenia.** Obecny przegląd wykazał
 problemy dostępności cech w czasie, protokołu holdout i metryk. Status
 `candidate` w artefakcie jest wynikiem starej, minimalnej reguły porównania WAPE.
-Zestaw zachowano jako punkt odniesienia do [ponownej oceny](../../../plans/ml-evaluation.md).
+Zestaw zachowano jako punkt odniesienia do [świeżej oceny](../fixed-origin-rf-2026-09-27/README.md).
 Nie wykonano nowego treningu przy porządkowaniu dokumentacji.
 
 ## Validation Command

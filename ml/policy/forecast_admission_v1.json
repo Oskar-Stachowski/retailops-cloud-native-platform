@@ -1,0 +1,15 @@
+{
+  "policy_version": "retailops-forecast-local-v1",
+  "use_case": "synthetic_local_forecast_validation",
+  "protocol_version": "synthetic_fixed_origin_v1",
+  "evaluation_scope": "synthetic_fixed_origin_horizon_v1",
+  "source_evidence": "synthetic_profile_completeness_assumption_v1",
+  "required_validation_windows": 3,
+  "required_coverage": "1.0000",
+  "min_relative_wape_improvement_percent": "5.0000",
+  "min_validation_wins": 2,
+  "segment_fields": ["store_id", "channel"],
+  "min_segment_rows": 20,
+  "max_segment_mae_regression_percent": "5.0000",
+  "reproduction_checks": ["source_snapshot", "artifact_roundtrip"]
+}

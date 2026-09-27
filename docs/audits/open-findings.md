@@ -1,109 +1,13 @@
 # Otwarte ustalenia audytowe
 
 Przegląd kodu: **27.09.2026**, baza `d7e8725bfb517595d2cefda4d6011f2db70b2aed`.
-Poniżej są wyłącznie problemy potwierdzone w źródłach. To przegląd statyczny;
-nie wykonano nowego treningu, testów runtime ani audytu kont zewnętrznych.
+Poniżej są wyłącznie problemy potwierdzone w źródłach. Ocena ich zakresu
+opiera się na przeglądzie statycznym; testy tożsamości RF nie weryfikują jakości
+prognoz ani kont zewnętrznych.
 
 **P1** oznacza ryzyko utraty danych, naruszenia granicy dostępu lub niewiarygodnej
 oceny modelu. **P2** oznacza problem odtwarzalności, izolacji lub diagnostyki.
 Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyjnej.
-
-## ML — do poprawy przed następną oceną modelu
-
-### ML-01 · P1 · Cechy korzystają z informacji niedostępnych w chwili prognozy
-
-**Dowód:** [budowanie cech](../../ml/features/demand_forecast.py) wylicza
-`unit_price` z przychodu i sprzedaży prognozowanego dnia, a `stockout_flag`
-z jego zdarzeń sprzedażowych. `_inventory_for_date` przy braku wcześniejszego
-snapshotu wybiera późniejszy; dopasowuje zapas tylko po produkcie, bez lokalizacji.
-[Random Forest](../../ml/models/random_forest_forecast.py),
-`build_training_features`, używa ceny, rabatu, stockout i zapasu z tego wiersza.
-Wynik takiego backtestu nie potwierdza jakości prognozy dostępnej przed tym dniem.
-
-**Kryterium zamknięcia:** jawny origin i kontrakt dostępności każdej cechy;
-wyłączenie informacji o późniejszych wynikach, brak fallbacku do przyszłości
-oraz poprawne dopasowanie lokalizacji. Cechy zapasu bez wiarygodnego kontraktu
-pozostają wyłączone. Testy wykazują, że zmiana faktów po origin nie zmienia cech
-ani zamrożonej prognozy. Target pozostaje obserwowaną sprzedażą.
-
-### ML-02 · P1 · Protokół nie weryfikuje prognozy całego horyzontu z jednego origin
-
-**Dowód:** `build_supervised_examples` w
-[modelu RF](../../ml/models/random_forest_forecast.py) przekazuje wszystkie
-wcześniejsze wiersze serii, także rzeczywiste wyniki wcześniejszych dni holdoutu.
-`horizon_days` jest parametrem konfiguracji, lecz nie steruje tym treningiem ani
-oceną. Kod wykonuje ocenę kroczącą, a nie zamrożoną prognozę siedmiodniową.
-`lag_7` oznacza siódmą wcześniejszą obserwację, a `window_days` liczbę wierszy;
-baseline w tym samym pliku filtruje okno po datach. Przy brakujących dniach są
-to różne zakresy historii. [Generator cech](../../ml/features/demand_forecast.py)
-tworzy wiersze z agregatów sprzedaży, bez pełnego kalendarza serii.
-
-**Kryterium zamknięcia:** oddzielnie nazwane i przetestowane protokoły dla
-stałego origin i oceny kroczącej; model i baseline mają tę samą granicę wiedzy
-oraz zbiór ocenianych rekordów. Lagi i okna odnoszą się do dat kalendarzowych,
-z jawnym rozróżnieniem brakujących danych i zerowej sprzedaży. Raport zawiera
-origin, horyzont, pokrycie, pominięcia, chronologiczne okna walidacji i odłożony
-test, którego nie używa się do strojenia.
-
-### ML-03 · P1 · Nieokreślone metryki są raportowane jako zero
-
-**Dowód:** `calculate_prediction_metrics` i `_safe_percentage_error` w
-[modelu RF](../../ml/models/random_forest_forecast.py) oraz `calculate_metrics`
-w [ocenie baseline](../../ml/evaluation/baseline_report.py) zwracają WAPE równe
-zero przy zerowej sumie actuals. MAPE przypisuje zerowy błąd procentowy rekordom
-z actual równym zero i uwzględnia je w średniej. Dodatnia błędna prognoza na
-samych zerach może więc otrzymać WAPE i MAPE równe zero.
-
-**Kryterium zamknięcia:** WAPE przy zerowym mianowniku ma `null` i status
-`not_evaluable`; MAPE obejmuje jawnie określone dodatnie actuals i podaje pokrycie.
-Raport zachowuje MAE i nadmiarową prognozę na zerach. Pusty zbiór, nieprawidłowe
-wartości i brak ocenialnej metryki nie pozwalają przejść bramki jakości.
-Test obejmuje m.in. actual `[0]`, prediction `[100]`.
-
-### ML-04 · P1 · Status modelu nie wynika z pełnej polityki dopuszczenia
-
-**Dowód:** `model_status_from_metrics` w
-[modelu RF](../../ml/models/random_forest_forecast.py) nadaje `candidate` po
-dowolnej poprawie WAPE względem baseline. Nie sprawdza pokrycia, stabilności,
-segmentów, odtwarzalności ani ważności protokołu. W
-[rejestrze metadanych](../../ml/metadata/model_registry.py) status, także
-`approved`, pochodzi z argumentu użytkownika; `_validate_status` sprawdza
-wyłącznie przynależność do listy dozwolonych nazw.
-
-**Kryterium zamknięcia:** wersjonowana polityka ustalona przed oceną zapisuje
-wynik i uzasadnienie każdego warunku. Progi muszą wynikać z uzgodnionego kontraktu,
-nie z dopasowania do uzyskanego wyniku. Ścieżka dopuszczania weryfikuje dowody
-i blokuje ręczne obejście decyzji. `candidate` oznacza zgodę na dalszą lokalną
-walidację; poprawne `rejected` jest pełnoprawnym wynikiem eksperymentu.
-
-### ML-05 · P1 · Batch, metadata i metryki nie używają ocenionego artefaktu RF
-
-**Dowód:** [batch inference](../../ml/inference/batch_forecast.py) wywołuje
-`build_baseline_forecasts`, [metadata registry](../../ml/metadata/model_registry.py)
-ponownie uruchamia trening i ocenę baseline, a
-[raport metryk](../../ml/observability/model_performance_metrics.py) uruchamia
-tę samą ścieżkę batch. Żaden z tych kroków nie odczytuje zapisanego
-`random_forest_model.joblib`. Uruchomienie wszystkich komend `make ml-*` nie
-potwierdza użycia jednego modelu od treningu do prognoz i monitoringu.
-
-**Kryterium zamknięcia:** lokalna ścieżka odczytuje dokładnie oceniony artefakt,
-bez niejawnego ponownego treningu ani przełączenia na baseline. Model, dataset,
-eksperyment, prognozy i metryki mają wspólną zweryfikowaną tożsamość. Test
-porównuje prognozy przed zapisem i po odczycie oraz odrzuca niezgodny artefakt.
-
-### ML-06 · P2 · Wersja modelu i ścieżka wyjściowa nie identyfikują eksperymentu
-
-**Dowód:** [model RF](../../ml/models/random_forest_forecast.py) ma stałą
-`MODEL_VERSION = "random-forest-v1"`, domyślnie 80 drzew i jedną ścieżkę
-wyjściową dla profilu. `write_trained_model_artifacts` nadpisuje pliki, a
-metadata nie zapisują commit SHA, wersji środowiska ani hashy danych/modelu.
-Różne konfiguracje i wykonania mogą nosić tę samą nazwę wersji.
-
-**Kryterium zamknięcia:** unikalna tożsamość przebiegu i artefaktu, konfiguracja,
-rewizja kodu, kontrakt/dataset, wersje zależności oraz sumy kontrolne. Ponowne
-wykonanie nie zastępuje dowodu innego eksperymentu. Zapisana procedura pozwala
-odtworzyć prognozy w ustalonej tolerancji; zgodność binarna i logiczna są
-raportowane osobno.
 
 ## Runtime i bezpieczeństwo
 

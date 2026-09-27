@@ -45,24 +45,13 @@ def test_drift_report_flags_numeric_and_categorical_changes() -> None:
     reference_rows = [
         {
             "dataset_id": "reference",
-            "units_sold": 10,
-            "latent_units_demand": 10,
-            "sales_revenue": "100.00",
-            "unit_price": "10.00",
-            "discount_percent": "0.0000",
-            "inventory_on_hand": 20,
-            "inventory_reserved": 0,
+            "day_of_week": 1,
+            "week_of_year": 20,
+            "month": 5,
             "channel": "online",
-            "promotion_active": False,
-            "promotion_type": "none",
-            "stockout_flag": False,
             "category": "apparel",
             "brand": "brand-a",
-            "product_status": "active",
-            "day_of_week": 1,
             "is_weekend": False,
-            "month": 5,
-            "data_quality_status": "passed",
         }
         for _ in range(4)
     ]
@@ -70,9 +59,7 @@ def test_drift_report_flags_numeric_and_categorical_changes() -> None:
         {
             **row,
             "dataset_id": "current",
-            "units_sold": 20,
-            "latent_units_demand": 22,
-            "sales_revenue": "220.00",
+            "day_of_week": 4,
             "channel": "store",
         }
         for row in reference_rows
@@ -93,7 +80,7 @@ def test_drift_report_flags_numeric_and_categorical_changes() -> None:
     }
 
     assert report["status"] == "failed"
-    assert "units_sold_mean_relative_change" in failed_checks
+    assert "day_of_week_mean_relative_change" in failed_checks
     assert "channel_max_bucket_share_delta" in failed_checks
 
 

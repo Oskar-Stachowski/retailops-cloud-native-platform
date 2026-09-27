@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://retailops.local/schemas/ml/demand_forecast_features.schema.json",
   "title": "RetailOps Demand Forecast Feature Row",
-  "description": "One daily feature row for demand forecasting at date, product, store and channel grain.",
+  "description": "Observed sale label and forecast-origin-safe fields at date, product, store and channel grain. An absent row is unknown, not zero.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,128 +14,49 @@
     "store_id",
     "channel",
     "units_sold",
-    "sales_revenue",
-    "unit_price",
-    "discount_percent",
-    "promotion_active",
-    "stockout_flag",
-    "inventory_on_hand",
+    "observation_status",
+    "observation_available_at",
     "category",
     "brand",
     "day_of_week",
     "is_weekend",
+    "week_of_year",
+    "month",
     "generated_at"
   ],
   "properties": {
-    "schema_version": {
-      "type": "string",
-      "const": "1.0"
-    },
-    "dataset_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Stable identifier for the generated feature dataset version."
-    },
-    "feature_row_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Deterministic row identifier derived from date, product_id, store_id and channel."
-    },
-    "date": {
-      "type": "string",
-      "format": "date"
-    },
-    "product_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "store_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "channel": {
-      "type": "string",
-      "enum": ["store", "online", "marketplace", "wholesale"]
-    },
+    "schema_version": {"type": "string", "const": "2.0"},
+    "dataset_id": {"type": "string", "minLength": 1},
+    "feature_row_id": {"type": "string", "minLength": 1},
+    "date": {"type": "string", "format": "date"},
+    "product_id": {"type": "string", "format": "uuid"},
+    "store_id": {"type": "string", "minLength": 1},
+    "channel": {"type": "string", "enum": ["store", "online", "marketplace", "wholesale"]},
     "units_sold": {
       "type": "integer",
       "minimum": 0,
-      "description": "Forecast target: observed units sold for the row grain and date."
+      "description": "Forecast target: observed units sold. It is a label, never a same-day model input."
     },
-    "latent_units_demand": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Optional uncensored demand estimate when stockout_flag is true."
-    },
-    "sales_revenue": {
-      "type": "number",
-      "minimum": 0
-    },
-    "unit_price": {
-      "type": "number",
-      "exclusiveMinimum": 0
-    },
-    "discount_percent": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
-    },
-    "promotion_active": {
-      "type": "boolean"
-    },
-    "promotion_type": {
+    "observation_status": {
       "type": "string",
-      "enum": ["none", "percentage_discount", "bundle", "clearance", "seasonal"]
+      "enum": ["observed_zero", "observed_positive"],
+      "description": "A zero requires an explicit zero-quantity sale record. Missing, closed, or inactive combinations do not get synthetic zero rows."
     },
-    "stockout_flag": {
-      "type": "boolean"
-    },
-    "inventory_on_hand": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "inventory_reserved": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "category": {
+    "observation_available_at": {
       "type": "string",
-      "minLength": 1
+      "format": "date-time",
+      "description": "Latest ingestion or order creation time contributing to the label. Historical sales can enter lag features only after this time."
     },
-    "brand": {
-      "type": "string",
-      "minLength": 1
-    },
-    "product_status": {
-      "type": "string",
-      "enum": ["active", "discontinued", "seasonal", "clearance"]
-    },
-    "day_of_week": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 7,
-      "description": "ISO day of week, Monday=1 and Sunday=7."
-    },
-    "is_weekend": {
-      "type": "boolean"
-    },
-    "week_of_year": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 53
-    },
-    "month": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 12
-    },
-    "data_quality_status": {
-      "type": "string",
-      "enum": ["passed", "warning", "failed"]
-    },
+    "category": {"type": "string", "minLength": 1},
+    "brand": {"type": "string", "minLength": 1},
+    "day_of_week": {"type": "integer", "minimum": 1, "maximum": 7},
+    "is_weekend": {"type": "boolean"},
+    "week_of_year": {"type": "integer", "minimum": 1, "maximum": 53},
+    "month": {"type": "integer", "minimum": 1, "maximum": 12},
     "generated_at": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Dataset generation metadata, not source availability at the forecast origin."
     }
   }
 }

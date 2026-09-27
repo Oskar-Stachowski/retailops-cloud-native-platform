@@ -7,8 +7,10 @@ workflows.
 
 | Path | Purpose |
 | --- | --- |
-| [random-forest-v1](random-forest-v1/README.md) | Latest retained model artifact; its evaluation has known limitations and requires reassessment before qualification. |
+| [fixed-origin-rf-2026-09-27](fixed-origin-rf-2026-09-27/README.md) | Current controlled 20/80-tree comparison, independent repeat and `rejected` admission decision. |
+| [random-forest-v1](random-forest-v1/README.md) | Historical artifact with an older, non-comparable evaluation protocol. |
+| [experiment-identity-2026-09-27.md](experiment-identity-2026-09-27.md) | Bounded 20/80-tree and repeat-run identity verification; no model qualification. |
 
 These files are reviewer-facing evidence with their original execution dates.
-Raw CI output remains under ignored `ci-cd/reports/`. The `small` dataset is
+Full experiment artifacts remain under ignored `ci-cd/reports/`. The `small` dataset is
 versioned; larger generated datasets are ignored. See [data profiles](../../reference/data-profiles.md).

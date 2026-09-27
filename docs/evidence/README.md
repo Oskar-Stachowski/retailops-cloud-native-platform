@@ -17,11 +17,11 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 | Zależności i kontrole CI | 2026-09-25 | [Raport kontroli](github-actions/2026-09-25-validation.md): konkretne rewizje, skany i progi. Bieżący zakres pipeline opisuje [CI/CD](../guides/ci-cd.md). |
 | Ochrona main | 2026-09-25 | [Ustawienia GitHub](github/README.md): zapis konfiguracji wymaganych PR i required-result. |
 | Dane demonstracyjne | 2026-09-27 | [Scenariusze](data/scenario-coverage-report.md): wynik kontraktów dla wybranego zestawu danych. |
-| Model Random Forest | 2026-05-13 według metadanych | [Ostatni dostępny artefakt](ml/README.md): punkt odniesienia do ponownej oceny, bez kwalifikacji do wdrożenia. |
+| Model Random Forest | 2026-09-27 | [Ocena i powtórzenie](ml/fixed-origin-rf-2026-09-27/README.md): RF 20/80 wobec dwóch baseline na tych samych oknach; decyzja `rejected`. Historyczny snapshot pozostaje w [indeksie ML](ml/README.md). |
 
 Daty danych uczących nie są datami treningu. Wyniki ML sprzed poprawienia
 protokołu oceny nie stanowią potwierdzenia jakości prognozy z ustalonego origin.
-Aktualne ograniczenia i plan: [ML](../guides/ml.md), [audyt](../audits/open-findings.md).
+Aktualne ograniczenia: [ML](../guides/ml.md), [audyt](../audits/open-findings.md).
 
 Opcjonalne nowe zrzuty można wygenerować do `frontend-api/` według instrukcji
 E2E. Zakres testów opisuje raport, a nie sama obecność obrazu. Zapisuj datę

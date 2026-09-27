@@ -24,8 +24,6 @@ MODEL_REGISTRY_FILENAME = "model_registry.jsonl"
 DEFAULT_MODEL_STATUS = "experimental"
 SUPPORTED_MODEL_STATUSES = {
     "experimental",
-    "candidate",
-    "approved",
     "rejected",
     "retraining_required",
 }
@@ -154,6 +152,7 @@ def persist_model_metadata(
     output_dir: Path,
     metadata: dict[str, object],
 ) -> dict[str, Path]:
+    _validate_status(str(metadata["status"]))
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata_path = output_dir / MODEL_METADATA_FILENAME
     registry_path = output_dir / MODEL_REGISTRY_FILENAME

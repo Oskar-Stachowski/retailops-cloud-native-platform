@@ -1,12 +1,13 @@
 # Dalsze prace
 
-Najbliższy krok to **poprawna ocena ML**. Pozostałe kierunki mają własny zakres
-i zależności; obecność opisu nie oznacza wdrożenia ani uruchomienia tych prac.
+Najbliższe lokalne poprawki są w [liście przed AI 00](before-ai-00.md).
+Ocena ML została zapisana w [dowodach](../evidence/ml/fixed-origin-rf-2026-09-27/README.md);
+jej wynik `rejected` nie oznacza dopuszczenia modelu do serving. Pozostałe
+kierunki mają własny zakres i zależności.
 
 | Potrzeba | Dokument | Kiedy korzystać |
 |---|---|---|
 | Podsumowanie przygotowań przed AI 00 | [Lista przygotowań](before-ai-00.md) | Przy wyborze najbliższych prac w obecnym RetailOps |
-| Wiarygodny eksperyment i decyzja o modelu | [Ocena ML](ml-evaluation.md) | Przed kolejnym treningiem lub uznaniem modelu za dopuszczony |
 | Potwierdzone problemy obecnego kodu | [Otwarte ustalenia](../audits/open-findings.md) | Przy wyborze poprawki i jej kryteriów odbioru |
 | Rozbudowa o osobny serwis AI | [Plan AI](ai/README.md) | Po wyborze tej rozbudowy; z wykorzystaniem wyników prac ML |
 | Aktywacja infrastruktury chmurowej | [Plan AWS](aws-activation.md) | Gdy istnieje potrzeba konkretnego środowiska i określony zakres kosztów |
