@@ -154,7 +154,7 @@ def _coverage_check(temporal: dict[str, object], policy: dict[str, object]) -> d
     counts = []
     if valid:
         try:
-            counts = [(int(fold["evaluated_rows"]), int(fold["eligible_rows"])) for fold in folds]
+            counts = [[int(fold["evaluated_rows"]), int(fold["eligible_rows"])] for fold in folds]
             required = Decimal(str(policy["required_coverage"]))
             valid = all(
                 eligible > 0

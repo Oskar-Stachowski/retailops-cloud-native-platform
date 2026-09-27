@@ -11,10 +11,7 @@ ustaleń poniżej.
 
 ## Ocena ML — główny pakiet przygotowawczy
 
-1. [ ] **Spójna ścieżka modelu** — batch, metadane i metryki korzystają
-   z dokładnie ocenionego artefaktu RF, bez cichego przełączenia na baseline
-   lub ponownego treningu.
-2. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
+1. [ ] **Świeży eksperyment i odbiór** — porównanie z baseline, powtórzenie
    wyniku, testy negatywne w CI, datowany raport i zmiany na `main` przez PR.
    Rzetelne odrzucenie modelu również może zakończyć ten pakiet.
 

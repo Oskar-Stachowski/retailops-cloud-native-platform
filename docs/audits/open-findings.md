@@ -2,29 +2,12 @@
 
 Przegląd kodu: **27.09.2026**, baza `d7e8725bfb517595d2cefda4d6011f2db70b2aed`.
 Poniżej są wyłącznie problemy potwierdzone w źródłach. Ocena ich zakresu
-opiera się na przeglądzie statycznym; test tożsamości RF nie weryfikuje jakości
+opiera się na przeglądzie statycznym; testy tożsamości RF nie weryfikują jakości
 prognoz ani kont zewnętrznych.
 
 **P1** oznacza ryzyko utraty danych, naruszenia granicy dostępu lub niewiarygodnej
 oceny modelu. **P2** oznacza problem odtwarzalności, izolacji lub diagnostyki.
 Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyjnej.
-
-## ML — do poprawy przed następną oceną modelu
-
-### ML-05 · P1 · Batch, metadata i metryki nie używają ocenionego artefaktu RF
-
-**Dowód:** [batch inference](../../ml/inference/batch_forecast.py) wywołuje
-`build_baseline_forecasts`, [metadata registry](../../ml/metadata/model_registry.py)
-ponownie uruchamia trening i ocenę baseline, a
-[raport metryk](../../ml/observability/model_performance_metrics.py) uruchamia
-tę samą ścieżkę batch. Żaden z tych kroków nie odczytuje zapisanego
-`random_forest_model.joblib`. Uruchomienie wszystkich komend `make ml-*` nie
-potwierdza użycia jednego modelu od treningu do prognoz i monitoringu.
-
-**Kryterium zamknięcia:** lokalna ścieżka odczytuje dokładnie oceniony artefakt,
-bez niejawnego ponownego treningu ani przełączenia na baseline. Model, dataset,
-eksperyment, prognozy i metryki mają wspólną zweryfikowaną tożsamość. Test
-porównuje prognozy przed zapisem i po odczycie oraz odrzuca niezgodny artefakt.
 
 ## Runtime i bezpieczeństwo
 

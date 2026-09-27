@@ -28,9 +28,10 @@ zasobów są częścią szerszych etapów AI lub świeżego odbioru eksperymentu
 tej lokalnej etykiety. Żadnego z tych dowodów nie należy przedstawiać jako
 spełnionego przez sam status `candidate`.
 
-Ścieżka baseline (`make ml-metadata`, `ml-inference`, `ml-metrics`) może zapisać
-jedynie `experimental`, `rejected` lub `retraining_required`; argument CLI nie
-może nadać jej `candidate` ani `approved`. RF wylicza decyzję z danych, protokołu
-i zapisanego artefaktu; ręczna zmiana pola statusu w kodzie budującym metadane
+Osobny moduł rejestru baseline może zapisać jedynie `experimental`, `rejected`
+lub `retraining_required`; argument CLI nie może nadać mu `candidate` ani
+`approved`. Polecenia `make ml-metadata`, `ml-inference` i `ml-metrics` korzystają
+z weryfikowanego przebiegu RF. RF wylicza decyzję z danych, protokołu i
+zapisanego artefaktu; ręczna zmiana pola statusu w kodzie budującym metadane
 jest odrzucana. Historyczne snapshoty zachowują dawne znaczenie statusów i nie
 są przeliczane według tej wersji.

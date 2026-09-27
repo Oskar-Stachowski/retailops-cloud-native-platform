@@ -4,7 +4,7 @@
 
 Celem jest świeży, odtwarzalny eksperyment ML, wiarygodne metryki i uzasadniona decyzja `candidate` albo `rejected`. Rzetelne odrzucenie modelu jest poprawnym wynikiem; nie wymaga dalszego strojenia w celu wymuszenia sukcesu.
 
-Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów, poprawne metryki i ocenę całego horyzontu na syntetycznym panelu. [Lokalna polityka dopuszczenia](../reference/ml-admission-policy.md) określa sprawdzaną decyzję RF. Dalsza praca dotyczy użycia ocenionego artefaktu i świeżego odbioru eksperymentu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
+Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje niedostępne w origin, a [instrukcja ML](../guides/ml.md) opisuje tożsamość przebiegów, poprawne metryki, ocenę całego horyzontu na syntetycznym panelu oraz użycie tego samego ocenionego artefaktu w batchu, metadanych i raporcie metryk. [Lokalna polityka dopuszczenia](../reference/ml-admission-policy.md) określa sprawdzaną decyzję RF. Dalsza praca dotyczy świeżego odbioru eksperymentu. Wspólne docelowe wymagania opisują [dane i czas](ai/kontrakty/dane-i-czas.md), [profile i bramki](ai/kontrakty/profile-i-bramki.md) oraz [ML/API](ai/kontrakty/ml-api-lifecycle.md). Ten lokalny plan nie oznacza realizacji całego serwisu AI ani jego etapu 07.
 
 ## 1. Kontrolowane treningi i analiza wyników
 
@@ -16,17 +16,7 @@ Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje nie
 
 **Odbiór:** świeży raport, porównywalne warianty, odtworzony wynik oraz jawne ograniczenia danych syntetycznych.
 
-## 2. Użycie dokładnie ocenionego artefaktu
-
-- Spiąć minimalną ścieżkę lokalną: zapis modelu → odczyt → batch predictions → metadata → raport metryk.
-- Każdy wynik ma wskazywać ten sam model, dataset i eksperyment. Wykluczyć ciche przełączenie na baseline lub niejawny retraining.
-- Sprawdzić zgodność prognoz z kontraktem API, unikalność kluczy i poprawność wartości oraz ograniczenia statusów.
-- Weryfikować zgodność prognoz przed i po zapisie. Odczyt wykonywać w zgodnym, zapisanym środowisku zależności; nie zakładać zgodności historycznych binariów z nową wersją scikit-learn.
-- Sam plik `.prom` nie oznacza rzeczywistego zbierania metryk przez Prometheus. Opisać zakres dowodu zgodnie z tym, co faktycznie uruchomiono.
-
-**Odbiór:** odczytany model jest dokładnie ocenionym artefaktem, a prognozy i metryki mają spójne pochodzenie.
-
-## 3. CI, dowody i aktualizacja main
+## 2. CI, dowody i aktualizacja main
 
 - Dodać małą deterministyczną kontrolę do CI i znaczące testy negatywne: leakage, pusta ocena, niezgodna identity, obejście blokady promocji.
 - Pełniejszą ocenę zapisywać jako osobny przebieg z artefaktami.
@@ -34,7 +24,7 @@ Obecny [kontrakt cech 2.0](../reference/ml-features.md) wyłącza informacje nie
 - Raport powinien zawierać konfigurację, środowisko, metryki, prognozy, sumy kontrolne, kartę modelu, decyzję i ograniczenia. Duże generowane dane pozostają poza Git zgodnie z polityką projektu.
 - Zaktualizować dokumentację ML i indeks dowodów, a wykonany zakres usunąć z aktywnego planu; zmiany przeprowadzić przez PR i wymagane kontrole do `main`.
 
-**Odbiór planu:** wiarygodny i odtwarzalny wynik, działająca polityka decyzji, spójna ścieżka artefaktu oraz dowody na main. Wynik `rejected` nie wymaga bezterminowego strojenia w celu wymuszenia sukcesu modelu.
+**Odbiór planu:** wiarygodny i odtwarzalny wynik, działająca polityka decyzji oraz dowody na main. Wynik `rejected` nie wymaga bezterminowego strojenia w celu wymuszenia sukcesu modelu.
 
 ## Powiązanie z rozbudową AI
 

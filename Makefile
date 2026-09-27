@@ -134,25 +134,17 @@ ML_TRAINED_HORIZON_DAYS ?= 7
 ML_TRAINED_MIN_HISTORY_OBSERVATIONS ?= 7
 ML_TRAINED_VALIDATION_WINDOWS ?= 3
 ML_TRAINED_N_ESTIMATORS ?= 80
+ML_EXPERIMENT_DIR ?=
 ML_EVALUATION_PROFILE ?= small
 ML_EVALUATION_OUTPUT_DIR ?= data/synthetic/$(ML_EVALUATION_PROFILE)/reports/demand_baseline
 ML_EVALUATION_WINDOW_DAYS ?= 28
 ML_EVALUATION_HOLDOUT_DAYS ?= 7
 ML_METADATA_PROFILE ?= small
 ML_METADATA_OUTPUT_DIR ?= data/synthetic/$(ML_METADATA_PROFILE)/metadata/model_registry
-ML_METADATA_STATUS ?= experimental
 ML_INFERENCE_PROFILE ?= small
-ML_INFERENCE_OUTPUT_DIR ?= data/synthetic/$(ML_INFERENCE_PROFILE)/inference/demand_baseline
-ML_INFERENCE_WINDOW_DAYS ?= 28
-ML_INFERENCE_HORIZON_DAYS ?= 7
-ML_INFERENCE_HOLDOUT_DAYS ?= 7
-ML_INFERENCE_MODEL_STATUS ?= experimental
+ML_INFERENCE_OUTPUT_DIR ?= data/synthetic/$(ML_INFERENCE_PROFILE)/inference/demand_random_forest
 ML_METRICS_PROFILE ?= small
 ML_METRICS_OUTPUT_DIR ?= data/synthetic/$(ML_METRICS_PROFILE)/observability/model_performance
-ML_METRICS_WINDOW_DAYS ?= 28
-ML_METRICS_HORIZON_DAYS ?= 7
-ML_METRICS_HOLDOUT_DAYS ?= 7
-ML_METRICS_MODEL_STATUS ?= experimental
 ML_DRIFT_PROFILE ?= small
 ML_DRIFT_OUTPUT_DIR ?= data/synthetic/$(ML_DRIFT_PROFILE)/reports/demand_feature_drift
 ML_DRIFT_REFERENCE_SEED ?= 42
@@ -197,9 +189,9 @@ help:
 	@echo "  make ml-baseline          Train baseline demand forecasting model"
 	@echo "  make ml-trained           Train RandomForest demand forecasting model"
 	@echo "  make ml-evaluate          Generate baseline model evaluation report"
-	@echo "  make ml-metadata          Persist baseline model metadata locally"
-	@echo "  make ml-inference         Run batch demand forecast inference"
-	@echo "  make ml-metrics           Generate model performance metrics artifacts"
+	@echo "  make ml-metadata          Register assessed RF metadata (ML_EXPERIMENT_DIR required)"
+	@echo "  make ml-inference         Forecast with assessed RF artifact (ML_EXPERIMENT_DIR required)"
+	@echo "  make ml-metrics           Report assessed RF metrics (ML_EXPERIMENT_DIR required)"
 	@echo "  make ml-drift             Generate demand feature drift checks"
 	@echo ""
 	@echo "Backend:"
@@ -396,18 +388,21 @@ ml-evaluate: api-install
 	@echo "Backtest predictions: $(ML_EVALUATION_OUTPUT_DIR)/backtest_predictions.csv"
 
 ml-metadata: api-install
-	$(API_VENV_PYTHON) -m ml.metadata.model_registry --profile "$(ML_METADATA_PROFILE)" --status "$(ML_METADATA_STATUS)" --output-dir "$(ML_METADATA_OUTPUT_DIR)"
+	@test -n "$(ML_EXPERIMENT_DIR)" || { echo "Set ML_EXPERIMENT_DIR to an assessed RF run directory"; exit 2; }
+	$(API_VENV_PYTHON) -m ml.metadata.verified_rf --experiment-dir "$(ML_EXPERIMENT_DIR)" --output-dir "$(ML_METADATA_OUTPUT_DIR)"
 	@echo "Model metadata: $(ML_METADATA_OUTPUT_DIR)/model_metadata.json"
 	@echo "Model registry: $(ML_METADATA_OUTPUT_DIR)/model_registry.jsonl"
 
 ml-inference: api-install
-	$(API_VENV_PYTHON) -m ml.inference.batch_forecast --profile "$(ML_INFERENCE_PROFILE)" --window-days "$(ML_INFERENCE_WINDOW_DAYS)" --horizon-days "$(ML_INFERENCE_HORIZON_DAYS)" --holdout-days "$(ML_INFERENCE_HOLDOUT_DAYS)" --model-status "$(ML_INFERENCE_MODEL_STATUS)" --output-dir "$(ML_INFERENCE_OUTPUT_DIR)"
+	@test -n "$(ML_EXPERIMENT_DIR)" || { echo "Set ML_EXPERIMENT_DIR to an assessed RF run directory"; exit 2; }
+	$(API_VENV_PYTHON) -m ml.inference.batch_forecast --experiment-dir "$(ML_EXPERIMENT_DIR)" --metadata-output-dir "$(ML_METADATA_OUTPUT_DIR)" --output-dir "$(ML_INFERENCE_OUTPUT_DIR)"
 	@echo "Batch predictions: $(ML_INFERENCE_OUTPUT_DIR)/batch_predictions.csv"
 	@echo "API forecasts: $(ML_INFERENCE_OUTPUT_DIR)/api_forecasts.csv"
 	@echo "Batch manifest: $(ML_INFERENCE_OUTPUT_DIR)/batch_inference_manifest.json"
 
 ml-metrics: api-install
-	$(API_VENV_PYTHON) -m ml.observability.model_performance_metrics --profile "$(ML_METRICS_PROFILE)" --window-days "$(ML_METRICS_WINDOW_DAYS)" --horizon-days "$(ML_METRICS_HORIZON_DAYS)" --holdout-days "$(ML_METRICS_HOLDOUT_DAYS)" --model-status "$(ML_METRICS_MODEL_STATUS)" --output-dir "$(ML_METRICS_OUTPUT_DIR)"
+	@test -n "$(ML_EXPERIMENT_DIR)" || { echo "Set ML_EXPERIMENT_DIR to an assessed RF run directory"; exit 2; }
+	$(API_VENV_PYTHON) -m ml.observability.model_performance_metrics --experiment-dir "$(ML_EXPERIMENT_DIR)" --metadata-output-dir "$(ML_METADATA_OUTPUT_DIR)" --inference-output-dir "$(ML_INFERENCE_OUTPUT_DIR)" --output-dir "$(ML_METRICS_OUTPUT_DIR)"
 	@echo "Model performance metrics: $(ML_METRICS_OUTPUT_DIR)/model_performance.prom"
 	@echo "Model performance snapshot: $(ML_METRICS_OUTPUT_DIR)/model_performance_snapshot.json"
 

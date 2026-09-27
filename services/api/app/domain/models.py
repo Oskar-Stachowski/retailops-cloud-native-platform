@@ -311,6 +311,7 @@ class ForecastMethod(str, Enum):
     seeded_demo = "seeded_demo"
     retailops_baseline_demand_model = "retailops-baseline-demand-model"
     retailops_realism_baseline_demand_model = "retailops-realism-baseline-demand-model"
+    retailops_random_forest_demand_model = "retailops-random-forest-demand-model"
 
 
 class ForecastStatus(str, Enum):

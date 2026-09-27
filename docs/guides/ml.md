@@ -1,22 +1,20 @@
 # ML — uruchamianie i interpretacja wyników
 
-Kod w `ml/` tworzy lokalne cechy, prognozy i raporty. Są dwie odrębne ścieżki:
-Random Forest zapisuje wytrenowany model i porównanie z baseline; pozostałe
-zadania metadanych, batch inference i metryk korzystają ze średniej ruchomej.
-Uruchomienie wszystkich poleceń `make ml-*` nie sprawdza jednego artefaktu
-Random Forest od treningu do użycia.
+Kod w `ml/` tworzy lokalne cechy, prognozy i raporty. `ml-trained` zapisuje
+wytrenowany Random Forest i porównanie z baseline. `ml-metadata`, `ml-inference`
+i `ml-metrics` odczytują wskazany przebieg RF; osobne `ml-baseline` i
+`ml-evaluate` pozostają ścieżką porównawczą.
 
-Najbliższą pracę opisuje [plan poprawnej oceny ML](../plans/ml-evaluation.md).
+[Plan oceny ML](../plans/ml-evaluation.md) obejmuje świeży eksperyment i odbiór.
 [Lokalna polityka dopuszczenia RF](../reference/ml-admission-policy.md) opisuje
-statusy i bramki; [otwarte ustalenia](../audits/open-findings.md) obejmują
-spójność ścieżki artefaktów.
+statusy i bramki.
 
 ## Polecenia i artefakty
 
 Polecenia wykonuje się z katalogu głównego repozytorium. Cele Make instalują
-zależności API i domyślnie używają profilu `small`. Bezpośredni trening RF
-używa `small`; pozostałe moduły mogą domyślnie używać `demo`. Przy odtwarzaniu
-eksperymentu podawaj profil jawnie.
+zależności API i domyślnie używają profilu `small`. Przy odtwarzaniu
+eksperymentu podawaj profil jawnie. Trzy polecenia korzystające z ocenionego RF
+wymagają `ML_EXPERIMENT_DIR` wskazującego katalog konkretnego przebiegu.
 
 | Polecenie | Co wykonuje | Główne pliki wyniku |
 |---|---|---|
@@ -24,9 +22,9 @@ eksperymentu podawaj profil jawnie.
 | `make ml-baseline` | Liczy prognozę ze średniej ruchomej | `baseline_forecasts.csv`, `model_manifest.json` |
 | `make ml-trained` | RF i baseline: trzy okna walidacyjne oraz odłożony test, każde z prognozą pełnego horyzontu z jednego origin | `random_forest_model.joblib`, `metrics.json`, `predictions.csv`, `daily_panel.csv`, `feature_importance.csv`, `model_metadata.json`, `model_card.md`, `experiment_inputs.json`, `experiment_source.zip`, `run_manifest.json` |
 | `make ml-evaluate` | Osobny, kroczący backtest baseline; nie jest porównaniem z RF | `evaluation_report.json`, `evaluation_summary.md`, `backtest_predictions.csv` |
-| `make ml-metadata` | Generuje baseline i ocenę, zapisuje lokalny rejestr | `model_metadata.json`, `model_registry.jsonl` |
-| `make ml-inference` | Generuje baseline, metadane i prognozy batch | `batch_predictions.csv`, `api_forecasts.csv`, `batch_inference_manifest.json` |
-| `make ml-metrics` | Uruchamia ścieżkę batch baseline i renderuje jej metryki | `model_performance.prom`, `model_performance_snapshot.json` |
+| `make ml-metadata` | Weryfikuje zapisany przebieg RF i rejestruje jego metadane | `model_metadata.json`, `model_registry.jsonl` |
+| `make ml-inference` | Odczytuje oceniony model RF i tworzy prognozy kolejnego horyzontu | `batch_predictions.csv`, `api_forecasts.csv`, `batch_inference_manifest.json` |
+| `make ml-metrics` | Weryfikuje ten sam przebieg i batch, renderuje metryki jego końcowego testu | `model_performance.prom`, `model_performance_snapshot.json` |
 | `make ml-drift` | Porównuje cechy dwóch generacji | `drift_report.json`, `drift_summary.md` |
 
 Domyślne katalogi i parametry podaje [Makefile](../../Makefile), zmienne `ML_*`.
@@ -36,8 +34,25 @@ zapisuje każdy przebieg osobno w
 Jego katalog bazowy można zmienić przez `ML_TRAINED_OUTPUT_ROOT` w Makefile albo
 `--output-root` w CLI. `--output-dir` wskazuje pojedynczy katalog i odmawia
 nadpisania niepustego katalogu. CLI wypisuje faktyczną ścieżkę.
-Przy wywołaniu batch/metadanych/metryk ustaw także katalogi artefaktów zależnych;
-samo `--output-dir` zmienia jedynie główny wynik danego modułu.
+Po treningu skopiuj wypisaną ścieżkę przebiegu i wskaż ją jawnie:
+
+```bash
+make ml-metadata ML_EXPERIMENT_DIR=ci-cd/reports/ml/experiments/small/ID_PRZEBIEGU
+make ml-inference ML_EXPERIMENT_DIR=ci-cd/reports/ml/experiments/small/ID_PRZEBIEGU
+make ml-metrics ML_EXPERIMENT_DIR=ci-cd/reports/ml/experiments/small/ID_PRZEBIEGU
+```
+
+Każde polecenie sprawdza sumy artefaktów, tożsamość eksperymentu, modelu i
+datasetu, logiczną zawartość panelu/prognoz, snapshot źródeł oraz zgodność
+prognoz testowych z modelem odczytanym z `.joblib`. `ml-inference` nie trenuje
+ponownie ani nie przełącza się na baseline. Tworzy prognozy od dnia po końcu
+zapisanego panelu, używając cech i historii znanych w tym origin. Przyjmuje
+ostatni znany stan aktywności asortymentu i sklepu; jest to lokalna prognoza
+diagnostyczna na danych syntetycznych. Batch manifest zapisuje identyfikatory
+`experiment_id`, `run_id`, `model_id`, `feature_dataset_id`, sumę manifestu
+źródłowego i sumy logiczne plików wyjściowych. Raport metryk sprawdza je przed
+zapisem. Przebieg ze statusem `rejected` może posłużyć do takiej analizy offline;
+nie oznacza to zgody na serving.
 
 Przykład ograniczonego eksperymentu RF:
 
@@ -119,7 +134,7 @@ pokazuje zapisane identyfikatory i sumy.
 - Status RF `candidate` wymaga przejścia wszystkich warunków wersjonowanej
   polityki lokalnej. Wynik każdego warunku jest w `admission_decision` raportu,
   metadanych i karty modelu; `candidate` nie oznacza serving ani produkcji.
-- Status rejestru baseline pozostaje parametrem CLI ograniczonym do
+- Osobny moduł rejestru baseline ma parametr CLI ograniczony do
   `experimental`, `rejected` i `retraining_required`; nie da się nim nadać
   `candidate` ani `approved`.
 - `api_forecasts.csv` jest plikiem zgodnym kształtem z rekordami prognoz API.
@@ -155,7 +170,8 @@ Testy zachowań są w `services/api/tests/test_fixed_origin_evaluation.py`,
 `test_demand_feature_generation.py`,
 `test_random_forest_forecasting_model.py`, `test_baseline_forecasting_model.py`,
 `test_baseline_evaluation_report.py`, `test_model_metadata_registry.py`,
-`test_batch_forecast_inference.py`, `test_model_performance_metrics.py`
+`test_assessed_rf_pipeline.py`, `test_batch_forecast_inference.py`,
+`test_model_performance_metrics.py`
 i `test_demand_feature_drift.py`. Uruchamiaj testy właściwe dla zmiany według
 [instrukcji testowania](testing.md). Samo przejście obecnych testów nie zamyka
 otwartych ustaleń metodologicznych.
