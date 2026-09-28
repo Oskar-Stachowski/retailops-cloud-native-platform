@@ -39,6 +39,8 @@ IDENTITY_FILENAME = "feature_identity_manifest.json"
 SCHEMA_PATH = "ml/contracts/demand_forecast_features.schema.json"
 IDENTITY_SCHEMA_PATH = "ml/contracts/feature_identity_manifest.schema.json"
 FEATURE_CODE = (
+    "ml/__init__.py",
+    "ml/features/__init__.py",
     "ml/features/demand_forecast.py",
     "ml/features/identity.py",
     SCHEMA_PATH,

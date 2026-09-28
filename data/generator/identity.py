@@ -267,6 +267,9 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
             "ml/features/fact_input.py",
             "ml/features/worker.py",
             "ml/features/ai_demand.py",
+            "data/__init__.py",
+            "ml/__init__.py",
+            "ml/features/__init__.py",
             *extra_files,
         ]
     )

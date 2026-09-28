@@ -55,7 +55,7 @@ def run_case(root: Path, name: str, config: DatasetGenerationConfig) -> dict:
 def historical_checks(root: Path) -> dict:
     result = {}
     repo = Path(__file__).resolve().parents[2]
-    for suffix in ("0", "1", "2", "3", "4"):
+    for suffix in ("0", "1", "2", "3", "4", "5"):
         directory = root / ("historical-2." + suffix)
         directory.mkdir()
         with ZipFile(
