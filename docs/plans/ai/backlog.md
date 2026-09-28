@@ -12,18 +12,18 @@ potwierdzone problemy i kryteria ich zamknięcia.
 ## Kolejny mały PR etapu 03
 
 **Repo:** RetailOps. **Zależność:** odebrane źródło 2.6 i bramki forecast-source.
-Zaimplementować typed Parquet przez jawną grupę zależności, date partitions i
-chunked writes dla dużych faktów. Rozdzielić facts/truth/raw/reports/manifests
-w layout eksportu; zachować CSV demo i fixtures. Kontrolowany cleanup ma
-odmawiać usuwania tracked fixture i plików poza generated root. Zmierzyć
-czas, peak RSS, rows/s, bytes oraz CSV/Parquet parity na ograniczonych profilach.
-Następny slice to niezmienny exporter z allowlistą faktów i atomową publikacją.
+**03.2 — niezmienny exporter.** Użyć [formatu 03.1](../../reference/parquet-artifacts.md),
+wybrać allowlist faktów i opcjonalną osobną truth, przeliczyć źródłowe gates
+dla wymaganych use cases oraz sprawdzić kompletne manifests/checksums.
+Zapis przygotować w staging i opublikować atomowo pod source ID; idempotencja
+i konflikt treści nie mogą nadpisywać gotowego snapshotu. Potem 03.3 handoff,
+03.4 importer, 03.5 curated i 03.6 bramka cross-repo.
 Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
 importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as-of.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 03:** typed Parquet, polityka artefaktów, następnie immutable export i handoff.
+- **RetailOps / etap 03:** immutable export i handoff; [03.1](../../evidence/ai/03/03.1/README.md) ma lokalny odbiór formatu i polityki.
 - **Repo AI / pozostały zakres 11:** rzeczywisty provider embeddings,
   użytkowa kwalifikacja/aktywacja i odbiór jakości na zatwierdzonym golden set.
   [Fundament offline](../../evidence/ai/11/README.md) obejmuje już korpus,

@@ -30,6 +30,8 @@ Odpowiednik bez Make:
 
 ```bash
 COMPOSE_PROFILES=dev,observability docker compose up --build -d
+make api-install
+services/api/.venv/bin/python -m data.seed_files --profile small
 COMPOSE_PROFILES=seed docker compose run --rm --no-deps seed
 ```
 
@@ -38,7 +40,9 @@ Redpandę z inicjalizacją tematów oraz Prometheus i Grafanę. Dane ładujesz
 osobnym poleceniem `compose-seed` tylko dla nowej bazy lub świadomego ponownego
 importu. Profil danych
 `RETAILOPS_SEED_DATA_PROFILE=small` jest domyślny; `demo` daje mniejszy zbiór do
-szybkiej demonstracji. Zadanie `seed` odtwarza zawartość tabel aplikacyjnych,
+szybkiej demonstracji. `make compose-seed` przygotowuje brakujące CSV wybranego
+profilu; dane skalowane są generowane lokalnie i ignorowane przez Git.
+Istniejący kompletny katalog pozostaje bez zmian. Zadanie `seed` odtwarza zawartość tabel aplikacyjnych,
 więc jego ponowne wykonanie usuwa wcześniejsze zmiany w tych danych.
 
 | Usługa | Domyślny adres |

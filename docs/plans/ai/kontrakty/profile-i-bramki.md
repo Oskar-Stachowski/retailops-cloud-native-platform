@@ -9,11 +9,13 @@ stock locations, ważne pary i osiem hard gates wymiarów oraz
 [Odbiór DATA-04](../../../evidence/ai/02/data04/README.md) potwierdza coverage cen
 i uzgodnienie transakcji. [Popyt/panel/koszyki](../../../evidence/ai/02/demand-panel/README.md)
 mają pełny ważny panel, cechy 3.0 i sześć bramek demand. Obserwacje cen są sparse;
-eksport nadal jest CSV. [DATA-03](../../../evidence/ai/02/data03/README.md)
+generator zachowuje CSV, a [03.1](../../../reference/parquet-artifacts.md) dodaje
+konwersję 40 tabel do typed Parquet. [DATA-03](../../../evidence/ai/02/data03/README.md)
 ma siedem bramek chronologii/zwrotów, dwa cutoffy i 39-dniowy ogon.
 [DATA-05](../../../evidence/ai/02/data05/README.md) kwalifikuje source 2.6:
 46 hard gates, rozdzielone parametry i izolowany worker z czterema projekcjami faktów oraz historią obserwacji as-of.
-Chunked Parquet, immutable snapshot/import i dalsze bramki wymagają implementacji.
+Chunked Parquet i bramka zasobów smoke mają lokalny odbiór 03.1.
+Immutable snapshot/import i dalsze bramki wymagają implementacji.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 
@@ -38,7 +40,10 @@ Development używa seed 42. Końcowa robustness policy obejmuje wcześniej zamro
 
 ## 2. Budżet wykonania i plików
 
-- Standardowe CI uruchamia schema smoke i temporal smoke. Proponowany budżet początkowy: 5 minut i 1 GiB peak RSS na każdy kompletny profil bez pobierania zależności; pierwszy benchmark w etapie 03 potwierdza albo jawnie koryguje limit. To docelowa bramka, nie zmierzony obecny wynik.
+- Standardowe Data CI uruchamia oba smoke dwukrotnie przez `make data-parquet-check`.
+  Polityka `ai03-format-budget-1.0.0` wymusza 5 minut i 1 GiB peak RSS na każdy
+  kompletny profil bez instalacji zależności. [Benchmark 03.1](../../../evidence/ai/03/03.1/README.md)
+  potwierdza lokalny zapas; zdalny wynik wymaga uruchomienia CI nowego brancha.
 - Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; co najwyżej jeden bieżący `ai-smoke`, bez pełnego training export. Małe archiwa wcześniejszych wersji służą wyłącznie regresji odczytu i łącznie mieszczą się w tym limicie, zgodnie z [polityką plików](dane-i-czas.md). Bieżące smoke i temporal smoke są generowane w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
 - `ai-dev` i `ai-training` zapisuje się chunkami. Raport mierzy czas, peak memory, rows/s oraz bytes. Jeżeli pełny profil przekracza zasoby, poprawić zapis/przetwarzanie lub jawnie stworzyć nowy mniejszy profil; nie nazywać go dotychczasowym `ai-training`.
 - Koszt zależności, pobierania obrazów, treningu TensorFlow i calls do Bedrock raportować oddzielnie; smoke dataset nie jest budżetem całej platformy.

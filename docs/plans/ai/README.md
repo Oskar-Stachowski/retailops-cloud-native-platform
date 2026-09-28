@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 odebrany lokalnie i zdalnie; następny zakres snapshot i curated w 03. Aktualizacja: 28.09.2026.**
+**Status: etap 02 odebrany lokalnie i zdalnie; 03.1 Parquet odebrany lokalnie. Następny zakres: 03.2 immutable exporter. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -20,7 +20,9 @@ rozliczenie revenue i osobne history/return-tail cutoffy.
 46 hard gates, rozdzielone parametry i izolowany worker faktów i wersjonowane obserwacje z odczytem as-of.
 [Required CI na main `30e3e70`](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645)
 potwierdza zdalny odbiór tej publikacji.
-Następna implementacja to [snapshot i curated 03](etapy/03-snapshot-curated.md);
+[AI 03.1](../../evidence/ai/03/03.1/README.md) dodaje typed Parquet,
+chunked writes, date partitions, politykę Git/cleanup i bramkę zasobów obu smoke.
+Następna implementacja to **03.2 immutable exporter** w [etapie 03](etapy/03-snapshot-curated.md);
 równolegle kontynuujemy [pozostały zakres RAG 11](../../evidence/ai/11/README.md).
 Fundament offline działa, ale odbiór jakości i użytkowa aktywacja pozostają otwarte.
 Modele i inventory nadal nie są gotowe.
