@@ -2,6 +2,11 @@
 
 **Status: wymagania do wdrożenia, nie opis gotowego systemu.** Wspólny kontrakt etapów 02–10. Decyzje tutaj zastępują sprzeczne zapisy pierwotnego raportu i specyfikacji. Zakres konkretnego etapu rozstrzyga, które bramki muszą już działać.
 
+W etapie 01 wdrożono wybrany forecast wire contract v1 oraz walidację offline
+dataset/feature/label/split/model/prediction/run/tool/bundle w repo AI.
+[Odbiór](../../../evidence/ai/01/README.md) wskazuje kod i ograniczenia: schemas
+nie implementują importu, workerów, modeli, tool executora, auth ani streamingu.
+
 ## 1. Właściciele i klasy danych
 
 | Klasa | Właściciel i miejsce | Zasada dostępu |

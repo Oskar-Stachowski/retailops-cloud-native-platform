@@ -2,6 +2,11 @@
 
 **Status:** docelowa specyfikacja wdrożenia, nie opis aktualnie działającego API RetailOps. Wersja planu: 1.1. Kontrakt dotyczy AI; istniejące endpointy RetailOps i ich adaptery są opisane w [integracji](integracja-agent.md). Semantykę danych/identity/czasu definiuje [dane-i-czas.md](dane-i-czas.md), progi/profile [profile-i-bramki.md](profile-i-bramki.md).
 
+W etapie 01 wdrożono wybrany forecast wire contract v1 oraz walidację offline
+dataset/feature/label/split/model/prediction/run/tool/bundle w repo AI.
+[Odbiór](../../../evidence/ai/01/README.md) wskazuje kod i ograniczenia: schemas
+nie implementują importu, workerów, modeli, tool executora, auth ani streamingu.
+
 ## 1. Granice modeli i targetów
 
 | Zastosowanie | Registry name | Baseline | Kandydaci | Target / grain |

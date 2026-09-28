@@ -1,0 +1,140 @@
+{
+  "source_commit": "cbf28b2a66e7e5f205cf73d9bfe620c491e22d93",
+  "branch": "ai/implementation",
+  "initial_worktree": "",
+  "executed_at_utc": "2026-09-27T15:30:56.899240+00:00",
+  "python": "3.11.15",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "tracked_data_sha256": {
+    "data/demo/alerts.csv": "86f3cc4769fb2162fee6fb41a68edd42297a7560b7ec39a05a40ffae31a47855",
+    "data/demo/anomalies.csv": "7e682d3b87988fee5effcfb7be7699b6cd8d1fc6ae69a8f6b90375cee087db7b",
+    "data/demo/dataset_manifest.json": "c9a6473fbb88398891c040b3d62b7797e125b604e2e6fcd1190a6365aca378a5",
+    "data/demo/forecasts.csv": "d2adeaf4efc217d9b8061bac2c57fdf6e0740475c275586b4f15749a482123a2",
+    "data/demo/inventory_snapshots.csv": "8392b7a1ac94e430526a4c208580b4a1ca7e096bd07a7d843ac3c279cd86f88a",
+    "data/demo/order_items.csv": "02961e33206c971d02b2c606800d24da7ef033d6a22d181b60ec571286e33be3",
+    "data/demo/orders.csv": "0a3ece0cb3ce60b40c2e4027b4701ff3caaeedc49121e9f313383b64ca3c2c82",
+    "data/demo/price_history.csv": "baf49f075556e185786bc9491862aae391d3247e4de7cb19589b2c545c4704cf",
+    "data/demo/products.csv": "50e5eb0f92a95591d0ae7afa327fb2ece9cf9add054781b59db5101c22b243ac",
+    "data/demo/promotions.csv": "c02e000214ab330726e552fe85acbfd1e2490a7fdc3ef629e7331861581a7492",
+    "data/demo/quality_report.json": "f4856b6b0430a06fb70d3ffee943f4c7712605589df0ad7397479a968f8acb1f",
+    "data/demo/recommendations.csv": "6452219e7ba7262634ba02fa9968bf65ccd746a5a27c475756f0ba6be8c8990d",
+    "data/demo/returns.csv": "311b8590d71bd7dd0b607cc8b1d995008a3309c432e902c5e6a8dfae3daeb2c9",
+    "data/demo/sales.csv": "b8f6ffa09382791a76e15db5dcfe250ce61af90469e5f30089942ddc4c8d0906",
+    "data/demo/stock_movements.csv": "00bbfd5e536c9e9aaee553ad2e1acd08b711fc8316f60bfd4d544adeea8e71f5",
+    "data/demo/stores.csv": "fba71de38772c50b614b577c1814cc88742615f6f24c8c6d7de013622b7099b9",
+    "data/demo/users.csv": "42f18204684236f68876519b2416ff2803b2dfd072110618a00c6d665a62ed74",
+    "data/demo/warehouses.csv": "ca4e04eef5c1fb20529a19fa9343ef07299445513831e0e8323afb1203266676",
+    "data/demo/workflow_actions.csv": "07bda31309f075b7b47bbe42db914ab20553afc7096df1d1d465faf331fca5da"
+  },
+  "runs": [
+    {
+      "name": "small-a",
+      "command": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "data.generator.main",
+        "--profile",
+        "small",
+        "--seed",
+        "42",
+        "--output-dir",
+        "/private/tmp/retailops-ai-00-vcp9wzdx/small-a"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 1.041
+    },
+    {
+      "name": "small-b",
+      "command": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "data.generator.main",
+        "--profile",
+        "small",
+        "--seed",
+        "42",
+        "--output-dir",
+        "/private/tmp/retailops-ai-00-vcp9wzdx/small-b"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.902
+    },
+    {
+      "name": "small-20",
+      "command": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "data.generator.main",
+        "--profile",
+        "small",
+        "--seed",
+        "42",
+        "--products",
+        "20",
+        "--output-dir",
+        "/private/tmp/retailops-ai-00-vcp9wzdx/small-20"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.204
+    }
+  ],
+  "packages": {
+    "pytest": "9.0.3",
+    "scikit-learn": "1.5.2",
+    "joblib": "1.4.2",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "fastapi": "0.136.1",
+    "pydantic": "2.13.0"
+  },
+  "tracked_data_unchanged": true,
+  "local_instructions": {
+    "ancestor_AGENTS_files": []
+  },
+  "local_ai_checkouts": [
+    "retailops-cloud-native-platform"
+  ],
+  "audit_tools_sha256": {
+    "scripts/data/audit_ai00_source.py": "ec3a572692f5a86e7a8dda4c560d8e59111924d48079c2a17580342761f28846",
+    "scripts/ci/audit_ai00_contracts.py": "ed2efbbc9bf7de2521b9fbc82e0ee2f35c943c13985919324e2ba56eaa35691f"
+  },
+  "focused_tests": {
+    "tests": 138,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "pytest_wall_seconds": 4.87,
+    "junit_sha256": "987ababd167dcbfb38597d5f6f7d6c13ec8c787c7e75ae6080db4526057aa630",
+    "modules": [
+      "tests.test_api_list_contract_readiness",
+      "tests.test_assessed_rf_pipeline",
+      "tests.test_baseline_evaluation_report",
+      "tests.test_baseline_forecasting_model",
+      "tests.test_batch_forecast_inference",
+      "tests.test_data_contracts",
+      "tests.test_data_generator_cli",
+      "tests.test_demand_feature_generation",
+      "tests.test_demo_auth_boundary_readiness",
+      "tests.test_fixed_origin_evaluation",
+      "tests.test_forecast_admission_policy",
+      "tests.test_forecast_metrics",
+      "tests.test_ml_feature_dataset_contract",
+      "tests.test_model_metadata_registry",
+      "tests.test_model_performance_metrics",
+      "tests.test_random_forest_forecasting_model",
+      "tests.test_realtime_consumer",
+      "tests.test_realtime_consumer_runner"
+    ],
+    "scope": "unit/function/contract tests, no real PostgreSQL, Kafka or AWS run"
+  },
+  "completed_at_utc": "2026-09-27T15:47:38.116484+00:00",
+  "report_validation": {
+    "contract_probe_repeated_identically": true,
+    "ruff_select_E_F_I": "passed",
+    "ruff_format": "passed",
+    "docs_local_links_checked": 567,
+    "docs_missing_local_link_targets": 0,
+    "stage_dependency_dag": "passed: 18 stages; next 01",
+    "git_diff_check": "passed"
+  }
+}

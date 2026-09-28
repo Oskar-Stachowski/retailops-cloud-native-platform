@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "date": "2026-09-27",
+  "date": "2026-09-28",
   "stages": [
     {
       "id": "00",
@@ -8,7 +8,10 @@
       "title": "Ustal stan wyjściowy",
       "repo": "oba",
       "depends_on": [],
-      "path": "etapy/00-audyt.md"
+      "path": "etapy/00-audyt.md",
+      "status": "completed",
+      "source_commit": "cbf28b2a66e7e5f205cf73d9bfe620c491e22d93",
+      "evidence": "../../evidence/ai/00/README.md"
     },
     {
       "id": "01",
@@ -18,7 +21,13 @@
       "depends_on": [
         "00"
       ],
-      "path": "etapy/01-fundament-projektu.md"
+      "path": "etapy/01-fundament-projektu.md",
+      "status": "in_progress",
+      "evidence": "../../evidence/ai/01/README.md",
+      "implementation_repository": "retailops-ai-intelligence",
+      "implementation_commit": "01eca67b1af4d0e082770ddb3e26dee601fa9d02",
+      "evidence_commit": "2f067c68cb5931ef31578f724e496f5381b3ae6a",
+      "next_scope": "Odbiór zdalnego Required CI nowych commitów po push, w tym persistence, i weryfikacja ochrony main. Po zamknięciu 01: DATA-01 w etapie 02."
     },
     {
       "id": "02",
@@ -28,7 +37,8 @@
       "depends_on": [
         "01"
       ],
-      "path": "etapy/02-dane-sprzedazowe.md"
+      "path": "etapy/02-dane-sprzedazowe.md",
+      "status": "planned"
     },
     {
       "id": "03",
@@ -38,7 +48,8 @@
       "depends_on": [
         "02"
       ],
-      "path": "etapy/03-snapshot-curated.md"
+      "path": "etapy/03-snapshot-curated.md",
+      "status": "planned"
     },
     {
       "id": "04",
@@ -48,7 +59,8 @@
       "depends_on": [
         "03"
       ],
-      "path": "etapy/04-forecasting.md"
+      "path": "etapy/04-forecasting.md",
+      "status": "planned"
     },
     {
       "id": "05",
@@ -58,7 +70,8 @@
       "depends_on": [
         "04"
       ],
-      "path": "etapy/05-mlflow-serving.md"
+      "path": "etapy/05-mlflow-serving.md",
+      "status": "planned"
     },
     {
       "id": "06",
@@ -68,7 +81,8 @@
       "depends_on": [
         "03"
       ],
-      "path": "etapy/06-inventory-ledger.md"
+      "path": "etapy/06-inventory-ledger.md",
+      "status": "planned"
     },
     {
       "id": "07",
@@ -80,7 +94,8 @@
         "05",
         "06"
       ],
-      "path": "etapy/07-anomalie-dq.md"
+      "path": "etapy/07-anomalie-dq.md",
+      "status": "planned"
     },
     {
       "id": "08",
@@ -92,7 +107,8 @@
         "05",
         "06"
       ],
-      "path": "etapy/08-stockout-risk.md"
+      "path": "etapy/08-stockout-risk.md",
+      "status": "planned"
     },
     {
       "id": "09",
@@ -103,7 +119,8 @@
         "07",
         "08"
       ],
-      "path": "etapy/09-tensorflow-robustness.md"
+      "path": "etapy/09-tensorflow-robustness.md",
+      "status": "planned"
     },
     {
       "id": "10",
@@ -114,7 +131,8 @@
         "07",
         "08"
       ],
-      "path": "etapy/10-integracja-retailops.md"
+      "path": "etapy/10-integracja-retailops.md",
+      "status": "planned"
     },
     {
       "id": "11",
@@ -124,7 +142,8 @@
       "depends_on": [
         "01"
       ],
-      "path": "etapy/11-rag.md"
+      "path": "etapy/11-rag.md",
+      "status": "planned"
     },
     {
       "id": "12",
@@ -135,7 +154,8 @@
         "10",
         "11"
       ],
-      "path": "etapy/12-agent-bedrock.md"
+      "path": "etapy/12-agent-bedrock.md",
+      "status": "planned"
     },
     {
       "id": "13",
@@ -146,7 +166,8 @@
         "09",
         "12"
       ],
-      "path": "etapy/13-monitoring-security.md"
+      "path": "etapy/13-monitoring-security.md",
+      "status": "planned"
     },
     {
       "id": "14",
@@ -156,7 +177,8 @@
       "depends_on": [
         "13"
       ],
-      "path": "etapy/14-helm-kind.md"
+      "path": "etapy/14-helm-kind.md",
+      "status": "planned"
     },
     {
       "id": "15",
@@ -166,7 +188,8 @@
       "depends_on": [
         "14"
       ],
-      "path": "etapy/15-cicd-gitops.md"
+      "path": "etapy/15-cicd-gitops.md",
+      "status": "planned"
     },
     {
       "id": "16",
@@ -176,7 +199,8 @@
       "depends_on": [
         "15"
       ],
-      "path": "etapy/16-aws.md"
+      "path": "etapy/16-aws.md",
+      "status": "planned"
     },
     {
       "id": "17",
@@ -186,8 +210,10 @@
       "depends_on": [
         "16"
       ],
-      "path": "etapy/17-odbior-portfolio.md"
+      "path": "etapy/17-odbior-portfolio.md",
+      "status": "planned"
     }
   ],
-  "status": "proposed"
+  "status": "in_progress",
+  "next_stage": "01"
 }

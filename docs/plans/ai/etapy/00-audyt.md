@@ -1,12 +1,17 @@
 # 00 — Ustal stan wyjściowy
 
-**Repo:** RetailOps; także AI, jeśli już istnieje. **Zależności:** brak. **Status planu:** do wykonania na aktualnym kodzie.
+**Repo:** RetailOps; także AI, jeśli jest dostępne. **Zależności:** brak.
+
+Aktualny wynik: [audyt z 27.09.2026 na `cbf28b2`](../../../evidence/ai/00/README.md).
+Następny krok: **[01 — fundament](01-fundament-projektu.md)**; [backlog](../backlog.md)
+podaje otwarte warunki i pierwsze małe PR-y. Poniżej pozostaje procedura
+ponownego audytu po zmianie źródeł, nie lista prac oczekujących w etapie 00.
 
 ## Cel
 
-Potwierdź, które zadania są nadal potrzebne, na aktualnym commicie i bez nadpisywania wcześniejszej pracy. Uwzględnij [lokalną ocenę ML](../../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i jej ograniczenia. Poniższa lista określa kontrole do przeprowadzenia, nie wyniki nowego audytu.
+Potwierdź, które zadania są nadal potrzebne, na aktualnym commicie i bez nadpisywania wcześniejszej pracy. Uwzględnij [lokalną ocenę ML](../../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i jej ograniczenia. Wyniki i wykonane polecenia są w raporcie; poniższe wymagania służą powtórzeniu audytu na nowej rewizji.
 
-## Małe zadania / PR-y
+## Procedura ponownego audytu
 
 1. **Inwentaryzacja.** Zapisz branch, SHA, working-tree status, lokalne instrukcje i istniejące PR-y. Przeczytaj Makefile, generator, `ml/`, API, event registry/consumer, wymagane CI oraz entry point Terraform. Oddziel istniejący runtime od opisów planowanych.
 2. **Reprodukcja danych.** Uruchom mały deterministyczny profil dwukrotnie do różnych katalogów tymczasowych. Zapisz parametry efektywne, wersje środowiska, row counts i checksums. Nie nadpisuj `data/demo` ani commitowanych fixtures.
@@ -14,7 +19,7 @@ Potwierdź, które zadania są nadal potrzebne, na aktualnym commicie i bez nadp
 4. **Reprodukcja kontraktów.** Porównaj event registry, publikowane envelope, router i walidację konsumenta, topic init i faktyczne pola API. Przejrzyj ACK/DLQ oraz projekcje wyników AI.
 5. **Raport i backlog.** Utrwal wyniki w małym pliku evidence, przypisz potwierdzone otwarte problemy do etapów 02–16. Problemy już naprawione usuń z aktywnej listy; nie odtwarzaj ich przez cofnięcie kodu i nie pozostawiaj wpisów „rozwiązane”.
 
-## Lista kontroli na aktualnym kodzie
+## Zakres kontroli przy powtórzeniu
 
 | Kontrola | Co sprawdzić | Etap powiązany |
 |---|---|---|

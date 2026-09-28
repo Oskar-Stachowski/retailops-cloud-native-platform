@@ -1,0 +1,544 @@
+{
+  "effective_config": {
+    "days": 90,
+    "products": 100,
+    "stores": 5,
+    "warehouses": 3,
+    "profile": "small",
+    "seed": 42,
+    "end_date": "2026-04-30"
+  },
+  "manifest_parameters": {
+    "days": null,
+    "products": null,
+    "stores": null,
+    "warehouses": null
+  },
+  "row_counts": {
+    "alerts": 20,
+    "anomalies": 20,
+    "forecasts": 350,
+    "inventory_snapshots": 1300,
+    "order_items": 17429,
+    "orders": 9000,
+    "price_history": 300,
+    "products": 100,
+    "promotions": 100,
+    "recommendations": 20,
+    "returns": 2388,
+    "sales": 17429,
+    "stock_movements": 18829,
+    "stores": 5,
+    "users": 4,
+    "warehouses": 3,
+    "workflow_actions": 20
+  },
+  "determinism": {
+    "files": {
+      "alerts.csv": {
+        "first_sha256": "412f65f47aac0736dc2bf02ba0a39dfb92809064021d9f24cc01464bc169268e",
+        "repeat_sha256": "412f65f47aac0736dc2bf02ba0a39dfb92809064021d9f24cc01464bc169268e",
+        "bytes_equal": true
+      },
+      "anomalies.csv": {
+        "first_sha256": "e180a9c064e78cb9332ed4ff5ae079d2ac660ed21c3f9ea5a69064c2d67100b1",
+        "repeat_sha256": "e180a9c064e78cb9332ed4ff5ae079d2ac660ed21c3f9ea5a69064c2d67100b1",
+        "bytes_equal": true
+      },
+      "dataset_manifest.json": {
+        "first_sha256": "678bfbc64d5bc7d2088b180011c09c8bebdc0cc3d0b68e5153a3f7488b4e7ae0",
+        "repeat_sha256": "97f8195da51ba328ea4d11ed668e468beb49cf11a9cb4bd3667b7e775919258e",
+        "bytes_equal": false,
+        "equal_excluding_generated_at": true
+      },
+      "forecasts.csv": {
+        "first_sha256": "d074803be2ea65ff631a7ed8ccc7d0e430facfe2e34a662a3348aedcd68b0525",
+        "repeat_sha256": "d074803be2ea65ff631a7ed8ccc7d0e430facfe2e34a662a3348aedcd68b0525",
+        "bytes_equal": true
+      },
+      "inventory_snapshots.csv": {
+        "first_sha256": "b6d612b51d5b98d640284e9dd00ad207662962a0a806417fcb9f06f49866d539",
+        "repeat_sha256": "b6d612b51d5b98d640284e9dd00ad207662962a0a806417fcb9f06f49866d539",
+        "bytes_equal": true
+      },
+      "order_items.csv": {
+        "first_sha256": "a64585946b7685d1b864e8450bfeadd5397c0a88cbab5234077b7bc2f886b117",
+        "repeat_sha256": "a64585946b7685d1b864e8450bfeadd5397c0a88cbab5234077b7bc2f886b117",
+        "bytes_equal": true
+      },
+      "orders.csv": {
+        "first_sha256": "04f3e8ed31a17b6b73a233f80eb431d0ca8287a7e4f58f5374c75f9a0c2a5e81",
+        "repeat_sha256": "04f3e8ed31a17b6b73a233f80eb431d0ca8287a7e4f58f5374c75f9a0c2a5e81",
+        "bytes_equal": true
+      },
+      "price_history.csv": {
+        "first_sha256": "88e8faed8426c981272658c73ab4110034ac89e5963c91ba54887672106350e8",
+        "repeat_sha256": "88e8faed8426c981272658c73ab4110034ac89e5963c91ba54887672106350e8",
+        "bytes_equal": true
+      },
+      "products.csv": {
+        "first_sha256": "9fd5dc394db9cbd92abff1a4c2155c980def114be61d879801107be591c11089",
+        "repeat_sha256": "9fd5dc394db9cbd92abff1a4c2155c980def114be61d879801107be591c11089",
+        "bytes_equal": true
+      },
+      "promotions.csv": {
+        "first_sha256": "2c640914879909a175f84732511717e5604aa90a057102cdb6e074e5140426a2",
+        "repeat_sha256": "2c640914879909a175f84732511717e5604aa90a057102cdb6e074e5140426a2",
+        "bytes_equal": true
+      },
+      "quality_report.json": {
+        "first_sha256": "ae8bfa06b47a80dae6a6eaddad99f317a70865bdb47b2a99a54d9db5d4db056f",
+        "repeat_sha256": "ae8bfa06b47a80dae6a6eaddad99f317a70865bdb47b2a99a54d9db5d4db056f",
+        "bytes_equal": true,
+        "equal_excluding_generated_at": true
+      },
+      "realism_report.json": {
+        "first_sha256": "f177901b52cb66fcbb02d42c52db4ef9a710671b8b39cb1ba5d2b988ed83e3cb",
+        "repeat_sha256": "f177901b52cb66fcbb02d42c52db4ef9a710671b8b39cb1ba5d2b988ed83e3cb",
+        "bytes_equal": true,
+        "equal_excluding_generated_at": true
+      },
+      "recommendations.csv": {
+        "first_sha256": "3b2eb24db7ef577635572e51db589cb36805fcf3a7e50c10166a593f8f52cb07",
+        "repeat_sha256": "3b2eb24db7ef577635572e51db589cb36805fcf3a7e50c10166a593f8f52cb07",
+        "bytes_equal": true
+      },
+      "returns.csv": {
+        "first_sha256": "4cc1d5d5b35b8944fc016832f56a23cc712de9bd7760db26e3ab339ffbb151ac",
+        "repeat_sha256": "4cc1d5d5b35b8944fc016832f56a23cc712de9bd7760db26e3ab339ffbb151ac",
+        "bytes_equal": true
+      },
+      "sales.csv": {
+        "first_sha256": "accc69e0bf73fc68383a8d29a11abd35fd810dd3758f12cfdb522cf7463bed17",
+        "repeat_sha256": "accc69e0bf73fc68383a8d29a11abd35fd810dd3758f12cfdb522cf7463bed17",
+        "bytes_equal": true
+      },
+      "stock_movements.csv": {
+        "first_sha256": "5170386035557dcfcfe4f039ac81b4fb5e74f5fb0b407742eb02434f156573ab",
+        "repeat_sha256": "5170386035557dcfcfe4f039ac81b4fb5e74f5fb0b407742eb02434f156573ab",
+        "bytes_equal": true
+      },
+      "stores.csv": {
+        "first_sha256": "063a4bc54ed49133d0f645e49ae22ba8c1af5df9262b36810249761196adf952",
+        "repeat_sha256": "063a4bc54ed49133d0f645e49ae22ba8c1af5df9262b36810249761196adf952",
+        "bytes_equal": true
+      },
+      "users.csv": {
+        "first_sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+        "repeat_sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+        "bytes_equal": true
+      },
+      "warehouses.csv": {
+        "first_sha256": "8f87ea628d4b67b914e5f5ae23342ff9ac1d3e4b8b4c2f74ecff07ea05ae1702",
+        "repeat_sha256": "8f87ea628d4b67b914e5f5ae23342ff9ac1d3e4b8b4c2f74ecff07ea05ae1702",
+        "bytes_equal": true
+      },
+      "workflow_actions.csv": {
+        "first_sha256": "e421e21e3c00aa0d9e27ad7232e057fb66d8f7b80e3ce06991835dd520dbf7bd",
+        "repeat_sha256": "e421e21e3c00aa0d9e27ad7232e057fb66d8f7b80e3ce06991835dd520dbf7bd",
+        "bytes_equal": true
+      }
+    },
+    "all_csv_identical": true
+  },
+  "identity": {
+    "source_dataset_id_present": false,
+    "byte_checksums_in_manifest": false,
+    "feature_id_100": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+    "feature_id_20": "retailops-demand-forecast-features-small-2026-01-31-2026-04-30-seed42",
+    "feature_hash_100": "fee7d2212ecc19d9189f2af36a9e105a32095865fee785c115e84f3f2209ef60",
+    "feature_hash_20": "1916c6ad5042eb568952c8cb9382824c4770268c02aa7b5b21afb5fedf77792c",
+    "feature_rows_100": 12718,
+    "feature_rows_20": 2891
+  },
+  "panel": {
+    "valid_static_location_channel_pairs": 5,
+    "assumed_valid_daily_rows": 45000,
+    "source_feature_rows": 12718,
+    "source_feature_coverage": 0.2826222222222222,
+    "source_explicit_zero_rows": 0,
+    "synthetic_ml_panel_rows": 45000,
+    "synthetic_ml_panel_statuses": {
+      "observed_positive": 12718,
+      "complete_zero": 32282
+    },
+    "without_evidence_status": "unknown_eligibility",
+    "without_evidence_units": null,
+    "assumption": "all active products x active stores; each store has one channel; all source days complete; no versioned assignments/lifecycle"
+  },
+  "dimensions": {
+    "sku_with_whitespace": 12,
+    "category_brand_pairs": 8,
+    "categories": 8,
+    "brands": 8,
+    "region_channel_pairs": [
+      [
+        "DE-East",
+        "wholesale"
+      ],
+      [
+        "PL-Central",
+        "store"
+      ],
+      [
+        "PL-North",
+        "online"
+      ],
+      [
+        "PL-South",
+        "marketplace"
+      ]
+    ]
+  },
+  "commerce": {
+    "sales": 17429,
+    "orders": 9000,
+    "sales_before_order": 954,
+    "early_sale_example": {
+      "sale_id": "fc0b0616-7fe1-580b-b430-8166ba8b495a",
+      "sold_at": "2026-04-30T08:00:00+00:00",
+      "ordered_at": "2026-04-30T19:00:00+00:00"
+    },
+    "baskets_with_duplicate_product": 338,
+    "duplicate_product_lines": 338,
+    "order_total_mismatches": 0,
+    "item_sale_mismatches": 0,
+    "returns": 2388,
+    "returns_before_sale": 0,
+    "cumulative_over_returns": 0,
+    "return_delay_days_min_max": [
+      0.9166666666666666,
+      94.25
+    ]
+  },
+  "pricing": {
+    "sales_with_one_price": 11756,
+    "realized_vs_calendar_price_mismatches": 9207,
+    "realized_vs_discounted_calendar_mismatches": 2319,
+    "sales_without_price": 5673,
+    "sales": 17429,
+    "price_coverage": 0.6745080039015434,
+    "overlap_convention": "inclusive valid_from and valid_to"
+  },
+  "promotions": {
+    "active_promotion_without_flag": 1936,
+    "flagged_sales": 2866,
+    "flag_without_active_promotion": 2197,
+    "promotion_mismatch": {
+      "sale_id": "0abc233a-b211-5f9f-97ea-c99fdd7614ad",
+      "day": "2026-04-30",
+      "promotion_applied": "false",
+      "declared_intervals": [
+        [
+          "2026-04-16",
+          "2026-05-14"
+        ]
+      ]
+    },
+    "truth_day_offsets": {
+      "post_promo_dip_25_28": [
+        "2026-04-02",
+        "2026-04-05"
+      ],
+      "promotion_10_24": [
+        "2026-04-06",
+        "2026-04-20"
+      ],
+      "pre_promo_softening_7_9": [
+        "2026-04-21",
+        "2026-04-23"
+      ]
+    }
+  },
+  "dates": {
+    "manifest_start": "2026-01-20",
+    "manifest_end": "2026-04-30",
+    "tables": {
+      "alerts": {
+        "created_at": {
+          "min": "2026-04-11",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "anomalies": {
+        "period_end": {
+          "min": "2026-04-11",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "period_start": {
+          "min": "2026-04-10",
+          "max": "2026-04-29",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "forecasts": {
+        "forecast_period_end": {
+          "min": "2026-05-07",
+          "max": "2026-05-13",
+          "after_manifest_end": 350,
+          "before_manifest_start": 0
+        },
+        "forecast_period_start": {
+          "min": "2026-05-01",
+          "max": "2026-05-07",
+          "after_manifest_end": 350,
+          "before_manifest_start": 0
+        },
+        "generated_at": {
+          "min": "2026-04-30",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "inventory_snapshots": {
+        "created_at": {
+          "min": "2026-02-05",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "ingested_at": {
+          "min": "2026-02-05",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "recorded_at": {
+          "min": "2026-02-05",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "order_items": {},
+      "orders": {
+        "created_at": {
+          "min": "2026-01-31",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "ordered_at": {
+          "min": "2026-01-31",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "price_history": {
+        "created_at": {
+          "min": "2026-01-20",
+          "max": "2026-04-29",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "valid_from": {
+          "min": "2026-03-01",
+          "max": "2026-05-31",
+          "after_manifest_end": 100,
+          "before_manifest_start": 0
+        },
+        "valid_to": {
+          "min": "2026-03-30",
+          "max": "2026-05-30",
+          "after_manifest_end": 100,
+          "before_manifest_start": 0
+        }
+      },
+      "products": {},
+      "promotions": {
+        "ends_at": {
+          "min": "2026-05-14",
+          "max": "2026-05-17",
+          "after_manifest_end": 100,
+          "before_manifest_start": 0
+        },
+        "starts_at": {
+          "min": "2026-04-16",
+          "max": "2026-04-19",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "recommendations": {
+        "created_at": {
+          "min": "2026-04-11",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "generated_at": {
+          "min": "2026-04-11",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "returns": {
+        "returned_at": {
+          "min": "2026-05-01",
+          "max": "2026-05-05",
+          "after_manifest_end": 2388,
+          "before_manifest_start": 0
+        }
+      },
+      "sales": {
+        "ingested_at": {
+          "min": "2026-01-31",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "sold_at": {
+          "min": "2026-01-31",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "stock_movements": {
+        "created_at": {
+          "min": "2026-01-31",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        },
+        "occurred_at": {
+          "min": "2026-01-31",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      },
+      "stores": {},
+      "users": {},
+      "warehouses": {},
+      "workflow_actions": {
+        "created_at": {
+          "min": "2026-04-11",
+          "max": "2026-04-30",
+          "after_manifest_end": 0,
+          "before_manifest_start": 0
+        }
+      }
+    },
+    "watermarks_present": false
+  },
+  "inventory": {
+    "snapshots": 1300,
+    "opening_movements": 1300,
+    "product_stock_location_pairs": 300,
+    "pairs_with_repeated_opening": 300,
+    "extra_opening_movements": 1000,
+    "opening_counts_min_max": [
+      4,
+      5
+    ]
+  },
+  "ml_probes": {
+    "calendar_gap": {
+      "lag_1_units": 0.0,
+      "lag_1_available": 0,
+      "lag_7_units": 7.0,
+      "lag_7_available": 1,
+      "training_observation_count": 2
+    },
+    "future_day_does_not_change_features": true,
+    "target_price_promo_stockout_inventory_truth_ignored": true,
+    "late_arrival_changes_old_origin": {
+      "lag_1_units": [
+        3.0,
+        0.0
+      ],
+      "lag_1_available": [
+        1,
+        0
+      ],
+      "rolling_mean_units": [
+        3.0,
+        0.0
+      ],
+      "rolling_min_units": [
+        3.0,
+        0.0
+      ],
+      "rolling_max_units": [
+        3.0,
+        0.0
+      ],
+      "training_observation_count": [
+        1,
+        0
+      ]
+    },
+    "zero_metrics": {
+      "status": "not_evaluable",
+      "evaluated_rows": 1,
+      "mape_evaluated_rows": 0,
+      "mape_coverage": "0.0000",
+      "zero_actual_rows": 1,
+      "zero_actual_overforecast_units": "100.0000",
+      "mae": "100.0000",
+      "rmse": "100.0000",
+      "mape": null,
+      "bias": "100.0000",
+      "wape": null
+    },
+    "empty_metrics": {
+      "status": "not_evaluable",
+      "evaluated_rows": 0,
+      "mape_evaluated_rows": 0,
+      "mape_coverage": "0.0000",
+      "zero_actual_rows": 0,
+      "zero_actual_overforecast_units": "0.0000",
+      "mae": null,
+      "rmse": null,
+      "mape": null,
+      "bias": null,
+      "wape": null
+    },
+    "input_columns": [
+      "brand",
+      "category",
+      "channel",
+      "day_of_week",
+      "horizon_day",
+      "is_weekend",
+      "lag_1_available",
+      "lag_1_units",
+      "lag_7_available",
+      "lag_7_units",
+      "month",
+      "product_id",
+      "rolling_max_units",
+      "rolling_mean_units",
+      "rolling_min_units",
+      "store_id",
+      "training_observation_count",
+      "week_of_year"
+    ]
+  },
+  "source_quality": {
+    "original": {
+      "checks": 15,
+      "failed": 0,
+      "passed": 15
+    },
+    "injected_return_before_sale_status": "passed",
+    "injected_cumulative_excess_return_status": "passed",
+    "truth_in_sales_csv": [
+      "data_quality_status",
+      "demand_noise",
+      "latent_demand",
+      "price_elasticity_effect",
+      "promotion_uplift",
+      "stockout_flag"
+    ]
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "observed_at_utc": "2026-09-27T15:44:16.334977+00:00",
+  "source_commit": "cbf28b2a66e7e5f205cf73d9bfe620c491e22d93",
+  "open_prs": [],
+  "branches": {
+    "main": "cbf28b2a66e7e5f205cf73d9bfe620c491e22d93",
+    "ai/implementation": "cbf28b2a66e7e5f205cf73d9bfe620c491e22d93"
+  },
+  "checks": [
+    {
+      "name": "required-result",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108650401668"
+    },
+    {
+      "name": "api-gate / API Docker image build",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649402395"
+    },
+    {
+      "name": "security-gate / Security evidence summary",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649190804"
+    },
+    {
+      "name": "docker-gate / Build full stack and run smoke tests",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649107901"
+    },
+    {
+      "name": "data-gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043950"
+    },
+    {
+      "name": "terraform-validation-gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043932"
+    },
+    {
+      "name": "kubernetes-gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043927"
+    },
+    {
+      "name": "frontend-gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043606"
+    },
+    {
+      "name": "iac-security-gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043504"
+    },
+    {
+      "name": "security-gate / Secret scanning with Gitleaks",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043298"
+    },
+    {
+      "name": "security-gate / Python dependency audit",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043262"
+    },
+    {
+      "name": "security-gate / Frontend dependency audit",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043251"
+    },
+    {
+      "name": "security-gate / Frontend image vulnerability scan",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043247"
+    },
+    {
+      "name": "security-gate / Backend image vulnerability scan",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043240"
+    },
+    {
+      "name": "security-gate / Filesystem vulnerability scan",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043234"
+    },
+    {
+      "name": "docker-gate / Validate Docker Compose config",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043210"
+    },
+    {
+      "name": "api-gate / API integration tests",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649043202"
+    },
+    {
+      "name": "Repository diff hygiene",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649042901"
+    },
+    {
+      "name": "Detect changed areas",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649013860"
+    },
+    {
+      "name": "Required CI contract tests",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647835/job/108649013632"
+    },
+    {
+      "name": "Build local images and generate provenance attestations",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36329647580/job/108649012620"
+    }
+  ],
+  "preparation_pr": {
+    "number": 58,
+    "merged": true,
+    "merge_commit_sha": "cbf28b2a66e7e5f205cf73d9bfe620c491e22d93",
+    "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/58"
+  },
+  "ai_repository": {
+    "lookup_url": "https://api.github.com/repos/Oskar-Stachowski/retailops-ai-intelligence",
+    "status": "not_found_or_not_accessible",
+    "http_status": 404
+  }
+}

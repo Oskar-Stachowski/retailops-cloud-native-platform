@@ -1,6 +1,15 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: propozycja dalszego rozwoju, do wdrożenia. Aktualizacja dokumentacji: 27.09.2026.** Ten katalog opisuje projekt osobnego serwisu AI i wymagania jego przyszłych etapów. Nie potwierdza wdrożenia komponentów ani zatwierdzenia nowych kosztów lub infrastruktury.
+**Status: etap 01 w realizacji. Aktualizacja: 28.09.2026.**
+[Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
+[Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
+pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
+kontrakty danych/run/tool z walidacją offline oraz lokalne poświadczenia i scope API.
+Lokalny zakres 01 ma odbiór; pozostaje zdalny Required CI nowych commitów po push.
+Po zamknięciu 01 następną implementacją jest DATA-01 w etapie 02.
+[Backlog](backlog.md) podaje pozostałą pracę 01 i pierwszy mały PR 02.
+Pozostała część 01 oraz etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
+istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.
 
@@ -8,7 +17,7 @@ Czytaj kolejno tę mapę, [architekturę](architektura.md) i plik właściwego [
 
 ## Cel i podział pracy
 
-**RetailOps** pozostaje właścicielem danych operacyjnych, generatora, API i interfejsu sklepowego. **RetailOps AI Intelligence** będzie osobnym repozytorium i serwisem odpowiedzialnym za przetwarzanie danych, modele, predykcje, RAG i agenta. Repozytoria komunikują się przez wersjonowane pliki, API i zdarzenia; mają oddzielne bazy danych.
+**RetailOps** pozostaje właścicielem danych operacyjnych, generatora, API i interfejsu sklepowego. **RetailOps AI Intelligence** ma osobne repozytorium z pakietem, HTTP i lokalnym stosem PostgreSQL/MLflow. Docelowy serwis będzie odpowiedzialny za przetwarzanie danych, modele, predykcje, RAG i agenta. Repozytoria komunikują się przez wersjonowane pliki, API i zdarzenia; mają oddzielne bazy danych.
 
 Efektem końcowym będzie system, który prognozuje sprzedaż, wykrywa anomalie, ocenia ryzyko braku zapasu oraz wyjaśnia wyniki przy pomocy agenta korzystającego z danych i cytowanych dokumentów. Całość ma mieć powtarzalne eksperymenty, kontrolowane wdrożenia, monitoring, rollback i dowody działania.
 
@@ -16,7 +25,7 @@ Efektem końcowym będzie system, który prognozuje sprzedaż, wykrywa anomalie,
 
 | Krok | Co zrobić | Główny rezultat | Gdzie |
 |---|---|---|---|
-| [00](etapy/00-audyt.md) | Ustal aktualny stan repo i potwierdź problemy z przeglądu. | Lista istniejących funkcji, błędów i prac, przypięta do commitu. | Oba repo |
+| [00](etapy/00-audyt.md) | Stan wyjściowy na `cbf28b2`: [raport](../../evidence/ai/00/README.md). | Pomiary, istniejące funkcje i [backlog](backlog.md). | RetailOps; inwentaryzacja dostępności AI |
 | [01](etapy/01-fundament-projektu.md) | Ustal granice systemu, kontrakty i uruchom szkielet AI. | Działająca aplikacja bazowa, konfiguracja, lokalne zależności i podstawowe CI. | Oba repo |
 | [02](etapy/02-dane-sprzedazowe.md) | Napraw generator i uporządkuj dane sprzedaży, cen, promocji i lokalizacji. | Spójny panel dzienny, poprawna chronologia i rozdzielenie danych od prawdy symulatora. | RetailOps |
 | [03](etapy/03-snapshot-curated.md) | Zbuduj eksport, importer i oczyszczoną warstwę danych. | Niezmienny snapshot z identyfikatorami, kontrolą integralności i bramkami jakości. | Oba repo |
