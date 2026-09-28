@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from datetime import date, timedelta
 from decimal import Decimal
 
-from data.generator.common import deterministic_uuid, iso_date, money
+from data.generator.common import BASE_DATE, deterministic_uuid, money
 
 
 def _discount_for(product: dict[str, str], index: int) -> Decimal:
@@ -22,6 +23,7 @@ def _discount_for(product: dict[str, str], index: int) -> Decimal:
 
 def generate_price_history(
     products: list[dict[str, str]],
+    base_date: date = BASE_DATE,
 ) -> list[dict[str, str]]:
     price_history: list[dict[str, str]] = []
 
@@ -45,13 +47,15 @@ def generate_price_history(
                     "product_id": product["id"],
                     "price": price,
                     "currency": "PLN",
-                    "valid_from": iso_date(days_offset=valid_from_offset),
+                    "valid_from": (base_date + timedelta(days=valid_from_offset)).isoformat(),
                     "valid_to": (
-                        iso_date(days_offset=valid_to_offset) if valid_to_offset is not None else ""
+                        (base_date + timedelta(days=valid_to_offset)).isoformat()
+                        if valid_to_offset is not None
+                        else ""
                     ),
                     "price_type": ("regular" if version != "planned" else "planned"),
                     "source": "synthetic_pricing_rules",
-                    "created_at": iso_date(days_offset=-(index + 1)),
+                    "created_at": (base_date - timedelta(days=index + 1)).isoformat(),
                 },
             )
 
@@ -60,6 +64,7 @@ def generate_price_history(
 
 def generate_promotions(
     products: list[dict[str, str]],
+    base_date: date = BASE_DATE,
 ) -> list[dict[str, str]]:
     promotions: list[dict[str, str]] = []
 
@@ -74,8 +79,8 @@ def generate_promotions(
                 "name": f"Synthetic promotion for {product['sku']}",
                 "promotion_type": "discount",
                 "discount_percent": money(discount_percent * Decimal(100)),
-                "starts_at": iso_date(days_offset=-14 + index % 4),
-                "ends_at": iso_date(days_offset=14 + index % 4),
+                "starts_at": (base_date + timedelta(days=-14 + index % 4)).isoformat(),
+                "ends_at": (base_date + timedelta(days=14 + index % 4)).isoformat(),
                 "channel": "all",
                 "status": "active",
             },

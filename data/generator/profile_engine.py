@@ -6,17 +6,10 @@ from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
 
-from data.generator.common import BASE_DATETIME, deterministic_uuid, money
+from data.generator.common import DEFAULT_CLOCK, GenerationClock, deterministic_uuid, money
+from data.generator.configuration import PROFILE_DEFAULTS, SyntheticProfileDefaults
 from data.generator.pricing import generate_price_history, generate_promotions
 from data.generator.users import generate_users
-
-
-@dataclass(frozen=True)
-class SyntheticProfileDefaults:
-    days: int
-    products: int
-    stores: int
-    warehouses: int
 
 
 @dataclass(frozen=True)
@@ -27,12 +20,6 @@ class ProductRealism:
     seasonal_pattern: str
     return_rate: Decimal
 
-
-PROFILE_DEFAULTS: dict[str, SyntheticProfileDefaults] = {
-    "small": SyntheticProfileDefaults(days=90, products=100, stores=5, warehouses=3),
-    "medium": SyntheticProfileDefaults(days=180, products=500, stores=20, warehouses=6),
-    "large": SyntheticProfileDefaults(days=365, products=1000, stores=50, warehouses=10),
-}
 
 CATEGORIES = [
     "Electronics",
@@ -128,14 +115,6 @@ BASKET_SIZE_ROLL_THRESHOLDS = {
 
 def profile_defaults(profile: str) -> SyntheticProfileDefaults:
     return PROFILE_DEFAULTS[profile]
-
-
-def _date_at_offset(days_back: int, hours: int = 0) -> str:
-    return (BASE_DATETIME - timedelta(days=days_back) + timedelta(hours=hours)).isoformat()
-
-
-def _date_only_at_offset(days_back: int) -> str:
-    return (BASE_DATETIME.date() - timedelta(days=days_back)).isoformat()
 
 
 def _rng(seed: int, profile: str) -> random.Random:
@@ -281,8 +260,13 @@ def generate_profile_warehouses(
     return warehouses
 
 
-def _weekly_multiplier(category: str, channel: str, day_index: int) -> Decimal:
-    weekday = (BASE_DATETIME.date() - timedelta(days=day_index)).weekday()
+def _weekly_multiplier(
+    category: str,
+    channel: str,
+    day_index: int,
+    clock: GenerationClock,
+) -> Decimal:
+    weekday = (clock.end_date - timedelta(days=day_index)).weekday()
     if channel == "wholesale":
         return Decimal("1.25") if weekday in (0, 1, 2) else Decimal("0.72")
     if weekday in (5, 6):
@@ -293,8 +277,8 @@ def _weekly_multiplier(category: str, channel: str, day_index: int) -> Decimal:
     return Decimal("1.00")
 
 
-def _seasonal_multiplier(pattern: str, day_index: int) -> Decimal:
-    day_of_year = (BASE_DATETIME.date() - timedelta(days=day_index)).timetuple().tm_yday
+def _seasonal_multiplier(pattern: str, day_index: int, clock: GenerationClock) -> Decimal:
+    day_of_year = (clock.end_date - timedelta(days=day_index)).timetuple().tm_yday
     if pattern == "holiday_peak" and day_of_year >= HOLIDAY_PEAK_START_DAY:
         return Decimal("1.65")
     if (
@@ -404,6 +388,7 @@ def generate_profile_commerce(
     stores: list[dict[str, str]],
     days: int,
     rng: random.Random,
+    clock: GenerationClock = DEFAULT_CLOCK,
 ) -> tuple[list[dict[str, str]], list[dict[str, str]], list[dict[str, str]]]:
     sales: list[dict[str, str]] = []
     orders: list[dict[str, str]] = []
@@ -431,10 +416,12 @@ def generate_profile_commerce(
                     item_product["category"],
                     store["channel"],
                     day_index,
+                    clock,
                 )
                 seasonal = _seasonal_multiplier(
                     item_product["seasonal_pattern"],
                     day_index,
+                    clock,
                 )
                 lifecycle = _lifecycle_multiplier(item_product, day_index, days)
                 price, price_effect = _price_effect(item_product, day_index)
@@ -473,7 +460,7 @@ def generate_profile_commerce(
                 item_key = f"{order_reference}-{item_product['sku']}-{item_index + 1}"
                 order_item_id = deterministic_uuid("order_item", item_key)
                 sale_id = deterministic_uuid("sale", item_key)
-                sold_at = _date_at_offset(day_index, (product_index + item_index) % 12)
+                sold_at = clock.at(day_index, (product_index + item_index) % 12)
                 data_quality_status = _data_quality_status(rng)
 
                 order_item_rows.append(
@@ -507,7 +494,7 @@ def generate_profile_commerce(
                         "price_elasticity_effect": str(price_effect.quantize(Decimal("0.0001"))),
                         "demand_noise": str(noise.quantize(Decimal("0.0001"))),
                         "data_quality_status": data_quality_status,
-                        "ingested_at": _date_at_offset(
+                        "ingested_at": clock.at(
                             day_index,
                             (product_index + item_index) % 12
                             + (2 if data_quality_status == "late_event" else 0),
@@ -525,8 +512,8 @@ def generate_profile_commerce(
                     "status": "completed",
                     "order_total": money(order_total),
                     "currency": "PLN",
-                    "ordered_at": _date_at_offset(day_index, product_index % 12),
-                    "created_at": _date_at_offset(day_index, product_index % 12),
+                    "ordered_at": clock.at(day_index, product_index % 12),
+                    "created_at": clock.at(day_index, product_index % 12),
                 },
             )
             order_items.extend(order_item_rows)
@@ -538,6 +525,7 @@ def generate_profile_inventory_snapshots(
     products: list[dict[str, str]],
     warehouses: list[dict[str, str]],
     days: int,
+    clock: GenerationClock = DEFAULT_CLOCK,
 ) -> list[dict[str, str]]:
     snapshots: list[dict[str, str]] = []
     oldest_snapshot_day_index = ((days - 1) // 7) * 7
@@ -557,7 +545,7 @@ def generate_profile_inventory_snapshots(
                 cycle_start_stock - cycle_position * max(1, normal_daily_sales // 3),
             )
             natural_key = f"{product['sku']}-{warehouse['warehouse_code']}-{day_index}"
-            recorded_at = _date_at_offset(day_index, product_index % 8)
+            recorded_at = clock.at(day_index, product_index % 8)
 
             snapshots.append(
                 {
@@ -644,6 +632,7 @@ def generate_profile_returns(
     order_items: list[dict[str, str]],
     orders: list[dict[str, str]],
     rng: random.Random,
+    clock: GenerationClock = DEFAULT_CLOCK,
 ) -> list[dict[str, str]]:
     order_by_id = {order["id"]: order for order in orders}
     product_by_id = {product["id"]: product for product in products}
@@ -682,7 +671,7 @@ def generate_profile_returns(
                 "currency": order_item["currency"],
                 "reason": "customer_return",
                 "status": "received",
-                "returned_at": _date_at_offset(-(1 + index % 5), index % 12),
+                "returned_at": clock.at(-(1 + index % 5), index % 12),
             },
         )
 
@@ -692,6 +681,7 @@ def generate_profile_returns(
 def generate_profile_forecasts(
     products: list[dict[str, str]],
     days: int,  # noqa: ARG001 - retained for profile generator interface
+    clock: GenerationClock = DEFAULT_CLOCK,
 ) -> list[dict[str, str]]:
     forecasts: list[dict[str, str]] = []
     forecast_product_count = min(len(products), max(20, len(products) // 2))
@@ -726,11 +716,11 @@ def generate_profile_forecasts(
                 {
                     "id": deterministic_uuid("forecast", natural_key),
                     "product_id": product["id"],
-                    "forecast_period_start": _date_only_at_offset(forecast_start_offset),
-                    "forecast_period_end": _date_only_at_offset(forecast_end_offset),
+                    "forecast_period_start": clock.day(forecast_start_offset),
+                    "forecast_period_end": clock.day(forecast_end_offset),
                     "predicted_quantity": str(horizon_quantity),
                     "unit_of_measure": "pcs",
-                    "generated_at": _date_at_offset(0, horizon_index + 1),
+                    "generated_at": clock.at(0, horizon_index + 1),
                     "method": "retailops-realism-baseline-demand-model",
                     "status": "generated",
                     "confidence_level": str(
@@ -753,6 +743,7 @@ def generate_profile_incident_dataset(
     products: list[dict[str, str]],
     users: list[dict[str, str]],
     sales: list[dict[str, str]],
+    clock: GenerationClock = DEFAULT_CLOCK,
 ) -> dict[str, list[dict[str, str]]]:
     anomalies: list[dict[str, str]] = []
     alerts: list[dict[str, str]] = []
@@ -788,7 +779,7 @@ def generate_profile_incident_dataset(
         alert_id = deterministic_uuid("alert", product["sku"])
         recommendation_id = deterministic_uuid("recommendation", product["sku"])
         workflow_action_id = deterministic_uuid("workflow_action", product["sku"])
-        detected_at = _date_at_offset(index, 2)
+        detected_at = clock.at(index, 2)
 
         anomalies.append(
             {
@@ -802,7 +793,7 @@ def generate_profile_incident_dataset(
                 "impact_value": money(actual_value - expected_value),
                 "impact_unit": "pcs",
                 "severity": severity,
-                "period_start": _date_at_offset(index + 1),
+                "period_start": clock.at(index + 1),
                 "period_end": detected_at,
                 "detected_at": detected_at,
             },
@@ -869,6 +860,7 @@ def build_profile_dataset(
     store_count: int,
     warehouse_count: int,
     seed: int = 42,
+    clock: GenerationClock = DEFAULT_CLOCK,
 ) -> dict[str, list[dict[str, str]]]:
     rng = _rng(seed, profile)
     products = generate_profile_products(product_count, rng)
@@ -880,22 +872,24 @@ def build_profile_dataset(
         stores,
         days,
         rng,
+        clock,
     )
-    price_history = generate_price_history(products)
-    promotions = generate_promotions(products)
+    price_history = generate_price_history(products, clock.end_date)
+    promotions = generate_promotions(products, clock.end_date)
     inventory_snapshots = generate_profile_inventory_snapshots(
         products,
         warehouses,
         days,
+        clock,
     )
     stock_movements = generate_profile_stock_movements(
         inventory_snapshots,
         sales,
         warehouses,
     )
-    returns = generate_profile_returns(products, order_items, orders, rng)
-    forecasts = generate_profile_forecasts(products, days)
-    incidents = generate_profile_incident_dataset(products, users, sales)
+    returns = generate_profile_returns(products, order_items, orders, rng, clock)
+    forecasts = generate_profile_forecasts(products, days, clock)
+    incidents = generate_profile_incident_dataset(products, users, sales, clock)
 
     return {
         "products": products,

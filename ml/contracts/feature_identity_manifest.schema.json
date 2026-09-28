@@ -1,0 +1,608 @@
+{
+  "$defs": {
+    "FeatureArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "const": "features.csv",
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "FeatureArtifact",
+      "type": "object"
+    },
+    "FeatureDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "code_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Code Sha256",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "content_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "dependency_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dependency Sha256",
+          "type": "string"
+        },
+        "feature_schema_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Feature Schema Sha256",
+          "type": "string"
+        },
+        "identity_columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Identity Columns",
+          "type": "array"
+        },
+        "identity_version": {
+          "const": "1.0.0",
+          "title": "Identity Version",
+          "type": "string"
+        },
+        "owner": {
+          "const": "retailops-cloud-native-platform",
+          "title": "Owner",
+          "type": "string"
+        },
+        "parent_ids": {
+          "items": {
+            "pattern": "^source-sha256-[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Parent Ids",
+          "type": "array"
+        },
+        "python_version": {
+          "title": "Python Version",
+          "type": "string"
+        },
+        "role": {
+          "const": "features",
+          "title": "Role",
+          "type": "string"
+        },
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "transformation_version": {
+          "const": "observed-demand-identity-1.0.0",
+          "title": "Transformation Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "identity_version",
+        "role",
+        "owner",
+        "parent_ids",
+        "schema_version",
+        "feature_schema_sha256",
+        "transformation_version",
+        "code_sha256",
+        "dependency_sha256",
+        "python_version",
+        "columns",
+        "identity_columns",
+        "row_count",
+        "content_sha256"
+      ],
+      "title": "FeatureDescriptor",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "code_files": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Code Files",
+          "type": "object"
+        },
+        "code_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Code Sha256",
+          "type": "string"
+        },
+        "code_state": {
+          "enum": [
+            "clean",
+            "modified",
+            "unavailable"
+          ],
+          "title": "Code State",
+          "type": "string"
+        },
+        "dependency_files": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Dependency Files",
+          "type": "object"
+        },
+        "dependency_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dependency Sha256",
+          "type": "string"
+        },
+        "git_commit": {
+          "pattern": "^(?:[0-9a-f]{40}|unavailable)$",
+          "title": "Git Commit",
+          "type": "string"
+        },
+        "python_version": {
+          "title": "Python Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code_sha256",
+        "dependency_sha256",
+        "code_files",
+        "dependency_files",
+        "python_version",
+        "git_commit",
+        "code_state"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "RequestedParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Days"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "max_daily_rows": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Daily Rows"
+        },
+        "products": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Products"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "seed": {
+          "exclusiveMinimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "stores": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Stores"
+        },
+        "warehouses": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Warehouses"
+        }
+      },
+      "required": [
+        "profile",
+        "days",
+        "products",
+        "stores",
+        "warehouses",
+        "seed",
+        "start_date",
+        "end_date",
+        "max_daily_rows"
+      ],
+      "title": "RequestedParameters",
+      "type": "object"
+    },
+    "ResolvedParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "business_timezone": {
+          "const": "UTC",
+          "title": "Business Timezone",
+          "type": "string"
+        },
+        "days": {
+          "exclusiveMinimum": 0,
+          "title": "Days",
+          "type": "integer"
+        },
+        "end_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "End Date",
+          "type": "string"
+        },
+        "label_tail_days": {
+          "minimum": 0,
+          "title": "Label Tail Days",
+          "type": "integer"
+        },
+        "max_daily_rows": {
+          "exclusiveMinimum": 0,
+          "title": "Max Daily Rows",
+          "type": "integer"
+        },
+        "origin_days": {
+          "minimum": 0,
+          "title": "Origin Days",
+          "type": "integer"
+        },
+        "output_format": {
+          "const": "csv",
+          "title": "Output Format",
+          "type": "string"
+        },
+        "products": {
+          "exclusiveMinimum": 0,
+          "title": "Products",
+          "type": "integer"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "seed": {
+          "exclusiveMinimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Start Date",
+          "type": "string"
+        },
+        "stores": {
+          "exclusiveMinimum": 0,
+          "title": "Stores",
+          "type": "integer"
+        },
+        "warehouses": {
+          "exclusiveMinimum": 0,
+          "title": "Warehouses",
+          "type": "integer"
+        },
+        "warmup_days": {
+          "minimum": 0,
+          "title": "Warmup Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile",
+        "days",
+        "products",
+        "stores",
+        "warehouses",
+        "seed",
+        "start_date",
+        "end_date",
+        "max_daily_rows",
+        "business_timezone",
+        "output_format",
+        "warmup_days",
+        "origin_days",
+        "label_tail_days"
+      ],
+      "title": "ResolvedParameters",
+      "type": "object"
+    },
+    "SourceDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "code_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Code Sha256",
+          "type": "string"
+        },
+        "dependency_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dependency Sha256",
+          "type": "string"
+        },
+        "identity_version": {
+          "const": "1.0.0",
+          "title": "Identity Version",
+          "type": "string"
+        },
+        "owner": {
+          "const": "retailops-cloud-native-platform",
+          "title": "Owner",
+          "type": "string"
+        },
+        "parent_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Parent Ids",
+          "type": "array"
+        },
+        "python_version": {
+          "title": "Python Version",
+          "type": "string"
+        },
+        "resolved_parameters": {
+          "$ref": "#/$defs/ResolvedParameters"
+        },
+        "role": {
+          "const": "source",
+          "title": "Role",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "tables": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TableIdentity"
+          },
+          "title": "Tables",
+          "type": "object"
+        },
+        "versions": {
+          "$ref": "#/$defs/Versions"
+        }
+      },
+      "required": [
+        "identity_version",
+        "role",
+        "owner",
+        "parent_ids",
+        "schema_version",
+        "versions",
+        "resolved_parameters",
+        "code_sha256",
+        "dependency_sha256",
+        "python_version",
+        "tables"
+      ],
+      "title": "SourceDescriptor",
+      "type": "object"
+    },
+    "TableIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "content_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "data_class": {
+          "enum": [
+            "source_observation",
+            "mixed_fact_and_simulation_truth",
+            "source_operational_output",
+            "source_plan"
+          ],
+          "title": "Data Class",
+          "type": "string"
+        },
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "row_count",
+        "columns",
+        "content_sha256",
+        "data_class"
+      ],
+      "title": "TableIdentity",
+      "type": "object"
+    },
+    "Versions": {
+      "additionalProperties": false,
+      "properties": {
+        "calendar": {
+          "const": "legacy-weekday-seasonality-1.0.0",
+          "title": "Calendar",
+          "type": "string"
+        },
+        "canonicalization": {
+          "const": "typed-csv-nfc-utc-multiset-1.0.0",
+          "title": "Canonicalization",
+          "type": "string"
+        },
+        "config": {
+          "const": "1.0.0",
+          "title": "Config",
+          "type": "string"
+        },
+        "csv_schema": {
+          "const": "1.0",
+          "title": "Csv Schema",
+          "type": "string"
+        },
+        "generator": {
+          "const": "0.2.0",
+          "title": "Generator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "generator",
+        "config",
+        "calendar",
+        "canonicalization",
+        "csv_schema"
+      ],
+      "title": "Versions",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "artifact": {
+      "$ref": "#/$defs/FeatureArtifact"
+    },
+    "complete_daily_panel": {
+      "const": false,
+      "title": "Complete Daily Panel",
+      "type": "boolean"
+    },
+    "dataset_id": {
+      "pattern": "^features-sha256-[0-9a-f]{64}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "descriptor": {
+      "$ref": "#/$defs/FeatureDescriptor"
+    },
+    "generated_at": {
+      "title": "Generated At",
+      "type": "string"
+    },
+    "inventory_ready": {
+      "const": false,
+      "title": "Inventory Ready",
+      "type": "boolean"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "readiness": {
+      "const": "not_ready",
+      "title": "Readiness",
+      "type": "string"
+    },
+    "requested_parameters": {
+      "$ref": "#/$defs/RequestedParameters"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_descriptor": {
+      "$ref": "#/$defs/SourceDescriptor"
+    }
+  },
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "descriptor",
+    "source_descriptor",
+    "requested_parameters",
+    "provenance",
+    "artifact",
+    "generated_at",
+    "complete_daily_panel",
+    "inventory_ready",
+    "readiness"
+  ],
+  "title": "FeatureIdentityManifest",
+  "type": "object"
+}

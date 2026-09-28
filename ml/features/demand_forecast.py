@@ -8,11 +8,18 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from data.generator.configuration import SUPPORTED_PROFILES
+from data.generator.identity import GENERATOR_VERSION
 from data.generator.main import (
     DatasetGenerationConfig,
     build_dataset,
 )
-from data.generator.manifest import GENERATOR_VERSION
+from ml.features.identity import (
+    IDENTITY_FILENAME,
+    feature_identity,
+    load_feature_identity_manifest,
+    write_feature_identity_manifest,
+)
 
 SCHEMA_VERSION = "2.0"
 DATASET_NAME = "retailops-demand-forecast-features"
@@ -97,17 +104,6 @@ def _feature_generated_at(tables: dict[str, list[dict[str, object]]]) -> str:
         _text(sale.get("ingested_at")) or _text(sale.get("sold_at")) for sale in tables["sales"]
     ]
     return max(candidates) if candidates else datetime.now(UTC).isoformat()
-
-
-def _dataset_id(
-    profile: str,
-    seed: int,
-    rows: list[dict[str, object]],
-) -> str:
-    dates = [row["date"] for row in rows]
-    date_start = min(dates) if dates else "empty"
-    date_end = max(dates) if dates else "empty"
-    return f"{DATASET_NAME}-{profile}-{date_start}-{date_end}-seed{seed}"
 
 
 def _build_aggregates(
@@ -196,7 +192,7 @@ def build_demand_feature_rows(
             },
         )
 
-    dataset_id = _dataset_id(config.profile, config.seed, rows)
+    dataset_id, _, _ = feature_identity(config, tables, rows, FEATURE_COLUMNS)
     for row in rows:
         row["dataset_id"] = dataset_id
 
@@ -206,9 +202,14 @@ def build_demand_feature_rows(
 def build_feature_manifest(
     config: DatasetGenerationConfig,
     rows: list[dict[str, object]],
+    *,
+    dataset_id: str | None = None,
 ) -> dict[str, object]:
     dates = [row["date"] for row in rows]
-    dataset_id = rows[0]["dataset_id"] if rows else _dataset_id(config.profile, config.seed, rows)
+    dataset_id = str(rows[0]["dataset_id"]) if rows else dataset_id
+    if dataset_id is None:
+        msg = "Empty features require an explicit source-derived dataset ID."
+        raise ValueError(msg)
 
     return {
         "dataset_id": dataset_id,
@@ -274,9 +275,16 @@ def generate_demand_feature_dataset(
 ) -> dict[str, object]:
     tables = build_dataset(config.dataset)
     rows = build_demand_feature_rows(tables, config.dataset)
-    manifest = build_feature_manifest(config.dataset, rows)
+    dataset_id, _, _ = feature_identity(config.dataset, tables, rows, FEATURE_COLUMNS)
+    manifest = build_feature_manifest(config.dataset, rows, dataset_id=dataset_id)
     output_dir = config.output_dir or default_feature_output_dir(config.dataset.profile)
+    if (output_dir / IDENTITY_FILENAME).exists():
+        previous = load_feature_identity_manifest(output_dir, FEATURE_COLUMNS)
+        if previous["dataset_id"] != dataset_id:
+            msg = "Output already contains different features; choose a new output directory."
+            raise ValueError(msg)
     write_feature_dataset(output_dir, rows, manifest)
+    write_feature_identity_manifest(config.dataset, tables, rows, FEATURE_COLUMNS, output_dir)
     return manifest
 
 
@@ -284,12 +292,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate RetailOps demand forecasting feature dataset.",
     )
-    parser.add_argument("--profile", choices=("demo", "small", "medium", "large"), default="demo")
+    parser.add_argument("--profile", choices=SUPPORTED_PROFILES, default="demo")
     parser.add_argument("--days", type=int)
     parser.add_argument("--products", type=int)
     parser.add_argument("--stores", type=int)
     parser.add_argument("--warehouses", type=int)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--start-date", type=date.fromisoformat)
+    parser.add_argument("--end-date", type=date.fromisoformat)
+    parser.add_argument("--max-daily-rows", type=int)
     parser.add_argument("--output-dir", type=Path)
     return parser.parse_args()
 
@@ -303,6 +314,9 @@ def config_from_args(args: argparse.Namespace) -> DemandFeatureGenerationConfig:
             stores=args.stores,
             warehouses=args.warehouses,
             seed=args.seed,
+            start_date=getattr(args, "start_date", None),
+            end_date=getattr(args, "end_date", None),
+            max_daily_rows=getattr(args, "max_daily_rows", None),
         ),
         output_dir=args.output_dir,
     )

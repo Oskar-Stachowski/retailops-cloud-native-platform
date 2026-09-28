@@ -1,7 +1,7 @@
 # Profile danych
 
 Aktualne wartości definiują [generator](../../data/generator/main.py)
-i [ustawienia profili](../../data/generator/profile_engine.py).
+i [konfiguracja 1.0.0](../../data/generator/configuration.py).
 To profile syntetycznych danych do demonstracji i testów.
 
 | Profil | Historia w dniach | Produkty | Sklepy / miejsca sprzedaży | Magazyny | Domyślny katalog |
@@ -10,14 +10,33 @@ To profile syntetycznych danych do demonstracji i testów.
 | `small` | 90 | 100 | 5 | 3 | `data/synthetic/small/` |
 | `medium` | 180 | 500 | 20 | 6 | `data/synthetic/medium/` |
 | `large` | 365 | 1 000 | 50 | 10 | `data/synthetic/large/` |
+| `ai-smoke` | 30 | 20 | 3 | 2 | `data/synthetic/ai-smoke/` |
+| `ai-temporal-smoke` | 102 | 8 | 3 | 2 | `data/synthetic/ai-temporal-smoke/` |
+| `ai-dev` | 365 | 100 | 5 | 3 | `data/synthetic/ai-dev/` |
+| `ai-training` | 730 | 200 | 10 | 4 | `data/synthetic/ai-training/` |
+| `ai-load` | Jawne | Jawne | Jawne | Jawne | `data/synthetic/ai-load/` |
 
-`demo` ignoruje `--days`, `--products`, `--stores` i `--warehouses`, wyświetlając
-ostrzeżenie. `small`, `medium` i `large` przyjmują te nadpisania oraz `--seed`
+`demo` ignoruje rozmiary, limit siatki i seed, wyświetlając ostrzeżenie;
+zachowuje stały scenariusz i seed 42. Profile skalowane przyjmują nadpisania oraz `--seed`
 (domyślnie 42). Parametry liczbowe muszą być dodatnie. Profil nie jest gwarancją
 stałej liczby transakcji ani kompletnego dziennego panelu ML.
 
-Generator opiera daty na stałej `BASE_DATE=2026-04-30` w
-[common.py](../../data/generator/common.py), a nie na bieżącej dacie komputera.
+Domyślny koniec legacy to `2026-04-30`, profili AI — `2026-07-31`.
+Bez początku start wynika z końca minus `days - 1`. CLI przyjmuje
+`--start-date` i `--end-date`; granice są włączne. Sam początek wyznacza koniec
+według liczby dni. Obie daty bez `--days` wyznaczają liczbę dni;
+z jawnym `--days` muszą być zgodne. Demo odrzuca daty inne niż stały zakres
+sprzedaży `2026-04-27`–`2026-04-30`.
+
+`ai-temporal-smoke` deklaruje 28 dni warmup, 60 dni originów i 14 dni tail;
+override dni zmienia część originów, minimum to 43 dni. To metadane konfiguracji,
+nie ocena modelu. Kalendarz `legacy-weekday-seasonality-1.0.0` używa UTC
+i wcześniejszych reguł; PL/DE i flagi otwarcia są kolejną pracą.
+
+`ai-load` wymaga czterech rozmiarów oraz `--max-daily-rows`.
+Limit sprawdza iloczyn dni × produktów × sklepów przed generacją.
+Dla innych profili domyślny limit jest równy temu iloczynowi; można podać własny.
+To limit nominalnej siatki, nie orders/items ani dowód kompletnego panelu.
 Zakresy poszczególnych tabel mogą wykraczać poza nominalną historię sprzedaży,
 np. z powodu zwrotów lub planów cen. Odczytuj rzeczywiste daty z artefaktów;
 nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
@@ -29,7 +48,7 @@ nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
 - Nowy eksperyment zapisuj przez `--output-dir` do osobnego katalogu.
   Wyjątek ignorowania dla `small` obejmuje także nowe podkatalogi, więc duże
   wyniki ML w tym miejscu wymagają świadomego pozostawienia poza commitem.
-- Każdy profil zapisuje CSV, `dataset_manifest.json` i `quality_report.json`.
+- Każdy profil zapisuje CSV, `dataset_manifest.json`, `dataset_manifest.v2.json` i `quality_report.json`.
   Profile skalowane zapisują również `realism_report.json`.
 - `row_counts` i raporty konkretnego wykonania opisują jego zawartość.
   Stała nazwa profilu ani sam seed nie identyfikują wszystkich parametrów.
@@ -44,5 +63,38 @@ wskazać własny katalog CSV. `large` nie jest obsługiwanym profilem loadera.
 Loader zastępuje zawartość tabel aplikacji danymi z wybranego katalogu.
 
 Instrukcje generowania i ładowania: [praca z danymi](../guides/data.md).
-Profile `ai-smoke`, `ai-dev` i pozostałe z [planu AI](../plans/ai/kontrakty/profile-i-bramki.md)
-są propozycją do wdrożenia; obecne CLI ich nie obsługuje.
+Profile AI nie rozszerzają listy profili seeda. Duże profile nadal używają
+pamięci i CSV; chunked Parquet i pełny benchmark pozostają do wdrożenia.
+
+## Manifest v2 i identity
+
+V1 zachowuje dotychczasowy format. Aktualną konfigurację odczytuj z
+`descriptor.resolved_parameters` w v2: wartości nie są null.
+V2 zapisuje wersje generatora 0.2.0, konfiguracji i kalendarza, requested config,
+seed, SHA kodu i przypiętych plików requirements, wersję Pythona oraz commit/stan kodu.
+Każdy CSV ma checksumę SHA-256 bajtów, rozmiar i liczbę rekordów oraz osobny
+hash kanonicznej treści. Zakresy obejmują wszystkie zadeklarowane pola czasu:
+także końce promocji, forecast horizon, przyszłe ceny i zwroty.
+Watermark to granica wiedzy na koniec konfiguracji o 23:59:59 UTC;
+`complete_through=null` oznacza brak gwarancji kompletności.
+
+Logical ID to `source-sha256-<hash deskryptora>`. Kanonizacja obejmuje typowane
+liczby, null, NFC, UTC i uporządkowany multizbiór zachowujący duplikaty.
+Adapter czasu rozpoznaje dawną reprezentację tuple w CSV demo bez zmiany bajtów.
+Katalog, ścieżka venv, czas zapisu, własny ID i checksum całego manifestu
+nie wchodzą do ID. Treść kodu i zależności wchodzi do ID.
+Przestawienie wierszy albo równoważny zapis liczby może zachować hash treści,
+ale zmienia checksumę pliku.
+
+Nowe cechy zachowują schema 2.0 i `feature_manifest.json`, otrzymując
+`features-sha256-<hash>` zamiast dawnego ID profil/daty/seed.
+`feature_identity_manifest.json` zapisuje source parent ID i deskryptor,
+hash kontraktu/transformacji oraz checksumę CSV. Historyczne artefakty pozostają
+historyczne; nowe eksperymenty budują cechy w nowych katalogach.
+
+Katalog z manifestem v2 można ponowić dla tej samej identity.
+Inna identity albo uszkodzony eksport blokuje zapis przed nadpisaniem.
+Atomowy pełny snapshot i importer pozostają etapem 03.
+Źródło ma `inventory_ready=false`, forecasting/anomaly/stockout/replay `not_ready`,
+RAG `not_applicable`; nadal zawiera sparse panel i mixed simulation truth.
+[Odbiór DATA-01](../evidence/ai/02/data01/README.md) potwierdza konfigurację i identity.
