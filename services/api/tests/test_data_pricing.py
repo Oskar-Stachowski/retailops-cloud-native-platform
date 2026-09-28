@@ -468,7 +468,7 @@ def test_historical_2_1_source_and_features_keep_identity(tmp_path):
             assert Path(name).name == name
             (tmp_path / name).write_bytes(fixture.read(name))
     source = load_source_manifest_v2(tmp_path)
-    features = load_feature_identity_manifest(tmp_path, FEATURE_COLUMNS)
+    features = load_feature_identity_manifest(tmp_path)
     assert source["schema_version"] == "2.1.0" and len(source["artifacts"]) == 26
     assert (
         source["dataset_id"]

@@ -25,6 +25,7 @@ from data.generator.dimension_schema import DIMENSION_COLUMNS
 from data.generator.dimensions import DimensionIndex, in_period, resolve_version
 from data.generator.main import build_dataset, generate_demo_dataset
 from data.generator.manifest_v2 import build_source_manifest_v2, load_source_manifest_v2
+from data.generator.observation_history import HISTORY_TABLE
 from data.generator.pricing_schema import PRICING_COLUMNS
 from ml.features.demand_forecast import FEATURE_COLUMNS, build_demand_feature_rows
 from ml.features.identity import load_feature_identity_manifest
@@ -39,7 +40,7 @@ def dimensions():
 
 
 def test_catalog_separates_brands_categories_locations_and_channels(dimensions):
-    assert set(dimensions) == set(CSV_WRITE_ORDER) | set(DIMENSION_COLUMNS) | set(PRICING_COLUMNS) | set(DEMAND_COLUMNS) | set(RETURN_COLUMNS) | set(SIMULATION_COLUMNS)
+    assert set(dimensions) == set(CSV_WRITE_ORDER) | set(DIMENSION_COLUMNS) | set(PRICING_COLUMNS) | set(DEMAND_COLUMNS) | set(RETURN_COLUMNS) | set(SIMULATION_COLUMNS) | {HISTORY_TABLE}
     report = validate_dimensions(dimensions, resolve_generation_config(CONFIG))
     assert len(report["checks"]) == 8
     assert all(c["severity"] == "hard" and c["status"] == "passed" for c in report["checks"])
@@ -308,7 +309,7 @@ def test_genuine_data01_export_remains_readable_without_identity_change(tmp_path
         == "source-sha256-b4d2a6cf560129ce23374841340e65897a7b09becbe4749e1352c3f150bc1309"
     )
     assert len(manifest["artifacts"]) == 17
-    features = load_feature_identity_manifest(tmp_path, FEATURE_COLUMNS)
+    features = load_feature_identity_manifest(tmp_path)
     assert (
         features["dataset_id"]
         == "features-sha256-bdb259d15fd67e0af15dbce1465ff480ae93421125bde83231b0bf5730a9db13"
