@@ -16,20 +16,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
-### DATA-01 · P2 · Manifest i tożsamość nie opisują pełnej zawartości zestawu
-
-**Dowód:** source manifest zapisuje domyślne parametry jako null, nie ma source ID
-ani checksumów. 100 i 20 produktów ma identyczny feature `dataset_id` przy różnej
-treści. Zakres kończy się 30.04, choć zwroty, plany cen i forecasty sięgają maja;
-brak watermarków i zakresów per tabela. Kod: [manifest](../../data/generator/manifest.py),
-[feature ID](../../ml/features/demand_forecast.py). Oceniony RF ma dodatkowe hashe treści.
-
-**Kryterium zamknięcia — AI 02–03:** manifest v2 z requested/effective config,
-wersjami, provenance, zakresami historii/planów/tail, watermarkami, logical IDs
-oraz byte checksums. Powtórzenie identycznych danych zachowuje ID niezależnie od
-katalogu/czasu zapisu; kontrast 100/20 oraz zmiana treści zmienia właściwe ID.
-Legacy demo/v1 zachowuje zgodność.
-
 ### DATA-02 · P2 · Brak źródłowego kontraktu panelu, wymiarów i lifecycle
 
 **Dowód:** 12 SKU z whitespace; kategoria↔marka i region↔kanał są sprzężone.

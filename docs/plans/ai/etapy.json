@@ -43,7 +43,11 @@
         "01"
       ],
       "path": "etapy/02-dane-sprzedazowe.md",
-      "status": "planned"
+      "status": "in_progress",
+      "next_scope": "DATA-02: dimensions, SKU, routing and lifecycle",
+      "evidence": "../../evidence/ai/02/data01/README.md",
+      "implementation_commit": "bb9333eb337a1b6dfd498d8531fc9657044f8ca9",
+      "implementation_scope": "DATA-01 only; remaining source fixes pending"
     },
     {
       "id": "03",

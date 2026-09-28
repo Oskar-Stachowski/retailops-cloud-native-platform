@@ -36,10 +36,12 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
-Następna implementacja to **[AI 02 / DATA-01](plans/ai/etapy/02-dane-sprzedazowe.md)**
-w RetailOps: konfiguracja, identity i manifest v2. Równolegle repo AI może
+Etap 02 jest w realizacji. [DATA-01](evidence/ai/02/data01/README.md) ma lokalny
+odbiór konfiguracji, jawnych dat i source/feature identity z manifestem v2.
+Następna implementacja to **[AI 02 / DATA-02](plans/ai/etapy/02-dane-sprzedazowe.md)**
+w RetailOps: wymiary, SKU, routing i lifecycle. Równolegle repo AI może
 rozpocząć [RAG 11](plans/ai/etapy/11-rag.md) od zatwierdzonego korpusu.
 [Backlog](plans/ai/backlog.md) określa zakres pierwszego PR i zależności.
-DATA-01–05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
+DATA-02–05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
 historii przed odbiorem cech i forecastingu. Inventory, streaming, auth oraz
 serving mają własne późniejsze bramki. Kryteria: [otwarte ustalenia](audits/open-findings.md).

@@ -2,41 +2,29 @@
 
 [Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
 Required CI PR oraz push na main obu repozytoriów ma success.
-Główny punkt wznowienia to DATA-01 etapu 02. Etapy 02–17 pozostają planowane.
+Główny punkt wznowienia to DATA-02 etapu 02. [DATA-01](../../evidence/ai/02/data01/README.md)
+ma lokalny odbiór konfiguracji i tożsamości; etap 02 jest w realizacji.
 Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
 potwierdzone problemy i kryteria ich zamknięcia.
 
-## Pierwszy mały PR etapu 02
+## Kolejny mały PR etapu 02
 
-**Repo:** RetailOps. **Zależność:** odebrany fundament 01 i uzgodnione wersje kontraktów.
-Zakres DATA-01: jedno rozwiązanie requested/effective config, jawne daty i manifest v2
-obok v1, wersje generatora/kalendarza/konfiguracji, source identity oraz checksumy.
-Powiązać nowe feature ID z treścią źródła i kontraktem cech, zamiast wyłącznie profilem/datami/seedem.
-Nie zmieniać w tym PR formuły popytu, cen, koszyków ani legacy demo.
+**Repo:** RetailOps. **Zależność:** konfiguracja i identity DATA-01.
+Zakres DATA-02: rozdzielić selling location, stock location, channel i region;
+wersjonować assignments/routing oraz lifecycle/assortment. Naprawić SKU,
+rozdzielić brand/category i channel/region, dodać hierarchię produktów i
+kalendarz PL/DE z flagami otwarcia. Legacy pola wyprowadzać przez adapter.
+Zachować demo, manifest v2 oraz testy identity i powtarzalności.
 
-**Odbiór tego PR:**
-
-- Powtórzenie tych samych wejść w dwóch katalogach daje ten sam logical source/feature
-  ID i treść; ścieżka venv/outputu oraz czas zapisu nie wchodzą do tożsamości logicznej.
-- `small/seed42` dla 100 i 20 produktów daje różne ID. Zmiana seeda, dat, treści
-  lub semantycznej konfiguracji zmienia właściwy ID; raw byte checksums są odrębne.
-- Żaden efektywny parametr nie pozostaje `null`; manifest jawnie zapisuje wartości
-  domyślne i override, wersje, provenance kodu i zależności.
-- Zakresy per tabela obejmują rzeczywiste zwroty, promocje, plany cen i forecasty.
-  Rozróżnić sprzedaż, plan i return tail; watermark ma zdefiniowane znaczenie,
-  nie jest równy automatycznie największej przyszłej dacie.
-- Testy istniejących kontraktów v1/demo/seed przechodzą, 19 śledzonych plików demo
-  nie jest nadpisywanych. Uszkodzona treść/checksum i niekompletna konfiguracja
-  manifestu v2 są odrzucane. Raport nie nazywa jeszcze źródła gotowym do AI 03.
-
-Kolejne PR-y 02 zgodnie z [instrukcją](etapy/02-dane-sprzedazowe.md):
-wymiary/lifecycle (DATA-02), wspólne ceny/promocje (DATA-04), demand/panel/koszyki
-(DATA-02/03/05), chronologia/zwroty (DATA-03), rozdzielenie truth i bramki (DATA-05).
+Dalsze PR-y według [instrukcji](etapy/02-dane-sprzedazowe.md):
+wspólne ceny/promocje (DATA-04), demand/panel/koszyki (DATA-02/03/05),
+chronologia/zwroty (DATA-03), rozdzielenie truth i bramki (DATA-05).
+Źródło pozostaje `not_ready` do AI 03 do odbioru pełnego etapu 02.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 02, DATA-01:** konfiguracja, identity i manifest v2; potem
-  kolejne poprawki źródła w kolejności opisanej wyżej.
+- **RetailOps / etap 02, DATA-02:** wymiary, SKU, routing, lifecycle i kalendarz;
+  potem kolejne poprawki źródła w kolejności opisanej wyżej.
 - **Repo AI / etap 11, zakres 1–2:** rejestr zatwierdzonego korpusu, allowlista,
   access_class, source SHA/checksums i document_status; następnie parser/chunker
   oraz testy offline. Nie wymaga ukończenia etapu 02.
@@ -52,8 +40,8 @@ Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **02 — źródło** | DATA-01–05. Pełny poprawny panel, scope/availability cen i promocji, zgodne transakcje i return tail, odrębne truth, hard gates z negatywnymi przypadkami. `inventory_ready=false`, stockout/anomaly `not_ready`. |
-| **03 — snapshot/curated** | DATA-01 + ML-07: niezależne source/curated/feature/label IDs, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
+| **02 — źródło** | DATA-02–05. Pełny poprawny panel, scope/availability cen i promocji, zgodne transakcje i return tail, odrębne truth, hard gates z negatywnymi przypadkami. `inventory_ready=false`, stockout/anomaly `not_ready`. |
+| **03 — snapshot/curated** | ML-07: rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | ML-07 jako warunek wejść. Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |

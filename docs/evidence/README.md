@@ -6,6 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| Konfiguracja i identity AI 02 / DATA-01 | 2026-09-28 | [Odbiór lokalny](ai/02/data01/README.md): jawne daty/profile, manifest v2, source/feature IDs, dwukrotne smoke i temporal smoke, kontrast 100/20, zgodność demo i seeda; pełny etap 02 pozostaje otwarty. |
 | Fundament, persistence, kontrakty i lokalne auth AI 01 | 2026-09-28 | [Osobne repo AI](ai/01/README.md): 267 testów, prywatne poświadczenia i whole-scope 401/403, schemas/PIT/lineage oraz rzeczywisty HTTP z wheel na czystym checkoutcie. Osobny wcześniejszy pomiar rzeczywistego Compose: PostgreSQL/pgvector, MLflow, migracje, trwałość i DB outage/recovery. [Zdalny Required CI obu repo](ai/01/remote-ci.json): PR i push na main success, 273 testy AI, rzeczywisty Compose na Linux AMD64 i zachowana ochrona main. |
 | Audyt AI 00 | 2026-09-27 | [Stan wyjściowy `cbf28b2`](ai/00/README.md): dwa `small`, kontrast 100/20, dane/ML/event/API, 138 testów, RF reload i CI źródłowego SHA. Źródło wymaga poprawek w 02. |
 | Izolacja seeda | 2026-09-27 | [Próby PostgreSQL](pre-ai-00/2026-09-27-seed-isolation.md) na kodzie `667f349`: 27 testów bez DB, pięć przebiegów DB i sprzątanie po błędzie; osobny zakres wobec audytu AI 00. |

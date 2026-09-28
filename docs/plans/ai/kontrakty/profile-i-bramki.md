@@ -1,6 +1,11 @@
 # Profile, budżety i bramki odbioru
 
-**Status: propozycja wersjonowanej polityki do wdrożenia.** Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku ani zatwierdzoną polityką obecnego RetailOps. Przy wdrożeniu utrwal docelową politykę w tym dokumencie i maszynowej konfiguracji o tej samej wersji. Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
+**Status: rozmiary i jawne daty profili wdrożone w DATA-01; pozostałe bramki są planem.**
+[Konfiguracja 1.0.0](../../../../data/generator/configuration.py) jest wykonywalnym źródłem
+rozmiarów i dat. Generator nadal tworzy legacy CSV i sparse panel; stock locations,
+aktywne pary, chunked Parquet i hard gates pozostają do wdrożenia.
+Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
+Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 
 ## 1. Jeden zestaw profili
 
