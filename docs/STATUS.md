@@ -50,7 +50,25 @@ zgodne bajty demo i zachowanie IDs archiwów 2.0–2.5.
 replay cross-repo mają własne dalsze bramki.
 
 Pierwszy zakres 03 to typed Parquet, polityka artefaktów i niezmienny eksport
-w RetailOps. Repo AI może równolegle rozwijać [RAG 11](plans/ai/etapy/11-rag.md)
-od zatwierdzonego korpusu. [Backlog](plans/ai/backlog.md) opisuje zależności,
-a [otwarte ustalenia](audits/open-findings.md) pozostałe problemy.
+w RetailOps, następnie importer i curated w AI. Równolegle repo AI kontynuuje
+pozostały zakres 11. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
+przypisuje etapy 03–17 do repozytoriów i podaje kolejność oraz możliwości
+pracy równoległej. [Backlog](plans/ai/backlog.md) opisuje najbliższe zadania,
+a [otwarte ustalenia](audits/open-findings.md) potwierdzone problemy.
 Dowód zdalnego Required CI i publikacji na main: [audyt](evidence/ai/02/audit/README.md).
+
+## Etap AI 11 — zakres i braki
+
+[Odbiór Etapu 11](evidence/ai/11/README.md) dotyczy implementacji w
+`retailops-ai-intelligence`, opublikowanej na `origin/main` (`1c3b65e`)
+po zielonym Required CI PR i push na main. Fundament offline obejmuje zatwierdzony korpus
+29 dokumentów, 451 fragmentów, fake embeddings, pgvector, testową aktywację
+i rollback, retrieval z filtrami uprawnień/statusów oraz trwałe runy i raporty
+dla 44 pytań golden. Pełny lokalny odbiór ma 627 testów, audyt dodatkowo 104.
+
+**Etap pozostaje w realizacji.** Brakuje ścieżki rzeczywistego providera
+embeddings, użytkowej kwalifikacji/aktywacji/rollback oraz zaliczenia jakości
+semantycznej. Fake Recall@5 i MRR wynoszą 0,0441176471 przy progach 0,80 i 0,60;
+9/9 kontroli krytycznych nie zastępuje tych progów. Wyszukiwanie użytkowe
+pozostaje zablokowane. Integracja real embeddings i smoke Bedrock należą do
+12; pełny agent wymaga również ukończenia 10.

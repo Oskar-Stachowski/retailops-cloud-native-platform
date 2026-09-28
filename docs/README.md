@@ -18,7 +18,7 @@ w [indeksie dowodów](evidence/README.md).
 |---|---|
 | Stan projektu | [STATUS.md](STATUS.md) |
 | Problemy wymagające poprawy | [Audyt: otwarte ustalenia](audits/open-findings.md) |
-| Najbliższa praca i rozwój AI | [AI 03](plans/ai/etapy/03-snapshot-curated.md), [backlog po audycie](plans/ai/backlog.md), [plan prac](plans/README.md) |
+| Najbliższa praca i rozwój AI | [AI 03](plans/ai/etapy/03-snapshot-curated.md), [kolejność i repozytoria](plans/ai/kolejnosc-i-repozytoria.md), [backlog](plans/ai/backlog.md), [status RAG 11](evidence/ai/11/README.md) |
 | Uruchomienie i rozwój aplikacji | [Lokalnie](guides/local-development.md), [frontend](guides/frontend.md), [backend](guides/backend.md) |
 | Dane, baza i streaming | [Generator](guides/data.md), [baza](guides/database.md), [broker](guides/streaming.md) |
 | Uczenie maszynowe | [Obecna implementacja](guides/ml.md), [ostatnia ocena](evidence/ml/fixed-origin-rf-2026-09-27/README.md) |
