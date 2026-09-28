@@ -133,14 +133,686 @@
   "platform": {
     "architecture": "arm64",
     "python": "3.11.15",
+    "remote": "GitHub Actions ubuntu-latest / Linux AMD64",
     "system": "Darwin",
     "worker": "Linux ARM64 via Docker Desktop"
   },
   "policy_version": "ai02-readiness-audit-1.1.0",
   "remote_ci": {
     "branch_protection_retained": true,
+    "checked_at_utc": "2026-09-28T16:16:04.237351+00:00",
+    "main_push": {
+      "api_verification": {
+        "coverage_percent": 83.82,
+        "coverage_threshold_percent": 80,
+        "failures": 0,
+        "job_id": 109011076034,
+        "platform": "Linux x64",
+        "python": "3.11.16",
+        "run_attempt": 1,
+        "run_id": 36446776645,
+        "skipped": 0,
+        "summary_lines": [
+          "2026-09-28T15:52:22.2577642Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.16-pip-89143f477a85f117531ad0632b95ed3dabb1e2252974d9948dedfbd02fe97c0a",
+          "2026-09-28T15:53:34.1171652Z platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0",
+          "2026-09-28T16:05:12.8935542Z Required test coverage of 80% reached. Total coverage: 83.82%",
+          "2026-09-28T16:05:12.8936176Z ================== 670 passed, 1 warning in 701.74s (0:11:41) =================="
+        ],
+        "tests": 670
+      },
+      "conclusion": "success",
+      "created_at": "2026-09-28T15:51:40Z",
+      "event": "push",
+      "head_sha": "30e3e70641763b072675f0b2864e0f22d9d0603b",
+      "initial_attempt": {
+        "api_dashboard_recommendations_duration_ms": 5165.15,
+        "api_dashboard_recommendations_status": 200,
+        "artifact_id": 10981835369,
+        "artifact_sha256": "aeac650ac0dfad1bf7a65ca92420bf9c20ac7f7fca029bc358cf25e07b28e407",
+        "assertion_timeout_ms": 5000,
+        "cleanup": "passed",
+        "completed_stages": [
+          "previous",
+          "database_restarted",
+          "workloads_restarted",
+          "upgraded"
+        ],
+        "diagnosis": "The browser assertion timed out during a slow first request after intentional outage and rollback; repeat required on a fresh runner without changing product code.",
+        "failed_job_id": 109011381418,
+        "negative_checks": {
+          "api_outage": "HTTP 504 detected through ingress"
+        },
+        "run_attempt": 1,
+        "run_id": 36446776645,
+        "stage": "rolled_back browser dashboard",
+        "successful_jobs": [
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011011407",
+            "id": 109011011407,
+            "name": "Required CI contract tests"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011011692",
+            "id": 109011011692,
+            "name": "Detect changed areas"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011072383",
+            "id": 109011072383,
+            "name": "Repository diff hygiene"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011074790",
+            "id": 109011074790,
+            "name": "docker-gate / Validate Docker Compose config"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075249",
+            "id": 109011075249,
+            "name": "frontend-gate / Frontend tests and lint"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075544",
+            "id": 109011075544,
+            "name": "terraform-validation-gate / Terraform fmt, init and validate"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075550",
+            "id": 109011075550,
+            "name": "iac-security-gate / TFLint IaC quality gate"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075589",
+            "id": 109011075589,
+            "name": "iac-security-gate / Checkov IaC security report"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075682",
+            "id": 109011075682,
+            "name": "data-gate / Synthetic data quality gate"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075767",
+            "id": 109011075767,
+            "name": "security-gate / Frontend dependency audit"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075926",
+            "id": 109011075926,
+            "name": "kubernetes-gate / Kustomize, schema and policy gates"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011075934",
+            "id": 109011075934,
+            "name": "security-gate / Filesystem vulnerability scan"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011076034",
+            "id": 109011076034,
+            "name": "api-gate / API integration tests"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011076116",
+            "id": 109011076116,
+            "name": "security-gate / Frontend image vulnerability scan"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011076138",
+            "id": 109011076138,
+            "name": "security-gate / Secret scanning with Gitleaks"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011076176",
+            "id": 109011076176,
+            "name": "security-gate / Python dependency audit"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011076711",
+            "id": 109011076711,
+            "name": "security-gate / Backend image vulnerability scan"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011211777",
+            "id": 109011211777,
+            "name": "frontend-gate / Build frontend application"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011242958",
+            "id": 109011242958,
+            "name": "docker-gate / Build full stack and run smoke tests"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011315911",
+            "id": 109011315911,
+            "name": "frontend-gate / Build frontend Docker image"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109011497160",
+            "id": 109011497160,
+            "name": "security-gate / Security evidence summary"
+          },
+          {
+            "conclusion": "success",
+            "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109016777412",
+            "id": 109016777412,
+            "name": "api-gate / API Docker image build"
+          }
+        ]
+      },
+      "jobs": [
+        {
+          "conclusion": "success",
+          "id": 109017392475,
+          "name": "Required CI contract tests",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017392475"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017393309,
+          "name": "Detect changed areas",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017393309"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017393669,
+          "name": "Repository diff hygiene",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017393669"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017395404,
+          "name": "docker-gate / Validate Docker Compose config",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017395404"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017395663,
+          "name": "iac-security-gate / TFLint IaC quality gate",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017395663"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017395685,
+          "name": "security-gate / Backend image vulnerability scan",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017395685"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017395993,
+          "name": "security-gate / Frontend dependency audit",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017395993"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396148,
+          "name": "terraform-validation-gate / Terraform fmt, init and validate",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396148"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396207,
+          "name": "kubernetes-gate / Kustomize, schema and policy gates",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396207"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396242,
+          "name": "data-gate / Synthetic data quality gate",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396242"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396264,
+          "name": "security-gate / Python dependency audit",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396264"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396328,
+          "name": "security-gate / Filesystem vulnerability scan",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396328"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396396,
+          "name": "frontend-gate / Frontend tests and lint",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396396"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396526,
+          "name": "iac-security-gate / Checkov IaC security report",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396526"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396539,
+          "name": "api-gate / API integration tests",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396539"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017396636,
+          "name": "security-gate / Frontend image vulnerability scan",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017396636"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017397090,
+          "name": "security-gate / Secret scanning with Gitleaks",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017397090"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017397228,
+          "name": "kubernetes-gate / Local kind runtime, persistence and rollback",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017397228"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017398303,
+          "name": "api-gate / API Docker image build",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017398303"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017398678,
+          "name": "docker-gate / Build full stack and run smoke tests",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017398678"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017400073,
+          "name": "frontend-gate / Build frontend application",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017400073"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017400164,
+          "name": "security-gate / Security evidence summary",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017400164"
+        },
+        {
+          "conclusion": "success",
+          "id": 109017401893,
+          "name": "frontend-gate / Build frontend Docker image",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109017401893"
+        },
+        {
+          "conclusion": "success",
+          "id": 109020611106,
+          "name": "required-result",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645/job/109020611106"
+        }
+      ],
+      "raw_jobs_response_sha256": "12b74f79ea3032663c9b5ba51e89220231690d5f1aa664b056514ee46b372589",
+      "raw_run_response_sha256": "562b11b0db653b8f43a80fa0d038f94287a97ec974e4ab8b27cb0473a2baa818",
+      "required_result": "success",
+      "run_attempt": 2,
+      "run_id": 36446776645,
+      "status": "completed",
+      "updated_at": "2026-09-28T16:14:36Z",
+      "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645"
+    },
+    "merge_commit": "30e3e70641763b072675f0b2864e0f22d9d0603b",
+    "pr": {
+      "api_verification": {
+        "coverage_percent": 83.82,
+        "coverage_threshold_percent": 80,
+        "failures": 0,
+        "job_id": 109004459046,
+        "platform": "Linux x64",
+        "python": "3.11.16",
+        "run_id": 36444858612,
+        "skipped": 0,
+        "summary_lines": [
+          "2026-09-28T15:37:05.9848944Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.16-pip-89143f477a85f117531ad0632b95ed3dabb1e2252974d9948dedfbd02fe97c0a",
+          "2026-09-28T15:38:21.4626834Z platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0",
+          "2026-09-28T15:50:00.0700402Z Required test coverage of 80% reached. Total coverage: 83.82%",
+          "2026-09-28T15:50:00.0700817Z ================== 670 passed, 1 warning in 701.63s (0:11:41) =================="
+        ],
+        "tests": 670,
+        "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459046",
+        "warnings": 1
+      },
+      "conclusion": "success",
+      "created_at": "2026-09-28T15:36:22Z",
+      "event": "pull_request",
+      "head_sha": "0b6104a472f4a9faa3ff73ef1a40c3059507d1bf",
+      "jobs": [
+        {
+          "conclusion": "success",
+          "id": 109004385814,
+          "name": "Detect changed areas",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004385814"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004386215,
+          "name": "Required CI contract tests",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004386215"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004457371,
+          "name": "Repository diff hygiene",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004457371"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004458930,
+          "name": "frontend-gate / Frontend tests and lint",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004458930"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459023,
+          "name": "docker-gate / Validate Docker Compose config",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459023"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459046,
+          "name": "api-gate / API integration tests",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459046"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459139,
+          "name": "iac-security-gate / TFLint IaC quality gate",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459139"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459175,
+          "name": "terraform-validation-gate / Terraform fmt, init and validate",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459175"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459255,
+          "name": "security-gate / Python dependency audit",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459255"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459286,
+          "name": "security-gate / Frontend dependency audit",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459286"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459296,
+          "name": "iac-security-gate / Checkov IaC security report",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459296"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459359,
+          "name": "security-gate / Filesystem vulnerability scan",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459359"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459449,
+          "name": "security-gate / Backend image vulnerability scan",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459449"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459452,
+          "name": "kubernetes-gate / Kustomize, schema and policy gates",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459452"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459481,
+          "name": "data-gate / Synthetic data quality gate",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459481"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459486,
+          "name": "security-gate / Frontend image vulnerability scan",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459486"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004459687,
+          "name": "security-gate / Secret scanning with Gitleaks",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004459687"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004572829,
+          "name": "docker-gate / Build full stack and run smoke tests",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004572829"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004576728,
+          "name": "frontend-gate / Build frontend application",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004576728"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004700915,
+          "name": "frontend-gate / Build frontend Docker image",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004700915"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004814384,
+          "name": "kubernetes-gate / Local kind runtime, persistence and rollback",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004814384"
+        },
+        {
+          "conclusion": "success",
+          "id": 109004829666,
+          "name": "security-gate / Security evidence summary",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109004829666"
+        },
+        {
+          "conclusion": "success",
+          "id": 109010359163,
+          "name": "api-gate / API Docker image build",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109010359163"
+        },
+        {
+          "conclusion": "success",
+          "id": 109010643590,
+          "name": "required-result",
+          "runner_labels": [
+            "ubuntu-latest"
+          ],
+          "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612/job/109010643590"
+        }
+      ],
+      "raw_jobs_response_sha256": "6698c7a4153383636f681e1ef00635517a2a1bbbf67f13147e3f6ddf2586038a",
+      "raw_run_response_sha256": "526b73e15676160d63f74516e1c0adcbf0b84d2258f9d4965bf69488873de7c7",
+      "required_result": "success",
+      "run_attempt": 1,
+      "run_id": 36444858612,
+      "status": "completed",
+      "updated_at": "2026-09-28T15:50:55Z",
+      "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612"
+    },
+    "provenance": {
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "30e3e70641763b072675f0b2864e0f22d9d0603b",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776292",
+      "id": 36446776292,
+      "status": "completed"
+    },
+    "pull_request": 61,
+    "pull_request_url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/61",
+    "repository": "Oskar-Stachowski/retailops-cloud-native-platform",
     "required_context": "required-result",
-    "status": "pending_publication"
+    "scope": "full Required CI for implementation on Linux AMD64; this follow-up records evidence and changes documentation only",
+    "status": "success"
   },
   "source_acceptance": {
     "cases": 9,

@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 odebrany lokalnie; następny zakres snapshot i curated w 03. Aktualizacja: 28.09.2026.**
+**Status: etap 02 odebrany lokalnie i zdalnie; następny zakres snapshot i curated w 03. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne

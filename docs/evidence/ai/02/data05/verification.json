@@ -236,8 +236,7 @@
   "limitations": [
     "No new model training, serving or ai-dev/ai-training benchmark",
     "No complete cross-repo import/curated/replay qualification",
-    "Inventory ledger not qualified; inventory_ready=false",
-    "Remote publication is recorded separately in audit verification"
+    "Inventory ledger not qualified; inventory_ready=false"
   ],
   "platform": {
     "architecture": "arm64",
@@ -274,10 +273,13 @@
   },
   "remote_ci": {
     "evidence": "../audit/verification.json",
-    "status": "pending_publication"
+    "implementation_merge_commit": "30e3e70641763b072675f0b2864e0f22d9d0603b",
+    "main_push_run_id": 36446776645,
+    "pr_run_id": 36444858612,
+    "status": "success"
   },
   "runtime_platform_scope": {
-    "linux_amd64_execution": "not_run",
+    "linux_amd64_execution": "passed in remote Required CI API, Compose and kind gates",
     "local_worker": "Linux ARM64 via Docker Desktop",
     "pinned_image_index_includes_linux_amd64": true
   },

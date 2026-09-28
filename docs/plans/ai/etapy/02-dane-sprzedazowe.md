@@ -1,6 +1,6 @@
 # 02 — Źródło sprzedaży AI
 
-**Etap odebrany lokalnie. Repo: RetailOps. Zależność: 01.**
+**Etap odebrany lokalnie i zdalnie. Repo: RetailOps. Zależność: 01.**
 
 [Audyt gotowości](../../../evidence/ai/02/audit/README.md) potwierdza wejście do
 AI 03 dla syntetycznej sprzedaży obserwowanej. [Odbiór źródła](../../../evidence/ai/02/data05/README.md)
