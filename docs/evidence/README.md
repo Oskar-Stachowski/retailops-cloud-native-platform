@@ -6,7 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| Audyt AI 02 → AI 03 | 2026-09-28 | [Gotowość do rozpoczęcia 03](ai/02/audit/README.md): pełny fingerprint workera, historia obserwacji as-of, ponowny odbiór źródła i pełne testy na PostgreSQL. Wynik zdalnego CI zapisuje audyt. |
+| Audyt AI 02 → AI 03 | 2026-09-28 | [Gotowość do rozpoczęcia 03](ai/02/audit/README.md): pełny fingerprint workera, historia obserwacji as-of, ponowny odbiór źródła i pełne testy na PostgreSQL. Required CI PR i push na main ma success; audyt zawiera SHA i wyniki kontroli. |
 | Źródło i izolacja AI 02 / DATA-05 | 2026-09-28 | [Odbiór](ai/02/data05/README.md): source 2.6, 46 hard gates, osobne parametry symulacji, izolowany worker, powtórzenia profili, zgodne demo i archiwa 2.0–2.5. Źródło do AI 03; modele/inventory mają dalsze bramki. |
 | Chronologia i zwroty AI 02 / DATA-03 | 2026-09-28 | [Odbiór lokalny](ai/02/data03/README.md): konkretne pozycje, częściowe ilości, okna kategorii/kanałów, refundacje według zapłaconej ceny i 39-dniowy ogon; siedem hard gates, dwa snapshot cutoffy, zgodne demo i odczyt source 2.0–2.3. Końcowy odbiór źródła: DATA-05. |
 | Popyt, panel i koszyki AI 02 / DATA-02/03/05 | 2026-09-28 | [Odbiór lokalny](ai/02/demand-panel/README.md): pełny ważny panel i jawne statusy, jedna formuła, konserwacja sztuk i koszyki bez powtórzeń, cechy AI 3.0; 100% coverage smoke, zgodne demo. Dalsze odbiory: [zwroty](ai/02/data03/README.md); izolację truth potwierdza DATA-05. |

@@ -48,8 +48,17 @@ Nie wykonano benchmarku ai-dev/ai-training ani nowej oceny modelu.
 
 ## Publikacja i dalsza praca
 
-Zdalny Required CI dla PR i push na main jest oddzielnym dowodem w
-verification.json; lokalny odbiór nie zastępuje tej bramki.
+Całość AI 02 opublikowano przez [PR #61](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/61) na
+main, merge `30e3e70`. Required CI dla
+[PR](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36444858612) i [push na main](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645) ma **success**,
+łącznie z API, full-stack Compose, kind/persistence/rollback oraz kontrolami
+security i danych na Linux AMD64. `required-result` jest zielony; ochrona
+main pozostała aktywna. [verification.json](verification.json) zapisuje SHA,
+job IDs i wyniki obu przebiegów. Pierwsza próba Kubernetes po rollbacku
+przekroczyła 5 s oczekiwania dashboardu; API odpowiedziało 200 po 5,17 s.
+Ponowienie wyłącznie nieudanej próby i zależnej bramki przeszło na świeżym
+runnerze bez zmian kodu. Receipt zachowuje pierwszy wynik i identyfikator artefaktu.
+Ten kolejny commit uzupełnia wyłącznie dokumentację.
 
 AI 03 implementuje Parquet, immutable export, kontrakt cross-repo, importer
 i curated. Musi zachować istniejące wersje i dostępność; nie deklarować

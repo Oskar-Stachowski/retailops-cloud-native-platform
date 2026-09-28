@@ -46,10 +46,18 @@
       "status": "completed",
       "evidence": "../../evidence/ai/02/data05/README.md",
       "readiness_audit": "../../evidence/ai/02/audit/README.md",
-      "implementation_commit": "5a8678c",
+      "implementation_commit": "5a8678c51f0343c528fc55b030dbfd1cf246aff8",
       "implementation_scope": "Source 2.6: DATA-01–05 source gates, full worker provenance and append-only observed quantity versions; AI features 3.1 and legacy 2.1 with as-of reads",
       "acceptance_scope": "bounded ai-smoke/ai-temporal-smoke; source ready for AI03; models, inventory and cross-repo replay have later gates",
-      "verification_commit": "152341e"
+      "verification_commit": "152341e4e217c5eac4c700e9e9d67c2eb61090ef",
+      "remote_ci": {
+        "status": "success",
+        "pr": 61,
+        "pr_run": 36444858612,
+        "main_push_run": 36446776645,
+        "merge_commit": "30e3e70641763b072675f0b2864e0f22d9d0603b",
+        "evidence": "../../evidence/ai/02/audit/verification.json"
+      }
     },
     {
       "id": "03",

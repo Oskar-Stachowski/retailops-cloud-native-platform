@@ -32,7 +32,7 @@ importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as
 
 Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
 kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
-Etap 03 ma spełnioną lokalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
+Etap 03 ma spełnioną lokalną i zdalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
 a agent 12 na 10 i 11.
 Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
