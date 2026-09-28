@@ -1,0 +1,101 @@
+{
+  "api_coverage_percent": 83.82,
+  "api_coverage_required_percent": 70,
+  "checks": [
+    {
+      "command": "REQUIRE_DB_TESTS=1 PYTHONPATH=services/api:. COVERAGE_FILE=/private/tmp/retailops-demand.coverage services/api/.venv/bin/python -m pytest -q services/api/tests --cov=services/api/app --cov-report=term --cov-report=xml:/private/tmp/retailops-demand-coverage.xml --junitxml=/private/tmp/retailops-demand-full-tests.xml",
+      "environment": "DATABASE_URL points to disposable loopback PostgreSQL demand_panel DB",
+      "name": "full pytest including PostgreSQL and API",
+      "status": "passed"
+    },
+    {
+      "command": "services/api/.venv/bin/python -m ruff check services/api/app services/api/scripts data ml scripts/data/verify_data01.py scripts/data/verify_data02.py scripts/data/verify_data04.py scripts/data/verify_demand_panel.py",
+      "name": "ruff",
+      "status": "passed"
+    },
+    {
+      "command": "services/api/.venv/bin/python -m ruff format --check services/api/app services/api/scripts data ml scripts/data/verify_data01.py scripts/data/verify_data02.py scripts/data/verify_data04.py scripts/data/verify_demand_panel.py",
+      "formatted_files": 138,
+      "name": "format",
+      "status": "passed"
+    },
+    {
+      "command": "services/api/.venv/bin/python -m mypy",
+      "name": "types",
+      "scope": "5 configured API modules",
+      "status": "passed"
+    },
+    {
+      "command": "services/api/.venv/bin/python -m bandit --severity-level high --confidence-level high -q -r services/api/app services/api/scripts data/generator ml/features",
+      "name": "security lint",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --cached | gitleaks stdin --redact --no-banner",
+      "name": "secrets",
+      "scope": "implementation patch",
+      "status": "passed"
+    },
+    {
+      "name": "source/feature CLI",
+      "outcomes": [
+        {
+          "exit_code": 0,
+          "name": "generate source 2.3 with complete demand panel",
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "verify source semantics and reports",
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "generate features 3.0",
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "verify feature identity and parent",
+          "status": "passed"
+        },
+        {
+          "exit_code": 1,
+          "name": "reject missing daily panel row",
+          "status": "passed"
+        },
+        {
+          "exit_code": 1,
+          "name": "reject corrupt AI feature CSV",
+          "status": "passed"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "remote Required CI",
+      "scope": "local AI branch only",
+      "status": "not_run"
+    }
+  ],
+  "coverage_xml_sha256": "ccc00b42df2c97e40da163c4332895514c966979c099f90767e7517db40f8f7d",
+  "database": {
+    "cleanup": "stopped and removed",
+    "fixture": "fresh demo migration/seed; seed tests create isolated DBs",
+    "image": "postgres:16-alpine",
+    "network": "temporary loopback port",
+    "storage": "disposable --rm container, no volume"
+  },
+  "demand_panel_test_cases": 42,
+  "implementation_commit": "7dad24f3e36419d965cb084fa0e09b7734012197",
+  "junit_sha256": "79c30e67b0479d253fe6acf5efaccaee8f78201ab8e2831c69593ec14dbdb861",
+  "source_commit": "138e48477f7965de907098ccb169774b5451d049",
+  "test_seconds": 221.01,
+  "tests": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 585
+  },
+  "verified_at": "2026-09-28"
+}

@@ -17,45 +17,33 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
-### DATA-02 · P2 · Brak pełnego panelu obserwacji i kompletności per dzień
+### DATA-03 · P1 · Zwroty i pełne bramki chronologii wymagają poprawy
 
-**Dowód:** [odbiór DATA-02](../evidence/ai/02/data02/README.md) ma dla ai-smoke
-639 sparse wierszy cech i 1612 ważnych dni asortymentu przed ograniczeniem otwarcia;
-nie publikuje daily observations ani completeness per dzień. Nie można wyprowadzić
-zer sprzedaży z samego kalendarza. Historyczny panel ML uzupełnia brakujące wiersze
-tylko po deklaracji kompletności syntetycznej; nie zastępuje to źródłowego kontraktu.
-Kod: [profile_engine](../../data/generator/profile_engine.py), [panel ML](../../ml/evaluation/fixed_origin.py).
+**Dowód:** [generate_profile_returns](../../data/generator/profile_engine.py)
+wyznacza returned_at względem końca całej historii i indeksu pozycji, bez okna
+własnej sprzedaży, kategorii i kanału. Źródłowy panel nie zatwierdza jeszcze
+net revenue ani return units. Nie ma pełnej bramki ordered/sold/returned ani
+skumulowanych zwrotów dla nowego eksportu AI.
 
-**Kryterium zamknięcia — AI 02:** daily observations pokrywają 100% poprawnych
-kombinacji wyznaczonych przez wersje wymiarów. Zero jest oddzielone
-od missing/closed/inactive. Test usunięcia dnia nie zamienia luki w sprzedaż zero.
-Mianownik nie mnoży dowolnie kanałów, a jego coverage uwzględnia lifecycle i asortyment.
+**Kryterium zamknięcia — AI 02:** wersjonowana polityka zwrotu konkretnej pozycji,
+category/channel window, ilość częściowa, skumulowany zwrot ≤ zakup,
+gross/net revenue i osobny tail. Ordered ≤ sold ≤ returned oraz availability
+muszą być egzekwowane także na celowo błędnych danych, z nonzero exit.
+Zdarzenia po watermark nie wchodzą do wcześniejszego snapshotu.
 
-### DATA-03 · P1 · Niespójna chronologia i powtórzone pozycje koszyka
+### DATA-05 · P1 · Pełna izolacja truth i odbiór źródła pozostają otwarte
 
-**Dowód:** 954/17 429 sprzedaży przed własnym zamówieniem oraz 338/9000 koszyków
-z powtórzonym produktem. Sumy i ilości pozycji zgadzają się. Zwroty są przypisane
-do końca całej próby, bez okna własnej transakcji; opóźnienia do 94,25 dnia.
-Kod: [commerce i returns](../../data/generator/profile_engine.py).
+**Dowód:** products/stores nadal są sklasyfikowane jako mixed_fact_and_simulation_truth:
+demand_weight/elasticity/return_rate i traffic/promo_sensitivity są w legacy
+adapterach. Builder generuje pełne źródło wraz z truth przed upstream gates;
+sam moduł cech przyjmuje wyłącznie jawne fakty, ale nie dowodzi izolacji procesu
+ani runtime. Źródło deklaruje forecasting/anomaly/stockout/replay not_ready.
 
-**Kryterium zamknięcia — AI 02:** sale/order/item mają jednoznaczne powiązania;
-sprzedaż nie poprzedza zamówienia, koszyki wybierają SKU bez replacement,
-sumy/ilości/przychód uzgadniają się. Return window zależy od właściwej sprzedaży,
-kategorii/kanału, skumulowany zwrot nie przekracza zakupu. Późniejszy tail pozostaje
-jawny. Negatywne przypadki naruszające te reguły kończą się failed gate.
-
-### DATA-05 · P1 · Truth i niepełne bramki nie chronią nowego źródła ML
-
-**Dowód:** pola latent/noise/multipliers/stockout/DQ pozostają w sales CSV.
-Statycznie demand weight jest użyty dwukrotnie w [profile_engine](../../data/generator/profile_engine.py).
-15 checks przechodzi także po osobnym wstrzyknięciu zwrotu przed sprzedażą i
-nadmiarowego zwrotu. Obecna lista cech RF wyklucza truth; problem dotyczy nowego
-eksportu i znaczenia źródłowych quality gates, nie wykazanego leakage RF.
-
-**Kryterium zamknięcia — AI 02, etykiety w 07:** oddzielne operational/truth/labels,
-jedna formuła demand weight, wersjonowana allowlist i executable gates z liczebnością,
-wynikiem i nonzero exit przy błędzie. Negative fixtures DATA-01–04 oraz próba podania
-truth do features muszą zostać odrzucone. Zachować dotychczasowe checks strukturalne.
+**Kryterium zamknięcia — AI 02, etykiety w 07:** zakończyć rozdzielenie
+operational/truth/labels oraz kontrolę dostępu procesu/runtime. Domknąć
+quality/realism/readiness per use case, polityki i negatywne przypadki pełnego
+źródła, z JSON/MD evidence oraz niezerowym exit przy wymaganym błędzie.
+Zachować istniejące kontrole i odrzucać truth jako wejście features/runtime.
 
 ### DATA-06 · P1 · Snapshoty wielokrotnie otwierają inventory bez uzgodnionego ledgeru
 

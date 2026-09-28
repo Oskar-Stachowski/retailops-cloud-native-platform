@@ -114,3 +114,4 @@ RAG `not_applicable`; AI ma pełny panel, lecz zwroty i pozostała izolacja trut
 [Odbiór DATA-01](../evidence/ai/02/data01/README.md) potwierdza konfigurację i identity.
 [Odbiór DATA-02](../evidence/ai/02/data02/README.md) obejmuje wymiary i kalendarz.
 [Odbiór DATA-04](../evidence/ai/02/data04/README.md) obejmuje ceny/promocje i uzgodnienie transakcji.
+[Odbiór popytu/panelu/koszyków](../evidence/ai/02/demand-panel/README.md) potwierdza pełny ważny panel i cechy AI 3.0.

@@ -5,7 +5,8 @@
 Obecny fundament danych: [DATA-01 — konfiguracja i identity](../../../evidence/ai/02/data01/README.md)
 oraz [DATA-02 — wymiary, lifecycle i kalendarz](../../../evidence/ai/02/data02/README.md),
 a także [DATA-04 — ceny i promocje](../../../evidence/ai/02/data04/README.md).
-Poniżej pozostała praca; punkt wznowienia to popyt, panel i koszyki (DATA-02/03/05).
+[Popyt/panel/koszyki](../../../evidence/ai/02/demand-panel/README.md) mają własny
+odbiór źródła 2.3 i cech AI 3.0. Poniżej pozostała praca; następne są chronologia i zwroty.
 
 Cel: uzyskać deterministyczny, kompletny i spójny zbiór obserwowanej sprzedaży, który można eksportować i użyć w pierwszym forecastingu. Pełny ledger jest etapem 06. W tym etapie inventory, stockout i lost-sales nie są wiarygodnymi cechami ani labelami modelu.
 
@@ -13,9 +14,8 @@ Przeczytaj [architekturę](../architektura.md), [dane i czas](../kontrakty/dane-
 
 ## Kolejność małych PR-ów
 
-4. **Popyt, panel i koszyki.** Wdrożyć jedną formułę popytu i użyć demand weight dokładnie raz. Generować pełny dzienny panel ważnych kombinacji, jawne zera i osobne missing/closed/inactive statusy. Tworzyć transakcje zgodne z docelową agregacją; komplementarne SKU losować deterministycznie bez replacement i bez stałego wybierania pierwszych produktów. Sumy koszyka, przychód i liczba sztuk muszą się uzgadniać. Lags w istniejących ścieżkach zastąpić kalendarzowymi lub jawnie wycofać legacy dataset z nowych porównań.
-5. **Chronologia i zwroty.** Wyznaczać `sold_at` względem własnego `ordered_at`, bez cofania godziny modulo. Zwrot ma konkretną pozycję, częściową ilość, category/channel return window, reason/status; nie przekracza skumulowanej ilości zakupionej. Uwzględnić gross/net revenue i osobny późniejszy tail; zdarzenia dostępne po watermark nie wchodzą do wcześniejszego snapshotu. Nie ucinać dat zwrotów do końca danych tylko po to, aby kontrola przeszła.
-6. **Separacja i bramki źródłowe.** Przenieść latent demand, multipliers, noise i lost sales do simulation truth. Dodać feature allowlist. Rozszerzyć quality/realism/readiness reports; każdy wynik ma policy version, sample size, wartości, status i evidence. Opublikować JSON i krótkie MD, nonzero exit dla obowiązkowych błędów. Zaktualizować dokumentację i zgodność demo.
+5. **Chronologia i zwroty.** Domknąć hard gates `ordered_at <= sold_at <= returned_at`, również na celowo błędnych danych. Zwrot ma konkretną pozycję, częściową ilość, category/channel return window, reason/status; nie przekracza skumulowanej ilości zakupionej. Uwzględnić gross/net revenue i osobny późniejszy tail; zdarzenia dostępne po watermark nie wchodzą do wcześniejszego snapshotu. Nie ucinać dat zwrotów do końca danych tylko po to, aby kontrola przeszła.
+6. **Separacja i bramki źródłowe.** Rozdzielić pozostałe parametry symulacji products/stores od źródłowych faktów. Domknąć granicę dostępu procesu feature buildera i runtime do truth oraz kontrolę dozwolonych wejść. Zakończyć quality/realism/readiness reports per use case; każdy wynik ma policy version, sample size, wartości, status i evidence. Zachować wykonywalne bramki, JSON/MD i nonzero exit dla obowiązkowych błędów; odbiór pełnego źródła wymaga aktualnych dowodów i zgodnego demo.
 
 ## Kontrakty i zakres pierwszego wariantu
 
@@ -47,7 +47,8 @@ Najpierw przeczytaj README.md, architektura.md, kontrakty/dane-i-czas.md,
 kontrakty/profile-i-bramki.md oraz evidence etapów 00 i 01.
 Potwierdź rzeczywiste pliki/CLI i stan brancha. Realizuj opisane małe PR-y po kolei.
 Zachowaj demo, źródłową własność generatora oraz manifest v2 i identity z DATA-01.
-Kontynuuj od popytu, kalendarzowego panelu i koszyków; potem chronologia i returns.
+Kontynuuj od chronologii i zwrotów. Zachowaj pełny panel, dzienne budżety,
+koszyki bez powtórzeń oraz cechy AI 3.0.
 Zachowaj resolver znanych planów i bramki cen/promocji z DATA-04.
 Oddziel simulation truth. Pierwszy wariant jest forecast-only bez inventory features;
 nie ogłaszaj gotowości stockout ani anomaly przed ich etapami.
