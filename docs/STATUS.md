@@ -49,8 +49,10 @@ zgodne bajty demo i zachowanie IDs archiwów 2.0–2.5.
 `source_ready=true` dotyczy obserwowanej sprzedaży. Modele, inventory i pełny
 replay cross-repo mają własne dalsze bramki.
 
-Pierwszy zakres 03 to typed Parquet, polityka artefaktów i niezmienny eksport
-w RetailOps, następnie importer i curated w AI. Równolegle repo AI kontynuuje
+[AI 03.1/03.2](evidence/ai/03/03.2/README.md) mają lokalny odbiór typed Parquet,
+polityki artefaktów i niezmiennego eksportu w RetailOps. Następny zakres to
+03.3 handoff fixture, następnie importer i curated w AI. Publikacja brancha
+i zdalne Required CI 03 pozostają otwarte. Równolegle repo AI kontynuuje
 pozostały zakres 11. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
 przypisuje etapy 03–17 do repozytoriów i podaje kolejność oraz możliwości
 pracy równoległej. [Backlog](plans/ai/backlog.md) opisuje najbliższe zadania,

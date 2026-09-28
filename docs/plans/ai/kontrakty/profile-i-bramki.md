@@ -14,8 +14,10 @@ konwersję 40 tabel do typed Parquet. [DATA-03](../../../evidence/ai/02/data03/R
 ma siedem bramek chronologii/zwrotów, dwa cutoffy i 39-dniowy ogon.
 [DATA-05](../../../evidence/ai/02/data05/README.md) kwalifikuje source 2.6:
 46 hard gates, rozdzielone parametry i izolowany worker z czterema projekcjami faktów oraz historią obserwacji as-of.
-Chunked Parquet i bramka zasobów smoke mają lokalny odbiór 03.1.
-Immutable snapshot/import i dalsze bramki wymagają implementacji.
+Chunked Parquet i niezmienny exporter mają lokalny odbiór 03.1/03.2.
+[Snapshot 03.2](../../../reference/ai-snapshots.md) przelicza bramki źródła
+i dopuszcza wyłącznie gotowe wymagane use cases. Handoff/import/curated
+i dalsze bramki wymagają implementacji.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 
@@ -41,8 +43,9 @@ Development używa seed 42. Końcowa robustness policy obejmuje wcześniej zamro
 ## 2. Budżet wykonania i plików
 
 - Standardowe Data CI uruchamia oba smoke dwukrotnie przez `make data-parquet-check`.
-  Polityka `ai03-format-budget-1.0.0` wymusza 5 minut i 1 GiB peak RSS na każdy
-  kompletny profil bez instalacji zależności. [Benchmark 03.1](../../../evidence/ai/03/03.1/README.md)
+  Polityka `ai03-snapshot-budget-1.0.0` wymusza 5 minut i 1 GiB peak RSS na każdy
+  kompletny profil: generacja/kwalifikacja/export/verify/reexport, bez instalacji
+  zależności. [Benchmark 03.2](../../../evidence/ai/03/03.2/README.md)
   potwierdza lokalny zapas; zdalny wynik wymaga uruchomienia CI nowego brancha.
 - Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; co najwyżej jeden bieżący `ai-smoke`, bez pełnego training export. Małe archiwa wcześniejszych wersji służą wyłącznie regresji odczytu i łącznie mieszczą się w tym limicie, zgodnie z [polityką plików](dane-i-czas.md). Bieżące smoke i temporal smoke są generowane w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
 - `ai-dev` i `ai-training` zapisuje się chunkami. Raport mierzy czas, peak memory, rows/s oraz bytes. Jeżeli pełny profil przekracza zasoby, poprawić zapis/przetwarzanie lub jawnie stworzyć nowy mniejszy profil; nie nazywać go dotychczasowym `ai-training`.

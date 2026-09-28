@@ -35,6 +35,8 @@ Datę można zmienić jawnie; generator nie używa dzisiejszej daty komputera.
 
 Eksport AI do typed Parquet, układ facts/truth/reports/manifests, benchmark
 i bezpieczny cleanup opisuje [runbook AI 03.1](../reference/parquet-artifacts.md).
+Kwalifikowaną atomową publikację, allowlistę faktów, opcjonalną evaluation truth
+i niezmienny re-export opisuje [runbook AI 03.2](../reference/ai-snapshots.md).
 
 Przykład profilu AI z kontrolą integralności źródła i cech:
 

@@ -6,6 +6,8 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| AI 03.2 — niezmienny exporter | 2026-09-28 | [Odbiór lokalny](ai/03/03.2/README.md): allowlista 25 tabel, opcjonalna evaluation truth, przeliczone 46 hard gates, atomowa publikacja, checksums/parity, idempotencja i dwa przebiegi obu smoke. Handoff/importer/curated oraz zdalne CI pozostają otwarte. |
+| AI 03.1 — format i artefakty | 2026-09-28 | [Odbiór lokalny](ai/03/03.1/README.md): typed Parquet wszystkich 40 tabel, porcje/partycje, polityka Git/fixture/cleanup oraz duży writer. |
 | AI 11 — fundament offline RAG | 2026-09-28 | [Odbiór i publikacja w repo AI](ai/11/README.md): korpus, indeks pgvector, filtrowany retrieval, golden i administracyjne runy. Otwarta ścieżka real embeddings, użytkowa kwalifikacja i jakość semantyczna. |
 | Audyt AI 02 → AI 03 | 2026-09-28 | [Gotowość do rozpoczęcia 03](ai/02/audit/README.md): pełny fingerprint workera, historia obserwacji as-of, ponowny odbiór źródła i pełne testy na PostgreSQL. Required CI PR i push na main ma success; audyt zawiera SHA i wyniki kontroli. |
 | Źródło i izolacja AI 02 / DATA-05 | 2026-09-28 | [Odbiór](ai/02/data05/README.md): source 2.6, 46 hard gates, osobne parametry symulacji, izolowany worker, powtórzenia profili, zgodne demo i archiwa 2.0–2.5. Źródło do AI 03; modele/inventory mają dalsze bramki. |

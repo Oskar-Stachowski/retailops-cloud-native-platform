@@ -1,6 +1,6 @@
 # 03. Zbuduj snapshot, importer i curated
 
-**Status: 03.1 odebrany lokalnie; następny zakres 03.2 immutable exporter. Repo: RetailOps + AI, osobne PR-y. Zależność: 02.**
+**Status: 03.1 i 03.2 odebrane lokalnie; następny zakres 03.3 handoff fixture. Repo: RetailOps + AI, osobne PR-y. Zależność: 02.**
 
 Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ścieżka to lokalny niezmienny eksport plików; kompletny REST/event integration powstaje w etapie 10. Ani działająca baza RetailOps, ani broker, ani AWS nie są wymagane do importu pierwszego snapshotu.
 
@@ -15,6 +15,11 @@ curated mają zachować te gwarancje oraz brak historii zgłaszać jawnie.
 [aktualny runbook formatu](../../../reference/parquet-artifacts.md) opisują
 40 typed tabel, porcje/partycje, checksums/parity, politykę Git i cleanup.
 Zapis ma jawne `snapshot_ready=false`; odbiór 03.1 nie otwiera jeszcze 04/06.
+[Evidence 03.2](../../../evidence/ai/03/03.2/README.md) i
+[runbook snapshotów](../../../reference/ai-snapshots.md) opisują istniejący
+`python -m data.export.ai_snapshot`: allowlistę, przeliczone bramki, atomową
+publikację, pełną walidację i niezmienny re-export. To lokalny odbiór eksportera;
+handoff/importer/curated oraz bramka cross-repo pozostają do wykonania.
 
 ## Kolejność małych PR-ów
 

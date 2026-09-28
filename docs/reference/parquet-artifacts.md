@@ -4,7 +4,8 @@ Wersja formatu `retailops-parquet-1.0.0`. Konwerter przyjmuje rozdzielone
 źródło AI **2.6.0** i zachowuje source ID oraz kanoniczne hashe wszystkich
 40 tabel. Jest warstwą zapisu plików: `status=format_only`,
 `snapshot_ready=false`. Publikacja niezmiennego snapshotu z bramkami use case
-powstaje w 03.2; importer i curated w dalszych zakresach 03.
+jest dostępna przez [eksporter 03.2](ai-snapshots.md); importer i curated
+pozostają dalszymi zakresami 03.
 
 ## Zależności i uruchomienie
 
@@ -29,7 +30,8 @@ Wybierz nowy katalog dla następnego przebiegu. Konwerter odmawia nadpisania
 istniejącego katalogu. Weryfikuje kompletność descriptor/artifacts, source ID,
 kolumny, klasy, checksumy i rozmiary CSV, liczby oraz logiczne hashe, a następnie
 odczytuje każdy zapisany Parquet i porównuje typed content. Kopiuje raporty po
-kontroli checksumów. Nie przelicza źródłowych quality gates — to obowiązek 03.2.
+kontroli checksumów. Nie przelicza źródłowych quality gates; do kwalifikowanej
+publikacji użyj [eksportera snapshotów](ai-snapshots.md).
 Przerwany zapis może zostawić niekompletny katalog; nie dostaje finalnego
 `manifests/format.json` i nie jest gotowym snapshotem.
 
@@ -98,12 +100,14 @@ services/api/.venv/bin/python -m data.export.cleanup data/generated/ai03/example
 
 ## Weryfikacja i koszt
 
-`make data-parquet-check` uruchamia testy formatu/polityki, kontrolę tracked
+`make data-parquet-check` uruchamia testy formatu/polityki/snapshotu, kontrolę tracked
 fixtures oraz oba pełne profile smoke dwukrotnie, w świeżych procesach.
 Wymagana bramka Data CI wywołuje to samo polecenie i zapisuje JUnit oraz benchmark
-pod `ci-cd/reports/data/`. Limit polityki `ai03-format-budget-1.0.0` wynosi
+pod `ci-cd/reports/data/`. Bieżąca polityka `ai03-snapshot-budget-1.0.0` ma limit
 **300 s i 1024 MiB peak RSS na pełny przebieg profilu**. Obejmuje generację,
-CSV, Parquet i odczyt kontrolny; instalacja zależności jest poza pomiarem.
+CSV, kwalifikację, eksport Parquet, odczyt kontrolny i niezmienny re-export;
+instalacja zależności jest poza pomiarem. Format-only benchmark pozostaje
+dostępny przez `python -m data.export.benchmark` bez flagi `--snapshot`.
 Przekroczenie czasu/RSS albo zmiana identity przy powtórzeniu kończy się błędem.
 Cały job Data CI ma timeout 30 minut, z zapasem na cztery przebiegi i instalację.
 

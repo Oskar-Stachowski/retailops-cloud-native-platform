@@ -2,7 +2,7 @@
 
 **Odbiór lokalny: 28.09.2026.** RetailOps, branch `ai/03-01-parquet`,
 implementacja `439d1c05600cd07fadc604f2dd50a20f45aa726e` na bazie
-main `adbed9d`. Zakres: typed Parquet, porcje/partycje, parity, układ plików,
+main `45e2580` (źródło AI 02 odebrane na `adbed9d`). Zakres: typed Parquet, porcje/partycje, parity, układ plików,
 Git/fixtures, bezpieczny cleanup i wykonywalna bramka zasobów.
 [Runbook](../../../../reference/parquet-artifacts.md) podaje istniejące komendy.
 [Rejestr weryfikacji](verification.json) opisuje zakres testów i ograniczenia.
@@ -75,11 +75,11 @@ a częściowe źródło jest odrzucane. Sześć archiwów regresji ma łącznie
 2435356 B po rozpakowaniu wobec 5 MiB limitu. Bieżącego fixture jest zero;
 handoff fixture należy do 03.3. Cleanup chroni wszystkie śledzone pliki.
 
-## Kolejny zakres
+## Granica odbioru formatu
 
-Można przejść do **03.2 — immutable exporter**. Format ma jawne
-`snapshot_ready=false`: atomowa publikacja, allowlista faktów, przeliczenie
-use-case gates, idempotencja/conflict oraz późniejszy importer/curated pozostają
-do wykonania. 04 i 06 otworzy dopiero bramka cross-repo 03.6.
+Format ma jawne `snapshot_ready=false`. Kwalifikowaną publikację, allowlistę,
+przeliczenie bramek oraz idempotencję opisuje osobny
+[odbiór eksportera 03.2](../03.2/README.md). Następny zakres to handoff fixture
+03.3, następnie importer/curated. 04 i 06 otworzy dopiero bramka cross-repo 03.6.
 Generacja pełnych ai-dev/ai-training nadal materializuje tabele;
 nie przyznano tym profilom odbioru end-to-end na podstawie writera.

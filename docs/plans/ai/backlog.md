@@ -12,18 +12,18 @@ potwierdzone problemy i kryteria ich zamknięcia.
 ## Kolejny mały PR etapu 03
 
 **Repo:** RetailOps. **Zależność:** odebrane źródło 2.6 i bramki forecast-source.
-**03.2 — niezmienny exporter.** Użyć [formatu 03.1](../../reference/parquet-artifacts.md),
-wybrać allowlist faktów i opcjonalną osobną truth, przeliczyć źródłowe gates
-dla wymaganych use cases oraz sprawdzić kompletne manifests/checksums.
-Zapis przygotować w staging i opublikować atomowo pod source ID; idempotencja
-i konflikt treści nie mogą nadpisywać gotowego snapshotu. Potem 03.3 handoff,
-03.4 importer, 03.5 curated i 03.6 bramka cross-repo.
+**03.3 — kontrakt handoff.** Przygotować jeden mały, samowystarczalny fixture
+na podstawie [eksportera 03.2](../../reference/ai-snapshots.md), schemas i expected
+manifest. Opisać grain, mapping, time semantics, wersje, date ranges i readiness.
+Zmiany upstream/consumer mają osobne commity/PR-y i wspólną wersję kontraktu.
+Fixture i archiwa regresji łącznie muszą mieścić się w limicie 5 MiB po rozpakowaniu.
+Następnie 03.4 importer, 03.5 curated i 03.6 bramka cross-repo.
 Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
 importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as-of.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 03:** immutable export i handoff; [03.1](../../evidence/ai/03/03.1/README.md) ma lokalny odbiór formatu i polityki.
+- **RetailOps / etap 03:** handoff fixture; [03.2](../../evidence/ai/03/03.2/README.md) ma lokalny odbiór eksportera. Publikacja 03.1/03.2 i zdalne Required CI pozostają do wykonania.
 - **Repo AI / pozostały zakres 11:** rzeczywisty provider embeddings,
   użytkowa kwalifikacja/aktywacja i odbiór jakości na zatwierdzonym golden set.
   [Fundament offline](../../evidence/ai/11/README.md) obejmuje już korpus,
