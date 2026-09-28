@@ -44,10 +44,12 @@ wersjonowanych assignments/routing/assortment, lifecycle i kalendarza PL/DE-BE.
 znanych wersji planów, uzgodnienia transakcji i chronologicznych pre/post effects.
 [Popyt/panel/koszyki](evidence/ai/02/demand-panel/README.md) mają lokalny odbiór:
 pełny fizyczny grain, jawne zera/closed, wykluczenia inactive i cechy AI 3.0.
-Następna implementacja to **[AI 02 / chronologia i zwroty](plans/ai/etapy/02-dane-sprzedazowe.md)**
-w RetailOps (pozostałe DATA-03). Równolegle repo AI może
+[DATA-03](evidence/ai/02/data03/README.md) ma lokalny odbiór chronologii,
+częściowych zwrotów, refundacji i osobnego ogona, z kontrolą dostępności.
+Następna implementacja to **[AI 02 / izolacja truth i odbiór źródła](plans/ai/etapy/02-dane-sprzedazowe.md)**
+w RetailOps (pozostałe DATA-05). Równolegle repo AI może
 rozpocząć [RAG 11](plans/ai/etapy/11-rag.md) od zatwierdzonego korpusu.
 [Backlog](plans/ai/backlog.md) określa zakres pierwszego PR i zależności.
-Pozostałe DATA-03/05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
+Pozostałe DATA-05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
 historii przed odbiorem cech i forecastingu. Inventory, streaming, auth oraz
 serving mają własne późniejsze bramki. Kryteria: [otwarte ustalenia](audits/open-findings.md).

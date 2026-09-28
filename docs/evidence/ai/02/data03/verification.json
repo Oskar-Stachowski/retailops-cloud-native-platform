@@ -1,0 +1,155 @@
+{
+  "acceptance": {
+    "artifact": "acceptance.json",
+    "command": "services/api/.venv/bin/python -m scripts.data.verify_data03 --output /private/tmp/retailops-data03-acceptance.json --baseline docs/evidence/ai/02/data01/legacy-baseline.json --require-clean",
+    "separate_full_pytest_ran_concurrently": true,
+    "sha256": "4d9767f08dd9e4c89ba66d670339d13e4358453bf624024359a3187378a0451c"
+  },
+  "branch": "ai/02-data-03",
+  "checks": {
+    "bandit": "passed; high severity/high confidence",
+    "git_diff_check": "passed",
+    "gitleaks": "passed; staged implementation and evidence",
+    "mypy": "passed; 5 configured API modules",
+    "relative_document_links": "passed",
+    "ruff": "passed; runtime and acceptance scripts",
+    "ruff_format": "passed; 145 files"
+  },
+  "cli": {
+    "commands": [
+      {
+        "exit_code": 0,
+        "kind": "valid_generation",
+        "module": "data.generator.main"
+      },
+      {
+        "exit_code": 0,
+        "kind": "valid_generation",
+        "module": "ml.features.demand_forecast"
+      },
+      {
+        "exit_code": 0,
+        "kind": "valid_verification",
+        "module": "data.generator.manifest_v2"
+      },
+      {
+        "exit_code": 0,
+        "kind": "valid_verification",
+        "module": "ml.features.identity"
+      },
+      {
+        "exit_code": 1,
+        "kind": "corrupt_bytes_verification",
+        "module": "data.generator.manifest_v2"
+      },
+      {
+        "exit_code": 1,
+        "kind": "corrupt_bytes_verification",
+        "module": "ml.features.identity"
+      }
+    ],
+    "source_feature_parent_matches": true,
+    "status": "passed"
+  },
+  "coverage": {
+    "combined_line_branch_percent": 83.82,
+    "required_percent": 70,
+    "scope": "services/api/app",
+    "xml_sha256": "723ed102e09cb188db59b0b2fc0073f4ada86a3b157534496a5f78fcb6b798c5"
+  },
+  "environment": {
+    "architecture": "arm64",
+    "database": "isolated data03; fresh migrations through 6b0f1c2d3e4a and demo seed",
+    "platform": "Darwin",
+    "postgres_image": "postgres:16-alpine",
+    "python": "3.11.15",
+    "test_container_removed": true
+  },
+  "implementation_commit": "f30bb544825a444d043d2d325d05c5cbf5830386",
+  "implementation_fingerprint": {
+    "code_files": {
+      "data/contracts/retail_demand.v1.schema.json": "06974ef2292024a62b0e5ae0caf95facd69b9f1fda47c480286900f18bd3c1b6",
+      "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+      "data/contracts/retail_pricing.v1.schema.json": "de5043a4a12c52b60612da61f0a164cca9335be8887abae0848c71e92159b6ce",
+      "data/contracts/retail_returns.v1.schema.json": "51fcbbd30cbfefc089d53d802764a4bcf921bab3a6ee760a2a3d22d040f14ffa",
+      "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+      "data/contracts/source_dataset_manifest.v2.schema.json": "2346565f081a0591375503e4751acfed86092b3a65e12b35e163a32f8eaa08da",
+      "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+      "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+      "data/generator/commerce_pricing.py": "bdde3f7e353d57573a5b1626f31cd3aaa850b32801a83e99d3c691cfbedd6148",
+      "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+      "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+      "data/generator/csv_writer.py": "77c7c26fde8c93b60af8e3b9b662bf3377f5932729adf1a2a6c0ace712c84f5b",
+      "data/generator/demand_commerce.py": "c943d3233835e8b3f885a0c380616858e2bedcb84593ed443811d60413031776",
+      "data/generator/demand_contract.py": "261193e148dbef1af0434a8489c0fc9afa65705667b6645fe1974537bce7305d",
+      "data/generator/demand_grid.py": "74c4070da96bc25c67f51828832450a2ffaa5d6646db8ccd9bfc7a9a5de8db1e",
+      "data/generator/demand_model.py": "7c3b4cbf629d3fdf433d297ea587abcc333f704d0e347c0b3f863a57566c4e21",
+      "data/generator/demand_panel.py": "40e5a324b87d8fe9697cc6da88b2683ba476f320b174c052e6e29a6b9db8883f",
+      "data/generator/demand_quality.py": "d2c384333cd7fed47bbec0580e8cacda130b16ff4dcf1fcf001e3b3eefb1982d",
+      "data/generator/demand_schema.py": "d90b48ff8e8e4171f868a0c7c84870a4b80c19f4102dd32d556eb75c2a0e2692",
+      "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+      "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+      "data/generator/dimension_schema.py": "cb085aef3876a3e763cbf07becb6e41d72b28a6735556d3622a28cfb5d752949",
+      "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+      "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+      "data/generator/identity.py": "80b8028e49df5e39b5bb3fee773647c43470e93109395638ec5fd34c10857160",
+      "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+      "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+      "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+      "data/generator/main.py": "10b56b1f611eeb0937c26f46c8b7a4aaf99d083969ecaeb11610c479d6f6adc1",
+      "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+      "data/generator/manifest_v2.py": "fe87f1f79664b93b5cf2886f7e35a5af7d1a118baa60ae5027190357bf2625ee",
+      "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+      "data/generator/price_resolver.py": "544e7ee10aa820af1cc4151a1ff8df43ed65fcfdb72f40d462763d7a12305df0",
+      "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+      "data/generator/pricing_contract.py": "d10a5651562feda96af33ebc05dec6c3c594279e7a303afb07b7440cd835990f",
+      "data/generator/pricing_plans.py": "72449ccd99beca4cf579cd88d8c9db77f54501050736492cc7ed2bd1580d6a4e",
+      "data/generator/pricing_quality.py": "d2aafd7d6b933d07b14d41b0ac448cc4ffff54bd6ca6063bdf3d51e1b808a322",
+      "data/generator/pricing_schema.py": "c563c0ac97897a3e69d636856624606c19b324945d9e754d070d3d5fb651b395",
+      "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+      "data/generator/profile_engine.py": "73a6a328126adf00c6e57089b3134484730ad86710038a1b8772da2a06deace4",
+      "data/generator/promotion_truth.py": "c78590d97c82aabe54168d0adc62eda86e06aec60e0758a1fc03b406060f6124",
+      "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+      "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+      "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+      "data/generator/return_contract.py": "93274f39f520ddbbb32c2c1d18e4b219ee353258f19fa91eedb4ec465da14704",
+      "data/generator/return_events.py": "c69149d66e224d45565014389160a193d1f9a931a8c4177a7ae6d2d78c33db9e",
+      "data/generator/return_quality.py": "303f6225438ae20e371d63144cd529ba721913828b16fb2a8943cecedc0b68cb",
+      "data/generator/return_reconciliation.py": "44ec00274f4a26d6f38bef564d9f187c23fd092020d82afa9b3b72d7a4407f1c",
+      "data/generator/return_schema.py": "22bc7856069693e5aac62527e14b2a8647f6526149925c325060fa59cb186b11",
+      "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+      "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+      "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+      "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+    },
+    "code_sha256": "0ecf816bcf582bc360d4d4fead9b02d0a2b242f5da01eb58aa1a59159741d939",
+    "code_state": "clean",
+    "dependency_files": {
+      "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+      "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+    },
+    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+    "git_commit": "f30bb544825a444d043d2d325d05c5cbf5830386",
+    "python_version": "3.11.15"
+  },
+  "limitations": [
+    "remaining truth isolation and final source acceptance DATA-05",
+    "inventory_ready=false",
+    "forecasting/anomaly/stockout/replay not_ready",
+    "no remote Required CI or model training"
+  ],
+  "pytest": {
+    "command": "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:56453/data03 REQUIRE_DB_TESTS=1 PYTHONPATH=services/api:. COVERAGE_FILE=/private/tmp/retailops-data03-final.coverage services/api/.venv/bin/python -m pytest -q services/api/tests --cov=services/api/app --cov-report=term --cov-report=xml:/private/tmp/retailops-data03-final-coverage.xml --junitxml=/private/tmp/retailops-data03-final-tests.xml",
+    "errors": 0,
+    "failures": 0,
+    "junit_sha256": "aad13020495138d7244ade896351d4c8002b8f7ba355e6a27513fa83ef612810",
+    "new_negative_gate_cases": 25,
+    "new_return_tests": 36,
+    "require_db_tests": true,
+    "seconds": 368.748,
+    "skipped": 0,
+    "tests": 621
+  },
+  "recorded_at": "2026-09-28T12:48:42.628804+00:00",
+  "status": "passed"
+}

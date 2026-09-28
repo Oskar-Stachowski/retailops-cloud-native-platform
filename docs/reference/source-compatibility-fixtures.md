@@ -1,4 +1,7 @@
-# Eksport do testu zgodności wstecznej
+# Eksporty do testów zgodności wstecznej
+
+Archiwa znajdują się w [fixtures](../../services/api/tests/fixtures/) i służą wyłącznie
+regresji odczytu. Bieżące smoke są generowane w temp.
 
 `source_manifest_v2_0.zip` zawiera rzeczywisty eksport CSV, raporty i cechy DATA-01,
 wygenerowane kodem z commita `4d57655` (generator 0.2.0, schemat źródła 2.0.0).

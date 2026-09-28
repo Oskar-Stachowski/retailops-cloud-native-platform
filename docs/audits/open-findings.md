@@ -17,20 +17,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
-### DATA-03 · P1 · Zwroty i pełne bramki chronologii wymagają poprawy
-
-**Dowód:** [generate_profile_returns](../../data/generator/profile_engine.py)
-wyznacza returned_at względem końca całej historii i indeksu pozycji, bez okna
-własnej sprzedaży, kategorii i kanału. Źródłowy panel nie zatwierdza jeszcze
-net revenue ani return units. Nie ma pełnej bramki ordered/sold/returned ani
-skumulowanych zwrotów dla nowego eksportu AI.
-
-**Kryterium zamknięcia — AI 02:** wersjonowana polityka zwrotu konkretnej pozycji,
-category/channel window, ilość częściowa, skumulowany zwrot ≤ zakup,
-gross/net revenue i osobny tail. Ordered ≤ sold ≤ returned oraz availability
-muszą być egzekwowane także na celowo błędnych danych, z nonzero exit.
-Zdarzenia po watermark nie wchodzą do wcześniejszego snapshotu.
-
 ### DATA-05 · P1 · Pełna izolacja truth i odbiór źródła pozostają otwarte
 
 **Dowód:** products/stores nadal są sklasyfikowane jako mixed_fact_and_simulation_truth:

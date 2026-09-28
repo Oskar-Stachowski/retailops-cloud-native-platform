@@ -4,8 +4,9 @@ Odbiór lokalny **2026-09-28**, branch ai/02-demand-panel, kod
 `7dad24f3e36419d965cb084fa0e09b7734012197`, baza DATA-04
 `138e48477f7965de907098ccb169774b5451d049`.
 Zakres: punkt 4 instrukcji etapu 02, bez końcowego odbioru całego etapu.
-[Pozostała instrukcja](../../../../plans/ai/etapy/02-dane-sprzedazowe.md)
-kontynuuje od chronologii i zwrotów, później pełnej izolacji truth.
+Nowszy [odbiór DATA-03](../data03/README.md) potwierdza chronologię i zwroty
+źródła 2.4. [Aktualna instrukcja](../../../../plans/ai/etapy/02-dane-sprzedazowe.md)
+kontynuuje od pełnej izolacji truth i końcowego odbioru źródła.
 
 ## Kontrakty i zachowanie
 

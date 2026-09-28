@@ -44,10 +44,10 @@
       ],
       "path": "etapy/02-dane-sprzedazowe.md",
       "status": "in_progress",
-      "next_scope": "DATA-03: chronology and returns",
-      "evidence": "../../evidence/ai/02/demand-panel/README.md",
-      "implementation_commit": "7dad24f3e36419d965cb084fa0e09b7734012197",
-      "implementation_scope": "DATA-01 identity, DATA-02 dimensions/calendar/full daily panel, DATA-04 pricing, DATA-03 baskets and DATA-05 demand formula only; chronology/returns and remaining truth isolation pending"
+      "next_scope": "DATA-05: truth isolation and final source gates",
+      "evidence": "../../evidence/ai/02/data03/README.md",
+      "implementation_commit": "f30bb544825a444d043d2d325d05c5cbf5830386",
+      "implementation_scope": "DATA-01 identity, DATA-02 dimensions/calendar/full daily panel, DATA-04 pricing, DATA-03 baskets/chronology/qualified returns and DATA-05 demand formula; remaining truth isolation and final source acceptance pending"
     },
     {
       "id": "03",

@@ -6,7 +6,9 @@ Obecny fundament danych: [DATA-01 — konfiguracja i identity](../../../evidence
 oraz [DATA-02 — wymiary, lifecycle i kalendarz](../../../evidence/ai/02/data02/README.md),
 a także [DATA-04 — ceny i promocje](../../../evidence/ai/02/data04/README.md).
 [Popyt/panel/koszyki](../../../evidence/ai/02/demand-panel/README.md) mają własny
-odbiór źródła 2.3 i cech AI 3.0. Poniżej pozostała praca; następne są chronologia i zwroty.
+odbiór źródła 2.3 i cech AI 3.0. [DATA-03](../../../evidence/ai/02/data03/README.md)
+kwalifikuje chronologię, zwroty, gross/net oraz history/return-tail cutoffy źródła 2.4.
+Poniżej pozostała praca: izolacja truth i końcowy odbiór źródła.
 
 Cel: uzyskać deterministyczny, kompletny i spójny zbiór obserwowanej sprzedaży, który można eksportować i użyć w pierwszym forecastingu. Pełny ledger jest etapem 06. W tym etapie inventory, stockout i lost-sales nie są wiarygodnymi cechami ani labelami modelu.
 
@@ -14,7 +16,6 @@ Przeczytaj [architekturę](../architektura.md), [dane i czas](../kontrakty/dane-
 
 ## Kolejność małych PR-ów
 
-5. **Chronologia i zwroty.** Domknąć hard gates `ordered_at <= sold_at <= returned_at`, również na celowo błędnych danych. Zwrot ma konkretną pozycję, częściową ilość, category/channel return window, reason/status; nie przekracza skumulowanej ilości zakupionej. Uwzględnić gross/net revenue i osobny późniejszy tail; zdarzenia dostępne po watermark nie wchodzą do wcześniejszego snapshotu. Nie ucinać dat zwrotów do końca danych tylko po to, aby kontrola przeszła.
 6. **Separacja i bramki źródłowe.** Rozdzielić pozostałe parametry symulacji products/stores od źródłowych faktów. Domknąć granicę dostępu procesu feature buildera i runtime do truth oraz kontrolę dozwolonych wejść. Zakończyć quality/realism/readiness reports per use case; każdy wynik ma policy version, sample size, wartości, status i evidence. Zachować wykonywalne bramki, JSON/MD i nonzero exit dla obowiązkowych błędów; odbiór pełnego źródła wymaga aktualnych dowodów i zgodnego demo.
 
 ## Kontrakty i zakres pierwszego wariantu
@@ -47,7 +48,9 @@ Najpierw przeczytaj README.md, architektura.md, kontrakty/dane-i-czas.md,
 kontrakty/profile-i-bramki.md oraz evidence etapów 00 i 01.
 Potwierdź rzeczywiste pliki/CLI i stan brancha. Realizuj opisane małe PR-y po kolei.
 Zachowaj demo, źródłową własność generatora oraz manifest v2 i identity z DATA-01.
-Kontynuuj od chronologii i zwrotów. Zachowaj pełny panel, dzienne budżety,
+Kontynuuj od izolacji truth i końcowych bramek/readiness źródła.
+Zachowaj bramki DATA-03, dojrzałość okien i history/return-tail cutoffy.
+Zachowaj pełny panel, dzienne budżety,
 koszyki bez powtórzeń oraz cechy AI 3.0.
 Zachowaj resolver znanych planów i bramki cen/promocji z DATA-04.
 Oddziel simulation truth. Pierwszy wariant jest forecast-only bez inventory features;
