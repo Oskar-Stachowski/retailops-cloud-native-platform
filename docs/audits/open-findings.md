@@ -17,20 +17,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
-### DATA-05 · P1 · Pełna izolacja truth i odbiór źródła pozostają otwarte
-
-**Dowód:** products/stores nadal są sklasyfikowane jako mixed_fact_and_simulation_truth:
-demand_weight/elasticity/return_rate i traffic/promo_sensitivity są w legacy
-adapterach. Builder generuje pełne źródło wraz z truth przed upstream gates;
-sam moduł cech przyjmuje wyłącznie jawne fakty, ale nie dowodzi izolacji procesu
-ani runtime. Źródło deklaruje forecasting/anomaly/stockout/replay not_ready.
-
-**Kryterium zamknięcia — AI 02, etykiety w 07:** zakończyć rozdzielenie
-operational/truth/labels oraz kontrolę dostępu procesu/runtime. Domknąć
-quality/realism/readiness per use case, polityki i negatywne przypadki pełnego
-źródła, z JSON/MD evidence oraz niezerowym exit przy wymaganym błędzie.
-Zachować istniejące kontrole i odrzucać truth jako wejście features/runtime.
-
 ### DATA-06 · P1 · Snapshoty wielokrotnie otwierają inventory bez uzgodnionego ledgeru
 
 **Dowód:** 1300 `initial_stock` dla 300 par produkt/magazyn, 1000 nadmiarowych otwarć.
@@ -60,7 +46,9 @@ dnia, a panel ocenionego przebiegu nie zawiera dostępności z późniejszego dn
 **Kryterium zamknięcia:** wersjonowane agregaty albo agregacja według stanu
 znanego w origin. Dodanie późniejszej sprzedaży lub korekty nie zmienia cech
 ani prognoz wcześniejszego origin. Brak potrzebnej historii ma jawny status.
-Warunek odbioru historycznych danych i forecastingu w AI 02–04, bez blokowania AI 01.
+Warunek importu historycznych korekt i pełnego replay w AI 03–04.
+Syntetyczne źródło 2.5 z bieżącymi day-close facts może rozpocząć AI 03;
+nie kwalifikuje to odtwarzania wcześniejszych wersji zewnętrznej historii.
 
 ## Runtime i bezpieczeństwo
 

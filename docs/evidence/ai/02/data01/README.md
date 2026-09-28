@@ -81,13 +81,8 @@ named volume; po próbach został zatrzymany i usunięty.
 
 ## Ograniczenia i dalsza praca
 
-Etap 02 pozostaje **w realizacji**. Sparse panel, wymiary/lifecycle, ceny,
-koszyki, chronologia/zwroty oraz separacja simulation truth wymagają następnych
-zakresów. Kalendarz PL/DE, transaction limits, chunked Parquet i atomic snapshot
-również pozostają poza tym odbiorem. `inventory_ready=false`,
-forecasting/anomaly/stockout/replay `not_ready`, RAG `not_applicable`.
-Tożsamość/checksumy nie są dowodem realizmu danych ani gotowości do AI 03.
-
-Następny zakres: **DATA-02 — wymiary, SKU, routing i lifecycle** zgodnie
-z [instrukcją etapu 02](../../../../plans/ai/etapy/02-dane-sprzedazowe.md).
-Niezależny strumień repo AI może realizować początek RAG 11.
+Ten pomiar kwalifikuje konfigurację i identity źródła 2.0; nie obejmował
+wymiarów, panelu, cen, chronologii/zwrotów ani izolacji procesu.
+Bieżący [odbiór źródła 2.5](../data05/README.md) obejmuje te komponenty
+oraz bramki do rozpoczęcia AI 03. Modele i inventory pozostają niegotowe.
+Aktualny punkt wznowienia: [snapshot i curated 03](../../../../plans/ai/etapy/03-snapshot-curated.md).

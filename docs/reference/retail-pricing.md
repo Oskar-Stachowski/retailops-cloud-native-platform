@@ -3,9 +3,10 @@
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Generowanie](../guides/data.md)
 
 Profile `ai-*` używają jednego [resolvera](../../data/generator/price_resolver.py)
-opartego na jawnych planach. Generator 0.6.0 i source schema 2.4.0 mają pięć
+opartego na jawnych planach. Generator 0.7.0 i source schema 2.5.0 mają pięć
 tabel pricing, dziewięć tabel wymiarów, trzy [popytu/panelu](daily-demand.md)
-trzy [zwrotów](retail-returns.md) i 17 tabel legacy: razem 37 CSV.
+trzy [zwrotów](retail-returns.md), dwie parametrów symulacji i 17 tabel zgodności:
+razem 39 CSV.
 Kontrakt `retail-pricing-1.0.0` ma [JSON Schema](../../data/contracts/retail_pricing.v1.schema.json)
 oraz [wykonywalne kontrole](../../data/generator/pricing_quality.py).
 Demo i profile small/medium/large zachowują wcześniejsze reguły i bajty CSV.
@@ -74,8 +75,8 @@ Kwoty używają Decimal i ROUND_HALF_UP: najpierw unit price do dwóch miejsc,
 potem total = quantity × zaokrąglona unit price, do dwóch miejsc.
 Ta sama wycena zasila order item i sale, a suma linii order total.
 Każda sale wskazuje właściwą pozycję, price plan i opcjonalną promotion revision.
-Cutoff wyceny jest równy `ordered_at`; poprawa relacji ordered/sold/returns
-pozostaje osobnym zakresem chronologii.
+Cutoff wyceny jest równy `ordered_at`; relacje ordered/sold/returns
+egzekwują [bramki chronologii](retail-returns.md).
 
 ## Obserwacje i truth
 
@@ -97,10 +98,10 @@ Efekt opisuje oddziaływanie kampanii niezależnie od tego, czy konkretna linia
 bundle osiągnęła próg ilościowy. Próbkowanie ilości opisuje [daily demand](daily-demand.md);
 nie ma iteracyjnego sprzęgania koszyka z rabatem bundle.
 
-AI sales zachowuje legacy nagłówek `promotion_uplift`, ale jego wartości są
-puste; pre/post/during multiplier znajduje się w osobnej tabeli sklasyfikowanej
-`simulation_truth`. Inne legacy latent/noise/stockout fields nadal czekają na
-separację DATA-05. Ten zakres nie oznacza pełnej izolacji truth/runtime.
+AI sales nie zawiera `promotion_uplift`; pre/post/during multiplier znajduje się
+w osobnej tabeli `simulation_truth`. Parametry produktów i lokalizacji także
+są oddzielone od faktów. [Admission i worker](source-acceptance.md) blokują
+dostęp procesu obliczania cech do truth.
 
 Legacy price_history/promotions są projekcjami kanonicznych planów.
 Ich końce dat pozostają włączne (exclusive end minus dzień), lecz stare kolumny
@@ -118,7 +119,7 @@ Wyniki JSON i krótkie MD trafiają do pricing_report i są objęte checksumami 
 Odczyt źródła odtwarza bramki i oba raporty; przeliczenie hashów błędnych danych
 nie omija kontroli. Generowanie, feature builder i validator odrzucają błędy.
 
-Source schema 2.4.0, pricing/demand policy oraz kanonizacja 1.4.0 wchodzą do identity.
+Source schema 2.5.0, pricing/demand policy oraz kanonizacja 1.5.0 wchodzą do identity.
 Readiness forecasting/anomaly/stockout/replay nadal wynosi not_ready,
-inventory_ready=false. Pozostała
-separacja truth i końcowy odbiór źródła wymagają dalszych prac etapu 02 przed nowym importem AI 03.
+inventory_ready=false. Osobne [source_ready=true](source-acceptance.md)
+kwalifikuje źródło do AI 03 po wszystkich bramkach.

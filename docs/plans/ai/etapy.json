@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "date": "2026-09-28",
   "stages": [
     {
@@ -43,11 +43,11 @@
         "01"
       ],
       "path": "etapy/02-dane-sprzedazowe.md",
-      "status": "in_progress",
-      "next_scope": "DATA-05: truth isolation and final source gates",
-      "evidence": "../../evidence/ai/02/data03/README.md",
-      "implementation_commit": "f30bb544825a444d043d2d325d05c5cbf5830386",
-      "implementation_scope": "DATA-01 identity, DATA-02 dimensions/calendar/full daily panel, DATA-04 pricing, DATA-03 baskets/chronology/qualified returns and DATA-05 demand formula; remaining truth isolation and final source acceptance pending"
+      "status": "completed",
+      "evidence": "../../evidence/ai/02/data05/README.md",
+      "implementation_commit": "6e06e909c7dac78675324e8d8ec42921e36b95e8",
+      "implementation_scope": "DATA-01 through DATA-05: source 2.5 identity, dimensions/calendar/pricing/full observed-sales panel/baskets/chronology/returns, separate simulation parameters, isolated facts worker and final source/readiness gates",
+      "acceptance_scope": "local bounded ai-smoke and ai-temporal-smoke; forecast source ready for AI-03, models/inventory/replay not ready; no remote Required CI"
     },
     {
       "id": "03",

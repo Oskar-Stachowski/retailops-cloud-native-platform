@@ -19,7 +19,7 @@ wymagają `ML_EXPERIMENT_DIR` wskazującego katalog konkretnego przebiegu.
 
 | Polecenie | Co wykonuje | Główne pliki wyniku |
 |---|---|---|
-| `make ml-features` | Generuje dane źródłowe i agreguje cechy | `features.csv`, `feature_manifest.json` |
+| `make ml-features` | Legacy: generuje źródło i agreguje cechy | `features.csv`, `feature_manifest.json` |
 | `make ml-baseline` | Liczy prognozę ze średniej ruchomej | `baseline_forecasts.csv`, `model_manifest.json` |
 | `make ml-trained` | RF i baseline: trzy okna walidacyjne oraz odłożony test, każde z prognozą pełnego horyzontu z jednego origin | `random_forest_model.joblib`, `metrics.json`, `predictions.csv`, `daily_panel.csv`, `feature_importance.csv`, `model_metadata.json`, `model_card.md`, `experiment_inputs.json`, `experiment_source.zip`, `run_manifest.json` |
 | `make ml-evaluate` | Osobny, kroczący backtest baseline; nie jest porównaniem z RF | `evaluation_report.json`, `evaluation_summary.md`, `backtest_predictions.csv` |
@@ -80,6 +80,8 @@ sprzedaży dostępnej w chwili prognozy. Nie używa zrealizowanej ceny, promocji
 stockout ani zapasu. Domyślna liczba drzew w kodzie i Makefile wynosi 80.
 Profile AI mają nowy pełny [kontrakt cech 3.0](../reference/ml-features.md).
 Obecny RF wymaga 2.0; forecasting na 3.0 jest osobnym zakresem AI 04.
+Cechy AI wymagają zaakceptowanego source 2.5, jawnego `--source-dir` i
+izolowanego workera Docker; [instrukcja danych](data.md) podaje komendy.
 Wszystkie dostępne flagi sprawdzisz przez `--help` właściwego modułu.
 
 `daily_panel.csv` zawiera dni, produkty, sklepy i kanały także bez sprzedaży.

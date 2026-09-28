@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 w realizacji; następny zakres izolacja truth i odbiór źródła. Aktualizacja: 28.09.2026.**
+**Status: etap 02 odebrany lokalnie; następny zakres snapshot i curated w 03. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -16,10 +16,12 @@ dodaje wspólne ceny/promocje, scope, wersje znanych planów i uzgodnienie trans
 panel, dzienne budżety, koszyki bez powtórzeń i cechy AI 3.0.
 [DATA-03](../../evidence/ai/02/data03/README.md) dodaje chronologię, zwroty,
 rozliczenie revenue i osobne history/return-tail cutoffy.
-Następna implementacja to izolacja truth i końcowy odbiór źródła (DATA-05);
-równolegle można rozpocząć RAG 11.
-[Backlog](backlog.md) podaje kolejny zakres 02 i granice równoległych strumieni.
-Etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
+[DATA-05](../../evidence/ai/02/data05/README.md) domyka lokalny odbiór source 2.5:
+45 hard gates, rozdzielone parametry i izolowany worker faktów.
+Następna implementacja to [snapshot i curated 03](etapy/03-snapshot-curated.md);
+równolegle można rozpocząć RAG 11. Modele i inventory nadal nie są gotowe.
+[Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.
+Etapy 03–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.

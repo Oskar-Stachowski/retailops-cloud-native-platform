@@ -36,12 +36,14 @@ Datę można zmienić jawnie; generator nie używa dzisiejszej daty komputera.
 Przykład profilu AI z kontrolą integralności źródła i cech:
 
 ```bash
+docker pull python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff
 data_ai_dir=$(mktemp -d /tmp/retailops-ai-smoke.XXXXXX)
 services/api/.venv/bin/python -m data.generator.main \
   --profile ai-smoke --end-date 2026-07-31 --output-dir "$data_ai_dir"
 services/api/.venv/bin/python -m data.generator.manifest_v2 --data-dir "$data_ai_dir"
 services/api/.venv/bin/python -m ml.features.demand_forecast \
-  --profile ai-smoke --end-date 2026-07-31 --output-dir "$data_ai_dir/features"
+  --profile ai-smoke --end-date 2026-07-31 --source-dir "$data_ai_dir" \
+  --output-dir "$data_ai_dir/features"
 services/api/.venv/bin/python -m ml.features.identity --data-dir "$data_ai_dir/features"
 ```
 
@@ -57,8 +59,14 @@ Sześć bramek [popytu/panelu](../reference/daily-demand.md) sprawdza pełną si
 agregaty, koszyki bez powtórzeń SKU, dzienne budżety i kompletność. Brak dnia,
 podwójna waga popytu albo nieuzgodniony koszyk blokuje eksport; missing jest unknown.
 Demand report ma JSON/MD, a cechy AI schema 3.0.
-Źródło pozostaje `not_ready` do odbioru pozostałych
-zakresów etapu 02. Inne parametry lub zmieniony kod wymagają nowego katalogu,
+Siedem bramek chronologii/zwrotów i trzy kontrole separacji domykają
+[45 bramek źródła](../reference/source-acceptance.md). `source_report.json/md`
+kwalifikuje AI do snapshotu 03, a `realism_report.json/md` pokazuje diagnostykę
+z jawnymi progami i nieocenialnymi metrykami. `source_ready=true` dotyczy źródła;
+modele i inventory zachowują `not_ready`. Cechy AI wymagają jawnego
+`--source-dir` i lokalnego Dockera z przypiętym obrazem; worker widzi tylko
+projekcje faktów. Nie generuje źródła we własnym procesie.
+Inne parametry lub zmieniony kod wymagają nowego katalogu,
 jeżeli obecny zawiera manifest v2.
 
 ## Kontrole danych

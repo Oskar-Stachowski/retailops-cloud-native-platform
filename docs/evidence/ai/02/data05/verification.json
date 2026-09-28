@@ -1,0 +1,269 @@
+{
+  "acceptance": {
+    "command": [
+      "services/api/.venv/bin/python",
+      "-m",
+      "scripts.data.verify_data05",
+      "--output",
+      "docs/evidence/ai/02/data05/acceptance.json",
+      "--baseline",
+      "docs/evidence/ai/02/data01/legacy-baseline.json",
+      "--require-clean"
+    ],
+    "exit_code": 0,
+    "report_sha256": "6ad4545228a36da478bc94f8a8f9dc5a13a05a35e2e41205b67df09265c27e22"
+  },
+  "base_commit": "0ab992cd69fec66c97a33f2535972f270975cb09",
+  "branch": "ai/02-data-05",
+  "checks": [
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "services/api/app",
+        "services/api/scripts",
+        "services/api/tests",
+        "data",
+        "ml",
+        "scripts/data/verify_data05.py",
+        "scripts/ci/ml_experiment_report.py"
+      ],
+      "exit_code": 0,
+      "name": "ruff",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "services/api/app",
+        "services/api/scripts",
+        "services/api/tests",
+        "data",
+        "ml",
+        "scripts/data/verify_data05.py",
+        "scripts/ci/ml_experiment_report.py"
+      ],
+      "exit_code": 0,
+      "name": "format",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "name": "mypy",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "bandit",
+        "--severity-level",
+        "high",
+        "--confidence-level",
+        "high",
+        "-q",
+        "-r",
+        "services/api/app",
+        "services/api/scripts",
+        "data/generator",
+        "ml/features",
+        "-f",
+        "txt",
+        "-o",
+        "/private/tmp/retailops-data05-final-bandit.txt"
+      ],
+      "exit_code": 0,
+      "name": "bandit",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-data05-final-gitleaks.json"
+      ],
+      "exit_code": 0,
+      "name": "gitleaks_code",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-data05-docs-gitleaks.json"
+      ],
+      "exit_code": 0,
+      "name": "gitleaks_documentation",
+      "status": "passed"
+    }
+  ],
+  "completed_at": "2026-09-28T14:05:52.687880+00:00",
+  "coverage": {
+    "branches-covered": 326,
+    "branches-valid": 502,
+    "combined_line_branch_percent": 83.82,
+    "lines-covered": 2674,
+    "lines-valid": 3077,
+    "threshold_percent": 70,
+    "xml_sha256": "c5efddd5f62d11cc858d1d503e10a1d8493af2b6c298d7e61ba2d6ba25879e0b"
+  },
+  "database": {
+    "address": "127.0.0.1:58198",
+    "cleanup": {
+      "command": [
+        "docker",
+        "stop",
+        "retailops-data05-postgres"
+      ],
+      "exit_code": 0,
+      "matching_containers": [],
+      "removed": true,
+      "verified_with": [
+        "docker",
+        "ps",
+        "-a",
+        "--filter",
+        "name=retailops-data05-postgres",
+        "--format",
+        "{{.Names}}"
+      ]
+    },
+    "container": "retailops-data05-postgres",
+    "database_name": "data05",
+    "image": "postgres:16-alpine",
+    "isolated_fresh_database": true,
+    "migration": {
+      "command": [
+        "env",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:58198/data05",
+        "PYTHONPATH=.",
+        ".venv/bin/alembic",
+        "upgrade",
+        "head"
+      ],
+      "cwd": "services/api",
+      "exit_code": 0
+    },
+    "migration_head": "6b0f1c2d3e4a",
+    "named_volume": false,
+    "seed": {
+      "command": [
+        "env",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:58198/data05",
+        "PYTHONPATH=.",
+        "RETAILOPS_SEED_DATA_PROFILE=demo",
+        ".venv/bin/python",
+        "scripts/seed_demo_data.py"
+      ],
+      "cwd": "services/api",
+      "exit_code": 0,
+      "profile": "demo",
+      "summary": {
+        "alerts": 4,
+        "anomalies": 4,
+        "forecasts": 6,
+        "inventory_snapshots": 8,
+        "products": 8,
+        "recommendations": 4,
+        "sales": 16,
+        "users": 4,
+        "workflow_actions": 4
+      }
+    }
+  },
+  "documentation": {
+    "completed_scope_removed_from_open_findings": true,
+    "missing_targets": [],
+    "next_scope": "typed Parquet and artifact policy",
+    "next_stage": "03",
+    "relative_links_checked": 331
+  },
+  "fingerprints": {
+    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+    "feature_code_sha256": "050f1d685f07f8d39cf0dd089e67125001a49708b68f503c272dc86431532517",
+    "source_code_sha256": "6d77215809fc7caa12d92d2c5ff642783881dd4c11135bf78042b4b243899cfe"
+  },
+  "implementation_commit": "6e06e909c7dac78675324e8d8ec42921e36b95e8",
+  "limitations": [
+    "No training or large-profile resource benchmark",
+    "Forecasting/anomaly/stockout/replay not_ready; inventory_ready=false",
+    "Snapshot/importer/curated/history corrections remain AI-03/04",
+    "Ruff and mypy scope follows configured project policy"
+  ],
+  "platform": {
+    "architecture": "arm64",
+    "python": "3.11.15",
+    "system": "Darwin"
+  },
+  "policy_version": "data05-local-verification-1.0.0",
+  "pytest": {
+    "command": [
+      "env",
+      "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:58198/data05",
+      "REQUIRE_DB_TESTS=1",
+      "PYTHONPATH=services/api:.",
+      "COVERAGE_FILE=/private/tmp/retailops-data05-final.coverage",
+      "services/api/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "services/api/tests",
+      "--cov=services/api/app",
+      "--cov-report=term",
+      "--cov-report=xml:/private/tmp/retailops-data05-final-coverage.xml",
+      "--junitxml=/private/tmp/retailops-data05-final-tests.xml"
+    ],
+    "database_required": true,
+    "errors": 0,
+    "exit_code": 0,
+    "failures": 0,
+    "junit_sha256": "dffcf5101d90deebaa5422789ca9c6d43db76f72162bbe4f66a1fbb98c5b7dfe",
+    "seconds": 487.01,
+    "skipped": 0,
+    "source_isolation_tests": 29,
+    "tests": 650
+  },
+  "remote_ci": "not_run",
+  "runtime_platform_scope": {
+    "linux_amd64_execution": "not_run",
+    "local_worker": "Linux ARM64 via Docker Desktop",
+    "pinned_image_index_includes_linux_amd64": true
+  },
+  "source_ready_for_ai03": true,
+  "static_scope": {
+    "bandit_confidence": "high",
+    "bandit_report_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bandit_severity": "high",
+    "mypy_configured_files": 5,
+    "ruff_formatted_files": 150,
+    "ruff_tests_excluded_by_project_policy": true
+  },
+  "status": "passed"
+}

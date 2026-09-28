@@ -3,9 +3,9 @@
 Odbiór lokalny **2026-09-28**, branch `ai/02-data-04`, kod
 `5fedb2b2976ebfd60a53ac721b0e8194561ca9de`, baza DATA-02
 `a4ddc79e6399c53a9538dd9bef96d0b8dfd58519`.
-Zakres: cena i promocja, punkt 3 instrukcji etapu 02. Pozostały zakres opisuje
-[aktualna instrukcja](../../../../plans/ai/etapy/02-dane-sprzedazowe.md).
-Następne są popyt, pełny panel dzienny i koszyki (DATA-02/03/05).
+Zakres tego pomiaru: cena i promocja, punkt 3 instrukcji etapu 02.
+Bieżący pełny odbiór źródła: [DATA-05](../data05/README.md);
+punkt wznowienia: [AI 03](../../../../plans/ai/etapy/03-snapshot-curated.md).
 
 ## Zachowanie i kontrakty
 
@@ -22,7 +22,7 @@ przed dniem docelowym, jeżeli był już dostępny. Pełna specyfikacja:
 | Pricing | retail-pricing-1.0.0; price_plans, promotion_plans, sale_price_references, daily_price_observations i promotion_effect_truth. |
 | Scope i czas | global/channel/location/location_channel; półotwarte okresy, known_at/available_at i cutoff zamówienia. |
 | Promocje | percentage/bundle/clearance/seasonal i produkty bez promocji; exclusive_highest_priority. Bundle jest rabatem całej linii od dwóch sztuk, nie pakietem różnych SKU. |
-| Truth | Pre przed startem, during w okresie kampanii, post po końcu; osobna tabela simulation_truth. Inne latent/noise/stockout fields wymagają dalszej separacji. |
+| Truth | Pre przed startem, during w okresie kampanii, post po końcu; osobna tabela simulation_truth. Dawne latent/noise/stockout fields były poza separacją tego pomiaru. |
 | Obserwacje cen | Quantity-weighted realized price z availability; wynik transakcji, bez używania jako cecha target day. |
 | Identity i cechy | Kanonizacja 1.2.0 i pricing policy w source ID; feature parent obejmuje pełne źródło. Feature schema 2.0 i kolumny pozostają bez zmian. |
 | Odczyt historyczny | Rzeczywiste source 2.0 i 2.1 oraz ich feature sidecars zachowują IDs i parent. |
@@ -84,6 +84,6 @@ PYTHONPATH=.:services/api services/api/.venv/bin/python -m pytest \
 Pełne testy wymagają świeżej bazy z migracjami i seedem demo; polecenie i zakres
 izolacji znajdują się w verification.json. Readiness forecasting, anomaly,
 stockout i replay pozostaje not_ready, inventory_ready=false.
-Popyt/panel/koszyki, chronologia/zwroty i pozostała separacja truth wymagają dalszej
-pracy etapu 02 przed AI 03. Resolver jest dostępny dla przyszłych znanych
-covariates; ten zakres nie dodaje planów cen/promocji do cech modelu.
+Ten pomiar nie kwalifikował całego źródła. Panel, zwroty i izolację procesu
+obejmuje bieżący [odbiór DATA-05](../data05/README.md). Resolver jest dostępny
+dla przyszłych znanych covariates; ten zakres nie dodaje ich do cech modelu.

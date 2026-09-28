@@ -2,7 +2,7 @@
 
 [Profile](data-profiles.md) · [Generowanie](../guides/data.md)
 
-Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.6.0 ma także
+Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.7.0 ma także
 [plany cen/promocji](retail-pricing.md) i [pełny panel popytu](daily-demand.md) oraz [chronologię/zwroty](retail-returns.md).
 Ich kontrakt to `retail-dimensions-1.0.0`, opisany przez
 [JSON Schema](../../data/contracts/retail_dimensions.v1.schema.json) i
@@ -99,5 +99,6 @@ Usunięcie obowiązkowego dnia kalendarza jest błędem, a nie zamknięciem albo
 `active_daily_combinations` liczy ważne dni asortymentu przed ograniczeniem otwarcia.
 Raport wymiarów nie certyfikuje panelu (observation_panel_status=not_ready);
 coverage i statusy obserwacji potwierdza odrębna bramka [daily demand](daily-demand.md).
-Readiness źródła i inventory pozostaje niegotowe; chronologia/zwroty
-oraz pozostała izolacja simulation truth wymagają dalszych prac.
+[Bramki chronologii/zwrotów](retail-returns.md) oraz
+[odbiór całego źródła i izolacja workera](source-acceptance.md)
+kwalifikują AI do etapu 03. Inventory i modele nadal pozostają not_ready.

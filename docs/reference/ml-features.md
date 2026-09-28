@@ -39,17 +39,20 @@ deterministycznym metadanym eksportu, nie cechą ani dowodem dostępności wiedz
 
 [Moduł cech](../../ml/features/ai_demand.py) używa jawnych kolumn faktów i odrzuca
 pola truth. Macierz nie zawiera inventory, realized price/revenue, multipliers
-ani noise. Target i status są labelami, availability metadanym. Builder sprawdza
-upstream gates; pełna izolacja procesu/runtime od truth jest dalszą pracą 02.
+ani noise. Target i status są labelami, availability metadanym.
+[Admission źródła i izolowany worker](source-acceptance.md) rozdzielają
+walidację pełnego source od procesu obliczania cech. AI wymaga source 2.5
+oraz `--source-dir`; nie generuje pełnego źródła we własnym procesie.
+Runtime i allowlista odrzucają truth, inventory oraz dodatkowe pola katalogu.
 
 Calendar lag wyznacza datę origin_day minus lag_days, gdzie origin jest końcem
 dnia przed pierwszym targetem. Używa tylko otwartych, kompletnych obserwacji
 znanych do origin. Brak daty, missing/closed i późny rekord dają unknown, bez
 podstawiania wcześniejszego sparse wiersza. Obsługuje także booleans z CSV.
 
-Nowy zestaw ma logiczny features-sha256 ID, parent source 2.3 i transformację
-daily-demand-panel-features-1.0.0. Source identity wiąże dane, kontrakty, kod i
-zależności. Historyczne source 2.0/2.1/2.2 i feature 2.0 zachowują IDs i parent.
+Nowy zestaw ma logiczny features-sha256 ID, parent source 2.5 i transformację
+daily-demand-facts-worker-1.0.0. Source identity wiąże dane, kontrakty, kod i
+zależności. Historyczne source 2.0–2.4 i feature 2.0/3.0 zachowują IDs i parent.
 
 ## Legacy 2.0 i istniejący RF
 

@@ -4,8 +4,8 @@ Odbiór lokalny **2026-09-28**, branch `ai/02-data-03`, kod
 `f30bb544825a444d043d2d325d05c5cbf5830386`, baza panelu/koszyków
 `36dca1f48b475f1d77d2f01b95b257cf931c02f7`.
 Zakres: chronologia i zwroty z punktu 5 etapu 02.
-[Kolejna instrukcja](../../../../plans/ai/etapy/02-dane-sprzedazowe.md)
-dotyczy DATA-05: izolacji truth i końcowego odbioru źródła.
+Bieżący odbiór źródła i workera: [DATA-05](../data05/README.md).
+Kolejna instrukcja: [AI 03](../../../../plans/ai/etapy/03-snapshot-curated.md).
 
 ## Kontrakt i wynik
 
@@ -96,5 +96,6 @@ Pełne polecenia DB/pytest i wynik kontroli znajdują się w
 [verification.json](verification.json). Zdalnego Required CI i nowych modeli
 nie uruchamiano. Source i features pozostają not_ready dla forecastingu,
 anomaly, stockout i replay; inventory_ready=false. Returns-ready dotyczy
-wyłącznie wersjonowanego komponentu zwrotów. Pełny etap 02 wymaga DATA-05;
-AI 03 rozwija później immutable import i wersje/korekty historii ML-07.
+wyłącznie wersjonowanego komponentu zwrotów. Końcowy [odbiór source 2.5](../data05/README.md)
+kwalifikuje rozpoczęcie AI 03; immutable import i wersje/korekty historii ML-07
+pozostają kolejnym zakresem.

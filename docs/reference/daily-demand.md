@@ -2,8 +2,9 @@
 
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Ceny](retail-pricing.md)
 
-Profile ai-* używają daily-demand-1.0.0, generatora 0.6.0 i source schema 2.4.0.
-Trzy tabele popytu i trzy [zwrotów](retail-returns.md) dają łącznie **37 CSV**. Demo i legacy zachowują wcześniejsze
+Profile ai-* używają daily-demand-1.0.0, generatora 0.7.0 i source schema 2.5.0.
+Trzy tabele popytu, trzy [zwrotów](retail-returns.md) i dwie parametrów
+symulacji dają łącznie **39 CSV**. Demo i legacy zachowują wcześniejsze
 reguły oraz bajty danych. [JSON Schema](../../data/contracts/retail_demand.v1.schema.json)
 opisuje komórki CSV; [walidator](../../data/generator/demand_quality.py) sprawdza semantykę.
 
@@ -40,8 +41,8 @@ To syntetyczna polityka, bez deklaracji kalibracji do rynku.
 
 Przed ledgerem nie ma inventory cap: próbka jest ilością generowanej sprzedaży
 dnia. Nie dowodzi niezaspokojonego popytu ani wiarygodnego stockout. Składniki
-i próbka są w daily truth; nagłówki latent/noise/stockout w AI sales są puste.
-Parametry symulacji produktów/stores wymagają dalszego rozdzielenia.
+i próbka są w daily truth; AI sales nie zawiera nagłówków latent/noise/stockout.
+Parametry produktów/stores mają [osobne tabele symulacji](source-acceptance.md).
 
 ## Koszyki zachowują dzienne ilości
 
@@ -88,8 +89,9 @@ koszyki, formułę/budżet i kompletność. Generacja, feature builder i odczyt 
 odtwarzają kontrole; demand_report JSON/MD są objęte checksumami. Przeliczenie
 hashów nie ukrywa luki ani fałszywego raportu. Raporty wymiarów/pricing potwierdzają
 własne komponenty; ich wcześniejsze flagi panelu nie zastępują bramki demand.
-Kanonizacja 1.4.0 i demand policy wchodzą do source identity.
+Kanonizacja 1.5.0 i demand policy wchodzą do source identity.
 
-Source 2.0–2.3 i features 2.0/3.0 zachowują IDs i parent. Źródło nadal jest not_ready
-do AI 03: pełna izolacja truth i końcowy odbiór źródła pozostają otwarte.
+Source 2.0–2.4 i features 2.0/3.0 zachowują IDs i parent.
+[Odbiór źródła](source-acceptance.md) kwalifikuje AI do snapshotu 03;
+inventory i modele pozostają not_ready.
 Forecast na cechach 3.0 jest etapem AI 04.

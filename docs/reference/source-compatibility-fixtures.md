@@ -26,5 +26,14 @@ Odczyt zachowuje source/feature IDs i parent.
 `source_manifest_v2_3.zip` pochodzi z czystego kodu panelu/koszyków, commit
 `36dca1f48b475f1d77d2f01b95b257cf931c02f7`; ai-smoke: 3 dni, 8 produktów,
 3 pary, 2 magazyny, seed 42. Zawiera source 2.3, 34 CSV, raporty i cechy AI 3.0.
-Odczyt zachowuje source/feature IDs i parent. Archiwa służą wyłącznie regresji
-odczytu; łącznie mają 1,079,345 bajtów po rozpakowaniu, poniżej limitu 5 MiB.
+Odczyt zachowuje source/feature IDs i parent. Archiwa służą wyłącznie regresji odczytu.
+
+
+`source_manifest_v2_4.zip` pochodzi z czystego DATA-03, commit
+`0ab992cd69fec66c97a33f2535972f270975cb09`; ai-smoke: 3 dni, 8 produktów,
+3 pary, 2 magazyny, seed 42. Zawiera source 2.4, 37 CSV, raporty i cechy AI 3.0.
+Source ID: `source-sha256-d6562b0397df3a18a45c9fe419910f11b086c99cfd498b5d55881f2d67e81e2c`.
+Feature ID: `features-sha256-daf83f0b54c4ba8901bc6fd0050735c35614c1ba800cdfcbe418d0484e52f6db`.
+Nowy reader zachowuje oba IDs i parent oraz dawny układ kolumn produktów/sklepów/sprzedaży.
+Pięć archiwów ma łącznie **1,729,984 bajtów** po rozpakowaniu, poniżej limitu 5 MiB.
+Bieżące source 2.5 smoke są generowane w temp, poza Git.

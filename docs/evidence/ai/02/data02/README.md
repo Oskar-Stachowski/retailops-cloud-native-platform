@@ -3,7 +3,8 @@
 Odbiór lokalny **2026-09-28**, branch `ai/02-data-02`, kod
 `a050e488e5ea5a93b21b5b4d2f678c195ac26cca`, baza DATA-01 `4d57655`.
 Zakres: punkt 2 [instrukcji etapu 02](../../../../plans/ai/etapy/02-dane-sprzedazowe.md).
-Etap 02 pozostaje w realizacji; następne są wspólne ceny i promocje DATA-04.
+Bieżący odbiór całego źródła: [DATA-05](../data05/README.md);
+punkt wznowienia: [AI 03](../../../../plans/ai/etapy/03-snapshot-curated.md).
 
 ## Zachowanie i kontrakty
 
@@ -72,5 +73,6 @@ PYTHONPATH=.:services/api services/api/.venv/bin/python -m pytest \
 Pełne testy wymagają świeżej bazy z migracjami i seedem demo; dokładne polecenie
 i parametry izolacji znajdują się w verification.json. Readiness forecasting,
 anomaly, stockout i replay pozostaje not_ready, inventory_ready=false.
-Pełny daily panel, ceny/promocje, popyt/koszyki, chronologia/zwroty i separacja
-truth wymagają dalszych zakresów przed AI 03. Routing jest planem, bez ledgeru AI 06.
+Ten pomiar obejmował tylko wymiary i kalendarz. Panel, ceny, zwroty i izolację
+kwalifikuje bieżący [odbiór źródła](../data05/README.md). Routing jest planem,
+bez ledgeru AI 06.

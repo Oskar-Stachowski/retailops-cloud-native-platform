@@ -1,7 +1,7 @@
 # Profile, budżety i bramki odbioru
 
 **Status: konfiguracja, identity, wymiary, kalendarz, ceny/promocje, popyt/panel/koszyki oraz chronologia/zwroty mają lokalny odbiór;
-bramki pełnego źródła/modeli pozostają planem.**
+pełne źródło ma lokalny odbiór, bramki modeli pozostają planem.**
 [Konfiguracja 1.0.0](../../../../data/generator/configuration.py) jest wykonywalnym źródłem
 rozmiarów i dat. Profile AI mają [kanoniczne wymiary](../../../reference/retail-dimensions.md),
 stock locations, ważne pary i osiem hard gates wymiarów oraz
@@ -11,8 +11,9 @@ i uzgodnienie transakcji. [Popyt/panel/koszyki](../../../evidence/ai/02/demand-p
 mają pełny ważny panel, cechy 3.0 i sześć bramek demand. Obserwacje cen są sparse;
 eksport nadal jest CSV. [DATA-03](../../../evidence/ai/02/data03/README.md)
 ma siedem bramek chronologii/zwrotów, dwa cutoffy i 39-dniowy ogon.
-Izolacja truth, końcowy odbiór źródła, chunked Parquet oraz dalsze bramki
-wymagają implementacji.
+[DATA-05](../../../evidence/ai/02/data05/README.md) kwalifikuje source 2.5:
+45 hard gates, rozdzielone parametry i izolowany worker z trzema projekcjami faktów.
+Chunked Parquet, immutable snapshot/import i dalsze bramki wymagają implementacji.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 

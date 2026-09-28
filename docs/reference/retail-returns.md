@@ -2,8 +2,8 @@
 
 [Profile](data-profiles.md) · [Panel sprzedaży](daily-demand.md) · [Ceny](retail-pricing.md)
 
-Source schema **2.4.0**, generator **0.6.0** i kanonizacja **1.4.0** dodają
-`retail-returns-1.0.0`. AI eksportuje 37 CSV; legacy zachowuje 17 i wcześniejsze
+Source schema **2.5.0**, generator **0.7.0** i kanonizacja **1.5.0** używają
+`retail-returns-1.0.0`. AI eksportuje 39 CSV; legacy zachowuje 17 i wcześniejsze
 bajty. [Schema](../../data/contracts/retail_returns.v1.schema.json) opisuje komórki
 CSV, a [walidator](../../data/generator/return_quality.py) sprawdza semantykę.
 To syntetyczna polityka generatora, bez deklaracji zasad prawnych lub kalibracji rynku.
@@ -23,8 +23,8 @@ granica jest włączona. Timestampy mają UTC; kalendarz lokalny nie zmienia
 czasu trwania okna. Polityka musi być znana przed ordered_at.
 
 Losowanie zwrotu używa oddzielnego RNG seed/sale/policy. Prawdopodobieństwo
-wykorzystuje return_rate produktu i mnożnik kanału; parametry generatora
-pozostają częścią otwartego zakresu izolacji truth DATA-05.
+wykorzystuje return_rate produktu i mnożnik kanału; parametry produktu są
+w osobnej [tabeli symulacji](source-acceptance.md), niedostępnej workerowi.
 Zwrot następuje 1–window_days po sprzedaży. Ilość to 1–purchased quantity;
 czasem dzieli się na dwa częściowe zgłoszenia. Suma wszystkich zgłoszonych
 ilości, również odrzuconych, nie przekracza zakupu — to świadomie uproszczona
@@ -79,7 +79,8 @@ przeliczenie checksumów nie omija bramek. Return report kwalifikuje zwroty,
 bez certyfikowania całego źródła do dalszych etapów AI.
 
 Cechy AI 3.0 nadal mają target observed_sales_units i nie przyjmują revenue,
-refundacji ani danych przyszłego ogona. Source 2.0–2.3 i ich feature IDs/parent
+refundacji ani danych przyszłego ogona. Source 2.0–2.4 i ich feature IDs/parent
 pozostają czytelne bez zmiany historycznych polityk. Forecasting, anomaly,
-stockout i replay pozostają not_ready; inventory_ready=false. Przed AI 03
-pozostaje izolacja truth i końcowy odbiór źródła DATA-05.
+stockout i replay pozostają not_ready; inventory_ready=false.
+[Końcowy odbiór źródła](source-acceptance.md) daje osobne source_ready=true
+do rozpoczęcia AI 03.

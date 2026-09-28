@@ -2,30 +2,28 @@
 
 [Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
 Required CI PR oraz push na main obu repozytoriów ma success.
-Główny punkt wznowienia to izolacja truth i końcowy odbiór źródła etapu 02. [DATA-01](../../evidence/ai/02/data01/README.md)
-ma lokalny odbiór konfiguracji i tożsamości, a [DATA-02](../../evidence/ai/02/data02/README.md)
-wymiarów, lifecycle i kalendarza. [DATA-04](../../evidence/ai/02/data04/README.md)
-ma lokalny odbiór cen/promocji i uzgodnienia transakcji.
-[Popyt/panel/koszyki](../../evidence/ai/02/demand-panel/README.md) mają pełny panel
-i cechy AI 3.0. [DATA-03](../../evidence/ai/02/data03/README.md) kwalifikuje
-chronologię i zwroty z osobnym ogonem; etap 02 jest w realizacji.
+Główny punkt wznowienia to [AI 03 — snapshot i curated](etapy/03-snapshot-curated.md).
+[Odbiór źródła 02](../../evidence/ai/02/data05/README.md) obejmuje identity,
+wymiary/kalendarz, ceny/promocje, pełny panel/koszyki, chronologię/zwroty,
+separację symulacji oraz rzeczywisty worker bez dostępu do truth.
 Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
 potwierdzone problemy i kryteria ich zamknięcia.
 
-## Kolejny mały PR etapu 02
+## Kolejny mały PR etapu 03
 
-**Repo:** RetailOps. **Zależność:** odebrane identity, wymiary, ceny, panel/koszyki i zwroty.
-Pozostałe DATA-05: rozdzielić parametry symulacji products/stores od źródłowych
-faktów. Domknąć granicę dostępu procesu feature buildera i runtime do truth,
-kontrolę dozwolonych wejść oraz końcowe quality/realism/readiness per use case.
-Zachować bramki identity, wymiarów, cen, panelu, chronologii/zwrotów i zgodność demo.
-
-Zakres opisuje [instrukcja](etapy/02-dane-sprzedazowe.md).
-Źródło pozostaje `not_ready` do AI 03 do odbioru pełnego etapu 02.
+**Repo:** RetailOps. **Zależność:** odebrane źródło 2.5 i bramki forecast-source.
+Zaimplementować typed Parquet przez jawną grupę zależności, date partitions i
+chunked writes dla dużych faktów. Rozdzielić facts/truth/raw/reports/manifests
+w layout eksportu; zachować CSV demo i fixtures. Kontrolowany cleanup ma
+odmawiać usuwania tracked fixture i plików poza generated root. Zmierzyć
+czas, peak RSS, rows/s, bytes oraz CSV/Parquet parity na ograniczonych profilach.
+Następny slice to niezmienny exporter z allowlistą faktów i atomową publikacją.
+Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
+importerze i curated builderze. ML-07 wersji/korekt pozostaje warunkiem replay.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 02, pozostałe DATA-05:** izolacja truth i końcowy odbiór źródła.
+- **RetailOps / etap 03:** typed Parquet, polityka artefaktów, następnie immutable export i handoff.
 - **Repo AI / etap 11, zakres 1–2:** rejestr zatwierdzonego korpusu, allowlista,
   access_class, source SHA/checksums i document_status; następnie parser/chunker
   oraz testy offline. Nie wymaga ukończenia etapu 02.
@@ -34,19 +32,19 @@ Zakres opisuje [instrukcja](etapy/02-dane-sprzedazowe.md).
 
 Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
 kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
-Etap 03 czeka na odbiór 02, a 04–05 na właściwe dane; agent 12 czeka na 10 i 11.
+Etap 03 ma spełnioną lokalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
+a agent 12 na 10 i 11.
 Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
 ## Przypisanie warunków do etapów
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **02 — źródło** | Pozostałe DATA-05: izolacja truth i końcowe quality/realism/readiness per use case, z negatywnymi przypadkami. `inventory_ready=false`, stockout/anomaly `not_ready`. |
 | **03 — snapshot/curated** | ML-07: rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | ML-07 jako warunek wejść. Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |
-| **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne truth/labels (DATA-05), dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
+| **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne scenariusze truth i dojrzałe labels, dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
 | **08 — stockout** | DATA-06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |
 | **10 — integracja** | OPS-03/07: jeden wykonywalny kontrakt, snapshot/version-aware event identity, legacy v1 oraz nowe intelligence.v2, trwałe ACK/kwarantanna, inbox/outbox, dedup/replay. Domenowe projekcje wyników, zgodne API/UI i rzeczywiste auth/scope. Testy z brokerem i awariami wymagane przed odbiorem. |

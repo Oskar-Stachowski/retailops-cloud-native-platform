@@ -5,8 +5,8 @@ Odbiór lokalny **2026-09-28**, branch ai/02-demand-panel, kod
 `138e48477f7965de907098ccb169774b5451d049`.
 Zakres: punkt 4 instrukcji etapu 02, bez końcowego odbioru całego etapu.
 Nowszy [odbiór DATA-03](../data03/README.md) potwierdza chronologię i zwroty
-źródła 2.4. [Aktualna instrukcja](../../../../plans/ai/etapy/02-dane-sprzedazowe.md)
-kontynuuje od pełnej izolacji truth i końcowego odbioru źródła.
+źródła 2.4. Bieżący pełny odbiór source 2.5 i workera: [DATA-05](../data05/README.md).
+Punkt wznowienia: [AI 03](../../../../plans/ai/etapy/03-snapshot-curated.md).
 
 ## Kontrakty i zachowanie
 
@@ -16,7 +16,7 @@ powstają przed koszykami; stochastic rounding pozwala na prawdziwe zero.
 Deterministyczne koszyki dobierają komplementarne SKU bez replacement oraz
 zachowują cały dzienny budżet. Order/items/sales, sztuki i przychód się uzgadniają.
 
-| Kontrakt | Obecny wariant |
+| Kontrakt | Wariant tego pomiaru |
 |---|---|
 | Generator / source schema | 0.5.0 / 2.3.0; 34 CSV AI i 17 legacy. |
 | Daily demand | daily-demand-1.0.0; observations, inactive exclusions i oddzielna simulation truth. |
@@ -83,6 +83,6 @@ PYTHONPATH=.:services/api services/api/.venv/bin/python -m pytest \
 Pełne polecenie pytest i zakres DB znajdują się w verification.json.
 Źródło i cechy zachowują not_ready dla forecastingu, anomaly, stockout i replay,
 inventory_ready=false. Pełny panel nie certyfikuje poprawności zwrotów,
-izolacji truth, historii korekt, modelu ani transportu. Etap 02 wymaga kolejno
-chronologii/zwrotów (pozostałe DATA-03) i izolacji truth/bramek (DATA-05)
-przed przejściem do importu AI 03.
+izolacji truth, historii korekt, modelu ani transportu. Chronologię/zwroty
+i izolację procesu kwalifikuje bieżący [odbiór source 2.5](../data05/README.md).
+Historia korekt i importer pozostają etapem 03.
