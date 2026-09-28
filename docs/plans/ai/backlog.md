@@ -1,35 +1,14 @@
-# Najbliższe prace po audycie AI 00
+# Najbliższe prace AI
 
-Baza: [pomiary na `cbf28b2`](../../evidence/ai/00/README.md), 27.09.2026.
-**Etap 01: lokalny zakres ma odbiór; pozostaje zdalny CI po push.**
-[Pakiet, HTTP, persistence, kontrakty i lokalne auth](../../evidence/ai/01/README.md)
-działają w osobnym repo `retailops-ai-intelligence`. 267 testów, czysty checkout
-oraz rzeczywisty HTTP z zainstalowanego wheel mają lokalne dowody.
-Ten plik zawiera otwartą pracę, a [audyt](../../audits/open-findings.md)
-dowody błędów i kryteria ich zamknięcia. 01 pozostaje in_progress, 02–17 planowane.
-
-## Pozostały odbiór etapu 01
-
-**Repo:** `retailops-ai-intelligence`, branch `ai/implementation`.
-Nowe commity persistence/kontraktów/auth nie zostały wypchnięte. Odczyt GitHub
-28.09.2026 potwierdza required-result i success bazowego 7d67530; nie odbiera HEAD.
-
-Po push odbierz Required CI dokładnego SHA nowych commitów: checks, secrets,
-persistence i required-result muszą mieć success. Zweryfikuj ochronę main,
-zapisz link/revision i evidence. Nie zastępuj zdalnego wyniku lokalnymi testami.
-Nie pomijaj nowego joba rzeczywistego smoke ani path/contract gates.
-Jeżeli CI pokaże błąd, popraw go, ponów kontrole i odbierz nowy SHA.
-Dopiero ten odbiór pozwala zamknąć rejestr etapu 01 i przejść do źródła 02.
-
-Lokalny auth jest owner-only mapą z opaque credentials, explicit capabilities
-oraz whole-scope check. Polityka jest snapshotem: revoke/grants/rotation wymagają
-restartu, expiry działa per request. Forecast-check nie czyta danych lub modelu;
-Compose nie montuje polityki, a MLflow nie ma aplikacyjnego auth. Dalszy serving,
-IdP/tenant/audit i uprawnienia danych mają własne etapy i nie są obiecywane przez 01.
+[Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
+Required CI PR oraz push na main obu repozytoriów ma success.
+Główny punkt wznowienia to DATA-01 etapu 02. Etapy 02–17 pozostają planowane.
+Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
+potwierdzone problemy i kryteria ich zamknięcia.
 
 ## Pierwszy mały PR etapu 02
 
-**Repo:** RetailOps. **Zależność:** odbiór 01 i uzgodnione wersje kontraktów.
+**Repo:** RetailOps. **Zależność:** odebrany fundament 01 i uzgodnione wersje kontraktów.
 Zakres DATA-01: jedno rozwiązanie requested/effective config, jawne daty i manifest v2
 obok v1, wersje generatora/kalendarza/konfiguracji, source identity oraz checksumy.
 Powiązać nowe feature ID z treścią źródła i kontraktem cech, zamiast wyłącznie profilem/datami/seedem.
@@ -53,6 +32,21 @@ Nie zmieniać w tym PR formuły popytu, cen, koszyków ani legacy demo.
 Kolejne PR-y 02 zgodnie z [instrukcją](etapy/02-dane-sprzedazowe.md):
 wymiary/lifecycle (DATA-02), wspólne ceny/promocje (DATA-04), demand/panel/koszyki
 (DATA-02/03/05), chronologia/zwroty (DATA-03), rozdzielenie truth i bramki (DATA-05).
+
+## Praca równoległa od obecnego punktu
+
+- **RetailOps / etap 02, DATA-01:** konfiguracja, identity i manifest v2; potem
+  kolejne poprawki źródła w kolejności opisanej wyżej.
+- **Repo AI / etap 11, zakres 1–2:** rejestr zatwierdzonego korpusu, allowlista,
+  access_class, source SHA/checksums i document_status; następnie parser/chunker
+  oraz testy offline. Nie wymaga ukończenia etapu 02.
+- **Opcjonalnie 16A:** projekt inputs/ownership i wariantu infrastruktury,
+  walidacja oraz kosztorys po ustaleniu tych wejść; bez automatycznej zgody na apply.
+
+Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
+kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
+Etap 03 czeka na odbiór 02, a 04–05 na właściwe dane; agent 12 czeka na 10 i 11.
+Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
 ## Przypisanie warunków do etapów
 

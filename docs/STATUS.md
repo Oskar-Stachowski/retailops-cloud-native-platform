@@ -22,7 +22,7 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 | Monitoring | Metryki API/DB/stream, Prometheus, Grafana i próba rzeczywistego firing/resolution alertu. SLO dotyczy scrape metryk; brak dowodu dostępności żądań użytkownika przez 30 dni i dostarczania powiadomień. |
 | Jenkins | Rzeczywiste lokalne wykonanie pipeline z 2026-09-26; dodatkowa walidacja, bez wdrażania do chmury. |
 | ML | Lokalna generacja cech, ocena RF z trzema oknami walidacyjnymi i odłożonym testem całego horyzontu oraz zweryfikowana ścieżka artefaktu do batchu, metadanych i metryk. [Ocena z 27.09.2026](evidence/ml/fixed-origin-rf-2026-09-27/README.md) odrzuciła RF wobec średniej ruchomej; brak kwalifikacji do serving. |
-| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. Kontrakty danych/run/tool, walidacja offline i lokalne uprawnienia API: 267 testów na czystym checkoutcie oraz rzeczywisty HTTP z wheel poza źródłami. Principal pochodzi z prywatnych poświadczeń, cały scope jest egzekwowany; admin nie dziedziczy odczytów. Osobny wcześniejszy pomiar Compose: crash, trwałość, awaria DB i recovery. Lokalny zakres 01 ma odbiór; pozostaje zdalny CI nowych commitów po push. Zmiana grants/revoked wymaga restartu API; nie ma OIDC/production IAM lub serving. Źródło nie spełnia jeszcze kontraktu danych AI 02–03. |
+| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. Kontrakty danych/run/tool, walidacja offline i lokalne uprawnienia API: 267 testów na czystym checkoutcie oraz rzeczywisty HTTP z wheel poza źródłami. Principal pochodzi z prywatnych poświadczeń, cały scope jest egzekwowany; admin nie dziedziczy odczytów. Osobny wcześniejszy pomiar Compose: crash, trwałość, awaria DB i recovery. Etap 01 ma odbiór lokalny i zdalny: Required CI PR oraz push na main obu repo przechodzi, w tym persistence na Linux AMD64; dodatkowe testy bramki CI zwiększają zestaw do 273 testów. Zmiana grants/revoked wymaga restartu API; nie ma OIDC/production IAM lub serving. Źródło nie spełnia jeszcze kontraktu danych AI 02–03. |
 
 ## Zakres użycia
 
@@ -36,10 +36,10 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
-Kontynuujemy **[AI 01 — fundament projektu](plans/ai/etapy/01-fundament-projektu.md)**:
-pozostaje odbiór zdalnego Required CI nowych commitów po push, w tym persistence.
-Po zamknięciu 01 następną implementacją jest DATA-01 etapu 02 w RetailOps.
-[Backlog](plans/ai/backlog.md) określa pozostałą pracę 01 i pierwszy mały PR 02.
+Następna implementacja to **[AI 02 / DATA-01](plans/ai/etapy/02-dane-sprzedazowe.md)**
+w RetailOps: konfiguracja, identity i manifest v2. Równolegle repo AI może
+rozpocząć [RAG 11](plans/ai/etapy/11-rag.md) od zatwierdzonego korpusu.
+[Backlog](plans/ai/backlog.md) określa zakres pierwszego PR i zależności.
 DATA-01–05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
 historii przed odbiorem cech i forecastingu. Inventory, streaming, auth oraz
 serving mają własne późniejsze bramki. Kryteria: [otwarte ustalenia](audits/open-findings.md).
