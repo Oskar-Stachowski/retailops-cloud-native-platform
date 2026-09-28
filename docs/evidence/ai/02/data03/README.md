@@ -96,6 +96,6 @@ Pełne polecenia DB/pytest i wynik kontroli znajdują się w
 [verification.json](verification.json). Zdalnego Required CI i nowych modeli
 nie uruchamiano. Source i features pozostają not_ready dla forecastingu,
 anomaly, stockout i replay; inventory_ready=false. Returns-ready dotyczy
-wyłącznie wersjonowanego komponentu zwrotów. Końcowy [odbiór source 2.5](../data05/README.md)
-kwalifikuje rozpoczęcie AI 03; immutable import i wersje/korekty historii ML-07
-pozostają kolejnym zakresem.
+wyłącznie wersjonowanego komponentu zwrotów. Końcowy [odbiór source 2.6](../data05/README.md)
+kwalifikuje rozpoczęcie AI 03; immutable import i curated pozostają kolejnym zakresem; zachowują
+istniejącą historię wersji obserwacji i odczyt as-of.

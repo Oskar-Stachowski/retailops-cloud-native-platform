@@ -2,8 +2,8 @@
 
 [Profile](data-profiles.md) · [Panel sprzedaży](daily-demand.md) · [Ceny](retail-pricing.md)
 
-Source schema **2.5.0**, generator **0.7.0** i kanonizacja **1.5.0** używają
-`retail-returns-1.0.0`. AI eksportuje 39 CSV; legacy zachowuje 17 i wcześniejsze
+Source schema **2.6.0**, generator **0.8.0** i kanonizacja **1.6.0** używają
+`retail-returns-1.0.0`. AI eksportuje 40 CSV; legacy zachowuje 17 i wcześniejsze
 bajty. [Schema](../../data/contracts/retail_returns.v1.schema.json) opisuje komórki
 CSV, a [walidator](../../data/generator/return_quality.py) sprawdza semantykę.
 To syntetyczna polityka generatora, bez deklaracji zasad prawnych lub kalibracji rynku.
@@ -78,8 +78,8 @@ Generacja, feature builder i odczyt manifestu odtwarzają kontrole i JSON/MD;
 przeliczenie checksumów nie omija bramek. Return report kwalifikuje zwroty,
 bez certyfikowania całego źródła do dalszych etapów AI.
 
-Cechy AI 3.0 nadal mają target observed_sales_units i nie przyjmują revenue,
-refundacji ani danych przyszłego ogona. Source 2.0–2.4 i ich feature IDs/parent
+Cechy AI 3.1 nadal mają target observed_sales_units i nie przyjmują revenue,
+refundacji ani danych przyszłego ogona. Source 2.0–2.5 i ich feature IDs/parent
 pozostają czytelne bez zmiany historycznych polityk. Forecasting, anomaly,
 stockout i replay pozostają not_ready; inventory_ready=false.
 [Końcowy odbiór źródła](source-acceptance.md) daje osobne source_ready=true

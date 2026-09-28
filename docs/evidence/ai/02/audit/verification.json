@@ -1,307 +1,154 @@
 {
-  "acceptance": {
-    "all_passed": true,
-    "case_count": 9,
-    "cases": [
-      {
-        "case": "ai-smoke-a",
-        "feature_artifact": {
-          "content_sha256": "fe0a7131059e070431ab68f22aecd4c694ba96159af3f1d06630ab3012216a99",
-          "path": "features.csv",
-          "row_count": 1612,
-          "sha256": "2d7687ba4ced3ae316e5c8921df9f6017a1309f17f96baf5cb6d2f0b4b564a43",
-          "size_bytes": 622947
-        },
-        "feature_id": "features-sha256-a5e081b28ae21eb79c81ab08d44788a61eba18a167f5238e73063a1eb60b0e3e",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 30,
-          "end_date": "2026-07-31",
-          "label_tail_days": 0,
-          "max_daily_rows": 1800,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 20,
-          "profile": "ai-smoke",
-          "seed": 42,
-          "start_date": "2026-07-02",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-0513daf074b58d6356eeda892228524618569d886f9f351d1d5ffdf4194066a3",
-        "source_ready": true
-      },
-      {
-        "case": "ai-smoke-b",
-        "feature_artifact": {
-          "content_sha256": "fe0a7131059e070431ab68f22aecd4c694ba96159af3f1d06630ab3012216a99",
-          "path": "features.csv",
-          "row_count": 1612,
-          "sha256": "2d7687ba4ced3ae316e5c8921df9f6017a1309f17f96baf5cb6d2f0b4b564a43",
-          "size_bytes": 622947
-        },
-        "feature_id": "features-sha256-a5e081b28ae21eb79c81ab08d44788a61eba18a167f5238e73063a1eb60b0e3e",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 30,
-          "end_date": "2026-07-31",
-          "label_tail_days": 0,
-          "max_daily_rows": 1800,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 20,
-          "profile": "ai-smoke",
-          "seed": 42,
-          "start_date": "2026-07-02",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-0513daf074b58d6356eeda892228524618569d886f9f351d1d5ffdf4194066a3",
-        "source_ready": true
-      },
-      {
-        "case": "ai-temporal-smoke-a",
-        "feature_artifact": {
-          "content_sha256": "34706ede96b3b37140270371b9b1d9cf81c1997f6df577c9e96dfd80b5a5bbdb",
-          "path": "features.csv",
-          "row_count": 2406,
-          "sha256": "6c0031edfa0cb0aa85efdac62e8e339a6e0d6117d7145268b27e4ccd883bf9a7",
-          "size_bytes": 928435
-        },
-        "feature_id": "features-sha256-6c34ace3ae07a68090928fc73deeed9ac9c06b1900c193270ead7637245187b6",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 102,
-          "end_date": "2026-07-31",
-          "label_tail_days": 14,
-          "max_daily_rows": 2448,
-          "origin_days": 60,
-          "output_format": "csv",
-          "products": 8,
-          "profile": "ai-temporal-smoke",
-          "seed": 42,
-          "start_date": "2026-04-21",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 28
-        },
-        "source_id": "source-sha256-1b46a16968277c102f9d661883e9dd721a0c1be75cdce9c94347fd59862d272b",
-        "source_ready": true
-      },
-      {
-        "case": "ai-temporal-smoke-b",
-        "feature_artifact": {
-          "content_sha256": "34706ede96b3b37140270371b9b1d9cf81c1997f6df577c9e96dfd80b5a5bbdb",
-          "path": "features.csv",
-          "row_count": 2406,
-          "sha256": "6c0031edfa0cb0aa85efdac62e8e339a6e0d6117d7145268b27e4ccd883bf9a7",
-          "size_bytes": 928435
-        },
-        "feature_id": "features-sha256-6c34ace3ae07a68090928fc73deeed9ac9c06b1900c193270ead7637245187b6",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 102,
-          "end_date": "2026-07-31",
-          "label_tail_days": 14,
-          "max_daily_rows": 2448,
-          "origin_days": 60,
-          "output_format": "csv",
-          "products": 8,
-          "profile": "ai-temporal-smoke",
-          "seed": 42,
-          "start_date": "2026-04-21",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 28
-        },
-        "source_id": "source-sha256-1b46a16968277c102f9d661883e9dd721a0c1be75cdce9c94347fd59862d272b",
-        "source_ready": true
-      },
-      {
-        "case": "contrast-base",
-        "feature_artifact": {
-          "content_sha256": "4856db8da890a38ff2ae480714f60332cdd46348f8437b9f93a53411a9996a07",
-          "path": "features.csv",
-          "row_count": 114,
-          "sha256": "988ead32fe66e8f40c579e80caec12a838b462a4d98652da310fb748097876ef",
-          "size_bytes": 44366
-        },
-        "feature_id": "features-sha256-d35068375213ae1e8561bd71dd679c7b753ec5d864f38644e815efbf730247f8",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 5,
-          "end_date": "2026-07-31",
-          "label_tail_days": 0,
-          "max_daily_rows": 120,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 8,
-          "profile": "ai-smoke",
-          "seed": 42,
-          "start_date": "2026-07-27",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-e8537a0c454bdb7b8536e5b7be3f8b925a68528f2e571e2f02f1ade5125b7bae",
-        "source_ready": true
-      },
-      {
-        "case": "contrast-seed",
-        "feature_artifact": {
-          "content_sha256": "7ef1e6c6423c6d5800482faedf1fdfc5923772b9d4b15fe960e3fe0ea6f9dab3",
-          "path": "features.csv",
-          "row_count": 114,
-          "sha256": "2ef3266f1da265ba765ab0ed1a3c1f40b1cf10093ba09b696dbd501a7326405b",
-          "size_bytes": 44385
-        },
-        "feature_id": "features-sha256-00b9a5017d3f47389c931f1c11912b8c806ce6c925f1ac67269e2e7ec47a2a4f",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 5,
-          "end_date": "2026-07-31",
-          "label_tail_days": 0,
-          "max_daily_rows": 120,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 8,
-          "profile": "ai-smoke",
-          "seed": 43,
-          "start_date": "2026-07-27",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-75fb9c5a7be79957dfa37bc90511d8c6f7e3b787191192f1c46d83ff0780390b",
-        "source_ready": true
-      },
-      {
-        "case": "contrast-products",
-        "feature_artifact": {
-          "content_sha256": "78d91b74f9f1141c0924ac4fb4acfbad72ddb1dce505d201e3a823765e81e056",
-          "path": "features.csv",
-          "row_count": 129,
-          "sha256": "de73e834677b4852a9b25f73a37f0701eddedef81cd604a2f6c4daf5569c70b6",
-          "size_bytes": 50253
-        },
-        "feature_id": "features-sha256-9f1fe65b0f796449d6b7536a8dd84b55d67fc77ca58aa3a6f1b1b91128c21fc1",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 5,
-          "end_date": "2026-07-31",
-          "label_tail_days": 0,
-          "max_daily_rows": 135,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 9,
-          "profile": "ai-smoke",
-          "seed": 42,
-          "start_date": "2026-07-27",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-8ba87229b121e1bf562a6793885e1411435324f6adf353dad49b05095304ad3c",
-        "source_ready": true
-      },
-      {
-        "case": "contrast-dates",
-        "feature_artifact": {
-          "content_sha256": "4bcf01d8d631cd8ab90efba22d571a5e7c2decd9cf8a7fa37e5c15bcf9357f82",
-          "path": "features.csv",
-          "row_count": 114,
-          "sha256": "71017a2d8c08f334f0aa2c99693d140a2d7827bf05b53528a104ba9f198dbfd8",
-          "size_bytes": 44205
-        },
-        "feature_id": "features-sha256-9d5d00bef814010dcb2c57448c59d1ccea363317fa9f7759df2a414e2d1f22b7",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 5,
-          "end_date": "2026-07-30",
-          "label_tail_days": 0,
-          "max_daily_rows": 120,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 8,
-          "profile": "ai-smoke",
-          "seed": 42,
-          "start_date": "2026-07-26",
-          "stores": 3,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-70fbf1b59fc9d56ea9bd48b003474042ff5f44ae23f63bfa8fa9ed885c095966",
-        "source_ready": true
-      },
-      {
-        "case": "spring-dst-all-channels",
-        "feature_artifact": {
-          "content_sha256": "f5f1a98285826c411f11ad84de9fef5d66e15c10c8ed9afcff354ef4fad9552e",
-          "path": "features.csv",
-          "row_count": 405,
-          "sha256": "f443ba5647fd95ee78dd8262395d29a1b6057274320916a67ae4a6975b20ad3a",
-          "size_bytes": 158270
-        },
-        "feature_id": "features-sha256-1483336ed7c0f54d4f29234ce6c1e92d66349937620e286db179cc1440bd841c",
-        "resolved_parameters": {
-          "business_timezone": "UTC",
-          "days": 7,
-          "end_date": "2026-04-01",
-          "label_tail_days": 0,
-          "max_daily_rows": 448,
-          "origin_days": 0,
-          "output_format": "csv",
-          "products": 8,
-          "profile": "ai-smoke",
-          "seed": 42,
-          "start_date": "2026-03-26",
-          "stores": 8,
-          "warehouses": 2,
-          "warmup_days": 0
-        },
-        "source_id": "source-sha256-002490517c559310087a6c114849843db3821c17a6caa2cefa30152c250fa8ec",
-        "source_ready": true
+  "audited_at_utc": "2026-09-28T15:32:00.823283+00:00",
+  "audited_commit": "152341e4e217c5eac4c700e9e9d67c2eb61090ef",
+  "branch": "ai/02-data-05",
+  "code_provenance": {
+    "all_files_in_source_and_feature_fingerprints": true,
+    "each_mutation_changes_code_hash_and_feature_id_for_equal_rows": true,
+    "executable_worker_files": 7,
+    "historical_ids_preserved": true,
+    "modified_code_provenance_detected": true,
+    "test": "services/api/tests/test_worker_provenance.py"
+  },
+  "coverage": {
+    "branches-covered": 326,
+    "branches-valid": 502,
+    "combined_line_branch_percent": 83.82,
+    "lines-covered": 2674,
+    "lines-valid": 3077,
+    "remote_threshold_percent": 80,
+    "threshold_percent": 70,
+    "xml_sha256": "db0fb2abf711f57e32f6c77d88c3fbcac9325e303dfffb1be14ae24ea68e86da"
+  },
+  "database": {
+    "address": "127.0.0.1:59649",
+    "cleanup": {
+      "command": [
+        "docker",
+        "stop",
+        "retailops-ai02-history-postgres"
+      ],
+      "exit_code": 0,
+      "matching_containers": [],
+      "removed": true,
+      "verified_with": [
+        "docker",
+        "ps",
+        "-a",
+        "--filter",
+        "name=retailops-ai02-history-postgres",
+        "--format",
+        "{{.Names}}"
+      ]
+    },
+    "container": "retailops-ai02-history-postgres",
+    "database_name": "history",
+    "fresh": true,
+    "image": "postgres:16-alpine",
+    "isolated_fresh_database": true,
+    "migration": {
+      "command": [
+        "env",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
+        "PYTHONPATH=.",
+        ".venv/bin/alembic",
+        "upgrade",
+        "head"
+      ],
+      "cwd": "services/api",
+      "exit_code": 0
+    },
+    "migration_head": "6b0f1c2d3e4a",
+    "named_volume": false,
+    "seed": {
+      "command": [
+        "env",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
+        "PYTHONPATH=.",
+        "RETAILOPS_SEED_DATA_PROFILE=demo",
+        ".venv/bin/python",
+        "scripts/seed_demo_data.py"
+      ],
+      "cwd": "services/api",
+      "exit_code": 0,
+      "profile": "demo",
+      "summary": {
+        "alerts": 4,
+        "anomalies": 4,
+        "forecasts": 6,
+        "inventory_snapshots": 8,
+        "products": 8,
+        "recommendations": 4,
+        "sales": 16,
+        "users": 4,
+        "workflow_actions": 4
       }
+    },
+    "volume": "none"
+  },
+  "decision": {
+    "entry_blockers": [],
+    "models_or_production_ready": false,
+    "open_findings": [
+      "DATA-06",
+      "OPS-03",
+      "OPS-06",
+      "OPS-07"
     ],
-    "cli_exit_codes": [
-      {
-        "actual": 0,
-        "expected": 0
-      },
-      {
-        "actual": 0,
-        "expected": 0
-      },
-      {
-        "actual": 0,
-        "expected": 0
-      },
-      {
-        "actual": 1,
-        "expected": 1
-      },
-      {
-        "actual": 1,
-        "expected": 1
-      }
-    ],
-    "command": [
-      "services/api/.venv/bin/python",
-      "-m",
-      "scripts.data.verify_data05",
-      "--output",
-      "/private/tmp/retailops-ai02-audit-acceptance.json",
-      "--baseline",
-      "docs/evidence/ai/02/data01/legacy-baseline.json",
-      "--require-clean"
-    ],
-    "comparison": "All values equal except measured time/RSS, runtime temporary CLI paths and provenance git_commit (documentation-only change)",
-    "comparison_reference": "docs/evidence/ai/02/data05/acceptance.json",
-    "elapsed_seconds": 150.433,
+    "scope": "bounded synthetic observed_sales_units snapshot",
+    "start_ai03": true
+  },
+  "fingerprints": {
+    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+    "feature_code_sha256": "7dce996c9eea3de4afdf5b3e09ced01453d23e59b9f37901ea0452be82f32bc5",
+    "source_code_sha256": "0f702a65ebcdb3d78770b08a4f20c901b06211f04b0fe8b2d8d22aa0e5aa6d3b"
+  },
+  "fresh_pytest": {
+    "errors": 0,
     "exit_code": 0,
-    "hard_gates_per_case": 45,
+    "failures": 0,
+    "path": "/private/tmp/retailops-ai02-history-tests.xml",
+    "seconds": 662.167,
+    "sha256": "3c4e812b82ad3de63dc64cff69ef94146e6be0e709829c6ee53f24e968b7ffc5",
+    "skipped": 0,
+    "tests": 670
+  },
+  "implementation_commit": "5a8678c51f0343c528fc55b030dbfd1cf246aff8",
+  "limits": [
+    "No new model training or full-profile benchmark",
+    "No full cross-repo replay, inventory ledger, model serving or production qualification"
+  ],
+  "next_scope": "AI03.1: typed Parquet and artifact policy in RetailOps",
+  "observation_history": {
+    "append_only_api": true,
+    "external_import_and_immutable_snapshots": "AI03 preserves these guarantees; not implemented here",
+    "feature_field": "observation_history",
+    "later_sales_and_quantity_replacements_preserve_old_features_and_predictions": true,
+    "missing_history_status": "missing_history",
+    "policy": "observed-quantity-history-1.0.0",
+    "source_table": "daily_demand_versions",
+    "test": "services/api/tests/test_observation_history.py",
+    "training_labels_selected_at_fold_origin": true
+  },
+  "platform": {
+    "architecture": "arm64",
+    "python": "3.11.15",
+    "system": "Darwin",
+    "worker": "Linux ARM64 via Docker Desktop"
+  },
+  "policy_version": "ai02-readiness-audit-1.1.0",
+  "remote_ci": {
+    "branch_protection_retained": true,
+    "required_context": "required-result",
+    "status": "pending_publication"
+  },
+  "source_acceptance": {
+    "cases": 9,
+    "checks_per_case": 46,
+    "elapsed_seconds": 137.5015,
+    "facts_projection_policy": "forecast-facts-2.0.0",
+    "feature_schema": "3.1",
+    "generator": "0.8.0",
     "historical_exports": {
       "2.0.0": {
         "feature_id": "features-sha256-bdb259d15fd67e0af15dbce1465ff480ae93421125bde83231b0bf5730a9db13",
@@ -327,6 +174,11 @@
         "feature_id": "features-sha256-daf83f0b54c4ba8901bc6fd0050735c35614c1ba800cdfcbe418d0484e52f6db",
         "identity_and_parent_unchanged": true,
         "source_id": "source-sha256-d6562b0397df3a18a45c9fe419910f11b086c99cfd498b5d55881f2d67e81e2c"
+      },
+      "2.5.0": {
+        "feature_id": "features-sha256-662447c8a6002cde3084489bf7eb7157d1dcbf29ad56acc52e9481d5ae9f7f07",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-608e4b784829f05628195c52ab403409ccbd61ada13ac1e1b34c5392a585e4d8"
       }
     },
     "legacy_compatibility": {
@@ -335,10 +187,24 @@
       "tracked_demo_files_unchanged": 19
     },
     "measurement_scope": "sequential bounded supervisor; container RSS not measured, worker memory limit 256 MiB",
-    "normalized_report_sha256": "1117dae8501613c7fe79379accc00862db368b858dde7a2fc632e26ca1e0215f",
-    "process_peak_rss_bytes": 139804672,
-    "raw_report_sha256": "4148d0117325866c2a36d9eeddbf6635714ebde464ca311b08fcf9fe0efb7c06",
-    "reference_sha256": "6ad4545228a36da478bc94f8a8f9dc5a13a05a35e2e41205b67df09265c27e22",
+    "path": "../data05/acceptance.json",
+    "process_peak_rss_bytes": 149848064,
+    "profiles": [
+      {
+        "feature_id": "features-sha256-869f9edea5e4c685772723cab2b02c5edf8d8d08fba6d1f5c916aee3488c186c",
+        "feature_rows": 1612,
+        "profile": "ai-smoke",
+        "source_csv_count": 40,
+        "source_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00"
+      },
+      {
+        "feature_id": "features-sha256-5d7e3237f1ebf897981834933e815ae51482486061be5072ccc00953d8d24390",
+        "feature_rows": 2406,
+        "profile": "ai-temporal-smoke",
+        "source_csv_count": 40,
+        "source_id": "source-sha256-94829460645140b79a6f68e87194f74d2c8e55392e2702a9fecbe6b771116d22"
+      }
+    ],
     "repeat_checks": {
       "same_source_feature_ids_bytes_reports": true
     },
@@ -363,176 +229,143 @@
       },
       "supervisor": "trusted source owner validates and projects facts; only worker is the isolated runtime"
     },
-    "seed_size_date_change_ids": true,
+    "sha256": "baf3acf9ce2ab84b90eda51daecafbc8bd7345e916227a19323fb17715038c75",
+    "source_gate_policy": "forecast-source-acceptance-1.1.0",
+    "source_schema": "2.6.0",
     "status": "passed"
   },
-  "audited_at_utc": "2026-09-28T14:29:00.957934+00:00",
-  "audited_commit": "a82152af93ed60f3879d923a3006478fb115930e",
-  "branch": "ai/02-data-05",
-  "code_provenance_probe": {
-    "command": [
-      "env",
-      "PYTHONPATH=services/api:.",
-      "services/api/.venv/bin/python",
-      "docs/evidence/ai/02/audit/worker-provenance-probe.py"
-    ],
-    "exit_code": 0,
-    "finding": "DATA-07",
-    "probe_sha256": "734799848cae58b1e370c8c2dace325d7b3bbf08527f9aab3ff4f6c57d5aa2ba",
-    "result": {
-      "code_fingerprint_after": "050f1d685f07f8d39cf0dd089e67125001a49708b68f503c272dc86431532517",
-      "code_fingerprint_before": "050f1d685f07f8d39cf0dd089e67125001a49708b68f503c272dc86431532517",
-      "feature_identity_equal": true,
-      "fingerprints_equal_after_executed_code_change": true,
-      "identity_after": "features-sha256-3c4a96c745908e6ef144118cb8895424eb494bbd42f20f1b8e8a5cb7eadd94b6",
-      "identity_before": "features-sha256-3c4a96c745908e6ef144118cb8895424eb494bbd42f20f1b8e8a5cb7eadd94b6",
-      "init_executed": true,
-      "omitted_worker_files": [
-        "ml/__init__.py",
-        "ml/features/__init__.py"
+  "static_checks": [
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "services/api/app",
+        "services/api/scripts",
+        "services/api/tests",
+        "data",
+        "ml",
+        "scripts/data/verify_data05.py",
+        "scripts/ci/ml_experiment_report.py"
       ],
-      "original_and_temp_fingerprints_equal": true,
-      "output_equal": true
+      "exit_code": 0,
+      "name": "ruff",
+      "status": "passed"
     },
-    "scope": "isolated Python process in a temporary code copy; does not repeat Docker isolation test"
-  },
-  "decision": {
-    "entry_blockers": [],
-    "models_or_production_ready": false,
-    "open_findings": [
-      "DATA-07",
-      "ML-07",
-      "DATA-06",
-      "OPS-03",
-      "OPS-06",
-      "OPS-07"
-    ],
-    "publication_prerequisite": "Close DATA-07 before first immutable snapshot publication; require remote CI before main merge",
-    "scope": "local development from bounded synthetic observed_sales_units source",
-    "start_ai03": true
-  },
-  "fingerprints": {
-    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
-    "feature_code_sha256": "050f1d685f07f8d39cf0dd089e67125001a49708b68f503c272dc86431532517",
-    "source_code_sha256": "6d77215809fc7caa12d92d2c5ff642783881dd4c11135bf78042b4b243899cfe"
-  },
-  "fresh_pytest": {
-    "runs": [
-      {
-        "command": [
-          "env",
-          "PYTHONPATH=services/api:.",
-          "services/api/.venv/bin/python",
-          "-m",
-          "pytest",
-          "-q",
-          "services/api/tests/test_data_dimensions.py",
-          "services/api/tests/test_data_pricing.py",
-          "services/api/tests/test_data_demand.py",
-          "services/api/tests/test_data_returns.py",
-          "-k",
-          "local_dst or frozen_country or temporal_versions or price_revision or unavailable_scope or pre_and_post or demand_weight or basket_allocation or calendar_lag or snapshot_revenue or occurrence_alone or return_window_deadline or absence_of_return or later_events_do_not",
-          "--junitxml=/private/tmp/retailops-ai02-semantics-tests.xml"
-        ],
-        "errors": 0,
-        "exit_code": 0,
-        "failures": 0,
-        "path": "/private/tmp/retailops-ai02-semantics-tests.xml",
-        "seconds": 1.29,
-        "sha256": "abaa79c6a6dca2b399eb802bd9890ef933a076e710726459a5c3cd41dc3af625",
-        "skipped": 0,
-        "tests": 36
-      },
-      {
-        "command": [
-          "env",
-          "PYTHONPATH=services/api:.",
-          "services/api/.venv/bin/python",
-          "-m",
-          "pytest",
-          "-q",
-          "services/api/tests/test_data_dimensions.py",
-          "services/api/tests/test_data_pricing.py",
-          "services/api/tests/test_data_demand.py",
-          "services/api/tests/test_data_returns.py",
-          "-k",
-          "hard_gates or negative_pricing or relational_and_sales or relational_price or missing_window or late_fact_after or feature_label_cannot",
-          "--junitxml=/private/tmp/retailops-ai02-semantics-negative-tests.xml"
-        ],
-        "errors": 0,
-        "exit_code": 0,
-        "failures": 0,
-        "path": "/private/tmp/retailops-ai02-semantics-negative-tests.xml",
-        "seconds": 49.953,
-        "sha256": "c53ff86bef5154af69570045f24a7e3366b7d1c5b27909bce9dc20bf74a38093",
-        "skipped": 0,
-        "tests": 98
-      },
-      {
-        "command": [
-          "env",
-          "PYTHONPATH=services/api:.",
-          "services/api/.venv/bin/python",
-          "-m",
-          "pytest",
-          "-q",
-          "services/api/tests/test_data_identity_v2.py",
-          "services/api/tests/test_source_isolation.py",
-          "--maxfail=2"
-        ],
-        "errors": 0,
-        "evidence_kind": "captured tool stdout; no JUnit requested",
-        "execution": "rerun with Docker permission after sandbox socket denial",
-        "exit_code": 0,
-        "failures": 0,
-        "seconds": 125.23,
-        "skipped": 0,
-        "tests": 72
-      }
-    ],
-    "total_passed": 206
-  },
-  "implementation_commit": "6e06e909c7dac78675324e8d8ec42921e36b95e8",
-  "limits": [
-    "No fresh remote Required CI evidence for stage02",
-    "No Linux AMD64 execution in this audit",
-    "No ai-dev/ai-training benchmark or model training",
-    "No qualification of external late corrections, inventory ledger, model serving or production"
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "services/api/app",
+        "services/api/scripts",
+        "services/api/tests",
+        "data",
+        "ml",
+        "scripts/data/verify_data05.py",
+        "scripts/ci/ml_experiment_report.py"
+      ],
+      "exit_code": 0,
+      "name": "format",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "name": "mypy",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "bandit",
+        "--severity-level",
+        "high",
+        "--confidence-level",
+        "high",
+        "-q",
+        "-r",
+        "services/api/app",
+        "services/api/scripts",
+        "data/generator",
+        "ml/features",
+        "-f",
+        "txt",
+        "-o",
+        "/private/tmp/retailops-ai02-history-bandit.txt"
+      ],
+      "exit_code": 0,
+      "name": "bandit",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-code-gitleaks.json"
+      ],
+      "exit_code": 0,
+      "name": "gitleaks_code",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-docs-gitleaks.json"
+      ],
+      "exit_code": 0,
+      "name": "gitleaks_documentation",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--log-opts=origin/main..HEAD",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-all-commits-gitleaks.json"
+      ],
+      "commits_scanned": 17,
+      "exit_code": 0,
+      "name": "gitleaks_all_ai02_commits",
+      "status": "passed"
+    }
   ],
-  "platform": {
-    "architecture": "arm64",
-    "python": "3.11.15",
-    "system": "Darwin",
-    "worker": "Linux ARM64 via Docker Desktop"
-  },
-  "policy_version": "ai02-readiness-audit-1.0.0",
-  "prior_full_suite_validation": {
-    "coverage": {
-      "branches-covered": 326,
-      "branches-valid": 502,
-      "combined_line_branch_percent": 83.82,
-      "lines-covered": 2674,
-      "lines-valid": 3077,
-      "threshold_percent": 70,
-      "xml_sha256": "c5efddd5f62d11cc858d1d503e10a1d8493af2b6c298d7e61ba2d6ba25879e0b"
-    },
-    "junit": {
-      "errors": 0,
-      "failures": 0,
-      "path": "/private/tmp/retailops-data05-final-tests.xml",
-      "seconds": 487.01,
-      "sha256": "dffcf5101d90deebaa5422789ca9c6d43db76f72162bbe4f66a1fbb98c5b7dfe",
-      "skipped": 0,
-      "tests": 650
-    },
-    "reason": "same implementation and source/feature/dependency fingerprints; verified raw JUnit and coverage against stored receipt",
-    "rerun_in_this_audit": false,
-    "verification": "docs/evidence/ai/02/data05/verification.json"
-  },
-  "requirements": {
-    "current_stage02": "docs/plans/ai/etapy/02-dane-sprzedazowe.md",
-    "late_correction_requirement": "partially covered for plans and return cutoffs; full aggregate history remains ML-07 in AI03/04",
-    "original_stage02_commit": "e665935",
-    "stage03": "docs/plans/ai/etapy/03-snapshot-curated.md"
+  "static_scope": {
+    "bandit_confidence": "high",
+    "bandit_report_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bandit_severity": "high",
+    "mypy_configured_files": 5,
+    "ruff_formatted_files": 152,
+    "ruff_tests_excluded_by_project_policy": true
   }
 }

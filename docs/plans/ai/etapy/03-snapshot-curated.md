@@ -6,11 +6,10 @@ Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ście
 
 Normatywne dokumenty: [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md), [architektura](../architektura.md), [szablony evidence](../szablony/karty-i-evidence.md). Warunek wejścia: źródłowe bramki 02 i zadeklarowana wersja kontraktu. Stage03 przyjmuje `inventory_ready=false`; nie wymusza sztucznych stockout/anomaly labels.
 
-[Audyt wejścia z 28.09.2026](../../../evidence/ai/02/audit/README.md) potwierdza
-lokalne rozpoczęcie etapu. Przed pierwszą publikacją immutable snapshot zamknąć
-[DATA-07](../../../audits/open-findings.md#data-07--p2--fingerprint-nie-obejmuje-całego-wykonywanego-kodu-workera):
-fingerprint całego wykonywanego bundla, także package initializers, z testami
-zmiany kodu/ID i clean provenance. ML-07 pozostaje warunkiem historii korekt.
+[Audyt wejścia](../../../evidence/ai/02/audit/README.md) potwierdza gotowość
+źródła 2.6. Fingerprint obejmuje cały wykonywany bundle; historia ilości jest
+append-only i odczytywana według stanu znanego w origin. Eksport, importer i
+curated mają zachować te gwarancje oraz brak historii zgłaszać jawnie.
 
 ## Kolejność małych PR-ów
 

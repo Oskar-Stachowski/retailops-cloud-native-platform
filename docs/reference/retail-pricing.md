@@ -3,10 +3,11 @@
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Generowanie](../guides/data.md)
 
 Profile `ai-*` używają jednego [resolvera](../../data/generator/price_resolver.py)
-opartego na jawnych planach. Generator 0.7.0 i source schema 2.5.0 mają pięć
+opartego na jawnych planach. Generator 0.8.0 i source schema 2.6.0 mają pięć
 tabel pricing, dziewięć tabel wymiarów, trzy [popytu/panelu](daily-demand.md)
-trzy [zwrotów](retail-returns.md), dwie parametrów symulacji i 17 tabel zgodności:
-razem 39 CSV.
+trzy [zwrotów](retail-returns.md), dwie parametrów symulacji, historię obserwacji
+i 17 tabel zgodności:
+razem 40 CSV.
 Kontrakt `retail-pricing-1.0.0` ma [JSON Schema](../../data/contracts/retail_pricing.v1.schema.json)
 oraz [wykonywalne kontrole](../../data/generator/pricing_quality.py).
 Demo i profile small/medium/large zachowują wcześniejsze reguły i bajty CSV.
@@ -85,7 +86,7 @@ Przy quantity 0 realized price pozostaje pusty. Availability to maksimum
 `sale.ingested_at` (lub sold_at) oraz cutoffów wyceny zamówień.
 To wynik zaobserwowanych transakcji, **nie plan ani cecha znana przed target day**.
 Tabela cen jest sparse; pełny panel demand ma [osobny kontrakt](daily-demand.md).
-Obecne cechy AI schema 3.0 oraz legacy 2.0 nie zawierają realized price, revenue ani promotion truth.
+Obecne cechy AI schema 3.1 oraz legacy 2.1 nie zawierają realized price, revenue ani promotion truth.
 Ich generator weryfikuje bramkę cenową, a parent identity obejmuje pełne źródło.
 
 Truth stosuje chronologiczne okna względem realnych dat kampanii:
@@ -119,7 +120,7 @@ Wyniki JSON i krótkie MD trafiają do pricing_report i są objęte checksumami 
 Odczyt źródła odtwarza bramki i oba raporty; przeliczenie hashów błędnych danych
 nie omija kontroli. Generowanie, feature builder i validator odrzucają błędy.
 
-Source schema 2.5.0, pricing/demand policy oraz kanonizacja 1.5.0 wchodzą do identity.
+Source schema 2.6.0, pricing/demand policy oraz kanonizacja 1.6.0 wchodzą do identity.
 Readiness forecasting/anomaly/stockout/replay nadal wynosi not_ready,
 inventory_ready=false. Osobne [source_ready=true](source-acceptance.md)
 kwalifikuje źródło do AI 03 po wszystkich bramkach.

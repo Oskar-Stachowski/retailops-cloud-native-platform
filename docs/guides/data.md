@@ -58,9 +58,9 @@ błędny rabat albo nieaktywna promocja kończy się błędem, także w feature 
 Sześć bramek [popytu/panelu](../reference/daily-demand.md) sprawdza pełną siatkę,
 agregaty, koszyki bez powtórzeń SKU, dzienne budżety i kompletność. Brak dnia,
 podwójna waga popytu albo nieuzgodniony koszyk blokuje eksport; missing jest unknown.
-Demand report ma JSON/MD, a cechy AI schema 3.0.
+Demand report ma JSON/MD, a cechy AI schema 3.1.
 Siedem bramek chronologii/zwrotów i trzy kontrole separacji domykają
-[45 bramek źródła](../reference/source-acceptance.md). `source_report.json/md`
+[46 bramek źródła](../reference/source-acceptance.md). `source_report.json/md`
 kwalifikuje AI do snapshotu 03, a `realism_report.json/md` pokazuje diagnostykę
 z jawnymi progami i nieocenialnymi metrykami. `source_ready=true` dotyczy źródła;
 modele i inventory zachowują `not_ready`. Cechy AI wymagają jawnego

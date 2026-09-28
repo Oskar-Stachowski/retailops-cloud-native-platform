@@ -2,9 +2,9 @@
 
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Ceny](retail-pricing.md)
 
-Profile ai-* używają daily-demand-1.0.0, generatora 0.7.0 i source schema 2.5.0.
-Trzy tabele popytu, trzy [zwrotów](retail-returns.md) i dwie parametrów
-symulacji dają łącznie **39 CSV**. Demo i legacy zachowują wcześniejsze
+Profile ai-* używają daily-demand-1.0.0, generatora 0.8.0 i source schema 2.6.0.
+Cztery tabele popytu i historii, trzy [zwrotów](retail-returns.md) i dwie parametrów
+symulacji dają łącznie **40 CSV**. Demo i legacy zachowują wcześniejsze
 reguły oraz bajty danych. [JSON Schema](../../data/contracts/retail_demand.v1.schema.json)
 opisuje komórki CSV; [walidator](../../data/generator/demand_quality.py) sprawdza semantykę.
 
@@ -77,9 +77,31 @@ zachowują brak gwarancji kompletności. Return units i net revenue opisują wie
 przy day close; dojrzałość okien oraz późniejsze refundacje opisują
 [rozliczenia zwrotów](retail-returns.md) z własnymi cutoffami. Nie zmieniają targetu sprzedaży.
 
+## Historia obserwacji
+
+`daily_demand_observations` zawiera najnowszy stan; `daily_demand_versions`
+zachowuje kolejne stany ilości dla tego samego observation ID i grain.
+[Schema CSV](../../data/contracts/observation_history.v1.schema.json) i
+[walidator](../../data/generator/observation_history.py) wymagają polityki
+`observed-quantity-history-1.0.0`, ciągłych wersji od 1, rosnącego UTC availability,
+pełnego pokrycia panelu i zgodności ostatniego stanu z bieżącą obserwacją.
+Pierwszy stan kompletnego dnia nie może poprzedzać jego zamknięcia.
+
+`append_daily_revision` kopiuje wcześniejsze wersje i dopisuje nowy stan;
+odrzuca backdating i korektę bez historii. Spóźniona nowa sprzedaż zwiększa
+sumę od chwili ingestii, a kolejna wersja tego samego sale ID zastępuje jego
+ilość. Odczyt as-of wybiera ostatni stan dostępny do origin. Wcześniejsze lagi,
+label treningowy i prognozy RF/baseline pozostają identyczne po późnej korekcie.
+Brak znanego stanu daje `missing_history`; stan niekompletny ma `missing` i null.
+Nie rekonstruuj wcześniejszych wartości z samej najnowszej sumy.
+
+Eksporter/importer i curated w AI 03 muszą przenieść te wersje i availability
+bez nadpisywania snapshotów. Ta tabela nie kwalifikuje jeszcze całej integracji
+cross-repo ani ledgeru zapasu.
+
 ## Cechy, bramki i dalsza praca
 
-[Cechy AI 3.0](ml-features.md) zachowują pełny fizyczny grain i statusy panelu,
+[Cechy AI 3.1](ml-features.md) zachowują pełny fizyczny grain i statusy panelu,
 bez inventory, truth i realized price/revenue target day. Calendar lag sprawdza
 dokładną datę względem origin i availability; luka, missing/closed lub późny
 rekord dają unknown. Nie przesuwa sparse wierszy.
@@ -89,9 +111,9 @@ koszyki, formułę/budżet i kompletność. Generacja, feature builder i odczyt 
 odtwarzają kontrole; demand_report JSON/MD są objęte checksumami. Przeliczenie
 hashów nie ukrywa luki ani fałszywego raportu. Raporty wymiarów/pricing potwierdzają
 własne komponenty; ich wcześniejsze flagi panelu nie zastępują bramki demand.
-Kanonizacja 1.5.0 i demand policy wchodzą do source identity.
+Kanonizacja 1.6.0 i demand policy wchodzą do source identity.
 
-Source 2.0–2.4 i features 2.0/3.0 zachowują IDs i parent.
+Source 2.0–2.5 i features 2.0/3.0 zachowują IDs i parent.
 [Odbiór źródła](source-acceptance.md) kwalifikuje AI do snapshotu 03;
 inventory i modele pozostają not_ready.
-Forecast na cechach 3.0 jest etapem AI 04.
+Forecast na cechach 3.1 jest etapem AI 04.

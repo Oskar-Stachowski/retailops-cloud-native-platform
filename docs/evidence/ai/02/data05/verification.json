@@ -1,17 +1,21 @@
 {
   "acceptance": {
+    "code_commit": "5a8678c51f0343c528fc55b030dbfd1cf246aff8",
     "command": [
       "services/api/.venv/bin/python",
       "-m",
       "scripts.data.verify_data05",
       "--output",
-      "docs/evidence/ai/02/data05/acceptance.json",
+      "/private/tmp/retailops-ai02-history-acceptance.json",
       "--baseline",
       "docs/evidence/ai/02/data01/legacy-baseline.json",
       "--require-clean"
     ],
     "exit_code": 0,
-    "report_sha256": "6ad4545228a36da478bc94f8a8f9dc5a13a05a35e2e41205b67df09265c27e22"
+    "normalization": "only absolute repo/temp paths in CLI evidence replaced with <repo>/<temp>",
+    "raw_report_sha256": "d7b79d9ecda63d516f113b80e1e57906448ea4332c393e13632820b827c558e9",
+    "report_sha256": "baf3acf9ce2ab84b90eda51daecafbc8bd7345e916227a19323fb17715038c75",
+    "same_fingerprints_at_verification_commit": true
   },
   "base_commit": "0ab992cd69fec66c97a33f2535972f270975cb09",
   "branch": "ai/02-data-05",
@@ -83,7 +87,7 @@
         "-f",
         "txt",
         "-o",
-        "/private/tmp/retailops-data05-final-bandit.txt"
+        "/private/tmp/retailops-ai02-history-bandit.txt"
       ],
       "exit_code": 0,
       "name": "bandit",
@@ -100,7 +104,7 @@
         "--report-format",
         "json",
         "--report-path",
-        "/private/tmp/retailops-data05-final-gitleaks.json"
+        "/private/tmp/retailops-ai02-history-code-gitleaks.json"
       ],
       "exit_code": 0,
       "name": "gitleaks_code",
@@ -117,30 +121,48 @@
         "--report-format",
         "json",
         "--report-path",
-        "/private/tmp/retailops-data05-docs-gitleaks.json"
+        "/private/tmp/retailops-ai02-history-docs-gitleaks.json"
       ],
       "exit_code": 0,
       "name": "gitleaks_documentation",
       "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--log-opts=origin/main..HEAD",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-all-commits-gitleaks.json"
+      ],
+      "commits_scanned": 17,
+      "exit_code": 0,
+      "name": "gitleaks_all_ai02_commits",
+      "status": "passed"
     }
   ],
-  "completed_at": "2026-09-28T14:05:52.687880+00:00",
+  "completed_at": "2026-09-28T15:32:00.820165+00:00",
   "coverage": {
     "branches-covered": 326,
     "branches-valid": 502,
     "combined_line_branch_percent": 83.82,
     "lines-covered": 2674,
     "lines-valid": 3077,
+    "remote_threshold_percent": 80,
     "threshold_percent": 70,
-    "xml_sha256": "c5efddd5f62d11cc858d1d503e10a1d8493af2b6c298d7e61ba2d6ba25879e0b"
+    "xml_sha256": "db0fb2abf711f57e32f6c77d88c3fbcac9325e303dfffb1be14ae24ea68e86da"
   },
   "database": {
-    "address": "127.0.0.1:58198",
+    "address": "127.0.0.1:59649",
     "cleanup": {
       "command": [
         "docker",
         "stop",
-        "retailops-data05-postgres"
+        "retailops-ai02-history-postgres"
       ],
       "exit_code": 0,
       "matching_containers": [],
@@ -150,19 +172,20 @@
         "ps",
         "-a",
         "--filter",
-        "name=retailops-data05-postgres",
+        "name=retailops-ai02-history-postgres",
         "--format",
         "{{.Names}}"
       ]
     },
-    "container": "retailops-data05-postgres",
-    "database_name": "data05",
+    "container": "retailops-ai02-history-postgres",
+    "database_name": "history",
+    "fresh": true,
     "image": "postgres:16-alpine",
     "isolated_fresh_database": true,
     "migration": {
       "command": [
         "env",
-        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:58198/data05",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
         "PYTHONPATH=.",
         ".venv/bin/alembic",
         "upgrade",
@@ -176,7 +199,7 @@
     "seed": {
       "command": [
         "env",
-        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:58198/data05",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
         "PYTHONPATH=.",
         "RETAILOPS_SEED_DATA_PROFILE=demo",
         ".venv/bin/python",
@@ -196,26 +219,25 @@
         "users": 4,
         "workflow_actions": 4
       }
-    }
+    },
+    "volume": "none"
   },
   "documentation": {
-    "completed_scope_removed_from_open_findings": true,
-    "missing_targets": [],
-    "next_scope": "typed Parquet and artifact policy",
-    "next_stage": "03",
-    "relative_links_checked": 331
+    "contracts": "../../../../reference/source-acceptance.md",
+    "local_links_and_json": "passed",
+    "readiness_audit": "../audit/README.md"
   },
   "fingerprints": {
     "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
-    "feature_code_sha256": "050f1d685f07f8d39cf0dd089e67125001a49708b68f503c272dc86431532517",
-    "source_code_sha256": "6d77215809fc7caa12d92d2c5ff642783881dd4c11135bf78042b4b243899cfe"
+    "feature_code_sha256": "7dce996c9eea3de4afdf5b3e09ced01453d23e59b9f37901ea0452be82f32bc5",
+    "source_code_sha256": "0f702a65ebcdb3d78770b08a4f20c901b06211f04b0fe8b2d8d22aa0e5aa6d3b"
   },
-  "implementation_commit": "6e06e909c7dac78675324e8d8ec42921e36b95e8",
+  "implementation_commit": "5a8678c51f0343c528fc55b030dbfd1cf246aff8",
   "limitations": [
-    "No training or large-profile resource benchmark",
-    "Forecasting/anomaly/stockout/replay not_ready; inventory_ready=false",
-    "Snapshot/importer/curated/history corrections remain AI-03/04",
-    "Ruff and mypy scope follows configured project policy"
+    "No new model training, serving or ai-dev/ai-training benchmark",
+    "No complete cross-repo import/curated/replay qualification",
+    "Inventory ledger not qualified; inventory_ready=false",
+    "Remote publication is recorded separately in audit verification"
   ],
   "platform": {
     "architecture": "arm64",
@@ -226,10 +248,10 @@
   "pytest": {
     "command": [
       "env",
-      "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:58198/data05",
+      "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
       "REQUIRE_DB_TESTS=1",
       "PYTHONPATH=services/api:.",
-      "COVERAGE_FILE=/private/tmp/retailops-data05-final.coverage",
+      "COVERAGE_FILE=/private/tmp/retailops-ai02-history.coverage",
       "services/api/.venv/bin/python",
       "-m",
       "pytest",
@@ -237,20 +259,23 @@
       "services/api/tests",
       "--cov=services/api/app",
       "--cov-report=term",
-      "--cov-report=xml:/private/tmp/retailops-data05-final-coverage.xml",
-      "--junitxml=/private/tmp/retailops-data05-final-tests.xml"
+      "--cov-report=xml:/private/tmp/retailops-ai02-history-coverage.xml",
+      "--junitxml=/private/tmp/retailops-ai02-history-tests.xml",
+      "--maxfail=5"
     ],
-    "database_required": true,
     "errors": 0,
     "exit_code": 0,
     "failures": 0,
-    "junit_sha256": "dffcf5101d90deebaa5422789ca9c6d43db76f72162bbe4f66a1fbb98c5b7dfe",
-    "seconds": 487.01,
+    "path": "/private/tmp/retailops-ai02-history-tests.xml",
+    "seconds": 662.167,
+    "sha256": "3c4e812b82ad3de63dc64cff69ef94146e6be0e709829c6ee53f24e968b7ffc5",
     "skipped": 0,
-    "source_isolation_tests": 29,
-    "tests": 650
+    "tests": 670
   },
-  "remote_ci": "not_run",
+  "remote_ci": {
+    "evidence": "../audit/verification.json",
+    "status": "pending_publication"
+  },
   "runtime_platform_scope": {
     "linux_amd64_execution": "not_run",
     "local_worker": "Linux ARM64 via Docker Desktop",
@@ -262,8 +287,9 @@
     "bandit_report_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "bandit_severity": "high",
     "mypy_configured_files": 5,
-    "ruff_formatted_files": 150,
+    "ruff_formatted_files": 152,
     "ruff_tests_excluded_by_project_policy": true
   },
-  "status": "passed"
+  "status": "passed",
+  "verification_commit": "152341e4e217c5eac4c700e9e9d67c2eb61090ef"
 }

@@ -16,8 +16,8 @@ dodaje wspólne ceny/promocje, scope, wersje znanych planów i uzgodnienie trans
 panel, dzienne budżety, koszyki bez powtórzeń i cechy AI 3.0.
 [DATA-03](../../evidence/ai/02/data03/README.md) dodaje chronologię, zwroty,
 rozliczenie revenue i osobne history/return-tail cutoffy.
-[DATA-05](../../evidence/ai/02/data05/README.md) domyka lokalny odbiór source 2.5:
-45 hard gates, rozdzielone parametry i izolowany worker faktów.
+[DATA-05](../../evidence/ai/02/data05/README.md) domyka lokalny odbiór source 2.6:
+46 hard gates, rozdzielone parametry i izolowany worker faktów i wersjonowane obserwacje z odczytem as-of.
 Następna implementacja to [snapshot i curated 03](etapy/03-snapshot-curated.md);
 równolegle można rozpocząć RAG 11. Modele i inventory nadal nie są gotowe.
 [Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.

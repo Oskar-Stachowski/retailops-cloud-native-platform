@@ -7,8 +7,8 @@ Poniżej są wyłącznie otwarte problemy potwierdzone w źródłach lub reprodu
 przegląd statyczny i odczyt CI. Pozwala rozpocząć AI 01;
 nie potwierdza gotowości wszystkich dalszych etapów ani wdrożenia produkcyjnego.
 Kolejność pracy i pierwsze małe PR-y: [backlog AI](../plans/ai/backlog.md).
-[Audyt AI 02](../evidence/ai/02/audit/README.md) na `a82152a` potwierdza
-lokalną gotowość źródła do rozpoczęcia AI 03; dodaje ustalenie DATA-07.
+[Audyt AI 02](../evidence/ai/02/audit/README.md) potwierdza
+gotowość źródła 2.6 do rozpoczęcia AI 03.
 
 **P1** oznacza ryzyko utraty danych, naruszenia granicy dostępu lub niewiarygodnej
 oceny modelu. **P2** oznacza problem odtwarzalności, izolacji lub diagnostyki.
@@ -29,47 +29,6 @@ mapping. Kod: [inventory i stock movements](../../data/generator/profile_engine.
 selling/stock location, uzgodnienie bilansu ruchów/sprzedaży/dostaw/zwrotów,
 availability snapshotów i testy braku/przyszłego zapasu. Dopiero wtedy labels stockout.
 Nie blokuje forecast-only AI 04–05, gdzie inventory features są pominięte.
-
-## ML i historia danych
-
-### DATA-07 · P2 · Fingerprint nie obejmuje całego wykonywanego kodu workera
-
-**Dowód:** [bundle workera](../../ml/features/isolated_runtime.py) zawiera
-`ml/__init__.py` i `ml/features/__init__.py`, ale
-[fingerprint cech](../../ml/features/identity.py) pomija oba pliki.
-[Reprodukcja audytu](../evidence/ai/02/audit/worker-provenance-probe.py)
-wykonuje dodatkowy kod inicjalizatora w kopii tymczasowej; fingerprint i feature ID
-pozostają identyczne przy niezmienionych wierszach. Jest to brak pełnego provenance
-transformacji. Hash treści nadal rozróżnia różne dane; nie wykazano jego kolizji.
-Obecne inicjalizatory mają wyłącznie docstringi, więc ustalenie nie podważa
-bieżącego odbioru danych ani izolacji runtime.
-
-**Kryterium zamknięcia — przed publikacją immutable snapshot w AI 03:** objąć
-fingerprintem wszystkie wykonywane pliki bundla, także inicjalizatory pakietów.
-Test zmiany każdego pliku ma zmienić hash kodu i właściwe ID również wtedy,
-gdy próbka wynikowych wierszy się nie zmienia; modified code nie może otrzymać
-clean provenance. Zachować odczyt wcześniejszych manifestów i ich IDs.
-Nie blokuje rozpoczęcia implementacji AI 03.
-
-### ML-07 · P2 · Dzienny agregat nie zachowuje wcześniejszych wersji historii
-
-**Dowód:** `_build_aggregates` w
-[generatorze cech](../../ml/features/demand_forecast.py) sumuje wszystkie
-sprzedaże dnia i zapisuje maksymalny czas dostępności. Dodanie spóźnionej
-sprzedaży do historycznego dnia przesuwa dostępność całego agregatu. Przy
-odtwarzaniu wcześniejszego origin znika także poprzednio znana część sprzedaży;
-reprodukcja zmienia `lag_1_units` z 3 na 0 i wskaźnik dostępności z 1 na 0.
-
-To ograniczenie przyszłego importu i odtwarzania historii, nie wykazany błąd
-zapisanej oceny RF: obecny generator syntetyczny dostarcza sprzedaż tego samego
-dnia, a panel ocenionego przebiegu nie zawiera dostępności z późniejszego dnia.
-
-**Kryterium zamknięcia:** wersjonowane agregaty albo agregacja według stanu
-znanego w origin. Dodanie późniejszej sprzedaży lub korekty nie zmienia cech
-ani prognoz wcześniejszego origin. Brak potrzebnej historii ma jawny status.
-Warunek importu historycznych korekt i pełnego replay w AI 03–04.
-Syntetyczne źródło 2.5 z bieżącymi day-close facts może rozpocząć AI 03;
-nie kwalifikuje to odtwarzania wcześniejszych wersji zewnętrznej historii.
 
 ## Runtime i bezpieczeństwo
 

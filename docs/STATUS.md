@@ -22,7 +22,7 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 | Monitoring | Metryki API/DB/stream, Prometheus, Grafana i próba rzeczywistego firing/resolution alertu. SLO dotyczy scrape metryk; brak dowodu dostępności żądań użytkownika przez 30 dni i dostarczania powiadomień. |
 | Jenkins | Rzeczywiste lokalne wykonanie pipeline z 2026-09-26; dodatkowa walidacja, bez wdrażania do chmury. |
 | ML | Lokalna generacja cech, ocena RF z trzema oknami walidacyjnymi i odłożonym testem całego horyzontu oraz zweryfikowana ścieżka artefaktu do batchu, metadanych i metryk. [Ocena z 27.09.2026](evidence/ml/fixed-origin-rf-2026-09-27/README.md) odrzuciła RF wobec średniej ruchomej; brak kwalifikacji do serving. |
-| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. Kontrakty danych/run/tool, walidacja offline i lokalne uprawnienia API: 267 testów na czystym checkoutcie oraz rzeczywisty HTTP z wheel poza źródłami. Principal pochodzi z prywatnych poświadczeń, cały scope jest egzekwowany; admin nie dziedziczy odczytów. Osobny wcześniejszy pomiar Compose: crash, trwałość, awaria DB i recovery. Etap 01 ma odbiór lokalny i zdalny: Required CI PR oraz push na main obu repo przechodzi, w tym persistence na Linux AMD64; dodatkowe testy bramki CI zwiększają zestaw do 273 testów. Zmiana grants/revoked wymaga restartu API; nie ma OIDC/production IAM lub serving. Źródło 2.5 ma lokalny odbiór AI 02; snapshot/importer AI 03 pozostają kolejnym zakresem. |
+| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. Kontrakty danych/run/tool, walidacja offline i lokalne uprawnienia API: 267 testów na czystym checkoutcie oraz rzeczywisty HTTP z wheel poza źródłami. Principal pochodzi z prywatnych poświadczeń, cały scope jest egzekwowany; admin nie dziedziczy odczytów. Osobny wcześniejszy pomiar Compose: crash, trwałość, awaria DB i recovery. Etap 01 ma odbiór lokalny i zdalny: Required CI PR oraz push na main obu repo przechodzi, w tym persistence na Linux AMD64; dodatkowe testy bramki CI zwiększają zestaw do 273 testów. Zmiana grants/revoked wymaga restartu API; nie ma OIDC/production IAM lub serving. Źródło 2.6 ma odbiór AI 02; snapshot/importer AI 03 pozostają kolejnym zakresem. |
 
 ## Zakres użycia
 
@@ -36,23 +36,20 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
-[Audyt AI 02](evidence/ai/02/audit/README.md) na `a82152a` potwierdza lokalne
-rozpoczęcie AI 03: ponowny odbiór źródła i 206 świeżych testów przeszły.
-DATA-07 wymaga uzupełnienia fingerprintu całego kodu workera przed pierwszą
-publikacją immutable snapshot; bieżące dane i izolacja pozostają poprawne.
+[Audyt AI 02](evidence/ai/02/audit/README.md) potwierdza gotowość źródła do
+**[AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md)**.
+Źródło 2.6 przechodzi 46 hard gates; cechy AI 3.1 powstają w izolowanym workerze
+z czterech projekcji faktów. Fingerprint obejmuje cały wykonywany kod, a wersje
+obserwacji zachowują stan znany w historycznym origin. Późna sprzedaż lub
+korekta nie zmienia wcześniejszych lagów, labels treningowych ani predykcji.
 
-Etap 02 ma [lokalny odbiór DATA-05](evidence/ai/02/data05/README.md):
-source 2.5, 45 hard gates, rozdzielone parametry symulacji i osobny worker cech,
-który przyjmuje wyłącznie trzy projekcje faktów. Oba profile smoke zachowują
-powtarzalne source/feature IDs i bajty; demo oraz archiwa 2.0–2.4 są zgodne.
-`source_ready=true` kwalifikuje obserwowaną sprzedaż do snapshotu, a nie model.
-Forecasting/anomaly/stockout/replay pozostają not_ready; inventory_ready=false.
+[Końcowy odbiór](evidence/ai/02/data05/README.md) obejmuje powtórzenia obu smoke,
+zgodne bajty demo i zachowanie IDs archiwów 2.0–2.5.
+`source_ready=true` dotyczy obserwowanej sprzedaży. Modele, inventory i pełny
+replay cross-repo mają własne dalsze bramki.
 
-Następna implementacja to **[AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md)**,
-począwszy od typed Parquet, polityki artefaktów i niezmiennego eksportu w RetailOps.
-Repo AI może równolegle rozwijać [RAG 11](plans/ai/etapy/11-rag.md) od zatwierdzonego korpusu.
-[Backlog](plans/ai/backlog.md) określa zakres i zależności.
-Historia korekt ML-07, ledger, streaming, auth i serving mają własne późniejsze bramki.
-Kryteria: [otwarte ustalenia](audits/open-findings.md).
-Nowe zakresy etapu 02 mają lokalne commity i evidence; zdalny Required CI tych zmian
-nie został jeszcze uruchomiony.
+Pierwszy zakres 03 to typed Parquet, polityka artefaktów i niezmienny eksport
+w RetailOps. Repo AI może równolegle rozwijać [RAG 11](plans/ai/etapy/11-rag.md)
+od zatwierdzonego korpusu. [Backlog](plans/ai/backlog.md) opisuje zależności,
+a [otwarte ustalenia](audits/open-findings.md) pozostałe problemy.
+Dowód zdalnego Required CI i publikacji na main: [audyt](evidence/ai/02/audit/README.md).

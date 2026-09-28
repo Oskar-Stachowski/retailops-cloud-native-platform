@@ -5,7 +5,7 @@ Odbiór lokalny **2026-09-28**, branch ai/02-demand-panel, kod
 `138e48477f7965de907098ccb169774b5451d049`.
 Zakres: punkt 4 instrukcji etapu 02, bez końcowego odbioru całego etapu.
 Nowszy [odbiór DATA-03](../data03/README.md) potwierdza chronologię i zwroty
-źródła 2.4. Bieżący pełny odbiór source 2.5 i workera: [DATA-05](../data05/README.md).
+źródła 2.4. Bieżący pełny odbiór source 2.6 i workera: [DATA-05](../data05/README.md).
 Punkt wznowienia: [AI 03](../../../../plans/ai/etapy/03-snapshot-curated.md).
 
 ## Kontrakty i zachowanie
@@ -84,5 +84,5 @@ Pełne polecenie pytest i zakres DB znajdują się w verification.json.
 Źródło i cechy zachowują not_ready dla forecastingu, anomaly, stockout i replay,
 inventory_ready=false. Pełny panel nie certyfikuje poprawności zwrotów,
 izolacji truth, historii korekt, modelu ani transportu. Chronologię/zwroty
-i izolację procesu kwalifikuje bieżący [odbiór source 2.5](../data05/README.md).
+i izolację procesu kwalifikuje bieżący [odbiór source 2.6](../data05/README.md).
 Historia korekt i importer pozostają etapem 03.

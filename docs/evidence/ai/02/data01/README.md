@@ -83,6 +83,6 @@ named volume; po próbach został zatrzymany i usunięty.
 
 Ten pomiar kwalifikuje konfigurację i identity źródła 2.0; nie obejmował
 wymiarów, panelu, cen, chronologii/zwrotów ani izolacji procesu.
-Bieżący [odbiór źródła 2.5](../data05/README.md) obejmuje te komponenty
+Bieżący [odbiór źródła 2.6](../data05/README.md) obejmuje te komponenty
 oraz bramki do rozpoczęcia AI 03. Modele i inventory pozostają niegotowe.
 Aktualny punkt wznowienia: [snapshot i curated 03](../../../../plans/ai/etapy/03-snapshot-curated.md).

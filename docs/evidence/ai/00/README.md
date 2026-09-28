@@ -85,10 +85,9 @@ Zmiana ceny/promocji/stockout/inventory/truth targetu również ich nie zmienił
 lista 18 wejść RF w JSON nie zawiera tych pól. Nie ma przyszłego inventory fallback
 w używanym torze forecastingu ani potrzeby przyjmowania nieznanego zapasu za zero.
 
-ML-07 pozostaje: późna sprzedaż historycznego dnia przesuwa availability całej sumy;
-przy tym samym starym origin lag1 zmienia się **3→0**, available **1→0**.
-Wymagana jest wersjonowana historia w AI 03 przed odbiorem AI 04. Ta próba
-nie dowodzi błędu starego, kompletnego syntetycznego panelu RF.
+Bieżący kontrakt wersjonowanych obserwacji i próby niezmienności historycznego
+origin opisuje [audyt AI 02](../02/audit/README.md). Pomiary poniżej dotyczą
+kodu bazowego AI 00.
 
 Dla `y=0, yhat=100`: WAPE/MAPE są null, status `not_evaluable`, MAE i bias=100,
 nadmiarowa prognoza na zerze=100. Pusta próba ma null metryk i zero ocenionych wierszy.
@@ -130,7 +129,7 @@ nie uruchomiono brokera ani zapisu domenowego.
 | Zastosowanie / przejście | Warunek dalszej pracy |
 |---|---|
 | **AI 01** | Odblokowane. Pierwszy mały PR: osobne repo, ADR granic, importowalny pakiet, lock i minimalne CI. [Dokładny zakres](../../../plans/ai/backlog.md). |
-| **AI 02 → 03** | Zamknąć DATA-01–05; następnie importer/curated i ML-07. Pierwszy PR 02 ograniczyć do konfiguracji/manifestu/identity, zachowując demo. |
+| **AI 02 → 03** | [Bieżący odbiór źródła i warunki AI 03](../02/audit/README.md). Następnie immutable snapshot, importer i curated. |
 | **AI 04 → 05, forecast-only** | Źródło i snapshot po swoich bramkach; nowe baseline/RF, zamrożony test, lifecycle i serving. Nie wymaga pełnego procurement ani inventory features. |
 | **AI 06–09, stockout/anomaly** | DATA-06, właściwe etykiety i bramki czasowe; ponowna wersja danych i ocena. Aktualne `stockout_ready=false`, `anomaly_ready=false`. |
 | **AI 10–12** | OPS-03/07, domenowe projekcje, nowe API/auth; dopiero potem narzędzia agenta. RAG 11 może rozpocząć się po 01 zgodnie z planem. |

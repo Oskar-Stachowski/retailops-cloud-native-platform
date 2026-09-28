@@ -55,7 +55,8 @@ nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
 - Profile AI zapisują dodatkowo dziewięć kanonicznych tabel CSV i `dimensions_report.json`;
   ich projekcje products/stores/warehouses pochodzą z tych wymiarów.
   Pięć tabel [cen/promocji](retail-pricing.md) i trzy [popytu/panelu](daily-demand.md)
-  oraz trzy [zwrotów](retail-returns.md) i dwie parametrów symulacji dają łącznie 39 CSV;
+  oraz trzy [zwrotów](retail-returns.md), dwie parametrów symulacji i tabela
+  historii obserwacji dają łącznie 40 CSV;
   pricing_report, demand_report, returns_report, source_report i realism_report mają JSON/MD.
 - `row_counts` i raporty konkretnego wykonania opisują jego zawartość.
   Stała nazwa profilu ani sam seed nie identyfikują wszystkich parametrów.
@@ -77,8 +78,8 @@ pamięci i CSV; chunked Parquet i pełny benchmark pozostają do wdrożenia.
 
 V1 zachowuje dotychczasowy format. Aktualną konfigurację odczytuj z
 `descriptor.resolved_parameters` w v2: wartości nie są null.
-Nowy v2 ma schemat 2.5.0 i generator 0.7.0. Zapisuje wersje konfiguracji,
-kalendarza, wymiarów, pricing, demand, returns, simulation oraz kanonizacji, requested config,
+Nowy v2 ma schemat 2.6.0 i generator 0.8.0. Zapisuje wersje konfiguracji,
+kalendarza, wymiarów, pricing, demand, returns, simulation, historii obserwacji oraz kanonizacji, requested config,
 seed, SHA kodu i przypiętych plików requirements, wersję Pythona oraz commit/stan kodu.
 Każdy CSV ma checksumę SHA-256 bajtów, rozmiar i liczbę rekordów oraz osobny
 hash kanonicznej treści. Zakresy obejmują wszystkie zadeklarowane pola czasu:
@@ -89,9 +90,9 @@ watermark następnej północy UTC, complete_through=end_date, dotyczący
 syntetycznej sprzedaży. [Zwroty](retail-returns.md) mają osobne cutoffy historii
 i 39-dniowego ogona oraz flagi dojrzałości kohort.
 Odczyt zachowuje zgodność z rzeczywistymi eksportami schema 2.0.0/generator 0.2.0
-oraz 2.1.0/0.3.0, 2.2.0/0.4.0 i 2.3.0/0.5.0 oraz 2.4.0/0.6.0;
+oraz 2.1.0/0.3.0, 2.2.0/0.4.0 i 2.3.0/0.5.0 oraz 2.4.0/0.6.0 i 2.5.0/0.7.0;
 ich identity nie jest przepisywane. Nowe profile AI wymagają tabel i bramek wymiarów,
-a nowe legacy deklarują dimensions, pricing, demand, returns i simulation `not_applicable`.
+a nowe legacy deklarują dimensions, pricing, demand, returns, simulation i historię obserwacji `not_applicable`.
 
 Logical ID to `source-sha256-<hash deskryptora>`. Kanonizacja obejmuje typowane
 liczby, null, NFC, UTC i uporządkowany multizbiór zachowujący duplikaty.
@@ -101,7 +102,7 @@ nie wchodzą do ID. Treść kodu i zależności wchodzi do ID.
 Przestawienie wierszy albo równoważny zapis liczby może zachować hash treści,
 ale zmienia checksumę pliku.
 
-Nowe cechy legacy zachowują schema 2.0, a AI używają [schema 3.0](ml-features.md).
+Nowe cechy legacy mają schema 2.1, a AI używają [schema 3.1](ml-features.md).
 Zachowują feature_manifest.json, otrzymując
 `features-sha256-<hash>` zamiast dawnego ID profil/daty/seed.
 `feature_identity_manifest.json` zapisuje source parent ID i deskryptor,
@@ -113,7 +114,7 @@ Inna identity albo uszkodzony eksport blokuje zapis przed nadpisaniem.
 Atomowy pełny snapshot i importer pozostają etapem 03.
 Źródło ma `inventory_ready=false`, forecasting/anomaly/stockout/replay `not_ready`,
 RAG `not_applicable`. AI deklaruje osobno `source_ready=true` po
-[45 bramkach źródła i separacji](source-acceptance.md); legacy ma source_ready=false.
+[46 bramkach źródła i separacji](source-acceptance.md); legacy ma source_ready=false.
 [Odbiór DATA-01](../evidence/ai/02/data01/README.md) potwierdza konfigurację i identity.
 [Odbiór DATA-02](../evidence/ai/02/data02/README.md) obejmuje wymiary i kalendarz.
 [Odbiór DATA-04](../evidence/ai/02/data04/README.md) obejmuje ceny/promocje i uzgodnienie transakcji.

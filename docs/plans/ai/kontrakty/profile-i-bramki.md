@@ -11,8 +11,8 @@ i uzgodnienie transakcji. [Popyt/panel/koszyki](../../../evidence/ai/02/demand-p
 mają pełny ważny panel, cechy 3.0 i sześć bramek demand. Obserwacje cen są sparse;
 eksport nadal jest CSV. [DATA-03](../../../evidence/ai/02/data03/README.md)
 ma siedem bramek chronologii/zwrotów, dwa cutoffy i 39-dniowy ogon.
-[DATA-05](../../../evidence/ai/02/data05/README.md) kwalifikuje source 2.5:
-45 hard gates, rozdzielone parametry i izolowany worker z trzema projekcjami faktów.
+[DATA-05](../../../evidence/ai/02/data05/README.md) kwalifikuje source 2.6:
+46 hard gates, rozdzielone parametry i izolowany worker z czterema projekcjami faktów oraz historią obserwacji as-of.
 Chunked Parquet, immutable snapshot/import i dalsze bramki wymagają implementacji.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.

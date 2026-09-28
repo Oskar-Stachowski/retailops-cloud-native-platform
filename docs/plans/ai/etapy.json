@@ -46,9 +46,10 @@
       "status": "completed",
       "evidence": "../../evidence/ai/02/data05/README.md",
       "readiness_audit": "../../evidence/ai/02/audit/README.md",
-      "implementation_commit": "6e06e909c7dac78675324e8d8ec42921e36b95e8",
-      "implementation_scope": "DATA-01 through DATA-05: source 2.5 identity, dimensions/calendar/pricing/full observed-sales panel/baskets/chronology/returns, separate simulation parameters, isolated facts worker and final source/readiness gates",
-      "acceptance_scope": "local bounded ai-smoke and ai-temporal-smoke; forecast source ready for AI-03, models/inventory/replay not ready; no remote Required CI"
+      "implementation_commit": "5a8678c",
+      "implementation_scope": "Source 2.6: DATA-01–05 source gates, full worker provenance and append-only observed quantity versions; AI features 3.1 and legacy 2.1 with as-of reads",
+      "acceptance_scope": "bounded ai-smoke/ai-temporal-smoke; source ready for AI03; models, inventory and cross-repo replay have later gates",
+      "verification_commit": "152341e"
     },
     {
       "id": "03",
