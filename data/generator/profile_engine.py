@@ -7,7 +7,14 @@ from datetime import timedelta
 from decimal import Decimal
 
 from data.generator.common import DEFAULT_CLOCK, GenerationClock, deterministic_uuid, money
-from data.generator.configuration import PROFILE_DEFAULTS, SyntheticProfileDefaults
+from data.generator.configuration import (
+    PROFILE_DEFAULTS,
+    DatasetGenerationConfig,
+    SyntheticProfileDefaults,
+    resolve_generation_config,
+)
+from data.generator.dimension_schema import uses_dimensions
+from data.generator.dimensions import DimensionIndex, build_dimensions
 from data.generator.pricing import generate_price_history, generate_promotions
 from data.generator.users import generate_users
 
@@ -389,6 +396,7 @@ def generate_profile_commerce(
     days: int,
     rng: random.Random,
     clock: GenerationClock = DEFAULT_CLOCK,
+    dimensions: DimensionIndex | None = None,
 ) -> tuple[list[dict[str, str]], list[dict[str, str]], list[dict[str, str]]]:
     sales: list[dict[str, str]] = []
     orders: list[dict[str, str]] = []
@@ -398,6 +406,10 @@ def generate_profile_commerce(
     for day_index in range(days):
         for product_index, product in enumerate(products):
             store = stores[(product_index + day_index) % len(stores)]
+            if dimensions is not None and not dimensions.eligible(
+                product["id"], store["id"], clock.day(day_index)
+            ):
+                continue
             basket_size = _basket_size(store["channel"], rng)
             order_reference = f"ORD-{product['sku']}-{day_index + 1:04d}"
             order_id = deterministic_uuid("order", order_reference)
@@ -411,6 +423,10 @@ def generate_profile_commerce(
             order_item_rows: list[dict[str, str]] = []
 
             for item_index, item_product in enumerate(candidate_products):
+                if dimensions is not None and not dimensions.eligible(
+                    item_product["id"], store["id"], clock.day(day_index)
+                ):
+                    continue
                 base_demand = Decimal(item_product["normal_daily_sales"])
                 weekly = _weekly_multiplier(
                     item_product["category"],
@@ -867,12 +883,32 @@ def build_profile_dataset(
     users = generate_users()
     stores = generate_profile_stores(store_count, rng)
     warehouses = generate_profile_warehouses(warehouse_count)
+    dimension_tables = {}
+    dimensions = None
+    if uses_dimensions(profile):
+        effective = resolve_generation_config(
+            DatasetGenerationConfig(
+                profile=profile,
+                days=days,
+                products=product_count,
+                stores=store_count,
+                warehouses=warehouse_count,
+                seed=seed,
+                end_date=clock.end_date,
+                max_daily_rows=days * product_count * store_count,
+            )
+        )
+        dimension_tables, products, stores, warehouses = build_dimensions(
+            products, stores, warehouses, BRANDS, effective
+        )
+        dimensions = DimensionIndex(dimension_tables)
     sales, orders, order_items = generate_profile_commerce(
         products,
         stores,
         days,
         rng,
         clock,
+        dimensions,
     )
     price_history = generate_price_history(products, clock.end_date)
     promotions = generate_promotions(products, clock.end_date)
@@ -906,4 +942,5 @@ def build_profile_dataset(
         "inventory_snapshots": inventory_snapshots,
         "forecasts": forecasts,
         **incidents,
+        **dimension_tables,
     }

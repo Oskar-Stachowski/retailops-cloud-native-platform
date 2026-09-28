@@ -149,7 +149,7 @@ def validate_feature_identity_manifest(
 ) -> str:
     manifest = FeatureIdentityManifest.model_validate(payload)
     descriptor = manifest.descriptor.model_dump()
-    source_descriptor = manifest.source_descriptor.model_dump()
+    source_descriptor = manifest.source_descriptor.model_dump(exclude_unset=True)
     source_id = "source-sha256-" + json_sha256(source_descriptor)
     config = config_from_parameters(manifest.requested_parameters.model_dump())
     if source_descriptor["resolved_parameters"] != resolve_generation_config(config).parameters():

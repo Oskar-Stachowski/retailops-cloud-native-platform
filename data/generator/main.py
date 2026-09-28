@@ -14,7 +14,9 @@ from data.generator.configuration import (
 from data.generator.configuration import (
     validate_generation_config as validate_generation_config,  # noqa: PLC0414 - public legacy API
 )
-from data.generator.csv_writer import CSV_WRITE_ORDER, write_tables
+from data.generator.csv_writer import write_tables
+from data.generator.dimension_quality import validate_dimensions, write_dimensions_report
+from data.generator.dimension_schema import uses_dimensions
 from data.generator.forecasts import generate_forecasts
 from data.generator.identity import source_identity
 from data.generator.incidents import generate_incident_dataset
@@ -144,12 +146,19 @@ def generate_demo_dataset(
     config = config or DatasetGenerationConfig()
     output_dir = output_dir or default_output_dir_for_profile(config.profile)
     tables = build_dataset(config)
+    dimensions_report = (
+        validate_dimensions(tables, resolve_generation_config(config))
+        if uses_dimensions(config.profile)
+        else None
+    )
     if (output_dir / MANIFEST_V2_FILENAME).exists():
         previous = load_source_manifest_v2(output_dir)
         if previous["dataset_id"] != source_identity(config, tables)[0]:
             msg = "Output already contains a different dataset; choose a new output directory."
             raise ValueError(msg)
     counts = write_tables(output_dir, tables)
+    if dimensions_report is not None:
+        write_dimensions_report(output_dir, dimensions_report)
     write_quality_report(output_dir, config.profile, tables)
     write_dataset_manifest(output_dir, config, tables)
     if config.profile != "demo":
@@ -236,7 +245,7 @@ def main() -> None:
     )
 
     print(f"RetailOps CSV dataset generated for profile '{config.profile}':")  # noqa: T201 - CLI output
-    for table_name in CSV_WRITE_ORDER:
+    for table_name in counts:
         print(f"- {table_name}: {counts[table_name]}")  # noqa: T201 - CLI output
     print(f"\nOutput directory: {output_dir}")  # noqa: T201 - CLI output
 

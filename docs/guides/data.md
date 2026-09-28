@@ -46,7 +46,10 @@ services/api/.venv/bin/python -m ml.features.identity --data-dir "$data_ai_dir/f
 ```
 
 Walidatory kończą się błędem dla niespójnej konfiguracji, identity lub checksumy.
-Weryfikują integralność; źródło pozostaje `not_ready` do odbioru pozostałych
+W profilach AI dodatkowo sprawdzają [kanoniczne wymiary, kalendarz i lifecycle](../reference/retail-dimensions.md).
+Osiem hard gates zapisuje wynik w `dimensions_report.json`; brak wymaganego dnia,
+SKU z whitespace, nieznany magazyn lub sprzedaż poza asortymentem blokuje eksport.
+Źródło pozostaje `not_ready` do odbioru pozostałych
 zakresów etapu 02. Inne parametry lub zmieniony kod wymagają nowego katalogu,
 jeżeli obecny zawiera manifest v2.
 

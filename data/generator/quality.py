@@ -5,6 +5,8 @@ from collections import defaultdict
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from data.generator.csv_writer import CSV_WRITE_ORDER
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -82,7 +84,8 @@ def build_quality_report(
     anomaly_ids = _ids(anomalies)
     alert_ids = _ids(alerts)
 
-    all_ids = [row["id"] for rows in tables.values() for row in rows if row.get("id")]
+    # Dimensions and compatibility views deliberately share entity IDs.
+    all_ids = [row["id"] for name in CSV_WRITE_ORDER for row in tables[name] if row.get("id")]
     _check(
         checks,
         "primary_keys_are_unique",

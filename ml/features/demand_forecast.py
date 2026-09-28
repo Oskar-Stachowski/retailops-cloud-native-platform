@@ -8,7 +8,9 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from data.generator.configuration import SUPPORTED_PROFILES
+from data.generator.configuration import SUPPORTED_PROFILES, resolve_generation_config
+from data.generator.dimension_quality import validate_dimensions
+from data.generator.dimension_schema import uses_dimensions
 from data.generator.identity import GENERATOR_VERSION
 from data.generator.main import (
     DatasetGenerationConfig,
@@ -157,6 +159,8 @@ def build_demand_feature_rows(
     tables: dict[str, list[dict[str, object]]],
     config: DatasetGenerationConfig,
 ) -> list[dict[str, object]]:
+    if uses_dimensions(config.profile):
+        validate_dimensions(tables, resolve_generation_config(config))
     products_by_id = {_text(product["id"]): product for product in tables["products"]}
     generated_at = _feature_generated_at(tables)
     aggregates = _build_aggregates(tables)

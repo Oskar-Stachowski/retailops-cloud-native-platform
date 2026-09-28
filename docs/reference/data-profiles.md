@@ -4,7 +4,7 @@ Aktualne wartości definiują [generator](../../data/generator/main.py)
 i [konfiguracja 1.0.0](../../data/generator/configuration.py).
 To profile syntetycznych danych do demonstracji i testów.
 
-| Profil | Historia w dniach | Produkty | Sklepy / miejsca sprzedaży | Magazyny | Domyślny katalog |
+| Profil | Historia w dniach | Produkty | Sklepy legacy / ważne pary AI | Magazyny | Domyślny katalog |
 |---|---:|---:|---:|---:|---|
 | `demo` | Stały scenariusz | Stały scenariusz | Stały scenariusz | Stały scenariusz | `data/demo/` |
 | `small` | 90 | 100 | 5 | 3 | `data/synthetic/small/` |
@@ -30,8 +30,10 @@ sprzedaży `2026-04-27`–`2026-04-30`.
 
 `ai-temporal-smoke` deklaruje 28 dni warmup, 60 dni originów i 14 dni tail;
 override dni zmienia część originów, minimum to 43 dni. To metadane konfiguracji,
-nie ocena modelu. Kalendarz `legacy-weekday-seasonality-1.0.0` używa UTC
-i wcześniejszych reguł; PL/DE i flagi otwarcia są kolejną pracą.
+nie ocena modelu. Profile AI używają [wymiarów i kalendarza PL/DE-BE](retail-dimensions.md)
+w latach 2024–2027, UTC oraz jawnych flag otwarcia. Profile legacy zachowują
+`legacy-weekday-seasonality-1.0.0`. `--stores` w AI liczy ważne pary
+selling location/channel; fizycznych miejsc może być mniej niż par.
 
 `ai-load` wymaga czterech rozmiarów oraz `--max-daily-rows`.
 Limit sprawdza iloczyn dni × produktów × sklepów przed generacją.
@@ -50,6 +52,8 @@ nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
   wyniki ML w tym miejscu wymagają świadomego pozostawienia poza commitem.
 - Każdy profil zapisuje CSV, `dataset_manifest.json`, `dataset_manifest.v2.json` i `quality_report.json`.
   Profile skalowane zapisują również `realism_report.json`.
+- Profile AI zapisują dodatkowo dziewięć kanonicznych tabel CSV i `dimensions_report.json`;
+  łącznie 26 tabel. Ich projekcje products/stores/warehouses pochodzą z tych wymiarów.
 - `row_counts` i raporty konkretnego wykonania opisują jego zawartość.
   Stała nazwa profilu ani sam seed nie identyfikują wszystkich parametrów.
 
@@ -70,13 +74,17 @@ pamięci i CSV; chunked Parquet i pełny benchmark pozostają do wdrożenia.
 
 V1 zachowuje dotychczasowy format. Aktualną konfigurację odczytuj z
 `descriptor.resolved_parameters` w v2: wartości nie są null.
-V2 zapisuje wersje generatora 0.2.0, konfiguracji i kalendarza, requested config,
+Nowy v2 ma schemat 2.1.0 i generator 0.3.0. Zapisuje wersje konfiguracji,
+kalendarza, wymiarów oraz kanonizacji, requested config,
 seed, SHA kodu i przypiętych plików requirements, wersję Pythona oraz commit/stan kodu.
 Każdy CSV ma checksumę SHA-256 bajtów, rozmiar i liczbę rekordów oraz osobny
 hash kanonicznej treści. Zakresy obejmują wszystkie zadeklarowane pola czasu:
 także końce promocji, forecast horizon, przyszłe ceny i zwroty.
 Watermark to granica wiedzy na koniec konfiguracji o 23:59:59 UTC;
 `complete_through=null` oznacza brak gwarancji kompletności.
+Odczyt zachowuje zgodność z rzeczywistymi eksportami schema 2.0.0/generator 0.2.0;
+ich identity nie jest przepisywane. Nowe profile AI wymagają tabel i bramek wymiarów,
+a nowe legacy deklarują dimensions `not_applicable`.
 
 Logical ID to `source-sha256-<hash deskryptora>`. Kanonizacja obejmuje typowane
 liczby, null, NFC, UTC i uporządkowany multizbiór zachowujący duplikaty.

@@ -15,7 +15,14 @@ from data.generator.configuration import (
     requested_parameters,
     resolve_generation_config,
 )
-from data.generator.csv_writer import CSV_WRITE_ORDER, TABLE_COLUMNS
+from data.generator.csv_writer import source_columns, source_table_order
+from data.generator.dimension_quality import validate_dimensions
+from data.generator.dimension_schema import (
+    AI_CALENDAR_VERSION,
+    DIMENSION_GRAINS,
+    DIMENSIONS_VERSION,
+    uses_dimensions,
+)
 from data.generator.identity import (
     DATA_CLASSES,
     TIME_FIELDS,
@@ -76,10 +83,13 @@ class ResolvedParameters(Contract):
 
 
 class Versions(Contract):
-    generator: Literal["0.2.0"]
+    generator: Literal["0.2.0", "0.3.0"]
     config: Literal["1.0.0"]
-    calendar: Literal["legacy-weekday-seasonality-1.0.0"]
-    canonicalization: Literal["typed-csv-nfc-utc-multiset-1.0.0"]
+    calendar: Literal["legacy-weekday-seasonality-1.0.0", "pl-de-berlin-calendar-1.0.0"]
+    dimensions: Literal["retail-dimensions-1.0.0", "not_applicable"] | None = None
+    canonicalization: Literal[
+        "typed-csv-nfc-utc-multiset-1.0.0", "typed-csv-nfc-utc-multiset-1.1.0"
+    ]
     csv_schema: Literal["1.0"]
 
 
@@ -95,7 +105,7 @@ class SourceDescriptor(Contract):
     role: Literal["source"]
     owner: Literal["retailops-cloud-native-platform"]
     parent_ids: list[str]
-    schema_version: Literal["2.0.0"]
+    schema_version: Literal["2.0.0", "2.1.0"]
     versions: Versions
     resolved_parameters: ResolvedParameters
     code_sha256: SHA256
@@ -105,13 +115,37 @@ class SourceDescriptor(Contract):
 
     @model_validator(mode="after")
     def complete_source_schema(self) -> SourceDescriptor:
-        if self.parent_ids or set(self.tables) != set(CSV_WRITE_ORDER):
+        expected_generator = "0.2.0" if self.schema_version == "2.0.0" else "0.3.0"
+        expected_canonicalization = "typed-csv-nfc-utc-multiset-" + (
+            "1.0.0" if self.schema_version == "2.0.0" else "1.1.0"
+        )
+        if (
+            self.versions.generator != expected_generator
+            or self.versions.canonicalization != expected_canonicalization
+        ):
+            msg = "Source schema and producer versions disagree."
+            raise ValueError(msg)
+        names = source_table_order(self.resolved_parameters.profile, self.schema_version)
+        if self.parent_ids or set(self.tables) != set(names):
             msg = "Source descriptor requires all tables and no parents."
             raise ValueError(msg)
         for name, table in self.tables.items():
-            if table.columns != TABLE_COLUMNS[name] or table.data_class != DATA_CLASSES[name]:
+            if table.columns != source_columns(name) or table.data_class != DATA_CLASSES[name]:
                 msg = "Source descriptor table schema or classification disagrees."
                 raise ValueError(msg)
+        if uses_dimensions(self.resolved_parameters.profile, self.schema_version) and (
+            self.versions.calendar != AI_CALENDAR_VERSION
+            or self.versions.dimensions != DIMENSIONS_VERSION
+        ):
+            msg = "AI dimensions require their explicit calendar and dimension versions."
+            raise ValueError(msg)
+        if not uses_dimensions(self.resolved_parameters.profile, self.schema_version) and (
+            self.versions.calendar != "legacy-weekday-seasonality-1.0.0"
+            or self.versions.dimensions
+            != (None if self.schema_version == "2.0.0" else "not_applicable")
+        ):
+            msg = "Legacy source must retain its calendar and dimension policy."
+            raise ValueError(msg)
         return self
 
 
@@ -192,7 +226,7 @@ class Readiness(Contract):
 
 
 class SourceManifestV2(Contract):
-    schema_version: Literal["2.0.0"]
+    schema_version: Literal["2.0.0", "2.1.0"]
     dataset_name: Literal["retailops-synthetic"]
     dataset_id: Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]
     descriptor: SourceDescriptor
@@ -220,7 +254,7 @@ def artifact_metadata(
     output_dir: Path,
     end_date: str,
 ) -> dict[str, Any]:
-    columns = TABLE_COLUMNS[name]
+    columns = source_columns(name)
     field_values = {
         key: [str(canonical_cell(key, row[key]))[:10] for row in rows if csv_text(row.get(key))]
         for key in columns
@@ -228,7 +262,7 @@ def artifact_metadata(
     }
     all_dates = [value for values in field_values.values() for value in values]
     role = "observations" if field_values else "dimension"
-    if name in {"price_history", "promotions"}:
+    if DATA_CLASSES[name] == "source_plan":
         role = "plans"
     elif name == "returns":
         role = "return_tail"
@@ -244,7 +278,7 @@ def artifact_metadata(
         "content_sha256": content_sha256(rows, columns),
         "schema_version": "1.0",
         "columns": columns,
-        "grain": ["id"],
+        "grain": DIMENSION_GRAINS.get(name, ["id"]),
         "data_class": DATA_CLASSES[name],
         "temporal_role": role,
         "date_range": date_range(all_dates),
@@ -254,16 +288,20 @@ def artifact_metadata(
         "open_interval_rows": sum(
             not csv_text(row.get(key))
             for row in rows
-            for key in ("valid_to", "ends_at")
+            for key in ("valid_to", "ends_at", "discontinue_date")
             if key in columns
         ),
     }
 
 
-def report_metadata(output_dir: Path, profile: str) -> list[dict[str, Any]]:
+def report_metadata(
+    output_dir: Path, profile: str, schema_version: str = "2.1.0"
+) -> list[dict[str, Any]]:
     names = ["dataset_manifest.json", "quality_report.json"]
     if profile != "demo":
         names.append("realism_report.json")
+    if uses_dimensions(profile, schema_version):
+        names.append("dimensions_report.json")
     reports = []
     for name in names:
         path = output_dir / name
@@ -273,7 +311,9 @@ def report_metadata(output_dir: Path, profile: str) -> list[dict[str, Any]]:
                 "path": name,
                 "sha256": file_sha256(path),
                 "size_bytes": path.stat().st_size,
-                "policy_version": "legacy-" + name.removesuffix(".json") + "-1.0",
+                "policy_version": DIMENSIONS_VERSION
+                if name == "dimensions_report.json"
+                else "legacy-" + name.removesuffix(".json") + "-1.0",
                 "status": str(payload.get("status", "not_applicable")),
             }
         )
@@ -302,7 +342,7 @@ def build_source_manifest_v2(
     dataset_id, descriptor = source_identity(config, tables)
     effective = resolve_generation_config(config)
     payload = {
-        "schema_version": "2.0.0",
+        "schema_version": "2.1.0",
         "dataset_name": "retailops-synthetic",
         "dataset_id": dataset_id,
         "descriptor": descriptor,
@@ -311,7 +351,7 @@ def build_source_manifest_v2(
         "generated_at": datetime.now(UTC).isoformat(),
         "artifacts": [
             artifact_metadata(name, tables[name], output_dir, effective.end_date.isoformat())
-            for name in CSV_WRITE_ORDER
+            for name in source_table_order(config.profile)
         ],
         "reports": report_metadata(output_dir, config.profile),
         "watermarks": watermark_metadata(effective.end_date),
@@ -337,7 +377,10 @@ def config_from_parameters(parameters: dict[str, Any]) -> DatasetGenerationConfi
 
 def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> str:
     manifest = SourceManifestV2.model_validate(payload)
-    descriptor = manifest.descriptor.model_dump()
+    descriptor = manifest.descriptor.model_dump(exclude_unset=True)
+    if manifest.schema_version != descriptor["schema_version"]:
+        msg = "Source manifest and descriptor versions disagree."
+        raise ValueError(msg)
     config = config_from_parameters(manifest.requested_parameters.model_dump())
     effective = resolve_generation_config(config)
     if (
@@ -368,15 +411,14 @@ def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> st
     if generated.tzinfo is None or generated.utcoffset().total_seconds() != 0:
         msg = "Manifest generation time requires UTC."
         raise ValueError(msg)
-    if (
-        set(descriptor["tables"]) != set(CSV_WRITE_ORDER)
-        or [a.table for a in manifest.artifacts] != CSV_WRITE_ORDER
+    if [a.table for a in manifest.artifacts] != source_table_order(
+        config.profile, manifest.schema_version
     ):
         msg = "Source manifest requires every table exactly once."
         raise ValueError(msg)
     verify_source_artifacts(manifest, output_dir, effective.end_date.isoformat())
     if [report.model_dump() for report in manifest.reports] != report_metadata(
-        output_dir, config.profile
+        output_dir, config.profile, manifest.schema_version
     ):
         msg = "Source metadata or report checksum does not match."
         raise ValueError(msg)
@@ -389,6 +431,7 @@ def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> st
 
 
 def verify_source_artifacts(manifest: SourceManifestV2, output_dir: Path, end_date: str) -> None:
+    tables = {}
     for artifact in manifest.artifacts:
         name = artifact.table
         if artifact.path != name + ".csv" or (output_dir / artifact.path).is_symlink():
@@ -396,10 +439,11 @@ def verify_source_artifacts(manifest: SourceManifestV2, output_dir: Path, end_da
             raise ValueError(msg)
         with (output_dir / artifact.path).open(newline="", encoding="utf-8") as stream:
             reader = csv.DictReader(stream)
-            if reader.fieldnames != TABLE_COLUMNS[name]:
+            if reader.fieldnames != source_columns(name):
                 msg = "CSV columns do not match source schema."
                 raise ValueError(msg)
             rows = list(reader)
+        tables[name] = rows
         if any(None in row or any(value is None for value in row.values()) for row in rows):
             msg = "Malformed CSV record width."
             raise ValueError(msg)
@@ -412,6 +456,19 @@ def verify_source_artifacts(manifest: SourceManifestV2, output_dir: Path, end_da
             or identity != manifest.descriptor.tables[name].model_dump()
         ):
             msg = "Artifact checksum, content, dates or identity do not match."
+            raise ValueError(msg)
+    if uses_dimensions(manifest.descriptor.resolved_parameters.profile, manifest.schema_version):
+        dimensions_report = validate_dimensions(
+            tables,
+            resolve_generation_config(
+                config_from_parameters(manifest.requested_parameters.model_dump())
+            ),
+        )
+        if (
+            json.loads((output_dir / "dimensions_report.json").read_text(encoding="utf-8"))
+            != dimensions_report
+        ):
+            msg = "Dimensions report does not match verified source records."
             raise ValueError(msg)
 
 

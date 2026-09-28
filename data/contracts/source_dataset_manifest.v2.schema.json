@@ -536,7 +536,10 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "2.0.0",
+          "enum": [
+            "2.0.0",
+            "2.1.0"
+          ],
           "title": "Schema Version",
           "type": "string"
         },
@@ -611,12 +614,18 @@
       "additionalProperties": false,
       "properties": {
         "calendar": {
-          "const": "legacy-weekday-seasonality-1.0.0",
+          "enum": [
+            "legacy-weekday-seasonality-1.0.0",
+            "pl-de-berlin-calendar-1.0.0"
+          ],
           "title": "Calendar",
           "type": "string"
         },
         "canonicalization": {
-          "const": "typed-csv-nfc-utc-multiset-1.0.0",
+          "enum": [
+            "typed-csv-nfc-utc-multiset-1.0.0",
+            "typed-csv-nfc-utc-multiset-1.1.0"
+          ],
           "title": "Canonicalization",
           "type": "string"
         },
@@ -630,8 +639,27 @@
           "title": "Csv Schema",
           "type": "string"
         },
+        "dimensions": {
+          "anyOf": [
+            {
+              "enum": [
+                "retail-dimensions-1.0.0",
+                "not_applicable"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dimensions"
+        },
         "generator": {
-          "const": "0.2.0",
+          "enum": [
+            "0.2.0",
+            "0.3.0"
+          ],
           "title": "Generator",
           "type": "string"
         }
@@ -732,7 +760,10 @@
       "$ref": "#/$defs/RequestedParameters"
     },
     "schema_version": {
-      "const": "2.0.0",
+      "enum": [
+        "2.0.0",
+        "2.1.0"
+      ],
       "title": "Schema Version",
       "type": "string"
     },

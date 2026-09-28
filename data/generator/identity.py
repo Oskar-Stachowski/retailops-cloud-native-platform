@@ -18,12 +18,18 @@ from data.generator.configuration import (
     DatasetGenerationConfig,
     resolve_generation_config,
 )
-from data.generator.csv_writer import CSV_WRITE_ORDER, TABLE_COLUMNS
+from data.generator.csv_writer import CSV_WRITE_ORDER, source_columns, source_table_order
+from data.generator.dimension_schema import (
+    AI_CALENDAR_VERSION,
+    DIMENSION_CLASSES,
+    DIMENSIONS_VERSION,
+    uses_dimensions,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_VERSION = "0.2.0"
-CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.0.0"
-SOURCE_SCHEMA_VERSION = "2.0.0"
+GENERATOR_VERSION = "0.3.0"
+CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.1.0"
+SOURCE_SCHEMA_VERSION = "2.1.0"
 INTEGER_FIELDS = {
     "quantity",
     "stock_quantity",
@@ -34,6 +40,9 @@ INTEGER_FIELDS = {
     "day_of_week",
     "week_of_year",
     "month",
+    "quarter",
+    "version",
+    "pack_quantity",
 }
 DECIMAL_FIELDS = {
     "price",
@@ -55,8 +64,20 @@ DECIMAL_FIELDS = {
     "expected_value",
     "deviation_percent",
     "impact_value",
+    "unit_cost",
 }
 BOOLEAN_FIELDS = {"stockout_flag", "promotion_applied", "is_weekend"}
+BOOLEAN_FIELDS.update(
+    {
+        "is_public_holiday",
+        "is_easter",
+        "is_christmas",
+        "is_black_friday",
+        "is_cyber_monday",
+        "location_open",
+        "is_category_season",
+    }
+)
 TIME_FIELDS = {
     "sold_at",
     "ordered_at",
@@ -80,6 +101,16 @@ TIME_FIELDS = {
     "forecast_period_end",
     "date",
     "observation_available_at",
+    "available_at",
+    "effective_from",
+    "effective_to",
+    "business_date",
+    "launch_date",
+    "discontinue_date",
+    "business_day_start_at",
+    "business_day_end_at",
+    "local_day_start_at",
+    "local_day_end_at",
 }
 DATA_CLASSES = dict.fromkeys(CSV_WRITE_ORDER, "source_observation")
 DATA_CLASSES.update(
@@ -92,6 +123,7 @@ DATA_CLASSES.update(
     )
 )
 DATA_CLASSES.update(dict.fromkeys(("price_history", "promotions"), "source_plan"))
+DATA_CLASSES.update(DIMENSION_CLASSES)
 DEPENDENCY_FILES = (
     "services/api/requirements.txt",
     "services/api/requirements-dev.txt",
@@ -185,6 +217,7 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
         [
             "data/contracts/retailops_seed_dataset.contract.json",
             "data/contracts/source_dataset_manifest.v2.schema.json",
+            "data/contracts/retail_dimensions.v1.schema.json",
             *extra_files,
         ]
     )
@@ -251,7 +284,12 @@ def source_identity(
         "versions": {
             "generator": GENERATOR_VERSION,
             "config": CONFIG_VERSION,
-            "calendar": CALENDAR_VERSION,
+            "calendar": AI_CALENDAR_VERSION
+            if uses_dimensions(config.profile)
+            else CALENDAR_VERSION,
+            "dimensions": DIMENSIONS_VERSION
+            if uses_dimensions(config.profile)
+            else "not_applicable",
             "canonicalization": CANONICALIZATION_VERSION,
             "csv_schema": "1.0",
         },
@@ -262,11 +300,11 @@ def source_identity(
         "tables": {
             name: {
                 "row_count": len(tables[name]),
-                "columns": TABLE_COLUMNS[name],
-                "content_sha256": content_sha256(tables[name], TABLE_COLUMNS[name]),
+                "columns": source_columns(name),
+                "content_sha256": content_sha256(tables[name], source_columns(name)),
                 "data_class": DATA_CLASSES[name],
             }
-            for name in CSV_WRITE_ORDER
+            for name in source_table_order(config.profile)
         },
     }
     return "source-sha256-" + json_sha256(descriptor), descriptor
