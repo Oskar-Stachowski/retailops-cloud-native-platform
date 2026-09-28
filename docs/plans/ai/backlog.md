@@ -24,18 +24,16 @@ importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as
 ## Praca równoległa od obecnego punktu
 
 - **RetailOps / etap 03:** typed Parquet, polityka artefaktów, następnie immutable export i handoff.
-- **Repo AI / pozostały zakres 11:** rzeczywisty provider embeddings,
-  użytkowa kwalifikacja/aktywacja i odbiór jakości na zatwierdzonym golden set.
-  [Fundament offline](../../evidence/ai/11/README.md) obejmuje już korpus,
-  chunker, pgvector, retrieval, testowy lifecycle i administracyjne runy.
-  Integrację real embeddings skoordynować z 12; nie obniżać progów dla fake.
+- **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, limity,
+  kontrakty i test doubles. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
+  pełne zamknięcie agenta nadal wymaga AI 10.
 - **Opcjonalnie 16A:** projekt inputs/ownership i wariantu infrastruktury,
   walidacja oraz kosztorys po ustaleniu tych wejść; bez automatycznej zgody na apply.
 
 Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
 kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
 Etap 03 ma spełnioną lokalną i zdalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
-a agent 12 na 10 i 11.
+a pełny agent 12 czeka jeszcze na 10.
 Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc-i-repozytoria.md).
 
@@ -51,7 +49,6 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 | **08 — stockout** | DATA-06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |
 | **10 — integracja** | OPS-03/07: jeden wykonywalny kontrakt, snapshot/version-aware event identity, legacy v1 oraz nowe intelligence.v2, trwałe ACK/kwarantanna, inbox/outbox, dedup/replay. Domenowe projekcje wyników, zgodne API/UI i rzeczywiste auth/scope. Testy z brokerem i awariami wymagane przed odbiorem. |
-| **11 — RAG** | Ścieżka rzeczywistego providera w build/query i kontraktach, użytkowa kwalifikacja/aktywacja/rollback oraz zaliczone progi jakości. Zgody na obecny korpus i 44 pytania zapisano; fake nie otwiera aktywacji. |
 | **12 — agent** | Po 10/11: narzędzia read-only z auth, limitami, freshness i audytem; bez domyślnego demo-admin i mutacji operacyjnych. |
 | **13 — monitoring/security** | Własne SLO AI, performance drift z dojrzałymi etykietami, telemetry, incident/security gates; lokalne testy 00 ich nie odbierają. |
 | **14–15 — kind/release** | OPS-06 dla istniejących obrazów/workflow; AI Helm, persistence/migracje, NetworkPolicy, CI/GitOps, niezmienne releasy i rzeczywisty rollback. |

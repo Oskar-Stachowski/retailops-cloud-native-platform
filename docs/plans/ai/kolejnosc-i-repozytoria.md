@@ -34,13 +34,12 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
 
 ## Zalecana kolejność od obecnego punktu
 
-1. **Teraz dwa niezależne strumienie:** AI 03 w obu repo oraz pozostały
-   zakres AI 11 w AI-intelligence. Pierwszy mały zakres 03 powstaje
-   w cloud-native: typed Parquet i polityka artefaktów, potem exporter.
+1. **Teraz AI 03** w obu repo. Pierwszy zakres powstaje w cloud-native:
+   typed Parquet i polityka artefaktów, potem immutable exporter.
    Po uzgodnieniu fixture/kontraktu AI rozwija importer i curated; końcowy
    odbiór 03 sprawdza rzeczywisty eksport/import między repozytoriami.
-   W 11 pozostają rzeczywisty provider, użytkowa kwalifikacja/aktywacja
-   i odbiór jakości; publikacja fundamentu offline nie zamyka tych warunków.
+   **AI 11 jest zamknięty.** Równolegle można przygotować interfejsy,
+   limity i test doubles AI 12. Jego pełna integracja czeka jeszcze na AI 10.
 2. **Po 03:** równolegle 04 w AI-intelligence oraz 06 w cloud-native.
    Po 04 można przejść do 05, nawet jeśli 06 jeszcze trwa. Pierwszy
    forecasting opisuje obserwowaną sprzedaż i pomija niegotowe cechy inventory.
@@ -51,10 +50,9 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
    i uzgodnionych kontraktów.
 5. **Po 10 i gotowym indeksie 11:** pełny zakres **12**. Może trwać równolegle
    z pozostałymi pracami 09. Adaptery i test doubles 12 można przygotować
-   wcześniej. Rzeczywiste embeddings i ograniczony smoke Bedrock z instrukcji
-   12 są wspólnym punktem odbioru jakości RAG i integracji providera;
-   można je przygotować przed pełnym agentem. Smoke nie zastępuje golden set
-   ani pełnych bramek 10/11 wymaganych do zamknięcia 12.
+   wcześniej. Rzeczywiste embeddings i ich odbiór jakości zaliczono w 11.
+   W 12 pozostają rzeczywiste generowanie odpowiedzi, groundedness,
+   narzędzia i integracja z RetailOps. Odbiór embeddings nie zastępuje tych bramek.
 6. **Po 09 i 12:** zamknąć **13**, następnie **14**, potem **15**.
    Logowanie, bezpieczeństwo, CI i podstawowe metryki rozwijamy od początku;
    te późniejsze numery oznaczają pełny odbiór, nie początek dbania o jakość.

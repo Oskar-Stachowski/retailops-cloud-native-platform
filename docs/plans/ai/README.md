@@ -21,8 +21,9 @@ rozliczenie revenue i osobne history/return-tail cutoffy.
 [Required CI na main `30e3e70`](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645)
 potwierdza zdalny odbiór tej publikacji.
 Następna implementacja to [snapshot i curated 03](etapy/03-snapshot-curated.md);
-równolegle kontynuujemy [pozostały zakres RAG 11](../../evidence/ai/11/README.md).
-Fundament offline działa, ale odbiór jakości i użytkowa aktywacja pozostają otwarte.
+[RAG 11 jest odebrany](../../evidence/ai/11/README.md), łącznie z rzeczywistymi
+embeddings, jakością i użytkową aktywacją. Równolegle można przygotować
+interfejsy/test doubles AI 12; pełne zamknięcie agenta czeka jeszcze na AI 10.
 Modele i inventory nadal nie są gotowe.
 [Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
