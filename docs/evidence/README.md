@@ -1,12 +1,12 @@
 # Dowody weryfikacji
 
-Indeks przeglądany 2026-09-27. Poniżej znajdują się ostatnie zachowane wyniki
+Indeks przeglądany 2026-09-28. Poniżej znajdują się ostatnie zachowane wyniki
 potrzebne do opisania obecnych możliwości projektu. Każdy raport dotyczy
 konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| Fundament i HTTP AI 01 | 2026-09-27 | [Osobne repo AI](ai/01/README.md): pakiet/CLI, HTTP/telemetry, 62 testy na czystym checkout, blokada błędnego kontraktu i działający HTTP z wheel. Lokalna weryfikacja; DB/MLflow i zdalne CI pozostają do wykonania. |
+| Fundament, HTTP i persistence AI 01 | 2026-09-28 | [Osobne repo AI](ai/01/README.md): 77 testów i Compose na czystym checkoutcie, PostgreSQL/pgvector, MLflow, jawne migracje, crash/restart, trwałość i DB outage/recovery. Nowy zakres zweryfikowany lokalnie; CI baseline na GitHub ma success, CI nowych commitów czeka na push. |
 | Audyt AI 00 | 2026-09-27 | [Stan wyjściowy `cbf28b2`](ai/00/README.md): dwa `small`, kontrast 100/20, dane/ML/event/API, 138 testów, RF reload i CI źródłowego SHA. Następny etap 01; źródło wymaga poprawek w 02. |
 | Izolacja seeda | 2026-09-27 | [Próby PostgreSQL](pre-ai-00/2026-09-27-seed-isolation.md) na kodzie `667f349`: 27 testów bez DB, pięć przebiegów DB i sprzątanie po błędzie; osobny zakres wobec audytu AI 00. |
 | Monitoring | 2026-09-26 | [ARM64/AMD64](observability/2026-09-26-validation.md): próbki, Grafana, pending/firing/resolution alertu; 24 zadania Required CI. |

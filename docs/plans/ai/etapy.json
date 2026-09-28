@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "date": "2026-09-27",
+  "date": "2026-09-28",
   "stages": [
     {
       "id": "00",
@@ -25,9 +25,9 @@
       "status": "in_progress",
       "evidence": "../../evidence/ai/01/README.md",
       "implementation_repository": "retailops-ai-intelligence",
-      "implementation_commit": "e6c78886be9ef151417ee7e5fc91cc817e1bec40",
-      "evidence_commit": "7d67530ca574e4acf60405c22fdde1ec59f1f174",
-      "next_scope": "Persistence AI/MLflow, migracje i Compose; następnie kontrakty danych, auth oraz zdalne CI."
+      "implementation_commit": "7e0978b7a3d14ba222c7c305d8b995e960369fc1",
+      "evidence_commit": "7bd17e65a3bb5416620526a8b48e14986923d140",
+      "next_scope": "Wykonywalne kontrakty dataset/feature/label/prediction/run/tool i zgodność wersji; uprawnienia nowych endpointów; po push CI nowych commitów."
     },
     {
       "id": "02",

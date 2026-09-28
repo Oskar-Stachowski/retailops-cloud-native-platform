@@ -2,22 +2,23 @@
 
 **Repo:** oba; nowe komponenty w AI. **Zależność:** 00. **Rezultat:** działający fundament lokalny bez deklaracji gotowych modeli.
 
-**Stan bieżący:** osobne lokalne repo `retailops-ai-intelligence` zawiera pakiet,
-settings, CLI i bazowy serwis HTTP w warstwach api/domain/pipelines/adapters.
-Działają health/ready/version/metrics, logi JSON, kontekst W3C i bezpieczne błędy.
-[Dowody](../../../evidence/ai/01/README.md) obejmują 62 testy, rzeczywisty proces
-na loopback oraz uruchomienie z wheel; nie obejmują DB/MLflow ani zdalnego CI.
+**Stan bieżący:** osobne repo `retailops-ai-intelligence` zawiera pakiet,
+settings, CLI i bazowy HTTP w warstwach api/domain/pipelines/adapters.
+Działają PostgreSQL/pgvector dla AI oraz oddzielna baza i rola MLflow, jawne
+migracje i lokalny Compose z trwałymi wolumenami.
+[Dowody](../../../evidence/ai/01/README.md) obejmują 77 testów i czysty checkout
+z rzeczywistymi próbami crash/restart, DB outage/recovery i zachowania artefaktów.
+Repo jest na GitHub, main chronione przez required-result, CI bazowego 7d67530
+ma success. Commity persistence są lokalne, ich zdalny CI czeka na push.
 Cały etap jest `in_progress`; poniżej pozostaje zakres do wykonania.
 
 Przeczytaj [architekturę](../architektura.md) i wspólne kontrakty w `../kontrakty/`. Model danych/ziarno/availability uzgodnij przed implementacją pipeline’ów; pełne zdarzenia zostaną uruchomione w 10.
 
 ## Praca w małych PR-ach
 
-4. **Persistence.** Dodaj rzeczywistą sondę DB do istniejącego mechanizmu readiness. Dodaj PostgreSQL dla AI, migracje Alembic, oddzielną bazę i użytkownika MLflow; pgvector tylko w bazie AI. Zaplanuj rozdzielenie metadata od dużych artefaktów. Migracje są jawne, nie uruchamiane konkurencyjnie przy starcie każdego poda.
-5. **Compose.** Postaw API/Postgres/MLflow z lokalnymi wolumenami i health checks. Provider fakes pozwalają wykonać testy bez AWS. Nowy Compose nie definiuje drugiego brokera RetailOps. Pełne external networking oraz event worker wymagane w10; opcjonalny worker nie jest konieczny do pierwszego zdrowego serwisu.
 6. **Wspólne kontrakty.** Nadaj wersje dataset/feature/label/prediction/run/tool schemas; wzory w tym pakiecie przełóż na wykonywalne modele i fixtures w repo. Zapisz semantykę braków, zer, czasu i source ownership. Event schema inventory jeszcze nie oznacza działającego streamingu.
-7. **Rozwój CI i zabezpieczeń.** Rozszerz istniejące lint/type/package/test/docs/contracts i secret scan na nowe komponenty bez pomijania ich ścieżek. Po publikacji repo wykonaj zdalne CI i ustaw ochronę gałęzi z wymaganym `required-result`. Własne endpointy administracyjne od początku mają granicę dostępu. Sekrety poza Git i logami. Używaj ról o ograniczonym zakresie, nie demo admina RetailOps jako domyślnej tożsamości agenta.
-8. **Status i polecenia.** Rozwijaj istniejące `make bootstrap`, `make test` i `make ci-local` wraz z aplikacją. Dodaj rzeczywiste `make compose-up` i `make compose-down` przy wdrożeniu lokalnych usług. Nie dopisuj pustych targetów udających działający trening/deploy. Aktualizuj rejestr etapu i evidence.
+7. **Rozwój CI i zabezpieczeń.** Rozszerz istniejące lint/type/package/test/docs/contracts i secret scan na nowe komponenty bez pomijania ich ścieżek. Po push nowych commitów odbierz ich zdalne CI z nowym jobem persistence; zachowaj wymaganą ochronę main przez `required-result`. Własne endpointy administracyjne od początku mają granicę dostępu. Sekrety poza Git i logami. Używaj ról o ograniczonym zakresie, nie demo admina RetailOps jako domyślnej tożsamości agenta.
+8. **Status i polecenia.** Rozwijaj istniejące `make bootstrap`, `make test` i `make ci-local` wraz z aplikacją. Rozwijaj działające polecenia Compose i smoke wraz z nowymi rolami. Nie dopisuj pustych targetów udających działający trening/deploy. Aktualizuj rejestr etapu i evidence.
 
 ## Ustawienia i granice
 
@@ -39,11 +40,13 @@ Zapisz ADR-y, listę uruchomionych poleceń i ograniczenia. Etap odblokowuje dan
 ## Prompt
 
 ```text
-Zaimplementuj wskazany mały fragment etapu01 RetailOps instrukcja.
-Zachowaj architektura.md i wspólne kontrakty. Utwórz działający szkielet AI:
-package/settings/CLI, health/ready/version/metrics, logi i correlation, jawne
-migracje, oddzielne persistence AI/MLflow oraz Compose i podstawowe required CI.
-Użyj fakes dla providerów. Wersjonuj kontrakty i ADR-y, nie kopiuj generatora/UI/DB
-RetailOps. Nie twierdź, że modele lub nowe zdarzenia już działają. Dokończ fragment
-z pozytywnymi/negatywnymi testami i evidence, aktualizując stan etapu.
+Zaimplementuj kolejny mały fragment etapu01: wykonywalne wersjonowane kontrakty
+dataset/feature/label/prediction/run/tool, fixtures oraz reguły kompatybilności.
+Zachowaj architektura.md i wspólne kontrakty. Uzgodnij grain, identity, lineage,
+availability/as-of oraz braki i zera przed importerem i pipeline ML.
+Utrzymaj działający pakiet, HTTP, DB/MLflow, migracje, Compose i required CI.
+Uprawnienia nowych endpointów mają działać od pierwszej implementacji.
+Nie kopiuj generatora/UI/operacyjnej DB RetailOps ani nie deklaruj modeli lub
+streamingu na podstawie schema. Zapisz pozytywne i negatywne testy, evidence
+i aktualny status; po push odbierz wymagane zdalne kontrole.
 ```

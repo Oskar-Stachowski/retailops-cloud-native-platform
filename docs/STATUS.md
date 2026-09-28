@@ -1,6 +1,6 @@
 # Aktualny status RetailOps
 
-Aktualizacja: **2026-09-27**. [Audyt AI 00](evidence/ai/00/README.md) na
+Aktualizacja: **2026-09-28**. [Audyt AI 00](evidence/ai/00/README.md) na
 `cbf28b2` obejmuje dwukrotną generację `small`, kontrast 100/20 produktów,
 pomiary danych i kontraktów, **138 testów bez pominięć** oraz ponowny odczyt
 ocenionych artefaktów RF. Required CI tego SHA ma `success`.
@@ -22,7 +22,7 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 | Monitoring | Metryki API/DB/stream, Prometheus, Grafana i próba rzeczywistego firing/resolution alertu. SLO dotyczy scrape metryk; brak dowodu dostępności żądań użytkownika przez 30 dni i dostarczania powiadomień. |
 | Jenkins | Rzeczywiste lokalne wykonanie pipeline z 2026-09-26; dodatkowa walidacja, bez wdrażania do chmury. |
 | ML | Lokalna generacja cech, ocena RF z trzema oknami walidacyjnymi i odłożonym testem całego horyzontu oraz zweryfikowana ścieżka artefaktu do batchu, metadanych i metryk. [Ocena z 27.09.2026](evidence/ml/fixed-origin-rf-2026-09-27/README.md) odrzuciła RF wobec średniej ruchomej; brak kwalifikacji do serving. |
-| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym lokalnym repo: pakiet/CLI, bazowy HTTP, bezpieczne błędy, logi JSON i telemetry; 62 testy oraz próby procesu i wheel. Etap 01 pozostaje częściowy: DB/MLflow i zdalne CI są przed nami. Źródło nie spełnia jeszcze kontraktu danych AI 02–03. |
+| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. 77 testów oraz rzeczywisty Compose na czystym checkoutcie: crash, trwałość, awaria DB i recovery. Etap 01 pozostaje częściowy: kontrakty danych/run/tool i uprawnienia endpointów są przed nami; nowe commity oczekują zdalnego CI po push. Źródło nie spełnia jeszcze kontraktu danych AI 02–03. |
 
 ## Zakres użycia
 
@@ -30,13 +30,15 @@ Projekt służy do lokalnego demo i weryfikacji praktyk DevOps. Przełączanie
 `user_id` nie jest uwierzytelnianiem. Lokalny Compose przypina publikowane
 porty do loopback zgodnie z [instrukcją](guides/local-development.md).
 
-Nie ma potwierdzonego produkcyjnego wdrożenia AWS/EKS, produkcyjnego model serving,
-MLflow, RAG ani agenta Bedrock. Te elementy opisuje wyłącznie [plan AI](plans/ai/README.md).
+Działa lokalny MLflow w repo AI. Nie ma potwierdzonego produkcyjnego wdrożenia
+AWS/EKS, produkcyjnego model serving, RAG ani agenta Bedrock. Te elementy
+opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
 Kontynuujemy **[AI 01 — fundament projektu](plans/ai/etapy/01-fundament-projektu.md)**:
-następny zakres to persistence AI/MLflow, migracje i lokalny Compose w repo AI.
+następny zakres to wykonywalne kontrakty dataset/feature/label/prediction/run/tool
+i reguły kompatybilności w repo AI.
 [Backlog](plans/ai/backlog.md) określa pozostałą pracę 01 i pierwszy mały PR 02.
 DATA-01–05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji
 historii przed odbiorem cech i forecastingu. Inventory, streaming, auth oraz

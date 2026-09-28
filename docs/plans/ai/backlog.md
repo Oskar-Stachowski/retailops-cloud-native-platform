@@ -1,47 +1,44 @@
 # Najbliższe prace po audycie AI 00
 
 Baza: [pomiary na `cbf28b2`](../../evidence/ai/00/README.md), 27.09.2026.
-**Etap 01 w realizacji; następny zakres: persistence, migracje i Compose.**
-[Pakiet i bazowy HTTP](../../evidence/ai/01/README.md) działają w osobnym
-lokalnym repo `retailops-ai-intelligence`.
+**Etap 01 w realizacji; następny zakres: wykonywalne kontrakty danych i runów.**
+[Pakiet, HTTP i persistence](../../evidence/ai/01/README.md) działają w osobnym
+repo `retailops-ai-intelligence`.
 Ten plik zawiera otwartą pracę, a [audyt](../../audits/open-findings.md)
 dowody błędów i kryteria ich zamknięcia. Etap 01 pozostaje częściowy, 02–17 są planowane;
 brak nowej funkcji z planu nie jest sam w sobie błędem istniejącego demo.
 
 ## Następny mały PR etapu 01
 
-**Repo:** osobne `retailops-ai-intelligence` obok RetailOps, branch
-`ai/implementation`. HTTP: `e6c7888`; dowody czystego checkoutu/wheel: `7d67530`.
-Bieżące możliwości i uruchomienie opisują `docs/STATUS.md` oraz
-`docs/http-service.md` w repo AI. Repo pozostaje lokalne.
+**Repo:** `retailops-ai-intelligence`, branch `ai/implementation`.
+Działa lokalny stos API/PostgreSQL/MLflow z jawnymi migracjami i trwałością
+potwierdzoną po crash/restart i awarii DB. [Dowody](../../evidence/ai/01/README.md)
+wskazują commity i ograniczenia. Uruchomienie: `docs/local-stack.md` w repo AI.
 
-Zakres: PostgreSQL dla AI, oddzielna baza i użytkownik MLflow, jawne migracje
-Alembic oraz lokalny Compose API/Postgres/MLflow z trwałymi wolumenami.
-Zarejestruj rzeczywistą sondę DB w mechanizmie readiness; obecna rola foundation
-sprawdza tylko startup i nie potwierdza gotowości bazy ani predykcji.
+**Zakres:** wykonywalne, wersjonowane kontrakty dataset/feature/label/prediction/run/tool
+oraz fixtures i reguły kompatybilności. Uzgodnić identity/provenance, grain,
+availability/as-of, braki i zera oraz własność źródła przed importerem lub pipeline ML.
+Nie kopiować generatora ani modeli operacyjnej DB do repo AI.
 
 **Odbiór tego PR:**
 
-- Własność i uprawnienia AI/MLflow są rozdzielone od operacyjnej bazy RetailOps.
-  Metadata i duże artefakty mają jawne miejsca zapisu; sekrety są poza Git/logami.
-- Migracje mają wersję, są uruchamiane jawnie i nie konkurują ze startem każdego
-  procesu API. Nie zastępuj ich samym create_all przy uruchomieniu serwera.
-- Rzeczywiste `make compose-up/compose-down` uruchamiają i zatrzymują usługi.
-  Porty hosta pozostają lokalne; zasady bind/Host są świadomie dostosowane
-  do kontrolowanej sieci Compose. Nie powstaje drugi broker RetailOps.
-- Zapisane dane przetrwają restart usług. Odłączenie rzeczywistej DB pogarsza
-  readiness do 503, health pozostaje 200, a po powrocie DB gotowość wraca.
-  Raport rozróżnia provider fakes od prób rzeczywistych usług.
-- Konfiguracja, migracje, Compose i nowe testy wchodzą do wymaganych kontroli.
-  Instrukcja obejmuje pierwsze uruchomienie, migrację i bezpieczne zatrzymanie;
-  usunięcie wolumenów nie jest domyślnym shutdown.
+- Jeden kontrakt w kodzie i schematach opisuje każdą rodzinę; poprawne przykłady
+  przechodzą walidację, a niepełne/błędne wersje i niezgodna lineage są odrzucane.
+- Osobne source/curated/feature/label/split/model/run IDs i wersje, bez mylenia
+  tożsamości logicznej z checksumem pliku. Rozdzielić obserwowane fakty, simulation
+  truth i etykiety; braku danych nie zastępować zerem.
+- Grain pierwszej prognozy odpowiada observed_sales_units i selling location/kanał,
+  origin/target date; availability nie przekracza origin. Nie zadeklarować
+  inventory ani nowych zdarzeń jako gotowych tylko na podstawie schema.
+- Opisać politykę zmian wersji i zgodność fixtures/OpenAPI/JSON Schema; testy
+  kontraktów muszą wykryć ich celowe osłabienie. Kontrole i evidence obejmują nowe pliki.
 
-Pozostała część **tego samego etapu 01**: wykonywalne wersje kontraktów
-dataset/feature/label/prediction/run/tool oraz uprawnienia pierwszych endpointów
-aplikacyjnych. Obecny token metryk nie jest systemem tożsamości użytkowników AI.
-Po publikacji repo należy wykonać zdalne CI i ustawić ochronę gałęzi z wymaganym
-`required-result`; lokalna walidacja workflow nie potwierdza tych ustawień.
-Cały etap 01 pozostaje otwarty.
+Pozostała praca **tego samego etapu 01**: uprawnienia pierwszych endpointów
+aplikacyjnych od ich pierwszej implementacji. Token metryk nie jest systemem
+tożsamości użytkowników, a MLflow ma tylko lokalną granicę sieciową.
+Repo AI jest na GitHub; odczyt 28.09.2026 potwierdził ochronę main z required-result
+i udany CI bazowego 7d67530. Nowe commity persistence są lokalne; po push trzeba
+odebrać ich zdalny CI, w tym nowy job persistence. Cały etap 01 pozostaje otwarty.
 
 ## Pierwszy mały PR etapu 02
 
