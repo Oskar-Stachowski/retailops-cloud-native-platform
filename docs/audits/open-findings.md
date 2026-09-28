@@ -1,6 +1,7 @@
 # Otwarte ustalenia audytowe
 
-Przegląd i pomiary: **27.09.2026**, baza `cbf28b2a66e7e5f205cf73d9bfe620c491e22d93`.
+Pomiary bazowe: **27.09.2026**, baza `cbf28b2a66e7e5f205cf73d9bfe620c491e22d93`.
+Aktualizacja otwartego zakresu: **28.09.2026**.
 Poniżej są wyłącznie otwarte problemy potwierdzone w źródłach lub reprodukcji.
 [Audyt AI 00](../evidence/ai/00/README.md) rozdziela pomiary, 138 testów,
 przegląd statyczny i odczyt CI. Pozwala rozpocząć AI 01;
@@ -16,18 +17,19 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
-### DATA-02 · P2 · Brak źródłowego kontraktu panelu, wymiarów i lifecycle
+### DATA-02 · P2 · Brak pełnego panelu obserwacji i kompletności per dzień
 
-**Dowód:** 12 SKU z whitespace; kategoria↔marka i region↔kanał są sprzężone.
-Rzadki zbiór cech ma 12 718/45 000 rekordów przy założeniu statycznie ważnych par.
-ML uzupełnia 32 282 zera tylko po deklaracji kompletności syntetycznej; źródło nie
-publikuje wersji asortymentu, kalendarza otwarcia ani completeness per dzień.
+**Dowód:** [odbiór DATA-02](../evidence/ai/02/data02/README.md) ma dla ai-smoke
+639 sparse wierszy cech i 1612 ważnych dni asortymentu przed ograniczeniem otwarcia;
+nie publikuje daily observations ani completeness per dzień. Nie można wyprowadzić
+zer sprzedaży z samego kalendarza. Historyczny panel ML uzupełnia brakujące wiersze
+tylko po deklaracji kompletności syntetycznej; nie zastępuje to źródłowego kontraktu.
 Kod: [profile_engine](../../data/generator/profile_engine.py), [panel ML](../../ml/evaluation/fixed_origin.py).
 
-**Kryterium zamknięcia — AI 02:** poprawne SKU, rozdzielone wymiary i wersjonowane
-assignments/lifecycle; 100% poprawnych kombinacji dziennych. Zero jest oddzielone
-od missing/closed/inactive. Test usunięcia dnia nie zamienia luki w sprzedaż zero;
-sprzedaż poza okresem aktywności jest odrzucana. Mianownik nie mnoży dowolnie kanałów.
+**Kryterium zamknięcia — AI 02:** daily observations pokrywają 100% poprawnych
+kombinacji wyznaczonych przez wersje wymiarów. Zero jest oddzielone
+od missing/closed/inactive. Test usunięcia dnia nie zamienia luki w sprzedaż zero.
+Mianownik nie mnoży dowolnie kanałów, a jego coverage uwzględnia lifecycle i asortyment.
 
 ### DATA-03 · P1 · Niespójna chronologia i powtórzone pozycje koszyka
 

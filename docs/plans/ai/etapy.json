@@ -44,10 +44,10 @@
       ],
       "path": "etapy/02-dane-sprzedazowe.md",
       "status": "in_progress",
-      "next_scope": "DATA-02: dimensions, SKU, routing and lifecycle",
-      "evidence": "../../evidence/ai/02/data01/README.md",
-      "implementation_commit": "bb9333eb337a1b6dfd498d8531fc9657044f8ca9",
-      "implementation_scope": "DATA-01 only; remaining source fixes pending"
+      "next_scope": "DATA-04: shared price and promotion resolver",
+      "evidence": "../../evidence/ai/02/data02/README.md",
+      "implementation_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+      "implementation_scope": "DATA-01 configuration/identity and DATA-02 dimensions/calendar only; remaining source fixes pending"
     },
     {
       "id": "03",

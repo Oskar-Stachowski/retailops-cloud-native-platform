@@ -106,3 +106,4 @@ Atomowy pełny snapshot i importer pozostają etapem 03.
 Źródło ma `inventory_ready=false`, forecasting/anomaly/stockout/replay `not_ready`,
 RAG `not_applicable`; nadal zawiera sparse panel i mixed simulation truth.
 [Odbiór DATA-01](../evidence/ai/02/data01/README.md) potwierdza konfigurację i identity.
+[Odbiór DATA-02](../evidence/ai/02/data02/README.md) obejmuje wymiary i kalendarz.

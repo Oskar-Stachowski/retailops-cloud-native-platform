@@ -2,28 +2,29 @@
 
 [Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
 Required CI PR oraz push na main obu repozytoriów ma success.
-Główny punkt wznowienia to DATA-02 etapu 02. [DATA-01](../../evidence/ai/02/data01/README.md)
-ma lokalny odbiór konfiguracji i tożsamości; etap 02 jest w realizacji.
+Główny punkt wznowienia to DATA-04 etapu 02. [DATA-01](../../evidence/ai/02/data01/README.md)
+ma lokalny odbiór konfiguracji i tożsamości, a [DATA-02](../../evidence/ai/02/data02/README.md)
+wymiarów, lifecycle i kalendarza; etap 02 jest w realizacji.
 Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
 potwierdzone problemy i kryteria ich zamknięcia.
 
 ## Kolejny mały PR etapu 02
 
-**Repo:** RetailOps. **Zależność:** konfiguracja i identity DATA-01.
-Zakres DATA-02: rozdzielić selling location, stock location, channel i region;
-wersjonować assignments/routing oraz lifecycle/assortment. Naprawić SKU,
-rozdzielić brand/category i channel/region, dodać hierarchię produktów i
-kalendarz PL/DE z flagami otwarcia. Legacy pola wyprowadzać przez adapter.
-Zachować demo, manifest v2 oraz testy identity i powtarzalności.
+**Repo:** RetailOps. **Zależność:** konfiguracja/identity oraz kanoniczne wymiary.
+Zakres DATA-04: wspólny resolver cen/promocji według produktu, scope, daty
+i znanej wersji planu; pełne coverage i odrzucanie overlap. Promocje mają
+available time, różne typy/daty i ograniczenia kanału/lokalizacji. Zdefiniować
+stacking/priority, uzgodnić ceny order items/sales/agregatów oraz naprawić
+kierunek pre/post effects. Zachować demo, adapter wymiarów i testy identity.
 
 Dalsze PR-y według [instrukcji](etapy/02-dane-sprzedazowe.md):
-wspólne ceny/promocje (DATA-04), demand/panel/koszyki (DATA-02/03/05),
+demand/panel/koszyki (DATA-02/03/05),
 chronologia/zwroty (DATA-03), rozdzielenie truth i bramki (DATA-05).
 Źródło pozostaje `not_ready` do AI 03 do odbioru pełnego etapu 02.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 02, DATA-02:** wymiary, SKU, routing, lifecycle i kalendarz;
+- **RetailOps / etap 02, DATA-04:** wspólne ceny i promocje;
   potem kolejne poprawki źródła w kolejności opisanej wyżej.
 - **Repo AI / etap 11, zakres 1–2:** rejestr zatwierdzonego korpusu, allowlista,
   access_class, source SHA/checksums i document_status; następnie parser/chunker

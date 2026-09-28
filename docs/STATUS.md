@@ -38,8 +38,10 @@ opisuje [plan AI](plans/ai/README.md).
 
 Etap 02 jest w realizacji. [DATA-01](evidence/ai/02/data01/README.md) ma lokalny
 odbiór konfiguracji, jawnych dat i source/feature identity z manifestem v2.
-Następna implementacja to **[AI 02 / DATA-02](plans/ai/etapy/02-dane-sprzedazowe.md)**
-w RetailOps: wymiary, SKU, routing i lifecycle. Równolegle repo AI może
+[DATA-02](evidence/ai/02/data02/README.md) ma lokalny odbiór wymiarów, SKU,
+wersjonowanych assignments/routing/assortment, lifecycle i kalendarza PL/DE-BE.
+Następna implementacja to **[AI 02 / DATA-04](plans/ai/etapy/02-dane-sprzedazowe.md)**
+w RetailOps: wspólny resolver ceny i promocji. Równolegle repo AI może
 rozpocząć [RAG 11](plans/ai/etapy/11-rag.md) od zatwierdzonego korpusu.
 [Backlog](plans/ai/backlog.md) określa zakres pierwszego PR i zależności.
 DATA-02–05 wymagają poprawek źródła przed odbiorem nowego importu; ML-07 wersji

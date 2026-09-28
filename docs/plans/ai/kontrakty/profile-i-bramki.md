@@ -1,9 +1,11 @@
 # Profile, budżety i bramki odbioru
 
-**Status: rozmiary i jawne daty profili wdrożone w DATA-01; pozostałe bramki są planem.**
+**Status: konfiguracja, identity, wymiary i kalendarz mają lokalny odbiór DATA-01/02;
+bramki pełnego źródła/modeli pozostają planem.**
 [Konfiguracja 1.0.0](../../../../data/generator/configuration.py) jest wykonywalnym źródłem
-rozmiarów i dat. Generator nadal tworzy legacy CSV i sparse panel; stock locations,
-aktywne pary, chunked Parquet i hard gates pozostają do wdrożenia.
+rozmiarów i dat. Profile AI mają [kanoniczne wymiary](../../../reference/retail-dimensions.md),
+stock locations, ważne pary i osiem hard gates wymiarów; nadal tworzą sparse panel
+i CSV. Pełny panel, chunked Parquet oraz pozostałe bramki wymagają implementacji.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 

@@ -2,8 +2,9 @@
 
 **Status: w realizacji. Repo: RetailOps. Zależność: 01.**
 
-Obecny fundament danych: [DATA-01 — konfiguracja i identity](../../../evidence/ai/02/data01/README.md).
-Poniżej pozostała praca; punkt wznowienia to wymiary/lifecycle DATA-02.
+Obecny fundament danych: [DATA-01 — konfiguracja i identity](../../../evidence/ai/02/data01/README.md)
+oraz [DATA-02 — wymiary, lifecycle i kalendarz](../../../evidence/ai/02/data02/README.md).
+Poniżej pozostała praca; punkt wznowienia to wspólne ceny/promocje DATA-04.
 
 Cel: uzyskać deterministyczny, kompletny i spójny zbiór obserwowanej sprzedaży, który można eksportować i użyć w pierwszym forecastingu. Pełny ledger jest etapem 06. W tym etapie inventory, stockout i lost-sales nie są wiarygodnymi cechami ani labelami modelu.
 
@@ -11,7 +12,6 @@ Przeczytaj [architekturę](../architektura.md), [dane i czas](../kontrakty/dane-
 
 ## Kolejność małych PR-ów
 
-2. **Wymiary, SKU i czas.** Rozdzielić selling location, stock location, channel i region. Dodać versioned assignments/routing i lifecycle/assortment. SKU ma wersjonowany regex bez whitespace, także dla Pet Care; brand nie jest kopią category, channel nie jest kopią region. Product hierarchy, pack/size oraz cost/margin band dodać tam, gdzie mają zastosowanie. Zbudować deterministyczny kalendarz PL/DE i flagi otwarcia. Legacy pola wyprowadzać przez adapter, nie przez utrzymanie dwóch niezależnych źródeł.
 3. **Cena i promocja.** Jedna funkcja rozstrzyga cenę według produktu, scope, daty i wersji planu. Uzupełnić pełne price coverage; odrzucać niejednoznaczne overlap. Promocje mają `known_at/available_at`, ograniczenia kanału/lokalizacji i różne daty, typy percentage/bundle/clearance/seasonal oraz produkty bez promocji. Zdefiniować stacking/priority i pre/post effects; te ostatnie jako truth. Ta sama cena trafia do order items, sales i agregatów. Naprawić odwrócony kierunek indeksowania pre/post, nie korygować samych etykiet.
 4. **Popyt, panel i koszyki.** Wdrożyć jedną formułę popytu i użyć demand weight dokładnie raz. Generować pełny dzienny panel ważnych kombinacji, jawne zera i osobne missing/closed/inactive statusy. Tworzyć transakcje zgodne z docelową agregacją; komplementarne SKU losować deterministycznie bez replacement i bez stałego wybierania pierwszych produktów. Sumy koszyka, przychód i liczba sztuk muszą się uzgadniać. Lags w istniejących ścieżkach zastąpić kalendarzowymi lub jawnie wycofać legacy dataset z nowych porównań.
 5. **Chronologia i zwroty.** Wyznaczać `sold_at` względem własnego `ordered_at`, bez cofania godziny modulo. Zwrot ma konkretną pozycję, częściową ilość, category/channel return window, reason/status; nie przekracza skumulowanej ilości zakupionej. Uwzględnić gross/net revenue i osobny późniejszy tail; zdarzenia dostępne po watermark nie wchodzą do wcześniejszego snapshotu. Nie ucinać dat zwrotów do końca danych tylko po to, aby kontrola przeszła.
@@ -47,7 +47,7 @@ Najpierw przeczytaj README.md, architektura.md, kontrakty/dane-i-czas.md,
 kontrakty/profile-i-bramki.md oraz evidence etapów 00 i 01.
 Potwierdź rzeczywiste pliki/CLI i stan brancha. Realizuj opisane małe PR-y po kolei.
 Zachowaj demo, źródłową własność generatora oraz manifest v2 i identity z DATA-01.
-Kontynuuj od wymiarów/lifecycle; potem pricing/promo, kalendarzowy panel, koszyki,
+Kontynuuj od pricing/promo; potem kalendarzowy panel, koszyki,
 chronologia i returns.
 Oddziel simulation truth. Pierwszy wariant jest forecast-only bez inventory features;
 nie ogłaszaj gotowości stockout ani anomaly przed ich etapami.

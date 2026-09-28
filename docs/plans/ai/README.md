@@ -1,14 +1,17 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 w realizacji; następny zakres DATA-02. Aktualizacja: 28.09.2026.**
+**Status: etap 02 w realizacji; następny zakres DATA-04. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
 kontrakty danych/run/tool z walidacją offline oraz lokalne poświadczenia i scope API.
-Required CI PR i push na main obu repozytoriów ma success; ochrona main pozostaje aktywna.
+Required CI fundamentu 01 dla PR i push na main obu repozytoriów ma success;
+ochrona main pozostaje aktywna.
 [DATA-01](../../evidence/ai/02/data01/README.md) wprowadza jawne daty, profile,
-manifest v2 oraz source/feature identity z lokalnym odbiorem. Następna implementacja
-to wymiary/lifecycle DATA-02; równolegle można rozpocząć RAG 11.
+manifest v2 oraz source/feature identity z lokalnym odbiorem.
+[DATA-02](../../evidence/ai/02/data02/README.md) dodaje wymiary, lifecycle,
+routing i kalendarz PL/DE-BE. Następna implementacja to wspólne ceny/promocje
+DATA-04; równolegle można rozpocząć RAG 11.
 [Backlog](backlog.md) podaje kolejny zakres 02 i granice równoległych strumieni.
 Etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.

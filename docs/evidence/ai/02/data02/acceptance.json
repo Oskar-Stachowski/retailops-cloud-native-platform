@@ -1,0 +1,2151 @@
+{
+  "cases": [
+    {
+      "case": "ai-smoke-a",
+      "code_provenance": {
+        "code_files": {
+          "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+          "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+          "data/contracts/source_dataset_manifest.v2.schema.json": "0c0e1dd487572f0a1c938b0161101062d19ea9809dc411612bbe1ecf7d2c46b7",
+          "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+          "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+          "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+          "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+          "data/generator/csv_writer.py": "cc04e102168296b49cd82d698379f7e3e4e56751cd58549d16d6f06e18271dd2",
+          "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+          "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+          "data/generator/dimension_schema.py": "6bd15f9a08409f05b5201787f1982c4a96b3ee9a030b90ff7873ccae6604dd8f",
+          "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+          "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+          "data/generator/identity.py": "c7477477251e37381f5231c91b9b2b9d907a1c27bff6f2da57a7b1c5dd87f57c",
+          "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+          "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+          "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+          "data/generator/main.py": "94851fd47c77ecc9675afc4f138b595b908050b489bb7ec413ed38201e8a8f0a",
+          "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+          "data/generator/manifest_v2.py": "67468597569fd6d423013297cd53513c0185d674629058ae619eb88f85e07cdc",
+          "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+          "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+          "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+          "data/generator/profile_engine.py": "882301712093400524fde7128eb788994ea89f06906df4d632b889c5062a9c34",
+          "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+          "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+          "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+          "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+          "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+          "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+          "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+        },
+        "code_sha256": "9daf169dc823c4f5b4f63ff13abd96037342e9b1afb3ff03cc16e511672652b6",
+        "code_state": "clean",
+        "dependency_files": {
+          "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+          "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+        },
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "git_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+        "python_version": "3.11.15"
+      },
+      "dimensions_report": {
+        "active_daily_combinations": 1612,
+        "checks": [
+          {
+            "check_id": "dimension_schema_pk_sku",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 488,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "selling_stock_channel_region",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 3,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "assignment_routing_versions",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 6,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "catalog_lifecycle_assortment",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 1612,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "calendar_exact_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 90,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "category_season_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 240,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "legacy_adapter_consistency",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 25,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "sales_active_open_known_routing",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 715,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          }
+        ],
+        "inventory_ready": false,
+        "nominal_daily_grid": 1800,
+        "observation_panel_status": "not_ready",
+        "policy_version": "retail-dimensions-1.0.0",
+        "status": "passed"
+      },
+      "feature_artifact": {
+        "content_sha256": "4cd099919a38ff122e00d81f4c4b709834416b31c2918e404ca6d2dbae5cb805",
+        "path": "features.csv",
+        "row_count": 639,
+        "sha256": "d1f2dd38566b88278494b5a8cde5c4d385adbec12d8aea7a0af2faf79607bf35",
+        "size_bytes": 239037
+      },
+      "feature_id": "features-sha256-894beb29cb127c64e1a054a5e17e7fcdc283fee2926c9b43304f9a4c74f6da13",
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 30,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 1800,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 20,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-02",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "seconds": 0.9403,
+      "source_artifacts": [
+        {
+          "content_sha256": "928d1de089d403c71947ca84aed15ebfb032e3f0ce31babc206a1d3a4fb7c498",
+          "row_count": 20,
+          "sha256": "01b9b924ef0a8ac3a4a0bfb23cef646447a637ab6fd4609c88bc1318319b652c",
+          "table": "products"
+        },
+        {
+          "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+          "row_count": 4,
+          "sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+          "table": "users"
+        },
+        {
+          "content_sha256": "0813acd1d04a6a931d1026641bc445f75a109ef96916b3d818851ba953452fc6",
+          "row_count": 3,
+          "sha256": "e1950f44f958d3113c1a6eeb2b31199b1b476c7e420b76afcfcee8b54d9b4051",
+          "table": "stores"
+        },
+        {
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "row_count": 2,
+          "sha256": "fdea968ba1c6d5195d422bcc38d6b07fad26e54a88dac7334cf75b65ede762ea",
+          "table": "warehouses"
+        },
+        {
+          "content_sha256": "fee8d6331d3da26db12a66468e4ee6a520e1bab0c2e24a0d9e691f659faba301",
+          "row_count": 490,
+          "sha256": "65c002f9d48a8928d2905971c34ee4a19e28dd3ba203bb299cf3ecfc91612ade",
+          "table": "orders"
+        },
+        {
+          "content_sha256": "64f68b71a3c5e3abd4a8fccc0864c0febdc85820e0920da8fbb31820b97ee764",
+          "row_count": 715,
+          "sha256": "d0a023b7eccd2360d0fab0e74b26309b15779bc1200b6a1adbea437824fe4d07",
+          "table": "order_items"
+        },
+        {
+          "content_sha256": "8583555b245430aeb675aff2f439f082c587d3f1c9231ac6a8f3d708e8e26218",
+          "row_count": 60,
+          "sha256": "d2dd01c2c8722034a712c5b34887163a2c75cc6d434c1e6c54fabfef44f002fa",
+          "table": "price_history"
+        },
+        {
+          "content_sha256": "ce6f17322a083b2283dfaccc3a3b781628c9d09458bbb655a1106c74ec960677",
+          "row_count": 20,
+          "sha256": "b48c4e06e831da48d47464cb980e1b2d8488ee6e16e79ce0c3c374b1f5825073",
+          "table": "promotions"
+        },
+        {
+          "content_sha256": "ce3e7978f300566af9e78617d4af68d93ef25b6c29e2224561eceb6df2dd49e7",
+          "row_count": 815,
+          "sha256": "a444346049fa4e96f8b02db2b0fa9afa14797270b636c48e6e8bf8be19b0dc17",
+          "table": "stock_movements"
+        },
+        {
+          "content_sha256": "70b11a4cdf3da07273dab7b259324804e6b9ccde940067b04bad921197f5aef6",
+          "row_count": 122,
+          "sha256": "c097e21365c598fbff6b6f398c918b12d453e1c58506064ffc1b41d9184bb7b9",
+          "table": "returns"
+        },
+        {
+          "content_sha256": "1ddb0c461a1fe781c02e4cd2d98194c3e2823be8fb49622e6bb21a7dd96c76ed",
+          "row_count": 715,
+          "sha256": "a7096ce285ab1b174fbb34715d3cd56e720373e250bb8b98213aa1ce35edcb5c",
+          "table": "sales"
+        },
+        {
+          "content_sha256": "b4c2d4aa348caab8f097b16e662738e3518099133dbe236d9d372fed3564c8f6",
+          "row_count": 100,
+          "sha256": "beab97fcde2c87ede8fc5c2b6e5707df89c68a317cc8c4f492af17c0728db744",
+          "table": "inventory_snapshots"
+        },
+        {
+          "content_sha256": "bf6f6c361475b46b2292f4dab2a0192371ff0cbbb6dcccfcbe249bd9246301dd",
+          "row_count": 140,
+          "sha256": "65131111b69b0b14787cf9fd73a9e4e46cb495e722de2710b19277138eaba449",
+          "table": "forecasts"
+        },
+        {
+          "content_sha256": "e5847198479d17a3cb2285f4053c7047f118208641e1bcc1c0b93c7adef76333",
+          "row_count": 20,
+          "sha256": "e11b3fff4edc38f1139b289137efea6b1da5985adff2baefc5b8b9c556751097",
+          "table": "anomalies"
+        },
+        {
+          "content_sha256": "81b6dcf88d68dfef32ac00db6f0db3fd10eb72268fee5efac8511dcab1976b21",
+          "row_count": 20,
+          "sha256": "6884341705ad390cb9c252e6c60979446fa7dd321727c0113d5511bbe44559f6",
+          "table": "alerts"
+        },
+        {
+          "content_sha256": "cf3d158b50c71612b5d6c9d89fe46cb7be64aca004f0678e5e74c0dc89b3efca",
+          "row_count": 20,
+          "sha256": "81bd8113e7a6a42c2f355076f06d819dc0c6dfcc715cde8d274a9856028c0c6c",
+          "table": "recommendations"
+        },
+        {
+          "content_sha256": "9d17696b7186660f798d4d07a63ccb822a6763be8ed55c2e300667154096df05",
+          "row_count": 20,
+          "sha256": "c5ead7e3db150708fbc4c6872ab374e5621aa84fa668c9fffbb3cd067e46d1ca",
+          "table": "workflow_actions"
+        },
+        {
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "row_count": 8,
+          "sha256": "16ac165b51d8658b03131784bf879c804bb6601596aa1cfb43a47b0dfdf2cf2b",
+          "table": "catalog_categories"
+        },
+        {
+          "content_sha256": "44e5cfe788116f30be4b2cf684bcbb7f56cd3d6da5da6543458b2410469517ca",
+          "row_count": 20,
+          "sha256": "1355ee7b99862dd1c26d6d2cf18b7fcdf5dafff48f9ca871123f4bf92877b054",
+          "table": "product_catalog"
+        },
+        {
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "row_count": 2,
+          "sha256": "5caad5769edf09c6105acdc70a537697a1b02016e617b40f7e678c5c90872ee8",
+          "table": "selling_locations"
+        },
+        {
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "row_count": 2,
+          "sha256": "a88ab76d68228f4bfd23f81aaa5b97fd39709dd61150ba799b104b3c4c84afb3",
+          "table": "stock_locations"
+        },
+        {
+          "content_sha256": "6197b4a24f7e0ff133ecf0d10f402a6ffd60f1f8d5b2b26c5e10e03b8b245cda",
+          "row_count": 6,
+          "sha256": "c78fac019a8428f6c6767a156470bfe5bbe31c5a14fd2a188c0a828b7f5e6347",
+          "table": "channel_assignments"
+        },
+        {
+          "content_sha256": "5b2d966eda850d4b2a967fddd2e3c2d632625cfc7c4ba8fb8c05126b4eda4bb5",
+          "row_count": 6,
+          "sha256": "211a66d3add6455a3ae0c123791109f8f6a9ce44d641bb2b62d82534734baf43",
+          "table": "fulfillment_routes"
+        },
+        {
+          "content_sha256": "86cca33bb6b669a6a51287cff5692322232bb19b5013afc13e504802d71d40e9",
+          "row_count": 114,
+          "sha256": "8ca38d9fcc51d10e70beebac337e62a74457594719f847cbfa6cbc65b667129f",
+          "table": "assortment"
+        },
+        {
+          "content_sha256": "228a2f388a271deb86fb585dde647d9eff0e0abd28a0223e4136e9f0c93681c3",
+          "row_count": 90,
+          "sha256": "07cd94bd95e453874d7927d8fbd793342c674aa28da38613d132aa3dc28e03c0",
+          "table": "business_calendar"
+        },
+        {
+          "content_sha256": "eba465347e92344acb93fb8938158575233a8451bda2697fcbb5fc7cc3c8cb61",
+          "row_count": 240,
+          "sha256": "76d3b440ab8785fd9861729a15f45fb1f6718f19851471f246cd2948367b2120",
+          "table": "category_calendar"
+        }
+      ],
+      "source_id": "source-sha256-adca062c266f3779ed45cac3b3dc91bc7bb12998b57dd000b1693fd81c2ee053",
+      "source_schema_version": "2.1.0",
+      "versions": {
+        "calendar": "pl-de-berlin-calendar-1.0.0",
+        "canonicalization": "typed-csv-nfc-utc-multiset-1.1.0",
+        "config": "1.0.0",
+        "csv_schema": "1.0",
+        "dimensions": "retail-dimensions-1.0.0",
+        "generator": "0.3.0"
+      }
+    },
+    {
+      "case": "ai-smoke-b",
+      "code_provenance": {
+        "code_files": {
+          "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+          "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+          "data/contracts/source_dataset_manifest.v2.schema.json": "0c0e1dd487572f0a1c938b0161101062d19ea9809dc411612bbe1ecf7d2c46b7",
+          "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+          "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+          "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+          "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+          "data/generator/csv_writer.py": "cc04e102168296b49cd82d698379f7e3e4e56751cd58549d16d6f06e18271dd2",
+          "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+          "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+          "data/generator/dimension_schema.py": "6bd15f9a08409f05b5201787f1982c4a96b3ee9a030b90ff7873ccae6604dd8f",
+          "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+          "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+          "data/generator/identity.py": "c7477477251e37381f5231c91b9b2b9d907a1c27bff6f2da57a7b1c5dd87f57c",
+          "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+          "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+          "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+          "data/generator/main.py": "94851fd47c77ecc9675afc4f138b595b908050b489bb7ec413ed38201e8a8f0a",
+          "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+          "data/generator/manifest_v2.py": "67468597569fd6d423013297cd53513c0185d674629058ae619eb88f85e07cdc",
+          "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+          "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+          "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+          "data/generator/profile_engine.py": "882301712093400524fde7128eb788994ea89f06906df4d632b889c5062a9c34",
+          "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+          "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+          "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+          "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+          "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+          "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+          "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+        },
+        "code_sha256": "9daf169dc823c4f5b4f63ff13abd96037342e9b1afb3ff03cc16e511672652b6",
+        "code_state": "clean",
+        "dependency_files": {
+          "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+          "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+        },
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "git_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+        "python_version": "3.11.15"
+      },
+      "dimensions_report": {
+        "active_daily_combinations": 1612,
+        "checks": [
+          {
+            "check_id": "dimension_schema_pk_sku",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 488,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "selling_stock_channel_region",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 3,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "assignment_routing_versions",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 6,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "catalog_lifecycle_assortment",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 1612,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "calendar_exact_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 90,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "category_season_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 240,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "legacy_adapter_consistency",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 25,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "sales_active_open_known_routing",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 715,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          }
+        ],
+        "inventory_ready": false,
+        "nominal_daily_grid": 1800,
+        "observation_panel_status": "not_ready",
+        "policy_version": "retail-dimensions-1.0.0",
+        "status": "passed"
+      },
+      "feature_artifact": {
+        "content_sha256": "4cd099919a38ff122e00d81f4c4b709834416b31c2918e404ca6d2dbae5cb805",
+        "path": "features.csv",
+        "row_count": 639,
+        "sha256": "d1f2dd38566b88278494b5a8cde5c4d385adbec12d8aea7a0af2faf79607bf35",
+        "size_bytes": 239037
+      },
+      "feature_id": "features-sha256-894beb29cb127c64e1a054a5e17e7fcdc283fee2926c9b43304f9a4c74f6da13",
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 30,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 1800,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 20,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-02",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "seconds": 0.7646,
+      "source_artifacts": [
+        {
+          "content_sha256": "928d1de089d403c71947ca84aed15ebfb032e3f0ce31babc206a1d3a4fb7c498",
+          "row_count": 20,
+          "sha256": "01b9b924ef0a8ac3a4a0bfb23cef646447a637ab6fd4609c88bc1318319b652c",
+          "table": "products"
+        },
+        {
+          "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+          "row_count": 4,
+          "sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+          "table": "users"
+        },
+        {
+          "content_sha256": "0813acd1d04a6a931d1026641bc445f75a109ef96916b3d818851ba953452fc6",
+          "row_count": 3,
+          "sha256": "e1950f44f958d3113c1a6eeb2b31199b1b476c7e420b76afcfcee8b54d9b4051",
+          "table": "stores"
+        },
+        {
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "row_count": 2,
+          "sha256": "fdea968ba1c6d5195d422bcc38d6b07fad26e54a88dac7334cf75b65ede762ea",
+          "table": "warehouses"
+        },
+        {
+          "content_sha256": "fee8d6331d3da26db12a66468e4ee6a520e1bab0c2e24a0d9e691f659faba301",
+          "row_count": 490,
+          "sha256": "65c002f9d48a8928d2905971c34ee4a19e28dd3ba203bb299cf3ecfc91612ade",
+          "table": "orders"
+        },
+        {
+          "content_sha256": "64f68b71a3c5e3abd4a8fccc0864c0febdc85820e0920da8fbb31820b97ee764",
+          "row_count": 715,
+          "sha256": "d0a023b7eccd2360d0fab0e74b26309b15779bc1200b6a1adbea437824fe4d07",
+          "table": "order_items"
+        },
+        {
+          "content_sha256": "8583555b245430aeb675aff2f439f082c587d3f1c9231ac6a8f3d708e8e26218",
+          "row_count": 60,
+          "sha256": "d2dd01c2c8722034a712c5b34887163a2c75cc6d434c1e6c54fabfef44f002fa",
+          "table": "price_history"
+        },
+        {
+          "content_sha256": "ce6f17322a083b2283dfaccc3a3b781628c9d09458bbb655a1106c74ec960677",
+          "row_count": 20,
+          "sha256": "b48c4e06e831da48d47464cb980e1b2d8488ee6e16e79ce0c3c374b1f5825073",
+          "table": "promotions"
+        },
+        {
+          "content_sha256": "ce3e7978f300566af9e78617d4af68d93ef25b6c29e2224561eceb6df2dd49e7",
+          "row_count": 815,
+          "sha256": "a444346049fa4e96f8b02db2b0fa9afa14797270b636c48e6e8bf8be19b0dc17",
+          "table": "stock_movements"
+        },
+        {
+          "content_sha256": "70b11a4cdf3da07273dab7b259324804e6b9ccde940067b04bad921197f5aef6",
+          "row_count": 122,
+          "sha256": "c097e21365c598fbff6b6f398c918b12d453e1c58506064ffc1b41d9184bb7b9",
+          "table": "returns"
+        },
+        {
+          "content_sha256": "1ddb0c461a1fe781c02e4cd2d98194c3e2823be8fb49622e6bb21a7dd96c76ed",
+          "row_count": 715,
+          "sha256": "a7096ce285ab1b174fbb34715d3cd56e720373e250bb8b98213aa1ce35edcb5c",
+          "table": "sales"
+        },
+        {
+          "content_sha256": "b4c2d4aa348caab8f097b16e662738e3518099133dbe236d9d372fed3564c8f6",
+          "row_count": 100,
+          "sha256": "beab97fcde2c87ede8fc5c2b6e5707df89c68a317cc8c4f492af17c0728db744",
+          "table": "inventory_snapshots"
+        },
+        {
+          "content_sha256": "bf6f6c361475b46b2292f4dab2a0192371ff0cbbb6dcccfcbe249bd9246301dd",
+          "row_count": 140,
+          "sha256": "65131111b69b0b14787cf9fd73a9e4e46cb495e722de2710b19277138eaba449",
+          "table": "forecasts"
+        },
+        {
+          "content_sha256": "e5847198479d17a3cb2285f4053c7047f118208641e1bcc1c0b93c7adef76333",
+          "row_count": 20,
+          "sha256": "e11b3fff4edc38f1139b289137efea6b1da5985adff2baefc5b8b9c556751097",
+          "table": "anomalies"
+        },
+        {
+          "content_sha256": "81b6dcf88d68dfef32ac00db6f0db3fd10eb72268fee5efac8511dcab1976b21",
+          "row_count": 20,
+          "sha256": "6884341705ad390cb9c252e6c60979446fa7dd321727c0113d5511bbe44559f6",
+          "table": "alerts"
+        },
+        {
+          "content_sha256": "cf3d158b50c71612b5d6c9d89fe46cb7be64aca004f0678e5e74c0dc89b3efca",
+          "row_count": 20,
+          "sha256": "81bd8113e7a6a42c2f355076f06d819dc0c6dfcc715cde8d274a9856028c0c6c",
+          "table": "recommendations"
+        },
+        {
+          "content_sha256": "9d17696b7186660f798d4d07a63ccb822a6763be8ed55c2e300667154096df05",
+          "row_count": 20,
+          "sha256": "c5ead7e3db150708fbc4c6872ab374e5621aa84fa668c9fffbb3cd067e46d1ca",
+          "table": "workflow_actions"
+        },
+        {
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "row_count": 8,
+          "sha256": "16ac165b51d8658b03131784bf879c804bb6601596aa1cfb43a47b0dfdf2cf2b",
+          "table": "catalog_categories"
+        },
+        {
+          "content_sha256": "44e5cfe788116f30be4b2cf684bcbb7f56cd3d6da5da6543458b2410469517ca",
+          "row_count": 20,
+          "sha256": "1355ee7b99862dd1c26d6d2cf18b7fcdf5dafff48f9ca871123f4bf92877b054",
+          "table": "product_catalog"
+        },
+        {
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "row_count": 2,
+          "sha256": "5caad5769edf09c6105acdc70a537697a1b02016e617b40f7e678c5c90872ee8",
+          "table": "selling_locations"
+        },
+        {
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "row_count": 2,
+          "sha256": "a88ab76d68228f4bfd23f81aaa5b97fd39709dd61150ba799b104b3c4c84afb3",
+          "table": "stock_locations"
+        },
+        {
+          "content_sha256": "6197b4a24f7e0ff133ecf0d10f402a6ffd60f1f8d5b2b26c5e10e03b8b245cda",
+          "row_count": 6,
+          "sha256": "c78fac019a8428f6c6767a156470bfe5bbe31c5a14fd2a188c0a828b7f5e6347",
+          "table": "channel_assignments"
+        },
+        {
+          "content_sha256": "5b2d966eda850d4b2a967fddd2e3c2d632625cfc7c4ba8fb8c05126b4eda4bb5",
+          "row_count": 6,
+          "sha256": "211a66d3add6455a3ae0c123791109f8f6a9ce44d641bb2b62d82534734baf43",
+          "table": "fulfillment_routes"
+        },
+        {
+          "content_sha256": "86cca33bb6b669a6a51287cff5692322232bb19b5013afc13e504802d71d40e9",
+          "row_count": 114,
+          "sha256": "8ca38d9fcc51d10e70beebac337e62a74457594719f847cbfa6cbc65b667129f",
+          "table": "assortment"
+        },
+        {
+          "content_sha256": "228a2f388a271deb86fb585dde647d9eff0e0abd28a0223e4136e9f0c93681c3",
+          "row_count": 90,
+          "sha256": "07cd94bd95e453874d7927d8fbd793342c674aa28da38613d132aa3dc28e03c0",
+          "table": "business_calendar"
+        },
+        {
+          "content_sha256": "eba465347e92344acb93fb8938158575233a8451bda2697fcbb5fc7cc3c8cb61",
+          "row_count": 240,
+          "sha256": "76d3b440ab8785fd9861729a15f45fb1f6718f19851471f246cd2948367b2120",
+          "table": "category_calendar"
+        }
+      ],
+      "source_id": "source-sha256-adca062c266f3779ed45cac3b3dc91bc7bb12998b57dd000b1693fd81c2ee053",
+      "source_schema_version": "2.1.0",
+      "versions": {
+        "calendar": "pl-de-berlin-calendar-1.0.0",
+        "canonicalization": "typed-csv-nfc-utc-multiset-1.1.0",
+        "config": "1.0.0",
+        "csv_schema": "1.0",
+        "dimensions": "retail-dimensions-1.0.0",
+        "generator": "0.3.0"
+      }
+    },
+    {
+      "case": "ai-temporal-smoke-a",
+      "code_provenance": {
+        "code_files": {
+          "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+          "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+          "data/contracts/source_dataset_manifest.v2.schema.json": "0c0e1dd487572f0a1c938b0161101062d19ea9809dc411612bbe1ecf7d2c46b7",
+          "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+          "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+          "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+          "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+          "data/generator/csv_writer.py": "cc04e102168296b49cd82d698379f7e3e4e56751cd58549d16d6f06e18271dd2",
+          "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+          "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+          "data/generator/dimension_schema.py": "6bd15f9a08409f05b5201787f1982c4a96b3ee9a030b90ff7873ccae6604dd8f",
+          "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+          "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+          "data/generator/identity.py": "c7477477251e37381f5231c91b9b2b9d907a1c27bff6f2da57a7b1c5dd87f57c",
+          "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+          "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+          "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+          "data/generator/main.py": "94851fd47c77ecc9675afc4f138b595b908050b489bb7ec413ed38201e8a8f0a",
+          "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+          "data/generator/manifest_v2.py": "67468597569fd6d423013297cd53513c0185d674629058ae619eb88f85e07cdc",
+          "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+          "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+          "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+          "data/generator/profile_engine.py": "882301712093400524fde7128eb788994ea89f06906df4d632b889c5062a9c34",
+          "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+          "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+          "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+          "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+          "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+          "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+          "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+        },
+        "code_sha256": "9daf169dc823c4f5b4f63ff13abd96037342e9b1afb3ff03cc16e511672652b6",
+        "code_state": "clean",
+        "dependency_files": {
+          "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+          "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+        },
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "git_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+        "python_version": "3.11.15"
+      },
+      "dimensions_report": {
+        "active_daily_combinations": 2406,
+        "checks": [
+          {
+            "check_id": "dimension_schema_pk_sku",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 1202,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "selling_stock_channel_region",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 3,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "assignment_routing_versions",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 6,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "catalog_lifecycle_assortment",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 2406,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "calendar_exact_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 306,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "category_season_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 816,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "legacy_adapter_consistency",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 13,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "sales_active_open_known_routing",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 999,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          }
+        ],
+        "inventory_ready": false,
+        "nominal_daily_grid": 2448,
+        "observation_panel_status": "not_ready",
+        "policy_version": "retail-dimensions-1.0.0",
+        "status": "passed"
+      },
+      "feature_artifact": {
+        "content_sha256": "c9cdbc66c930ba1bb9a4c824e0e58f8bb94d322eff43fc4e40cee11acee7412c",
+        "path": "features.csv",
+        "row_count": 852,
+        "sha256": "53dc043993c83cb7bea245c8f5bd6dabfae41454ae77a30df19b6da792e5b4b5",
+        "size_bytes": 318068
+      },
+      "feature_id": "features-sha256-113b53a004453026857ded02de3e93955652827791a98e4350f9ae2dbaff7520",
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 102,
+        "end_date": "2026-07-31",
+        "label_tail_days": 14,
+        "max_daily_rows": 2448,
+        "origin_days": 60,
+        "output_format": "csv",
+        "products": 8,
+        "profile": "ai-temporal-smoke",
+        "seed": 42,
+        "start_date": "2026-04-21",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 28
+      },
+      "seconds": 1.1393,
+      "source_artifacts": [
+        {
+          "content_sha256": "760a06782a53823180011676fb3b6871adb21c6c0ca5b04ee8905ac4ea07e991",
+          "row_count": 8,
+          "sha256": "470d7370566845e2e6afe05aa592a7951c3eb2fb65deaf14c0bfc74f276e07a6",
+          "table": "products"
+        },
+        {
+          "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+          "row_count": 4,
+          "sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+          "table": "users"
+        },
+        {
+          "content_sha256": "9f47080b1e1c44fbeb4305e971ffe65fe98bb5d276746e0026d906d6f57cb8ce",
+          "row_count": 3,
+          "sha256": "1b5db3b23b06b28c8ef8422402e5be9d42f5d86abb9859f79c0a214a9c5ac534",
+          "table": "stores"
+        },
+        {
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "row_count": 2,
+          "sha256": "fdea968ba1c6d5195d422bcc38d6b07fad26e54a88dac7334cf75b65ede762ea",
+          "table": "warehouses"
+        },
+        {
+          "content_sha256": "040abfc3fdc958be92d728b4495fb2cd245863fad0b7bc14b292f5ee652fecbb",
+          "row_count": 715,
+          "sha256": "77b13053212588aec394fa0ebbcdf23634171d65e3d2a4639cd94cdcaf9c4a79",
+          "table": "orders"
+        },
+        {
+          "content_sha256": "bec6edaa29b100717fbdee310e23acbdc660f477572446c2d6e8f37353e32e3e",
+          "row_count": 999,
+          "sha256": "88032568a777ad77fd57d9240f1ed784c9dfb86634ad6a42559f19c625bf0641",
+          "table": "order_items"
+        },
+        {
+          "content_sha256": "cda2cb12509a3cc0d0f52eb85eb3e7422f96bd0a245e02abc5b8acb5ff197cce",
+          "row_count": 24,
+          "sha256": "85f46bb8ec25c93837193583bd94c27c472c6e2e4d9b08827f183162024276d9",
+          "table": "price_history"
+        },
+        {
+          "content_sha256": "599db58ceea9bb09aecfed382f9d9c06d48c3853a1dcc60afe43b9181a9a2532",
+          "row_count": 8,
+          "sha256": "f92d2503336b160bdc680d8ab8e906668e28c7386f0c5a242acff629ffe0d571",
+          "table": "promotions"
+        },
+        {
+          "content_sha256": "91379c42ccf70fe36dbefeddf0a275a5cf86bc151d38515a8072cab9c9e52f46",
+          "row_count": 1127,
+          "sha256": "69f24b343aa072b100ddb63ec64354e98718d74ffe80fe7913357e8e34af31a3",
+          "table": "stock_movements"
+        },
+        {
+          "content_sha256": "5705ff940002c0846fc9c154353d3d24edb95880ee12818a359d42a4c3bbd8e6",
+          "row_count": 131,
+          "sha256": "7eadaa47466955519b29c93480104edfb3ecdb5bebbbd5d9fd072394196c2986",
+          "table": "returns"
+        },
+        {
+          "content_sha256": "357a83a42c3753459a173e533a6bac027bbeb870471d7f33c40c16521feb8043",
+          "row_count": 999,
+          "sha256": "d80a6a0754aa0dbeca3f949721a7d021822408cd018a465a0e9dbc545f80bdc9",
+          "table": "sales"
+        },
+        {
+          "content_sha256": "4d30c9c4a26375646fa53be75bbe13baa10a61571cf1de744a6e522cf28a96c3",
+          "row_count": 120,
+          "sha256": "c334ff2486e750bfaa4f3815841843bcdfa01df63489611c9533d5fbc19e2d58",
+          "table": "inventory_snapshots"
+        },
+        {
+          "content_sha256": "d3dda72a9481a69d38c9cf4981ebd9eb5557630887be4b13e0b629e4cad5af6c",
+          "row_count": 56,
+          "sha256": "75af7e38c27ac0edb26452cad4e698cb81caeeff9634431978b60e3dd75df9cc",
+          "table": "forecasts"
+        },
+        {
+          "content_sha256": "8e7599baf85732b9656f9a07020b399b49b3ad2f354daa94cebf1ac407842ccd",
+          "row_count": 8,
+          "sha256": "eb0c8d50beb81db4ecd8c8203d6b2d6a8b8f679db2aa968fa8bbb1e512b7e583",
+          "table": "anomalies"
+        },
+        {
+          "content_sha256": "7a832f7ac1d2a6ba865177db3e38051eb865af4b8d6cf01a5e5aad1132dfdc15",
+          "row_count": 8,
+          "sha256": "a366a58c9b5e027cf52422b23f1099e48ce4a21abbe5355ceb8d4c085551a4c0",
+          "table": "alerts"
+        },
+        {
+          "content_sha256": "bd648350e578532df90a974f0b9c5a527188e3738f7dbe72f2cf8a02bfea524d",
+          "row_count": 8,
+          "sha256": "192922f887c76528efb02a959204356dad8d00deffea485963b614b47d490f79",
+          "table": "recommendations"
+        },
+        {
+          "content_sha256": "84c7f273978fd870ad632fe1dec3a384be6f33cecb358091f114255665dcb1eb",
+          "row_count": 8,
+          "sha256": "fe0fcfa0310e91278ab7d3e1c9c133f68c447cee27103d877a13bfa1cd3c3788",
+          "table": "workflow_actions"
+        },
+        {
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "row_count": 8,
+          "sha256": "16ac165b51d8658b03131784bf879c804bb6601596aa1cfb43a47b0dfdf2cf2b",
+          "table": "catalog_categories"
+        },
+        {
+          "content_sha256": "15acac1351fd2affae33fa2f08f446b0740a6e0bce53b1117360e5cb4c372c42",
+          "row_count": 8,
+          "sha256": "4494d372a8be8b267d535204f2e4a9336ec226320150578fce0f7e237a7702a6",
+          "table": "product_catalog"
+        },
+        {
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "row_count": 2,
+          "sha256": "5caad5769edf09c6105acdc70a537697a1b02016e617b40f7e678c5c90872ee8",
+          "table": "selling_locations"
+        },
+        {
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "row_count": 2,
+          "sha256": "a88ab76d68228f4bfd23f81aaa5b97fd39709dd61150ba799b104b3c4c84afb3",
+          "table": "stock_locations"
+        },
+        {
+          "content_sha256": "0257de0ba690083962a9f88dca2fb1f8a2b4f994d7a6425bedc165fb09e608fe",
+          "row_count": 6,
+          "sha256": "83123257a30d55bf85ba6bc047a03d5e3b789b8f87743433cccaf874d61942b9",
+          "table": "channel_assignments"
+        },
+        {
+          "content_sha256": "c361d4f6fdf013ba754653944233ae90bbbde467c2473cb24d882d8bf42a0365",
+          "row_count": 6,
+          "sha256": "f37428ffe36508fd7d2273a0e42edbccd0ca02ec4774a8f239b55eb348af2a69",
+          "table": "fulfillment_routes"
+        },
+        {
+          "content_sha256": "149c8e53f24d1bc79bbc5cd50a590a18db01bf833dba17757bdce19f0cae4908",
+          "row_count": 48,
+          "sha256": "cb354b037c98f07d749109fc14a0a1ae50eeb17b2987e02e06cb4a7b54ee15b8",
+          "table": "assortment"
+        },
+        {
+          "content_sha256": "3547ab7a5bcfe3f38bcaacca6655cfd79dae82f89428d4d8e6ba03d3882bc736",
+          "row_count": 306,
+          "sha256": "f2879fce5af484df2b407fa996f6619530b976b0d04e42ebf730607f27d02e6e",
+          "table": "business_calendar"
+        },
+        {
+          "content_sha256": "102be5843a716dddd75f1e216d8c96273a1b4d87234c80ff214b1db71ab62ffb",
+          "row_count": 816,
+          "sha256": "1702d89a2b6a783cd4571cb30b6f3df00ef88fae87bf863871b1a7f11831112e",
+          "table": "category_calendar"
+        }
+      ],
+      "source_id": "source-sha256-de0f5e9ac8900bb843151ff3c0fd48ba1bbeb817325efa3fba2170a2ef442e08",
+      "source_schema_version": "2.1.0",
+      "versions": {
+        "calendar": "pl-de-berlin-calendar-1.0.0",
+        "canonicalization": "typed-csv-nfc-utc-multiset-1.1.0",
+        "config": "1.0.0",
+        "csv_schema": "1.0",
+        "dimensions": "retail-dimensions-1.0.0",
+        "generator": "0.3.0"
+      }
+    },
+    {
+      "case": "ai-temporal-smoke-b",
+      "code_provenance": {
+        "code_files": {
+          "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+          "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+          "data/contracts/source_dataset_manifest.v2.schema.json": "0c0e1dd487572f0a1c938b0161101062d19ea9809dc411612bbe1ecf7d2c46b7",
+          "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+          "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+          "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+          "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+          "data/generator/csv_writer.py": "cc04e102168296b49cd82d698379f7e3e4e56751cd58549d16d6f06e18271dd2",
+          "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+          "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+          "data/generator/dimension_schema.py": "6bd15f9a08409f05b5201787f1982c4a96b3ee9a030b90ff7873ccae6604dd8f",
+          "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+          "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+          "data/generator/identity.py": "c7477477251e37381f5231c91b9b2b9d907a1c27bff6f2da57a7b1c5dd87f57c",
+          "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+          "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+          "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+          "data/generator/main.py": "94851fd47c77ecc9675afc4f138b595b908050b489bb7ec413ed38201e8a8f0a",
+          "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+          "data/generator/manifest_v2.py": "67468597569fd6d423013297cd53513c0185d674629058ae619eb88f85e07cdc",
+          "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+          "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+          "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+          "data/generator/profile_engine.py": "882301712093400524fde7128eb788994ea89f06906df4d632b889c5062a9c34",
+          "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+          "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+          "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+          "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+          "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+          "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+          "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+        },
+        "code_sha256": "9daf169dc823c4f5b4f63ff13abd96037342e9b1afb3ff03cc16e511672652b6",
+        "code_state": "clean",
+        "dependency_files": {
+          "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+          "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+        },
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "git_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+        "python_version": "3.11.15"
+      },
+      "dimensions_report": {
+        "active_daily_combinations": 2406,
+        "checks": [
+          {
+            "check_id": "dimension_schema_pk_sku",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 1202,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "selling_stock_channel_region",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 3,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "assignment_routing_versions",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 6,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "catalog_lifecycle_assortment",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 2406,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "calendar_exact_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 306,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "category_season_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 816,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "legacy_adapter_consistency",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 13,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "sales_active_open_known_routing",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 999,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          }
+        ],
+        "inventory_ready": false,
+        "nominal_daily_grid": 2448,
+        "observation_panel_status": "not_ready",
+        "policy_version": "retail-dimensions-1.0.0",
+        "status": "passed"
+      },
+      "feature_artifact": {
+        "content_sha256": "c9cdbc66c930ba1bb9a4c824e0e58f8bb94d322eff43fc4e40cee11acee7412c",
+        "path": "features.csv",
+        "row_count": 852,
+        "sha256": "53dc043993c83cb7bea245c8f5bd6dabfae41454ae77a30df19b6da792e5b4b5",
+        "size_bytes": 318068
+      },
+      "feature_id": "features-sha256-113b53a004453026857ded02de3e93955652827791a98e4350f9ae2dbaff7520",
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 102,
+        "end_date": "2026-07-31",
+        "label_tail_days": 14,
+        "max_daily_rows": 2448,
+        "origin_days": 60,
+        "output_format": "csv",
+        "products": 8,
+        "profile": "ai-temporal-smoke",
+        "seed": 42,
+        "start_date": "2026-04-21",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 28
+      },
+      "seconds": 1.1452,
+      "source_artifacts": [
+        {
+          "content_sha256": "760a06782a53823180011676fb3b6871adb21c6c0ca5b04ee8905ac4ea07e991",
+          "row_count": 8,
+          "sha256": "470d7370566845e2e6afe05aa592a7951c3eb2fb65deaf14c0bfc74f276e07a6",
+          "table": "products"
+        },
+        {
+          "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+          "row_count": 4,
+          "sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+          "table": "users"
+        },
+        {
+          "content_sha256": "9f47080b1e1c44fbeb4305e971ffe65fe98bb5d276746e0026d906d6f57cb8ce",
+          "row_count": 3,
+          "sha256": "1b5db3b23b06b28c8ef8422402e5be9d42f5d86abb9859f79c0a214a9c5ac534",
+          "table": "stores"
+        },
+        {
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "row_count": 2,
+          "sha256": "fdea968ba1c6d5195d422bcc38d6b07fad26e54a88dac7334cf75b65ede762ea",
+          "table": "warehouses"
+        },
+        {
+          "content_sha256": "040abfc3fdc958be92d728b4495fb2cd245863fad0b7bc14b292f5ee652fecbb",
+          "row_count": 715,
+          "sha256": "77b13053212588aec394fa0ebbcdf23634171d65e3d2a4639cd94cdcaf9c4a79",
+          "table": "orders"
+        },
+        {
+          "content_sha256": "bec6edaa29b100717fbdee310e23acbdc660f477572446c2d6e8f37353e32e3e",
+          "row_count": 999,
+          "sha256": "88032568a777ad77fd57d9240f1ed784c9dfb86634ad6a42559f19c625bf0641",
+          "table": "order_items"
+        },
+        {
+          "content_sha256": "cda2cb12509a3cc0d0f52eb85eb3e7422f96bd0a245e02abc5b8acb5ff197cce",
+          "row_count": 24,
+          "sha256": "85f46bb8ec25c93837193583bd94c27c472c6e2e4d9b08827f183162024276d9",
+          "table": "price_history"
+        },
+        {
+          "content_sha256": "599db58ceea9bb09aecfed382f9d9c06d48c3853a1dcc60afe43b9181a9a2532",
+          "row_count": 8,
+          "sha256": "f92d2503336b160bdc680d8ab8e906668e28c7386f0c5a242acff629ffe0d571",
+          "table": "promotions"
+        },
+        {
+          "content_sha256": "91379c42ccf70fe36dbefeddf0a275a5cf86bc151d38515a8072cab9c9e52f46",
+          "row_count": 1127,
+          "sha256": "69f24b343aa072b100ddb63ec64354e98718d74ffe80fe7913357e8e34af31a3",
+          "table": "stock_movements"
+        },
+        {
+          "content_sha256": "5705ff940002c0846fc9c154353d3d24edb95880ee12818a359d42a4c3bbd8e6",
+          "row_count": 131,
+          "sha256": "7eadaa47466955519b29c93480104edfb3ecdb5bebbbd5d9fd072394196c2986",
+          "table": "returns"
+        },
+        {
+          "content_sha256": "357a83a42c3753459a173e533a6bac027bbeb870471d7f33c40c16521feb8043",
+          "row_count": 999,
+          "sha256": "d80a6a0754aa0dbeca3f949721a7d021822408cd018a465a0e9dbc545f80bdc9",
+          "table": "sales"
+        },
+        {
+          "content_sha256": "4d30c9c4a26375646fa53be75bbe13baa10a61571cf1de744a6e522cf28a96c3",
+          "row_count": 120,
+          "sha256": "c334ff2486e750bfaa4f3815841843bcdfa01df63489611c9533d5fbc19e2d58",
+          "table": "inventory_snapshots"
+        },
+        {
+          "content_sha256": "d3dda72a9481a69d38c9cf4981ebd9eb5557630887be4b13e0b629e4cad5af6c",
+          "row_count": 56,
+          "sha256": "75af7e38c27ac0edb26452cad4e698cb81caeeff9634431978b60e3dd75df9cc",
+          "table": "forecasts"
+        },
+        {
+          "content_sha256": "8e7599baf85732b9656f9a07020b399b49b3ad2f354daa94cebf1ac407842ccd",
+          "row_count": 8,
+          "sha256": "eb0c8d50beb81db4ecd8c8203d6b2d6a8b8f679db2aa968fa8bbb1e512b7e583",
+          "table": "anomalies"
+        },
+        {
+          "content_sha256": "7a832f7ac1d2a6ba865177db3e38051eb865af4b8d6cf01a5e5aad1132dfdc15",
+          "row_count": 8,
+          "sha256": "a366a58c9b5e027cf52422b23f1099e48ce4a21abbe5355ceb8d4c085551a4c0",
+          "table": "alerts"
+        },
+        {
+          "content_sha256": "bd648350e578532df90a974f0b9c5a527188e3738f7dbe72f2cf8a02bfea524d",
+          "row_count": 8,
+          "sha256": "192922f887c76528efb02a959204356dad8d00deffea485963b614b47d490f79",
+          "table": "recommendations"
+        },
+        {
+          "content_sha256": "84c7f273978fd870ad632fe1dec3a384be6f33cecb358091f114255665dcb1eb",
+          "row_count": 8,
+          "sha256": "fe0fcfa0310e91278ab7d3e1c9c133f68c447cee27103d877a13bfa1cd3c3788",
+          "table": "workflow_actions"
+        },
+        {
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "row_count": 8,
+          "sha256": "16ac165b51d8658b03131784bf879c804bb6601596aa1cfb43a47b0dfdf2cf2b",
+          "table": "catalog_categories"
+        },
+        {
+          "content_sha256": "15acac1351fd2affae33fa2f08f446b0740a6e0bce53b1117360e5cb4c372c42",
+          "row_count": 8,
+          "sha256": "4494d372a8be8b267d535204f2e4a9336ec226320150578fce0f7e237a7702a6",
+          "table": "product_catalog"
+        },
+        {
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "row_count": 2,
+          "sha256": "5caad5769edf09c6105acdc70a537697a1b02016e617b40f7e678c5c90872ee8",
+          "table": "selling_locations"
+        },
+        {
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "row_count": 2,
+          "sha256": "a88ab76d68228f4bfd23f81aaa5b97fd39709dd61150ba799b104b3c4c84afb3",
+          "table": "stock_locations"
+        },
+        {
+          "content_sha256": "0257de0ba690083962a9f88dca2fb1f8a2b4f994d7a6425bedc165fb09e608fe",
+          "row_count": 6,
+          "sha256": "83123257a30d55bf85ba6bc047a03d5e3b789b8f87743433cccaf874d61942b9",
+          "table": "channel_assignments"
+        },
+        {
+          "content_sha256": "c361d4f6fdf013ba754653944233ae90bbbde467c2473cb24d882d8bf42a0365",
+          "row_count": 6,
+          "sha256": "f37428ffe36508fd7d2273a0e42edbccd0ca02ec4774a8f239b55eb348af2a69",
+          "table": "fulfillment_routes"
+        },
+        {
+          "content_sha256": "149c8e53f24d1bc79bbc5cd50a590a18db01bf833dba17757bdce19f0cae4908",
+          "row_count": 48,
+          "sha256": "cb354b037c98f07d749109fc14a0a1ae50eeb17b2987e02e06cb4a7b54ee15b8",
+          "table": "assortment"
+        },
+        {
+          "content_sha256": "3547ab7a5bcfe3f38bcaacca6655cfd79dae82f89428d4d8e6ba03d3882bc736",
+          "row_count": 306,
+          "sha256": "f2879fce5af484df2b407fa996f6619530b976b0d04e42ebf730607f27d02e6e",
+          "table": "business_calendar"
+        },
+        {
+          "content_sha256": "102be5843a716dddd75f1e216d8c96273a1b4d87234c80ff214b1db71ab62ffb",
+          "row_count": 816,
+          "sha256": "1702d89a2b6a783cd4571cb30b6f3df00ef88fae87bf863871b1a7f11831112e",
+          "table": "category_calendar"
+        }
+      ],
+      "source_id": "source-sha256-de0f5e9ac8900bb843151ff3c0fd48ba1bbeb817325efa3fba2170a2ef442e08",
+      "source_schema_version": "2.1.0",
+      "versions": {
+        "calendar": "pl-de-berlin-calendar-1.0.0",
+        "canonicalization": "typed-csv-nfc-utc-multiset-1.1.0",
+        "config": "1.0.0",
+        "csv_schema": "1.0",
+        "dimensions": "retail-dimensions-1.0.0",
+        "generator": "0.3.0"
+      }
+    },
+    {
+      "case": "spring-dst-all-channels",
+      "code_provenance": {
+        "code_files": {
+          "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+          "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+          "data/contracts/source_dataset_manifest.v2.schema.json": "0c0e1dd487572f0a1c938b0161101062d19ea9809dc411612bbe1ecf7d2c46b7",
+          "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+          "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+          "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+          "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+          "data/generator/csv_writer.py": "cc04e102168296b49cd82d698379f7e3e4e56751cd58549d16d6f06e18271dd2",
+          "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+          "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+          "data/generator/dimension_schema.py": "6bd15f9a08409f05b5201787f1982c4a96b3ee9a030b90ff7873ccae6604dd8f",
+          "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+          "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+          "data/generator/identity.py": "c7477477251e37381f5231c91b9b2b9d907a1c27bff6f2da57a7b1c5dd87f57c",
+          "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+          "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+          "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+          "data/generator/main.py": "94851fd47c77ecc9675afc4f138b595b908050b489bb7ec413ed38201e8a8f0a",
+          "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+          "data/generator/manifest_v2.py": "67468597569fd6d423013297cd53513c0185d674629058ae619eb88f85e07cdc",
+          "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+          "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+          "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+          "data/generator/profile_engine.py": "882301712093400524fde7128eb788994ea89f06906df4d632b889c5062a9c34",
+          "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+          "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+          "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+          "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+          "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+          "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+          "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+        },
+        "code_sha256": "9daf169dc823c4f5b4f63ff13abd96037342e9b1afb3ff03cc16e511672652b6",
+        "code_state": "clean",
+        "dependency_files": {
+          "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+          "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+        },
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "git_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+        "python_version": "3.11.15"
+      },
+      "dimensions_report": {
+        "active_daily_combinations": 405,
+        "checks": [
+          {
+            "check_id": "dimension_schema_pk_sku",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 284,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "selling_stock_channel_region",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 8,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "assignment_routing_versions",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 16,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "catalog_lifecycle_assortment",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 405,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "calendar_exact_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 56,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "category_season_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 56,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "legacy_adapter_consistency",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 18,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "sales_active_open_known_routing",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 71,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          }
+        ],
+        "inventory_ready": false,
+        "nominal_daily_grid": 448,
+        "observation_panel_status": "not_ready",
+        "policy_version": "retail-dimensions-1.0.0",
+        "status": "passed"
+      },
+      "feature_artifact": {
+        "content_sha256": "cd88dc9b46cca593a2b544073b19aab8fb87de675a48987e1bb05f60ee8ffe04",
+        "path": "features.csv",
+        "row_count": 56,
+        "sha256": "6fa4ea71422bce990b1fd8286b112988087ecbabbcd165ed2da8f15f8eac27ef",
+        "size_bytes": 21362
+      },
+      "feature_id": "features-sha256-81340dc51a612966a13422b6805cefea6a9ca14beebc299d6765a236c0f577f2",
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 7,
+        "end_date": "2026-04-01",
+        "label_tail_days": 0,
+        "max_daily_rows": 448,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 8,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-03-26",
+        "stores": 8,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "seconds": 0.2042,
+      "source_artifacts": [
+        {
+          "content_sha256": "0dcea892fb0ec20434e6f781856ed7459a43eef58cc10bfa9fc82ee77dc09eaf",
+          "row_count": 8,
+          "sha256": "d523bbcea8b203540396327ec6803a6ae1228ee5588ee0c1a96942850393c3ab",
+          "table": "products"
+        },
+        {
+          "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+          "row_count": 4,
+          "sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+          "table": "users"
+        },
+        {
+          "content_sha256": "6a53c033e9635245710dac622ac84be1747bab07f4cb469c407da10955bf9869",
+          "row_count": 8,
+          "sha256": "f00eaf5b14f13819b1c2c1be9446ed9b7c7428336e89f1066400d775ee3aa9bb",
+          "table": "stores"
+        },
+        {
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "row_count": 2,
+          "sha256": "fdea968ba1c6d5195d422bcc38d6b07fad26e54a88dac7334cf75b65ede762ea",
+          "table": "warehouses"
+        },
+        {
+          "content_sha256": "4f264aaa63225ee142a29f8c9ec3859945bfcdb737f0728b8d2d0faeb2945d89",
+          "row_count": 46,
+          "sha256": "cd9a91621f8e9082e6568e0136c627e542bad1f6b77a854a0d6c1ba7875acee2",
+          "table": "orders"
+        },
+        {
+          "content_sha256": "1b73b1313eb15f40bce2a9fd77d7d1f9cfea621c3eecc870b3c014dd8f9955c8",
+          "row_count": 71,
+          "sha256": "4c01562f7a7de1cda90f5cc479c88b2a5054bd5d2748c517c2326594d03c616b",
+          "table": "order_items"
+        },
+        {
+          "content_sha256": "197efba4b6783f14c55099e2e956d70df1d750bdceec96d2e9fda24125c0464e",
+          "row_count": 24,
+          "sha256": "2c282b673abd461680dc13eddb09f7de860da4dc10e066c047189fde02073a33",
+          "table": "price_history"
+        },
+        {
+          "content_sha256": "6de1d99155534419cc5a958a9bb8f865d2c5bc37ea1a4cdd1766f765d6f21a0d",
+          "row_count": 8,
+          "sha256": "5d16c6794383ac169e82d0b2a7b39cb140e2cd314bd9d2c1d3585dc26348c1d1",
+          "table": "promotions"
+        },
+        {
+          "content_sha256": "3c6a98fdad817dc079925f2ff4aba3f837a42aed626eb4cbfcdda0ab23cd7035",
+          "row_count": 87,
+          "sha256": "96b57404f806836b3eee7d9301ed72b167532681d4c4b45038360224d18568be",
+          "table": "stock_movements"
+        },
+        {
+          "content_sha256": "4300024dd2dd9418157986f83728f5bb24464b0903764fd2cca17520c06d8434",
+          "row_count": 9,
+          "sha256": "702c45583daadcddd6de77e3e3b554c27ddcad30a37c31295fc06f48e05ea90f",
+          "table": "returns"
+        },
+        {
+          "content_sha256": "2b453ca2000a9d2e68679c45aa76265ed177eaa4b3286a02de02c473c18e0399",
+          "row_count": 71,
+          "sha256": "ce0e15a52f18caf69b9a0c507b513b2ef9c3f0ac316847b0d8bc99f898f5347b",
+          "table": "sales"
+        },
+        {
+          "content_sha256": "d2bad336c9bd885537a760d57f895b3664db238565d0a24751a133c41f54b99e",
+          "row_count": 8,
+          "sha256": "b2d0ac81a04fb9f2b8d5eb57c8fa92fd93230b6a0b3c1c963440e714908b0624",
+          "table": "inventory_snapshots"
+        },
+        {
+          "content_sha256": "127884bd649dfdf295a445f00d1c27ab02360a53c0026fd32d273baa15bf734b",
+          "row_count": 56,
+          "sha256": "5aca1faf5943aa088b4bb8b0d9ba96db672221badba528365672b547cae0008b",
+          "table": "forecasts"
+        },
+        {
+          "content_sha256": "f85f2cb7caa1db3ad60a3bfedb287dc29ee84932c57c6bd036967a2ebdb7890f",
+          "row_count": 8,
+          "sha256": "966ed00e8129971722279be5428e420a5c914270d3755c2a7f3b8c083129ddef",
+          "table": "anomalies"
+        },
+        {
+          "content_sha256": "3cc0dfafec86dde0e19fcf25ecf306be0b4d130ea283e2064aa34a7f38e47b00",
+          "row_count": 8,
+          "sha256": "e673d88e25e7d14872401c45e1470f59689cacb3a4039c8a1afc06736a71dbd9",
+          "table": "alerts"
+        },
+        {
+          "content_sha256": "8e617749f0d7894a98ccadecfff5b01505c0b7a9279a3da35fac80ab93fe8c03",
+          "row_count": 8,
+          "sha256": "73152033b0fe7f005a76f3d1020ce94e18f7badee4b788e200f4405f504050f5",
+          "table": "recommendations"
+        },
+        {
+          "content_sha256": "e1cbea74587cc27222b5e6afdcfe61282af25f60f1cfa2adb4956ad5cd8bf913",
+          "row_count": 8,
+          "sha256": "ca041ae0702219cfc2f0419f6c8edec105f270223529175ad7a64dcb5286284d",
+          "table": "workflow_actions"
+        },
+        {
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "row_count": 8,
+          "sha256": "16ac165b51d8658b03131784bf879c804bb6601596aa1cfb43a47b0dfdf2cf2b",
+          "table": "catalog_categories"
+        },
+        {
+          "content_sha256": "18f29d3bb1a24bbf3656f361318e8c753d2773beb4923b14ebd69b12dd669ced",
+          "row_count": 8,
+          "sha256": "622a1a603c16a5e84d6eb3983f13294366c809d7c68ab29aef1e9af6e59c6573",
+          "table": "product_catalog"
+        },
+        {
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "row_count": 2,
+          "sha256": "5caad5769edf09c6105acdc70a537697a1b02016e617b40f7e678c5c90872ee8",
+          "table": "selling_locations"
+        },
+        {
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "row_count": 2,
+          "sha256": "a88ab76d68228f4bfd23f81aaa5b97fd39709dd61150ba799b104b3c4c84afb3",
+          "table": "stock_locations"
+        },
+        {
+          "content_sha256": "2037eab5c8aab4c967f26b8147934b85365e2bb18aeb8afcd99163c28bf797cf",
+          "row_count": 16,
+          "sha256": "abef3352f4b8debbf2a31063c6dfabd0b4fa5c3dc84bcee0251262d3e642dae7",
+          "table": "channel_assignments"
+        },
+        {
+          "content_sha256": "6f1809554abc7fc0dac9667c56f28c76998127a1d0b7287601f5526b00c62a17",
+          "row_count": 16,
+          "sha256": "087f9d07f4afbbd75c062a911ff41890d64de0afc708dae2beba13a7d1f56935",
+          "table": "fulfillment_routes"
+        },
+        {
+          "content_sha256": "0e709e42c2e49f4c42d57183d085aac4c6a82c9e747e57c1c782ad67f8722659",
+          "row_count": 120,
+          "sha256": "1a49e95317641c9a77564ce94ef22ac384ff3ab1e5a461df94e5401875d17fb6",
+          "table": "assortment"
+        },
+        {
+          "content_sha256": "6cea6e38f887048439a38bd5138bec4cfdf47bd482f85170bd49281ad4c76568",
+          "row_count": 56,
+          "sha256": "2eec390bf0afd5adeb57cf972d7cb1e1585ead9e8447b165ae5999c6b279ed0f",
+          "table": "business_calendar"
+        },
+        {
+          "content_sha256": "c41ffb347f7e39b758bfa0c625d3ee925a82b18dcfe18970683faf349d8e3a85",
+          "row_count": 56,
+          "sha256": "051f2eb6f4a4931b664baea17296834547d61247aa93cf3f7570b0f6e9f5703a",
+          "table": "category_calendar"
+        }
+      ],
+      "source_id": "source-sha256-fd195b37fce959275fb21d989b4552edc22e0b7e5e38985b2a7876b600daa905",
+      "source_schema_version": "2.1.0",
+      "versions": {
+        "calendar": "pl-de-berlin-calendar-1.0.0",
+        "canonicalization": "typed-csv-nfc-utc-multiset-1.1.0",
+        "config": "1.0.0",
+        "csv_schema": "1.0",
+        "dimensions": "retail-dimensions-1.0.0",
+        "generator": "0.3.0"
+      }
+    },
+    {
+      "case": "winter-holidays",
+      "code_provenance": {
+        "code_files": {
+          "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+          "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+          "data/contracts/source_dataset_manifest.v2.schema.json": "0c0e1dd487572f0a1c938b0161101062d19ea9809dc411612bbe1ecf7d2c46b7",
+          "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+          "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+          "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+          "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+          "data/generator/csv_writer.py": "cc04e102168296b49cd82d698379f7e3e4e56751cd58549d16d6f06e18271dd2",
+          "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+          "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+          "data/generator/dimension_schema.py": "6bd15f9a08409f05b5201787f1982c4a96b3ee9a030b90ff7873ccae6604dd8f",
+          "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+          "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+          "data/generator/identity.py": "c7477477251e37381f5231c91b9b2b9d907a1c27bff6f2da57a7b1c5dd87f57c",
+          "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+          "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+          "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+          "data/generator/main.py": "94851fd47c77ecc9675afc4f138b595b908050b489bb7ec413ed38201e8a8f0a",
+          "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+          "data/generator/manifest_v2.py": "67468597569fd6d423013297cd53513c0185d674629058ae619eb88f85e07cdc",
+          "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+          "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+          "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+          "data/generator/profile_engine.py": "882301712093400524fde7128eb788994ea89f06906df4d632b889c5062a9c34",
+          "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+          "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+          "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+          "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+          "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+          "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+          "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5"
+        },
+        "code_sha256": "9daf169dc823c4f5b4f63ff13abd96037342e9b1afb3ff03cc16e511672652b6",
+        "code_state": "clean",
+        "dependency_files": {
+          "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63",
+          "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3"
+        },
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "git_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
+        "python_version": "3.11.15"
+      },
+      "dimensions_report": {
+        "active_daily_combinations": 342,
+        "checks": [
+          {
+            "check_id": "dimension_schema_pk_sku",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 245,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "selling_stock_channel_region",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 3,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "assignment_routing_versions",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 6,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "catalog_lifecycle_assortment",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 342,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "calendar_exact_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 45,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "category_season_coverage",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 120,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "legacy_adapter_consistency",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 13,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          },
+          {
+            "check_id": "sales_active_open_known_routing",
+            "description": "All required records satisfy the policy.",
+            "evidence": "dimensions_report.json",
+            "policy_version": "retail-dimensions-1.0.0",
+            "sample_size": 119,
+            "severity": "hard",
+            "status": "passed",
+            "threshold": 0,
+            "use_case": "source_dimensions",
+            "value": 0
+          }
+        ],
+        "inventory_ready": false,
+        "nominal_daily_grid": 360,
+        "observation_panel_status": "not_ready",
+        "policy_version": "retail-dimensions-1.0.0",
+        "status": "passed"
+      },
+      "feature_artifact": {
+        "content_sha256": "158171ee80802679ae5fb18b871b45d40ea40474348695e64d2317b394667c27",
+        "path": "features.csv",
+        "row_count": 97,
+        "sha256": "2bf7e53a9a73c6e6ae69afe58b372cc847710386e750e23582fc2771358553aa",
+        "size_bytes": 36477
+      },
+      "feature_id": "features-sha256-40f2db122c4b4ce1c5178a533d812292a0cd8253a99f81329e1e10a20ffc83bb",
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 15,
+        "end_date": "2027-01-03",
+        "label_tail_days": 0,
+        "max_daily_rows": 360,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 8,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-12-20",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "seconds": 0.2208,
+      "source_artifacts": [
+        {
+          "content_sha256": "0dcea892fb0ec20434e6f781856ed7459a43eef58cc10bfa9fc82ee77dc09eaf",
+          "row_count": 8,
+          "sha256": "d523bbcea8b203540396327ec6803a6ae1228ee5588ee0c1a96942850393c3ab",
+          "table": "products"
+        },
+        {
+          "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+          "row_count": 4,
+          "sha256": "0b2a425c153d43833fa2e29dcce606a2174b9357ceb11c9c2e0328a0528432eb",
+          "table": "users"
+        },
+        {
+          "content_sha256": "c32f0447d1f31d8d130262f09bb616a5b9c3f88071bec715e0116445153a29a7",
+          "row_count": 3,
+          "sha256": "2fec54ac8eaae63b15e0a1179469ac63591c27f034f0a7b1b461c18522e8b00e",
+          "table": "stores"
+        },
+        {
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "row_count": 2,
+          "sha256": "fdea968ba1c6d5195d422bcc38d6b07fad26e54a88dac7334cf75b65ede762ea",
+          "table": "warehouses"
+        },
+        {
+          "content_sha256": "4ac42d63b4121005d03147103790ceadbc8c3799a8fbc5026edfdcc45e5affb6",
+          "row_count": 81,
+          "sha256": "490fee5e6a430e16017530acd9091109780d089e3bc15f81c557ffdaf578c55f",
+          "table": "orders"
+        },
+        {
+          "content_sha256": "cf2a760f32fdbfca8fc295b750fa4caef290443863277862d8698170a5a9a056",
+          "row_count": 119,
+          "sha256": "5fd3ca1a3b4bcba55067f07f78c3c4c3070945d0fdf591430960ac7113efbe20",
+          "table": "order_items"
+        },
+        {
+          "content_sha256": "a0873ef7e526fb73e09bf586046a952315b5ddfbe1ec0c8467c590f7a09f44ac",
+          "row_count": 24,
+          "sha256": "723e9cb7367921e6b71aaf5400c8c9dd66a9c75ddf8f41af0271e93de74657bb",
+          "table": "price_history"
+        },
+        {
+          "content_sha256": "3c2a1592b4e246e858ef4b1f75c8edc104efeeddccf0137f355bdc6f340771cc",
+          "row_count": 8,
+          "sha256": "ba2837b206da17e7dd35600dc0ff21d00a9d78f06d30901ce54600fd507d2dc7",
+          "table": "promotions"
+        },
+        {
+          "content_sha256": "1acabceff9cb20b8e562329a626665613f561b8702494372a5e29bc1ff83e9b3",
+          "row_count": 143,
+          "sha256": "19ecc53cd649fe0da1ecee5bb50facdfcfc07d5df6395ce1659cb39a19911598",
+          "table": "stock_movements"
+        },
+        {
+          "content_sha256": "a521544126f9870bf4776a8f389262ed33b14d2c4513dcb6839a8886810893b6",
+          "row_count": 22,
+          "sha256": "57a3643a8cdf8d749bb6c652c58a05f6a74081c52cc07c7976a9cce1395749ef",
+          "table": "returns"
+        },
+        {
+          "content_sha256": "930897d7015d187d0ead000fd8814b76fd03b02b6fbb3fa9456f3003c1b04977",
+          "row_count": 119,
+          "sha256": "aac3fb45f9f21fc76f66c7626f90ef695a5ad8da41d8f3feefee57ed6301632b",
+          "table": "sales"
+        },
+        {
+          "content_sha256": "24b9b098b762d3a17ef4837319d51466b286f24d1d02d813d81c8c1a67ca6f5c",
+          "row_count": 24,
+          "sha256": "8b9914efd76aee79a7585df7052c6a666aa08a12dd5aec0defc555faa5ae8704",
+          "table": "inventory_snapshots"
+        },
+        {
+          "content_sha256": "c29b0ac38a126d1c066e42cb1cefdc097ebc7b92b0cb29339003d433d971e6e7",
+          "row_count": 56,
+          "sha256": "d3e9f0f0b58add5e77d1461e925b72ee381f253a25a25687208020aca14d33c3",
+          "table": "forecasts"
+        },
+        {
+          "content_sha256": "5ff8e6b6e65c5261386f63c589f10b207b6c7b79c6d6a55c769eec55f3ccbeb7",
+          "row_count": 8,
+          "sha256": "ff50b48b6f334a0e7d5d659c9a925060b96ff629cb5c4ff0d2e29d71bdab083e",
+          "table": "anomalies"
+        },
+        {
+          "content_sha256": "5ce656ba961b9e957885f7d09c1eff4028a2f2ef963e9d047d6cc11fd75fb1d3",
+          "row_count": 8,
+          "sha256": "27418d95836cd2e6b5c3fe717ad150c479429b46b3532f9cf603f6321a737d66",
+          "table": "alerts"
+        },
+        {
+          "content_sha256": "d4c481ce243e1bd377855c81009442a13e6bef5c12db96305e67971b164a5807",
+          "row_count": 8,
+          "sha256": "08a058e526cf65fc2eb6fb45346a5a9d2661076c2c6b9a43f25e14c89d4992b8",
+          "table": "recommendations"
+        },
+        {
+          "content_sha256": "d17c86b1d96fa4c21a9bf8b7cb76be19baff584e61df977345e14207e404fdc1",
+          "row_count": 8,
+          "sha256": "4f6fbefcd6ae73b310e5f05c664c726dacd17ad316d861a3b4fb37f6df0a5037",
+          "table": "workflow_actions"
+        },
+        {
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "row_count": 8,
+          "sha256": "16ac165b51d8658b03131784bf879c804bb6601596aa1cfb43a47b0dfdf2cf2b",
+          "table": "catalog_categories"
+        },
+        {
+          "content_sha256": "475786bb07122cc6163ebf25d7af99146e5918a57cb3d764857326acc604ddd5",
+          "row_count": 8,
+          "sha256": "284130fb1fba2afbc6b29e8daadbc1cfa88d315d67906d93ef8b98084bbad674",
+          "table": "product_catalog"
+        },
+        {
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "row_count": 2,
+          "sha256": "5caad5769edf09c6105acdc70a537697a1b02016e617b40f7e678c5c90872ee8",
+          "table": "selling_locations"
+        },
+        {
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "row_count": 2,
+          "sha256": "a88ab76d68228f4bfd23f81aaa5b97fd39709dd61150ba799b104b3c4c84afb3",
+          "table": "stock_locations"
+        },
+        {
+          "content_sha256": "96bc9b52e693c90ef0de870271fb0b79bc74429553167fd8ce52339cf473573f",
+          "row_count": 6,
+          "sha256": "2bb2879fa33f2a31538f79b8210993c736f05aa42cac334341362c06700fc5a8",
+          "table": "channel_assignments"
+        },
+        {
+          "content_sha256": "d5afc1347431b80786bd0c6d8d13c5dd030198ba348f7449a896434c520a2b5b",
+          "row_count": 6,
+          "sha256": "d9d25155dbeadf421e3a31929c714bfb8b26fc509fb14c8204cb5b11e4f4e9e1",
+          "table": "fulfillment_routes"
+        },
+        {
+          "content_sha256": "e6306c9b599ecadb839a3fe650b462e215e62a0c439f32e67b895b5b140171a4",
+          "row_count": 48,
+          "sha256": "f0f33a24fa10ccaf719004ca172a95271f7cb81535a1d216e50a47093425d141",
+          "table": "assortment"
+        },
+        {
+          "content_sha256": "c6b34665b2adec1354b915c6cbd7e2357227016dd665a42e2b7cf8e7e328e2e4",
+          "row_count": 45,
+          "sha256": "634d5f616d204c4b05d2e4760b7b98c6f49fbd06e8d88d3ac43679b56dc0280b",
+          "table": "business_calendar"
+        },
+        {
+          "content_sha256": "33654a593a8b02c9972d8efba695827fd866eb39663db97ef5c8f6bbb2b14574",
+          "row_count": 120,
+          "sha256": "e5e7b77c833b58181977ee4c73590422de2904a68c0f29045352d2f9d53e88b7",
+          "table": "category_calendar"
+        }
+      ],
+      "source_id": "source-sha256-feddeefef70a8b1bdfeea3cd34928194aaa72cc87339b85348775a912e1df203",
+      "source_schema_version": "2.1.0",
+      "versions": {
+        "calendar": "pl-de-berlin-calendar-1.0.0",
+        "canonicalization": "typed-csv-nfc-utc-multiset-1.1.0",
+        "config": "1.0.0",
+        "csv_schema": "1.0",
+        "dimensions": "retail-dimensions-1.0.0",
+        "generator": "0.3.0"
+      }
+    }
+  ],
+  "elapsed_seconds": 4.7202,
+  "historical_source_2_0": {
+    "dataset_id": "source-sha256-b4d2a6cf560129ce23374841340e65897a7b09becbe4749e1352c3f150bc1309",
+    "feature_id": "features-sha256-bdb259d15fd67e0af15dbce1465ff480ae93421125bde83231b0bf5730a9db13",
+    "feature_identity_and_parent_unchanged": true,
+    "identity_unchanged": true,
+    "readable": true
+  },
+  "legacy_compatibility": {
+    "demo_csv_count": 17,
+    "small_csv_count": 17,
+    "tracked_demo_files_unchanged": 19
+  },
+  "limitations": [
+    "sparse observation panel",
+    "legacy pricing and baskets",
+    "inventory_ready=false",
+    "truth separation pending",
+    "no remote CI in this acceptance"
+  ],
+  "measurement_scope": "single sequential source/features/validation process; bounded profiles; no training benchmark",
+  "policy_version": "data02-local-acceptance-1.0.0",
+  "process_peak_rss_bytes": 45416448,
+  "repeat_checks": {
+    "same_dimension_reports": true,
+    "same_source_and_feature_bytes": true,
+    "same_source_and_feature_ids": true
+  },
+  "status": "passed"
+}
