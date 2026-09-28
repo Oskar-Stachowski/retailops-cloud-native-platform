@@ -1,14 +1,14 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 01 w realizacji. Aktualizacja: 28.09.2026.**
+**Status: etap 01 odebrany; następny zakres DATA-01 w etapie 02. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
 kontrakty danych/run/tool z walidacją offline oraz lokalne poświadczenia i scope API.
-Lokalny zakres 01 ma odbiór; pozostaje zdalny Required CI nowych commitów po push.
-Po zamknięciu 01 następną implementacją jest DATA-01 w etapie 02.
-[Backlog](backlog.md) podaje pozostałą pracę 01 i pierwszy mały PR 02.
-Pozostała część 01 oraz etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
+Required CI PR i push na main obu repozytoriów ma success; ochrona main pozostaje aktywna.
+Następną implementacją jest DATA-01 w etapie 02, a równolegle można rozpocząć RAG 11.
+[Backlog](backlog.md) podaje pierwszy mały PR 02 i granice równoległych strumieni.
+Etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.

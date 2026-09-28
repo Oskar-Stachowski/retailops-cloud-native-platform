@@ -5,13 +5,23 @@ PostgreSQL/pgvector/MLflow, kontrakty danych/run/tool i lokalne poświadczenia/s
 [Raport auth](access.json) dotyczy implementacji `01eca67` i dowodów `2f067c6`.
 [Raport kontraktów](contracts.json) dotyczy implementacji `ae21d4e` i dowodów
 `40ad85c`; osobny [raport persistence](persistence.json) implementacji `7e0978b`.
-Cały etap 01 pozostaje `in_progress`.
+Etap 01 ma odbiór lokalny i zdalny. [Required CI obu repo](remote-ci.json)
+potwierdza PR oraz push na main; wszystkie wymagane jobs mają success.
+Repo AI wykonuje 273 testy i rzeczywisty Compose na Linux AMD64; RetailOps
+pełną macierz CI. Main obu repo zachowuje strict, PR i required-result także
+dla administratora. Następna implementacja to DATA-01 etapu 02; RAG 11 może
+powstawać równolegle według [backlogu](../../../plans/ai/backlog.md).
+
+| Repo | Main SHA | Required CI push |
+|---|---|---|
+| retailops-cloud-native-platform | `a0a83c4` | [success](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36394194602) |
+| retailops-ai-intelligence | `f2c047b` | [success](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36395139229) |
 
 ## Repo i wersje
 
 Repo lokalne: `/Users/oskarstachowski/retailops-ai-intelligence`,
-obok RetailOps, branch `ai/implementation`; origin na GitHub. Nowe commity
-tego zakresu pozostają lokalne.
+obok RetailOps, branch `ai/implementation`; zmiany są opublikowane na GitHub main.
+Dokładne odebrane SHA i URL workflow zapisano w [raporcie zdalnym](remote-ci.json).
 
 | Commit w repo AI | Zakres |
 |---|---|
@@ -25,7 +35,8 @@ tego zakresu pozostają lokalne.
 | `2f067c68cb5931ef31578f724e496f5381b3ae6a` | Dowody czystego checkoutu i rzeczywistego auth HTTP z wheel, z restartem po revoke. |
 
 Pełne komendy, wyniki i sumy kodu/artefaktów są w repo AI:
-`docs/evidence/01-http.md/json`, `01-persistence.md/json`, `01-contracts.md/json` i `01-access.md/json`.
+`docs/evidence/01-http.md/json`, `01-persistence.md/json`, `01-contracts.md/json`,
+`01-access.md/json` i `01-remote-ci.md/json`.
 Bieżące uruchomienie i ograniczenia opisują `docs/http-service.md`,
 `docs/local-stack.md`, `docs/data-contracts.md`, `docs/access-control.md`,
 `docs/development.md` i `docs/STATUS.md`. Ten wpis wskazuje dowody
@@ -68,7 +79,7 @@ expiry działa per request. Nie ma OIDC/JWT/publicznego IAM/tenant/audit store,
 rate limiter, rzeczywistego tool executora lub serving. Obecny Compose nie montuje
 policy, więc /api/v1 pozostaje zamknięte; MLflow nie ma aplikacyjnego auth.
 Nie ponawiano pełnego DB/crash/restart smoke; wcześniejszy pomiar niżej pozostaje
-osobny. Lokalny zakres 01 ma odbiór; zdalny Required CI nowych commitów czeka na push.
+osobny; aktualny odbiór zdalny jest wskazany na początku tego raportu.
 
 ## Kontrakty — osobny odbiór 28.09.2026
 
@@ -106,7 +117,7 @@ format, nie odpowiadają fizycznym plikom ani treningowi. Walidacja nie weryfiku
 byte checksums, source gates lub rzeczywistego użycia splitu. Run nie jest workerem,
 tool nie ma executora/auth/agenta. Import/ML/streaming wymagają późniejszych etapów.
 Nie ponawiano Compose crash/restart dla tej zmiany kontraktów; osobny pomiar niżej
-zachowuje datę i zakres. Nowe commity nie zostały wypchnięte — zdalny CI pozostaje otwarty.
+zachowuje datę i zakres; aktualny odbiór zdalny jest wskazany na początku raportu.
 
 ## Persistence — rzeczywisty lokalny runtime
 
@@ -135,11 +146,9 @@ Po fast-forward commitów do docelowego repo odtworzono venv z lockfile; testy
 procesu HTTP i rzeczywistego niedostępnego DB przeszły (2 passed in 5.63s),
 a worktree pozostał czysty.
 
-Odczyt GitHub 28.09.2026: main chronione z wymaganym required-result,
-[Required CI bazowego 7d67530 ma success](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36383297184).
-Zdalnego CI nowej implementacji nie wykonano, bo nowe commity nie zostały wypchnięte.
-Cały etap 01 pozostaje otwarty: [odbiór zdalnego CI nowych commitów](../../../plans/ai/backlog.md).
-Nie odebrano Linux x86_64 runtime, backup/restore, modeli, RAG, OTLP ani AWS.
+Ten wcześniejszy pomiar obejmował lokalny macOS/ARM64. Odrębny aktualny
+[odbiór zdalny](remote-ci.json) potwierdza Linux AMD64 i chronione main.
+Nie odebrano backup/restore AI, modeli, RAG, OTLP ani AWS.
 
 ## HTTP — wcześniejszy pomiar 27.09.2026
 
