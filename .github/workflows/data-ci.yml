@@ -53,7 +53,7 @@ jobs:
       - name: Run data readiness gates
         run: make data-generate data-quality data-contracts data-scenario-report DATA_PROFILE="${DATA_PROFILE}"
 
-      - name: Verify Parquet parity, artifact policy and profile resource budgets
+      - name: Verify Parquet, immutable snapshots and profile resource budgets
         run: make data-parquet-check
 
       - name: Write data CI summary
@@ -69,8 +69,8 @@ jobs:
             echo "| Generated dataset | \`ci-cd/reports/data/generated/${DATA_PROFILE}/\` |"
             echo "| Contract report | \`ci-cd/reports/data/data-contract-report.json\` |"
             echo "| Scenario coverage | \`ci-cd/reports/data/scenario-coverage-report.json\` |"
-            echo "| Parquet tests | \`ci-cd/reports/data/ai03-tests.xml\` |"
-            echo "| Both smoke profiles, twice, max 300s / 1024 MiB per run | \`ci-cd/reports/data/ai03-benchmark.json\` |"
+            echo "| Parquet and immutable snapshot tests | \`ci-cd/reports/data/ai03-tests.xml\` |"
+            echo "| Generate / qualify / export / verify / reexport, both smokes twice, max 300s / 1024 MiB per run | \`ci-cd/reports/data/ai03-benchmark.json\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload data quality evidence

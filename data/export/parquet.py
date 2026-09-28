@@ -114,6 +114,7 @@ def write_table(
     chunk_rows: int = DEFAULT_CHUNK_ROWS,
     partition_min_rows: int = PARTITION_MIN_ROWS,
     order_dates: sqlite3.Connection | None = None,
+    truth_directory: str = "truth",
 ) -> dict:
     if not 1 <= chunk_rows <= MAX_CHUNK_ROWS or partition_min_rows < 1:
         msg = "Invalid chunk or partition bound."
@@ -124,7 +125,13 @@ def write_table(
     if artifact["data_class"] != data_class:
         msg = "Artifact classification disagrees with source schema."
         raise ValueError(msg)
-    directory = output / CLASS_DIRECTORIES[data_class] / name
+    namespace = (
+        truth_directory if data_class == "simulation_truth" else CLASS_DIRECTORIES[data_class]
+    )
+    if namespace not in {"facts", "truth", "evaluation_truth", "operational_outputs"}:
+        msg = "Unsupported artifact namespace."
+        raise ValueError(msg)
+    directory = output / namespace / name
     directory.mkdir(parents=True, exist_ok=False)
     field = "business_date" if "business_date" in schema.names else PARTITION_FIELDS.get(name)
     partition_field = field if artifact["row_count"] >= partition_min_rows else None
@@ -214,7 +221,14 @@ def verified_csv(source: Path, artifact: Artifact) -> Path:
 
 
 def write_artifacts(
-    manifest: SourceManifestV2, source: Path, output: Path, chunk_rows: int, partition_min_rows: int
+    manifest: SourceManifestV2,
+    source: Path,
+    output: Path,
+    chunk_rows: int,
+    partition_min_rows: int,
+    *,
+    tables: tuple[str, ...] | None = None,
+    truth_directory: str = "truth",
 ) -> list[dict]:
     profile = manifest.descriptor.resolved_parameters.profile
     artifacts = {artifact.table: artifact for artifact in manifest.artifacts}
@@ -244,8 +258,10 @@ def write_artifacts(
                 chunk_rows=chunk_rows,
                 partition_min_rows=partition_min_rows,
                 order_dates=dates if needs_dates else None,
+                truth_directory=truth_directory,
             )
             for artifact in manifest.artifacts
+            if tables is None or artifact.table in tables
         ]
 
 

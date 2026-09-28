@@ -14,17 +14,21 @@ from pathlib import Path
 
 import pyarrow as pa
 
+from data.export.ai_snapshot import export_snapshot
 from data.export.parquet import DEFAULT_CHUNK_ROWS, convert
 from data.export.policy import GENERATED_ROOT, ROOT, fixture_budget
+from data.export.snapshot_contract import MANIFEST_NAME
 from data.generator.configuration import DatasetGenerationConfig
+from data.generator.identity import file_sha256
 from data.generator.main import generate_demo_dataset
+from data.generator.manifest_v2 import MANIFEST_V2_FILENAME
 
 POLICY_VERSION = "ai03-format-budget-1.0.0"
 MAX_SECONDS = 300
 MAX_RSS_MIB = 1024
 
 
-def measure(profile: str, chunk_rows: int) -> dict:
+def measure(profile: str, chunk_rows: int, *, snapshot: bool = False) -> dict:
     GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
     with tempfile.TemporaryDirectory(prefix="ai03-benchmark-", dir=GENERATED_ROOT) as temporary:
@@ -32,16 +36,54 @@ def measure(profile: str, chunk_rows: int) -> dict:
         source = base / "csv"
         generate_demo_dataset(source, DatasetGenerationConfig(profile=profile, seed=42))
         generated = time.perf_counter()
-        result = convert(source, base / "parquet", chunk_rows=chunk_rows)
+        publication = None
+        if snapshot:
+            dataset_id = json.loads((source / MANIFEST_V2_FILENAME).read_text())["dataset_id"]
+            source_hashes = {path.name: file_sha256(path) for path in source.iterdir()}
+            publication = export_snapshot(
+                source, dataset_id, base / "snapshots", chunk_rows=chunk_rows
+            )
+            result = publication["manifest"]
+            first_bytes = {
+                path.relative_to(publication["path"]).as_posix(): file_sha256(path)
+                for path in Path(publication["path"]).rglob("*")
+                if path.is_file()
+            }
+            repeated = export_snapshot(
+                source, dataset_id, base / "snapshots", chunk_rows=chunk_rows
+            )
+            final_bytes = {
+                path.relative_to(publication["path"]).as_posix(): file_sha256(path)
+                for path in Path(publication["path"]).rglob("*")
+                if path.is_file()
+            }
+            if (
+                repeated["publication"] != "reused"
+                or repeated["manifest"] != result
+                or first_bytes != final_bytes
+                or source_hashes != {path.name: file_sha256(path) for path in source.iterdir()}
+            ):
+                msg = "Snapshot re-export changed source or published bytes."
+                raise ValueError(msg)
+        else:
+            result = convert(source, base / "parquet", chunk_rows=chunk_rows)
         finished = time.perf_counter()
         tables = result["tables"]
         rows = sum(table["row_count"] for table in tables)
         peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         return {
             "profile": profile,
-            "writer": result["writer"],
+            "writer": result["exporter"] if snapshot else result["writer"],
             "source_dataset_id": result["source_dataset_id"],
-            "source_commit": result["source_commit"],
+            "source_commit": result["source"]["provenance"]["git_commit"]
+            if snapshot
+            else result["source_commit"],
+            "snapshot_id": result.get("snapshot_id"),
+            "snapshot_ready": result.get("snapshot_ready", False),
+            "idempotent_reexport": "passed" if snapshot else "not_applicable",
+            "manifest_sha256": file_sha256(Path(publication["path"]) / MANIFEST_NAME)
+            if publication
+            else None,
             "seed": 42,
             "end_date": "2026-07-31",
             "rows": rows,
@@ -89,14 +131,22 @@ def main() -> None:
         "--output", type=Path, default=ROOT / "ci-cd/reports/data/ai03-benchmark.json"
     )
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument(
+        "--snapshot",
+        action="store_true",
+        help="Measure qualified immutable export and unchanged re-export.",
+    )
     args = parser.parse_args()
     if args.worker:
-        print(json.dumps(measure(args.profiles[0], args.chunk_rows)))  # noqa: T201 - worker protocol
+        print(json.dumps(measure(args.profiles[0], args.chunk_rows, snapshot=args.snapshot)))  # noqa: T201 - worker protocol
         return
     if args.repeats < 2 or args.max_seconds <= 0 or args.max_rss_mib <= 0:
         parser.error("At least two repeats and positive budgets are required.")
     report = {
-        "policy_version": POLICY_VERSION,
+        "policy_version": "ai03-snapshot-budget-1.0.0" if args.snapshot else POLICY_VERSION,
+        "pipeline": "generate/qualify/export/verify/reexport"
+        if args.snapshot
+        else "generate/format/parity",
         "status": "running",
         "limits": {
             "max_seconds_per_profile": args.max_seconds,
@@ -127,6 +177,7 @@ def main() -> None:
                         profile,
                         "--chunk-rows",
                         str(args.chunk_rows),
+                        *(["--snapshot"] if args.snapshot else []),
                     ],
                     cwd=ROOT,
                     capture_output=True,
@@ -138,7 +189,7 @@ def main() -> None:
                 result["process_wall_seconds"] = time.perf_counter() - started
                 report["runs"].append(result)
                 enforce_limits(result, args.max_seconds, args.max_rss_mib)
-                identity = (result["source_dataset_id"], result["tables"])
+                identity = (result["source_dataset_id"], result["snapshot_id"], result["tables"])
                 if previous is not None and identity != previous:
                     msg = "Repeated profile changed source identity or typed table content."
                     raise ValueError(msg)

@@ -181,7 +181,7 @@ help:
 	@echo "  make data-quality         Generate synthetic data and validate quality report"
 	@echo "  make data-contracts       Validate demo CSVs and event schema against data contracts"
 	@echo "  make data-scenario-report Generate scenario coverage evidence"
-	@echo "  make data-parquet-check   Verify typed Parquet, artifact policy and both smoke budgets"
+	@echo "  make data-parquet-check   Verify Parquet, immutable snapshots and both smoke budgets"
 	@echo "  make db-backup            Create local PostgreSQL logical backup evidence"
 	@echo "  make db-restore           Restore local PostgreSQL backup evidence"
 	@echo "  make db-recovery-drill    Verify backup/restore in a disposable, isolated database"
@@ -344,7 +344,7 @@ data-parquet-install: api-install
 data-parquet-check: data-parquet-install ensure-reports-dir
 	$(API_VENV_PYTHON) -m bandit --severity-level high --confidence-level high -q -r data/export data/seed_files.py -f json -o "$(DATA_REPORTS_DIR)/bandit-ai03.json"
 	$(API_VENV_PYTHON) -m pytest -q data/tests --junitxml="$(DATA_REPORTS_DIR)/ai03-tests.xml"
-	$(API_VENV_PYTHON) -m data.export.benchmark --repeats 2 --max-seconds 300 --max-rss-mib 1024 --output "$(DATA_REPORTS_DIR)/ai03-benchmark.json"
+	$(API_VENV_PYTHON) -m data.export.benchmark --snapshot --repeats 2 --max-seconds 300 --max-rss-mib 1024 --output "$(DATA_REPORTS_DIR)/ai03-benchmark.json"
 
 data-contracts: api-install ensure-reports-dir
 	$(API_VENV_PYTHON) scripts/data/validate_data_contracts.py --contract "$(DATA_CONTRACT)" --data-dir data/demo --event-contract "$(EVENT_CONTRACT)" --report "$(DATA_CONTRACT_REPORT)"
