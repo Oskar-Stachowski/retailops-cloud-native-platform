@@ -342,7 +342,7 @@ data-parquet-install: api-install
 	$(API_VENV_PIP) install -r "$(DATA_PARQUET_REQUIREMENTS)"
 
 data-parquet-check: data-parquet-install ensure-reports-dir
-	$(API_VENV_PYTHON) -m bandit --severity-level high --confidence-level high -q -r data/export data/seed_files.py -f json -o "$(DATA_REPORTS_DIR)/bandit-ai03.json"
+	$(API_VENV_PYTHON) -m bandit --severity-level high --confidence-level high -q -r data/export data/handoff data/seed_files.py -f json -o "$(DATA_REPORTS_DIR)/bandit-ai03.json"
 	$(API_VENV_PYTHON) -m pytest -q data/tests --junitxml="$(DATA_REPORTS_DIR)/ai03-tests.xml"
 	$(API_VENV_PYTHON) -m data.export.benchmark --snapshot --repeats 2 --max-seconds 300 --max-rss-mib 1024 --output "$(DATA_REPORTS_DIR)/ai03-benchmark.json"
 
