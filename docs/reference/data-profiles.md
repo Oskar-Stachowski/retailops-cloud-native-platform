@@ -109,3 +109,4 @@ Atomowy pełny snapshot i importer pozostają etapem 03.
 RAG `not_applicable`; nadal zawiera sparse panel i mixed simulation truth.
 [Odbiór DATA-01](../evidence/ai/02/data01/README.md) potwierdza konfigurację i identity.
 [Odbiór DATA-02](../evidence/ai/02/data02/README.md) obejmuje wymiary i kalendarz.
+[Odbiór DATA-04](../evidence/ai/02/data04/README.md) obejmuje ceny/promocje i uzgodnienie transakcji.

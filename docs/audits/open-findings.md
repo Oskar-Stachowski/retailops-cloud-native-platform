@@ -44,19 +44,6 @@ sumy/ilości/przychód uzgadniają się. Return window zależy od właściwej sp
 kategorii/kanału, skumulowany zwrot nie przekracza zakupu. Późniejszy tail pozostaje
 jawny. Negatywne przypadki naruszające te reguły kończą się failed gate.
 
-### DATA-04 · P1 · Ceny i promocje transakcji nie wynikają ze wspólnego kalendarza
-
-**Dowód:** price coverage 67,4508%; 5673 sprzedaże bez ceny; 2319 różnic także po
-rabacie katalogowym. 2197 flag promocji bez aktywnej promocji oraz 1936 przypadków
-odwrotnych. Efekty pre/post są odwrócone w czasie. [pricing.py](../../data/generator/pricing.py)
-i [commerce](../../data/generator/profile_engine.py) mają osobne reguły;
-brak scope i wersjonowanej dostępności planu. RF wyklucza te wejścia.
-
-**Kryterium zamknięcia — AI 02:** jeden resolver ceny/promo, pełne coverage,
-jednoznaczny scope/priority i known-at, zgodne daty/rabaty transakcji. Pre/post effects
-liczone w prawidłowym kierunku. Brak ceny, overlap, błędny rabat i nieaktywna promocja
-są odrzucane; przyszły plan używany przez model musi być znany przed origin.
-
 ### DATA-05 · P1 · Truth i niepełne bramki nie chronią nowego źródła ML
 
 **Dowód:** pola latent/noise/multipliers/stockout/DQ pozostają w sales CSV.

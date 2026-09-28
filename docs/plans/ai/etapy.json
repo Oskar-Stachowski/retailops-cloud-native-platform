@@ -44,10 +44,10 @@
       ],
       "path": "etapy/02-dane-sprzedazowe.md",
       "status": "in_progress",
-      "next_scope": "DATA-04: shared price and promotion resolver",
-      "evidence": "../../evidence/ai/02/data02/README.md",
-      "implementation_commit": "a050e488e5ea5a93b21b5b4d2f678c195ac26cca",
-      "implementation_scope": "DATA-01 configuration/identity and DATA-02 dimensions/calendar only; remaining source fixes pending"
+      "next_scope": "DATA-02/03/05: demand, daily panel and baskets",
+      "evidence": "../../evidence/ai/02/data04/README.md",
+      "implementation_commit": "5fedb2b2976ebfd60a53ac721b0e8194561ca9de",
+      "implementation_scope": "DATA-01 configuration/identity, DATA-02 dimensions/calendar and DATA-04 pricing only; remaining source fixes pending"
     },
     {
       "id": "03",

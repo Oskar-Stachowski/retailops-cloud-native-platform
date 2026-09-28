@@ -1,11 +1,14 @@
 # Profile, budżety i bramki odbioru
 
-**Status: konfiguracja, identity, wymiary i kalendarz mają lokalny odbiór DATA-01/02;
+**Status: konfiguracja, identity, wymiary, kalendarz i ceny/promocje mają lokalny odbiór DATA-01/02/04;
 bramki pełnego źródła/modeli pozostają planem.**
 [Konfiguracja 1.0.0](../../../../data/generator/configuration.py) jest wykonywalnym źródłem
 rozmiarów i dat. Profile AI mają [kanoniczne wymiary](../../../reference/retail-dimensions.md),
-stock locations, ważne pary i osiem hard gates wymiarów; nadal tworzą sparse panel
-i CSV. Pełny panel, chunked Parquet oraz pozostałe bramki wymagają implementacji.
+stock locations, ważne pary i osiem hard gates wymiarów oraz
+[znane plany cen/promocji](../../../reference/retail-pricing.md) i sześć bramek cenowych.
+[Odbiór DATA-04](../../../evidence/ai/02/data04/README.md) potwierdza coverage cen
+i uzgodnienie transakcji. Panel i obserwacje cen są nadal sparse, eksport jest CSV.
+Pełny panel, chunked Parquet oraz pozostałe bramki wymagają implementacji.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 
@@ -31,7 +34,7 @@ Development używa seed 42. Końcowa robustness policy obejmuje wcześniej zamro
 ## 2. Budżet wykonania i plików
 
 - Standardowe CI uruchamia schema smoke i temporal smoke. Proponowany budżet początkowy: 5 minut i 1 GiB peak RSS na każdy kompletny profil bez pobierania zależności; pierwszy benchmark w etapie 03 potwierdza albo jawnie koryguje limit. To docelowa bramka, nie zmierzony obecny wynik.
-- Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; tylko jeden `ai-smoke`, bez pełnego training export. Temporal smoke jest generowany w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
+- Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; co najwyżej jeden bieżący `ai-smoke`, bez pełnego training export. Małe archiwa wcześniejszych wersji służą wyłącznie regresji odczytu i łącznie mieszczą się w tym limicie, zgodnie z [polityką plików](dane-i-czas.md). Bieżące smoke i temporal smoke są generowane w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
 - `ai-dev` i `ai-training` zapisuje się chunkami. Raport mierzy czas, peak memory, rows/s oraz bytes. Jeżeli pełny profil przekracza zasoby, poprawić zapis/przetwarzanie lub jawnie stworzyć nowy mniejszy profil; nie nazywać go dotychczasowym `ai-training`.
 - Koszt zależności, pobierania obrazów, treningu TensorFlow i calls do Bedrock raportować oddzielnie; smoke dataset nie jest budżetem całej platformy.
 

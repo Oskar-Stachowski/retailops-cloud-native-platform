@@ -2,29 +2,31 @@
 
 [Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
 Required CI PR oraz push na main obu repozytoriów ma success.
-Główny punkt wznowienia to DATA-04 etapu 02. [DATA-01](../../evidence/ai/02/data01/README.md)
+Główny punkt wznowienia to popyt/panel/koszyki etapu 02. [DATA-01](../../evidence/ai/02/data01/README.md)
 ma lokalny odbiór konfiguracji i tożsamości, a [DATA-02](../../evidence/ai/02/data02/README.md)
-wymiarów, lifecycle i kalendarza; etap 02 jest w realizacji.
+wymiarów, lifecycle i kalendarza. [DATA-04](../../evidence/ai/02/data04/README.md)
+ma lokalny odbiór cen/promocji i uzgodnienia transakcji; etap 02 jest w realizacji.
 Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
 potwierdzone problemy i kryteria ich zamknięcia.
 
 ## Kolejny mały PR etapu 02
 
-**Repo:** RetailOps. **Zależność:** konfiguracja/identity oraz kanoniczne wymiary.
-Zakres DATA-04: wspólny resolver cen/promocji według produktu, scope, daty
-i znanej wersji planu; pełne coverage i odrzucanie overlap. Promocje mają
-available time, różne typy/daty i ograniczenia kanału/lokalizacji. Zdefiniować
-stacking/priority, uzgodnić ceny order items/sales/agregatów oraz naprawić
-kierunek pre/post effects. Zachować demo, adapter wymiarów i testy identity.
+**Repo:** RetailOps. **Zależność:** konfiguracja/identity, kanoniczne wymiary i plany cen/promocji.
+Zakres DATA-02/03/05: jedna formuła popytu z demand weight użytym dokładnie raz,
+pełny dzienny panel ważnych kombinacji oraz jawne zera i osobne statusy
+missing/closed/inactive. Transakcje muszą uzgadniać się z docelową agregacją.
+Komplementarne SKU losować deterministycznie bez replacement i bez stałego
+wybierania pierwszych produktów; uzgodnić ilości, przychód i sumy koszyków.
+Lags zastąpić kalendarzowymi lub jawnie wycofać legacy dataset z nowych porównań.
+Zachować demo, bramki wymiarów/cen oraz source/feature identity.
 
 Dalsze PR-y według [instrukcji](etapy/02-dane-sprzedazowe.md):
-demand/panel/koszyki (DATA-02/03/05),
 chronologia/zwroty (DATA-03), rozdzielenie truth i bramki (DATA-05).
 Źródło pozostaje `not_ready` do AI 03 do odbioru pełnego etapu 02.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 02, DATA-04:** wspólne ceny i promocje;
+- **RetailOps / etap 02, DATA-02/03/05:** popyt, panel i koszyki;
   potem kolejne poprawki źródła w kolejności opisanej wyżej.
 - **Repo AI / etap 11, zakres 1–2:** rejestr zatwierdzonego korpusu, allowlista,
   access_class, source SHA/checksums i document_status; następnie parser/chunker
@@ -41,7 +43,7 @@ Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **02 — źródło** | DATA-02–05. Pełny poprawny panel, scope/availability cen i promocji, zgodne transakcje i return tail, odrębne truth, hard gates z negatywnymi przypadkami. `inventory_ready=false`, stockout/anomaly `not_ready`. |
+| **02 — źródło** | Pozostałe DATA-02/03/05. Pełny poprawny panel i popyt, koszyki, chronologia i return tail, odrębne truth, hard gates z negatywnymi przypadkami. `inventory_ready=false`, stockout/anomaly `not_ready`. |
 | **03 — snapshot/curated** | ML-07: rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | ML-07 jako warunek wejść. Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |

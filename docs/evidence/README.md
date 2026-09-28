@@ -6,6 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| Ceny i promocje AI 02 / DATA-04 | 2026-09-28 | [Odbiór lokalny](ai/02/data04/README.md): wspólny resolver, scope/known-at i rewizje, cztery typy promocji, uzgodnienie transakcji, chronologiczne pre/post truth; sześć bramek, 100% coverage cen ważnych kombinacji smoke, 543 testy. Pełny etap 02 pozostaje otwarty. |
 | Wymiary i kalendarz AI 02 / DATA-02 | 2026-09-28 | [Odbiór lokalny](ai/02/data02/README.md): katalog/SKU, rozdzielone lokalizacje i kanały, wersje routing/asortyment/lifecycle, PL/DE-BE i DST, osiem hard gates, 485 testów; pełny panel i dalsze zakresy 02 pozostają otwarte. |
 | Konfiguracja i identity AI 02 / DATA-01 | 2026-09-28 | [Odbiór lokalny](ai/02/data01/README.md): jawne daty/profile, manifest v2, source/feature IDs, dwukrotne smoke i temporal smoke, kontrast 100/20, zgodność demo i seeda; pełny etap 02 pozostaje otwarty. |
 | Fundament, persistence, kontrakty i lokalne auth AI 01 | 2026-09-28 | [Osobne repo AI](ai/01/README.md): 267 testów, prywatne poświadczenia i whole-scope 401/403, schemas/PIT/lineage oraz rzeczywisty HTTP z wheel na czystym checkoutcie. Osobny wcześniejszy pomiar rzeczywistego Compose: PostgreSQL/pgvector, MLflow, migracje, trwałość i DB outage/recovery. [Zdalny Required CI obu repo](ai/01/remote-ci.json): PR i push na main success, 273 testy AI, rzeczywisty Compose na Linux AMD64 i zachowana ochrona main. |
