@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://retailops.local/schemas/ml/demand_forecast_features.schema.json",
-  "title": "RetailOps observed demand feature row 2.1",
-  "description": "Observed sale label and forecast-origin-safe fields at date, product, store and channel grain. An absent row is unknown, not zero.",
+  "$id": "https://retailops.local/schemas/ml/demand_forecast_features.v3_1.schema.json",
+  "title": "RetailOps AI daily demand feature row 3.1",
+  "description": "Full active daily panel at physical selling location/channel grain; closed and missing differ from observed zero.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -11,11 +11,14 @@
     "feature_row_id",
     "date",
     "product_id",
-    "store_id",
+    "selling_location_id",
     "channel",
     "units_sold",
     "observation_status",
     "observation_available_at",
+    "is_active_assortment",
+    "location_open",
+    "source_data_complete",
     "category",
     "brand",
     "day_of_week",
@@ -28,7 +31,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "2.1"
+      "const": "3.1"
     },
     "dataset_id": {
       "type": "string",
@@ -46,10 +49,6 @@
       "type": "string",
       "format": "uuid"
     },
-    "store_id": {
-      "type": "string",
-      "minLength": 1
-    },
     "channel": {
       "type": "string",
       "enum": [
@@ -60,17 +59,22 @@
       ]
     },
     "units_sold": {
-      "type": "integer",
+      "type": [
+        "integer",
+        "null"
+      ],
       "minimum": 0,
       "description": "Forecast target: observed units sold. It is a label, never a same-day model input."
     },
     "observation_status": {
       "type": "string",
       "enum": [
+        "observed_positive",
         "observed_zero",
-        "observed_positive"
+        "closed",
+        "missing"
       ],
-      "description": "A zero requires an explicit zero-quantity sale record. Missing, closed, or inactive combinations do not get synthetic zero rows."
+      "description": "Inactive rows are excluded. Missing has a null label. Closed zero is not an observed open-day zero."
     },
     "observation_available_at": {
       "type": "string",
@@ -108,10 +112,23 @@
       "format": "date-time",
       "description": "Dataset generation metadata, not source availability at the forecast origin."
     },
+    "selling_location_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "is_active_assortment": {
+      "type": "boolean"
+    },
+    "location_open": {
+      "type": "boolean"
+    },
+    "source_data_complete": {
+      "type": "boolean"
+    },
     "observation_history": {
       "type": "string",
       "minLength": 2,
-      "description": "Canonical JSON of contiguous append-only quantity versions with UTC availability; historical reads choose the last version known at origin."
+      "description": "Canonical JSON of contiguous append-only observed quantity versions, not simulator truth."
     }
   }
 }

@@ -26,11 +26,12 @@ def admit_feature_tables(tables: dict, config: DatasetGenerationConfig) -> dict:
 def admit_feature_source(source_dir: Path, config: DatasetGenerationConfig) -> tuple[dict, dict]:
     manifest = load_source_manifest_v2(source_dir)
     require(
-        uses_separation(config.profile, manifest["schema_version"])
+        manifest["schema_version"] == "2.6.0"
+        and uses_separation(config.profile, manifest["schema_version"])
         and manifest["source_ready"]
         and manifest["descriptor"]["resolved_parameters"]
         == resolve_generation_config(config).parameters(),
-        "Feature source requires an accepted 2.5 export with matching parameters.",
+        "Feature source requires an accepted 2.6 export with matching parameters.",
     )
     # The projected records themselves must match the verified identity, including
     # when a mutable export changes between admission and this second read.

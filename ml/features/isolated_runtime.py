@@ -14,6 +14,7 @@ WORKER_FILES = (
     "ml/__init__.py",
     "ml/features/__init__.py",
     "ml/features/fact_input.py",
+    "ml/features/observation_history.py",
     "ml/features/ai_demand.py",
     "ml/features/worker.py",
     "ml/features/runtime_probe.py",

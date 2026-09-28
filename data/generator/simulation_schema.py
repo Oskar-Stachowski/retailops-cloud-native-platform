@@ -36,8 +36,8 @@ SIMULATION_GRAINS = {
 }
 
 
-def uses_separation(profile: str, schema_version: str = "2.5.0") -> bool:
-    return profile.startswith("ai-") and schema_version == "2.5.0"
+def uses_separation(profile: str, schema_version: str = "2.6.0") -> bool:
+    return profile.startswith("ai-") and schema_version in {"2.5.0", "2.6.0"}
 
 
 def fact_columns(name: str, columns: list[str]) -> list[str]:

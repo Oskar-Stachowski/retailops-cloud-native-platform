@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://retailops.local/schemas/ml/demand_forecast_feature_manifest.schema.json",
+  "$id": "https://retailops.local/schemas/ml/demand_forecast_feature_manifest.v3.schema.json",
   "title": "RetailOps Demand Forecast Feature Dataset Manifest",
   "description": "Manifest for a generated demand forecasting feature dataset.",
   "type": "object",
@@ -24,7 +24,8 @@
     "observation_availability_field",
     "inventory_ready",
     "complete_daily_panel",
-    "generated_at"
+    "generated_at",
+    "target_type"
   ],
   "properties": {
     "dataset_id": {
@@ -37,19 +38,20 @@
     },
     "schema_version": {
       "type": "string",
-      "const": "2.1"
+      "const": "3.1"
     },
     "feature_schema": {
       "type": "string",
-      "const": "demand_forecast_features.schema.json"
+      "const": "demand_forecast_features.v3_1.schema.json"
     },
     "profile": {
       "type": "string",
       "enum": [
-        "demo",
-        "small",
-        "medium",
-        "large"
+        "ai-smoke",
+        "ai-temporal-smoke",
+        "ai-dev",
+        "ai-training",
+        "ai-load"
       ]
     },
     "grain": {
@@ -65,14 +67,20 @@
           "const": "product_id"
         },
         {
-          "const": "store_id"
+          "const": "selling_location_id"
         },
         {
           "const": "channel"
         }
       ],
       "minItems": 4,
-      "maxItems": 4
+      "maxItems": 4,
+      "const": [
+        "date",
+        "product_id",
+        "selling_location_id",
+        "channel"
+      ]
     },
     "target": {
       "type": "string",
@@ -143,7 +151,7 @@
     },
     "complete_daily_panel": {
       "type": "boolean",
-      "const": false
+      "const": true
     },
     "quality_report": {
       "type": "string"
@@ -157,6 +165,10 @@
     "generated_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "target_type": {
+      "type": "string",
+      "const": "observed_sales_units"
     }
   }
 }

@@ -40,13 +40,13 @@ def run_case(root: Path, name: str, config: DatasetGenerationConfig) -> dict:
     )
     features = load_feature_identity_manifest(path / "features")
     require(
-        features["descriptor"]["schema_version"] == "3.0" and features["complete_daily_panel"],
+        features["descriptor"]["schema_version"] == "3.1" and features["complete_daily_panel"],
         "AI feature contract/coverage failed.",
     )
     return {
         **result,
         "demand_report": report,
-        "feature_schema_version": "3.0",
+        "feature_schema_version": "3.1",
         "basket_line_count": len(items),
         "duplicate_basket_skus": 0,
     }

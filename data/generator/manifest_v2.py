@@ -37,6 +37,7 @@ from data.generator.identity import (
     source_data_class,
     source_identity,
 )
+from data.generator.observation_history import HISTORY_TABLE, HISTORY_VERSION, uses_history
 from data.generator.pricing_quality import pricing_report_markdown, validate_pricing
 from data.generator.pricing_schema import PRICING_GRAINS, PRICING_VERSION, uses_pricing
 from data.generator.return_quality import returns_report_markdown, validate_returns
@@ -97,7 +98,7 @@ class ResolvedParameters(Contract):
 
 
 class Versions(Contract):
-    generator: Literal["0.2.0", "0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0"]
+    generator: Literal["0.2.0", "0.3.0", "0.4.0", "0.5.0", "0.6.0", "0.7.0", "0.8.0"]
     config: Literal["1.0.0"]
     calendar: Literal["legacy-weekday-seasonality-1.0.0", "pl-de-berlin-calendar-1.0.0"]
     dimensions: Literal["retail-dimensions-1.0.0", "not_applicable"] | None = None
@@ -105,6 +106,7 @@ class Versions(Contract):
     demand: Literal["daily-demand-1.0.0", "not_applicable"] | None = None
     returns: Literal["retail-returns-1.0.0", "not_applicable"] | None = None
     simulation: Literal["retail-simulation-parameters-1.0.0", "not_applicable"] | None = None
+    history: Literal["observed-quantity-history-1.0.0", "not_applicable"] | None = None
     canonicalization: Literal[
         "typed-csv-nfc-utc-multiset-1.0.0",
         "typed-csv-nfc-utc-multiset-1.1.0",
@@ -112,6 +114,7 @@ class Versions(Contract):
         "typed-csv-nfc-utc-multiset-1.3.0",
         "typed-csv-nfc-utc-multiset-1.4.0",
         "typed-csv-nfc-utc-multiset-1.5.0",
+        "typed-csv-nfc-utc-multiset-1.6.0",
     ]
     csv_schema: Literal["1.0"]
 
@@ -128,7 +131,7 @@ class SourceDescriptor(Contract):
     role: Literal["source"]
     owner: Literal["retailops-cloud-native-platform"]
     parent_ids: list[str]
-    schema_version: Literal["2.0.0", "2.1.0", "2.2.0", "2.3.0", "2.4.0", "2.5.0"]
+    schema_version: Literal["2.0.0", "2.1.0", "2.2.0", "2.3.0", "2.4.0", "2.5.0", "2.6.0"]
     versions: Versions
     resolved_parameters: ResolvedParameters
     code_sha256: SHA256
@@ -138,9 +141,15 @@ class SourceDescriptor(Contract):
 
     @model_validator(mode="after")
     def complete_source_schema(self) -> SourceDescriptor:
-        revision = {"2.0.0": 0, "2.1.0": 1, "2.2.0": 2, "2.3.0": 3, "2.4.0": 4, "2.5.0": 5}[
-            self.schema_version
-        ]
+        revision = {
+            "2.0.0": 0,
+            "2.1.0": 1,
+            "2.2.0": 2,
+            "2.3.0": 3,
+            "2.4.0": 4,
+            "2.5.0": 5,
+            "2.6.0": 6,
+        }[self.schema_version]
         expected_generator = f"0.{revision + 2}.0"
         expected_canonicalization = f"typed-csv-nfc-utc-multiset-1.{revision}.0"
         if (
@@ -153,7 +162,7 @@ class SourceDescriptor(Contract):
             PRICING_VERSION
             if uses_pricing(self.resolved_parameters.profile, self.schema_version)
             else "not_applicable"
-            if self.schema_version in {"2.2.0", "2.3.0", "2.4.0", "2.5.0"}
+            if self.schema_version in {"2.2.0", "2.3.0", "2.4.0", "2.5.0", "2.6.0"}
             else None
         )
         if self.versions.pricing != expected_pricing:
@@ -163,7 +172,7 @@ class SourceDescriptor(Contract):
             DEMAND_VERSION
             if uses_demand(self.resolved_parameters.profile, self.schema_version)
             else "not_applicable"
-            if self.schema_version in {"2.3.0", "2.4.0", "2.5.0"}
+            if self.schema_version in {"2.3.0", "2.4.0", "2.5.0", "2.6.0"}
             else None
         )
         if self.versions.demand != expected_demand:
@@ -173,7 +182,7 @@ class SourceDescriptor(Contract):
             RETURNS_VERSION
             if uses_returns(self.resolved_parameters.profile, self.schema_version)
             else "not_applicable"
-            if self.schema_version in {"2.4.0", "2.5.0"}
+            if self.schema_version in {"2.4.0", "2.5.0", "2.6.0"}
             else None
         )
         if self.versions.returns != expected_returns:
@@ -183,11 +192,21 @@ class SourceDescriptor(Contract):
             SIMULATION_VERSION
             if uses_separation(self.resolved_parameters.profile, self.schema_version)
             else "not_applicable"
-            if self.schema_version == "2.5.0"
+            if self.schema_version in {"2.5.0", "2.6.0"}
             else None
         )
         if self.versions.simulation != expected_simulation:
             msg = "Source simulation policy disagrees with schema/profile."
+            raise ValueError(msg)
+        expected_history = (
+            HISTORY_VERSION
+            if uses_history(self.resolved_parameters.profile, self.schema_version)
+            else "not_applicable"
+            if self.schema_version == "2.6.0"
+            else None
+        )
+        if self.versions.history != expected_history:
+            msg = "Source observation history policy disagrees with schema/profile."
             raise ValueError(msg)
         names = source_table_order(self.resolved_parameters.profile, self.schema_version)
         if self.parent_ids or set(self.tables) != set(names):
@@ -306,7 +325,7 @@ class Readiness(Contract):
 
 
 class SourceManifestV2(Contract):
-    schema_version: Literal["2.0.0", "2.1.0", "2.2.0", "2.3.0", "2.4.0", "2.5.0"]
+    schema_version: Literal["2.0.0", "2.1.0", "2.2.0", "2.3.0", "2.4.0", "2.5.0", "2.6.0"]
     dataset_name: Literal["retailops-synthetic"]
     dataset_id: Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]
     descriptor: SourceDescriptor
@@ -335,7 +354,7 @@ def artifact_metadata(
     output_dir: Path,
     end_date: str,
     profile: str = "demo",
-    schema_version: str = "2.5.0",
+    schema_version: str = "2.6.0",
 ) -> dict[str, Any]:
     columns = source_columns(name, profile, schema_version)
     data_class = source_data_class(name, profile, schema_version)
@@ -370,6 +389,13 @@ def artifact_metadata(
             **DEMAND_GRAINS,
             **RETURN_GRAINS,
             **SIMULATION_GRAINS,
+            HISTORY_TABLE: [
+                "business_date",
+                "product_id",
+                "selling_location_id",
+                "channel",
+                "version",
+            ],
         }.get(name, ["id"]),
         "data_class": data_class,
         "temporal_role": role,
@@ -387,7 +413,7 @@ def artifact_metadata(
 
 
 def report_metadata(
-    output_dir: Path, profile: str, schema_version: str = "2.5.0"
+    output_dir: Path, profile: str, schema_version: str = "2.6.0"
 ) -> list[dict[str, Any]]:
     names = ["dataset_manifest.json", "quality_report.json"]
     if profile != "demo":
@@ -415,7 +441,11 @@ def report_metadata(
                 "path": name,
                 "sha256": file_sha256(path),
                 "size_bytes": path.stat().st_size,
-                "policy_version": "forecast-source-acceptance-1.0.0"
+                "policy_version": (
+                    "forecast-source-acceptance-1.1.0"
+                    if uses_history(profile, schema_version)
+                    else "forecast-source-acceptance-1.0.0"
+                )
                 if name.startswith("source_report")
                 else "observed-sales-realism-1.1.0"
                 if uses_separation(profile, schema_version) and name.startswith("realism_report")
@@ -435,7 +465,7 @@ def report_metadata(
 
 
 def watermark_metadata(
-    end_date: date, profile: str = "demo", schema_version: str = "2.5.0"
+    end_date: date, profile: str = "demo", schema_version: str = "2.6.0"
 ) -> dict[str, dict[str, Any]]:
     cutoff = datetime.combine(end_date, time(23, 59, 59), tzinfo=UTC).isoformat()
     result = {
@@ -487,7 +517,7 @@ def build_source_manifest_v2(
     dataset_id, descriptor = source_identity(config, tables)
     effective = resolve_generation_config(config)
     payload = {
-        "schema_version": "2.5.0",
+        "schema_version": "2.6.0",
         "dataset_name": "retailops-synthetic",
         "dataset_id": dataset_id,
         "descriptor": descriptor,
@@ -567,7 +597,7 @@ def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> st
         raise ValueError(msg)
     expected_ready = (
         uses_separation(config.profile, manifest.schema_version)
-        if manifest.schema_version == "2.5.0"
+        if manifest.schema_version in {"2.5.0", "2.6.0"}
         else None
     )
     if manifest.source_ready != expected_ready:

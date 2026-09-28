@@ -11,7 +11,10 @@ from ml.features.fact_input import validate_fact_input
 def transform(payload: dict) -> list[dict]:
     tables = validate_fact_input(payload)
     rows = ai_feature_rows(
-        tables["daily_demand_observations"], tables["product_catalog"], tables["catalog_categories"]
+        tables["daily_demand_observations"],
+        tables["product_catalog"],
+        tables["catalog_categories"],
+        tables.get("daily_demand_versions"),
     )
     validate_ai_records(rows)
     return rows

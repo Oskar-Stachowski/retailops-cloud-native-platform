@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from data.generator.demand_schema import DEMAND_COLUMNS, uses_demand
 from data.generator.dimension_schema import DIMENSION_COLUMNS, uses_dimensions
+from data.generator.observation_history import HISTORY_COLUMNS, HISTORY_TABLE, uses_history
 from data.generator.pricing_schema import PRICING_COLUMNS, uses_pricing
 from data.generator.return_schema import RETURN_COLUMNS, uses_returns
 from data.generator.simulation_schema import SIMULATION_COLUMNS, fact_columns, uses_separation
@@ -217,7 +218,7 @@ TABLE_COLUMNS: dict[str, list[str]] = {
 CSV_WRITE_ORDER = list(TABLE_COLUMNS.keys())
 
 
-def source_table_order(profile: str, schema_version: str = "2.5.0") -> list[str]:
+def source_table_order(profile: str, schema_version: str = "2.6.0") -> list[str]:
     return [
         *CSV_WRITE_ORDER,
         *(DIMENSION_COLUMNS if uses_dimensions(profile, schema_version) else ()),
@@ -225,10 +226,11 @@ def source_table_order(profile: str, schema_version: str = "2.5.0") -> list[str]
         *(DEMAND_COLUMNS if uses_demand(profile, schema_version) else ()),
         *(RETURN_COLUMNS if uses_returns(profile, schema_version) else ()),
         *(SIMULATION_COLUMNS if uses_separation(profile, schema_version) else ()),
+        *((HISTORY_TABLE,) if uses_history(profile, schema_version) else ()),
     ]
 
 
-def source_columns(table: str, profile: str = "demo", schema_version: str = "2.5.0") -> list[str]:
+def source_columns(table: str, profile: str = "demo", schema_version: str = "2.6.0") -> list[str]:
     columns = {
         **TABLE_COLUMNS,
         **DIMENSION_COLUMNS,
@@ -236,6 +238,7 @@ def source_columns(table: str, profile: str = "demo", schema_version: str = "2.5
         **DEMAND_COLUMNS,
         **RETURN_COLUMNS,
         **SIMULATION_COLUMNS,
+        HISTORY_TABLE: HISTORY_COLUMNS,
     }[table]
     return fact_columns(table, columns) if uses_separation(profile, schema_version) else columns
 
@@ -274,6 +277,7 @@ def write_tables(
                 **DEMAND_COLUMNS,
                 **RETURN_COLUMNS,
                 **SIMULATION_COLUMNS,
+                HISTORY_TABLE: HISTORY_COLUMNS,
             }
             if name in tables
         ),

@@ -26,7 +26,7 @@ from data.generator.demand_quality import build_demand_report, validate_demand
 from data.generator.demand_schema import DEMAND_COLUMNS, DEMAND_GRAIN
 from data.generator.main import build_dataset, generate_demo_dataset
 from data.generator.manifest_v2 import build_source_manifest_v2, load_source_manifest_v2
-from ml.features.ai_demand import AI_FEATURE_COLUMNS, ai_feature_rows, calendar_lag, validate_ai_records
+from ml.features.ai_demand import AI_FEATURE_COLUMNS, AI_HISTORY_COLUMNS, ai_feature_rows, calendar_lag, validate_ai_records
 from ml.features.demand_forecast import DemandFeatureGenerationConfig, build_demand_feature_rows, build_feature_manifest, generate_demand_feature_dataset
 from ml.features.identity import load_feature_identity_manifest
 
@@ -163,8 +163,8 @@ def test_feature_rows_use_physical_grain_and_no_truth_inventory_revenue(dataset)
     rows = transform(admit_feature_tables(dataset, CONFIG))
     manifest = build_feature_manifest(CONFIG, rows)
     assert len(rows) == len(dataset["daily_demand_observations"])
-    assert all(set(r) == set(AI_FEATURE_COLUMNS) for r in rows)
-    assert manifest["schema_version"] == "3.0" and manifest["complete_daily_panel"]
+    assert all(set(r) == set(AI_HISTORY_COLUMNS) for r in rows)
+    assert manifest["schema_version"] == "3.1" and manifest["complete_daily_panel"]
     assert manifest["target_type"] == "observed_sales_units"
     assert manifest["grain"] == ["date", "product_id", "selling_location_id", "channel"]
     assert not {"stock_quantity", "latent_units", "expected_rate", "gross_revenue", "realized_unit_price", "promotion_factor"} & set(AI_FEATURE_COLUMNS)
@@ -172,8 +172,8 @@ def test_feature_rows_use_physical_grain_and_no_truth_inventory_revenue(dataset)
     assert all(r["selling_location_id"] in selling for r in rows)
     with pytest.raises(ValueError, match="allowlist"):
         ai_feature_rows([dict(dataset["daily_demand_observations"][0], noise="1")], dataset["product_catalog"], dataset["catalog_categories"])
-    schema = json.loads((ROOT/"ml/contracts/demand_forecast_features.v3.schema.json").read_text())
-    assert set(schema["properties"]) == set(AI_FEATURE_COLUMNS)
+    schema = json.loads((ROOT/"ml/contracts/demand_forecast_features.v3_1.schema.json").read_text())
+    assert set(schema["properties"]) == set(AI_HISTORY_COLUMNS)
 
 
 def test_calendar_lag_does_not_use_previous_sparse_row_or_late_data():
@@ -192,7 +192,7 @@ def test_export_semantic_checks_cannot_be_bypassed_by_recomputed_hashes(tmp_path
     config = replace(CONFIG, days=3, products=8, stores=3)
     generate_demo_dataset(tmp_path, config)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.5.0" and len(source["artifacts"]) == 39
+    assert source["schema_version"] == "2.6.0" and len(source["artifacts"]) == 40
     assert source["watermarks"]["daily_demand_observations"]["complete_through"] == "2026-07-31"
     tables = build_dataset(config)
     tables["daily_demand_observations"].pop()
@@ -229,7 +229,7 @@ def test_ai_feature_export_is_verified_and_not_silently_legacy(tmp_path):
     generate_demo_dataset(source_dir,config)
     manifest = generate_demand_feature_dataset(DemandFeatureGenerationConfig(config,tmp_path,source_dir))
     identity = load_feature_identity_manifest(tmp_path)
-    assert identity["descriptor"]["schema_version"] == manifest["schema_version"] == "3.0"
+    assert identity["descriptor"]["schema_version"] == manifest["schema_version"] == "3.1"
     assert identity["complete_daily_panel"] is True
     assert identity["readiness"] == "not_ready"
 

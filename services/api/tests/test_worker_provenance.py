@@ -10,7 +10,7 @@ from data.generator import identity as source_identity
 from data.generator.configuration import DatasetGenerationConfig
 from data.generator.main import build_dataset
 from ml.features import identity as feature_identity
-from ml.features.ai_demand import AI_FEATURE_COLUMNS
+from ml.features.ai_demand import AI_HISTORY_COLUMNS
 from ml.features.isolated_runtime import WORKER_FILES
 
 
@@ -33,11 +33,11 @@ def test_every_executable_worker_file_changes_identity_and_dirty_provenance(tmp_
     monkeypatch.setattr(feature_identity, "ROOT", tmp_path)
     before = source_identity.code_fingerprint(feature_identity.FEATURE_CODE)
     assert source_identity.code_provenance(before)["code_state"] == "clean"
-    first = feature_identity.feature_identity_from_source(config, descriptor, [], AI_FEATURE_COLUMNS)[0]
+    first = feature_identity.feature_identity_from_source(config, descriptor, [], AI_HISTORY_COLUMNS)[0]
     changed = tmp_path / name
     changed.write_text(changed.read_text() + "\n# changed executable bundle input\n")
     after = source_identity.code_fingerprint(feature_identity.FEATURE_CODE)
-    second = feature_identity.feature_identity_from_source(config, descriptor, [], AI_FEATURE_COLUMNS)[0]
+    second = feature_identity.feature_identity_from_source(config, descriptor, [], AI_HISTORY_COLUMNS)[0]
     assert first != second
     assert before["code_sha256"] != after["code_sha256"]
     assert source_identity.code_provenance(after)["code_state"] == "modified"

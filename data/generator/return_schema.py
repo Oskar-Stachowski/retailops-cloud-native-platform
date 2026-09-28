@@ -74,5 +74,5 @@ RETURN_GRAINS = {
 }
 
 
-def uses_returns(profile: str, schema_version: str = "2.5.0") -> bool:
-    return profile.startswith("ai-") and schema_version in {"2.4.0", "2.5.0"}
+def uses_returns(profile: str, schema_version: str = "2.6.0") -> bool:
+    return profile.startswith("ai-") and schema_version in {"2.4.0", "2.5.0", "2.6.0"}

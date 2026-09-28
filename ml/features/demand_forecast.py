@@ -17,7 +17,7 @@ from data.generator.main import (
     DatasetGenerationConfig,
     build_dataset,
 )
-from ml.features.ai_demand import AI_FEATURE_COLUMNS
+from ml.features.ai_demand import AI_HISTORY_COLUMNS
 from ml.features.identity import (
     IDENTITY_FILENAME,
     feature_identity,
@@ -26,8 +26,14 @@ from ml.features.identity import (
     write_feature_identity_manifest,
 )
 from ml.features.isolated_runtime import isolated_feature_rows
+from ml.features.observation_history import (
+    SCORABLE,
+    aggregate_versions,
+    history_json,
+    observation_at_time,
+)
 
-SCHEMA_VERSION = "2.0"
+SCHEMA_VERSION = "2.1"
 DATASET_NAME = "retailops-demand-forecast-features"
 FEATURE_SCHEMA = "demand_forecast_features.schema.json"
 FEATURE_FILENAME = "features.csv"
@@ -39,7 +45,7 @@ SOURCE_ARTIFACTS = [
     "orders.csv",
     "products.csv",
 ]
-FEATURE_COLUMNS = [
+LEGACY_FEATURE_COLUMNS = [
     "schema_version",
     "dataset_id",
     "feature_row_id",
@@ -58,10 +64,11 @@ FEATURE_COLUMNS = [
     "month",
     "generated_at",
 ]
+FEATURE_COLUMNS = [*LEGACY_FEATURE_COLUMNS, "observation_history"]
 
 
 def feature_columns(profile: str) -> list[str]:
-    return AI_FEATURE_COLUMNS if uses_demand(profile) else FEATURE_COLUMNS
+    return AI_HISTORY_COLUMNS if uses_demand(profile) else FEATURE_COLUMNS
 
 
 @dataclass(frozen=True)
@@ -100,13 +107,27 @@ def forecast_origin_utc(first_target_date: date) -> datetime:
 
 
 def observation_known_at_origin(row: dict[str, object], forecast_date: date) -> bool:
+    return observation_at_origin(row, forecast_date) is not None
+
+
+def observation_at_origin(row: dict[str, object], forecast_date: date) -> dict | None:
     origin = forecast_origin_utc(forecast_date)
+    if _date(row["date"]) >= forecast_date:
+        return None
+    if (
+        row.get("observation_status")
+        in {"missing_data", "unknown_eligibility", "inactive_assortment", "location_closed"}
+        or row.get("source_data_complete") is False
+    ):
+        return None
+    evidence = row.get("source_evidence_available_at")
+    if evidence and _utc_timestamp(evidence) > origin:
+        return None
+    known = observation_at_time(row, origin)
     return (
-        _date(row["date"]) < forecast_date
-        and _utc_timestamp(
-            row["observation_available_at"],
-        )
-        <= origin
+        known
+        if known is not None and known.get("observation_status", "observed_positive") in SCORABLE
+        else None
     )
 
 
@@ -122,6 +143,7 @@ def _build_aggregates(
 ) -> dict[tuple[str, str, str, str], dict[str, object]]:
     orders_by_reference = {_text(order["order_reference"]): order for order in tables["orders"]}
     aggregates: dict[tuple[str, str, str, str], dict[str, object]] = {}
+    events = {}
 
     for sale in tables["sales"]:
         business_date = _text(sale["sold_at"])[:10]
@@ -153,6 +175,7 @@ def _build_aggregates(
                 "units_sold": 0,
                 "observation_available_at": available_at,
             }
+            events[key] = []
 
         aggregate = aggregates[key]
         aggregate["units_sold"] += quantity
@@ -160,6 +183,12 @@ def _build_aggregates(
             aggregate["observation_available_at"],
             available_at,
         )
+        events[key].append((_text(sale["id"]), available_at, quantity))
+
+    for key, aggregate in aggregates.items():
+        history = aggregate_versions(events[key])
+        aggregate["units_sold"] = history[-1]["units_sold"]
+        aggregate["observation_history"] = history_json(history)
 
     return aggregates
 
@@ -203,6 +232,7 @@ def build_demand_feature_rows(
                 "week_of_year": iso_calendar.week,
                 "month": business_date.month,
                 "generated_at": generated_at,
+                "observation_history": aggregate["observation_history"],
             },
         )
 
@@ -226,11 +256,18 @@ def build_feature_manifest(
         raise ValueError(msg)
 
     ai = uses_demand(config.profile)
+    schema_version = str(rows[0]["schema_version"]) if rows else "3.1" if ai else SCHEMA_VERSION
     return {
         "dataset_id": dataset_id,
         "dataset_name": DATASET_NAME,
-        "schema_version": "3.0" if ai else SCHEMA_VERSION,
-        "feature_schema": "demand_forecast_features.v3.schema.json" if ai else FEATURE_SCHEMA,
+        "schema_version": schema_version,
+        "feature_schema": (
+            "demand_forecast_features.v3_1.schema.json"
+            if schema_version == "3.1"
+            else "demand_forecast_features.v3.schema.json"
+        )
+        if ai
+        else FEATURE_SCHEMA,
         "profile": config.profile,
         "grain": ["date", "product_id", "selling_location_id", "channel"] if ai else GRAIN,
         "target": TARGET,
@@ -242,6 +279,7 @@ def build_feature_manifest(
             "daily_demand_observations.csv",
             "product_catalog.csv",
             "catalog_categories.csv",
+            *(["daily_demand_versions.csv"] if schema_version == "3.1" else []),
         ]
         if ai
         else SOURCE_ARTIFACTS,
@@ -284,8 +322,8 @@ def write_feature_dataset(
     with (output_dir / FEATURE_FILENAME).open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(
             file,
-            fieldnames=AI_FEATURE_COLUMNS
-            if manifest["schema_version"] == "3.0"
+            fieldnames=AI_HISTORY_COLUMNS
+            if manifest["schema_version"] == "3.1"
             else FEATURE_COLUMNS,
         )
         writer.writeheader()

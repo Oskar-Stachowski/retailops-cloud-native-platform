@@ -6,11 +6,18 @@ from typing import TYPE_CHECKING
 from data.generator.csv_writer import source_columns, source_table_order
 from data.generator.demand_quality import build_demand_report
 from data.generator.dimension_quality import build_dimensions_report, require
+from data.generator.observation_history import HISTORY_TABLE, validate_daily_versions
 from data.generator.pricing_quality import build_pricing_report
 from data.generator.quality import build_quality_report
 from data.generator.return_quality import build_return_report
 from data.generator.simulation import validate_simulation
-from ml.features.fact_input import FACT_COLUMNS, FACT_INPUT_VERSION, validate_fact_input
+from ml.features.fact_input import (
+    FACT_COLUMNS,
+    FACT_INPUT_VERSION,
+    HISTORY_FACT_COLUMNS,
+    HISTORY_INPUT_VERSION,
+    validate_fact_input,
+)
 from ml.features.worker import transform
 
 if TYPE_CHECKING:
@@ -22,11 +29,12 @@ SOURCE_POLICY = "forecast-source-acceptance-1.0.0"
 
 
 def project_facts(tables: dict) -> dict:
+    columns_by_table = HISTORY_FACT_COLUMNS if HISTORY_TABLE in tables else FACT_COLUMNS
     payload = {
-        "policy_version": FACT_INPUT_VERSION,
+        "policy_version": HISTORY_INPUT_VERSION if HISTORY_TABLE in tables else FACT_INPUT_VERSION,
         "tables": {
             name: [{field: row[field] for field in columns} for row in tables[name]]
-            for name, columns in FACT_COLUMNS.items()
+            for name, columns in columns_by_table.items()
         },
     }
     validate_fact_input(payload)
@@ -34,16 +42,24 @@ def project_facts(tables: dict) -> dict:
 
 
 def _fact_schema(tables: dict, config: ResolvedGenerationConfig) -> int:
-    require(set(tables) == set(source_table_order(config.profile)), "Source table set disagrees.")
+    schema_version = "2.6.0" if HISTORY_TABLE in tables else "2.5.0"
+    require(
+        set(tables) == set(source_table_order(config.profile, schema_version)),
+        "Source table set disagrees.",
+    )
     for name, rows in tables.items():
         require(
-            all(set(row) == set(source_columns(name, config.profile)) for row in rows),
+            all(
+                set(row) == set(source_columns(name, config.profile, schema_version))
+                for row in rows
+            ),
             "Source fact columns reject mixed simulation fields: " + name,
         )
     return sum(map(len, tables.values()))
 
 
 def build_source_report(tables: dict, config: ResolvedGenerationConfig) -> dict:
+    policy = "forecast-source-acceptance-1.1.0" if HISTORY_TABLE in tables else SOURCE_POLICY
     legacy = build_quality_report(config.profile, tables)
     count = sum(map(len, tables.values()))
     checks = [
@@ -69,11 +85,14 @@ def build_source_report(tables: dict, config: ResolvedGenerationConfig) -> dict:
     ):
         report = builder(tables, config)
         checks.extend(report["checks"])
-    for name, operation in {
+    operations = {
         "fact_schema_without_simulation": lambda: _fact_schema(tables, config),
         "simulation_parameters_schema_coverage": lambda: validate_simulation(tables),
         "feature_fact_projection": lambda: len(transform(project_facts(tables))),
-    }.items():
+    }
+    if HISTORY_TABLE in tables:
+        operations["append_only_observation_history"] = lambda: validate_daily_versions(tables)
+    for name, operation in operations.items():
         try:
             sample, status, detail = (
                 operation(),
@@ -85,7 +104,7 @@ def build_source_report(tables: dict, config: ResolvedGenerationConfig) -> dict:
         checks.append(
             {
                 "check_id": name,
-                "policy_version": SOURCE_POLICY,
+                "policy_version": policy,
                 "use_case": "forecast_source",
                 "severity": "hard",
                 "sample_size": sample,
@@ -112,7 +131,7 @@ def build_source_report(tables: dict, config: ResolvedGenerationConfig) -> dict:
         "rag": ("not_applicable", "Source sales qualification does not qualify RAG"),
     }
     return {
-        "policy_version": SOURCE_POLICY,
+        "policy_version": policy,
         "status": "passed" if passed else "failed",
         "checks": checks,
         "source_ready": passed,
@@ -120,7 +139,7 @@ def build_source_report(tables: dict, config: ResolvedGenerationConfig) -> dict:
         "target_type": "observed_sales_units",
         "readiness": {
             name: {
-                "policy_version": SOURCE_POLICY,
+                "policy_version": policy,
                 "sample_size": count,
                 "value": passed if name == "forecast_source" else None,
                 "threshold": True,

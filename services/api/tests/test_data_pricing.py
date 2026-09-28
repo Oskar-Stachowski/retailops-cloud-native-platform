@@ -484,7 +484,7 @@ def test_historical_2_1_source_and_features_keep_identity(tmp_path):
 def test_new_source_classifies_truth_and_reports_both_json_and_md(tmp_path):
     generate_demo_dataset(tmp_path, CONFIG)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.5.0" and len(source["artifacts"]) == 39
+    assert source["schema_version"] == "2.6.0" and len(source["artifacts"]) == 40
     assert source["descriptor"]["versions"]["pricing"] == "retail-pricing-1.0.0"
     truth = next(a for a in source["artifacts"] if a["table"] == "promotion_effect_truth")
     assert truth["data_class"] == truth["temporal_role"] == "simulation_truth"

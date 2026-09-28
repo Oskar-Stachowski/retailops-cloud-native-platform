@@ -212,7 +212,7 @@ def test_export_checks_semantics_even_with_recomputed_hashes_and_schema(tmp_path
     config = replace(CONFIG,days=3,products=8,stores=3)
     generate_demo_dataset(tmp_path,config)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.5.0" and len(source["artifacts"]) == 39
+    assert source["schema_version"] == "2.6.0" and len(source["artifacts"]) == 40
     assert source["descriptor"]["versions"]["returns"] == "retail-returns-1.0.0"
     assert source["watermarks"]["return_events"]["as_of_time"] == "2026-09-09T00:00:00+00:00"
     assert source["watermarks"]["daily_return_cohorts.history"]["as_of_time"] == "2026-08-01T00:00:00+00:00"

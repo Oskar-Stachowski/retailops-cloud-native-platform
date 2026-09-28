@@ -282,8 +282,8 @@ def test_recomputed_manifest_hashes_cannot_bypass_missing_calendar(tmp_path, dim
 def test_new_source_includes_all_dimensions_and_mixed_versions_fail(tmp_path):
     generate_demo_dataset(tmp_path, CONFIG)
     manifest = load_source_manifest_v2(tmp_path)
-    assert manifest["schema_version"] == "2.5.0"
-    assert len(manifest["artifacts"]) == 39
+    assert manifest["schema_version"] == "2.6.0"
+    assert len(manifest["artifacts"]) == 40
     assert manifest["descriptor"]["versions"]["dimensions"] == "retail-dimensions-1.0.0"
     assert any(
         r["path"] == "dimensions_report.json" and r["status"] == "passed"

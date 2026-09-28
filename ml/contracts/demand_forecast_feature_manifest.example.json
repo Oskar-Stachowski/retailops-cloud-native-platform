@@ -1,14 +1,21 @@
 {
   "dataset_id": "retailops-demand-forecast-features-small-2026-04-16-2026-04-30-seed42",
   "dataset_name": "retailops-demand-forecast-features",
-  "schema_version": "2.0",
+  "schema_version": "2.1",
   "feature_schema": "demand_forecast_features.schema.json",
   "profile": "small",
-  "grain": ["date", "product_id", "store_id", "channel"],
+  "grain": [
+    "date",
+    "product_id",
+    "store_id",
+    "channel"
+  ],
   "target": "units_sold",
   "date_start": "2026-04-16",
   "date_end": "2026-04-30",
-  "formats": ["csv"],
+  "formats": [
+    "csv"
+  ],
   "row_count": 15,
   "source_artifacts": [
     "sales.csv",
@@ -17,10 +24,21 @@
   ],
   "forecast_origin_rule": "previous_day_end_utc",
   "available_at_origin_fields": [
-    "date", "product_id", "store_id", "channel", "category", "brand",
-    "day_of_week", "is_weekend", "week_of_year", "month"
+    "date",
+    "product_id",
+    "store_id",
+    "channel",
+    "category",
+    "brand",
+    "day_of_week",
+    "is_weekend",
+    "week_of_year",
+    "month"
   ],
-  "label_fields": ["units_sold", "observation_status"],
+  "label_fields": [
+    "units_sold",
+    "observation_status"
+  ],
   "observation_availability_field": "observation_available_at",
   "inventory_ready": false,
   "complete_daily_panel": false,

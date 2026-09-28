@@ -18,6 +18,7 @@ from data.generator.demand_commerce import generate_demand_commerce
 from data.generator.demand_panel import build_daily_panel
 from data.generator.dimension_schema import uses_dimensions
 from data.generator.dimensions import DimensionIndex, build_dimensions
+from data.generator.observation_history import HISTORY_TABLE, build_daily_versions
 from data.generator.pricing import generate_price_history, generate_promotions
 from data.generator.pricing_plans import (
     build_pricing_plans,
@@ -1023,4 +1024,5 @@ def build_profile_dataset(
             tables, return_boundaries(effective)["history"]
         )
         separate_simulation(tables)
+        tables[HISTORY_TABLE] = build_daily_versions(tables, effective)
     return tables

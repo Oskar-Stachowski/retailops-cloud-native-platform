@@ -16,7 +16,7 @@ from data.generator.simulation_schema import PRODUCT_PARAMETERS, SALE_TRUTH_FIEL
 from data.generator.source_quality import build_source_report, project_facts
 from data.generator.source_realism import build_source_realism
 from ml.features.demand_forecast import DemandFeatureGenerationConfig, build_demand_feature_rows, generate_demand_feature_dataset
-from ml.features.fact_input import FACT_COLUMNS, validate_fact_input
+from ml.features.fact_input import HISTORY_FACT_COLUMNS as FACT_COLUMNS, validate_fact_input
 from ml.features.identity import load_feature_identity_manifest
 from ml.features.isolated_runtime import _run, isolated_feature_rows, verify_runtime_isolation
 from ml.features.worker import transform

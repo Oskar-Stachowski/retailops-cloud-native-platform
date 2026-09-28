@@ -16,7 +16,7 @@ from ml.features.demand_forecast import (
     GRAIN,
     TARGET,
     build_demand_feature_rows,
-    observation_known_at_origin,
+    observation_at_origin,
 )
 from ml.models.baseline_forecast import (
     MODEL_NAME,
@@ -111,9 +111,10 @@ def build_backtest_predictions(
             forecast_date = _row_date(holdout_row)
             train_start = forecast_date - timedelta(days=window_days)
             training_rows = [
-                row
+                known
                 for row in series_rows
-                if train_start <= _row_date(row) and observation_known_at_origin(row, forecast_date)
+                if train_start <= _row_date(row)
+                and (known := observation_at_origin(row, forecast_date)) is not None
             ]
             if not training_rows:
                 skipped_rows += 1

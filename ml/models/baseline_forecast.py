@@ -19,7 +19,7 @@ from ml.features.demand_forecast import (
     GRAIN,
     TARGET,
     build_demand_feature_rows,
-    observation_known_at_origin,
+    observation_at_origin,
 )
 
 MODEL_NAME = "retailops-demand-baseline-moving-average"
@@ -112,7 +112,9 @@ def build_baseline_forecasts(
         cutoff_start = feature_date_end_value - timedelta(days=window_days - 1)
         forecast_date_value = feature_date_end_value + timedelta(days=1)
         known_rows = [
-            row for row in series_rows if observation_known_at_origin(row, forecast_date_value)
+            known
+            for row in series_rows
+            if (known := observation_at_origin(row, forecast_date_value)) is not None
         ]
         if not known_rows:
             continue

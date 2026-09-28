@@ -27,7 +27,7 @@ def test_demand_feature_rows_follow_contract_grain_and_target() -> None:
     assert len(rows) <= len(tables["sales"])
 
     first = rows[0]
-    assert first["schema_version"] == "2.0"
+    assert first["schema_version"] == "2.1"
     assert first["dataset_id"].startswith("features-sha256-")
     assert first["feature_row_id"] == ":".join(str(first[field]) for field in GRAIN)
     assert first[TARGET] >= 0

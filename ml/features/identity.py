@@ -33,7 +33,13 @@ from data.generator.manifest_v2 import (
     config_from_parameters,
     unique_keys,
 )
-from ml.features.ai_demand import AI_FEATURE_COLUMNS, AI_FEATURE_SCHEMA_PATH, validate_ai_records
+from ml.features.ai_demand import (
+    AI_FEATURE_COLUMNS,
+    AI_FEATURE_SCHEMA_PATH,
+    AI_HISTORY_COLUMNS,
+    AI_HISTORY_SCHEMA_PATH,
+    validate_ai_records,
+)
 
 IDENTITY_FILENAME = "feature_identity_manifest.json"
 SCHEMA_PATH = "ml/contracts/demand_forecast_features.schema.json"
@@ -51,6 +57,8 @@ FEATURE_CODE = (
     "ml/features/isolated_runtime.py",
     "ml/features/runtime_probe.py",
     AI_FEATURE_SCHEMA_PATH,
+    AI_HISTORY_SCHEMA_PATH,
+    "ml/features/observation_history.py",
 )
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -60,12 +68,14 @@ class FeatureDescriptor(Contract):
     role: Literal["features"]
     owner: Literal["retailops-cloud-native-platform"]
     parent_ids: list[Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]]
-    schema_version: Literal["2.0", "3.0"]
+    schema_version: Literal["2.0", "2.1", "3.0", "3.1"]
     feature_schema_sha256: SHA256
     transformation_version: Literal[
         "observed-demand-identity-1.0.0",
         "daily-demand-panel-features-1.0.0",
         "daily-demand-facts-worker-1.0.0",
+        "daily-demand-history-worker-1.0.0",
+        "observed-demand-history-1.0.0",
     ]
     code_sha256: SHA256
     dependency_sha256: SHA256
@@ -119,13 +129,13 @@ def feature_identity_from_source(
         "role": "features",
         "owner": "retailops-cloud-native-platform",
         "parent_ids": [source_id],
-        "schema_version": "3.0" if ai else "2.0",
+        "schema_version": "3.1" if ai else "2.1",
         "feature_schema_sha256": file_sha256(
-            ROOT / (AI_FEATURE_SCHEMA_PATH if ai else SCHEMA_PATH)
+            ROOT / (AI_HISTORY_SCHEMA_PATH if ai else SCHEMA_PATH)
         ),
-        "transformation_version": "daily-demand-facts-worker-1.0.0"
+        "transformation_version": "daily-demand-history-worker-1.0.0"
         if ai
-        else "observed-demand-identity-1.0.0",
+        else "observed-demand-history-1.0.0",
         "code_sha256": fingerprint["code_sha256"],
         "dependency_sha256": fingerprint["dependency_sha256"],
         "python_version": fingerprint["python_version"],
@@ -179,11 +189,17 @@ def write_feature_identity_manifest(
 def identity_columns_for_schema(schema_version: str, columns: list[str] | None) -> list[str]:
     if columns is not None:
         return columns
+    if schema_version == "3.1":
+        return AI_HISTORY_COLUMNS
     if schema_version == "3.0":
         return AI_FEATURE_COLUMNS
     import ml.features.demand_forecast as legacy_features  # noqa: PLC0415 - avoid import cycle
 
-    return legacy_features.FEATURE_COLUMNS
+    return (
+        legacy_features.LEGACY_FEATURE_COLUMNS
+        if schema_version == "2.0"
+        else legacy_features.FEATURE_COLUMNS
+    )
 
 
 def validate_feature_identity_manifest(
@@ -196,15 +212,19 @@ def validate_feature_identity_manifest(
     source_descriptor = manifest.source_descriptor.model_dump(exclude_unset=True)
     source_id = "source-sha256-" + json_sha256(source_descriptor)
     columns = identity_columns_for_schema(descriptor["schema_version"], columns)
-    ai = descriptor["schema_version"] == "3.0"
+    ai = descriptor["schema_version"] in {"3.0", "3.1"}
     expected_transform = (
         (
-            "daily-demand-facts-worker-1.0.0"
+            "daily-demand-history-worker-1.0.0"
+            if source_descriptor["schema_version"] == "2.6.0"
+            else "daily-demand-facts-worker-1.0.0"
             if source_descriptor["schema_version"] == "2.5.0"
             else "daily-demand-panel-features-1.0.0"
         )
         if ai
         else "observed-demand-identity-1.0.0"
+        if descriptor["schema_version"] == "2.0"
+        else "observed-demand-history-1.0.0"
     )
     if (
         ai
@@ -233,7 +253,13 @@ def validate_feature_identity_manifest(
     provenance = manifest.provenance.model_dump()
     if (
         descriptor["feature_schema_sha256"]
-        != provenance["code_files"].get(AI_FEATURE_SCHEMA_PATH if ai else SCHEMA_PATH)
+        != provenance["code_files"].get(
+            AI_HISTORY_SCHEMA_PATH
+            if descriptor["schema_version"] == "3.1"
+            else AI_FEATURE_SCHEMA_PATH
+            if ai
+            else SCHEMA_PATH
+        )
         or source_descriptor["dependency_sha256"] != descriptor["dependency_sha256"]
         or source_descriptor["python_version"] != descriptor["python_version"]
     ):

@@ -26,14 +26,15 @@ from data.generator.dimension_schema import (
     DIMENSIONS_VERSION,
     uses_dimensions,
 )
+from data.generator.observation_history import HISTORY_TABLE, HISTORY_VERSION, uses_history
 from data.generator.pricing_schema import PRICING_CLASSES, PRICING_VERSION, uses_pricing
 from data.generator.return_schema import RETURN_CLASSES, RETURNS_VERSION, uses_returns
 from data.generator.simulation_schema import SIMULATION_COLUMNS, SIMULATION_VERSION, uses_separation
 
 ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_VERSION = "0.7.0"
-CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.5.0"
-SOURCE_SCHEMA_VERSION = "2.5.0"
+GENERATOR_VERSION = "0.8.0"
+CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.6.0"
+SOURCE_SCHEMA_VERSION = "2.6.0"
 INTEGER_FIELDS = {
     "observed_units",
     "observed_orders",
@@ -155,6 +156,7 @@ DATA_CLASSES.update(
     )
 )
 DATA_CLASSES.update(dict.fromkeys(("price_history", "promotions"), "source_plan"))
+DATA_CLASSES[HISTORY_TABLE] = "source_observation"
 DATA_CLASSES.update(DIMENSION_CLASSES)
 DATA_CLASSES.update(PRICING_CLASSES)
 DATA_CLASSES.update(DEMAND_CLASSES)
@@ -264,9 +266,11 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
             "data/contracts/retail_demand.v1.schema.json",
             "data/contracts/retail_returns.v1.schema.json",
             "data/contracts/retail_simulation.v1.schema.json",
+            "data/contracts/observation_history.v1.schema.json",
             "ml/features/fact_input.py",
             "ml/features/worker.py",
             "ml/features/ai_demand.py",
+            "ml/features/observation_history.py",
             "data/__init__.py",
             "ml/__init__.py",
             "ml/features/__init__.py",
@@ -348,6 +352,7 @@ def source_identity(
             "simulation": SIMULATION_VERSION
             if uses_separation(config.profile)
             else "not_applicable",
+            "history": HISTORY_VERSION if uses_history(config.profile) else "not_applicable",
             "canonicalization": CANONICALIZATION_VERSION,
             "csv_schema": "1.0",
         },
