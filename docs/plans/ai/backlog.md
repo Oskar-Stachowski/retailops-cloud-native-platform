@@ -1,39 +1,31 @@
 # Najbliższe prace po audycie AI 00
 
 Baza: [pomiary na `cbf28b2`](../../evidence/ai/00/README.md), 27.09.2026.
-**Etap 01 w realizacji; następny zakres: tożsamość i uprawnienia API.**
-[Pakiet, HTTP, persistence i kontrakty](../../evidence/ai/01/README.md) działają
-w osobnym repo `retailops-ai-intelligence`. Kontrakty mają wersję 1.0, fixtures,
-semantyczną walidację offline i wymaganą bramkę CI.
+**Etap 01: lokalny zakres ma odbiór; pozostaje zdalny CI po push.**
+[Pakiet, HTTP, persistence, kontrakty i lokalne auth](../../evidence/ai/01/README.md)
+działają w osobnym repo `retailops-ai-intelligence`. 267 testów, czysty checkout
+oraz rzeczywisty HTTP z zainstalowanego wheel mają lokalne dowody.
 Ten plik zawiera otwartą pracę, a [audyt](../../audits/open-findings.md)
-dowody błędów i kryteria ich zamknięcia. 01 pozostaje częściowy, 02–17 planowane.
+dowody błędów i kryteria ich zamknięcia. 01 pozostaje in_progress, 02–17 planowane.
 
-## Następny mały PR etapu 01
+## Pozostały odbiór etapu 01
 
 **Repo:** `retailops-ai-intelligence`, branch `ai/implementation`.
-[Działający fundament](../../evidence/ai/01/README.md) obejmuje pełny lokalny stos
-oraz kontrakty danych/run/tool. Instrukcje obsługi i walidacji są w docs repo AI.
+Nowe commity persistence/kontraktów/auth nie zostały wypchnięte. Odczyt GitHub
+28.09.2026 potwierdza required-result i success bazowego 7d67530; nie odbiera HEAD.
 
-**Zakres:** warstwa tożsamości i uprawnień pierwszych endpointów aplikacyjnych,
-zanim udostępnimy dane biznesowe. Uzgodnić verified principal, role/scopes oraz
-bezpieczne odpowiedzi odmowy i rozdzielić je od tokenu metryk.
-Nie używać caller-supplied user_id lub demo-admin RetailOps jako zaufanej tożsamości.
+Po push odbierz Required CI dokładnego SHA nowych commitów: checks, secrets,
+persistence i required-result muszą mieć success. Zweryfikuj ochronę main,
+zapisz link/revision i evidence. Nie zastępuj zdalnego wyniku lokalnymi testami.
+Nie pomijaj nowego joba rzeczywistego smoke ani path/contract gates.
+Jeżeli CI pokaże błąd, popraw go, ponów kontrole i odbierz nowy SHA.
+Dopiero ten odbiór pozwala zamknąć rejestr etapu 01 i przejść do źródła 02.
 
-**Odbiór tego PR:**
-
-- Principal pochodzi ze zweryfikowanych poświadczeń. Brak/niepoprawne poświadczenie
-  daje 401, brak wymaganego uprawnienia 403, bez wycieku danych lub tokenu.
-- Scope produktu/selling location/kanału jest egzekwowany; podmiana ID lub roli
-  w parametrach/body nie rozszerza dostępu. Nowe endpointy administracyjne są chronione.
-- Testy pozytywne i odmowy, bez AWS, obejmują nowy kod i required CI.
-  Zachować dotychczasowe HTTP, sondy, kontrakty, CLI, DB/MLflow i migracje.
-- Opisać bezpieczne uruchomienie, granice lokalnego auth i evidence. Nie deklarować
-  produkcyjnego IAM, działającego agenta lub serving na podstawie warstwy auth.
-
-Po push odebrać zdalny Required CI nowych commitów, w tym job persistence.
-Main ma required-result, a CI bazowego 7d67530 ma success; lokalne nowe commity
-nie mają jeszcze zdalnego odbioru. Token metryk nie jest auth użytkowników,
-MLflow ma lokalną granicę sieciową. Cały etap 01 pozostaje otwarty.
+Lokalny auth jest owner-only mapą z opaque credentials, explicit capabilities
+oraz whole-scope check. Polityka jest snapshotem: revoke/grants/rotation wymagają
+restartu, expiry działa per request. Forecast-check nie czyta danych lub modelu;
+Compose nie montuje polityki, a MLflow nie ma aplikacyjnego auth. Dalszy serving,
+IdP/tenant/audit i uprawnienia danych mają własne etapy i nie są obiecywane przez 01.
 
 ## Pierwszy mały PR etapu 02
 

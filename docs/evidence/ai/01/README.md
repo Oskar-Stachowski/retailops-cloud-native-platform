@@ -1,7 +1,8 @@
-# Fundament AI 01 — persistence i kontrakty
+# Fundament AI 01 — lokalne auth, kontrakty i persistence
 
 Aktualizacja: **2026-09-28**. Działa pakiet, HTTP, lokalny stos
-PostgreSQL/pgvector/MLflow i wykonywalne kontrakty danych/run/tool z walidacją offline.
+PostgreSQL/pgvector/MLflow, kontrakty danych/run/tool i lokalne poświadczenia/scope API.
+[Raport auth](access.json) dotyczy implementacji `01eca67` i dowodów `2f067c6`.
 [Raport kontraktów](contracts.json) dotyczy implementacji `ae21d4e` i dowodów
 `40ad85c`; osobny [raport persistence](persistence.json) implementacji `7e0978b`.
 Cały etap 01 pozostaje `in_progress`.
@@ -20,14 +21,56 @@ tego zakresu pozostają lokalne.
 | `7bd17e65a3bb5416620526a8b48e14986923d140` | Dowody czystego checkoutu i nowych wolumenów oraz odczyt bieżącego stanu GitHub. |
 | `ae21d4e37dc56fb6d12c53f103190aa663b9a0f0` | Kontrakty v1 dataset/feature/label/split/model/prediction/run/tool/bundle, schemas, fixtures, semantyczny CLI i wymagana bramka CI; 208 testów. |
 | `40ad85c39551f00546b994e902e476f0b171ac07` | Odbiór czystego checkoutu, paczki wheel poza źródłami oraz blokady celowo błędnego schema. |
+| `01eca67b1af4d0e082770ddb3e26dee601fa9d02` | Prywatne poświadczenia, immutable principal i whole-scope/capabilities; chronione identity, preflight i admin metadata, schemas oraz 267 testów. |
+| `2f067c68cb5931ef31578f724e496f5381b3ae6a` | Dowody czystego checkoutu i rzeczywistego auth HTTP z wheel, z restartem po revoke. |
 
 Pełne komendy, wyniki i sumy kodu/artefaktów są w repo AI:
-`docs/evidence/01-http.md/json`, `01-persistence.md/json` i `01-contracts.md/json`.
+`docs/evidence/01-http.md/json`, `01-persistence.md/json`, `01-contracts.md/json` i `01-access.md/json`.
 Bieżące uruchomienie i ograniczenia opisują `docs/http-service.md`,
-`docs/local-stack.md`, `docs/data-contracts.md`, `docs/development.md` i `docs/STATUS.md`. Ten wpis wskazuje dowody
+`docs/local-stack.md`, `docs/data-contracts.md`, `docs/access-control.md`,
+`docs/development.md` i `docs/STATUS.md`. Ten wpis wskazuje dowody
 między repozytoriami; nie tworzy drugiej instrukcji obsługi.
 
-## Kontrakty — aktualny odbiór 28.09.2026
+## Lokalna tożsamość i uprawnienia — odbiór 28.09.2026
+
+Czysty checkout `01eca67`, nowy venv: `make bootstrap ci-local` — exit 0,
+**267 passed in 12.27s**, bez pominięć. Ruff/format, Mypy strict (48 plików),
+docs/contracts/snapshots, wheel/sdist, Compose config i skany sekretów przechodzą.
+Actionlint przechodzi. Runtime dependencies i lockfile pozostają zgodne;
+diagnostyczny OpenAPI oraz intelligence fixtures nie zmieniły się.
+
+- Prywatna mapa poza Git: server grants/capabilities, fingerprints losowych
+  tokenów oraz not-before/expiry/revoked. Loader odrzuca symlink/FIFO/inne UID,
+  otwarte permissions, niepoprawny/za duży/niejednoznaczny JSON i błędne references.
+- Identity, forecast scope preflight i admin policy metadata wymagają credentials.
+  401 dla braku lub błędu; 403 dla braku capability lub choć jednej obcej jednostki.
+  Role nie są hierarchiczne, admin bez jawnego forecast:read nie uzyskuje odczytu.
+- Body/query/header role/user_id, cookie lub duplicate Authorization nie nadają
+  tożsamości. Token metryk jest osobny, reuse odrzucany. Request ma limity i
+  bezpieczne błędy; logi/metryki nie zawierają tokenów, fingerprintów lub danych body.
+- Schemas/OpenAPI mają pozytywne/negatywne testy i wymaganą bramkę; celowo usunięte
+  security ze snapshotu daje exit 1. access-init nie drukuje tokenów i nie nadpisuje
+  istniejących plików: katalog 0700, policy/client credentials 0600.
+
+Wheel zainstalowano poza checkoutem w osobnym venv z produkcyjnymi zależnościami
+z lockfile i hash verification; `uv pip check` przechodzi, import z site-packages,
+bez jsonschema dev. Rzeczywisty HTTP: identity 401/200, scope 200 i trzy 403,
+admin 403/200, admin→forecast 403, podszyty principal 422; health/readiness 200.
+Po zmianie revoked na dysku działający proces zachował snapshot. Restart odrzucił
+token 401. Oba procesy zakończyły lifespan, bez sekretów/private path w logach,
+bez katalogu artefaktów. Po fast-forward docelowego repo: locked bootstrap,
+**60 testów auth/rzeczywistych procesów in 3.19s** i snapshots przechodzą;
+worktree pozostaje czysty.
+
+Forecast-check to autoryzacja zakresu, bez odczytu prognozy lub walidacji source IDs.
+Polityka jest lokalnym startup snapshotem: grants/revoke/rotation wymagają restartu,
+expiry działa per request. Nie ma OIDC/JWT/publicznego IAM/tenant/audit store,
+rate limiter, rzeczywistego tool executora lub serving. Obecny Compose nie montuje
+policy, więc /api/v1 pozostaje zamknięte; MLflow nie ma aplikacyjnego auth.
+Nie ponawiano pełnego DB/crash/restart smoke; wcześniejszy pomiar niżej pozostaje
+osobny. Lokalny zakres 01 ma odbiór; zdalny Required CI nowych commitów czeka na push.
+
+## Kontrakty — osobny odbiór 28.09.2026
 
 Czysty checkout `ae21d4e`, nowy venv: `make bootstrap ci-local` — exit 0,
 **208 passed in 9.56s**, bez pominięć. Ruff/format, Mypy strict (40 plików),
@@ -95,7 +138,7 @@ a worktree pozostał czysty.
 Odczyt GitHub 28.09.2026: main chronione z wymaganym required-result,
 [Required CI bazowego 7d67530 ma success](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36383297184).
 Zdalnego CI nowej implementacji nie wykonano, bo nowe commity nie zostały wypchnięte.
-Cały etap 01 pozostaje otwarty: [tożsamość, uprawnienia i zdalny CI](../../../plans/ai/backlog.md).
+Cały etap 01 pozostaje otwarty: [odbiór zdalnego CI nowych commitów](../../../plans/ai/backlog.md).
 Nie odebrano Linux x86_64 runtime, backup/restore, modeli, RAG, OTLP ani AWS.
 
 ## HTTP — wcześniejszy pomiar 27.09.2026

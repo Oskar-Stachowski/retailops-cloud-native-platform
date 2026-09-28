@@ -9,6 +9,11 @@ dataset/feature/label/split/model/prediction/run/tool/bundle w repo AI.
 [Odbiór](../../../evidence/ai/01/README.md) wskazuje kod i ograniczenia: schemas
 nie implementują importu, workerów, modeli, tool executora, auth ani streamingu.
 
+Osobno wdrożono lokalny principal/capabilities/scope dla pierwszych /api/v1
+w repo AI. [Odbiór](../../../evidence/ai/01/README.md) opisuje opaque credentials,
+401/403 i restart po zmianie polityki. Nie jest to jeszcze auth tool executora,
+OIDC/AWS, produkcyjny serving ani izolacja tenantów.
+
 ## 1. Mapa integracji z API RetailOps
 
 Poniższe ścieżki są zasobami RetailOps, a nie AI `/api/v1`. Bazowy adres należy odczytać z konfiguracji deploymentu; nie dopisywać automatycznie prefiksu AI.

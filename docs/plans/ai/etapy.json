@@ -25,9 +25,9 @@
       "status": "in_progress",
       "evidence": "../../evidence/ai/01/README.md",
       "implementation_repository": "retailops-ai-intelligence",
-      "implementation_commit": "ae21d4e37dc56fb6d12c53f103190aa663b9a0f0",
-      "evidence_commit": "40ad85c39551f00546b994e902e476f0b171ac07",
-      "next_scope": "Tożsamość i uprawnienia pierwszych endpointów aplikacyjnych; po push zdalny Required CI nowych commitów, w tym persistence."
+      "implementation_commit": "01eca67b1af4d0e082770ddb3e26dee601fa9d02",
+      "evidence_commit": "2f067c68cb5931ef31578f724e496f5381b3ae6a",
+      "next_scope": "Odbiór zdalnego Required CI nowych commitów po push, w tym persistence, i weryfikacja ochrony main. Po zamknięciu 01: DATA-01 w etapie 02."
     },
     {
       "id": "02",
