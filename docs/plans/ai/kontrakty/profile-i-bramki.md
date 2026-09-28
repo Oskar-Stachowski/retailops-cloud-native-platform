@@ -1,6 +1,21 @@
 # Profile, budżety i bramki odbioru
 
-**Status: propozycja wersjonowanej polityki do wdrożenia.** Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku ani zatwierdzoną polityką obecnego RetailOps. Przy wdrożeniu utrwal docelową politykę w tym dokumencie i maszynowej konfiguracji o tej samej wersji. Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
+**Status: konfiguracja, identity, wymiary, kalendarz, ceny/promocje, popyt/panel/koszyki oraz chronologia/zwroty mają lokalny odbiór;
+pełne źródło ma lokalny odbiór, bramki modeli pozostają planem.**
+[Konfiguracja 1.0.0](../../../../data/generator/configuration.py) jest wykonywalnym źródłem
+rozmiarów i dat. Profile AI mają [kanoniczne wymiary](../../../reference/retail-dimensions.md),
+stock locations, ważne pary i osiem hard gates wymiarów oraz
+[znane plany cen/promocji](../../../reference/retail-pricing.md) i sześć bramek cenowych.
+[Odbiór DATA-04](../../../evidence/ai/02/data04/README.md) potwierdza coverage cen
+i uzgodnienie transakcji. [Popyt/panel/koszyki](../../../evidence/ai/02/demand-panel/README.md)
+mają pełny ważny panel, cechy 3.0 i sześć bramek demand. Obserwacje cen są sparse;
+eksport nadal jest CSV. [DATA-03](../../../evidence/ai/02/data03/README.md)
+ma siedem bramek chronologii/zwrotów, dwa cutoffy i 39-dniowy ogon.
+[DATA-05](../../../evidence/ai/02/data05/README.md) kwalifikuje source 2.6:
+46 hard gates, rozdzielone parametry i izolowany worker z czterema projekcjami faktów oraz historią obserwacji as-of.
+Chunked Parquet, immutable snapshot/import i dalsze bramki wymagają implementacji.
+Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
+Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 
 ## 1. Jeden zestaw profili
 
@@ -24,7 +39,7 @@ Development używa seed 42. Końcowa robustness policy obejmuje wcześniej zamro
 ## 2. Budżet wykonania i plików
 
 - Standardowe CI uruchamia schema smoke i temporal smoke. Proponowany budżet początkowy: 5 minut i 1 GiB peak RSS na każdy kompletny profil bez pobierania zależności; pierwszy benchmark w etapie 03 potwierdza albo jawnie koryguje limit. To docelowa bramka, nie zmierzony obecny wynik.
-- Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; tylko jeden `ai-smoke`, bez pełnego training export. Temporal smoke jest generowany w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
+- Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; co najwyżej jeden bieżący `ai-smoke`, bez pełnego training export. Małe archiwa wcześniejszych wersji służą wyłącznie regresji odczytu i łącznie mieszczą się w tym limicie, zgodnie z [polityką plików](dane-i-czas.md). Bieżące smoke i temporal smoke są generowane w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
 - `ai-dev` i `ai-training` zapisuje się chunkami. Raport mierzy czas, peak memory, rows/s oraz bytes. Jeżeli pełny profil przekracza zasoby, poprawić zapis/przetwarzanie lub jawnie stworzyć nowy mniejszy profil; nie nazywać go dotychczasowym `ai-training`.
 - Koszt zależności, pobierania obrazów, treningu TensorFlow i calls do Bedrock raportować oddzielnie; smoke dataset nie jest budżetem całej platformy.
 

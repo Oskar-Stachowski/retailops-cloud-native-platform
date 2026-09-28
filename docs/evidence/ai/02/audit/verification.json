@@ -1,0 +1,371 @@
+{
+  "audited_at_utc": "2026-09-28T15:32:00.823283+00:00",
+  "audited_commit": "152341e4e217c5eac4c700e9e9d67c2eb61090ef",
+  "branch": "ai/02-data-05",
+  "code_provenance": {
+    "all_files_in_source_and_feature_fingerprints": true,
+    "each_mutation_changes_code_hash_and_feature_id_for_equal_rows": true,
+    "executable_worker_files": 7,
+    "historical_ids_preserved": true,
+    "modified_code_provenance_detected": true,
+    "test": "services/api/tests/test_worker_provenance.py"
+  },
+  "coverage": {
+    "branches-covered": 326,
+    "branches-valid": 502,
+    "combined_line_branch_percent": 83.82,
+    "lines-covered": 2674,
+    "lines-valid": 3077,
+    "remote_threshold_percent": 80,
+    "threshold_percent": 70,
+    "xml_sha256": "db0fb2abf711f57e32f6c77d88c3fbcac9325e303dfffb1be14ae24ea68e86da"
+  },
+  "database": {
+    "address": "127.0.0.1:59649",
+    "cleanup": {
+      "command": [
+        "docker",
+        "stop",
+        "retailops-ai02-history-postgres"
+      ],
+      "exit_code": 0,
+      "matching_containers": [],
+      "removed": true,
+      "verified_with": [
+        "docker",
+        "ps",
+        "-a",
+        "--filter",
+        "name=retailops-ai02-history-postgres",
+        "--format",
+        "{{.Names}}"
+      ]
+    },
+    "container": "retailops-ai02-history-postgres",
+    "database_name": "history",
+    "fresh": true,
+    "image": "postgres:16-alpine",
+    "isolated_fresh_database": true,
+    "migration": {
+      "command": [
+        "env",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
+        "PYTHONPATH=.",
+        ".venv/bin/alembic",
+        "upgrade",
+        "head"
+      ],
+      "cwd": "services/api",
+      "exit_code": 0
+    },
+    "migration_head": "6b0f1c2d3e4a",
+    "named_volume": false,
+    "seed": {
+      "command": [
+        "env",
+        "DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:59649/history",
+        "PYTHONPATH=.",
+        "RETAILOPS_SEED_DATA_PROFILE=demo",
+        ".venv/bin/python",
+        "scripts/seed_demo_data.py"
+      ],
+      "cwd": "services/api",
+      "exit_code": 0,
+      "profile": "demo",
+      "summary": {
+        "alerts": 4,
+        "anomalies": 4,
+        "forecasts": 6,
+        "inventory_snapshots": 8,
+        "products": 8,
+        "recommendations": 4,
+        "sales": 16,
+        "users": 4,
+        "workflow_actions": 4
+      }
+    },
+    "volume": "none"
+  },
+  "decision": {
+    "entry_blockers": [],
+    "models_or_production_ready": false,
+    "open_findings": [
+      "DATA-06",
+      "OPS-03",
+      "OPS-06",
+      "OPS-07"
+    ],
+    "scope": "bounded synthetic observed_sales_units snapshot",
+    "start_ai03": true
+  },
+  "fingerprints": {
+    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+    "feature_code_sha256": "7dce996c9eea3de4afdf5b3e09ced01453d23e59b9f37901ea0452be82f32bc5",
+    "source_code_sha256": "0f702a65ebcdb3d78770b08a4f20c901b06211f04b0fe8b2d8d22aa0e5aa6d3b"
+  },
+  "fresh_pytest": {
+    "errors": 0,
+    "exit_code": 0,
+    "failures": 0,
+    "path": "/private/tmp/retailops-ai02-history-tests.xml",
+    "seconds": 662.167,
+    "sha256": "3c4e812b82ad3de63dc64cff69ef94146e6be0e709829c6ee53f24e968b7ffc5",
+    "skipped": 0,
+    "tests": 670
+  },
+  "implementation_commit": "5a8678c51f0343c528fc55b030dbfd1cf246aff8",
+  "limits": [
+    "No new model training or full-profile benchmark",
+    "No full cross-repo replay, inventory ledger, model serving or production qualification"
+  ],
+  "next_scope": "AI03.1: typed Parquet and artifact policy in RetailOps",
+  "observation_history": {
+    "append_only_api": true,
+    "external_import_and_immutable_snapshots": "AI03 preserves these guarantees; not implemented here",
+    "feature_field": "observation_history",
+    "later_sales_and_quantity_replacements_preserve_old_features_and_predictions": true,
+    "missing_history_status": "missing_history",
+    "policy": "observed-quantity-history-1.0.0",
+    "source_table": "daily_demand_versions",
+    "test": "services/api/tests/test_observation_history.py",
+    "training_labels_selected_at_fold_origin": true
+  },
+  "platform": {
+    "architecture": "arm64",
+    "python": "3.11.15",
+    "system": "Darwin",
+    "worker": "Linux ARM64 via Docker Desktop"
+  },
+  "policy_version": "ai02-readiness-audit-1.1.0",
+  "remote_ci": {
+    "branch_protection_retained": true,
+    "required_context": "required-result",
+    "status": "pending_publication"
+  },
+  "source_acceptance": {
+    "cases": 9,
+    "checks_per_case": 46,
+    "elapsed_seconds": 137.5015,
+    "facts_projection_policy": "forecast-facts-2.0.0",
+    "feature_schema": "3.1",
+    "generator": "0.8.0",
+    "historical_exports": {
+      "2.0.0": {
+        "feature_id": "features-sha256-bdb259d15fd67e0af15dbce1465ff480ae93421125bde83231b0bf5730a9db13",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-b4d2a6cf560129ce23374841340e65897a7b09becbe4749e1352c3f150bc1309"
+      },
+      "2.1.0": {
+        "feature_id": "features-sha256-a6de899cb7a6940f93941a1ef0ce67824aa765c9ba9fa78ff9921a99843130ed",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-ae37e69c364eb75d0db8d994c3096313d216046d3dc413b77d9896528823da50"
+      },
+      "2.2.0": {
+        "feature_id": "features-sha256-3b61cd73d4e27488b767004d6a4fa90a66f58a9591541f85920a67ade27db1f0",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-b8d99ab8e08f59d344be2cc42599e138b80f31d213cca4a89ddc1688e334135b"
+      },
+      "2.3.0": {
+        "feature_id": "features-sha256-f813965e89e513871a77ee5e8ca23080faa22dc9efc82e295fd79f90eacd3b20",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-f93e0b7c0949fce7e1893f2dff63ef818b3c8fa7989bead422c5febe0a33260d"
+      },
+      "2.4.0": {
+        "feature_id": "features-sha256-daf83f0b54c4ba8901bc6fd0050735c35614c1ba800cdfcbe418d0484e52f6db",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-d6562b0397df3a18a45c9fe419910f11b086c99cfd498b5d55881f2d67e81e2c"
+      },
+      "2.5.0": {
+        "feature_id": "features-sha256-662447c8a6002cde3084489bf7eb7157d1dcbf29ad56acc52e9481d5ae9f7f07",
+        "identity_and_parent_unchanged": true,
+        "source_id": "source-sha256-608e4b784829f05628195c52ab403409ccbd61ada13ac1e1b34c5392a585e4d8"
+      }
+    },
+    "legacy_compatibility": {
+      "demo_csv_count": 17,
+      "small_csv_count": 17,
+      "tracked_demo_files_unchanged": 19
+    },
+    "measurement_scope": "sequential bounded supervisor; container RSS not measured, worker memory limit 256 MiB",
+    "path": "../data05/acceptance.json",
+    "process_peak_rss_bytes": 149848064,
+    "profiles": [
+      {
+        "feature_id": "features-sha256-869f9edea5e4c685772723cab2b02c5edf8d8d08fba6d1f5c916aee3488c186c",
+        "feature_rows": 1612,
+        "profile": "ai-smoke",
+        "source_csv_count": 40,
+        "source_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00"
+      },
+      {
+        "feature_id": "features-sha256-5d7e3237f1ebf897981834933e815ae51482486061be5072ccc00953d8d24390",
+        "feature_rows": 2406,
+        "profile": "ai-temporal-smoke",
+        "source_csv_count": 40,
+        "source_id": "source-sha256-94829460645140b79a6f68e87194f74d2c8e55392e2702a9fecbe6b771116d22"
+      }
+    ],
+    "repeat_checks": {
+      "same_source_feature_ids_bytes_reports": true
+    },
+    "runtime": {
+      "image": "python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff",
+      "negative_inputs": {
+        "daily_demand_truth": "rejected_by_isolated_worker",
+        "inventory_snapshots": "rejected_by_isolated_worker"
+      },
+      "policy_version": "facts-docker-runtime-1.0.0",
+      "probes": {
+        "docker_socket_absent": true,
+        "generator_absent": true,
+        "host_canary_absent": true,
+        "host_workspace_absent": true,
+        "network_absent": true,
+        "source_mount_absent": true,
+        "supplied_source_path_absent": true,
+        "truth_files_absent": true,
+        "unprivileged": true,
+        "worker_readonly": true
+      },
+      "supervisor": "trusted source owner validates and projects facts; only worker is the isolated runtime"
+    },
+    "sha256": "baf3acf9ce2ab84b90eda51daecafbc8bd7345e916227a19323fb17715038c75",
+    "source_gate_policy": "forecast-source-acceptance-1.1.0",
+    "source_schema": "2.6.0",
+    "status": "passed"
+  },
+  "static_checks": [
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "services/api/app",
+        "services/api/scripts",
+        "services/api/tests",
+        "data",
+        "ml",
+        "scripts/data/verify_data05.py",
+        "scripts/ci/ml_experiment_report.py"
+      ],
+      "exit_code": 0,
+      "name": "ruff",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "services/api/app",
+        "services/api/scripts",
+        "services/api/tests",
+        "data",
+        "ml",
+        "scripts/data/verify_data05.py",
+        "scripts/ci/ml_experiment_report.py"
+      ],
+      "exit_code": 0,
+      "name": "format",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "pyproject.toml"
+      ],
+      "exit_code": 0,
+      "name": "mypy",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "bandit",
+        "--severity-level",
+        "high",
+        "--confidence-level",
+        "high",
+        "-q",
+        "-r",
+        "services/api/app",
+        "services/api/scripts",
+        "data/generator",
+        "ml/features",
+        "-f",
+        "txt",
+        "-o",
+        "/private/tmp/retailops-ai02-history-bandit.txt"
+      ],
+      "exit_code": 0,
+      "name": "bandit",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-code-gitleaks.json"
+      ],
+      "exit_code": 0,
+      "name": "gitleaks_code",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-docs-gitleaks.json"
+      ],
+      "exit_code": 0,
+      "name": "gitleaks_documentation",
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/gitleaks",
+        "git",
+        "--log-opts=origin/main..HEAD",
+        "--redact",
+        "--no-banner",
+        "--report-format",
+        "json",
+        "--report-path",
+        "/private/tmp/retailops-ai02-history-all-commits-gitleaks.json"
+      ],
+      "commits_scanned": 17,
+      "exit_code": 0,
+      "name": "gitleaks_all_ai02_commits",
+      "status": "passed"
+    }
+  ],
+  "static_scope": {
+    "bandit_confidence": "high",
+    "bandit_report_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bandit_severity": "high",
+    "mypy_configured_files": 5,
+    "ruff_formatted_files": 152,
+    "ruff_tests_excluded_by_project_policy": true
+  }
+}

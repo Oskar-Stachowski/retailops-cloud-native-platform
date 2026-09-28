@@ -41,7 +41,7 @@ from ml.features.demand_forecast import (
     GRAIN,
     TARGET,
     build_demand_feature_rows,
-    observation_known_at_origin,
+    observation_at_origin,
 )
 from ml.features.demand_forecast import SCHEMA_VERSION as FEATURE_SCHEMA_VERSION
 from ml.models.baseline_forecast import _prediction_value
@@ -156,9 +156,9 @@ def build_training_features(
         raise ValueError(msg)
     history = sorted(
         (
-            previous_row
+            known
             for previous_row in previous_rows
-            if observation_known_at_origin(previous_row, origin_date)
+            if (known := observation_at_origin(previous_row, origin_date)) is not None
         ),
         key=_row_date,
     )
@@ -268,16 +268,16 @@ def baseline_prediction_for_row(
     forecast_date = _row_date(row)
     train_start = forecast_date - timedelta(days=window_days)
     training_rows = [
-        candidate
+        known
         for candidate in series_rows
         if train_start <= _row_date(candidate)
-        and observation_known_at_origin(candidate, forecast_date)
+        and (known := observation_at_origin(candidate, forecast_date)) is not None
     ]
     if not training_rows:
         training_rows = [
-            candidate
+            known
             for candidate in series_rows
-            if observation_known_at_origin(candidate, forecast_date)
+            if (known := observation_at_origin(candidate, forecast_date)) is not None
         ]
     return max(0, _prediction_value(training_rows)) if training_rows else 0
 
@@ -868,7 +868,9 @@ def write_trained_model_artifacts(
         writer.writerows(predictions)
 
     with (output_dir / PANEL_FILENAME).open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=list(panel_rows[0]) if panel_rows else [])
+        writer = csv.DictWriter(
+            file, fieldnames=list(dict.fromkeys(field for row in panel_rows for field in row))
+        )
         writer.writeheader()
         writer.writerows(panel_rows)
 

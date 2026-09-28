@@ -37,6 +37,8 @@ wyliczane przez warstwę zapytań/usług; nie stanowi osobnej tabeli. Nazwa
 magazynu w `inventory_snapshots` jest kodem tekstowym. Rozszerzone CSV generatora
 mogą zawierać sklepy, zamówienia, pozycje zamówień, zwroty i promocje, ale nie
 oznacza to istnienia odpowiadających im tabel w obecnej bazie API.
+[Kanoniczne wymiary i kalendarz profili AI](retail-dimensions.md) również są
+tabelami eksportu generatora; nie rozszerzają schematu tej bazy.
 
 ## Trwałość i integralność
 

@@ -1,11 +1,14 @@
 # Otwarte ustalenia audytowe
 
-Przegląd i pomiary: **27.09.2026**, baza `cbf28b2a66e7e5f205cf73d9bfe620c491e22d93`.
+Pomiary bazowe: **27.09.2026**, baza `cbf28b2a66e7e5f205cf73d9bfe620c491e22d93`.
+Aktualizacja otwartego zakresu: **28.09.2026**.
 Poniżej są wyłącznie otwarte problemy potwierdzone w źródłach lub reprodukcji.
 [Audyt AI 00](../evidence/ai/00/README.md) rozdziela pomiary, 138 testów,
 przegląd statyczny i odczyt CI. Pozwala rozpocząć AI 01;
 nie potwierdza gotowości wszystkich dalszych etapów ani wdrożenia produkcyjnego.
 Kolejność pracy i pierwsze małe PR-y: [backlog AI](../plans/ai/backlog.md).
+[Audyt AI 02](../evidence/ai/02/audit/README.md) potwierdza
+gotowość źródła 2.6 do rozpoczęcia AI 03.
 
 **P1** oznacza ryzyko utraty danych, naruszenia granicy dostępu lub niewiarygodnej
 oceny modelu. **P2** oznacza problem odtwarzalności, izolacji lub diagnostyki.
@@ -15,72 +18,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
-
-### DATA-01 · P2 · Manifest i tożsamość nie opisują pełnej zawartości zestawu
-
-**Dowód:** source manifest zapisuje domyślne parametry jako null, nie ma source ID
-ani checksumów. 100 i 20 produktów ma identyczny feature `dataset_id` przy różnej
-treści. Zakres kończy się 30.04, choć zwroty, plany cen i forecasty sięgają maja;
-brak watermarków i zakresów per tabela. Kod: [manifest](../../data/generator/manifest.py),
-[feature ID](../../ml/features/demand_forecast.py). Oceniony RF ma dodatkowe hashe treści.
-
-**Kryterium zamknięcia — AI 02–03:** manifest v2 z requested/effective config,
-wersjami, provenance, zakresami historii/planów/tail, watermarkami, logical IDs
-oraz byte checksums. Powtórzenie identycznych danych zachowuje ID niezależnie od
-katalogu/czasu zapisu; kontrast 100/20 oraz zmiana treści zmienia właściwe ID.
-Legacy demo/v1 zachowuje zgodność.
-
-### DATA-02 · P2 · Brak źródłowego kontraktu panelu, wymiarów i lifecycle
-
-**Dowód:** 12 SKU z whitespace; kategoria↔marka i region↔kanał są sprzężone.
-Rzadki zbiór cech ma 12 718/45 000 rekordów przy założeniu statycznie ważnych par.
-ML uzupełnia 32 282 zera tylko po deklaracji kompletności syntetycznej; źródło nie
-publikuje wersji asortymentu, kalendarza otwarcia ani completeness per dzień.
-Kod: [profile_engine](../../data/generator/profile_engine.py), [panel ML](../../ml/evaluation/fixed_origin.py).
-
-**Kryterium zamknięcia — AI 02:** poprawne SKU, rozdzielone wymiary i wersjonowane
-assignments/lifecycle; 100% poprawnych kombinacji dziennych. Zero jest oddzielone
-od missing/closed/inactive. Test usunięcia dnia nie zamienia luki w sprzedaż zero;
-sprzedaż poza okresem aktywności jest odrzucana. Mianownik nie mnoży dowolnie kanałów.
-
-### DATA-03 · P1 · Niespójna chronologia i powtórzone pozycje koszyka
-
-**Dowód:** 954/17 429 sprzedaży przed własnym zamówieniem oraz 338/9000 koszyków
-z powtórzonym produktem. Sumy i ilości pozycji zgadzają się. Zwroty są przypisane
-do końca całej próby, bez okna własnej transakcji; opóźnienia do 94,25 dnia.
-Kod: [commerce i returns](../../data/generator/profile_engine.py).
-
-**Kryterium zamknięcia — AI 02:** sale/order/item mają jednoznaczne powiązania;
-sprzedaż nie poprzedza zamówienia, koszyki wybierają SKU bez replacement,
-sumy/ilości/przychód uzgadniają się. Return window zależy od właściwej sprzedaży,
-kategorii/kanału, skumulowany zwrot nie przekracza zakupu. Późniejszy tail pozostaje
-jawny. Negatywne przypadki naruszające te reguły kończą się failed gate.
-
-### DATA-04 · P1 · Ceny i promocje transakcji nie wynikają ze wspólnego kalendarza
-
-**Dowód:** price coverage 67,4508%; 5673 sprzedaże bez ceny; 2319 różnic także po
-rabacie katalogowym. 2197 flag promocji bez aktywnej promocji oraz 1936 przypadków
-odwrotnych. Efekty pre/post są odwrócone w czasie. [pricing.py](../../data/generator/pricing.py)
-i [commerce](../../data/generator/profile_engine.py) mają osobne reguły;
-brak scope i wersjonowanej dostępności planu. RF wyklucza te wejścia.
-
-**Kryterium zamknięcia — AI 02:** jeden resolver ceny/promo, pełne coverage,
-jednoznaczny scope/priority i known-at, zgodne daty/rabaty transakcji. Pre/post effects
-liczone w prawidłowym kierunku. Brak ceny, overlap, błędny rabat i nieaktywna promocja
-są odrzucane; przyszły plan używany przez model musi być znany przed origin.
-
-### DATA-05 · P1 · Truth i niepełne bramki nie chronią nowego źródła ML
-
-**Dowód:** pola latent/noise/multipliers/stockout/DQ pozostają w sales CSV.
-Statycznie demand weight jest użyty dwukrotnie w [profile_engine](../../data/generator/profile_engine.py).
-15 checks przechodzi także po osobnym wstrzyknięciu zwrotu przed sprzedażą i
-nadmiarowego zwrotu. Obecna lista cech RF wyklucza truth; problem dotyczy nowego
-eksportu i znaczenia źródłowych quality gates, nie wykazanego leakage RF.
-
-**Kryterium zamknięcia — AI 02, etykiety w 07:** oddzielne operational/truth/labels,
-jedna formuła demand weight, wersjonowana allowlist i executable gates z liczebnością,
-wynikiem i nonzero exit przy błędzie. Negative fixtures DATA-01–04 oraz próba podania
-truth do features muszą zostać odrzucone. Zachować dotychczasowe checks strukturalne.
 
 ### DATA-06 · P1 · Snapshoty wielokrotnie otwierają inventory bez uzgodnionego ledgeru
 
@@ -92,26 +29,6 @@ mapping. Kod: [inventory i stock movements](../../data/generator/profile_engine.
 selling/stock location, uzgodnienie bilansu ruchów/sprzedaży/dostaw/zwrotów,
 availability snapshotów i testy braku/przyszłego zapasu. Dopiero wtedy labels stockout.
 Nie blokuje forecast-only AI 04–05, gdzie inventory features są pominięte.
-
-## ML i historia danych
-
-### ML-07 · P2 · Dzienny agregat nie zachowuje wcześniejszych wersji historii
-
-**Dowód:** `_build_aggregates` w
-[generatorze cech](../../ml/features/demand_forecast.py) sumuje wszystkie
-sprzedaże dnia i zapisuje maksymalny czas dostępności. Dodanie spóźnionej
-sprzedaży do historycznego dnia przesuwa dostępność całego agregatu. Przy
-odtwarzaniu wcześniejszego origin znika także poprzednio znana część sprzedaży;
-reprodukcja zmienia `lag_1_units` z 3 na 0 i wskaźnik dostępności z 1 na 0.
-
-To ograniczenie przyszłego importu i odtwarzania historii, nie wykazany błąd
-zapisanej oceny RF: obecny generator syntetyczny dostarcza sprzedaż tego samego
-dnia, a panel ocenionego przebiegu nie zawiera dostępności z późniejszego dnia.
-
-**Kryterium zamknięcia:** wersjonowane agregaty albo agregacja według stanu
-znanego w origin. Dodanie późniejszej sprzedaży lub korekty nie zmienia cech
-ani prognoz wcześniejszego origin. Brak potrzebnej historii ma jawny status.
-Warunek odbioru historycznych danych i forecastingu w AI 02–04, bez blokowania AI 01.
 
 ## Runtime i bezpieczeństwo
 

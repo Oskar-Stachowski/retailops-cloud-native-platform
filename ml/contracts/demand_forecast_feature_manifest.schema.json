@@ -37,7 +37,7 @@
     },
     "schema_version": {
       "type": "string",
-      "const": "2.0"
+      "const": "2.1"
     },
     "feature_schema": {
       "type": "string",
@@ -45,7 +45,12 @@
     },
     "profile": {
       "type": "string",
-      "enum": ["demo", "small", "medium", "large"]
+      "enum": [
+        "demo",
+        "small",
+        "medium",
+        "large"
+      ]
     },
     "grain": {
       "type": "array",
@@ -53,10 +58,18 @@
         "type": "string"
       },
       "prefixItems": [
-        { "const": "date" },
-        { "const": "product_id" },
-        { "const": "store_id" },
-        { "const": "channel" }
+        {
+          "const": "date"
+        },
+        {
+          "const": "product_id"
+        },
+        {
+          "const": "store_id"
+        },
+        {
+          "const": "channel"
+        }
       ],
       "minItems": 4,
       "maxItems": 4
@@ -77,7 +90,11 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["csv", "parquet", "jsonl"]
+        "enum": [
+          "csv",
+          "parquet",
+          "jsonl"
+        ]
       },
       "minItems": 1,
       "uniqueItems": true
@@ -94,18 +111,40 @@
       "minItems": 1,
       "uniqueItems": true
     },
-    "forecast_origin_rule": {"type": "string", "const": "previous_day_end_utc"},
+    "forecast_origin_rule": {
+      "type": "string",
+      "const": "previous_day_end_utc"
+    },
     "available_at_origin_fields": {
-      "type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
     },
     "label_fields": {
-      "type": "array", "items": {"type": "string"}, "const": ["units_sold", "observation_status"]
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "const": [
+        "units_sold",
+        "observation_status"
+      ]
     },
     "observation_availability_field": {
-      "type": "string", "const": "observation_available_at"
+      "type": "string",
+      "const": "observation_available_at"
     },
-    "inventory_ready": {"type": "boolean", "const": false},
-    "complete_daily_panel": {"type": "boolean", "const": false},
+    "inventory_ready": {
+      "type": "boolean",
+      "const": false
+    },
+    "complete_daily_panel": {
+      "type": "boolean",
+      "const": false
+    },
     "quality_report": {
       "type": "string"
     },

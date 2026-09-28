@@ -27,12 +27,15 @@ def test_demand_feature_rows_follow_contract_grain_and_target() -> None:
     assert len(rows) <= len(tables["sales"])
 
     first = rows[0]
-    assert first["schema_version"] == "2.0"
-    assert first["dataset_id"].startswith("retailops-demand-forecast-features-demo-")
+    assert first["schema_version"] == "2.1"
+    assert first["dataset_id"].startswith("features-sha256-")
     assert first["feature_row_id"] == ":".join(str(first[field]) for field in GRAIN)
     assert first[TARGET] >= 0
     assert first["observation_status"] == "observed_positive"
-    assert not {"latent_units_demand", "unit_price", "promotion_active", "inventory_on_hand"} & first.keys()
+    assert (
+        not {"latent_units_demand", "unit_price", "promotion_active", "inventory_on_hand"}
+        & first.keys()
+    )
 
 
 def test_demand_feature_generation_aggregates_duplicate_grain_rows() -> None:
@@ -51,9 +54,7 @@ def test_demand_feature_generation_aggregates_duplicate_grain_rows() -> None:
 
     rows = build_demand_feature_rows(tables, config)
     order = next(
-        order
-        for order in tables["orders"]
-        if order["order_reference"] == sale["order_reference"]
+        order for order in tables["orders"] if order["order_reference"] == sale["order_reference"]
     )
     matching_row = next(
         row
@@ -118,7 +119,10 @@ def test_feature_rows_do_not_use_same_day_outcomes_or_unmapped_inventory() -> No
     }
     after = build_demand_feature_rows(tables, config)
 
-    assert before == after
+    assert before[0]["dataset_id"] != after[0]["dataset_id"]
+    assert [{k: v for k, v in row.items() if k != "dataset_id"} for row in before] == [
+        {k: v for k, v in row.items() if k != "dataset_id"} for row in after
+    ]
 
     tables["sales"][0]["quantity"] = str(int(tables["sales"][0]["quantity"]) + 100)
     changed_label = build_demand_feature_rows(tables, config)

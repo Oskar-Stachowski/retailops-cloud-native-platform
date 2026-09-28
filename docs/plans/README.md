@@ -1,6 +1,6 @@
 # Dalsze prace
 
-Najbliższy etap to [AI 02 / DATA-01](ai/etapy/02-dane-sprzedazowe.md), według
+Najbliższy etap to [AI 03 / snapshot i curated](ai/etapy/03-snapshot-curated.md), według
 [backlogu po audycie AI 00](ai/backlog.md).
 Ocena ML została zapisana w [dowodach](../evidence/ml/fixed-origin-rf-2026-09-27/README.md);
 jej wynik `rejected` nie oznacza dopuszczenia modelu do serving. Pozostałe

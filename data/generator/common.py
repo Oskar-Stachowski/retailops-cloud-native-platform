@@ -1,12 +1,28 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, timedelta
+from dataclasses import dataclass
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
 DEMO_NAMESPACE: UUID = uuid5(NAMESPACE_DNS, "retailops-demo-dataset-v1")
 BASE_DATE: date = date(2026, 4, 30)
 BASE_DATETIME: datetime = datetime(2026, 4, 30, 8, 0, tzinfo=UTC)
+
+
+@dataclass(frozen=True)
+class GenerationClock:
+    end_date: date = BASE_DATE
+
+    def at(self, days_back: int, hours: int = 0) -> str:
+        base = datetime.combine(self.end_date, time(8), tzinfo=UTC)
+        return (base - timedelta(days=days_back) + timedelta(hours=hours)).isoformat()
+
+    def day(self, days_back: int) -> str:
+        return (self.end_date - timedelta(days=days_back)).isoformat()
+
+
+DEFAULT_CLOCK = GenerationClock()
 
 
 def deterministic_uuid(entity: str, natural_key: str) -> str:

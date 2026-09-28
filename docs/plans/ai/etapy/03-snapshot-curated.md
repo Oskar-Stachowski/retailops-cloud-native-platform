@@ -6,6 +6,11 @@ Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ście
 
 Normatywne dokumenty: [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md), [architektura](../architektura.md), [szablony evidence](../szablony/karty-i-evidence.md). Warunek wejścia: źródłowe bramki 02 i zadeklarowana wersja kontraktu. Stage03 przyjmuje `inventory_ready=false`; nie wymusza sztucznych stockout/anomaly labels.
 
+[Audyt wejścia](../../../evidence/ai/02/audit/README.md) potwierdza gotowość
+źródła 2.6. Fingerprint obejmuje cały wykonywany bundle; historia ilości jest
+append-only i odczytywana według stanu znanego w origin. Eksport, importer i
+curated mają zachować te gwarancje oraz brak historii zgłaszać jawnie.
+
 ## Kolejność małych PR-ów
 
 1. **RetailOps — Parquet i polityka artefaktów.** Typed Parquet przez jawną grupę zależności, date partitions dla dużych faktów, chunked writes, CSV compatibility dla demo/fixture. Layout rozdziela facts, truth, raw events, reports, manifests. Git śledzi demo i najwyżej jeden mały fixture; generated exports ignored. Cleanup weryfikuje root i odmawia kasowania tracked fixture. Benchmark mierzy czas, peak RSS, rows/s, bytes oraz rzeczywisty limit CI.

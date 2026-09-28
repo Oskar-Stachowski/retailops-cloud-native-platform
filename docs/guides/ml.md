@@ -19,7 +19,7 @@ wymagają `ML_EXPERIMENT_DIR` wskazującego katalog konkretnego przebiegu.
 
 | Polecenie | Co wykonuje | Główne pliki wyniku |
 |---|---|---|
-| `make ml-features` | Generuje dane źródłowe i agreguje cechy | `features.csv`, `feature_manifest.json` |
+| `make ml-features` | Legacy: generuje źródło i agreguje cechy | `features.csv`, `feature_manifest.json` |
 | `make ml-baseline` | Liczy prognozę ze średniej ruchomej | `baseline_forecasts.csv`, `model_manifest.json` |
 | `make ml-trained` | RF i baseline: trzy okna walidacyjne oraz odłożony test, każde z prognozą pełnego horyzontu z jednego origin | `random_forest_model.joblib`, `metrics.json`, `predictions.csv`, `daily_panel.csv`, `feature_importance.csv`, `model_metadata.json`, `model_card.md`, `experiment_inputs.json`, `experiment_source.zip`, `run_manifest.json` |
 | `make ml-evaluate` | Osobny, kroczący backtest baseline; nie jest porównaniem z RF | `evaluation_report.json`, `evaluation_summary.md`, `backtest_predictions.csv` |
@@ -74,10 +74,17 @@ końcowego testu, a `temporal_protocol.folds` zawiera pokrycie, pominięcia i
 wyniki każdego okna. Model RF i baseline prognozują te same rekordy z tej samej
 wiedzy w origin. Kod trenuje osobny model dla każdego okna; zapisany `.joblib`
 pochodzi z końcowego testu. Model
-korzysta z [kontraktu cech 2.0](../reference/ml-features.md): kalendarza,
+korzysta z [kontraktu cech 2.1](../reference/ml-features.md): kalendarza,
 identyfikatorów serii, stałych opisów produktu i wcześniej zaobserwowanej
 sprzedaży dostępnej w chwili prognozy. Nie używa zrealizowanej ceny, promocji,
 stockout ani zapasu. Domyślna liczba drzew w kodzie i Makefile wynosi 80.
+Profile AI mają nowy pełny [kontrakt cech 3.1](../reference/ml-features.md).
+Nowe przebiegi RF używają 2.1; forecasting na 3.1 jest osobnym zakresem AI 04.
+Cechy AI wymagają zaakceptowanego source 2.6, jawnego `--source-dir` i
+izolowanego workera Docker; [instrukcja danych](data.md) podaje komendy.
+Historia ilości jest wersjonowana; lagi, baseline i labels treningowe wybierają
+ostatni stan znany w origin. Późniejsze korekty nie zmieniają wcześniejszych
+prognoz. Brak wcześniejszej historii pozostaje jawnie niedostępny.
 Wszystkie dostępne flagi sprawdzisz przez `--help` właściwego modułu.
 
 `daily_panel.csv` zawiera dni, produkty, sklepy i kanały także bez sprzedaży.

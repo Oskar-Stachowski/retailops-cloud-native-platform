@@ -58,6 +58,10 @@ jobs:
         working-directory: .
         run: mkdir -p "${API_REPORT_DIR}" "${DATA_REPORT_DIR}" "${SECURITY_REPORT_DIR}"
 
+      - name: Prepare isolated facts worker
+        working-directory: .
+        run: docker pull python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff
+
       - name: Run backend static quality gates
         working-directory: .
         run: |

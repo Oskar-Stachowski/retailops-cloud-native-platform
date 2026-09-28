@@ -3,18 +3,37 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from data.generator.configuration import SUPPORTED_PROFILES
+from data.generator.demand_schema import uses_demand
+from data.generator.feature_admission import admit_feature_source
+from data.generator.identity import GENERATOR_VERSION
 from data.generator.main import (
     DatasetGenerationConfig,
     build_dataset,
 )
-from data.generator.manifest import GENERATOR_VERSION
+from ml.features.ai_demand import AI_HISTORY_COLUMNS
+from ml.features.identity import (
+    IDENTITY_FILENAME,
+    feature_identity,
+    feature_identity_from_source,
+    load_feature_identity_manifest,
+    write_feature_identity_manifest,
+)
+from ml.features.isolated_runtime import isolated_feature_rows
+from ml.features.observation_history import (
+    SCORABLE,
+    aggregate_versions,
+    history_json,
+    observation_at_time,
+)
 
-SCHEMA_VERSION = "2.0"
+SCHEMA_VERSION = "2.1"
 DATASET_NAME = "retailops-demand-forecast-features"
 FEATURE_SCHEMA = "demand_forecast_features.schema.json"
 FEATURE_FILENAME = "features.csv"
@@ -26,7 +45,7 @@ SOURCE_ARTIFACTS = [
     "orders.csv",
     "products.csv",
 ]
-FEATURE_COLUMNS = [
+LEGACY_FEATURE_COLUMNS = [
     "schema_version",
     "dataset_id",
     "feature_row_id",
@@ -45,6 +64,11 @@ FEATURE_COLUMNS = [
     "month",
     "generated_at",
 ]
+FEATURE_COLUMNS = [*LEGACY_FEATURE_COLUMNS, "observation_history"]
+
+
+def feature_columns(profile: str) -> list[str]:
+    return AI_HISTORY_COLUMNS if uses_demand(profile) else FEATURE_COLUMNS
 
 
 @dataclass(frozen=True)
@@ -53,6 +77,7 @@ class DemandFeatureGenerationConfig:
         default_factory=lambda: DatasetGenerationConfig(profile="demo"),
     )
     output_dir: Path | None = None
+    source_dir: Path | None = None
 
 
 def _text(value: object) -> str:
@@ -82,13 +107,27 @@ def forecast_origin_utc(first_target_date: date) -> datetime:
 
 
 def observation_known_at_origin(row: dict[str, object], forecast_date: date) -> bool:
+    return observation_at_origin(row, forecast_date) is not None
+
+
+def observation_at_origin(row: dict[str, object], forecast_date: date) -> dict | None:
     origin = forecast_origin_utc(forecast_date)
+    if _date(row["date"]) >= forecast_date:
+        return None
+    if (
+        row.get("observation_status")
+        in {"missing_data", "unknown_eligibility", "inactive_assortment", "location_closed"}
+        or row.get("source_data_complete") is False
+    ):
+        return None
+    evidence = row.get("source_evidence_available_at")
+    if evidence and _utc_timestamp(evidence) > origin:
+        return None
+    known = observation_at_time(row, origin)
     return (
-        _date(row["date"]) < forecast_date
-        and _utc_timestamp(
-            row["observation_available_at"],
-        )
-        <= origin
+        known
+        if known is not None and known.get("observation_status", "observed_positive") in SCORABLE
+        else None
     )
 
 
@@ -99,22 +138,12 @@ def _feature_generated_at(tables: dict[str, list[dict[str, object]]]) -> str:
     return max(candidates) if candidates else datetime.now(UTC).isoformat()
 
 
-def _dataset_id(
-    profile: str,
-    seed: int,
-    rows: list[dict[str, object]],
-) -> str:
-    dates = [row["date"] for row in rows]
-    date_start = min(dates) if dates else "empty"
-    date_end = max(dates) if dates else "empty"
-    return f"{DATASET_NAME}-{profile}-{date_start}-{date_end}-seed{seed}"
-
-
 def _build_aggregates(
     tables: dict[str, list[dict[str, object]]],
 ) -> dict[tuple[str, str, str, str], dict[str, object]]:
     orders_by_reference = {_text(order["order_reference"]): order for order in tables["orders"]}
     aggregates: dict[tuple[str, str, str, str], dict[str, object]] = {}
+    events = {}
 
     for sale in tables["sales"]:
         business_date = _text(sale["sold_at"])[:10]
@@ -146,6 +175,7 @@ def _build_aggregates(
                 "units_sold": 0,
                 "observation_available_at": available_at,
             }
+            events[key] = []
 
         aggregate = aggregates[key]
         aggregate["units_sold"] += quantity
@@ -153,6 +183,12 @@ def _build_aggregates(
             aggregate["observation_available_at"],
             available_at,
         )
+        events[key].append((_text(sale["id"]), available_at, quantity))
+
+    for key, aggregate in aggregates.items():
+        history = aggregate_versions(events[key])
+        aggregate["units_sold"] = history[-1]["units_sold"]
+        aggregate["observation_history"] = history_json(history)
 
     return aggregates
 
@@ -161,6 +197,9 @@ def build_demand_feature_rows(
     tables: dict[str, list[dict[str, object]]],
     config: DatasetGenerationConfig,
 ) -> list[dict[str, object]]:
+    if uses_demand(config.profile):
+        msg = "AI features require an accepted source directory and isolated facts worker; full source tables are forbidden."
+        raise ValueError(msg)
     products_by_id = {_text(product["id"]): product for product in tables["products"]}
     generated_at = _feature_generated_at(tables)
     aggregates = _build_aggregates(tables)
@@ -193,10 +232,11 @@ def build_demand_feature_rows(
                 "week_of_year": iso_calendar.week,
                 "month": business_date.month,
                 "generated_at": generated_at,
+                "observation_history": aggregate["observation_history"],
             },
         )
 
-    dataset_id = _dataset_id(config.profile, config.seed, rows)
+    dataset_id, _, _ = feature_identity(config, tables, rows, FEATURE_COLUMNS)
     for row in rows:
         row["dataset_id"] = dataset_id
 
@@ -206,28 +246,49 @@ def build_demand_feature_rows(
 def build_feature_manifest(
     config: DatasetGenerationConfig,
     rows: list[dict[str, object]],
+    *,
+    dataset_id: str | None = None,
 ) -> dict[str, object]:
     dates = [row["date"] for row in rows]
-    dataset_id = rows[0]["dataset_id"] if rows else _dataset_id(config.profile, config.seed, rows)
+    dataset_id = str(rows[0]["dataset_id"]) if rows else dataset_id
+    if dataset_id is None:
+        msg = "Empty features require an explicit source-derived dataset ID."
+        raise ValueError(msg)
 
+    ai = uses_demand(config.profile)
+    schema_version = str(rows[0]["schema_version"]) if rows else "3.1" if ai else SCHEMA_VERSION
     return {
         "dataset_id": dataset_id,
         "dataset_name": DATASET_NAME,
-        "schema_version": SCHEMA_VERSION,
-        "feature_schema": FEATURE_SCHEMA,
+        "schema_version": schema_version,
+        "feature_schema": (
+            "demand_forecast_features.v3_1.schema.json"
+            if schema_version == "3.1"
+            else "demand_forecast_features.v3.schema.json"
+        )
+        if ai
+        else FEATURE_SCHEMA,
         "profile": config.profile,
-        "grain": GRAIN,
+        "grain": ["date", "product_id", "selling_location_id", "channel"] if ai else GRAIN,
         "target": TARGET,
         "date_start": min(dates) if dates else "",
         "date_end": max(dates) if dates else "",
         "formats": ["csv"],
         "row_count": len(rows),
-        "source_artifacts": SOURCE_ARTIFACTS,
+        "source_artifacts": [
+            "daily_demand_observations.csv",
+            "product_catalog.csv",
+            "catalog_categories.csv",
+            *(["daily_demand_versions.csv"] if schema_version == "3.1" else []),
+        ]
+        if ai
+        else SOURCE_ARTIFACTS,
+        **({"target_type": "observed_sales_units"} if ai else {}),
         "forecast_origin_rule": "previous_day_end_utc",
         "available_at_origin_fields": [
             "date",
             "product_id",
-            "store_id",
+            "selling_location_id" if ai else "store_id",
             "channel",
             "category",
             "brand",
@@ -239,8 +300,8 @@ def build_feature_manifest(
         "label_fields": ["units_sold", "observation_status"],
         "observation_availability_field": "observation_available_at",
         "inventory_ready": False,
-        "complete_daily_panel": False,
-        "quality_report": "quality_report.json",
+        "complete_daily_panel": ai and all(row["source_data_complete"] for row in rows),
+        "quality_report": "demand_report.json" if ai else "quality_report.json",
         "generator_version": GENERATOR_VERSION,
         "seed": config.seed,
         "generated_at": datetime.now(UTC).isoformat(),
@@ -259,7 +320,12 @@ def write_feature_dataset(
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     with (output_dir / FEATURE_FILENAME).open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=FEATURE_COLUMNS)
+        writer = csv.DictWriter(
+            file,
+            fieldnames=AI_HISTORY_COLUMNS
+            if manifest["schema_version"] == "3.1"
+            else FEATURE_COLUMNS,
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -272,11 +338,35 @@ def write_feature_dataset(
 def generate_demand_feature_dataset(
     config: DemandFeatureGenerationConfig,
 ) -> dict[str, object]:
-    tables = build_dataset(config.dataset)
-    rows = build_demand_feature_rows(tables, config.dataset)
-    manifest = build_feature_manifest(config.dataset, rows)
+    columns = feature_columns(config.dataset.profile)
+    source_descriptor = None
+    tables = None
+    if uses_demand(config.dataset.profile):
+        if config.source_dir is None:
+            msg = "AI features require --source-dir with an accepted source export."
+            raise ValueError(msg)
+        facts, source_descriptor = admit_feature_source(config.source_dir, config.dataset)
+        rows = isolated_feature_rows(facts)
+        dataset_id, _, _ = feature_identity_from_source(
+            config.dataset, source_descriptor, rows, columns
+        )
+        for row in rows:
+            row["dataset_id"] = dataset_id
+    else:
+        tables = build_dataset(config.dataset)
+        rows = build_demand_feature_rows(tables, config.dataset)
+        dataset_id, _, _ = feature_identity(config.dataset, tables, rows, columns)
+    manifest = build_feature_manifest(config.dataset, rows, dataset_id=dataset_id)
     output_dir = config.output_dir or default_feature_output_dir(config.dataset.profile)
+    if (output_dir / IDENTITY_FILENAME).exists():
+        previous = load_feature_identity_manifest(output_dir, columns)
+        if previous["dataset_id"] != dataset_id:
+            msg = "Output already contains different features; choose a new output directory."
+            raise ValueError(msg)
     write_feature_dataset(output_dir, rows, manifest)
+    write_feature_identity_manifest(
+        config.dataset, tables, rows, columns, output_dir, source_descriptor=source_descriptor
+    )
     return manifest
 
 
@@ -284,13 +374,17 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate RetailOps demand forecasting feature dataset.",
     )
-    parser.add_argument("--profile", choices=("demo", "small", "medium", "large"), default="demo")
+    parser.add_argument("--profile", choices=SUPPORTED_PROFILES, default="demo")
     parser.add_argument("--days", type=int)
     parser.add_argument("--products", type=int)
     parser.add_argument("--stores", type=int)
     parser.add_argument("--warehouses", type=int)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--start-date", type=date.fromisoformat)
+    parser.add_argument("--end-date", type=date.fromisoformat)
+    parser.add_argument("--max-daily-rows", type=int)
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--source-dir", type=Path)
     return parser.parse_args()
 
 
@@ -303,14 +397,21 @@ def config_from_args(args: argparse.Namespace) -> DemandFeatureGenerationConfig:
             stores=args.stores,
             warehouses=args.warehouses,
             seed=args.seed,
+            start_date=getattr(args, "start_date", None),
+            end_date=getattr(args, "end_date", None),
+            max_daily_rows=getattr(args, "max_daily_rows", None),
         ),
         output_dir=args.output_dir,
+        source_dir=getattr(args, "source_dir", None),
     )
 
 
 def main() -> None:
     config = config_from_args(parse_args())
-    manifest = generate_demand_feature_dataset(config)
+    try:
+        manifest = generate_demand_feature_dataset(config)
+    except (ValueError, RuntimeError, OSError):
+        sys.exit("Feature source admission or isolated runtime failed.")
     output_dir = config.output_dir or default_feature_output_dir(config.dataset.profile)
 
     print(  # noqa: T201 - CLI output

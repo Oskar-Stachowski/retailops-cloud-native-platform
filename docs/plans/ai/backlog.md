@@ -2,41 +2,28 @@
 
 [Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
 Required CI PR oraz push na main obu repozytoriów ma success.
-Główny punkt wznowienia to DATA-01 etapu 02. Etapy 02–17 pozostają planowane.
+Główny punkt wznowienia to [AI 03 — snapshot i curated](etapy/03-snapshot-curated.md).
+[Odbiór źródła 02](../../evidence/ai/02/data05/README.md) obejmuje identity,
+wymiary/kalendarz, ceny/promocje, pełny panel/koszyki, chronologię/zwroty,
+separację symulacji oraz rzeczywisty worker bez dostępu do truth.
 Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
 potwierdzone problemy i kryteria ich zamknięcia.
 
-## Pierwszy mały PR etapu 02
+## Kolejny mały PR etapu 03
 
-**Repo:** RetailOps. **Zależność:** odebrany fundament 01 i uzgodnione wersje kontraktów.
-Zakres DATA-01: jedno rozwiązanie requested/effective config, jawne daty i manifest v2
-obok v1, wersje generatora/kalendarza/konfiguracji, source identity oraz checksumy.
-Powiązać nowe feature ID z treścią źródła i kontraktem cech, zamiast wyłącznie profilem/datami/seedem.
-Nie zmieniać w tym PR formuły popytu, cen, koszyków ani legacy demo.
-
-**Odbiór tego PR:**
-
-- Powtórzenie tych samych wejść w dwóch katalogach daje ten sam logical source/feature
-  ID i treść; ścieżka venv/outputu oraz czas zapisu nie wchodzą do tożsamości logicznej.
-- `small/seed42` dla 100 i 20 produktów daje różne ID. Zmiana seeda, dat, treści
-  lub semantycznej konfiguracji zmienia właściwy ID; raw byte checksums są odrębne.
-- Żaden efektywny parametr nie pozostaje `null`; manifest jawnie zapisuje wartości
-  domyślne i override, wersje, provenance kodu i zależności.
-- Zakresy per tabela obejmują rzeczywiste zwroty, promocje, plany cen i forecasty.
-  Rozróżnić sprzedaż, plan i return tail; watermark ma zdefiniowane znaczenie,
-  nie jest równy automatycznie największej przyszłej dacie.
-- Testy istniejących kontraktów v1/demo/seed przechodzą, 19 śledzonych plików demo
-  nie jest nadpisywanych. Uszkodzona treść/checksum i niekompletna konfiguracja
-  manifestu v2 są odrzucane. Raport nie nazywa jeszcze źródła gotowym do AI 03.
-
-Kolejne PR-y 02 zgodnie z [instrukcją](etapy/02-dane-sprzedazowe.md):
-wymiary/lifecycle (DATA-02), wspólne ceny/promocje (DATA-04), demand/panel/koszyki
-(DATA-02/03/05), chronologia/zwroty (DATA-03), rozdzielenie truth i bramki (DATA-05).
+**Repo:** RetailOps. **Zależność:** odebrane źródło 2.6 i bramki forecast-source.
+Zaimplementować typed Parquet przez jawną grupę zależności, date partitions i
+chunked writes dla dużych faktów. Rozdzielić facts/truth/raw/reports/manifests
+w layout eksportu; zachować CSV demo i fixtures. Kontrolowany cleanup ma
+odmawiać usuwania tracked fixture i plików poza generated root. Zmierzyć
+czas, peak RSS, rows/s, bytes oraz CSV/Parquet parity na ograniczonych profilach.
+Następny slice to niezmienny exporter z allowlistą faktów i atomową publikacją.
+Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
+importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as-of.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 02, DATA-01:** konfiguracja, identity i manifest v2; potem
-  kolejne poprawki źródła w kolejności opisanej wyżej.
+- **RetailOps / etap 03:** typed Parquet, polityka artefaktów, następnie immutable export i handoff.
 - **Repo AI / etap 11, zakres 1–2:** rejestr zatwierdzonego korpusu, allowlista,
   access_class, source SHA/checksums i document_status; następnie parser/chunker
   oraz testy offline. Nie wymaga ukończenia etapu 02.
@@ -45,19 +32,19 @@ wymiary/lifecycle (DATA-02), wspólne ceny/promocje (DATA-04), demand/panel/kosz
 
 Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
 kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
-Etap 03 czeka na odbiór 02, a 04–05 na właściwe dane; agent 12 czeka na 10 i 11.
+Etap 03 ma spełnioną lokalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
+a agent 12 na 10 i 11.
 Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
 ## Przypisanie warunków do etapów
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **02 — źródło** | DATA-01–05. Pełny poprawny panel, scope/availability cen i promocji, zgodne transakcje i return tail, odrębne truth, hard gates z negatywnymi przypadkami. `inventory_ready=false`, stockout/anomaly `not_ready`. |
-| **03 — snapshot/curated** | DATA-01 + ML-07: niezależne source/curated/feature/label IDs, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
-| **04 — forecasting** | ML-07 jako warunek wejść. Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
+| **03 — snapshot/curated** | Rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
+| **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |
-| **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne truth/labels (DATA-05), dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
+| **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne scenariusze truth i dojrzałe labels, dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
 | **08 — stockout** | DATA-06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |
 | **10 — integracja** | OPS-03/07: jeden wykonywalny kontrakt, snapshot/version-aware event identity, legacy v1 oraz nowe intelligence.v2, trwałe ACK/kwarantanna, inbox/outbox, dedup/replay. Domenowe projekcje wyników, zgodne API/UI i rzeczywiste auth/scope. Testy z brokerem i awariami wymagane przed odbiorem. |

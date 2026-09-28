@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://retailops.local/schemas/ml/demand_forecast_features.v3.schema.json",
+  "title": "RetailOps AI daily demand feature row 3.0",
+  "description": "Full active daily panel at physical selling location/channel grain; closed and missing differ from observed zero.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "feature_row_id",
+    "date",
+    "product_id",
+    "selling_location_id",
+    "channel",
+    "units_sold",
+    "observation_status",
+    "observation_available_at",
+    "is_active_assortment",
+    "location_open",
+    "source_data_complete",
+    "category",
+    "brand",
+    "day_of_week",
+    "is_weekend",
+    "week_of_year",
+    "month",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "3.0"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "feature_row_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "product_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "store",
+        "online",
+        "marketplace",
+        "wholesale"
+      ]
+    },
+    "units_sold": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Forecast target: observed units sold. It is a label, never a same-day model input."
+    },
+    "observation_status": {
+      "type": "string",
+      "enum": [
+        "observed_positive",
+        "observed_zero",
+        "closed",
+        "missing"
+      ],
+      "description": "Inactive rows are excluded. Missing has a null label. Closed zero is not an observed open-day zero."
+    },
+    "observation_available_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Latest ingestion or order creation time contributing to the label. Historical sales can enter lag features only after this time."
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "brand": {
+      "type": "string",
+      "minLength": 1
+    },
+    "day_of_week": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 7
+    },
+    "is_weekend": {
+      "type": "boolean"
+    },
+    "week_of_year": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 53
+    },
+    "month": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Dataset generation metadata, not source availability at the forecast origin."
+    },
+    "selling_location_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "is_active_assortment": {
+      "type": "boolean"
+    },
+    "location_open": {
+      "type": "boolean"
+    },
+    "source_data_complete": {
+      "type": "boolean"
+    }
+  }
+}

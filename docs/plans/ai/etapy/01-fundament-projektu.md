@@ -15,7 +15,7 @@ ani danych. Compose nie montuje polityki aplikacji; MLflow ma izolację sieciow�
 bez aplikacyjnego auth. Fundament nie obejmuje produkcyjnego IAM, importerów,
 modeli, właściwego serving, RAG, agenta ani AWS.
 
-Następna implementacja: **DATA-01 w [etapie 02](02-dane-sprzedazowe.md)**.
+Punkt wznowienia implementacji: [backlog AI](../backlog.md).
 Równolegle dostępny jest [etap 11 — RAG](11-rag.md), począwszy od zatwierdzonego
 korpusu i jego metadanych. Projektowanie [16A](16-aws.md) wymaga wcześniejszego
 ustalenia infrastrukturalnego input contract. Bieżący zakres prac opisuje

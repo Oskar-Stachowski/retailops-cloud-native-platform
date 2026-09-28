@@ -21,8 +21,9 @@ from ml.experiments.identity import logical_rows_sha256
 from ml.features.demand_forecast import (
     build_demand_feature_rows,
     forecast_origin_utc,
-    observation_known_at_origin,
+    observation_at_origin,
 )
+from ml.features.observation_history import append_version, history_json, observation_at_time
 from ml.models.random_forest_forecast import (
     MODEL_VERSION,
     build_random_forest_pipeline,
@@ -72,6 +73,7 @@ PANEL_COLUMNS = [
     "units_sold",
     "observation_status",
     "observation_available_at",
+    "observation_history",
 ]
 
 
@@ -107,8 +109,7 @@ def _series_key(row: dict[str, object]) -> SeriesKey:
 
 
 def _label_known(row: dict[str, object], origin: date) -> bool:
-    available_at = datetime.fromisoformat(str(row["observation_available_at"]))
-    return available_at <= forecast_origin_utc(origin)
+    return observation_at_time(row, forecast_origin_utc(origin)) is not None
 
 
 def _calendar(date_value: date) -> dict[str, object]:
@@ -195,6 +196,17 @@ def build_daily_panel(
                 if sale is not None and available_at is not None:
                     sale_available = datetime.fromisoformat(str(sale["observation_available_at"]))
                     available_at = max(available_at, sale_available)
+                quantity_history = sale.get("observation_history") if sale is not None else None
+                if quantity_history is None:
+                    quantity_history = history_json(
+                        append_version(
+                            [],
+                            int(sale["units_sold"]) if sale is not None else 0,
+                            available_at.isoformat(),
+                        )
+                        if available_at is not None and status in SCORABLE
+                        else []
+                    )
                 panel.append(
                     {
                         "date": date_text,
@@ -217,6 +229,7 @@ def build_daily_panel(
                         "observation_available_at": available_at.isoformat()
                         if available_at
                         else "",
+                        "observation_history": quantity_history,
                     },
                 )
     unexpected = set(sale_by_key) - {(str(row["date"]), *_series_key(row)) for row in panel}
@@ -259,11 +272,10 @@ def _history(
 ) -> list[dict[str, object]]:
     window_start = origin - timedelta(days=window_days)
     return [
-        row
+        known
         for row in rows
-        if row["observation_status"] in SCORABLE
-        and _day(row["date"]) >= window_start
-        and observation_known_at_origin(row, origin)
+        if _day(row["date"]) >= window_start
+        and (known := observation_at_origin(row, origin)) is not None
     ]
 
 
@@ -293,6 +305,9 @@ def _training_examples(
                     fold_origin,
                 ):
                     continue
+                label = observation_at_time(target, forecast_origin_utc(fold_origin))
+                if label["observation_status"] not in SCORABLE:
+                    continue
                 features.append(
                     build_training_features(
                         target,
@@ -301,7 +316,7 @@ def _training_examples(
                         origin=origin,
                     ),
                 )
-                labels.append(int(target["units_sold"]))
+                labels.append(int(label["units_sold"]))
         origin += timedelta(days=config.horizon_days)
     return features, labels
 

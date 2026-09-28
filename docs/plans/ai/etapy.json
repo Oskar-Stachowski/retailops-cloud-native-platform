@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "date": "2026-09-28",
   "stages": [
     {
@@ -43,7 +43,13 @@
         "01"
       ],
       "path": "etapy/02-dane-sprzedazowe.md",
-      "status": "planned"
+      "status": "completed",
+      "evidence": "../../evidence/ai/02/data05/README.md",
+      "readiness_audit": "../../evidence/ai/02/audit/README.md",
+      "implementation_commit": "5a8678c",
+      "implementation_scope": "Source 2.6: DATA-01–05 source gates, full worker provenance and append-only observed quantity versions; AI features 3.1 and legacy 2.1 with as-of reads",
+      "acceptance_scope": "bounded ai-smoke/ai-temporal-smoke; source ready for AI03; models, inventory and cross-repo replay have later gates",
+      "verification_commit": "152341e"
     },
     {
       "id": "03",
@@ -220,5 +226,5 @@
     }
   ],
   "status": "in_progress",
-  "next_stage": "02"
+  "next_stage": "03"
 }

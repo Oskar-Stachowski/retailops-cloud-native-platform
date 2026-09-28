@@ -1,14 +1,27 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 01 odebrany; następny zakres DATA-01 w etapie 02. Aktualizacja: 28.09.2026.**
+**Status: etap 02 odebrany lokalnie; następny zakres snapshot i curated w 03. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
 kontrakty danych/run/tool z walidacją offline oraz lokalne poświadczenia i scope API.
-Required CI PR i push na main obu repozytoriów ma success; ochrona main pozostaje aktywna.
-Następną implementacją jest DATA-01 w etapie 02, a równolegle można rozpocząć RAG 11.
-[Backlog](backlog.md) podaje pierwszy mały PR 02 i granice równoległych strumieni.
-Etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
+Required CI fundamentu 01 dla PR i push na main obu repozytoriów ma success;
+ochrona main pozostaje aktywna.
+[DATA-01](../../evidence/ai/02/data01/README.md) wprowadza jawne daty, profile,
+manifest v2 oraz source/feature identity z lokalnym odbiorem.
+[DATA-02](../../evidence/ai/02/data02/README.md) dodaje wymiary, lifecycle,
+routing i kalendarz PL/DE-BE. [DATA-04](../../evidence/ai/02/data04/README.md)
+dodaje wspólne ceny/promocje, scope, wersje znanych planów i uzgodnienie transakcji.
+[Popyt/panel/koszyki](../../evidence/ai/02/demand-panel/README.md) dodają pełny
+panel, dzienne budżety, koszyki bez powtórzeń i cechy AI 3.0.
+[DATA-03](../../evidence/ai/02/data03/README.md) dodaje chronologię, zwroty,
+rozliczenie revenue i osobne history/return-tail cutoffy.
+[DATA-05](../../evidence/ai/02/data05/README.md) domyka lokalny odbiór source 2.6:
+46 hard gates, rozdzielone parametry i izolowany worker faktów i wersjonowane obserwacje z odczytem as-of.
+Następna implementacja to [snapshot i curated 03](etapy/03-snapshot-curated.md);
+równolegle można rozpocząć RAG 11. Modele i inventory nadal nie są gotowe.
+[Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.
+Etapy 03–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.

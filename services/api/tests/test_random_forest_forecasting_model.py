@@ -93,7 +93,8 @@ def test_future_outcomes_and_rows_cannot_change_a_frozen_one_step_prediction() -
     assert model.predict([before])[0] == model.predict([after])[0]
 
 
-def test_late_historical_sale_is_not_available_to_model_or_baseline() -> None:
+@pytest.mark.parametrize("versioned", [False, True])
+def test_late_historical_sale_is_not_available_to_model_or_baseline(versioned) -> None:
     dataset = DatasetGenerationConfig(
         profile="small", days=8, products=8, stores=2, warehouses=2, seed=42,
     )
@@ -109,6 +110,13 @@ def test_late_historical_sale_is_not_available_to_model_or_baseline() -> None:
     target = series[-1]
     history = series[:-1]
     late = {**history[-1], "observation_available_at": "2099-01-01T12:00:00+00:00"}
+    if versioned:
+        versions = json.loads(str(late["observation_history"]))
+        assert len(versions) == 1
+        versions[0]["available_at"] = str(late["observation_available_at"])
+        late["observation_history"] = json.dumps(versions)
+    else:
+        late.pop("observation_history")
 
     model_features = build_training_features(target, [*history[:-1], late], window_days=7)
     known_features = build_training_features(target, history[:-1], window_days=7)
