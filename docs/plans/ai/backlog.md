@@ -18,6 +18,8 @@ w layout eksportu; zachować CSV demo i fixtures. Kontrolowany cleanup ma
 odmawiać usuwania tracked fixture i plików poza generated root. Zmierzyć
 czas, peak RSS, rows/s, bytes oraz CSV/Parquet parity na ograniczonych profilach.
 Następny slice to niezmienny exporter z allowlistą faktów i atomową publikacją.
+Przed jego publikacją zamknąć DATA-07: fingerprint ma obejmować cały wykonywany
+bundle workera, w tym inicjalizatory pakietów, z testem zmiany kodu i provenance.
 Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
 importerze i curated builderze. ML-07 wersji/korekt pozostaje warunkiem replay.
 
@@ -40,7 +42,7 @@ Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **03 — snapshot/curated** | ML-07: rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
+| **03 — snapshot/curated** | DATA-07: pełny fingerprint bundla przed publikacją. ML-07: rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | ML-07 jako warunek wejść. Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |

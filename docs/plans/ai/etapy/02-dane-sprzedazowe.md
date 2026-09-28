@@ -2,6 +2,11 @@
 
 **Etap odebrany lokalnie 28.09.2026. Repo: RetailOps. Zależność: 01.**
 
+[Audyt gotowości do AI 03](../../../evidence/ai/02/audit/README.md) potwierdza
+wejście dla bieżącej syntetycznej sprzedaży obserwowanej. Pełna historia korekt
+ML-07 pozostaje otwarta; DATA-07 wymaga uzupełnienia fingerprintu workera przed
+publikacją immutable snapshot w AI 03.
+
 [DATA-05](../../../evidence/ai/02/data05/README.md) potwierdza source 2.5,
 generator 0.7, kanonizację 1.5, 45 hard gates i izolowany worker cech 3.0.
 Źródło obejmuje jawne profile/daty/identity, kanoniczne wymiary i kalendarz,

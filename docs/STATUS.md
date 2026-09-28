@@ -36,6 +36,11 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
+[Audyt AI 02](evidence/ai/02/audit/README.md) na `a82152a` potwierdza lokalne
+rozpoczęcie AI 03: ponowny odbiór źródła i 206 świeżych testów przeszły.
+DATA-07 wymaga uzupełnienia fingerprintu całego kodu workera przed pierwszą
+publikacją immutable snapshot; bieżące dane i izolacja pozostają poprawne.
+
 Etap 02 ma [lokalny odbiór DATA-05](evidence/ai/02/data05/README.md):
 source 2.5, 45 hard gates, rozdzielone parametry symulacji i osobny worker cech,
 który przyjmuje wyłącznie trzy projekcje faktów. Oba profile smoke zachowują

@@ -6,6 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| Audyt AI 02 → AI 03 | 2026-09-28 | [Gotowość do rozpoczęcia 03](ai/02/audit/README.md): zgodność z wymaganiami, powtórzony odbiór źródła, 206 świeżych testów i weryfikacja wcześniejszych 650. DATA-07 przed publikacją snapshotu; ML-07 przed pełnym replay. Brak nowego zdalnego CI. |
 | Źródło i izolacja AI 02 / DATA-05 | 2026-09-28 | [Odbiór lokalny](ai/02/data05/README.md): source 2.5, 45 hard gates, osobne parametry symulacji, worker bez źródła/sieci/generatora, negatywne wejścia truth/inventory, powtórzenia profili i zgodne demo. Źródło do AI 03; modele/inventory nadal niegotowe. |
 | Chronologia i zwroty AI 02 / DATA-03 | 2026-09-28 | [Odbiór lokalny](ai/02/data03/README.md): konkretne pozycje, częściowe ilości, okna kategorii/kanałów, refundacje według zapłaconej ceny i 39-dniowy ogon; siedem hard gates, dwa snapshot cutoffy, zgodne demo i odczyt source 2.0–2.3. Końcowy odbiór źródła: DATA-05. |
 | Popyt, panel i koszyki AI 02 / DATA-02/03/05 | 2026-09-28 | [Odbiór lokalny](ai/02/demand-panel/README.md): pełny ważny panel i jawne statusy, jedna formuła, konserwacja sztuk i koszyki bez powtórzeń, cechy AI 3.0; 100% coverage smoke, zgodne demo. Dalsze odbiory: [zwroty](ai/02/data03/README.md); izolację truth potwierdza DATA-05. |

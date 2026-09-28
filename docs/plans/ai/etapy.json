@@ -45,6 +45,7 @@
       "path": "etapy/02-dane-sprzedazowe.md",
       "status": "completed",
       "evidence": "../../evidence/ai/02/data05/README.md",
+      "readiness_audit": "../../evidence/ai/02/audit/README.md",
       "implementation_commit": "6e06e909c7dac78675324e8d8ec42921e36b95e8",
       "implementation_scope": "DATA-01 through DATA-05: source 2.5 identity, dimensions/calendar/pricing/full observed-sales panel/baskets/chronology/returns, separate simulation parameters, isolated facts worker and final source/readiness gates",
       "acceptance_scope": "local bounded ai-smoke and ai-temporal-smoke; forecast source ready for AI-03, models/inventory/replay not ready; no remote Required CI"
@@ -224,5 +225,5 @@
     }
   ],
   "status": "in_progress",
-  "next_stage": "02"
+  "next_stage": "03"
 }
