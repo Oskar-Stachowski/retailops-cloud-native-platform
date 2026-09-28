@@ -271,7 +271,7 @@ def test_repeated_exports_keep_logical_identity_and_table_bytes(tmp_path, config
         generate_demo_dataset(directory, config)
         manifests.append(load_source_manifest_v2(directory))
         generate_demand_feature_dataset(
-            DemandFeatureGenerationConfig(dataset=config, output_dir=directory / "features")
+            DemandFeatureGenerationConfig(dataset=config, output_dir=directory / "features", source_dir=directory)
         )
         feature_manifests.append(
             load_feature_identity_manifest(directory / "features")

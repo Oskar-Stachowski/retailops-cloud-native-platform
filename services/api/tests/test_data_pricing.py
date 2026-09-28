@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from data.generator.feature_admission import admit_feature_tables
+from data.generator.source_quality import project_facts
+from ml.features.worker import transform
+
 import copy
 import json
 from dataclasses import replace
@@ -129,7 +133,7 @@ def test_generated_ai_plans_cover_all_assortment_and_have_controls(priced_datase
         "location_channel",
     }
     assert {r["id"] for r in priced_dataset["products"]} - {r["product_id"] for r in plans}
-    assert all(r["promotion_uplift"] == "" for r in priced_dataset["sales"])
+    assert all("promotion_uplift" not in r for r in priced_dataset["sales"])
 
 
 @pytest.mark.parametrize(
@@ -411,7 +415,7 @@ def test_relational_price_failures_cannot_pass_or_reach_features(priced_dataset,
         broken["promotion_effect_truth"].append(dict(broken["promotion_effect_truth"][0]))
     assert build_pricing_report(broken, resolve_generation_config(CONFIG))["status"] == "failed"
     with pytest.raises(ValueError, match="hard gate"):
-        build_demand_feature_rows(broken, CONFIG)
+        admit_feature_tables(broken, CONFIG)
 
 
 def test_recomputed_checksums_cannot_hide_price_gap_or_false_report(tmp_path, priced_dataset):
@@ -480,7 +484,7 @@ def test_historical_2_1_source_and_features_keep_identity(tmp_path):
 def test_new_source_classifies_truth_and_reports_both_json_and_md(tmp_path):
     generate_demo_dataset(tmp_path, CONFIG)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.4.0" and len(source["artifacts"]) == 37
+    assert source["schema_version"] == "2.5.0" and len(source["artifacts"]) == 39
     assert source["descriptor"]["versions"]["pricing"] == "retail-pricing-1.0.0"
     truth = next(a for a in source["artifacts"] if a["table"] == "promotion_effect_truth")
     assert truth["data_class"] == truth["temporal_role"] == "simulation_truth"

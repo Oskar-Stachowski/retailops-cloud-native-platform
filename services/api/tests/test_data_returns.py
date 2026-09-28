@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from data.generator.feature_admission import admit_feature_tables
+from data.generator.source_quality import project_facts
+from ml.features.worker import transform
+
 import copy
 import json
 import subprocess
@@ -178,7 +182,7 @@ def test_hard_gates_block_malformed_chronology_returns_and_revenue(dataset,mutat
     with pytest.raises(ValueError,match="hard gate"):
         validate_returns(tables,resolve_generation_config(CONFIG))
     with pytest.raises(ValueError):
-        build_demand_feature_rows(tables,CONFIG)
+        admit_feature_tables(tables,CONFIG)
 
 
 def test_later_events_do_not_rewrite_daily_sales_labels_or_day_close_net(dataset):
@@ -192,7 +196,7 @@ def test_later_events_do_not_rewrite_daily_sales_labels_or_day_close_net(dataset
 def test_row_order_does_not_change_return_semantics_or_ai_features(dataset):
     reordered = {name:list(reversed(rows)) if name in {*RETURN_COLUMNS,"returns"} else rows for name,rows in dataset.items()}
     assert validate_returns(reordered,resolve_generation_config(CONFIG)) == validate_returns(dataset,resolve_generation_config(CONFIG))
-    assert build_demand_feature_rows(reordered,CONFIG) == build_demand_feature_rows(dataset,CONFIG)
+    assert transform(admit_feature_tables(reordered,CONFIG)) == transform(admit_feature_tables(dataset,CONFIG))
 
 
 def test_empty_closed_history_matures_without_fictitious_returns():
@@ -208,7 +212,7 @@ def test_export_checks_semantics_even_with_recomputed_hashes_and_schema(tmp_path
     config = replace(CONFIG,days=3,products=8,stores=3)
     generate_demo_dataset(tmp_path,config)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.4.0" and len(source["artifacts"]) == 37
+    assert source["schema_version"] == "2.5.0" and len(source["artifacts"]) == 39
     assert source["descriptor"]["versions"]["returns"] == "retail-returns-1.0.0"
     assert source["watermarks"]["return_events"]["as_of_time"] == "2026-09-09T00:00:00+00:00"
     assert source["watermarks"]["daily_return_cohorts.history"]["as_of_time"] == "2026-08-01T00:00:00+00:00"

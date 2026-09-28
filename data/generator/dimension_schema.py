@@ -153,5 +153,11 @@ DIMENSION_CLASSES = {
 }
 
 
-def uses_dimensions(profile: str, schema_version: str = "2.4.0") -> bool:
-    return profile.startswith("ai-") and schema_version in {"2.1.0", "2.2.0", "2.3.0", "2.4.0"}
+def uses_dimensions(profile: str, schema_version: str = "2.5.0") -> bool:
+    return profile.startswith("ai-") and schema_version in {
+        "2.1.0",
+        "2.2.0",
+        "2.3.0",
+        "2.4.0",
+        "2.5.0",
+    }

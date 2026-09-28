@@ -41,6 +41,9 @@ from data.generator.realism_report import write_realism_report
 from data.generator.return_quality import validate_returns, write_returns_report
 from data.generator.return_schema import uses_returns
 from data.generator.sales import generate_sales
+from data.generator.simulation_schema import uses_separation
+from data.generator.source_quality import validate_source_report, write_source_report
+from data.generator.source_realism import build_source_realism, write_source_realism
 from data.generator.stock import generate_returns, generate_stock_movements
 from data.generator.users import generate_users
 
@@ -172,6 +175,11 @@ def generate_demo_dataset(
         if uses_returns(config.profile)
         else None
     )
+    source_report = (
+        validate_source_report(tables, resolve_generation_config(config))
+        if uses_separation(config.profile)
+        else None
+    )
     if (output_dir / MANIFEST_V2_FILENAME).exists():
         previous = load_source_manifest_v2(output_dir)
         if previous["dataset_id"] != source_identity(config, tables)[0]:
@@ -188,7 +196,10 @@ def generate_demo_dataset(
         write_returns_report(output_dir, returns_report)
     write_quality_report(output_dir, config.profile, tables)
     write_dataset_manifest(output_dir, config, tables)
-    if config.profile != "demo":
+    if source_report is not None:
+        write_source_report(output_dir, source_report)
+        write_source_realism(output_dir, build_source_realism(config.profile, config.seed, tables))
+    elif config.profile != "demo":
         write_realism_report(output_dir, config.profile, config.seed, tables)
     write_source_manifest_v2(config, tables, output_dir)
     return counts

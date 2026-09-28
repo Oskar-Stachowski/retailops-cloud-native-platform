@@ -44,6 +44,10 @@ FEATURE_CODE = (
     SCHEMA_PATH,
     IDENTITY_SCHEMA_PATH,
     "ml/features/ai_demand.py",
+    "ml/features/fact_input.py",
+    "ml/features/worker.py",
+    "ml/features/isolated_runtime.py",
+    "ml/features/runtime_probe.py",
     AI_FEATURE_SCHEMA_PATH,
 )
 ROOT = Path(__file__).resolve().parents[2]
@@ -57,7 +61,9 @@ class FeatureDescriptor(Contract):
     schema_version: Literal["2.0", "3.0"]
     feature_schema_sha256: SHA256
     transformation_version: Literal[
-        "observed-demand-identity-1.0.0", "daily-demand-panel-features-1.0.0"
+        "observed-demand-identity-1.0.0",
+        "daily-demand-panel-features-1.0.0",
+        "daily-demand-facts-worker-1.0.0",
     ]
     code_sha256: SHA256
     dependency_sha256: SHA256
@@ -94,7 +100,15 @@ def feature_identity(
     rows: list[dict[str, Any]],
     columns: list[str],
 ) -> tuple[str, dict[str, Any], dict[str, Any]]:
-    source_id, source_descriptor = source_identity(config, tables)
+    _, source_descriptor = source_identity(config, tables)
+    return feature_identity_from_source(config, source_descriptor, rows, columns)
+
+
+def feature_identity_from_source(
+    config: DatasetGenerationConfig, source_descriptor: dict, rows: list[dict], columns: list[str]
+) -> tuple[str, dict, dict]:
+    SourceDescriptor.model_validate(source_descriptor)
+    source_id = "source-sha256-" + json_sha256(source_descriptor)
     ai = uses_demand(config.profile)
     fingerprint = code_fingerprint(FEATURE_CODE)
     identity_columns = [name for name in columns if name not in {"dataset_id", "generated_at"}]
@@ -107,7 +121,7 @@ def feature_identity(
         "feature_schema_sha256": file_sha256(
             ROOT / (AI_FEATURE_SCHEMA_PATH if ai else SCHEMA_PATH)
         ),
-        "transformation_version": "daily-demand-panel-features-1.0.0"
+        "transformation_version": "daily-demand-facts-worker-1.0.0"
         if ai
         else "observed-demand-identity-1.0.0",
         "code_sha256": fingerprint["code_sha256"],
@@ -123,12 +137,19 @@ def feature_identity(
 
 def write_feature_identity_manifest(
     config: DatasetGenerationConfig,
-    tables: dict[str, list[dict[str, Any]]],
+    tables: dict[str, list[dict[str, Any]]] | None,
     rows: list[dict[str, Any]],
     columns: list[str],
     output_dir: Path,
+    *,
+    source_descriptor: dict | None = None,
 ) -> None:
-    dataset_id, descriptor, source_descriptor = feature_identity(config, tables, rows, columns)
+    if source_descriptor is None:
+        dataset_id, descriptor, source_descriptor = feature_identity(config, tables, rows, columns)
+    else:
+        dataset_id, descriptor, source_descriptor = feature_identity_from_source(
+            config, source_descriptor, rows, columns
+        )
     path = output_dir / "features.csv"
     payload = {
         "schema_version": "1.0.0",
@@ -174,14 +195,22 @@ def validate_feature_identity_manifest(
     source_id = "source-sha256-" + json_sha256(source_descriptor)
     columns = identity_columns_for_schema(descriptor["schema_version"], columns)
     ai = descriptor["schema_version"] == "3.0"
+    expected_transform = (
+        (
+            "daily-demand-facts-worker-1.0.0"
+            if source_descriptor["schema_version"] == "2.5.0"
+            else "daily-demand-panel-features-1.0.0"
+        )
+        if ai
+        else "observed-demand-identity-1.0.0"
+    )
     if (
         ai
         != uses_demand(
             source_descriptor["resolved_parameters"]["profile"], source_descriptor["schema_version"]
         )
         or manifest.complete_daily_panel != ai
-        or descriptor["transformation_version"]
-        != ("daily-demand-panel-features-1.0.0" if ai else "observed-demand-identity-1.0.0")
+        or descriptor["transformation_version"] != expected_transform
     ):
         msg = "Feature schema, completeness or source version disagree."
         raise ValueError(msg)

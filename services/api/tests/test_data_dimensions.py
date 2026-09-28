@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from data.generator.simulation_schema import SIMULATION_COLUMNS
+from data.generator.feature_admission import admit_feature_tables
+from data.generator.source_quality import project_facts
+from ml.features.worker import transform
+
 import copy
 import json
 from dataclasses import replace
@@ -34,7 +39,7 @@ def dimensions():
 
 
 def test_catalog_separates_brands_categories_locations_and_channels(dimensions):
-    assert set(dimensions) == set(CSV_WRITE_ORDER) | set(DIMENSION_COLUMNS) | set(PRICING_COLUMNS) | set(DEMAND_COLUMNS) | set(RETURN_COLUMNS)
+    assert set(dimensions) == set(CSV_WRITE_ORDER) | set(DIMENSION_COLUMNS) | set(PRICING_COLUMNS) | set(DEMAND_COLUMNS) | set(RETURN_COLUMNS) | set(SIMULATION_COLUMNS)
     report = validate_dimensions(dimensions, resolve_generation_config(CONFIG))
     assert len(report["checks"]) == 8
     assert all(c["severity"] == "hard" and c["status"] == "passed" for c in report["checks"])
@@ -212,7 +217,7 @@ def test_missing_calendar_is_unknown_and_cannot_be_used_for_features(dimensions)
             missing["business_date"],
         )
     with pytest.raises(ValueError, match="hard gate"):
-        build_demand_feature_rows(broken, CONFIG)
+        admit_feature_tables(broken, CONFIG)
 
 
 @pytest.mark.parametrize(
@@ -277,8 +282,8 @@ def test_recomputed_manifest_hashes_cannot_bypass_missing_calendar(tmp_path, dim
 def test_new_source_includes_all_dimensions_and_mixed_versions_fail(tmp_path):
     generate_demo_dataset(tmp_path, CONFIG)
     manifest = load_source_manifest_v2(tmp_path)
-    assert manifest["schema_version"] == "2.4.0"
-    assert len(manifest["artifacts"]) == 37
+    assert manifest["schema_version"] == "2.5.0"
+    assert len(manifest["artifacts"]) == 39
     assert manifest["descriptor"]["versions"]["dimensions"] == "retail-dimensions-1.0.0"
     assert any(
         r["path"] == "dimensions_report.json" and r["status"] == "passed"

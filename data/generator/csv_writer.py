@@ -7,6 +7,7 @@ from data.generator.demand_schema import DEMAND_COLUMNS, uses_demand
 from data.generator.dimension_schema import DIMENSION_COLUMNS, uses_dimensions
 from data.generator.pricing_schema import PRICING_COLUMNS, uses_pricing
 from data.generator.return_schema import RETURN_COLUMNS, uses_returns
+from data.generator.simulation_schema import SIMULATION_COLUMNS, fact_columns, uses_separation
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -216,24 +217,27 @@ TABLE_COLUMNS: dict[str, list[str]] = {
 CSV_WRITE_ORDER = list(TABLE_COLUMNS.keys())
 
 
-def source_table_order(profile: str, schema_version: str = "2.4.0") -> list[str]:
+def source_table_order(profile: str, schema_version: str = "2.5.0") -> list[str]:
     return [
         *CSV_WRITE_ORDER,
         *(DIMENSION_COLUMNS if uses_dimensions(profile, schema_version) else ()),
         *(PRICING_COLUMNS if uses_pricing(profile, schema_version) else ()),
         *(DEMAND_COLUMNS if uses_demand(profile, schema_version) else ()),
         *(RETURN_COLUMNS if uses_returns(profile, schema_version) else ()),
+        *(SIMULATION_COLUMNS if uses_separation(profile, schema_version) else ()),
     ]
 
 
-def source_columns(table: str) -> list[str]:
-    return {
+def source_columns(table: str, profile: str = "demo", schema_version: str = "2.5.0") -> list[str]:
+    columns = {
         **TABLE_COLUMNS,
         **DIMENSION_COLUMNS,
         **PRICING_COLUMNS,
         **DEMAND_COLUMNS,
         **RETURN_COLUMNS,
+        **SIMULATION_COLUMNS,
     }[table]
+    return fact_columns(table, columns) if uses_separation(profile, schema_version) else columns
 
 
 def write_csv(
@@ -264,12 +268,20 @@ def write_tables(
         *CSV_WRITE_ORDER,
         *(
             name
-            for name in {**DIMENSION_COLUMNS, **PRICING_COLUMNS, **DEMAND_COLUMNS, **RETURN_COLUMNS}
+            for name in {
+                **DIMENSION_COLUMNS,
+                **PRICING_COLUMNS,
+                **DEMAND_COLUMNS,
+                **RETURN_COLUMNS,
+                **SIMULATION_COLUMNS,
+            }
             if name in tables
         ),
     ]:
         rows = tables[table_name]
-        columns = source_columns(table_name)
+        columns = source_columns(
+            table_name, "ai-export" if "product_simulation_parameters" in tables else "demo"
+        )
         write_csv(output_dir / f"{table_name}.csv", rows, columns)
         counts[table_name] = len(rows)
 

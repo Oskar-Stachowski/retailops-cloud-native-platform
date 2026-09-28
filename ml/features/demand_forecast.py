@@ -3,32 +3,29 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from data.generator.configuration import SUPPORTED_PROFILES, resolve_generation_config
-from data.generator.demand_quality import validate_demand
+from data.generator.configuration import SUPPORTED_PROFILES
 from data.generator.demand_schema import uses_demand
-from data.generator.dimension_quality import validate_dimensions
-from data.generator.dimension_schema import uses_dimensions
+from data.generator.feature_admission import admit_feature_source
 from data.generator.identity import GENERATOR_VERSION
 from data.generator.main import (
     DatasetGenerationConfig,
     build_dataset,
 )
-from data.generator.pricing_quality import validate_pricing
-from data.generator.pricing_schema import uses_pricing
-from data.generator.return_quality import validate_returns
-from data.generator.return_schema import uses_returns
-from ml.features.ai_demand import AI_FEATURE_COLUMNS, ai_feature_rows
+from ml.features.ai_demand import AI_FEATURE_COLUMNS
 from ml.features.identity import (
     IDENTITY_FILENAME,
     feature_identity,
+    feature_identity_from_source,
     load_feature_identity_manifest,
     write_feature_identity_manifest,
 )
+from ml.features.isolated_runtime import isolated_feature_rows
 
 SCHEMA_VERSION = "2.0"
 DATASET_NAME = "retailops-demand-forecast-features"
@@ -73,6 +70,7 @@ class DemandFeatureGenerationConfig:
         default_factory=lambda: DatasetGenerationConfig(profile="demo"),
     )
     output_dir: Path | None = None
+    source_dir: Path | None = None
 
 
 def _text(value: object) -> str:
@@ -170,23 +168,9 @@ def build_demand_feature_rows(
     tables: dict[str, list[dict[str, object]]],
     config: DatasetGenerationConfig,
 ) -> list[dict[str, object]]:
-    if uses_dimensions(config.profile):
-        validate_dimensions(tables, resolve_generation_config(config))
-    if uses_pricing(config.profile):
-        validate_pricing(tables, resolve_generation_config(config))
     if uses_demand(config.profile):
-        if uses_returns(config.profile):
-            validate_returns(tables, resolve_generation_config(config))
-        validate_demand(tables, resolve_generation_config(config))
-        rows = ai_feature_rows(
-            tables["daily_demand_observations"],
-            tables["product_catalog"],
-            tables["catalog_categories"],
-        )
-        dataset_id, _, _ = feature_identity(config, tables, rows, AI_FEATURE_COLUMNS)
-        for row in rows:
-            row["dataset_id"] = dataset_id
-        return rows
+        msg = "AI features require an accepted source directory and isolated facts worker; full source tables are forbidden."
+        raise ValueError(msg)
     products_by_id = {_text(product["id"]): product for product in tables["products"]}
     generated_at = _feature_generated_at(tables)
     aggregates = _build_aggregates(tables)
@@ -316,10 +300,24 @@ def write_feature_dataset(
 def generate_demand_feature_dataset(
     config: DemandFeatureGenerationConfig,
 ) -> dict[str, object]:
-    tables = build_dataset(config.dataset)
-    rows = build_demand_feature_rows(tables, config.dataset)
     columns = feature_columns(config.dataset.profile)
-    dataset_id, _, _ = feature_identity(config.dataset, tables, rows, columns)
+    source_descriptor = None
+    tables = None
+    if uses_demand(config.dataset.profile):
+        if config.source_dir is None:
+            msg = "AI features require --source-dir with an accepted source export."
+            raise ValueError(msg)
+        facts, source_descriptor = admit_feature_source(config.source_dir, config.dataset)
+        rows = isolated_feature_rows(facts)
+        dataset_id, _, _ = feature_identity_from_source(
+            config.dataset, source_descriptor, rows, columns
+        )
+        for row in rows:
+            row["dataset_id"] = dataset_id
+    else:
+        tables = build_dataset(config.dataset)
+        rows = build_demand_feature_rows(tables, config.dataset)
+        dataset_id, _, _ = feature_identity(config.dataset, tables, rows, columns)
     manifest = build_feature_manifest(config.dataset, rows, dataset_id=dataset_id)
     output_dir = config.output_dir or default_feature_output_dir(config.dataset.profile)
     if (output_dir / IDENTITY_FILENAME).exists():
@@ -328,7 +326,9 @@ def generate_demand_feature_dataset(
             msg = "Output already contains different features; choose a new output directory."
             raise ValueError(msg)
     write_feature_dataset(output_dir, rows, manifest)
-    write_feature_identity_manifest(config.dataset, tables, rows, columns, output_dir)
+    write_feature_identity_manifest(
+        config.dataset, tables, rows, columns, output_dir, source_descriptor=source_descriptor
+    )
     return manifest
 
 
@@ -346,6 +346,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--end-date", type=date.fromisoformat)
     parser.add_argument("--max-daily-rows", type=int)
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--source-dir", type=Path)
     return parser.parse_args()
 
 
@@ -363,12 +364,16 @@ def config_from_args(args: argparse.Namespace) -> DemandFeatureGenerationConfig:
             max_daily_rows=getattr(args, "max_daily_rows", None),
         ),
         output_dir=args.output_dir,
+        source_dir=getattr(args, "source_dir", None),
     )
 
 
 def main() -> None:
     config = config_from_args(parse_args())
-    manifest = generate_demand_feature_dataset(config)
+    try:
+        manifest = generate_demand_feature_dataset(config)
+    except (ValueError, RuntimeError, OSError):
+        sys.exit("Feature source admission or isolated runtime failed.")
     output_dir = config.output_dir or default_feature_output_dir(config.dataset.profile)
 
     print(  # noqa: T201 - CLI output

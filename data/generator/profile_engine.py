@@ -30,6 +30,7 @@ from data.generator.return_reconciliation import (
     legacy_return_projection,
     return_boundaries,
 )
+from data.generator.simulation import separate_simulation
 from data.generator.users import generate_users
 
 
@@ -1021,4 +1022,5 @@ def build_profile_dataset(
         tables["returns"] = legacy_return_projection(
             tables, return_boundaries(effective)["history"]
         )
+        separate_simulation(tables)
     return tables

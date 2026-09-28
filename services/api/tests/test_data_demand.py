@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from data.generator.feature_admission import admit_feature_tables
+from data.generator.source_quality import project_facts
+from ml.features.worker import transform
+
 import copy
 import json
 import random
@@ -105,7 +109,7 @@ def test_actual_transactions_reconcile_to_daily_budget_and_unique_skus(dataset):
         units[k] += int(sale["quantity"])
         revenue[k] += Decimal(sale["total_amount"])
         orders[k].add(sale["order_reference"])
-        assert sale["latent_demand"] == sale["demand_noise"] == sale["stockout_flag"] == ""
+        assert not {"latent_demand", "demand_noise", "stockout_flag"} & sale.keys()
     for row in dataset["daily_demand_observations"]:
         k = key(row)
         assert int(row["observed_units"]) == units[k]
@@ -148,7 +152,7 @@ def test_missing_window_stays_null_and_blocks_complete_export(dataset):
     tables["daily_demand_observations"] = build_daily_panel(tables, resolve_generation_config(CONFIG), missing_keys=frozenset([key(zero)]))
     missing = next(r for r in tables["daily_demand_observations"] if r["observation_status"] == "missing")
     assert missing["observed_units"] == missing["gross_revenue"] == ""
-    features = ai_feature_rows(tables["daily_demand_observations"], tables["product_catalog"], tables["catalog_categories"])
+    features = ai_feature_rows(**{k:project_facts(tables)["tables"][v] for k,v in (("observations","daily_demand_observations"),("catalog","product_catalog"),("categories","catalog_categories"))})
     row = next(r for r in features if r["observation_status"] == "missing")
     assert row["units_sold"] is None and row["source_data_complete"] is False
     with pytest.raises(ValueError, match="daily_source_completeness"):
@@ -156,7 +160,7 @@ def test_missing_window_stays_null_and_blocks_complete_export(dataset):
 
 
 def test_feature_rows_use_physical_grain_and_no_truth_inventory_revenue(dataset):
-    rows = build_demand_feature_rows(dataset, CONFIG)
+    rows = transform(admit_feature_tables(dataset, CONFIG))
     manifest = build_feature_manifest(CONFIG, rows)
     assert len(rows) == len(dataset["daily_demand_observations"])
     assert all(set(r) == set(AI_FEATURE_COLUMNS) for r in rows)
@@ -188,7 +192,7 @@ def test_export_semantic_checks_cannot_be_bypassed_by_recomputed_hashes(tmp_path
     config = replace(CONFIG, days=3, products=8, stores=3)
     generate_demo_dataset(tmp_path, config)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.4.0" and len(source["artifacts"]) == 37
+    assert source["schema_version"] == "2.5.0" and len(source["artifacts"]) == 39
     assert source["watermarks"]["daily_demand_observations"]["complete_through"] == "2026-07-31"
     tables = build_dataset(config)
     tables["daily_demand_observations"].pop()
@@ -221,7 +225,9 @@ def test_demand_schema_and_minimal_closed_profile():
 
 def test_ai_feature_export_is_verified_and_not_silently_legacy(tmp_path):
     config = replace(CONFIG, days=3, products=8, stores=3)
-    manifest = generate_demand_feature_dataset(DemandFeatureGenerationConfig(config,tmp_path))
+    source_dir = tmp_path / "source"
+    generate_demo_dataset(source_dir,config)
+    manifest = generate_demand_feature_dataset(DemandFeatureGenerationConfig(config,tmp_path,source_dir))
     identity = load_feature_identity_manifest(tmp_path)
     assert identity["descriptor"]["schema_version"] == manifest["schema_version"] == "3.0"
     assert identity["complete_daily_panel"] is True
@@ -230,7 +236,7 @@ def test_ai_feature_export_is_verified_and_not_silently_legacy(tmp_path):
 
 @pytest.mark.parametrize("mutation", ["negative_label", "fake_status", "fake_calendar", "fake_flag", "duplicate"])
 def test_ai_feature_semantics_reject_malformed_records(dataset, mutation):
-    rows = ai_feature_rows(dataset["daily_demand_observations"], dataset["product_catalog"], dataset["catalog_categories"])
+    rows = transform(project_facts(dataset))
     if mutation == "negative_label": rows[0]["units_sold"] = -1
     elif mutation == "fake_status": rows[0]["observation_status"] = "unknown"
     elif mutation == "fake_calendar": rows[0]["month"] = 99
@@ -249,7 +255,7 @@ def test_late_fact_after_declared_snapshot_cannot_claim_completeness(dataset):
 
 
 def test_feature_label_cannot_claim_availability_before_day_close(dataset):
-    rows = ai_feature_rows(dataset["daily_demand_observations"], dataset["product_catalog"], dataset["catalog_categories"])
+    rows = transform(project_facts(dataset))
     rows[0]["observation_available_at"] = rows[0]["date"] + "T12:00:00+00:00"
     with pytest.raises(ValueError, match="day close"):
         validate_ai_records(rows)

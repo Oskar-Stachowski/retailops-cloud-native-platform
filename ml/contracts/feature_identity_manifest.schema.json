@@ -69,7 +69,8 @@
         "transformation_version": {
           "enum": [
             "observed-demand-identity-1.0.0",
-            "daily-demand-panel-features-1.0.0"
+            "daily-demand-panel-features-1.0.0",
+            "daily-demand-facts-worker-1.0.0"
           ],
           "title": "Transformation Version",
           "type": "string"
@@ -426,7 +427,8 @@
             "2.1.0",
             "2.2.0",
             "2.3.0",
-            "2.4.0"
+            "2.4.0",
+            "2.5.0"
           ],
           "title": "Schema Version",
           "type": "string"
@@ -525,7 +527,8 @@
             "0.3.0",
             "0.4.0",
             "0.5.0",
-            "0.6.0"
+            "0.6.0",
+            "0.7.0"
           ],
           "title": "Generator",
           "type": "string"
@@ -607,13 +610,30 @@
           "default": null,
           "title": "Returns"
         },
+        "simulation": {
+          "anyOf": [
+            {
+              "enum": [
+                "retail-simulation-parameters-1.0.0",
+                "not_applicable"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Simulation"
+        },
         "canonicalization": {
           "enum": [
             "typed-csv-nfc-utc-multiset-1.0.0",
             "typed-csv-nfc-utc-multiset-1.1.0",
             "typed-csv-nfc-utc-multiset-1.2.0",
             "typed-csv-nfc-utc-multiset-1.3.0",
-            "typed-csv-nfc-utc-multiset-1.4.0"
+            "typed-csv-nfc-utc-multiset-1.4.0",
+            "typed-csv-nfc-utc-multiset-1.5.0"
           ],
           "title": "Canonicalization",
           "type": "string"

@@ -31,7 +31,7 @@ def run_case(root: Path, name: str, config: DatasetGenerationConfig) -> dict[str
     generate_demo_dataset(output, config)
     source = load_source_manifest_v2(output)
     generate_demand_feature_dataset(
-        DemandFeatureGenerationConfig(dataset=config, output_dir=output / "features")
+        DemandFeatureGenerationConfig(dataset=config, output_dir=output / "features", source_dir=output)
     )
     features = load_feature_identity_manifest(output / "features")
     require(

@@ -210,7 +210,7 @@ def _transactions(
             "Order item and sale prices disagree.",
         )
         require(
-            sale["promotion_uplift"] == "",
+            sale.get("promotion_uplift", "") == "",
             "Promotion effects belong to simulation truth, not sales.",
         )
     totals = defaultdict(Decimal)

@@ -28,11 +28,12 @@ from data.generator.dimension_schema import (
 )
 from data.generator.pricing_schema import PRICING_CLASSES, PRICING_VERSION, uses_pricing
 from data.generator.return_schema import RETURN_CLASSES, RETURNS_VERSION, uses_returns
+from data.generator.simulation_schema import SIMULATION_COLUMNS, SIMULATION_VERSION, uses_separation
 
 ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_VERSION = "0.6.0"
-CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.4.0"
-SOURCE_SCHEMA_VERSION = "2.4.0"
+GENERATOR_VERSION = "0.7.0"
+CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.5.0"
+SOURCE_SCHEMA_VERSION = "2.5.0"
 INTEGER_FIELDS = {
     "observed_units",
     "observed_orders",
@@ -158,10 +159,17 @@ DATA_CLASSES.update(DIMENSION_CLASSES)
 DATA_CLASSES.update(PRICING_CLASSES)
 DATA_CLASSES.update(DEMAND_CLASSES)
 DATA_CLASSES.update(RETURN_CLASSES)
+DATA_CLASSES.update(dict.fromkeys(SIMULATION_COLUMNS, "simulation_truth"))
 DEPENDENCY_FILES = (
     "services/api/requirements.txt",
     "services/api/requirements-dev.txt",
 )
+
+
+def source_data_class(name: str, profile: str, schema_version: str = SOURCE_SCHEMA_VERSION) -> str:
+    if uses_separation(profile, schema_version) and name in {"products", "stores", "sales"}:
+        return "source_observation"
+    return DATA_CLASSES[name]
 
 
 def canonical_json(value: object) -> bytes:
@@ -255,6 +263,10 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
             "data/contracts/retail_pricing.v1.schema.json",
             "data/contracts/retail_demand.v1.schema.json",
             "data/contracts/retail_returns.v1.schema.json",
+            "data/contracts/retail_simulation.v1.schema.json",
+            "ml/features/fact_input.py",
+            "ml/features/worker.py",
+            "ml/features/ai_demand.py",
             *extra_files,
         ]
     )
@@ -330,6 +342,9 @@ def source_identity(
             "pricing": PRICING_VERSION if uses_pricing(config.profile) else "not_applicable",
             "demand": DEMAND_VERSION if uses_demand(config.profile) else "not_applicable",
             "returns": RETURNS_VERSION if uses_returns(config.profile) else "not_applicable",
+            "simulation": SIMULATION_VERSION
+            if uses_separation(config.profile)
+            else "not_applicable",
             "canonicalization": CANONICALIZATION_VERSION,
             "csv_schema": "1.0",
         },
@@ -340,9 +355,11 @@ def source_identity(
         "tables": {
             name: {
                 "row_count": len(tables[name]),
-                "columns": source_columns(name),
-                "content_sha256": content_sha256(tables[name], source_columns(name)),
-                "data_class": DATA_CLASSES[name],
+                "columns": source_columns(name, config.profile),
+                "content_sha256": content_sha256(
+                    tables[name], source_columns(name, config.profile)
+                ),
+                "data_class": source_data_class(name, config.profile),
             }
             for name in source_table_order(config.profile)
         },

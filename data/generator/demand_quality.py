@@ -16,6 +16,7 @@ from data.generator.demand_schema import DEMAND_COLUMNS, DEMAND_GRAIN, DEMAND_VE
 from data.generator.dimension_quality import require, timestamp
 from data.generator.dimensions import DimensionIndex
 from data.generator.return_quality import build_return_report
+from data.generator.simulation import simulation_entities
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -104,8 +105,8 @@ def _baskets(tables: dict, _config: ResolvedGenerationConfig) -> int:
 def _demand(tables: dict, config: ResolvedGenerationConfig) -> int:
     grid, _ = demand_grid(tables, config)
     products, stores = (
-        {r["id"]: r for r in tables["products"]},
-        {r["id"]: r for r in tables["stores"]},
+        {r["id"]: r for r in simulation_entities(tables, "products")},
+        {r["id"]: r for r in simulation_entities(tables, "stores")},
     )
     pricing = CommercePricing(tables, DimensionIndex(tables))
     expected = [
@@ -123,7 +124,7 @@ def _demand(tables: dict, config: ResolvedGenerationConfig) -> int:
         totals[_key(refs[row["id"]])] += int(row["quantity"])
         require(
             all(
-                row[field] == ""
+                row.get(field, "") == ""
                 for field in (
                     "latent_demand",
                     "stockout_flag",

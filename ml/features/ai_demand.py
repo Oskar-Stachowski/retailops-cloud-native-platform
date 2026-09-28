@@ -4,8 +4,13 @@ import re
 from datetime import date, timedelta
 from typing import Any
 
-from data.generator.demand_schema import DEMAND_COLUMNS
-from data.generator.dimension_quality import require, timestamp
+from ml.features.fact_input import (
+    FACT_COLUMNS,
+    FACT_INPUT_VERSION,
+    require,
+    timestamp,
+    validate_fact_input,
+)
 
 AI_FEATURE_COLUMNS = [
     "schema_version",
@@ -108,6 +113,16 @@ def ai_feature_rows(
     catalog: list[dict[str, str]],
     categories: list[dict[str, str]],
 ) -> list[dict[str, Any]]:
+    validate_fact_input(
+        {
+            "policy_version": FACT_INPUT_VERSION,
+            "tables": {
+                "daily_demand_observations": observations,
+                "product_catalog": catalog,
+                "catalog_categories": categories,
+            },
+        }
+    )
     products, category_names = (
         {r["id"]: r for r in catalog},
         {r["id"]: r["name"] for r in categories},
@@ -119,7 +134,7 @@ def ai_feature_rows(
         key=lambda r: (r["business_date"], r["product_id"], r["selling_location_id"], r["channel"]),
     ):
         require(
-            set(row) == set(DEMAND_COLUMNS["daily_demand_observations"]),
+            set(row) == set(FACT_COLUMNS["daily_demand_observations"]),
             "Feature observation allowlist rejects unknown or simulation fields.",
         )
         day, product = date.fromisoformat(row["business_date"]), products[row["product_id"]]
