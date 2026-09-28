@@ -20,6 +20,8 @@ from data.generator.main import (
 )
 from data.generator.pricing_quality import validate_pricing
 from data.generator.pricing_schema import uses_pricing
+from data.generator.return_quality import validate_returns
+from data.generator.return_schema import uses_returns
 from ml.features.ai_demand import AI_FEATURE_COLUMNS, ai_feature_rows
 from ml.features.identity import (
     IDENTITY_FILENAME,
@@ -173,6 +175,8 @@ def build_demand_feature_rows(
     if uses_pricing(config.profile):
         validate_pricing(tables, resolve_generation_config(config))
     if uses_demand(config.profile):
+        if uses_returns(config.profile):
+            validate_returns(tables, resolve_generation_config(config))
         validate_demand(tables, resolve_generation_config(config))
         rows = ai_feature_rows(
             tables["daily_demand_observations"],

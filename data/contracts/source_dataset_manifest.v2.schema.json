@@ -525,7 +525,8 @@
             "2.0.0",
             "2.1.0",
             "2.2.0",
-            "2.3.0"
+            "2.3.0",
+            "2.4.0"
           ],
           "title": "Schema Version",
           "type": "string"
@@ -623,7 +624,8 @@
             "0.2.0",
             "0.3.0",
             "0.4.0",
-            "0.5.0"
+            "0.5.0",
+            "0.6.0"
           ],
           "title": "Generator",
           "type": "string"
@@ -689,12 +691,29 @@
           "default": null,
           "title": "Demand"
         },
+        "returns": {
+          "anyOf": [
+            {
+              "enum": [
+                "retail-returns-1.0.0",
+                "not_applicable"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Returns"
+        },
         "canonicalization": {
           "enum": [
             "typed-csv-nfc-utc-multiset-1.0.0",
             "typed-csv-nfc-utc-multiset-1.1.0",
             "typed-csv-nfc-utc-multiset-1.2.0",
-            "typed-csv-nfc-utc-multiset-1.3.0"
+            "typed-csv-nfc-utc-multiset-1.3.0",
+            "typed-csv-nfc-utc-multiset-1.4.0"
           ],
           "title": "Canonicalization",
           "type": "string"
@@ -745,7 +764,8 @@
         "policy_version": {
           "enum": [
             "legacy-source-boundary-1.0.0",
-            "daily-demand-1.0.0"
+            "daily-demand-1.0.0",
+            "retail-returns-1.0.0"
           ],
           "title": "Policy Version",
           "type": "string"
@@ -753,7 +773,9 @@
         "meaning": {
           "enum": [
             "knowledge_boundary_without_completeness_guarantee",
-            "synthetic_sales_day_close_without_return_guarantee"
+            "synthetic_sales_day_close_without_return_guarantee",
+            "synthetic_return_events_with_bounded_ingestion",
+            "synthetic_return_cohort_snapshot_with_window_maturity"
           ],
           "title": "Meaning",
           "type": "string"
@@ -777,7 +799,8 @@
         "2.0.0",
         "2.1.0",
         "2.2.0",
-        "2.3.0"
+        "2.3.0",
+        "2.4.0"
       ],
       "title": "Schema Version",
       "type": "string"

@@ -43,13 +43,13 @@ def test_full_valid_panel_zeros_closed_and_inactive_are_distinct(dataset):
     report = validate_demand(dataset, resolve_generation_config(CONFIG))
     assert report["complete_daily_panel"] and report["daily_panel_coverage_percent"] == 100
     assert report["valid_daily_combinations"] + report["inactive_combinations"] == 720
-    assert report["inventory_ready"] is report["returns_ready"] is False
+    assert report["inventory_ready"] is False and report["returns_ready"] is True
     assert len(report["checks"]) == 6
     assert set(report["observation_status_counts"]) == {"observed_positive", "observed_zero", "closed"}
     assert all(r["observed_units"] == "0" and r["observed_orders"] == "0" and r["gross_revenue"] == "0.00" for r in dataset["daily_demand_observations"] if r["observation_status"] in {"observed_zero", "closed"})
     assert {key(r) for r in dataset["daily_demand_observations"]}.isdisjoint({key(r) for r in dataset["daily_demand_exclusions"]})
     assert {r["observation_status"] for r in dataset["daily_demand_exclusions"]} == {"inactive"}
-    assert all(r["net_revenue"] == r["return_units"] == "" and r["return_data_complete"] == "false" for r in dataset["daily_demand_observations"])
+    assert all(r["net_revenue"] == r["gross_revenue"] and r["return_units"] == "0" for r in dataset["daily_demand_observations"])
 
 
 def test_demand_weight_acts_once_and_stochastic_rounding_allows_zero():
@@ -135,7 +135,7 @@ def test_demand_hard_gates_reject_broken_data(dataset, mutation, check):
     elif mutation == "repeated_sku": tables["order_items"].append(dict(tables["order_items"][0], id="bad-duplicate"))
     elif mutation == "wrong_order_total": tables["orders"][0]["order_total"] = "0.00"
     elif mutation == "doubled_weight": tables["daily_demand_truth"][0]["product_factor"] = "999"
-    elif mutation == "invented_net": panel[0]["net_revenue"] = panel[0]["gross_revenue"]
+    elif mutation == "invented_net": panel[0]["net_revenue"] = "99999999.00"
     report = build_demand_report(tables, resolve_generation_config(CONFIG))
     assert next(c for c in report["checks"] if c["check_id"] == check)["status"] == "failed"
     with pytest.raises(ValueError, match="hard gate"):
@@ -188,7 +188,7 @@ def test_export_semantic_checks_cannot_be_bypassed_by_recomputed_hashes(tmp_path
     config = replace(CONFIG, days=3, products=8, stores=3)
     generate_demo_dataset(tmp_path, config)
     source = load_source_manifest_v2(tmp_path)
-    assert source["schema_version"] == "2.3.0" and len(source["artifacts"]) == 34
+    assert source["schema_version"] == "2.4.0" and len(source["artifacts"]) == 37
     assert source["watermarks"]["daily_demand_observations"]["complete_through"] == "2026-07-31"
     tables = build_dataset(config)
     tables["daily_demand_observations"].pop()

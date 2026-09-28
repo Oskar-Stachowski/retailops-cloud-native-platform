@@ -27,15 +27,19 @@ from data.generator.dimension_schema import (
     uses_dimensions,
 )
 from data.generator.pricing_schema import PRICING_CLASSES, PRICING_VERSION, uses_pricing
+from data.generator.return_schema import RETURN_CLASSES, RETURNS_VERSION, uses_returns
 
 ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_VERSION = "0.5.0"
-CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.3.0"
-SOURCE_SCHEMA_VERSION = "2.3.0"
+GENERATOR_VERSION = "0.6.0"
+CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.4.0"
+SOURCE_SCHEMA_VERSION = "2.4.0"
 INTEGER_FIELDS = {
     "observed_units",
     "observed_orders",
     "return_units",
+    "net_units",
+    "window_days",
+    "max_ingestion_delay_days",
     "latent_units",
     "quantity",
     "stock_quantity",
@@ -153,6 +157,7 @@ DATA_CLASSES.update(dict.fromkeys(("price_history", "promotions"), "source_plan"
 DATA_CLASSES.update(DIMENSION_CLASSES)
 DATA_CLASSES.update(PRICING_CLASSES)
 DATA_CLASSES.update(DEMAND_CLASSES)
+DATA_CLASSES.update(RETURN_CLASSES)
 DEPENDENCY_FILES = (
     "services/api/requirements.txt",
     "services/api/requirements-dev.txt",
@@ -249,6 +254,7 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
             "data/contracts/retail_dimensions.v1.schema.json",
             "data/contracts/retail_pricing.v1.schema.json",
             "data/contracts/retail_demand.v1.schema.json",
+            "data/contracts/retail_returns.v1.schema.json",
             *extra_files,
         ]
     )
@@ -323,6 +329,7 @@ def source_identity(
             else "not_applicable",
             "pricing": PRICING_VERSION if uses_pricing(config.profile) else "not_applicable",
             "demand": DEMAND_VERSION if uses_demand(config.profile) else "not_applicable",
+            "returns": RETURNS_VERSION if uses_returns(config.profile) else "not_applicable",
             "canonicalization": CANONICALIZATION_VERSION,
             "csv_schema": "1.0",
         },

@@ -8,93 +8,65 @@ import resource
 import sys
 import time
 from dataclasses import replace
+from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from zipfile import ZipFile
 
 from scripts.data.verify_data01 import legacy_checks, require
 from scripts.data.verify_data02 import run_case as source_case
+from scripts.data.verify_demand_panel import historical_checks
 
 from data.generator.configuration import DatasetGenerationConfig
 from data.generator.manifest_v2 import load_source_manifest_v2
-from ml.features.identity import load_feature_identity_manifest
 
 
 def run_case(root: Path, name: str, config: DatasetGenerationConfig) -> dict:
     result = source_case(root, name, config)
-    path = root / name
-    report = json.loads((path / "demand_report.json").read_text(encoding="utf-8"))
+    output = root / name
+    reports = {
+        kind: json.loads((output / (kind + "_report.json")).read_text(encoding="utf-8"))
+        for kind in ("returns", "demand", "pricing", "quality")
+    }
+    require(all(r["status"] == "passed" for r in reports.values()), "Source gate failed.")
+    with (output / "daily_return_cohorts.csv").open(newline="", encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream))
+    totals = {}
+    for kind in ("history", "return_tail"):
+        selected = [r for r in rows if r["snapshot_kind"] == kind]
+        totals[kind] = {
+            "cohort_count": len(selected),
+            "observed_units": sum(int(r["observed_units"]) for r in selected),
+            "return_units": sum(int(r["return_units"]) for r in selected),
+            "mature_cohorts": sum(r["return_data_complete"] == "true" for r in selected),
+            **{
+                field: str(sum((Decimal(r[field]) for r in selected), Decimal(0)))
+                for field in ("gross_revenue", "refund_amount", "net_revenue")
+            },
+        }
     require(
-        report["status"] == "passed" and report["daily_panel_coverage_percent"] == 100,
-        "Daily panel gate failed.",
+        totals["history"]["observed_units"] == totals["return_tail"]["observed_units"]
+        and totals["return_tail"]["mature_cohorts"] == totals["return_tail"]["cohort_count"],
+        "Return tail changes sales or loses maturity.",
     )
-    require(
-        json.loads((path / "quality_report.json").read_text(encoding="utf-8"))["status"]
-        == "passed",
-        "Legacy structural gate failed.",
-    )
-    with (path / "order_items.csv").open(newline="", encoding="utf-8") as stream:
-        items = list(csv.DictReader(stream))
-    require(
-        len({(r["order_id"], r["product_id"]) for r in items}) == len(items), "Repeated basket SKU."
-    )
-    features = load_feature_identity_manifest(path / "features")
-    require(
-        features["descriptor"]["schema_version"] == "3.0" and features["complete_daily_panel"],
-        "AI feature contract/coverage failed.",
-    )
+    source = load_source_manifest_v2(output)
     return {
         **result,
-        "demand_report": report,
-        "feature_schema_version": "3.0",
-        "basket_line_count": len(items),
-        "duplicate_basket_skus": 0,
+        "reports": reports,
+        "watermarks": source["watermarks"],
+        "cohort_totals": totals,
     }
 
 
-def historical_checks(root: Path) -> dict:
-    result = {}
-    repo = Path(__file__).resolve().parents[2]
-    for suffix in ("0", "1", "2", "3"):
-        directory = root / ("historical-2." + suffix)
-        directory.mkdir()
-        with ZipFile(
-            repo / "services/api/tests/fixtures" / ("source_manifest_v2_" + suffix + ".zip")
-        ) as archive:
-            for name in archive.namelist():
-                require(Path(name).name == name, "Archive has a nested path.")
-                (directory / name).write_bytes(archive.read(name))
-        original = json.loads((directory / "dataset_manifest.v2.json").read_text(encoding="utf-8"))
-        source, features = (
-            load_source_manifest_v2(directory),
-            load_feature_identity_manifest(directory),
-        )
-        original_features = json.loads(
-            (directory / "feature_identity_manifest.json").read_text(encoding="utf-8")
-        )
-        require(
-            source["dataset_id"] == original["dataset_id"]
-            and features["dataset_id"] == original_features["dataset_id"]
-            and features["descriptor"]["parent_ids"] == [source["dataset_id"]],
-            "Historical IDs/parent changed.",
-        )
-        result[source["schema_version"]] = {
-            "source_id": source["dataset_id"],
-            "feature_id": features["dataset_id"],
-            "identity_and_parent_unchanged": True,
-        }
-    return result
-
-
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Bounded AI daily demand/panel/basket acceptance.")
+    parser = argparse.ArgumentParser(description="Bounded DATA-03 chronology/returns acceptance.")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--require-clean", action="store_true")
     args = parser.parse_args()
     started = time.perf_counter()
     baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
-    with TemporaryDirectory(prefix="retailops-demand-") as tmp:
+    with TemporaryDirectory(prefix="retailops-data03-") as tmp:
         root = Path(tmp)
         cases = [
             run_case(root, profile + "-" + suffix, DatasetGenerationConfig(profile=profile))
@@ -108,7 +80,9 @@ def main() -> None:
                 "source_artifacts",
                 "feature_artifact",
                 "dimensions_report",
-                "demand_report",
+                "reports",
+                "cohort_totals",
+                "watermarks",
             ):
                 require(first[field] == second[field], "Repeated IDs, bytes or reports changed.")
         bounded = DatasetGenerationConfig(
@@ -120,31 +94,45 @@ def main() -> None:
                 ("contrast-base", bounded),
                 ("contrast-seed", replace(bounded, seed=43)),
                 ("contrast-products", replace(bounded, products=9)),
+                ("contrast-dates", replace(bounded, end_date=date(2026, 7, 30))),
             )
         ]
         require(
             len({r["source_id"] for r in contrasts})
             == len({r["feature_id"] for r in contrasts})
-            == 3,
-            "Seed/size identity collision.",
+            == 4,
+            "Seed/size/date identity collision.",
+        )
+        dst = run_case(
+            root,
+            "spring-dst-all-channels",
+            DatasetGenerationConfig(
+                profile="ai-smoke",
+                days=7,
+                products=8,
+                stores=8,
+                warehouses=2,
+                end_date=date(2026, 4, 1),
+            ),
         )
         compatibility, historical = legacy_checks(root, baseline), historical_checks(root)
     if args.require_clean:
         require(
-            all(r["code_provenance"]["code_state"] == "clean" for r in [*cases, *contrasts]),
+            all(r["code_provenance"]["code_state"] == "clean" for r in [*cases, *contrasts, dst]),
             "Acceptance requires committed code.",
         )
     peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     result = {
-        "policy_version": "daily-demand-local-acceptance-1.0.0",
+        "policy_version": "data03-local-acceptance-1.0.0",
         "status": "passed",
         "cases": cases,
         "contrasts": contrasts,
+        "dst_case": dst,
         "repeat_checks": {
             "same_source_feature_ids_and_bytes": True,
-            "same_dimensions_demand_reports": True,
+            "same_source_reports_and_watermarks": True,
         },
-        "seed_and_size_change_ids": True,
+        "seed_size_date_change_ids": True,
         "legacy_compatibility": compatibility,
         "historical_exports": historical,
         "elapsed_seconds": round(time.perf_counter() - started, 4),
@@ -159,7 +147,7 @@ def main() -> None:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print("Daily demand acceptance passed: " + str(args.output))  # noqa: T201 - CLI output
+    print("DATA-03 acceptance passed: " + str(args.output))  # noqa: T201 - CLI result
 
 
 if __name__ == "__main__":

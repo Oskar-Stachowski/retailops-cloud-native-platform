@@ -57,5 +57,5 @@ DEMAND_CLASSES = {
 DEMAND_GRAINS = dict.fromkeys(DEMAND_COLUMNS, DEMAND_GRAIN)
 
 
-def uses_demand(profile: str, schema_version: str = "2.3.0") -> bool:
-    return profile.startswith("ai-") and schema_version == "2.3.0"
+def uses_demand(profile: str, schema_version: str = "2.4.0") -> bool:
+    return profile.startswith("ai-") and schema_version in {"2.3.0", "2.4.0"}

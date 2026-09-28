@@ -24,6 +24,12 @@ from data.generator.pricing_plans import (
     daily_price_observations,
     legacy_pricing_projection,
 )
+from data.generator.return_events import build_return_policies, generate_return_events
+from data.generator.return_reconciliation import (
+    build_return_cohorts,
+    legacy_return_projection,
+    return_boundaries,
+)
 from data.generator.users import generate_users
 
 
@@ -988,7 +994,7 @@ def build_profile_dataset(
     forecasts = generate_profile_forecasts(products, days, clock)
     incidents = generate_profile_incident_dataset(products, users, sales, clock)
 
-    return {
+    tables = {
         "products": products,
         "users": users,
         "stores": stores,
@@ -1007,3 +1013,12 @@ def build_profile_dataset(
         **(pricing_tables or {}),
         **demand_tables,
     }
+    if pricing_tables is not None:
+        tables["return_policies"] = build_return_policies(tables, effective)
+        tables["return_events"] = generate_return_events(tables, effective)
+        tables["daily_demand_observations"] = build_daily_panel(tables, effective)
+        tables["daily_return_cohorts"] = build_return_cohorts(tables, effective)
+        tables["returns"] = legacy_return_projection(
+            tables, return_boundaries(effective)["history"]
+        )
+    return tables

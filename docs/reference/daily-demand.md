@@ -2,8 +2,8 @@
 
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Ceny](retail-pricing.md)
 
-Profile ai-* używają daily-demand-1.0.0, generatora 0.5.0 i source schema 2.3.0.
-Trzy nowe tabele dają łącznie **34 CSV**. Demo i legacy zachowują wcześniejsze
+Profile ai-* używają daily-demand-1.0.0, generatora 0.6.0 i source schema 2.4.0.
+Trzy tabele popytu i trzy [zwrotów](retail-returns.md) dają łącznie **37 CSV**. Demo i legacy zachowują wcześniejsze
 reguły oraz bajty danych. [JSON Schema](../../data/contracts/retail_demand.v1.schema.json)
 opisuje komórki CSV; [walidator](../../data/generator/demand_quality.py) sprawdza semantykę.
 
@@ -56,7 +56,7 @@ Ilość linii to 1–3 sztuki (wholesale 1–6), do pozostałego budżetu. Koszy
 dodaje popytu. Wszystkie sztuki są przydzielone raz; wycena używa rzeczywistej
 ilości także dla bundle. Order/items/sales i dzienne agregaty sztuk/przychodu
 są uzgodnione. Ordered/sold mają rosnący czas w obrębie dnia; pełne bramki
-chronologii i okna/tail zwrotów pozostają następnym zakresem.
+chronologii oraz okna/tail zwrotów egzekwuje [DATA-03](retail-returns.md).
 
 ## Zero, zamknięcie i brak danych
 
@@ -72,8 +72,9 @@ Availability pełnego dnia to maksimum następnej północy UTC i czasów
 ingestii/wyceny faktów. Zerowy dzień staje się znany po zamknięciu okna.
 Manifest ma osobny syntetyczny watermark daily observations na północ po końcu
 historii; dane dostępne później blokują kompletny eksport. Legacy strumienie
-zachowują brak gwarancji kompletności. Return units i net revenue są puste,
-return_data_complete=false: niezatwierdzone zwroty nie są zerami.
+zachowują brak gwarancji kompletności. Return units i net revenue opisują wiedzę
+przy day close; dojrzałość okien oraz późniejsze refundacje opisują
+[rozliczenia zwrotów](retail-returns.md) z własnymi cutoffami. Nie zmieniają targetu sprzedaży.
 
 ## Cechy, bramki i dalsza praca
 
@@ -87,8 +88,8 @@ koszyki, formułę/budżet i kompletność. Generacja, feature builder i odczyt 
 odtwarzają kontrole; demand_report JSON/MD są objęte checksumami. Przeliczenie
 hashów nie ukrywa luki ani fałszywego raportu. Raporty wymiarów/pricing potwierdzają
 własne komponenty; ich wcześniejsze flagi panelu nie zastępują bramki demand.
-Kanonizacja 1.3.0 i demand policy wchodzą do source identity.
+Kanonizacja 1.4.0 i demand policy wchodzą do source identity.
 
-Source 2.0/2.1/2.2 i feature 2.0 zachowują IDs i parent. Źródło nadal jest not_ready
-do AI 03: chronologia/zwroty i pełna izolacja truth pozostają otwarte.
+Source 2.0–2.3 i features 2.0/3.0 zachowują IDs i parent. Źródło nadal jest not_ready
+do AI 03: pełna izolacja truth i końcowy odbiór źródła pozostają otwarte.
 Forecast na cechach 3.0 jest etapem AI 04.

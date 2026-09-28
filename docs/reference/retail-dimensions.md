@@ -2,8 +2,8 @@
 
 [Profile](data-profiles.md) · [Generowanie](../guides/data.md)
 
-Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.5.0 ma także
-[plany cen/promocji](retail-pricing.md) i [pełny panel popytu](daily-demand.md).
+Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.6.0 ma także
+[plany cen/promocji](retail-pricing.md) i [pełny panel popytu](daily-demand.md) oraz [chronologię/zwroty](retail-returns.md).
 Ich kontrakt to `retail-dimensions-1.0.0`, opisany przez
 [JSON Schema](../../data/contracts/retail_dimensions.v1.schema.json) i
 [walidator](../../data/generator/dimension_quality.py). CSV ma komórki tekstowe;

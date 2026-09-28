@@ -10,6 +10,7 @@ from data.generator.common import deterministic_uuid, money
 from data.generator.demand_grid import demand_grid
 from data.generator.demand_schema import DEMAND_GRAIN, DEMAND_VERSION
 from data.generator.dimension_quality import require, timestamp
+from data.generator.return_reconciliation import ReturnLedger
 
 if TYPE_CHECKING:
     from data.generator.configuration import ResolvedGenerationConfig
@@ -32,6 +33,7 @@ def build_daily_panel(
         require(grid[key]["location_open"] == "true", "Sale in closed location.")
         by_key[key].append(sale)
     panel = []
+    ledger = ReturnLedger(tables) if "return_events" in tables else None
     for key, flags in sorted(grid.items()):
         facts = by_key[key]
         missing, opened = key in missing_keys, flags["location_open"] == "true"
@@ -55,6 +57,7 @@ def build_daily_panel(
             if units
             else "observed_zero"
         )
+        returns = ledger.reconcile(facts, available) if ledger is not None and not missing else None
         panel.append(
             {
                 "id": deterministic_uuid("daily_demand", ":".join(key)),
@@ -64,9 +67,9 @@ def build_daily_panel(
                 if missing
                 else str(len({r["order_reference"] for r in facts})),
                 "gross_revenue": "" if missing else money(revenue),
-                "net_revenue": "",
-                "return_units": "",
-                "return_data_complete": "false",
+                "net_revenue": returns["net_revenue"] if returns else "",
+                "return_units": returns["return_units"] if returns else "",
+                "return_data_complete": returns["return_data_complete"] if returns else "false",
                 "currency": "PLN",
                 "realized_unit_price": money(revenue / units) if units and not missing else "",
                 "promotion_plan_ids": "|".join(

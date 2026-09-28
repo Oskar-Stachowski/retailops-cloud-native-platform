@@ -3,9 +3,9 @@
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Generowanie](../guides/data.md)
 
 Profile `ai-*` używają jednego [resolvera](../../data/generator/price_resolver.py)
-opartego na jawnych planach. Generator 0.5.0 i source schema 2.3.0 mają pięć
+opartego na jawnych planach. Generator 0.6.0 i source schema 2.4.0 mają pięć
 tabel pricing, dziewięć tabel wymiarów, trzy [popytu/panelu](daily-demand.md)
-i 17 tabel legacy: razem 34 CSV.
+trzy [zwrotów](retail-returns.md) i 17 tabel legacy: razem 37 CSV.
 Kontrakt `retail-pricing-1.0.0` ma [JSON Schema](../../data/contracts/retail_pricing.v1.schema.json)
 oraz [wykonywalne kontrole](../../data/generator/pricing_quality.py).
 Demo i profile small/medium/large zachowują wcześniejsze reguły i bajty CSV.
@@ -118,7 +118,7 @@ Wyniki JSON i krótkie MD trafiają do pricing_report i są objęte checksumami 
 Odczyt źródła odtwarza bramki i oba raporty; przeliczenie hashów błędnych danych
 nie omija kontroli. Generowanie, feature builder i validator odrzucają błędy.
 
-Source schema 2.3.0, pricing/demand policy oraz kanonizacja 1.3.0 wchodzą do identity.
+Source schema 2.4.0, pricing/demand policy oraz kanonizacja 1.4.0 wchodzą do identity.
 Readiness forecasting/anomaly/stockout/replay nadal wynosi not_ready,
-inventory_ready=false. Chronologia/zwroty i pozostała
-separacja truth wymagają dalszych prac etapu 02 przed nowym importem AI 03.
+inventory_ready=false. Pozostała
+separacja truth i końcowy odbiór źródła wymagają dalszych prac etapu 02 przed nowym importem AI 03.

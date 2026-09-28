@@ -38,6 +38,8 @@ from data.generator.products import generate_products
 from data.generator.profile_engine import build_profile_dataset
 from data.generator.quality import write_quality_report
 from data.generator.realism_report import write_realism_report
+from data.generator.return_quality import validate_returns, write_returns_report
+from data.generator.return_schema import uses_returns
 from data.generator.sales import generate_sales
 from data.generator.stock import generate_returns, generate_stock_movements
 from data.generator.users import generate_users
@@ -165,6 +167,11 @@ def generate_demo_dataset(
         if uses_demand(config.profile)
         else None
     )
+    returns_report = (
+        validate_returns(tables, resolve_generation_config(config))
+        if uses_returns(config.profile)
+        else None
+    )
     if (output_dir / MANIFEST_V2_FILENAME).exists():
         previous = load_source_manifest_v2(output_dir)
         if previous["dataset_id"] != source_identity(config, tables)[0]:
@@ -177,6 +184,8 @@ def generate_demo_dataset(
         write_pricing_report(output_dir, pricing_report)
     if demand_report is not None:
         write_demand_report(output_dir, demand_report)
+    if returns_report is not None:
+        write_returns_report(output_dir, returns_report)
     write_quality_report(output_dir, config.profile, tables)
     write_dataset_manifest(output_dir, config, tables)
     if config.profile != "demo":

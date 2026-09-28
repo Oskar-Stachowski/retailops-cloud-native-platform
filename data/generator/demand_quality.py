@@ -15,6 +15,7 @@ from data.generator.demand_panel import build_daily_panel
 from data.generator.demand_schema import DEMAND_COLUMNS, DEMAND_GRAIN, DEMAND_VERSION
 from data.generator.dimension_quality import require, timestamp
 from data.generator.dimensions import DimensionIndex
+from data.generator.return_quality import build_return_report
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -149,13 +150,27 @@ def _complete(tables: dict, config: ResolvedGenerationConfig) -> int:
         ),
         "Complete export requires explicit complete windows; missing remains unknown.",
     )
-    require(
-        all(
-            r["net_revenue"] == r["return_units"] == "" and r["return_data_complete"] == "false"
-            for r in rows
-        ),
-        "Unqualified legacy returns cannot become net revenue or zero returns.",
-    )
+    if "return_events" in tables:
+        expected = build_daily_panel(tables, config)
+        require(
+            {
+                r["id"]: (r["net_revenue"], r["return_units"], r["return_data_complete"])
+                for r in rows
+            }
+            == {
+                r["id"]: (r["net_revenue"], r["return_units"], r["return_data_complete"])
+                for r in expected
+            },
+            "Daily return/net observations disagree with knowledge at day close.",
+        )
+    else:
+        require(
+            all(
+                r["net_revenue"] == r["return_units"] == "" and r["return_data_complete"] == "false"
+                for r in rows
+            ),
+            "Unqualified legacy returns cannot become net revenue or zero returns.",
+        )
     boundary = timestamp(utc_midnight(config.end_date + timedelta(days=1)))
     require(
         all(timestamp(r["available_at"]) <= boundary for r in rows),
@@ -210,7 +225,8 @@ def build_demand_report(
         "inactive_combinations": len(tables.get("daily_demand_exclusions", [])),
         "observation_status_counts": dict(sorted(counts.items())),
         "inventory_ready": False,
-        "returns_ready": False,
+        "returns_ready": "return_events" in tables
+        and build_return_report(tables, config)["status"] == "passed",
         "sampling": "stochastic_rounding_without_inventory_cap",
     }
 
@@ -243,7 +259,9 @@ def demand_report_markdown(report: dict) -> str:
         [
             "",
             f"Valid panel rows: {report['valid_daily_combinations']}; excluded inactive: {report['inactive_combinations']}.",
-            "Inventory and return reconciliation are not ready.",
+            "Inventory remains not ready; returns are reconciled by retail-returns-1.0.0."
+            if report["returns_ready"]
+            else "Inventory and return reconciliation are not ready.",
             "",
         ]
     )
