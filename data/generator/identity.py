@@ -19,6 +19,7 @@ from data.generator.configuration import (
     resolve_generation_config,
 )
 from data.generator.csv_writer import CSV_WRITE_ORDER, source_columns, source_table_order
+from data.generator.demand_schema import DEMAND_CLASSES, DEMAND_VERSION, uses_demand
 from data.generator.dimension_schema import (
     AI_CALENDAR_VERSION,
     DIMENSION_CLASSES,
@@ -28,10 +29,14 @@ from data.generator.dimension_schema import (
 from data.generator.pricing_schema import PRICING_CLASSES, PRICING_VERSION, uses_pricing
 
 ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_VERSION = "0.4.0"
-CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.2.0"
-SOURCE_SCHEMA_VERSION = "2.2.0"
+GENERATOR_VERSION = "0.5.0"
+CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.3.0"
+SOURCE_SCHEMA_VERSION = "2.3.0"
 INTEGER_FIELDS = {
+    "observed_units",
+    "observed_orders",
+    "return_units",
+    "latent_units",
     "quantity",
     "stock_quantity",
     "latent_demand",
@@ -48,6 +53,19 @@ INTEGER_FIELDS = {
     "priority",
 }
 DECIMAL_FIELDS = {
+    "net_revenue",
+    "base_rate",
+    "product_factor",
+    "location_factor",
+    "weekly_factor",
+    "seasonal_factor",
+    "lifecycle_factor",
+    "price_factor",
+    "promotion_factor",
+    "anomaly_factor",
+    "noise",
+    "expected_rate",
+    "rounding_draw",
     "price",
     "unit_price",
     "total_amount",
@@ -73,6 +91,7 @@ DECIMAL_FIELDS = {
     "demand_multiplier",
 }
 BOOLEAN_FIELDS = {"stockout_flag", "promotion_applied", "is_weekend"}
+BOOLEAN_FIELDS.update({"source_data_complete", "is_active_assortment", "return_data_complete"})
 BOOLEAN_FIELDS.update(
     {
         "is_public_holiday",
@@ -133,6 +152,7 @@ DATA_CLASSES.update(
 DATA_CLASSES.update(dict.fromkeys(("price_history", "promotions"), "source_plan"))
 DATA_CLASSES.update(DIMENSION_CLASSES)
 DATA_CLASSES.update(PRICING_CLASSES)
+DATA_CLASSES.update(DEMAND_CLASSES)
 DEPENDENCY_FILES = (
     "services/api/requirements.txt",
     "services/api/requirements-dev.txt",
@@ -228,6 +248,7 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
             "data/contracts/source_dataset_manifest.v2.schema.json",
             "data/contracts/retail_dimensions.v1.schema.json",
             "data/contracts/retail_pricing.v1.schema.json",
+            "data/contracts/retail_demand.v1.schema.json",
             *extra_files,
         ]
     )
@@ -301,6 +322,7 @@ def source_identity(
             if uses_dimensions(config.profile)
             else "not_applicable",
             "pricing": PRICING_VERSION if uses_pricing(config.profile) else "not_applicable",
+            "demand": DEMAND_VERSION if uses_demand(config.profile) else "not_applicable",
             "canonicalization": CANONICALIZATION_VERSION,
             "csv_schema": "1.0",
         },

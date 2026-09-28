@@ -274,7 +274,7 @@ def test_repeated_exports_keep_logical_identity_and_table_bytes(tmp_path, config
             DemandFeatureGenerationConfig(dataset=config, output_dir=directory / "features")
         )
         feature_manifests.append(
-            load_feature_identity_manifest(directory / "features", FEATURE_COLUMNS)
+            load_feature_identity_manifest(directory / "features")
         )
     assert manifests[0]["dataset_id"] == manifests[1]["dataset_id"]
     assert manifests[0]["artifacts"] == manifests[1]["artifacts"]

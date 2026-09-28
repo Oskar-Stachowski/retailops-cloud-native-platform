@@ -54,7 +54,8 @@ nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
   Profile skalowane zapisują również `realism_report.json`.
 - Profile AI zapisują dodatkowo dziewięć kanonicznych tabel CSV i `dimensions_report.json`;
   ich projekcje products/stores/warehouses pochodzą z tych wymiarów.
-  Pięć tabel [cen/promocji](retail-pricing.md) i pricing_report JSON/MD daje łącznie 31 tabel CSV.
+  Pięć tabel [cen/promocji](retail-pricing.md) i trzy [popytu/panelu](daily-demand.md)
+  dają łącznie 34 CSV; pricing_report i demand_report mają JSON/MD.
 - `row_counts` i raporty konkretnego wykonania opisują jego zawartość.
   Stała nazwa profilu ani sam seed nie identyfikują wszystkich parametrów.
 
@@ -75,18 +76,20 @@ pamięci i CSV; chunked Parquet i pełny benchmark pozostają do wdrożenia.
 
 V1 zachowuje dotychczasowy format. Aktualną konfigurację odczytuj z
 `descriptor.resolved_parameters` w v2: wartości nie są null.
-Nowy v2 ma schemat 2.2.0 i generator 0.4.0. Zapisuje wersje konfiguracji,
-kalendarza, wymiarów, pricing oraz kanonizacji, requested config,
+Nowy v2 ma schemat 2.3.0 i generator 0.5.0. Zapisuje wersje konfiguracji,
+kalendarza, wymiarów, pricing, demand oraz kanonizacji, requested config,
 seed, SHA kodu i przypiętych plików requirements, wersję Pythona oraz commit/stan kodu.
 Każdy CSV ma checksumę SHA-256 bajtów, rozmiar i liczbę rekordów oraz osobny
 hash kanonicznej treści. Zakresy obejmują wszystkie zadeklarowane pola czasu:
 także końce promocji, forecast horizon, przyszłe ceny i zwroty.
-Watermark to granica wiedzy na koniec konfiguracji o 23:59:59 UTC;
-`complete_through=null` oznacza brak gwarancji kompletności.
+Legacy watermarks to granica wiedzy na koniec konfiguracji o 23:59:59 UTC;
+complete_through=null oznacza brak gwarancji kompletności. Panel AI ma osobny
+watermark następnej północy UTC, complete_through=end_date, dotyczący
+syntetycznej sprzedaży, bez gwarancji kompletności zwrotów.
 Odczyt zachowuje zgodność z rzeczywistymi eksportami schema 2.0.0/generator 0.2.0
-oraz 2.1.0/0.3.0;
+oraz 2.1.0/0.3.0 i 2.2.0/0.4.0;
 ich identity nie jest przepisywane. Nowe profile AI wymagają tabel i bramek wymiarów,
-a nowe legacy deklarują dimensions i pricing `not_applicable`.
+a nowe legacy deklarują dimensions, pricing i demand `not_applicable`.
 
 Logical ID to `source-sha256-<hash deskryptora>`. Kanonizacja obejmuje typowane
 liczby, null, NFC, UTC i uporządkowany multizbiór zachowujący duplikaty.
@@ -96,7 +99,8 @@ nie wchodzą do ID. Treść kodu i zależności wchodzi do ID.
 Przestawienie wierszy albo równoważny zapis liczby może zachować hash treści,
 ale zmienia checksumę pliku.
 
-Nowe cechy zachowują schema 2.0 i `feature_manifest.json`, otrzymując
+Nowe cechy legacy zachowują schema 2.0, a AI używają [schema 3.0](ml-features.md).
+Zachowują feature_manifest.json, otrzymując
 `features-sha256-<hash>` zamiast dawnego ID profil/daty/seed.
 `feature_identity_manifest.json` zapisuje source parent ID i deskryptor,
 hash kontraktu/transformacji oraz checksumę CSV. Historyczne artefakty pozostają
@@ -106,7 +110,7 @@ Katalog z manifestem v2 można ponowić dla tej samej identity.
 Inna identity albo uszkodzony eksport blokuje zapis przed nadpisaniem.
 Atomowy pełny snapshot i importer pozostają etapem 03.
 Źródło ma `inventory_ready=false`, forecasting/anomaly/stockout/replay `not_ready`,
-RAG `not_applicable`; nadal zawiera sparse panel i mixed simulation truth.
+RAG `not_applicable`; AI ma pełny panel, lecz zwroty i pozostała izolacja truth są w realizacji.
 [Odbiór DATA-01](../evidence/ai/02/data01/README.md) potwierdza konfigurację i identity.
 [Odbiór DATA-02](../evidence/ai/02/data02/README.md) obejmuje wymiary i kalendarz.
 [Odbiór DATA-04](../evidence/ai/02/data04/README.md) obejmuje ceny/promocje i uzgodnienie transakcji.

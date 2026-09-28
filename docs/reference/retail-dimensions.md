@@ -2,8 +2,8 @@
 
 [Profile](data-profiles.md) · [Generowanie](../guides/data.md)
 
-Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.4.0 rozszerza
-je o [plany cen/promocji](retail-pricing.md) i ich obserwacje.
+Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.5.0 ma także
+[plany cen/promocji](retail-pricing.md) i [pełny panel popytu](daily-demand.md).
 Ich kontrakt to `retail-dimensions-1.0.0`, opisany przez
 [JSON Schema](../../data/contracts/retail_dimensions.v1.schema.json) i
 [walidator](../../data/generator/dimension_quality.py). CSV ma komórki tekstowe;
@@ -34,7 +34,7 @@ dwie fizyczne lokalizacje PL/DE i dwa magazyny. Ta sama lokalizacja może obsłu
 więcej niż jeden kanał. `channel` ma wartości store/online/marketplace/wholesale,
 a region jest atrybutem lokalizacji. Treningowa siatka nominalna liczy
 days × products × valid pairs; lifecycle i asortyment zmniejszają liczbę aktywnych
-kombinacji. Ten zakres nie tworzy jeszcze pełnego panelu obserwacji.
+kombinacji. Pełny panel obserwacji ma osobną politykę daily-demand-1.0.0.
 
 ## Okresy i adapter
 
@@ -88,7 +88,7 @@ otwarcia i nie jest oceną zgodności przedsiębiorstwa z prawem.
 
 ## Bramka źródłowa
 
-Generowanie oraz odczyt manifestu 2.1/2.2 sprawdzają osiem hard gates:
+Generowanie oraz odczyt manifestu 2.1/2.2/2.3 sprawdzają osiem hard gates:
 schema/PK/SKU, rozdzielenie lokalizacji i kanałów, wersje/routing, katalog/lifecycle/
 asortyment, pełny kalendarz ważnych par, sezon kategorii, zgodność adaptera
 oraz sprzedaż w aktywnych i otwartych kombinacjach ze znanym routingiem.
@@ -97,7 +97,7 @@ Odczyt odtwarza wynik z CSV; ponowne obliczenie hashów błędnych tabel nie omi
 
 Usunięcie obowiązkowego dnia kalendarza jest błędem, a nie zamknięciem albo zerem.
 `active_daily_combinations` liczy ważne dni asortymentu przed ograniczeniem otwarcia.
-`observation_panel_status=not_ready`: nie ma jeszcze kompletności per dzień,
-daily observations ani rozdzielenia zero/missing/closed/inactive.
-Readiness źródła i inventory pozostaje niegotowe; popyt/panel, koszyki,
-chronologia oraz pozostała separacja simulation truth wymagają dalszych prac.
+Raport wymiarów nie certyfikuje panelu (observation_panel_status=not_ready);
+coverage i statusy obserwacji potwierdza odrębna bramka [daily demand](daily-demand.md).
+Readiness źródła i inventory pozostaje niegotowe; chronologia/zwroty
+oraz pozostała izolacja simulation truth wymagają dalszych prac.

@@ -99,5 +99,5 @@ PRICING_GRAINS = {
 }
 
 
-def uses_pricing(profile: str, schema_version: str = "2.2.0") -> bool:
-    return profile.startswith("ai-") and schema_version == "2.2.0"
+def uses_pricing(profile: str, schema_version: str = "2.3.0") -> bool:
+    return profile.startswith("ai-") and schema_version in {"2.2.0", "2.3.0"}

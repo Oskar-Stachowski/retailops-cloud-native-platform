@@ -78,6 +78,8 @@ korzysta z [kontraktu cech 2.0](../reference/ml-features.md): kalendarza,
 identyfikatorów serii, stałych opisów produktu i wcześniej zaobserwowanej
 sprzedaży dostępnej w chwili prognozy. Nie używa zrealizowanej ceny, promocji,
 stockout ani zapasu. Domyślna liczba drzew w kodzie i Makefile wynosi 80.
+Profile AI mają nowy pełny [kontrakt cech 3.0](../reference/ml-features.md).
+Obecny RF wymaga 2.0; forecasting na 3.0 jest osobnym zakresem AI 04.
 Wszystkie dostępne flagi sprawdzisz przez `--help` właściwego modułu.
 
 `daily_panel.csv` zawiera dni, produkty, sklepy i kanały także bez sprzedaży.

@@ -15,6 +15,8 @@ from data.generator.configuration import (
     validate_generation_config as validate_generation_config,  # noqa: PLC0414 - public legacy API
 )
 from data.generator.csv_writer import write_tables
+from data.generator.demand_quality import validate_demand, write_demand_report
+from data.generator.demand_schema import uses_demand
 from data.generator.dimension_quality import validate_dimensions, write_dimensions_report
 from data.generator.dimension_schema import uses_dimensions
 from data.generator.forecasts import generate_forecasts
@@ -158,6 +160,11 @@ def generate_demo_dataset(
         if uses_pricing(config.profile)
         else None
     )
+    demand_report = (
+        validate_demand(tables, resolve_generation_config(config))
+        if uses_demand(config.profile)
+        else None
+    )
     if (output_dir / MANIFEST_V2_FILENAME).exists():
         previous = load_source_manifest_v2(output_dir)
         if previous["dataset_id"] != source_identity(config, tables)[0]:
@@ -168,6 +175,8 @@ def generate_demo_dataset(
         write_dimensions_report(output_dir, dimensions_report)
     if pricing_report is not None:
         write_pricing_report(output_dir, pricing_report)
+    if demand_report is not None:
+        write_demand_report(output_dir, demand_report)
     write_quality_report(output_dir, config.profile, tables)
     write_dataset_manifest(output_dir, config, tables)
     if config.profile != "demo":

@@ -14,6 +14,7 @@ from data.generator.configuration import (
     requested_parameters,
     resolve_generation_config,
 )
+from data.generator.demand_schema import uses_demand
 from data.generator.identity import (
     code_fingerprint,
     code_provenance,
@@ -32,6 +33,7 @@ from data.generator.manifest_v2 import (
     config_from_parameters,
     unique_keys,
 )
+from ml.features.ai_demand import AI_FEATURE_COLUMNS, AI_FEATURE_SCHEMA_PATH, validate_ai_records
 
 IDENTITY_FILENAME = "feature_identity_manifest.json"
 SCHEMA_PATH = "ml/contracts/demand_forecast_features.schema.json"
@@ -41,6 +43,8 @@ FEATURE_CODE = (
     "ml/features/identity.py",
     SCHEMA_PATH,
     IDENTITY_SCHEMA_PATH,
+    "ml/features/ai_demand.py",
+    AI_FEATURE_SCHEMA_PATH,
 )
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -50,9 +54,11 @@ class FeatureDescriptor(Contract):
     role: Literal["features"]
     owner: Literal["retailops-cloud-native-platform"]
     parent_ids: list[Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]]
-    schema_version: Literal["2.0"]
+    schema_version: Literal["2.0", "3.0"]
     feature_schema_sha256: SHA256
-    transformation_version: Literal["observed-demand-identity-1.0.0"]
+    transformation_version: Literal[
+        "observed-demand-identity-1.0.0", "daily-demand-panel-features-1.0.0"
+    ]
     code_sha256: SHA256
     dependency_sha256: SHA256
     python_version: str
@@ -77,7 +83,7 @@ class FeatureIdentityManifest(Contract):
     provenance: Provenance
     artifact: FeatureArtifact
     generated_at: str
-    complete_daily_panel: Literal[False]
+    complete_daily_panel: bool
     inventory_ready: Literal[False]
     readiness: Literal["not_ready"]
 
@@ -89,6 +95,7 @@ def feature_identity(
     columns: list[str],
 ) -> tuple[str, dict[str, Any], dict[str, Any]]:
     source_id, source_descriptor = source_identity(config, tables)
+    ai = uses_demand(config.profile)
     fingerprint = code_fingerprint(FEATURE_CODE)
     identity_columns = [name for name in columns if name not in {"dataset_id", "generated_at"}]
     descriptor = {
@@ -96,9 +103,13 @@ def feature_identity(
         "role": "features",
         "owner": "retailops-cloud-native-platform",
         "parent_ids": [source_id],
-        "schema_version": "2.0",
-        "feature_schema_sha256": file_sha256(ROOT / SCHEMA_PATH),
-        "transformation_version": "observed-demand-identity-1.0.0",
+        "schema_version": "3.0" if ai else "2.0",
+        "feature_schema_sha256": file_sha256(
+            ROOT / (AI_FEATURE_SCHEMA_PATH if ai else SCHEMA_PATH)
+        ),
+        "transformation_version": "daily-demand-panel-features-1.0.0"
+        if ai
+        else "observed-demand-identity-1.0.0",
         "code_sha256": fingerprint["code_sha256"],
         "dependency_sha256": fingerprint["dependency_sha256"],
         "python_version": fingerprint["python_version"],
@@ -132,7 +143,7 @@ def write_feature_identity_manifest(
             "size_bytes": path.stat().st_size,
         },
         "generated_at": datetime.now(UTC).isoformat(),
-        "complete_daily_panel": False,
+        "complete_daily_panel": uses_demand(config.profile),
         "inventory_ready": False,
         "readiness": "not_ready",
     }
@@ -142,15 +153,38 @@ def write_feature_identity_manifest(
     )
 
 
+def identity_columns_for_schema(schema_version: str, columns: list[str] | None) -> list[str]:
+    if columns is not None:
+        return columns
+    if schema_version == "3.0":
+        return AI_FEATURE_COLUMNS
+    import ml.features.demand_forecast as legacy_features  # noqa: PLC0415 - avoid import cycle
+
+    return legacy_features.FEATURE_COLUMNS
+
+
 def validate_feature_identity_manifest(
     payload: dict[str, Any],
     output_dir: Path,
-    columns: list[str],
+    columns: list[str] | None,
 ) -> str:
     manifest = FeatureIdentityManifest.model_validate(payload)
     descriptor = manifest.descriptor.model_dump()
     source_descriptor = manifest.source_descriptor.model_dump(exclude_unset=True)
     source_id = "source-sha256-" + json_sha256(source_descriptor)
+    columns = identity_columns_for_schema(descriptor["schema_version"], columns)
+    ai = descriptor["schema_version"] == "3.0"
+    if (
+        ai
+        != uses_demand(
+            source_descriptor["resolved_parameters"]["profile"], source_descriptor["schema_version"]
+        )
+        or manifest.complete_daily_panel != ai
+        or descriptor["transformation_version"]
+        != ("daily-demand-panel-features-1.0.0" if ai else "observed-demand-identity-1.0.0")
+    ):
+        msg = "Feature schema, completeness or source version disagree."
+        raise ValueError(msg)
     config = config_from_parameters(manifest.requested_parameters.model_dump())
     if source_descriptor["resolved_parameters"] != resolve_generation_config(config).parameters():
         msg = "Feature source parameters disagree."
@@ -167,7 +201,8 @@ def validate_feature_identity_manifest(
         raise ValueError(msg)
     provenance = manifest.provenance.model_dump()
     if (
-        descriptor["feature_schema_sha256"] != provenance["code_files"].get(SCHEMA_PATH)
+        descriptor["feature_schema_sha256"]
+        != provenance["code_files"].get(AI_FEATURE_SCHEMA_PATH if ai else SCHEMA_PATH)
         or source_descriptor["dependency_sha256"] != descriptor["dependency_sha256"]
         or source_descriptor["python_version"] != descriptor["python_version"]
     ):
@@ -208,10 +243,14 @@ def validate_feature_identity_manifest(
     ):
         msg = "Feature content or row identity disagrees."
         raise ValueError(msg)
+    if ai:
+        validate_ai_records(rows)
     return manifest.dataset_id
 
 
-def load_feature_identity_manifest(output_dir: Path, columns: list[str]) -> dict[str, Any]:
+def load_feature_identity_manifest(
+    output_dir: Path, columns: list[str] | None = None
+) -> dict[str, Any]:
     path = output_dir / IDENTITY_FILENAME
     if path.is_symlink() or path.stat().st_size > 1024 * 1024:
         msg = "Feature manifest must be a bounded regular file."
@@ -222,15 +261,11 @@ def load_feature_identity_manifest(output_dir: Path, columns: list[str]) -> dict
 
 
 def main() -> None:
-    from ml.features.demand_forecast import (  # noqa: PLC0415 - avoid generation import cycle
-        FEATURE_COLUMNS,
-    )
-
     parser = argparse.ArgumentParser(description="Verify feature identity and source lineage.")
     parser.add_argument("--data-dir", type=Path, required=True)
     args = parser.parse_args()
     try:
-        manifest = load_feature_identity_manifest(args.data_dir, FEATURE_COLUMNS)
+        manifest = load_feature_identity_manifest(args.data_dir)
     except (ValueError, OSError):
         parser.exit(1, "Feature identity verification failed.\n")
     print("Feature identity verified: " + manifest["dataset_id"])  # noqa: T201 - CLI result

@@ -14,6 +14,8 @@ from data.generator.configuration import (
     SyntheticProfileDefaults,
     resolve_generation_config,
 )
+from data.generator.demand_commerce import generate_demand_commerce
+from data.generator.demand_panel import build_daily_panel
 from data.generator.dimension_schema import uses_dimensions
 from data.generator.dimensions import DimensionIndex, build_dimensions
 from data.generator.pricing import generate_price_history, generate_promotions
@@ -946,15 +948,22 @@ def build_profile_dataset(
         )
         dimensions = DimensionIndex(dimension_tables)
         pricing_tables = build_pricing_plans(products, dimension_tables, effective)
-    sales, orders, order_items = generate_profile_commerce(
-        products,
-        stores,
-        days,
-        rng,
-        clock,
-        dimensions,
-        pricing_tables,
-    )
+    demand_tables = {}
+    if pricing_tables is not None:
+        sales, orders, order_items, truth, exclusions = generate_demand_commerce(
+            products, stores, dimension_tables, pricing_tables, effective
+        )
+        demand_tables = {
+            "daily_demand_truth": truth,
+            "daily_demand_exclusions": exclusions,
+            "daily_demand_observations": build_daily_panel(
+                {**dimension_tables, **pricing_tables, "sales": sales}, effective
+            ),
+        }
+    else:
+        sales, orders, order_items = generate_profile_commerce(
+            products, stores, days, rng, clock, dimensions, pricing_tables
+        )
     price_history = generate_price_history(products, clock.end_date)
     promotions = generate_promotions(products, clock.end_date)
     if pricing_tables is not None:
@@ -996,4 +1005,5 @@ def build_profile_dataset(
         **incidents,
         **dimension_tables,
         **(pricing_tables or {}),
+        **demand_tables,
     }

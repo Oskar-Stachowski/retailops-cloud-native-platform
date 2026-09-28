@@ -4,7 +4,7 @@
 |---|---|
 | HTTP API | [Mapa API](api.md), [listy i paginacja](api-list-contract.md) |
 | Dane aplikacji | [Model danych](data-model.md), [workflow i role](business-workflows.md) |
-| Dane syntetyczne | [Profile](data-profiles.md), [wymiary i kalendarz AI](retail-dimensions.md), [ceny/promocje AI](retail-pricing.md), [kontrakty danych](data-contracts.md) |
+| Dane syntetyczne | [Profile](data-profiles.md), [wymiary i kalendarz AI](retail-dimensions.md), [ceny/promocje AI](retail-pricing.md), [popyt/panel/koszyki AI](daily-demand.md), [kontrakty danych](data-contracts.md) |
 | Streaming | [Zdarzenia](events.md), [trwałość metryk](live-metrics-persistence.md) |
 | ML | [Kontrakt cech](ml-features.md), [lokalna polityka dopuszczenia RF](ml-admission-policy.md) |
 | Konwencje | [Nazwy i tagi](conventions.md) |

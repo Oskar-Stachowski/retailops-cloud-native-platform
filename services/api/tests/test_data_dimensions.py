@@ -12,6 +12,7 @@ import pytest
 from data.generator.business_calendar import calendar_attributes, day_bounds, holiday_dates
 from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
 from data.generator.csv_writer import CSV_WRITE_ORDER, write_tables
+from data.generator.demand_schema import DEMAND_COLUMNS
 from data.generator.dimension_contract import dimension_contract_schema
 from data.generator.dimension_quality import build_dimensions_report, validate_dimensions
 from data.generator.dimension_schema import DIMENSION_COLUMNS
@@ -32,7 +33,7 @@ def dimensions():
 
 
 def test_catalog_separates_brands_categories_locations_and_channels(dimensions):
-    assert set(dimensions) == set(CSV_WRITE_ORDER) | set(DIMENSION_COLUMNS) | set(PRICING_COLUMNS)
+    assert set(dimensions) == set(CSV_WRITE_ORDER) | set(DIMENSION_COLUMNS) | set(PRICING_COLUMNS) | set(DEMAND_COLUMNS)
     report = validate_dimensions(dimensions, resolve_generation_config(CONFIG))
     assert len(report["checks"]) == 8
     assert all(c["severity"] == "hard" and c["status"] == "passed" for c in report["checks"])
@@ -275,8 +276,8 @@ def test_recomputed_manifest_hashes_cannot_bypass_missing_calendar(tmp_path, dim
 def test_new_source_includes_all_dimensions_and_mixed_versions_fail(tmp_path):
     generate_demo_dataset(tmp_path, CONFIG)
     manifest = load_source_manifest_v2(tmp_path)
-    assert manifest["schema_version"] == "2.2.0"
-    assert len(manifest["artifacts"]) == 31
+    assert manifest["schema_version"] == "2.3.0"
+    assert len(manifest["artifacts"]) == 34
     assert manifest["descriptor"]["versions"]["dimensions"] == "retail-dimensions-1.0.0"
     assert any(
         r["path"] == "dimensions_report.json" and r["status"] == "passed"

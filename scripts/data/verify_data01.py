@@ -14,7 +14,6 @@ from data.generator.identity import file_sha256
 from data.generator.main import generate_demo_dataset
 from data.generator.manifest_v2 import load_source_manifest_v2
 from ml.features.demand_forecast import (
-    FEATURE_COLUMNS,
     DemandFeatureGenerationConfig,
     generate_demand_feature_dataset,
 )
@@ -34,7 +33,7 @@ def run_case(root: Path, name: str, config: DatasetGenerationConfig) -> dict[str
     generate_demand_feature_dataset(
         DemandFeatureGenerationConfig(dataset=config, output_dir=output / "features")
     )
-    features = load_feature_identity_manifest(output / "features", FEATURE_COLUMNS)
+    features = load_feature_identity_manifest(output / "features")
     require(
         features["descriptor"]["parent_ids"] == [source["dataset_id"]], "Source lineage mismatch."
     )

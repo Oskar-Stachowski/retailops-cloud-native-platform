@@ -3,69 +3,12 @@
     "Artifact": {
       "additionalProperties": false,
       "properties": {
-        "columns": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Columns",
-          "type": "array"
-        },
-        "content_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Content Sha256",
+        "table": {
+          "title": "Table",
           "type": "string"
-        },
-        "data_class": {
-          "enum": [
-            "source_observation",
-            "mixed_fact_and_simulation_truth",
-            "source_operational_output",
-            "source_plan",
-            "simulation_truth"
-          ],
-          "title": "Data Class",
-          "type": "string"
-        },
-        "date_range": {
-          "$ref": "#/$defs/DateRange"
-        },
-        "field_ranges": {
-          "additionalProperties": {
-            "$ref": "#/$defs/DateRange"
-          },
-          "title": "Field Ranges",
-          "type": "object"
-        },
-        "future_range": {
-          "$ref": "#/$defs/DateRange"
-        },
-        "grain": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Grain",
-          "type": "array"
-        },
-        "history_range": {
-          "$ref": "#/$defs/DateRange"
-        },
-        "open_interval_rows": {
-          "minimum": 0,
-          "title": "Open Interval Rows",
-          "type": "integer"
         },
         "path": {
           "title": "Path",
-          "type": "string"
-        },
-        "row_count": {
-          "minimum": 0,
-          "title": "Row Count",
-          "type": "integer"
-        },
-        "schema_version": {
-          "const": "1.0",
-          "title": "Schema Version",
           "type": "string"
         },
         "sha256": {
@@ -78,8 +21,44 @@
           "title": "Size Bytes",
           "type": "integer"
         },
-        "table": {
-          "title": "Table",
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "content_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "grain": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Grain",
+          "type": "array"
+        },
+        "data_class": {
+          "enum": [
+            "source_observation",
+            "mixed_fact_and_simulation_truth",
+            "source_operational_output",
+            "source_plan",
+            "simulation_truth"
+          ],
+          "title": "Data Class",
           "type": "string"
         },
         "temporal_role": {
@@ -93,6 +72,27 @@
           ],
           "title": "Temporal Role",
           "type": "string"
+        },
+        "date_range": {
+          "$ref": "#/$defs/DateRange"
+        },
+        "field_ranges": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DateRange"
+          },
+          "title": "Field Ranges",
+          "type": "object"
+        },
+        "history_range": {
+          "$ref": "#/$defs/DateRange"
+        },
+        "future_range": {
+          "$ref": "#/$defs/DateRange"
+        },
+        "open_interval_rows": {
+          "minimum": 0,
+          "title": "Open Interval Rows",
+          "type": "integer"
         }
       },
       "required": [
@@ -119,18 +119,6 @@
     "DateRange": {
       "additionalProperties": false,
       "properties": {
-        "date_end": {
-          "anyOf": [
-            {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Date End"
-        },
         "date_start": {
           "anyOf": [
             {
@@ -142,6 +130,18 @@
             }
           ],
           "title": "Date Start"
+        },
+        "date_end": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date End"
         },
         "value_count": {
           "minimum": 0,
@@ -160,6 +160,16 @@
     "Provenance": {
       "additionalProperties": false,
       "properties": {
+        "code_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Code Sha256",
+          "type": "string"
+        },
+        "dependency_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dependency Sha256",
+          "type": "string"
+        },
         "code_files": {
           "additionalProperties": {
             "pattern": "^[0-9a-f]{64}$",
@@ -167,20 +177,6 @@
           },
           "title": "Code Files",
           "type": "object"
-        },
-        "code_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Code Sha256",
-          "type": "string"
-        },
-        "code_state": {
-          "enum": [
-            "clean",
-            "modified",
-            "unavailable"
-          ],
-          "title": "Code State",
-          "type": "string"
         },
         "dependency_files": {
           "additionalProperties": {
@@ -190,9 +186,8 @@
           "title": "Dependency Files",
           "type": "object"
         },
-        "dependency_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Dependency Sha256",
+        "python_version": {
+          "title": "Python Version",
           "type": "string"
         },
         "git_commit": {
@@ -200,8 +195,13 @@
           "title": "Git Commit",
           "type": "string"
         },
-        "python_version": {
-          "title": "Python Version",
+        "code_state": {
+          "enum": [
+            "clean",
+            "modified",
+            "unavailable"
+          ],
+          "title": "Code State",
           "type": "string"
         }
       },
@@ -220,19 +220,19 @@
     "Readiness": {
       "additionalProperties": false,
       "properties": {
-        "anomaly": {
-          "const": "not_ready",
-          "title": "Anomaly",
-          "type": "string"
-        },
         "forecasting": {
           "const": "not_ready",
           "title": "Forecasting",
           "type": "string"
         },
-        "rag": {
-          "const": "not_applicable",
-          "title": "Rag",
+        "anomaly": {
+          "const": "not_ready",
+          "title": "Anomaly",
+          "type": "string"
+        },
+        "stockout": {
+          "const": "not_ready",
+          "title": "Stockout",
           "type": "string"
         },
         "replay": {
@@ -240,9 +240,9 @@
           "title": "Replay",
           "type": "string"
         },
-        "stockout": {
-          "const": "not_ready",
-          "title": "Stockout",
+        "rag": {
+          "const": "not_applicable",
+          "title": "Rag",
           "type": "string"
         }
       },
@@ -263,10 +263,6 @@
           "title": "Path",
           "type": "string"
         },
-        "policy_version": {
-          "title": "Policy Version",
-          "type": "string"
-        },
         "sha256": {
           "pattern": "^[0-9a-f]{64}$",
           "title": "Sha256",
@@ -276,6 +272,10 @@
           "minimum": 0,
           "title": "Size Bytes",
           "type": "integer"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
         },
         "status": {
           "title": "Status",
@@ -295,6 +295,10 @@
     "RequestedParameters": {
       "additionalProperties": false,
       "properties": {
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
         "days": {
           "anyOf": [
             {
@@ -307,30 +311,6 @@
           ],
           "title": "Days"
         },
-        "end_date": {
-          "anyOf": [
-            {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "End Date"
-        },
-        "max_daily_rows": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Max Daily Rows"
-        },
         "products": {
           "anyOf": [
             {
@@ -342,27 +322,6 @@
             }
           ],
           "title": "Products"
-        },
-        "profile": {
-          "title": "Profile",
-          "type": "string"
-        },
-        "seed": {
-          "exclusiveMinimum": 0,
-          "title": "Seed",
-          "type": "integer"
-        },
-        "start_date": {
-          "anyOf": [
-            {
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Start Date"
         },
         "stores": {
           "anyOf": [
@@ -387,6 +346,47 @@
             }
           ],
           "title": "Warehouses"
+        },
+        "seed": {
+          "exclusiveMinimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "max_daily_rows": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Daily Rows"
         }
       },
       "required": [
@@ -406,9 +406,8 @@
     "ResolvedParameters": {
       "additionalProperties": false,
       "properties": {
-        "business_timezone": {
-          "const": "UTC",
-          "title": "Business Timezone",
+        "profile": {
+          "title": "Profile",
           "type": "string"
         },
         "days": {
@@ -416,49 +415,10 @@
           "title": "Days",
           "type": "integer"
         },
-        "end_date": {
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-          "title": "End Date",
-          "type": "string"
-        },
-        "label_tail_days": {
-          "minimum": 0,
-          "title": "Label Tail Days",
-          "type": "integer"
-        },
-        "max_daily_rows": {
-          "exclusiveMinimum": 0,
-          "title": "Max Daily Rows",
-          "type": "integer"
-        },
-        "origin_days": {
-          "minimum": 0,
-          "title": "Origin Days",
-          "type": "integer"
-        },
-        "output_format": {
-          "const": "csv",
-          "title": "Output Format",
-          "type": "string"
-        },
         "products": {
           "exclusiveMinimum": 0,
           "title": "Products",
           "type": "integer"
-        },
-        "profile": {
-          "title": "Profile",
-          "type": "string"
-        },
-        "seed": {
-          "exclusiveMinimum": 0,
-          "title": "Seed",
-          "type": "integer"
-        },
-        "start_date": {
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-          "title": "Start Date",
-          "type": "string"
         },
         "stores": {
           "exclusiveMinimum": 0,
@@ -470,9 +430,49 @@
           "title": "Warehouses",
           "type": "integer"
         },
+        "seed": {
+          "exclusiveMinimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Start Date",
+          "type": "string"
+        },
+        "end_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "End Date",
+          "type": "string"
+        },
+        "max_daily_rows": {
+          "exclusiveMinimum": 0,
+          "title": "Max Daily Rows",
+          "type": "integer"
+        },
+        "business_timezone": {
+          "const": "UTC",
+          "title": "Business Timezone",
+          "type": "string"
+        },
+        "output_format": {
+          "const": "csv",
+          "title": "Output Format",
+          "type": "string"
+        },
         "warmup_days": {
           "minimum": 0,
           "title": "Warmup Days",
+          "type": "integer"
+        },
+        "origin_days": {
+          "minimum": 0,
+          "title": "Origin Days",
+          "type": "integer"
+        },
+        "label_tail_days": {
+          "minimum": 0,
+          "title": "Label Tail Days",
           "type": "integer"
         }
       },
@@ -498,19 +498,14 @@
     "SourceDescriptor": {
       "additionalProperties": false,
       "properties": {
-        "code_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Code Sha256",
-          "type": "string"
-        },
-        "dependency_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Dependency Sha256",
-          "type": "string"
-        },
         "identity_version": {
           "const": "1.0.0",
           "title": "Identity Version",
+          "type": "string"
+        },
+        "role": {
+          "const": "source",
+          "title": "Role",
           "type": "string"
         },
         "owner": {
@@ -525,25 +520,34 @@
           "title": "Parent Ids",
           "type": "array"
         },
-        "python_version": {
-          "title": "Python Version",
-          "type": "string"
-        },
-        "resolved_parameters": {
-          "$ref": "#/$defs/ResolvedParameters"
-        },
-        "role": {
-          "const": "source",
-          "title": "Role",
-          "type": "string"
-        },
         "schema_version": {
           "enum": [
             "2.0.0",
             "2.1.0",
-            "2.2.0"
+            "2.2.0",
+            "2.3.0"
           ],
           "title": "Schema Version",
+          "type": "string"
+        },
+        "versions": {
+          "$ref": "#/$defs/Versions"
+        },
+        "resolved_parameters": {
+          "$ref": "#/$defs/ResolvedParameters"
+        },
+        "code_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Code Sha256",
+          "type": "string"
+        },
+        "dependency_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Dependency Sha256",
+          "type": "string"
+        },
+        "python_version": {
+          "title": "Python Version",
           "type": "string"
         },
         "tables": {
@@ -552,9 +556,6 @@
           },
           "title": "Tables",
           "type": "object"
-        },
-        "versions": {
-          "$ref": "#/$defs/Versions"
         }
       },
       "required": [
@@ -576,6 +577,11 @@
     "TableIdentity": {
       "additionalProperties": false,
       "properties": {
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
         "columns": {
           "items": {
             "type": "string"
@@ -598,11 +604,6 @@
           ],
           "title": "Data Class",
           "type": "string"
-        },
-        "row_count": {
-          "minimum": 0,
-          "title": "Row Count",
-          "type": "integer"
         }
       },
       "required": [
@@ -617,21 +618,14 @@
     "Versions": {
       "additionalProperties": false,
       "properties": {
-        "calendar": {
+        "generator": {
           "enum": [
-            "legacy-weekday-seasonality-1.0.0",
-            "pl-de-berlin-calendar-1.0.0"
+            "0.2.0",
+            "0.3.0",
+            "0.4.0",
+            "0.5.0"
           ],
-          "title": "Calendar",
-          "type": "string"
-        },
-        "canonicalization": {
-          "enum": [
-            "typed-csv-nfc-utc-multiset-1.0.0",
-            "typed-csv-nfc-utc-multiset-1.1.0",
-            "typed-csv-nfc-utc-multiset-1.2.0"
-          ],
-          "title": "Canonicalization",
+          "title": "Generator",
           "type": "string"
         },
         "config": {
@@ -639,9 +633,12 @@
           "title": "Config",
           "type": "string"
         },
-        "csv_schema": {
-          "const": "1.0",
-          "title": "Csv Schema",
+        "calendar": {
+          "enum": [
+            "legacy-weekday-seasonality-1.0.0",
+            "pl-de-berlin-calendar-1.0.0"
+          ],
+          "title": "Calendar",
           "type": "string"
         },
         "dimensions": {
@@ -660,15 +657,6 @@
           "default": null,
           "title": "Dimensions"
         },
-        "generator": {
-          "enum": [
-            "0.2.0",
-            "0.3.0",
-            "0.4.0"
-          ],
-          "title": "Generator",
-          "type": "string"
-        },
         "pricing": {
           "anyOf": [
             {
@@ -684,6 +672,37 @@
           ],
           "default": null,
           "title": "Pricing"
+        },
+        "demand": {
+          "anyOf": [
+            {
+              "enum": [
+                "daily-demand-1.0.0",
+                "not_applicable"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Demand"
+        },
+        "canonicalization": {
+          "enum": [
+            "typed-csv-nfc-utc-multiset-1.0.0",
+            "typed-csv-nfc-utc-multiset-1.1.0",
+            "typed-csv-nfc-utc-multiset-1.2.0",
+            "typed-csv-nfc-utc-multiset-1.3.0"
+          ],
+          "title": "Canonicalization",
+          "type": "string"
+        },
+        "csv_schema": {
+          "const": "1.0",
+          "title": "Csv Schema",
+          "type": "string"
         }
       },
       "required": [
@@ -704,22 +723,39 @@
           "type": "string"
         },
         "complete_through": {
-          "title": "Complete Through",
-          "type": "null"
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Complete Through"
         },
         "completeness_status": {
-          "const": "not_ready",
+          "enum": [
+            "not_ready",
+            "complete"
+          ],
           "title": "Completeness Status",
           "type": "string"
         },
-        "meaning": {
-          "const": "knowledge_boundary_without_completeness_guarantee",
-          "title": "Meaning",
+        "policy_version": {
+          "enum": [
+            "legacy-source-boundary-1.0.0",
+            "daily-demand-1.0.0"
+          ],
+          "title": "Policy Version",
           "type": "string"
         },
-        "policy_version": {
-          "const": "legacy-source-boundary-1.0.0",
-          "title": "Policy Version",
+        "meaning": {
+          "enum": [
+            "knowledge_boundary_without_completeness_guarantee",
+            "synthetic_sales_day_close_without_return_guarantee"
+          ],
+          "title": "Meaning",
           "type": "string"
         }
       },
@@ -736,16 +772,14 @@
   },
   "additionalProperties": false,
   "properties": {
-    "artifacts": {
-      "items": {
-        "$ref": "#/$defs/Artifact"
-      },
-      "title": "Artifacts",
-      "type": "array"
-    },
-    "dataset_id": {
-      "pattern": "^source-sha256-[0-9a-f]{64}$",
-      "title": "Dataset Id",
+    "schema_version": {
+      "enum": [
+        "2.0.0",
+        "2.1.0",
+        "2.2.0",
+        "2.3.0"
+      ],
+      "title": "Schema Version",
       "type": "string"
     },
     "dataset_name": {
@@ -753,23 +787,30 @@
       "title": "Dataset Name",
       "type": "string"
     },
+    "dataset_id": {
+      "pattern": "^source-sha256-[0-9a-f]{64}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
     "descriptor": {
       "$ref": "#/$defs/SourceDescriptor"
+    },
+    "requested_parameters": {
+      "$ref": "#/$defs/RequestedParameters"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
     },
     "generated_at": {
       "title": "Generated At",
       "type": "string"
     },
-    "inventory_ready": {
-      "const": false,
-      "title": "Inventory Ready",
-      "type": "boolean"
-    },
-    "provenance": {
-      "$ref": "#/$defs/Provenance"
-    },
-    "readiness": {
-      "$ref": "#/$defs/Readiness"
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/Artifact"
+      },
+      "title": "Artifacts",
+      "type": "array"
     },
     "reports": {
       "items": {
@@ -778,24 +819,20 @@
       "title": "Reports",
       "type": "array"
     },
-    "requested_parameters": {
-      "$ref": "#/$defs/RequestedParameters"
-    },
-    "schema_version": {
-      "enum": [
-        "2.0.0",
-        "2.1.0",
-        "2.2.0"
-      ],
-      "title": "Schema Version",
-      "type": "string"
-    },
     "watermarks": {
       "additionalProperties": {
         "$ref": "#/$defs/Watermark"
       },
       "title": "Watermarks",
       "type": "object"
+    },
+    "readiness": {
+      "$ref": "#/$defs/Readiness"
+    },
+    "inventory_ready": {
+      "const": false,
+      "title": "Inventory Ready",
+      "type": "boolean"
     }
   },
   "required": [

@@ -16,6 +16,8 @@ from data.generator.configuration import (
     resolve_generation_config,
 )
 from data.generator.csv_writer import source_columns, source_table_order
+from data.generator.demand_quality import demand_report_markdown, validate_demand
+from data.generator.demand_schema import DEMAND_GRAINS, DEMAND_VERSION, uses_demand
 from data.generator.dimension_quality import validate_dimensions
 from data.generator.dimension_schema import (
     AI_CALENDAR_VERSION,
@@ -86,15 +88,17 @@ class ResolvedParameters(Contract):
 
 
 class Versions(Contract):
-    generator: Literal["0.2.0", "0.3.0", "0.4.0"]
+    generator: Literal["0.2.0", "0.3.0", "0.4.0", "0.5.0"]
     config: Literal["1.0.0"]
     calendar: Literal["legacy-weekday-seasonality-1.0.0", "pl-de-berlin-calendar-1.0.0"]
     dimensions: Literal["retail-dimensions-1.0.0", "not_applicable"] | None = None
     pricing: Literal["retail-pricing-1.0.0", "not_applicable"] | None = None
+    demand: Literal["daily-demand-1.0.0", "not_applicable"] | None = None
     canonicalization: Literal[
         "typed-csv-nfc-utc-multiset-1.0.0",
         "typed-csv-nfc-utc-multiset-1.1.0",
         "typed-csv-nfc-utc-multiset-1.2.0",
+        "typed-csv-nfc-utc-multiset-1.3.0",
     ]
     csv_schema: Literal["1.0"]
 
@@ -111,7 +115,7 @@ class SourceDescriptor(Contract):
     role: Literal["source"]
     owner: Literal["retailops-cloud-native-platform"]
     parent_ids: list[str]
-    schema_version: Literal["2.0.0", "2.1.0", "2.2.0"]
+    schema_version: Literal["2.0.0", "2.1.0", "2.2.0", "2.3.0"]
     versions: Versions
     resolved_parameters: ResolvedParameters
     code_sha256: SHA256
@@ -121,7 +125,7 @@ class SourceDescriptor(Contract):
 
     @model_validator(mode="after")
     def complete_source_schema(self) -> SourceDescriptor:
-        revision = {"2.0.0": 0, "2.1.0": 1, "2.2.0": 2}[self.schema_version]
+        revision = {"2.0.0": 0, "2.1.0": 1, "2.2.0": 2, "2.3.0": 3}[self.schema_version]
         expected_generator = f"0.{revision + 2}.0"
         expected_canonicalization = f"typed-csv-nfc-utc-multiset-1.{revision}.0"
         if (
@@ -134,11 +138,21 @@ class SourceDescriptor(Contract):
             PRICING_VERSION
             if uses_pricing(self.resolved_parameters.profile, self.schema_version)
             else "not_applicable"
-            if self.schema_version == "2.2.0"
+            if self.schema_version in {"2.2.0", "2.3.0"}
             else None
         )
         if self.versions.pricing != expected_pricing:
             msg = "Source pricing policy disagrees with schema/profile."
+            raise ValueError(msg)
+        expected_demand = (
+            DEMAND_VERSION
+            if uses_demand(self.resolved_parameters.profile, self.schema_version)
+            else "not_applicable"
+            if self.schema_version == "2.3.0"
+            else None
+        )
+        if self.versions.demand != expected_demand:
+            msg = "Source demand policy disagrees with schema/profile."
             raise ValueError(msg)
         names = source_table_order(self.resolved_parameters.profile, self.schema_version)
         if self.parent_ids or set(self.tables) != set(names):
@@ -231,10 +245,13 @@ class Report(Contract):
 
 class Watermark(Contract):
     as_of_time: str
-    complete_through: None
-    completeness_status: Literal["not_ready"]
-    policy_version: Literal["legacy-source-boundary-1.0.0"]
-    meaning: Literal["knowledge_boundary_without_completeness_guarantee"]
+    complete_through: ISODate | None
+    completeness_status: Literal["not_ready", "complete"]
+    policy_version: Literal["legacy-source-boundary-1.0.0", "daily-demand-1.0.0"]
+    meaning: Literal[
+        "knowledge_boundary_without_completeness_guarantee",
+        "synthetic_sales_day_close_without_return_guarantee",
+    ]
 
 
 class Readiness(Contract):
@@ -246,7 +263,7 @@ class Readiness(Contract):
 
 
 class SourceManifestV2(Contract):
-    schema_version: Literal["2.0.0", "2.1.0", "2.2.0"]
+    schema_version: Literal["2.0.0", "2.1.0", "2.2.0", "2.3.0"]
     dataset_name: Literal["retailops-synthetic"]
     dataset_id: Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]
     descriptor: SourceDescriptor
@@ -300,7 +317,7 @@ def artifact_metadata(
         "content_sha256": content_sha256(rows, columns),
         "schema_version": "1.0",
         "columns": columns,
-        "grain": {**DIMENSION_GRAINS, **PRICING_GRAINS}.get(name, ["id"]),
+        "grain": {**DIMENSION_GRAINS, **PRICING_GRAINS, **DEMAND_GRAINS}.get(name, ["id"]),
         "data_class": DATA_CLASSES[name],
         "temporal_role": role,
         "date_range": date_range(all_dates),
@@ -317,7 +334,7 @@ def artifact_metadata(
 
 
 def report_metadata(
-    output_dir: Path, profile: str, schema_version: str = "2.2.0"
+    output_dir: Path, profile: str, schema_version: str = "2.3.0"
 ) -> list[dict[str, Any]]:
     names = ["dataset_manifest.json", "quality_report.json"]
     if profile != "demo":
@@ -326,12 +343,14 @@ def report_metadata(
         names.append("dimensions_report.json")
     if uses_pricing(profile, schema_version):
         names.extend(["pricing_report.json", "pricing_report.md"])
+    if uses_demand(profile, schema_version):
+        names.extend(["demand_report.json", "demand_report.md"])
     reports = []
     for name in names:
         path = output_dir / name
         payload = json.loads(
             (
-                output_dir / ("pricing_report.json" if name == "pricing_report.md" else name)
+                output_dir / (name.removesuffix(".md") + ".json" if name.endswith(".md") else name)
             ).read_text(encoding="utf-8")
         )
         reports.append(
@@ -343,6 +362,8 @@ def report_metadata(
                 if name == "dimensions_report.json"
                 else PRICING_VERSION
                 if name in {"pricing_report.json", "pricing_report.md"}
+                else DEMAND_VERSION
+                if name in {"demand_report.json", "demand_report.md"}
                 else "legacy-" + name.removesuffix(".json") + "-1.0",
                 "status": str(payload.get("status", "not_applicable")),
             }
@@ -350,9 +371,11 @@ def report_metadata(
     return reports
 
 
-def watermark_metadata(end_date: date) -> dict[str, dict[str, Any]]:
+def watermark_metadata(
+    end_date: date, profile: str = "demo", schema_version: str = "2.3.0"
+) -> dict[str, dict[str, Any]]:
     cutoff = datetime.combine(end_date, time(23, 59, 59), tzinfo=UTC).isoformat()
-    return {
+    result = {
         name: {
             "as_of_time": cutoff,
             "complete_through": None,
@@ -362,6 +385,19 @@ def watermark_metadata(end_date: date) -> dict[str, dict[str, Any]]:
         }
         for name in ("sales", "orders", "returns", "inventory_snapshots", "stock_movements")
     }
+    if uses_demand(profile, schema_version):
+        from datetime import timedelta  # noqa: PLC0415 - date arithmetic for versioned stream
+
+        result["daily_demand_observations"] = {
+            "as_of_time": datetime.combine(
+                end_date + timedelta(days=1), time.min, tzinfo=UTC
+            ).isoformat(),
+            "complete_through": end_date.isoformat(),
+            "completeness_status": "complete",
+            "policy_version": DEMAND_VERSION,
+            "meaning": "synthetic_sales_day_close_without_return_guarantee",
+        }
+    return result
 
 
 def build_source_manifest_v2(
@@ -372,7 +408,7 @@ def build_source_manifest_v2(
     dataset_id, descriptor = source_identity(config, tables)
     effective = resolve_generation_config(config)
     payload = {
-        "schema_version": "2.2.0",
+        "schema_version": "2.3.0",
         "dataset_name": "retailops-synthetic",
         "dataset_id": dataset_id,
         "descriptor": descriptor,
@@ -384,7 +420,7 @@ def build_source_manifest_v2(
             for name in source_table_order(config.profile)
         ],
         "reports": report_metadata(output_dir, config.profile),
-        "watermarks": watermark_metadata(effective.end_date),
+        "watermarks": watermark_metadata(effective.end_date, config.profile),
         "readiness": {
             "forecasting": "not_ready",
             "anomaly": "not_ready",
@@ -455,7 +491,7 @@ def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> st
         raise ValueError(msg)
     if {
         key: value.model_dump() for key, value in manifest.watermarks.items()
-    } != watermark_metadata(effective.end_date):
+    } != watermark_metadata(effective.end_date, config.profile, manifest.schema_version):
         msg = "Watermarks must preserve the explicit boundary and unknown completeness."
         raise ValueError(msg)
     return manifest.dataset_id
@@ -514,6 +550,20 @@ def verify_source_artifacts(manifest: SourceManifestV2, output_dir: Path, end_da
             encoding="utf-8"
         ) != pricing_report_markdown(report):
             msg = "Pricing report does not match verified source records."
+            raise ValueError(msg)
+    if uses_demand(manifest.descriptor.resolved_parameters.profile, manifest.schema_version):
+        report = validate_demand(
+            tables,
+            resolve_generation_config(
+                config_from_parameters(manifest.requested_parameters.model_dump())
+            ),
+        )
+        if json.loads(
+            (output_dir / "demand_report.json").read_text(encoding="utf-8")
+        ) != report or (output_dir / "demand_report.md").read_text(
+            encoding="utf-8"
+        ) != demand_report_markdown(report):
+            msg = "Demand report does not match verified source records."
             raise ValueError(msg)
 
 

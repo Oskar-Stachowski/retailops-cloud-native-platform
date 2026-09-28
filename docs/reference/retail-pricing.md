@@ -3,8 +3,9 @@
 [Profile](data-profiles.md) · [Wymiary](retail-dimensions.md) · [Generowanie](../guides/data.md)
 
 Profile `ai-*` używają jednego [resolvera](../../data/generator/price_resolver.py)
-opartego na jawnych planach. Generator 0.4.0 i source schema 2.2.0 dodają pięć
-tabel do dziewięciu tabel wymiarów i 17 tabel legacy: razem 31 CSV.
+opartego na jawnych planach. Generator 0.5.0 i source schema 2.3.0 mają pięć
+tabel pricing, dziewięć tabel wymiarów, trzy [popytu/panelu](daily-demand.md)
+i 17 tabel legacy: razem 34 CSV.
 Kontrakt `retail-pricing-1.0.0` ma [JSON Schema](../../data/contracts/retail_pricing.v1.schema.json)
 oraz [wykonywalne kontrole](../../data/generator/pricing_quality.py).
 Demo i profile small/medium/large zachowują wcześniejsze reguły i bajty CSV.
@@ -82,8 +83,8 @@ Daily realized price jest quantity-weighted: sum(gross revenue)/sum(quantity).
 Przy quantity 0 realized price pozostaje pusty. Availability to maksimum
 `sale.ingested_at` (lub sold_at) oraz cutoffów wyceny zamówień.
 To wynik zaobserwowanych transakcji, **nie plan ani cecha znana przed target day**.
-Tabela jest sparse; nie zastępuje przyszłego pełnego panelu demand i kompletności.
-Obecne cechy schema 2.0 nie zawierają realized price, revenue ani promotion truth.
+Tabela cen jest sparse; pełny panel demand ma [osobny kontrakt](daily-demand.md).
+Obecne cechy AI schema 3.0 oraz legacy 2.0 nie zawierają realized price, revenue ani promotion truth.
 Ich generator weryfikuje bramkę cenową, a parent identity obejmuje pełne źródło.
 
 Truth stosuje chronologiczne okna względem realnych dat kampanii:
@@ -93,8 +94,8 @@ Generator uwzględnia znaną wersję i scope kampanii; w during dodatkowo używa
 syntetycznej promo sensitivity miejsca. Przy kilku sąsiednich efektach during
 ma pierwszeństwo, potem priority i stabilny plan ID.
 Efekt opisuje oddziaływanie kampanii niezależnie od tego, czy konkretna linia
-bundle osiągnęła próg ilościowy. Próbkowanie ilości i jego kalibracja są dalszą
-pracą demand; nie ma iteracyjnego sprzęgania koszyka z rabatem bundle.
+bundle osiągnęła próg ilościowy. Próbkowanie ilości opisuje [daily demand](daily-demand.md);
+nie ma iteracyjnego sprzęgania koszyka z rabatem bundle.
 
 AI sales zachowuje legacy nagłówek `promotion_uplift`, ale jego wartości są
 puste; pre/post/during multiplier znajduje się w osobnej tabeli sklasyfikowanej
@@ -117,7 +118,7 @@ Wyniki JSON i krótkie MD trafiają do pricing_report i są objęte checksumami 
 Odczyt źródła odtwarza bramki i oba raporty; przeliczenie hashów błędnych danych
 nie omija kontroli. Generowanie, feature builder i validator odrzucają błędy.
 
-Source schema 2.2.0, pricing policy oraz kanonizacja 1.2.0 wchodzą do identity.
+Source schema 2.3.0, pricing/demand policy oraz kanonizacja 1.3.0 wchodzą do identity.
 Readiness forecasting/anomaly/stockout/replay nadal wynosi not_ready,
-inventory_ready=false. Pełny panel, popyt/koszyki, chronologia/zwroty i pozostała
+inventory_ready=false. Chronologia/zwroty i pozostała
 separacja truth wymagają dalszych prac etapu 02 przed nowym importem AI 03.

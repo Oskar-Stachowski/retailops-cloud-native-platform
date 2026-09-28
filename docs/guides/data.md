@@ -53,6 +53,10 @@ Sześć kolejnych bramek [cen/promocji](../reference/retail-pricing.md) weryfiku
 coverage, znane wersje/scope, transakcje i realized price aggregates oraz kierunek
 truth pre/post. Wynik pricing_report ma JSON i krótkie MD. Brak ceny, overlap,
 błędny rabat albo nieaktywna promocja kończy się błędem, także w feature builderze.
+Sześć bramek [popytu/panelu](../reference/daily-demand.md) sprawdza pełną siatkę,
+agregaty, koszyki bez powtórzeń SKU, dzienne budżety i kompletność. Brak dnia,
+podwójna waga popytu albo nieuzgodniony koszyk blokuje eksport; missing jest unknown.
+Demand report ma JSON/MD, a cechy AI schema 3.0.
 Źródło pozostaje `not_ready` do odbioru pozostałych
 zakresów etapu 02. Inne parametry lub zmieniony kod wymagają nowego katalogu,
 jeżeli obecny zawiera manifest v2.

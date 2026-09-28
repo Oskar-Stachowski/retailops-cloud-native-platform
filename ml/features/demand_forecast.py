@@ -9,6 +9,8 @@ from decimal import Decimal
 from pathlib import Path
 
 from data.generator.configuration import SUPPORTED_PROFILES, resolve_generation_config
+from data.generator.demand_quality import validate_demand
+from data.generator.demand_schema import uses_demand
 from data.generator.dimension_quality import validate_dimensions
 from data.generator.dimension_schema import uses_dimensions
 from data.generator.identity import GENERATOR_VERSION
@@ -18,6 +20,7 @@ from data.generator.main import (
 )
 from data.generator.pricing_quality import validate_pricing
 from data.generator.pricing_schema import uses_pricing
+from ml.features.ai_demand import AI_FEATURE_COLUMNS, ai_feature_rows
 from ml.features.identity import (
     IDENTITY_FILENAME,
     feature_identity,
@@ -56,6 +59,10 @@ FEATURE_COLUMNS = [
     "month",
     "generated_at",
 ]
+
+
+def feature_columns(profile: str) -> list[str]:
+    return AI_FEATURE_COLUMNS if uses_demand(profile) else FEATURE_COLUMNS
 
 
 @dataclass(frozen=True)
@@ -165,6 +172,17 @@ def build_demand_feature_rows(
         validate_dimensions(tables, resolve_generation_config(config))
     if uses_pricing(config.profile):
         validate_pricing(tables, resolve_generation_config(config))
+    if uses_demand(config.profile):
+        validate_demand(tables, resolve_generation_config(config))
+        rows = ai_feature_rows(
+            tables["daily_demand_observations"],
+            tables["product_catalog"],
+            tables["catalog_categories"],
+        )
+        dataset_id, _, _ = feature_identity(config, tables, rows, AI_FEATURE_COLUMNS)
+        for row in rows:
+            row["dataset_id"] = dataset_id
+        return rows
     products_by_id = {_text(product["id"]): product for product in tables["products"]}
     generated_at = _feature_generated_at(tables)
     aggregates = _build_aggregates(tables)
@@ -219,24 +237,32 @@ def build_feature_manifest(
         msg = "Empty features require an explicit source-derived dataset ID."
         raise ValueError(msg)
 
+    ai = uses_demand(config.profile)
     return {
         "dataset_id": dataset_id,
         "dataset_name": DATASET_NAME,
-        "schema_version": SCHEMA_VERSION,
-        "feature_schema": FEATURE_SCHEMA,
+        "schema_version": "3.0" if ai else SCHEMA_VERSION,
+        "feature_schema": "demand_forecast_features.v3.schema.json" if ai else FEATURE_SCHEMA,
         "profile": config.profile,
-        "grain": GRAIN,
+        "grain": ["date", "product_id", "selling_location_id", "channel"] if ai else GRAIN,
         "target": TARGET,
         "date_start": min(dates) if dates else "",
         "date_end": max(dates) if dates else "",
         "formats": ["csv"],
         "row_count": len(rows),
-        "source_artifacts": SOURCE_ARTIFACTS,
+        "source_artifacts": [
+            "daily_demand_observations.csv",
+            "product_catalog.csv",
+            "catalog_categories.csv",
+        ]
+        if ai
+        else SOURCE_ARTIFACTS,
+        **({"target_type": "observed_sales_units"} if ai else {}),
         "forecast_origin_rule": "previous_day_end_utc",
         "available_at_origin_fields": [
             "date",
             "product_id",
-            "store_id",
+            "selling_location_id" if ai else "store_id",
             "channel",
             "category",
             "brand",
@@ -248,8 +274,8 @@ def build_feature_manifest(
         "label_fields": ["units_sold", "observation_status"],
         "observation_availability_field": "observation_available_at",
         "inventory_ready": False,
-        "complete_daily_panel": False,
-        "quality_report": "quality_report.json",
+        "complete_daily_panel": ai and all(row["source_data_complete"] for row in rows),
+        "quality_report": "demand_report.json" if ai else "quality_report.json",
         "generator_version": GENERATOR_VERSION,
         "seed": config.seed,
         "generated_at": datetime.now(UTC).isoformat(),
@@ -268,7 +294,12 @@ def write_feature_dataset(
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     with (output_dir / FEATURE_FILENAME).open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=FEATURE_COLUMNS)
+        writer = csv.DictWriter(
+            file,
+            fieldnames=AI_FEATURE_COLUMNS
+            if manifest["schema_version"] == "3.0"
+            else FEATURE_COLUMNS,
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -283,16 +314,17 @@ def generate_demand_feature_dataset(
 ) -> dict[str, object]:
     tables = build_dataset(config.dataset)
     rows = build_demand_feature_rows(tables, config.dataset)
-    dataset_id, _, _ = feature_identity(config.dataset, tables, rows, FEATURE_COLUMNS)
+    columns = feature_columns(config.dataset.profile)
+    dataset_id, _, _ = feature_identity(config.dataset, tables, rows, columns)
     manifest = build_feature_manifest(config.dataset, rows, dataset_id=dataset_id)
     output_dir = config.output_dir or default_feature_output_dir(config.dataset.profile)
     if (output_dir / IDENTITY_FILENAME).exists():
-        previous = load_feature_identity_manifest(output_dir, FEATURE_COLUMNS)
+        previous = load_feature_identity_manifest(output_dir, columns)
         if previous["dataset_id"] != dataset_id:
             msg = "Output already contains different features; choose a new output directory."
             raise ValueError(msg)
     write_feature_dataset(output_dir, rows, manifest)
-    write_feature_identity_manifest(config.dataset, tables, rows, FEATURE_COLUMNS, output_dir)
+    write_feature_identity_manifest(config.dataset, tables, rows, columns, output_dir)
     return manifest
 
 

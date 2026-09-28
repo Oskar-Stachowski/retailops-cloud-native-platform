@@ -1,89 +1,69 @@
 # Kontrakt cech prognozy sprzedaży
 
-Aktualny format tworzy [generator cech](../../ml/features/demand_forecast.py).
-Polecenia uruchomienia opisuje [instrukcja ML](../guides/ml.md).
+[Generator](../../ml/features/demand_forecast.py) rozdziela pełny panel AI
+od legacy używanego przez demo i obecną ocenę RF. Polecenia:
+[instrukcja ML](../guides/ml.md), [generowanie źródła](../guides/data.md).
 
-| Właściwość | Wartość |
-|---|---|
-| Nazwa datasetu | `retailops-demand-forecast-features` |
-| Wersja schematu | `2.0` |
-| Ziarno | `date`, `product_id`, `store_id`, `channel` |
-| Target | `units_sold` — zaobserwowana liczba sprzedanych sztuk |
-| Pliki | `features.csv`, `feature_manifest.json` |
-| Domyślny katalog | `data/synthetic/<profile>/features/demand_forecast/` |
+| Właściwość | AI | Legacy demo/small/medium/large |
+|---|---|---|
+| Schema | 3.0 | 2.0 |
+| Grain | date/product_id/selling_location_id/channel | date/product_id/store_id/channel |
+| Target | units_sold, target_type=observed_sales_units | units_sold |
+| Coverage | Pełny aktywny panel źródłowy | Sparse agregaty sprzedaży |
+| Statusy | observed_positive, observed_zero, closed, missing | observed_positive, observed_zero |
+| Inventory | Bez kolumn zapasu; inventory_ready=false | Bez kolumn zapasu; inventory_ready=false |
 
-[Schemat wiersza](../../ml/contracts/demand_forecast_features.schema.json),
-[schemat manifestu](../../ml/contracts/demand_forecast_feature_manifest.schema.json),
-[przykład wiersza](../../ml/contracts/demand_forecast_features.example.jsonl)
-i [przykład manifestu](../../ml/contracts/demand_forecast_feature_manifest.example.json)
-są wersjonowane razem z kodem.
+Obie wersje zapisują features.csv, feature_manifest.json i feature_identity_manifest.json.
+Domyślny katalog: data/synthetic/<profile>/features/demand_forecast/.
 
-## Granica czasu i pochodzenie
+## Pełny panel AI 3.0
 
-W ocenie RF origin jest o `23:59:59 UTC` dnia poprzedzającego pierwszy target.
-Rekord dostępny później, nawet przed północą, nie wchodzi do tej prognozy.
-Wszystkie dni horyzontu używają tej
-samej historii. Kalendarz targetu, identyfikatory serii oraz kategoria i marka
-produktu ze statycznego katalogu generatora są znane w origin. Lagi i okna RF
-odnoszą się do dat kalendarzowych względem origin; brak dnia ma osobny wskaźnik.
-Historia obejmuje tylko obserwacje dostępne najpóźniej w origin. Dla pojedynczego
-wiersza kontraktu reguła `previous_day_end_utc` oznacza najwcześniejszy możliwy
-origin jednodniowy; dłuższy horyzont może mieć wcześniejszy origin.
-`observation_available_at` to maksimum czasu
-ingestii sprzedaży i utworzenia zamówienia składających się na dany agregat;
-gdy rekord sprzedaży nie ma czasu ingestii, używany jest `sold_at`. Taką samą
-granicę stosuje baseline w ocenie RF. `units_sold` oraz
-wyprowadzony z niego `observation_status` są etykietami. `generated_at` jest
-metadanym wykonania, nie dowodem dostępności źródła w historycznym origin.
-`observation_available_at` jest metadanym dostępności etykiety, nie cechą RF.
-Manifest wymienia pola wejściowe, etykiety i metadane dostępności osobno.
+[Schema wiersza](../../ml/contracts/demand_forecast_features.v3.schema.json) i
+[manifestu](../../ml/contracts/demand_forecast_feature_manifest.v3.schema.json)
+wersjonują fizyczny grain. Wiersze pochodzą z
+[daily_demand_observations](daily-demand.md), kanonicznego katalogu i kategorii.
+Nie są rekonstruowane ze sparse sales ani iloczynu dowolnych kanałów.
+Inactive combinations mają osobny eksport wykluczeń, poza mianownikiem panelu.
 
-Agregat zachowuje tylko najnowszą sumę i jej dostępność, bez wcześniejszych
-wersji. Spóźniona sprzedaż historycznego dnia może przez to usunąć wcześniej
-znaną obserwację z cech starego origin. Obecna ocena syntetyczna ma ingestie
-w tym samym dniu; nie potwierdza odtwarzania historii z późniejszymi korektami.
-To otwarte ograniczenie [ML-07](../audits/open-findings.md), do usunięcia
-przed odbiorem takiej historii w AI 02–04.
+Observed zero wymaga kompletnego otwartego dnia źródłowego, bez sztucznej
+transakcji quantity=0. Closed ma zero i oddzielny status. Missing ma null label
+i source_data_complete=false, nie jest zerem. Kompletny eksport blokuje missing
+oraz luki w grain. Manifest ma complete_daily_panel=true po bramce demand;
+nie jest to ML readiness.
 
-Wiersz powstaje wyłącznie z jawnego rekordu sprzedaży połączonego z zamówieniem.
-Suma `quantity=0` daje `observation_status=observed_zero`; dodatnia suma daje
-`observed_positive`. Brak rekordu nie tworzy wiersza o zerowym targetcie, a brak
-wartości `quantity` jest błędem. Obecny generator nie dostarcza wersjonowanego
-asortymentu, kalendarza otwarcia sklepów ani watermarku kompletności. Dlatego
-nie da się wiarygodnie zaklasyfikować nieobecnego wiersza jako zera, zamknięcia,
-nieaktywności lub brakujących zdarzeń. Manifest deklaruje
-`complete_daily_panel=false`: sam zbiór cech nie jest panelem. Osobny
-[protokół oceny RF](../guides/ml.md) buduje pełny panel tylko dla profili
-syntetycznych, przy jawnej deklaracji ich kompletności i statycznego asortymentu.
-Nie wolno przenosić tego założenia na fixture `demo` ani zewnętrzne dane bez
-wersjonowanego potwierdzenia kompletności, otwarcia i asortymentu.
+Observation_available_at to maksimum następnej północy UTC oraz ingestii i
+cutoff wyceny faktów. Nie może poprzedzać zamknięcia źródła. Source watermark
+panelu ma complete_through=end_date i cutoff następnej północy, bez gwarancji
+kompletności legacy zwrotów ani ledgeru. Generated_at w wierszu jest
+deterministycznym metadanym eksportu, nie cechą ani dowodem dostępności wiedzy.
 
-Historia cen i promocje generatora nie dokumentują jednoznacznie wersji znanej
-w każdym origin. Zrealizowana cena, przychód, rabat, stockout i prawda symulatora
-z dnia targetu są wynikami dnia. Żadne z tych pól nie trafia do zbioru cech ani
-do wejścia RF. Bieżący `product_status` także nie jest historycznie wersjonowany
-i pozostaje wyłączony. Kategoria i marka są w obecnym generatorze stałe przez
-cały okres; po dopuszczeniu ich zmian źródło będzie wymagać wersji z czasem
-dostępności.
+[Moduł cech](../../ml/features/ai_demand.py) używa jawnych kolumn faktów i odrzuca
+pola truth. Macierz nie zawiera inventory, realized price/revenue, multipliers
+ani noise. Target i status są labelami, availability metadanym. Builder sprawdza
+upstream gates; pełna izolacja procesu/runtime od truth jest dalszą pracą 02.
 
-Snapshoty zapasu dotyczą magazynów (`warehouse_code`), podczas gdy grain
-prognozy używa `store_id`. Brakuje mapowania sklepu i kanału do miejsca zapasu
-obowiązującego w danym czasie. Zapas nie jest dopasowywany po samym produkcie,
-nie ma fallbacku do późniejszego snapshotu i nie jest zamieniany na pozorne zero.
-Nie ma żadnej cechy zależnej od zapasu; manifest deklaruje `inventory_ready=false`.
-Przywrócenie takich cech wymaga mapowania fulfillment i wiarygodnego ledgeru.
+Calendar lag wyznacza datę origin_day minus lag_days, gdzie origin jest końcem
+dnia przed pierwszym targetem. Używa tylko otwartych, kompletnych obserwacji
+znanych do origin. Brak daty, missing/closed i późny rekord dają unknown, bez
+podstawiania wcześniejszego sparse wiersza. Obsługuje także booleans z CSV.
 
-## Zakres obecnej oceny
+Nowy zestaw ma logiczny features-sha256 ID, parent source 2.3 i transformację
+daily-demand-panel-features-1.0.0. Source identity wiąże dane, kontrakty, kod i
+zależności. Historyczne source 2.0/2.1/2.2 i feature 2.0 zachowują IDs i parent.
 
-Zmiana schematu `1.0` → `2.0`, RF `random-forest-v1` → `random-forest-v3`
-oraz baseline `baseline-moving-average-v1` → `baseline-moving-average-v2`
-oddziela nowe przebiegi od [historycznego snapshotu](../evidence/ml/random-forest-v1/README.md).
-RF ocenia trzy chronologiczne okna walidacyjne oraz odłożony końcowy test, każdy
-z jednym origin na cały horyzont. Wynik ma osobne pokrycie i pominięcia. Osobny
-`make ml-evaluate` pozostaje kroczącym backtestem samego baseline i nie służy
-do porównania z RF.
+## Legacy 2.0 i istniejący RF
 
-`dataset_id` zawiera profil, zakres dat i seed. Pełną konfigurację, logiczne
-sumy danych i kod wiąże [tożsamość eksperymentu](../guides/ml.md), a nie sam
-identyfikator datasetu. Manifest może wskazywać `quality_report.json` bez
-kopiowania tego pliku do katalogu cech.
+[Schema wiersza](../../ml/contracts/demand_forecast_features.schema.json),
+[manifestu](../../ml/contracts/demand_forecast_feature_manifest.schema.json) oraz
+[przykłady](../../ml/contracts/demand_forecast_features.example.jsonl) pozostają
+formatem demo i obecnego RF. Wiersz pochodzi z jawnej sprzedaży i zamówienia.
+Brak transakcji nie tworzy zera; complete_daily_panel=false. Osobny protokół RF
+uzupełnia panel tylko dla syntetycznych profili przy założeniach z instrukcji ML.
+
+RF i baseline używają dat kalendarzowych, wcześniejszych obserwacji znanych
+w origin o 23:59:59 UTC i tego samego zamrożonego horyzontu. Nie korzystają
+z przyszłych cen zrealizowanych ani zapasu. Obecny RF wymaga schema 2.0;
+cechy 3.0 wymagają osobnej implementacji/oceny AI 04. Nie porównuj automatycznie
+modeli na różnych snapshotach. Ostatnia [ocena RF](../evidence/ml/fixed-origin-rf-2026-09-27/README.md)
+pozostaje rejected. Historia korekt i pełna lineage są częścią
+[ML-07](../audits/open-findings.md), etapów AI 03–04.
