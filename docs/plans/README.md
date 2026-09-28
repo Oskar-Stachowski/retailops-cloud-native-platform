@@ -8,7 +8,8 @@ kierunki mają własny zakres i zależności.
 
 | Potrzeba | Dokument | Kiedy korzystać |
 |---|---|---|
-| Najbliższe prace AI | [Backlog 02–16](ai/backlog.md) | Zakres pierwszych PR-ów i przypisanie warunków do etapów |
+| Najbliższe prace AI | [Backlog 03–16](ai/backlog.md) | Zakres pierwszych PR-ów i przypisanie warunków do etapów |
+| Kolejność i repozytoria AI | [Pisemna mapa 03–17](ai/kolejnosc-i-repozytoria.md) | Podział cloud-native/AI-intelligence i praca równoległa |
 | Potwierdzone problemy obecnego kodu | [Otwarte ustalenia](../audits/open-findings.md) | Przy wyborze poprawki i jej kryteriów odbioru |
 | Rozbudowa o osobny serwis AI | [Plan AI](ai/README.md) | Po wyborze tej rozbudowy; z wykorzystaniem wyników prac ML |
 | Aktywacja infrastruktury chmurowej | [Plan AWS](aws-activation.md) | Gdy istnieje potrzeba konkretnego środowiska i określony zakres kosztów |

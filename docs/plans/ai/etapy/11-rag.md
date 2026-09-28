@@ -1,5 +1,11 @@
 # Etap 11 — Zbuduj wersjonowaną wiedzę i RAG
 
+**Stan realizacji:** fundament offline ma odbiór w repo AI; pełny etap pozostaje
+otwarty. [Aktualny zakres i braki](../../../evidence/ai/11/README.md): rzeczywisty
+provider, użytkowa kwalifikacja/aktywacja i jakość semantyczna. Poniższa
+instrukcja opisuje docelowy kontrakt całego etapu; punkt wznowienia podaje
+[backlog](../backlog.md).
+
 **Repozytorium:** RetailOps AI. **Wymagany etap:** 01. Może przebiegać równolegle z danymi/ML; działający agent jest odbierany dopiero w etapie 12. Dokument nadrzędny: [kontrakt integracji i agenta](../kontrakty/integracja-agent.md).
 
 ## Cel

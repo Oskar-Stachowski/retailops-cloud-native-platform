@@ -18,9 +18,15 @@ panel, dzienne budżety, koszyki bez powtórzeń i cechy AI 3.0.
 rozliczenie revenue i osobne history/return-tail cutoffy.
 [DATA-05](../../evidence/ai/02/data05/README.md) domyka lokalny odbiór source 2.6:
 46 hard gates, rozdzielone parametry i izolowany worker faktów i wersjonowane obserwacje z odczytem as-of.
+[Required CI na main `30e3e70`](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36446776645)
+potwierdza zdalny odbiór tej publikacji.
 Następna implementacja to [snapshot i curated 03](etapy/03-snapshot-curated.md);
-równolegle można rozpocząć RAG 11. Modele i inventory nadal nie są gotowe.
+równolegle kontynuujemy [pozostały zakres RAG 11](../../evidence/ai/11/README.md).
+Fundament offline działa, ale odbiór jakości i użytkowa aktywacja pozostają otwarte.
+Modele i inventory nadal nie są gotowe.
 [Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.
+Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
+rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.
 Etapy 03–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 

@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "stage": "11",
+  "scope": "offline_rag_foundation_publication_not_full_stage_completion",
+  "repository": "Oskar-Stachowski/retailops-ai-intelligence",
+  "verified_at": "2026-09-28T16:21:11.354195+00:00",
+  "pull_request": {
+    "number": 3,
+    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/3",
+    "merged": true,
+    "head_sha": "6936621ee8cce0d28c9218dca7d79fdadf3f2139",
+    "merge_commit": "1c3b65e2bff68a920c45a5fbfd39b64c2bc80d95"
+  },
+  "required_ci": {
+    "pull_request": {
+      "id": 36449464231,
+      "head_sha": "6936621ee8cce0d28c9218dca7d79fdadf3f2139",
+      "head_branch": "ai/rag-corpus",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231",
+      "jobs": [
+        {
+          "id": 109020176540,
+          "name": "checks",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109020176540"
+        },
+        {
+          "id": 109020176963,
+          "name": "persistence",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109020176963"
+        },
+        {
+          "id": 109020177023,
+          "name": "secrets",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109020177023"
+        },
+        {
+          "id": 109021360688,
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109021360688"
+        }
+      ],
+      "observed_at": "2026-09-28T16:20:02.819588+00:00"
+    },
+    "main_push": {
+      "id": 36449971211,
+      "head_sha": "1c3b65e2bff68a920c45a5fbfd39b64c2bc80d95",
+      "head_branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211",
+      "jobs": [
+        {
+          "id": 109021911994,
+          "name": "secrets",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109021911994"
+        },
+        {
+          "id": 109021912138,
+          "name": "checks",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109021912138"
+        },
+        {
+          "id": 109021912190,
+          "name": "persistence",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109021912190"
+        },
+        {
+          "id": 109023033659,
+          "name": "required-result",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109023033659"
+        }
+      ],
+      "observed_at": "2026-09-28T16:21:11.354195+00:00"
+    }
+  },
+  "main_protection": {
+    "protected": true,
+    "required_contexts": [
+      "required-result"
+    ],
+    "strict": true,
+    "pull_request_required": true,
+    "enforce_admins": true,
+    "changed_in_this_publication": false
+  },
+  "runtime": "GitHub Actions Ubuntu 24.04 / Linux AMD64",
+  "checks_command": "make bootstrap check",
+  "persistence_command": "make bootstrap compose-smoke",
+  "user_retrieval_activated": false,
+  "semantic_quality_accepted": false,
+  "stage_complete": false,
+  "aws_executed": false,
+  "remaining": [
+    "real_embedding_provider_path",
+    "user_qualification_activation_and_rollback",
+    "real_embedding_golden_quality_acceptance"
+  ]
+}
