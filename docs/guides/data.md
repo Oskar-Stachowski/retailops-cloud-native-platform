@@ -49,6 +49,10 @@ Walidatory kończą się błędem dla niespójnej konfiguracji, identity lub che
 W profilach AI dodatkowo sprawdzają [kanoniczne wymiary, kalendarz i lifecycle](../reference/retail-dimensions.md).
 Osiem hard gates zapisuje wynik w `dimensions_report.json`; brak wymaganego dnia,
 SKU z whitespace, nieznany magazyn lub sprzedaż poza asortymentem blokuje eksport.
+Sześć kolejnych bramek [cen/promocji](../reference/retail-pricing.md) weryfikuje
+coverage, znane wersje/scope, transakcje i realized price aggregates oraz kierunek
+truth pre/post. Wynik pricing_report ma JSON i krótkie MD. Brak ceny, overlap,
+błędny rabat albo nieaktywna promocja kończy się błędem, także w feature builderze.
 Źródło pozostaje `not_ready` do odbioru pozostałych
 zakresów etapu 02. Inne parametry lub zmieniony kod wymagają nowego katalogu,
 jeżeli obecny zawiera manifest v2.

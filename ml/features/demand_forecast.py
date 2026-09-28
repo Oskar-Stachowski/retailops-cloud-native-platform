@@ -16,6 +16,8 @@ from data.generator.main import (
     DatasetGenerationConfig,
     build_dataset,
 )
+from data.generator.pricing_quality import validate_pricing
+from data.generator.pricing_schema import uses_pricing
 from ml.features.identity import (
     IDENTITY_FILENAME,
     feature_identity,
@@ -161,6 +163,8 @@ def build_demand_feature_rows(
 ) -> list[dict[str, object]]:
     if uses_dimensions(config.profile):
         validate_dimensions(tables, resolve_generation_config(config))
+    if uses_pricing(config.profile):
+        validate_pricing(tables, resolve_generation_config(config))
     products_by_id = {_text(product["id"]): product for product in tables["products"]}
     generated_at = _feature_generated_at(tables)
     aggregates = _build_aggregates(tables)

@@ -2,7 +2,8 @@
 
 [Profile](data-profiles.md) · [Generowanie](../guides/data.md)
 
-Generator 0.3.0 dodaje do profili `ai-*` dziewięć tabel źródłowych.
+Profile `ai-*` mają dziewięć tabel wymiarów źródłowych; generator 0.4.0 rozszerza
+je o [plany cen/promocji](retail-pricing.md) i ich obserwacje.
 Ich kontrakt to `retail-dimensions-1.0.0`, opisany przez
 [JSON Schema](../../data/contracts/retail_dimensions.v1.schema.json) i
 [walidator](../../data/generator/dimension_quality.py). CSV ma komórki tekstowe;
@@ -87,7 +88,7 @@ otwarcia i nie jest oceną zgodności przedsiębiorstwa z prawem.
 
 ## Bramka źródłowa
 
-Generowanie oraz odczyt manifestu 2.1 sprawdzają osiem hard gates:
+Generowanie oraz odczyt manifestu 2.1/2.2 sprawdzają osiem hard gates:
 schema/PK/SKU, rozdzielenie lokalizacji i kanałów, wersje/routing, katalog/lifecycle/
 asortyment, pełny kalendarz ważnych par, sezon kategorii, zgodność adaptera
 oraz sprzedaż w aktywnych i otwartych kombinacjach ze znanym routingiem.
@@ -98,5 +99,5 @@ Usunięcie obowiązkowego dnia kalendarza jest błędem, a nie zamknięciem albo
 `active_daily_combinations` liczy ważne dni asortymentu przed ograniczeniem otwarcia.
 `observation_panel_status=not_ready`: nie ma jeszcze kompletności per dzień,
 daily observations ani rozdzielenia zero/missing/closed/inactive.
-Readiness źródła i inventory pozostaje niegotowe; ceny, koszyki, chronologia
-oraz separacja simulation truth należą do dalszych zakresów.
+Readiness źródła i inventory pozostaje niegotowe; popyt/panel, koszyki,
+chronologia oraz pozostała separacja simulation truth wymagają dalszych prac.

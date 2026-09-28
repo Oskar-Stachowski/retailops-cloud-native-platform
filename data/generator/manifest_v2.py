@@ -35,6 +35,8 @@ from data.generator.identity import (
     json_sha256,
     source_identity,
 )
+from data.generator.pricing_quality import pricing_report_markdown, validate_pricing
+from data.generator.pricing_schema import PRICING_GRAINS, PRICING_VERSION, uses_pricing
 
 MANIFEST_V2_FILENAME = "dataset_manifest.v2.json"
 SHA256 = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
@@ -46,6 +48,7 @@ DataClass = Literal[
     "mixed_fact_and_simulation_truth",
     "source_operational_output",
     "source_plan",
+    "simulation_truth",
 ]
 
 
@@ -83,12 +86,15 @@ class ResolvedParameters(Contract):
 
 
 class Versions(Contract):
-    generator: Literal["0.2.0", "0.3.0"]
+    generator: Literal["0.2.0", "0.3.0", "0.4.0"]
     config: Literal["1.0.0"]
     calendar: Literal["legacy-weekday-seasonality-1.0.0", "pl-de-berlin-calendar-1.0.0"]
     dimensions: Literal["retail-dimensions-1.0.0", "not_applicable"] | None = None
+    pricing: Literal["retail-pricing-1.0.0", "not_applicable"] | None = None
     canonicalization: Literal[
-        "typed-csv-nfc-utc-multiset-1.0.0", "typed-csv-nfc-utc-multiset-1.1.0"
+        "typed-csv-nfc-utc-multiset-1.0.0",
+        "typed-csv-nfc-utc-multiset-1.1.0",
+        "typed-csv-nfc-utc-multiset-1.2.0",
     ]
     csv_schema: Literal["1.0"]
 
@@ -105,7 +111,7 @@ class SourceDescriptor(Contract):
     role: Literal["source"]
     owner: Literal["retailops-cloud-native-platform"]
     parent_ids: list[str]
-    schema_version: Literal["2.0.0", "2.1.0"]
+    schema_version: Literal["2.0.0", "2.1.0", "2.2.0"]
     versions: Versions
     resolved_parameters: ResolvedParameters
     code_sha256: SHA256
@@ -115,15 +121,24 @@ class SourceDescriptor(Contract):
 
     @model_validator(mode="after")
     def complete_source_schema(self) -> SourceDescriptor:
-        expected_generator = "0.2.0" if self.schema_version == "2.0.0" else "0.3.0"
-        expected_canonicalization = "typed-csv-nfc-utc-multiset-" + (
-            "1.0.0" if self.schema_version == "2.0.0" else "1.1.0"
-        )
+        revision = {"2.0.0": 0, "2.1.0": 1, "2.2.0": 2}[self.schema_version]
+        expected_generator = f"0.{revision + 2}.0"
+        expected_canonicalization = f"typed-csv-nfc-utc-multiset-1.{revision}.0"
         if (
             self.versions.generator != expected_generator
             or self.versions.canonicalization != expected_canonicalization
         ):
             msg = "Source schema and producer versions disagree."
+            raise ValueError(msg)
+        expected_pricing = (
+            PRICING_VERSION
+            if uses_pricing(self.resolved_parameters.profile, self.schema_version)
+            else "not_applicable"
+            if self.schema_version == "2.2.0"
+            else None
+        )
+        if self.versions.pricing != expected_pricing:
+            msg = "Source pricing policy disagrees with schema/profile."
             raise ValueError(msg)
         names = source_table_order(self.resolved_parameters.profile, self.schema_version)
         if self.parent_ids or set(self.tables) != set(names):
@@ -192,7 +207,12 @@ class Artifact(Contract):
     grain: list[str]
     data_class: DataClass
     temporal_role: Literal[
-        "dimension", "observations", "plans", "return_tail", "operational_output"
+        "dimension",
+        "observations",
+        "plans",
+        "return_tail",
+        "operational_output",
+        "simulation_truth",
     ]
     date_range: DateRange
     field_ranges: dict[str, DateRange]
@@ -226,7 +246,7 @@ class Readiness(Contract):
 
 
 class SourceManifestV2(Contract):
-    schema_version: Literal["2.0.0", "2.1.0"]
+    schema_version: Literal["2.0.0", "2.1.0", "2.2.0"]
     dataset_name: Literal["retailops-synthetic"]
     dataset_id: Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]
     descriptor: SourceDescriptor
@@ -268,6 +288,8 @@ def artifact_metadata(
         role = "return_tail"
     elif DATA_CLASSES[name] == "source_operational_output":
         role = "operational_output"
+    elif DATA_CLASSES[name] == "simulation_truth":
+        role = "simulation_truth"
     path = output_dir / (name + ".csv")
     return {
         "table": name,
@@ -278,7 +300,7 @@ def artifact_metadata(
         "content_sha256": content_sha256(rows, columns),
         "schema_version": "1.0",
         "columns": columns,
-        "grain": DIMENSION_GRAINS.get(name, ["id"]),
+        "grain": {**DIMENSION_GRAINS, **PRICING_GRAINS}.get(name, ["id"]),
         "data_class": DATA_CLASSES[name],
         "temporal_role": role,
         "date_range": date_range(all_dates),
@@ -295,17 +317,23 @@ def artifact_metadata(
 
 
 def report_metadata(
-    output_dir: Path, profile: str, schema_version: str = "2.1.0"
+    output_dir: Path, profile: str, schema_version: str = "2.2.0"
 ) -> list[dict[str, Any]]:
     names = ["dataset_manifest.json", "quality_report.json"]
     if profile != "demo":
         names.append("realism_report.json")
     if uses_dimensions(profile, schema_version):
         names.append("dimensions_report.json")
+    if uses_pricing(profile, schema_version):
+        names.extend(["pricing_report.json", "pricing_report.md"])
     reports = []
     for name in names:
         path = output_dir / name
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(
+            (
+                output_dir / ("pricing_report.json" if name == "pricing_report.md" else name)
+            ).read_text(encoding="utf-8")
+        )
         reports.append(
             {
                 "path": name,
@@ -313,6 +341,8 @@ def report_metadata(
                 "size_bytes": path.stat().st_size,
                 "policy_version": DIMENSIONS_VERSION
                 if name == "dimensions_report.json"
+                else PRICING_VERSION
+                if name in {"pricing_report.json", "pricing_report.md"}
                 else "legacy-" + name.removesuffix(".json") + "-1.0",
                 "status": str(payload.get("status", "not_applicable")),
             }
@@ -342,7 +372,7 @@ def build_source_manifest_v2(
     dataset_id, descriptor = source_identity(config, tables)
     effective = resolve_generation_config(config)
     payload = {
-        "schema_version": "2.1.0",
+        "schema_version": "2.2.0",
         "dataset_name": "retailops-synthetic",
         "dataset_id": dataset_id,
         "descriptor": descriptor,
@@ -407,6 +437,7 @@ def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> st
         ):
             msg = "Code or dependency provenance does not match identity."
             raise ValueError(msg)
+
     generated = datetime.fromisoformat(manifest.generated_at)
     if generated.tzinfo is None or generated.utcoffset().total_seconds() != 0:
         msg = "Manifest generation time requires UTC."
@@ -469,6 +500,20 @@ def verify_source_artifacts(manifest: SourceManifestV2, output_dir: Path, end_da
             != dimensions_report
         ):
             msg = "Dimensions report does not match verified source records."
+            raise ValueError(msg)
+    if uses_pricing(manifest.descriptor.resolved_parameters.profile, manifest.schema_version):
+        report = validate_pricing(
+            tables,
+            resolve_generation_config(
+                config_from_parameters(manifest.requested_parameters.model_dump())
+            ),
+        )
+        if json.loads(
+            (output_dir / "pricing_report.json").read_text(encoding="utf-8")
+        ) != report or (output_dir / "pricing_report.md").read_text(
+            encoding="utf-8"
+        ) != pricing_report_markdown(report):
+            msg = "Pricing report does not match verified source records."
             raise ValueError(msg)
 
 

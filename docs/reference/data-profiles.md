@@ -53,7 +53,8 @@ nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
 - Każdy profil zapisuje CSV, `dataset_manifest.json`, `dataset_manifest.v2.json` i `quality_report.json`.
   Profile skalowane zapisują również `realism_report.json`.
 - Profile AI zapisują dodatkowo dziewięć kanonicznych tabel CSV i `dimensions_report.json`;
-  łącznie 26 tabel. Ich projekcje products/stores/warehouses pochodzą z tych wymiarów.
+  ich projekcje products/stores/warehouses pochodzą z tych wymiarów.
+  Pięć tabel [cen/promocji](retail-pricing.md) i pricing_report JSON/MD daje łącznie 31 tabel CSV.
 - `row_counts` i raporty konkretnego wykonania opisują jego zawartość.
   Stała nazwa profilu ani sam seed nie identyfikują wszystkich parametrów.
 
@@ -74,17 +75,18 @@ pamięci i CSV; chunked Parquet i pełny benchmark pozostają do wdrożenia.
 
 V1 zachowuje dotychczasowy format. Aktualną konfigurację odczytuj z
 `descriptor.resolved_parameters` w v2: wartości nie są null.
-Nowy v2 ma schemat 2.1.0 i generator 0.3.0. Zapisuje wersje konfiguracji,
-kalendarza, wymiarów oraz kanonizacji, requested config,
+Nowy v2 ma schemat 2.2.0 i generator 0.4.0. Zapisuje wersje konfiguracji,
+kalendarza, wymiarów, pricing oraz kanonizacji, requested config,
 seed, SHA kodu i przypiętych plików requirements, wersję Pythona oraz commit/stan kodu.
 Każdy CSV ma checksumę SHA-256 bajtów, rozmiar i liczbę rekordów oraz osobny
 hash kanonicznej treści. Zakresy obejmują wszystkie zadeklarowane pola czasu:
 także końce promocji, forecast horizon, przyszłe ceny i zwroty.
 Watermark to granica wiedzy na koniec konfiguracji o 23:59:59 UTC;
 `complete_through=null` oznacza brak gwarancji kompletności.
-Odczyt zachowuje zgodność z rzeczywistymi eksportami schema 2.0.0/generator 0.2.0;
+Odczyt zachowuje zgodność z rzeczywistymi eksportami schema 2.0.0/generator 0.2.0
+oraz 2.1.0/0.3.0;
 ich identity nie jest przepisywane. Nowe profile AI wymagają tabel i bramek wymiarów,
-a nowe legacy deklarują dimensions `not_applicable`.
+a nowe legacy deklarują dimensions i pricing `not_applicable`.
 
 Logical ID to `source-sha256-<hash deskryptora>`. Kanonizacja obejmuje typowane
 liczby, null, NFC, UTC i uporządkowany multizbiór zachowujący duplikaty.

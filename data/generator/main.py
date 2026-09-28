@@ -30,6 +30,8 @@ from data.generator.manifest_v2 import (
 )
 from data.generator.orders import generate_order_items, generate_orders
 from data.generator.pricing import generate_price_history, generate_promotions
+from data.generator.pricing_quality import validate_pricing, write_pricing_report
+from data.generator.pricing_schema import uses_pricing
 from data.generator.products import generate_products
 from data.generator.profile_engine import build_profile_dataset
 from data.generator.quality import write_quality_report
@@ -151,6 +153,11 @@ def generate_demo_dataset(
         if uses_dimensions(config.profile)
         else None
     )
+    pricing_report = (
+        validate_pricing(tables, resolve_generation_config(config))
+        if uses_pricing(config.profile)
+        else None
+    )
     if (output_dir / MANIFEST_V2_FILENAME).exists():
         previous = load_source_manifest_v2(output_dir)
         if previous["dataset_id"] != source_identity(config, tables)[0]:
@@ -159,6 +166,8 @@ def generate_demo_dataset(
     counts = write_tables(output_dir, tables)
     if dimensions_report is not None:
         write_dimensions_report(output_dir, dimensions_report)
+    if pricing_report is not None:
+        write_pricing_report(output_dir, pricing_report)
     write_quality_report(output_dir, config.profile, tables)
     write_dataset_manifest(output_dir, config, tables)
     if config.profile != "demo":

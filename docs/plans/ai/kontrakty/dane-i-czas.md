@@ -94,6 +94,6 @@ Minimalny łańcuch: source dataset → curated → features/labels + split → 
 
 Eksport i import weryfikują kompletny manifest, obsługiwane major versions, wszystkie checksums, klasyfikacje i gates właściwe dla use case’u. Zapis do katalogu tymczasowego; publikacja przez atomowy rename dopiero po weryfikacji. Ten sam ID z różną treścią jest konfliktem, nie nadpisaniem. Nie dopuszczać ścieżek artefaktów wychodzących poza root snapshotu.
 
-CSV zachować dla demo i małych fixtures. Dane AI zapisywać w typed Parquet; duże fakty partycjonować po business date, z bounded/chunked writes. Repo śledzi demo i co najwyżej jeden mały fixture; duże eksporty i treningowe artefakty są ignorowane przez Git. Cleanup odmawia usunięcia śledzonego fixture.
+CSV zachować dla demo i małych fixtures. Dane AI zapisywać w typed Parquet; duże fakty partycjonować po business date, z bounded/chunked writes. Repo śledzi demo i co najwyżej jeden bieżący mały fixture. Małe archiwa wcześniejszych wersji służą wyłącznie regresji zgodności odczytu i łącznie mieszczą się w limicie 5 MiB po rozpakowaniu; bieżące smoke generować w temp. Duże eksporty i treningowe artefakty są ignorowane przez Git. Cleanup odmawia usunięcia śledzonego fixture.
 
 Po etapach 06 i 07 reużyć eksport/import z etapu 03, wygenerować nowe manifesty i zaktualizować readiness; nie zmieniać opublikowanego snapshotu. Dawne modele zachowują lineage do swoich danych i nie uzyskują automatycznie zgodności z nowym feature schema.

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
 
+from data.generator.commerce_pricing import CommercePricing
 from data.generator.common import DEFAULT_CLOCK, GenerationClock, deterministic_uuid, money
 from data.generator.configuration import (
     PROFILE_DEFAULTS,
@@ -16,6 +17,11 @@ from data.generator.configuration import (
 from data.generator.dimension_schema import uses_dimensions
 from data.generator.dimensions import DimensionIndex, build_dimensions
 from data.generator.pricing import generate_price_history, generate_promotions
+from data.generator.pricing_plans import (
+    build_pricing_plans,
+    daily_price_observations,
+    legacy_pricing_projection,
+)
 from data.generator.users import generate_users
 
 
@@ -390,6 +396,15 @@ def _basket_size(channel: str, rng: random.Random) -> int:
     return 1 if roll < thresholds["store"][0] else 2
 
 
+def _basket_candidates(
+    product: dict[str, str], grouped: dict[str, list[dict[str, str]]], size: int
+) -> list[dict[str, str]]:
+    return [
+        product,
+        *grouped.get(COMPLEMENTARY_CATEGORY[product["category"]], [])[: max(0, size - 1)],
+    ][:size]
+
+
 def generate_profile_commerce(
     products: list[dict[str, str]],
     stores: list[dict[str, str]],
@@ -397,11 +412,13 @@ def generate_profile_commerce(
     rng: random.Random,
     clock: GenerationClock = DEFAULT_CLOCK,
     dimensions: DimensionIndex | None = None,
+    pricing_tables: dict[str, list[dict[str, str]]] | None = None,
 ) -> tuple[list[dict[str, str]], list[dict[str, str]], list[dict[str, str]]]:
     sales: list[dict[str, str]] = []
     orders: list[dict[str, str]] = []
     order_items: list[dict[str, str]] = []
     products_by_category = _products_by_category(products)
+    pricing = CommercePricing(pricing_tables, dimensions) if pricing_tables is not None else None
 
     for day_index in range(days):
         for product_index, product in enumerate(products):
@@ -413,12 +430,7 @@ def generate_profile_commerce(
             basket_size = _basket_size(store["channel"], rng)
             order_reference = f"ORD-{product['sku']}-{day_index + 1:04d}"
             order_id = deterministic_uuid("order", order_reference)
-            candidate_products = [product]
-            complementary = COMPLEMENTARY_CATEGORY[product["category"]]
-            candidate_products.extend(
-                products_by_category.get(complementary, [])[: max(0, basket_size - 1)],
-            )
-            candidate_products = candidate_products[:basket_size]
+            candidate_products = _basket_candidates(product, products_by_category, basket_size)
             order_total = Decimal("0.00")
             order_item_rows: list[dict[str, str]] = []
 
@@ -446,6 +458,13 @@ def generate_profile_commerce(
                     store,
                     day_index,
                 )
+                if pricing is not None:
+                    price, price_effect, promotion = pricing.demand_inputs(
+                        item_product,
+                        store,
+                        clock.day(day_index),
+                        clock.at(day_index, product_index % 12),
+                    )
                 noise = Decimal(str(rng.uniform(0.78, 1.24)))
                 latent_demand = max(
                     1,
@@ -471,11 +490,32 @@ def generate_profile_commerce(
                     latent_demand = max(observed_sales, int(latent_demand * Decimal("0.18")))
 
                 unit_price = money(price)
+                quote = None
+                if pricing is not None:
+                    quote = pricing.quote(
+                        item_product["id"],
+                        store,
+                        clock.day(day_index),
+                        clock.at(day_index, product_index % 12),
+                        observed_sales,
+                    )
+                    unit_price = money(quote.unit_price)
+                    promotion_applied = str(bool(quote.promotion_plan_id)).lower()
                 total_amount = money(Decimal(observed_sales) * Decimal(unit_price))
                 order_total += Decimal(total_amount)
                 item_key = f"{order_reference}-{item_product['sku']}-{item_index + 1}"
                 order_item_id = deterministic_uuid("order_item", item_key)
                 sale_id = deterministic_uuid("sale", item_key)
+                if quote is not None:
+                    pricing.record(
+                        sale_id,
+                        order_item_id,
+                        item_product["id"],
+                        store,
+                        clock.day(day_index),
+                        clock.at(day_index, product_index % 12),
+                        quote,
+                    )
                 sold_at = clock.at(day_index, (product_index + item_index) % 12)
                 data_quality_status = _data_quality_status(rng)
 
@@ -506,7 +546,9 @@ def generate_profile_commerce(
                         "observed_sales": str(observed_sales),
                         "stockout_flag": stockout_flag,
                         "promotion_applied": promotion_applied,
-                        "promotion_uplift": str(promotion_uplift.quantize(Decimal("0.0001"))),
+                        "promotion_uplift": ""
+                        if pricing is not None
+                        else str(promotion_uplift.quantize(Decimal("0.0001"))),
                         "price_elasticity_effect": str(price_effect.quantize(Decimal("0.0001"))),
                         "demand_noise": str(noise.quantize(Decimal("0.0001"))),
                         "data_quality_status": data_quality_status,
@@ -885,6 +927,7 @@ def build_profile_dataset(
     warehouses = generate_profile_warehouses(warehouse_count)
     dimension_tables = {}
     dimensions = None
+    pricing_tables = None
     if uses_dimensions(profile):
         effective = resolve_generation_config(
             DatasetGenerationConfig(
@@ -902,6 +945,7 @@ def build_profile_dataset(
             products, stores, warehouses, BRANDS, effective
         )
         dimensions = DimensionIndex(dimension_tables)
+        pricing_tables = build_pricing_plans(products, dimension_tables, effective)
     sales, orders, order_items = generate_profile_commerce(
         products,
         stores,
@@ -909,9 +953,17 @@ def build_profile_dataset(
         rng,
         clock,
         dimensions,
+        pricing_tables,
     )
     price_history = generate_price_history(products, clock.end_date)
     promotions = generate_promotions(products, clock.end_date)
+    if pricing_tables is not None:
+        price_history, promotions = legacy_pricing_projection(
+            {"products": products, **pricing_tables}
+        )
+        pricing_tables["daily_price_observations"] = daily_price_observations(
+            sales, pricing_tables["sale_price_references"]
+        )
     inventory_snapshots = generate_profile_inventory_snapshots(
         products,
         warehouses,
@@ -943,4 +995,5 @@ def build_profile_dataset(
         "forecasts": forecasts,
         **incidents,
         **dimension_tables,
+        **(pricing_tables or {}),
     }

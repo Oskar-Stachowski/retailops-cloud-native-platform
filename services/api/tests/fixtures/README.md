@@ -8,3 +8,9 @@ seed 42; daty wynikają z końca profilu 2026-07-31.
 Generator uruchomiono z archiwum `git archive`, bez katalogu `.git`, dlatego
 manifest poprawnie deklaruje provenance Git `unavailable`. Identity nie jest
 przepisywane na nowy schemat. Pliki są małe i wyłącznie syntetyczne.
+
+`source_manifest_v2_1.zip` pochodzi z czystego kodu DATA-02, commit `a4ddc79`;
+parametry ai-smoke: 3 dni, 8 produktów, 3 pary, 2 magazyny, seed 42.
+Zawiera 26 CSV, raporty, source manifest 2.1 i feature sidecar.
+Test odczytu zachowuje oba identity oraz relację parent, bez przeliczania ich
+według bieżącego generatora 0.4.0.

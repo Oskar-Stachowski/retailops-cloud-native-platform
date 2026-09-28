@@ -20,7 +20,8 @@
             "source_observation",
             "mixed_fact_and_simulation_truth",
             "source_operational_output",
-            "source_plan"
+            "source_plan",
+            "simulation_truth"
           ],
           "title": "Data Class",
           "type": "string"
@@ -87,7 +88,8 @@
             "observations",
             "plans",
             "return_tail",
-            "operational_output"
+            "operational_output",
+            "simulation_truth"
           ],
           "title": "Temporal Role",
           "type": "string"
@@ -538,7 +540,8 @@
         "schema_version": {
           "enum": [
             "2.0.0",
-            "2.1.0"
+            "2.1.0",
+            "2.2.0"
           ],
           "title": "Schema Version",
           "type": "string"
@@ -590,7 +593,8 @@
             "source_observation",
             "mixed_fact_and_simulation_truth",
             "source_operational_output",
-            "source_plan"
+            "source_plan",
+            "simulation_truth"
           ],
           "title": "Data Class",
           "type": "string"
@@ -624,7 +628,8 @@
         "canonicalization": {
           "enum": [
             "typed-csv-nfc-utc-multiset-1.0.0",
-            "typed-csv-nfc-utc-multiset-1.1.0"
+            "typed-csv-nfc-utc-multiset-1.1.0",
+            "typed-csv-nfc-utc-multiset-1.2.0"
           ],
           "title": "Canonicalization",
           "type": "string"
@@ -658,10 +663,27 @@
         "generator": {
           "enum": [
             "0.2.0",
-            "0.3.0"
+            "0.3.0",
+            "0.4.0"
           ],
           "title": "Generator",
           "type": "string"
+        },
+        "pricing": {
+          "anyOf": [
+            {
+              "enum": [
+                "retail-pricing-1.0.0",
+                "not_applicable"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pricing"
         }
       },
       "required": [
@@ -762,7 +784,8 @@
     "schema_version": {
       "enum": [
         "2.0.0",
-        "2.1.0"
+        "2.1.0",
+        "2.2.0"
       ],
       "title": "Schema Version",
       "type": "string"

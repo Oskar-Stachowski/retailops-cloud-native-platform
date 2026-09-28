@@ -25,11 +25,12 @@ from data.generator.dimension_schema import (
     DIMENSIONS_VERSION,
     uses_dimensions,
 )
+from data.generator.pricing_schema import PRICING_CLASSES, PRICING_VERSION, uses_pricing
 
 ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_VERSION = "0.3.0"
-CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.1.0"
-SOURCE_SCHEMA_VERSION = "2.1.0"
+GENERATOR_VERSION = "0.4.0"
+CANONICALIZATION_VERSION = "typed-csv-nfc-utc-multiset-1.2.0"
+SOURCE_SCHEMA_VERSION = "2.2.0"
 INTEGER_FIELDS = {
     "quantity",
     "stock_quantity",
@@ -43,6 +44,8 @@ INTEGER_FIELDS = {
     "quarter",
     "version",
     "pack_quantity",
+    "minimum_quantity",
+    "priority",
 }
 DECIMAL_FIELDS = {
     "price",
@@ -65,6 +68,9 @@ DECIMAL_FIELDS = {
     "deviation_percent",
     "impact_value",
     "unit_cost",
+    "gross_revenue",
+    "realized_unit_price",
+    "demand_multiplier",
 }
 BOOLEAN_FIELDS = {"stockout_flag", "promotion_applied", "is_weekend"}
 BOOLEAN_FIELDS.update(
@@ -111,6 +117,8 @@ TIME_FIELDS = {
     "business_day_end_at",
     "local_day_start_at",
     "local_day_end_at",
+    "known_at",
+    "as_of_time",
 }
 DATA_CLASSES = dict.fromkeys(CSV_WRITE_ORDER, "source_observation")
 DATA_CLASSES.update(
@@ -124,6 +132,7 @@ DATA_CLASSES.update(
 )
 DATA_CLASSES.update(dict.fromkeys(("price_history", "promotions"), "source_plan"))
 DATA_CLASSES.update(DIMENSION_CLASSES)
+DATA_CLASSES.update(PRICING_CLASSES)
 DEPENDENCY_FILES = (
     "services/api/requirements.txt",
     "services/api/requirements-dev.txt",
@@ -218,6 +227,7 @@ def code_fingerprint(extra_files: tuple[str, ...] = ()) -> dict[str, Any]:
             "data/contracts/retailops_seed_dataset.contract.json",
             "data/contracts/source_dataset_manifest.v2.schema.json",
             "data/contracts/retail_dimensions.v1.schema.json",
+            "data/contracts/retail_pricing.v1.schema.json",
             *extra_files,
         ]
     )
@@ -290,6 +300,7 @@ def source_identity(
             "dimensions": DIMENSIONS_VERSION
             if uses_dimensions(config.profile)
             else "not_applicable",
+            "pricing": PRICING_VERSION if uses_pricing(config.profile) else "not_applicable",
             "canonicalization": CANONICALIZATION_VERSION,
             "csv_schema": "1.0",
         },
