@@ -68,7 +68,16 @@
         "02"
       ],
       "path": "etapy/03-snapshot-curated.md",
-      "status": "planned"
+      "status": "in_progress",
+      "evidence": "../../evidence/ai/03/03.3/README.md",
+      "implementation_scope": "03.1 typed Parquet and artifact policy; 03.2 immutable qualified exporter; 03.3 self-contained handoff contract/fixture and independent pinned consumer acceptance",
+      "acceptance_scope": "Local smoke acceptance; typed importer 03.4, curated 03.5 and cross-repo gate 03.6 remain open",
+      "next_scope": "03.4",
+      "implementation_commits": {
+        "retailops-cloud-native-platform": "e26faa2e4733397ce7e561ebf19b65966a0d909f",
+        "retailops-ai-intelligence": "654a54254e1965a3e4247aa22485684586f167e0"
+      },
+      "remote_required_ci": "not_run"
     },
     {
       "id": "04",
@@ -162,25 +171,25 @@
         "01"
       ],
       "path": "etapy/11-rag.md",
-      "status": "in_progress",
+      "status": "completed",
       "evidence": "../../evidence/ai/11/README.md",
       "implementation_repository": "retailops-ai-intelligence",
-      "implementation_commit": "b58d7b71c68fb0d12b05c3b499d0b6ead9fc5fe3",
-      "audited_commit": "ceec8f042c8d35d80775a62d766ba2ceafac8042",
-      "readiness_audit": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/b1fb00f29e500ecdf696563ba37270158c0db3c7/docs/evidence/11-audit.md",
-      "acceptance_scope": "Offline foundation: approved corpus, chunking, fake embeddings/pgvector, test lifecycle, filtered retrieval, golden set and durable admin jobs; no user activation or semantic acceptance",
-      "remaining": [
-        "Real-capable embedding contracts, provider selection, build and query",
-        "User qualification, activation and rollback policy with acceptance",
-        "Quality thresholds on approved golden set with real embeddings, coordinated with stage 12"
-      ],
-      "remote_ci": {
+      "implementation_commit": "6790f485cfa879b0336dbf1f710f30adea06c6d0",
+      "acceptance_scope": "Local semantic RAG: real Titan V2 embeddings, approved 44-question golden quality, user qualification/activation/rollback, PostgreSQL/HTTP and crash persistence. Agent answers/tools and deployment remain later scopes.",
+      "accepted_main_commit": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9",
+      "completion_evidence": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/abf3f69a6a78c444b5a8a910fef8b3b43ba047a9/docs/evidence/11-completion.md",
+      "foundation_remote_ci": {
         "status": "success",
         "pr": 3,
         "pr_run": 36449464231,
         "main_push_run": 36449971211,
         "merge_commit": "1c3b65e2bff68a920c45a5fbfd39b64c2bc80d95",
         "evidence": "../../evidence/ai/11/remote-ci.json"
+      },
+      "completion_publication": {
+        "pr": 4,
+        "merge_commit": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9",
+        "remote_ci_reverification_in_ai03_3": "not_performed"
       }
     },
     {

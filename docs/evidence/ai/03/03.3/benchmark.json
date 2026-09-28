@@ -1,0 +1,1303 @@
+{
+  "policy_version": "ai03-snapshot-budget-1.0.0",
+  "pipeline": "generate/qualify/export/verify/reexport",
+  "status": "passed",
+  "limits": {
+    "max_seconds_per_profile": 300.0,
+    "max_rss_mib_per_profile": 1024.0
+  },
+  "environment": {
+    "python": "3.11.15",
+    "pyarrow": "25.0.1",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "architecture": "arm64"
+  },
+  "fixture_budget": {
+    "unpacked_bytes": 4484021,
+    "limit_bytes": 5242880,
+    "current_fixtures": 1,
+    "legacy_archives": 6
+  },
+  "runs": [
+    {
+      "profile": "ai-smoke",
+      "writer": {
+        "code_files": {
+          "data/export/__init__.py": "dd60f0ca12c4847c3497d0fe863d13bcd276eacd085969da09ec030ea795dd93",
+          "data/export/ai_snapshot.py": "76c5ecbd5d3509d27aa548140bba49dc602795a78c3cee4d5b546f5612ff4fc3",
+          "data/export/atomic.py": "1a9f313247d47eed762b0355bf9f35deab0185a5d131b7e0c758ec97df10bb84",
+          "data/export/benchmark.py": "9414069446b8e59b09145633f5f2739859829a1b15fdfca4bea0d7fcfe1665cf",
+          "data/export/cleanup.py": "27992185c9cc23a6860702a439045ecb9af7ae075d33ec28ac9a44be2c5663aa",
+          "data/export/hashing.py": "1c4583a3bb2198fdaf5a635c095e18bc24474e76601c66b0f45d3cd3332968d2",
+          "data/export/parquet.py": "f95203c83d73d376d53686f08f54a46a1324ad93e47df5d4a81d95214ed818f4",
+          "data/export/policy.py": "a619ae6d0ab19285d9d9ee57db73dc70b81c625f8526d28d1ceb7171aa46b506",
+          "data/export/schema.py": "5bd17d2cec506572766b329ef9edb5da382c3f06a35d1c63065b8a804993fcde",
+          "data/export/snapshot_contract.py": "e38da1774beb69dc2bf815e8901121f101800ebb07d4bd568d2f3dbdb38c6c45",
+          "data/export/snapshot_validation.py": "78b3d771b883cedc325b21fe18c6eb88a12cddfd7d28d68425e3cc531b87d617",
+          "data/export/stress.py": "ba0d952a9989da5aa72ba08e82fecd260835de3866e6c18b23adda37dad8a4b8"
+        },
+        "dependency_sha256": "820f9d976a43690862abdf91c6b6a7af27b86201ef39e58ef0dc09b76d6d6f44",
+        "git_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+        "pyarrow_version": "25.0.1",
+        "python_version": "3.11.15"
+      },
+      "source_dataset_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00",
+      "source_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+      "snapshot_id": "snapshot-sha256-4d856185ebbe3a8f07dc468468c54eacf69aa40b7d49bfff7e39af8ddde815a4",
+      "snapshot_ready": true,
+      "idempotent_reexport": "passed",
+      "manifest_sha256": "6f633969bc78566e03e77d76e9a48aa33b619056513faa80ede38a97ac4d09a9",
+      "seed": 42,
+      "end_date": "2026-07-31",
+      "rows": 31171,
+      "table_count": 25,
+      "generation_csv_seconds": 7.280648582993308,
+      "parquet_and_parity_seconds": 10.006242334005947,
+      "total_seconds": 17.286890916999255,
+      "rows_per_second": 1803.1582515134432,
+      "peak_rss_mib": 128.671875,
+      "csv_bytes": 9289735,
+      "parquet_bytes": 1396368,
+      "chunk_rows": 8192,
+      "parity": "passed",
+      "tables": [
+        {
+          "table": "products",
+          "row_count": 20,
+          "content_sha256": "738aff059a93227edf51e59247ee35ced077850b909e699fc61da23d7ea73e39",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stores",
+          "row_count": 3,
+          "content_sha256": "31d474709d97f3765d58b2f21dfa797ae562f99a391ea63a6216f77d070b146f",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "warehouses",
+          "row_count": 2,
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "orders",
+          "row_count": 3244,
+          "content_sha256": "590ca9ffeb4f0ad36db453970d26c37ae54ee14fe8b2eaa2fa0519055f09361b",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 6488
+          }
+        },
+        {
+          "table": "order_items",
+          "row_count": 6096,
+          "content_sha256": "7b0879b14475b3353cd53820c4173104898b2b2343248ef2caee467414f6693c",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "sales",
+          "row_count": 6096,
+          "content_sha256": "4a7c75bb6b8cb1fd77f1c2f4d54018d04c91d0228bfca3ed2f4383b9d3c29e00",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 12192
+          }
+        },
+        {
+          "table": "catalog_categories",
+          "row_count": 8,
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "product_catalog",
+          "row_count": 20,
+          "content_sha256": "44e5cfe788116f30be4b2cf684bcbb7f56cd3d6da5da6543458b2410469517ca",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-25",
+            "date_start": "2026-07-01",
+            "value_count": 42
+          }
+        },
+        {
+          "table": "selling_locations",
+          "row_count": 2,
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stock_locations",
+          "row_count": 2,
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "channel_assignments",
+          "row_count": 6,
+          "content_sha256": "6197b4a24f7e0ff133ecf0d10f402a6ffd60f1f8d5b2b26c5e10e03b8b245cda",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "fulfillment_routes",
+          "row_count": 6,
+          "content_sha256": "5b2d966eda850d4b2a967fddd2e3c2d632625cfc7c4ba8fb8c05126b4eda4bb5",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "assortment",
+          "row_count": 114,
+          "content_sha256": "86cca33bb6b669a6a51287cff5692322232bb19b5013afc13e504802d71d40e9",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 342
+          }
+        },
+        {
+          "table": "business_calendar",
+          "row_count": 90,
+          "content_sha256": "228a2f388a271deb86fb585dde647d9eff0e0abd28a0223e4136e9f0c93681c3",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 540
+          }
+        },
+        {
+          "table": "category_calendar",
+          "row_count": 240,
+          "content_sha256": "eba465347e92344acb93fb8938158575233a8451bda2697fcbb5fc7cc3c8cb61",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-01",
+            "value_count": 480
+          }
+        },
+        {
+          "table": "price_plans",
+          "row_count": 90,
+          "content_sha256": "c1ddd52b09f99fc32155a45fe302d4d972fa32ad13c6d8880d81b01d114525c2",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-15",
+            "date_start": "2026-07-01",
+            "value_count": 360
+          }
+        },
+        {
+          "table": "promotion_plans",
+          "row_count": 32,
+          "content_sha256": "0a9a70edbb37d6e92a2eabe61cdefaab25b9011913584aa8c3d28e3c910d2492",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-22",
+            "date_start": "2026-06-29",
+            "value_count": 128
+          }
+        },
+        {
+          "table": "sale_price_references",
+          "row_count": 6096,
+          "content_sha256": "5de93ffe77d011a58b975ea22717550b88f1f7366c23fe137312dbab1c06a6db",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 12192
+          }
+        },
+        {
+          "table": "daily_price_observations",
+          "row_count": 1292,
+          "content_sha256": "6944de51ad76eee221641fa433177404e0994523458f283c70eef517fc5f8c06",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 2584
+          }
+        },
+        {
+          "table": "daily_demand_observations",
+          "row_count": 1612,
+          "content_sha256": "b355983abd67a0214e410ffcea54d85884ace8cc86a2fb85d64079d34c8dd2c7",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-02",
+            "value_count": 3224
+          }
+        },
+        {
+          "table": "daily_demand_exclusions",
+          "row_count": 188,
+          "content_sha256": "7d63ec36ac6baa39a90c74d98d7528730ea20b7a410f466a4000e713351be058",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 188
+          }
+        },
+        {
+          "table": "return_policies",
+          "row_count": 32,
+          "content_sha256": "28c2687f1a11f3047ec206f8cfb82b8feb1bac510b992c3715eb9634374dfaf3",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-01",
+            "date_start": "2026-07-01",
+            "value_count": 32
+          }
+        },
+        {
+          "table": "return_events",
+          "row_count": 1044,
+          "content_sha256": "8ea9f5ad1eaf63b511e2fdc87695e028b4084bfa294b016f6c130b0e4231afea",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-09-03",
+            "date_start": "2026-07-03",
+            "value_count": 3132
+          }
+        },
+        {
+          "table": "daily_return_cohorts",
+          "row_count": 3224,
+          "content_sha256": "29ab2393b7806443de5814ba70d23a96d3af8ee19196520e1cf627dc482b1e43",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-09-09",
+            "date_start": "2026-07-02",
+            "value_count": 9672
+          }
+        },
+        {
+          "table": "daily_demand_versions",
+          "row_count": 1612,
+          "content_sha256": "b2aeb1efcef107df240b0b8bbc683eef9c167d4ffd25f0e51cf281931fbfae21",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-02",
+            "value_count": 3224
+          }
+        }
+      ],
+      "process_wall_seconds": 17.588542625002447
+    },
+    {
+      "profile": "ai-smoke",
+      "writer": {
+        "code_files": {
+          "data/export/__init__.py": "dd60f0ca12c4847c3497d0fe863d13bcd276eacd085969da09ec030ea795dd93",
+          "data/export/ai_snapshot.py": "76c5ecbd5d3509d27aa548140bba49dc602795a78c3cee4d5b546f5612ff4fc3",
+          "data/export/atomic.py": "1a9f313247d47eed762b0355bf9f35deab0185a5d131b7e0c758ec97df10bb84",
+          "data/export/benchmark.py": "9414069446b8e59b09145633f5f2739859829a1b15fdfca4bea0d7fcfe1665cf",
+          "data/export/cleanup.py": "27992185c9cc23a6860702a439045ecb9af7ae075d33ec28ac9a44be2c5663aa",
+          "data/export/hashing.py": "1c4583a3bb2198fdaf5a635c095e18bc24474e76601c66b0f45d3cd3332968d2",
+          "data/export/parquet.py": "f95203c83d73d376d53686f08f54a46a1324ad93e47df5d4a81d95214ed818f4",
+          "data/export/policy.py": "a619ae6d0ab19285d9d9ee57db73dc70b81c625f8526d28d1ceb7171aa46b506",
+          "data/export/schema.py": "5bd17d2cec506572766b329ef9edb5da382c3f06a35d1c63065b8a804993fcde",
+          "data/export/snapshot_contract.py": "e38da1774beb69dc2bf815e8901121f101800ebb07d4bd568d2f3dbdb38c6c45",
+          "data/export/snapshot_validation.py": "78b3d771b883cedc325b21fe18c6eb88a12cddfd7d28d68425e3cc531b87d617",
+          "data/export/stress.py": "ba0d952a9989da5aa72ba08e82fecd260835de3866e6c18b23adda37dad8a4b8"
+        },
+        "dependency_sha256": "820f9d976a43690862abdf91c6b6a7af27b86201ef39e58ef0dc09b76d6d6f44",
+        "git_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+        "pyarrow_version": "25.0.1",
+        "python_version": "3.11.15"
+      },
+      "source_dataset_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00",
+      "source_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+      "snapshot_id": "snapshot-sha256-4d856185ebbe3a8f07dc468468c54eacf69aa40b7d49bfff7e39af8ddde815a4",
+      "snapshot_ready": true,
+      "idempotent_reexport": "passed",
+      "manifest_sha256": "01c12d4a7b5915187269d4bbcd2e929843e0fce1c3acd92030e121860ec04b3e",
+      "seed": 42,
+      "end_date": "2026-07-31",
+      "rows": 31171,
+      "table_count": 25,
+      "generation_csv_seconds": 6.858005875001254,
+      "parquet_and_parity_seconds": 9.700259416997142,
+      "total_seconds": 16.558265291998396,
+      "rows_per_second": 1882.5039610316578,
+      "peak_rss_mib": 131.109375,
+      "csv_bytes": 9289735,
+      "parquet_bytes": 1396368,
+      "chunk_rows": 8192,
+      "parity": "passed",
+      "tables": [
+        {
+          "table": "products",
+          "row_count": 20,
+          "content_sha256": "738aff059a93227edf51e59247ee35ced077850b909e699fc61da23d7ea73e39",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stores",
+          "row_count": 3,
+          "content_sha256": "31d474709d97f3765d58b2f21dfa797ae562f99a391ea63a6216f77d070b146f",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "warehouses",
+          "row_count": 2,
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "orders",
+          "row_count": 3244,
+          "content_sha256": "590ca9ffeb4f0ad36db453970d26c37ae54ee14fe8b2eaa2fa0519055f09361b",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 6488
+          }
+        },
+        {
+          "table": "order_items",
+          "row_count": 6096,
+          "content_sha256": "7b0879b14475b3353cd53820c4173104898b2b2343248ef2caee467414f6693c",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "sales",
+          "row_count": 6096,
+          "content_sha256": "4a7c75bb6b8cb1fd77f1c2f4d54018d04c91d0228bfca3ed2f4383b9d3c29e00",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 12192
+          }
+        },
+        {
+          "table": "catalog_categories",
+          "row_count": 8,
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "product_catalog",
+          "row_count": 20,
+          "content_sha256": "44e5cfe788116f30be4b2cf684bcbb7f56cd3d6da5da6543458b2410469517ca",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-25",
+            "date_start": "2026-07-01",
+            "value_count": 42
+          }
+        },
+        {
+          "table": "selling_locations",
+          "row_count": 2,
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stock_locations",
+          "row_count": 2,
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "channel_assignments",
+          "row_count": 6,
+          "content_sha256": "6197b4a24f7e0ff133ecf0d10f402a6ffd60f1f8d5b2b26c5e10e03b8b245cda",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "fulfillment_routes",
+          "row_count": 6,
+          "content_sha256": "5b2d966eda850d4b2a967fddd2e3c2d632625cfc7c4ba8fb8c05126b4eda4bb5",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "assortment",
+          "row_count": 114,
+          "content_sha256": "86cca33bb6b669a6a51287cff5692322232bb19b5013afc13e504802d71d40e9",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 342
+          }
+        },
+        {
+          "table": "business_calendar",
+          "row_count": 90,
+          "content_sha256": "228a2f388a271deb86fb585dde647d9eff0e0abd28a0223e4136e9f0c93681c3",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-01",
+            "value_count": 540
+          }
+        },
+        {
+          "table": "category_calendar",
+          "row_count": 240,
+          "content_sha256": "eba465347e92344acb93fb8938158575233a8451bda2697fcbb5fc7cc3c8cb61",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-01",
+            "value_count": 480
+          }
+        },
+        {
+          "table": "price_plans",
+          "row_count": 90,
+          "content_sha256": "c1ddd52b09f99fc32155a45fe302d4d972fa32ad13c6d8880d81b01d114525c2",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-15",
+            "date_start": "2026-07-01",
+            "value_count": 360
+          }
+        },
+        {
+          "table": "promotion_plans",
+          "row_count": 32,
+          "content_sha256": "0a9a70edbb37d6e92a2eabe61cdefaab25b9011913584aa8c3d28e3c910d2492",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-22",
+            "date_start": "2026-06-29",
+            "value_count": 128
+          }
+        },
+        {
+          "table": "sale_price_references",
+          "row_count": 6096,
+          "content_sha256": "5de93ffe77d011a58b975ea22717550b88f1f7366c23fe137312dbab1c06a6db",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 12192
+          }
+        },
+        {
+          "table": "daily_price_observations",
+          "row_count": 1292,
+          "content_sha256": "6944de51ad76eee221641fa433177404e0994523458f283c70eef517fc5f8c06",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 2584
+          }
+        },
+        {
+          "table": "daily_demand_observations",
+          "row_count": 1612,
+          "content_sha256": "b355983abd67a0214e410ffcea54d85884ace8cc86a2fb85d64079d34c8dd2c7",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-02",
+            "value_count": 3224
+          }
+        },
+        {
+          "table": "daily_demand_exclusions",
+          "row_count": 188,
+          "content_sha256": "7d63ec36ac6baa39a90c74d98d7528730ea20b7a410f466a4000e713351be058",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-07-02",
+            "value_count": 188
+          }
+        },
+        {
+          "table": "return_policies",
+          "row_count": 32,
+          "content_sha256": "28c2687f1a11f3047ec206f8cfb82b8feb1bac510b992c3715eb9634374dfaf3",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-01",
+            "date_start": "2026-07-01",
+            "value_count": 32
+          }
+        },
+        {
+          "table": "return_events",
+          "row_count": 1044,
+          "content_sha256": "8ea9f5ad1eaf63b511e2fdc87695e028b4084bfa294b016f6c130b0e4231afea",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-09-03",
+            "date_start": "2026-07-03",
+            "value_count": 3132
+          }
+        },
+        {
+          "table": "daily_return_cohorts",
+          "row_count": 3224,
+          "content_sha256": "29ab2393b7806443de5814ba70d23a96d3af8ee19196520e1cf627dc482b1e43",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-09-09",
+            "date_start": "2026-07-02",
+            "value_count": 9672
+          }
+        },
+        {
+          "table": "daily_demand_versions",
+          "row_count": 1612,
+          "content_sha256": "b2aeb1efcef107df240b0b8bbc683eef9c167d4ffd25f0e51cf281931fbfae21",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-07-02",
+            "value_count": 3224
+          }
+        }
+      ],
+      "process_wall_seconds": 16.92019012500532
+    },
+    {
+      "profile": "ai-temporal-smoke",
+      "writer": {
+        "code_files": {
+          "data/export/__init__.py": "dd60f0ca12c4847c3497d0fe863d13bcd276eacd085969da09ec030ea795dd93",
+          "data/export/ai_snapshot.py": "76c5ecbd5d3509d27aa548140bba49dc602795a78c3cee4d5b546f5612ff4fc3",
+          "data/export/atomic.py": "1a9f313247d47eed762b0355bf9f35deab0185a5d131b7e0c758ec97df10bb84",
+          "data/export/benchmark.py": "9414069446b8e59b09145633f5f2739859829a1b15fdfca4bea0d7fcfe1665cf",
+          "data/export/cleanup.py": "27992185c9cc23a6860702a439045ecb9af7ae075d33ec28ac9a44be2c5663aa",
+          "data/export/hashing.py": "1c4583a3bb2198fdaf5a635c095e18bc24474e76601c66b0f45d3cd3332968d2",
+          "data/export/parquet.py": "f95203c83d73d376d53686f08f54a46a1324ad93e47df5d4a81d95214ed818f4",
+          "data/export/policy.py": "a619ae6d0ab19285d9d9ee57db73dc70b81c625f8526d28d1ceb7171aa46b506",
+          "data/export/schema.py": "5bd17d2cec506572766b329ef9edb5da382c3f06a35d1c63065b8a804993fcde",
+          "data/export/snapshot_contract.py": "e38da1774beb69dc2bf815e8901121f101800ebb07d4bd568d2f3dbdb38c6c45",
+          "data/export/snapshot_validation.py": "78b3d771b883cedc325b21fe18c6eb88a12cddfd7d28d68425e3cc531b87d617",
+          "data/export/stress.py": "ba0d952a9989da5aa72ba08e82fecd260835de3866e6c18b23adda37dad8a4b8"
+        },
+        "dependency_sha256": "820f9d976a43690862abdf91c6b6a7af27b86201ef39e58ef0dc09b76d6d6f44",
+        "git_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+        "pyarrow_version": "25.0.1",
+        "python_version": "3.11.15"
+      },
+      "source_dataset_id": "source-sha256-94829460645140b79a6f68e87194f74d2c8e55392e2702a9fecbe6b771116d22",
+      "source_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+      "snapshot_id": "snapshot-sha256-d84c7b9630c6a34f7807abc7560253bf8e7ba3d7d962abee8aca580cf909b767",
+      "snapshot_ready": true,
+      "idempotent_reexport": "passed",
+      "manifest_sha256": "8e10ed6af83d426b15801e86115d7da71b7c4a99fd4cb87c7b7f840144068edc",
+      "seed": 42,
+      "end_date": "2026-07-31",
+      "rows": 52973,
+      "table_count": 25,
+      "generation_csv_seconds": 11.444925542004057,
+      "parquet_and_parity_seconds": 16.76696145800088,
+      "total_seconds": 28.211887000004936,
+      "rows_per_second": 1877.683687021387,
+      "peak_rss_mib": 165.703125,
+      "csv_bytes": 15662801,
+      "parquet_bytes": 2289699,
+      "chunk_rows": 8192,
+      "parity": "passed",
+      "tables": [
+        {
+          "table": "products",
+          "row_count": 8,
+          "content_sha256": "ef2b5247897109f96b79ac4318beac89acc9bdcb1ec0a2e9e5ebe31b908d2488",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stores",
+          "row_count": 3,
+          "content_sha256": "31d474709d97f3765d58b2f21dfa797ae562f99a391ea63a6216f77d070b146f",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "warehouses",
+          "row_count": 2,
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "orders",
+          "row_count": 5993,
+          "content_sha256": "fa2197946e0e4000daa69c15ba24841bfdbfb0614cd395ac0009402d9e9edb23",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 11986
+          }
+        },
+        {
+          "table": "order_items",
+          "row_count": 10817,
+          "content_sha256": "a7cbc569684d277116051a0b0d372a1ccfadce661a4cba4c877444dc9b87cc26",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "sales",
+          "row_count": 10817,
+          "content_sha256": "1f42c807ff93778d2016f833701b5349789edd75c9b46a8dd5b7e890feccbeac",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 21634
+          }
+        },
+        {
+          "table": "catalog_categories",
+          "row_count": 8,
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "product_catalog",
+          "row_count": 8,
+          "content_sha256": "15acac1351fd2affae33fa2f08f446b0740a6e0bce53b1117360e5cb4c372c42",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-25",
+            "date_start": "2026-04-20",
+            "value_count": 17
+          }
+        },
+        {
+          "table": "selling_locations",
+          "row_count": 2,
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stock_locations",
+          "row_count": 2,
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "channel_assignments",
+          "row_count": 6,
+          "content_sha256": "0257de0ba690083962a9f88dca2fb1f8a2b4f994d7a6425bedc165fb09e608fe",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "fulfillment_routes",
+          "row_count": 6,
+          "content_sha256": "c361d4f6fdf013ba754653944233ae90bbbde467c2473cb24d882d8bf42a0365",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "assortment",
+          "row_count": 48,
+          "content_sha256": "149c8e53f24d1bc79bbc5cd50a590a18db01bf833dba17757bdce19f0cae4908",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 144
+          }
+        },
+        {
+          "table": "business_calendar",
+          "row_count": 306,
+          "content_sha256": "3547ab7a5bcfe3f38bcaacca6655cfd79dae82f89428d4d8e6ba03d3882bc736",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 1836
+          }
+        },
+        {
+          "table": "category_calendar",
+          "row_count": 816,
+          "content_sha256": "102be5843a716dddd75f1e216d8c96273a1b4d87234c80ff214b1db71ab62ffb",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-20",
+            "value_count": 1632
+          }
+        },
+        {
+          "table": "price_plans",
+          "row_count": 36,
+          "content_sha256": "e58a28298d1400104d25451d46479290e4a4f5e77dd21f04f24726aad90b2af6",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-15",
+            "date_start": "2026-04-20",
+            "value_count": 144
+          }
+        },
+        {
+          "table": "promotion_plans",
+          "row_count": 14,
+          "content_sha256": "34032ad6c0c421c75a008396783352f50f02b37d42d67ad7ac8ae52c6c08814c",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-06-04",
+            "date_start": "2026-04-18",
+            "value_count": 56
+          }
+        },
+        {
+          "table": "sale_price_references",
+          "row_count": 10817,
+          "content_sha256": "1fa1003d3c0c2fc7fd0c171b9cf2683a8dd3b255caaf79052f0e57545a1247ff",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 21634
+          }
+        },
+        {
+          "table": "daily_price_observations",
+          "row_count": 1865,
+          "content_sha256": "b388fe0ada7e404af8f454bb301de9ef23e8bc56fd0290f559cfa9c16f85d763",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 3730
+          }
+        },
+        {
+          "table": "daily_demand_observations",
+          "row_count": 2406,
+          "content_sha256": "c8084da9ec8368ad9e6c3ba1939bef098fb503a02d80a834fab23afb903e520d",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-21",
+            "value_count": 4812
+          }
+        },
+        {
+          "table": "daily_demand_exclusions",
+          "row_count": 42,
+          "content_sha256": "a4547f2c2c65447587765a30dbdaa070ca391246357e0e12ecf3a1cb91b1a16a",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 42
+          }
+        },
+        {
+          "table": "return_policies",
+          "row_count": 32,
+          "content_sha256": "e9991c9d43f409907a963ddc9d57cfb12c158060e05cf94e994ffaa57a519270",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-04-20",
+            "date_start": "2026-04-20",
+            "value_count": 32
+          }
+        },
+        {
+          "table": "return_events",
+          "row_count": 1701,
+          "content_sha256": "8a9afab125f508a87e7974aaa7b887a079ab2838e545aeb847c13cc1f3fe6a9e",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-31",
+            "date_start": "2026-04-23",
+            "value_count": 5103
+          }
+        },
+        {
+          "table": "daily_return_cohorts",
+          "row_count": 4812,
+          "content_sha256": "7778aaa65aba582024252a4c6bacbd41b45ea14dfb4efca5022b62fccc4bf532",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-09-09",
+            "date_start": "2026-04-21",
+            "value_count": 14436
+          }
+        },
+        {
+          "table": "daily_demand_versions",
+          "row_count": 2406,
+          "content_sha256": "5431b205dc82c06173ddcadd0d64bb6d7aa83b4747197a87d6d8bf5064639210",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-21",
+            "value_count": 4812
+          }
+        }
+      ],
+      "process_wall_seconds": 28.622728250004002
+    },
+    {
+      "profile": "ai-temporal-smoke",
+      "writer": {
+        "code_files": {
+          "data/export/__init__.py": "dd60f0ca12c4847c3497d0fe863d13bcd276eacd085969da09ec030ea795dd93",
+          "data/export/ai_snapshot.py": "76c5ecbd5d3509d27aa548140bba49dc602795a78c3cee4d5b546f5612ff4fc3",
+          "data/export/atomic.py": "1a9f313247d47eed762b0355bf9f35deab0185a5d131b7e0c758ec97df10bb84",
+          "data/export/benchmark.py": "9414069446b8e59b09145633f5f2739859829a1b15fdfca4bea0d7fcfe1665cf",
+          "data/export/cleanup.py": "27992185c9cc23a6860702a439045ecb9af7ae075d33ec28ac9a44be2c5663aa",
+          "data/export/hashing.py": "1c4583a3bb2198fdaf5a635c095e18bc24474e76601c66b0f45d3cd3332968d2",
+          "data/export/parquet.py": "f95203c83d73d376d53686f08f54a46a1324ad93e47df5d4a81d95214ed818f4",
+          "data/export/policy.py": "a619ae6d0ab19285d9d9ee57db73dc70b81c625f8526d28d1ceb7171aa46b506",
+          "data/export/schema.py": "5bd17d2cec506572766b329ef9edb5da382c3f06a35d1c63065b8a804993fcde",
+          "data/export/snapshot_contract.py": "e38da1774beb69dc2bf815e8901121f101800ebb07d4bd568d2f3dbdb38c6c45",
+          "data/export/snapshot_validation.py": "78b3d771b883cedc325b21fe18c6eb88a12cddfd7d28d68425e3cc531b87d617",
+          "data/export/stress.py": "ba0d952a9989da5aa72ba08e82fecd260835de3866e6c18b23adda37dad8a4b8"
+        },
+        "dependency_sha256": "820f9d976a43690862abdf91c6b6a7af27b86201ef39e58ef0dc09b76d6d6f44",
+        "git_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+        "pyarrow_version": "25.0.1",
+        "python_version": "3.11.15"
+      },
+      "source_dataset_id": "source-sha256-94829460645140b79a6f68e87194f74d2c8e55392e2702a9fecbe6b771116d22",
+      "source_commit": "ea633300333dcc500e82ca34ad714f5cda243f91",
+      "snapshot_id": "snapshot-sha256-d84c7b9630c6a34f7807abc7560253bf8e7ba3d7d962abee8aca580cf909b767",
+      "snapshot_ready": true,
+      "idempotent_reexport": "passed",
+      "manifest_sha256": "463bc1a988fb0595bbf9b93436b9ab1c320f525d3a6d353e460a78e9297ec996",
+      "seed": 42,
+      "end_date": "2026-07-31",
+      "rows": 52973,
+      "table_count": 25,
+      "generation_csv_seconds": 13.189109999999346,
+      "parquet_and_parity_seconds": 22.11168370800442,
+      "total_seconds": 35.300793708003766,
+      "rows_per_second": 1500.6178172132545,
+      "peak_rss_mib": 160.578125,
+      "csv_bytes": 15662801,
+      "parquet_bytes": 2289699,
+      "chunk_rows": 8192,
+      "parity": "passed",
+      "tables": [
+        {
+          "table": "products",
+          "row_count": 8,
+          "content_sha256": "ef2b5247897109f96b79ac4318beac89acc9bdcb1ec0a2e9e5ebe31b908d2488",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stores",
+          "row_count": 3,
+          "content_sha256": "31d474709d97f3765d58b2f21dfa797ae562f99a391ea63a6216f77d070b146f",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "warehouses",
+          "row_count": 2,
+          "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "orders",
+          "row_count": 5993,
+          "content_sha256": "fa2197946e0e4000daa69c15ba24841bfdbfb0614cd395ac0009402d9e9edb23",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 11986
+          }
+        },
+        {
+          "table": "order_items",
+          "row_count": 10817,
+          "content_sha256": "a7cbc569684d277116051a0b0d372a1ccfadce661a4cba4c877444dc9b87cc26",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "sales",
+          "row_count": 10817,
+          "content_sha256": "1f42c807ff93778d2016f833701b5349789edd75c9b46a8dd5b7e890feccbeac",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 21634
+          }
+        },
+        {
+          "table": "catalog_categories",
+          "row_count": 8,
+          "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "product_catalog",
+          "row_count": 8,
+          "content_sha256": "15acac1351fd2affae33fa2f08f446b0740a6e0bce53b1117360e5cb4c372c42",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-25",
+            "date_start": "2026-04-20",
+            "value_count": 17
+          }
+        },
+        {
+          "table": "selling_locations",
+          "row_count": 2,
+          "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "stock_locations",
+          "row_count": 2,
+          "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": null,
+            "date_start": null,
+            "value_count": 0
+          }
+        },
+        {
+          "table": "channel_assignments",
+          "row_count": 6,
+          "content_sha256": "0257de0ba690083962a9f88dca2fb1f8a2b4f994d7a6425bedc165fb09e608fe",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "fulfillment_routes",
+          "row_count": 6,
+          "content_sha256": "c361d4f6fdf013ba754653944233ae90bbbde467c2473cb24d882d8bf42a0365",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 18
+          }
+        },
+        {
+          "table": "assortment",
+          "row_count": 48,
+          "content_sha256": "149c8e53f24d1bc79bbc5cd50a590a18db01bf833dba17757bdce19f0cae4908",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 144
+          }
+        },
+        {
+          "table": "business_calendar",
+          "row_count": 306,
+          "content_sha256": "3547ab7a5bcfe3f38bcaacca6655cfd79dae82f89428d4d8e6ba03d3882bc736",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-20",
+            "value_count": 1836
+          }
+        },
+        {
+          "table": "category_calendar",
+          "row_count": 816,
+          "content_sha256": "102be5843a716dddd75f1e216d8c96273a1b4d87234c80ff214b1db71ab62ffb",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-20",
+            "value_count": 1632
+          }
+        },
+        {
+          "table": "price_plans",
+          "row_count": 36,
+          "content_sha256": "e58a28298d1400104d25451d46479290e4a4f5e77dd21f04f24726aad90b2af6",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-08-15",
+            "date_start": "2026-04-20",
+            "value_count": 144
+          }
+        },
+        {
+          "table": "promotion_plans",
+          "row_count": 14,
+          "content_sha256": "34032ad6c0c421c75a008396783352f50f02b37d42d67ad7ac8ae52c6c08814c",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-06-04",
+            "date_start": "2026-04-18",
+            "value_count": 56
+          }
+        },
+        {
+          "table": "sale_price_references",
+          "row_count": 10817,
+          "content_sha256": "1fa1003d3c0c2fc7fd0c171b9cf2683a8dd3b255caaf79052f0e57545a1247ff",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 21634
+          }
+        },
+        {
+          "table": "daily_price_observations",
+          "row_count": 1865,
+          "content_sha256": "b388fe0ada7e404af8f454bb301de9ef23e8bc56fd0290f559cfa9c16f85d763",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 3730
+          }
+        },
+        {
+          "table": "daily_demand_observations",
+          "row_count": 2406,
+          "content_sha256": "c8084da9ec8368ad9e6c3ba1939bef098fb503a02d80a834fab23afb903e520d",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-21",
+            "value_count": 4812
+          }
+        },
+        {
+          "table": "daily_demand_exclusions",
+          "row_count": 42,
+          "content_sha256": "a4547f2c2c65447587765a30dbdaa070ca391246357e0e12ecf3a1cb91b1a16a",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-07-31",
+            "date_start": "2026-04-21",
+            "value_count": 42
+          }
+        },
+        {
+          "table": "return_policies",
+          "row_count": 32,
+          "content_sha256": "e9991c9d43f409907a963ddc9d57cfb12c158060e05cf94e994ffaa57a519270",
+          "data_class": "source_plan",
+          "date_range": {
+            "date_end": "2026-04-20",
+            "date_start": "2026-04-20",
+            "value_count": 32
+          }
+        },
+        {
+          "table": "return_events",
+          "row_count": 1701,
+          "content_sha256": "8a9afab125f508a87e7974aaa7b887a079ab2838e545aeb847c13cc1f3fe6a9e",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-31",
+            "date_start": "2026-04-23",
+            "value_count": 5103
+          }
+        },
+        {
+          "table": "daily_return_cohorts",
+          "row_count": 4812,
+          "content_sha256": "7778aaa65aba582024252a4c6bacbd41b45ea14dfb4efca5022b62fccc4bf532",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-09-09",
+            "date_start": "2026-04-21",
+            "value_count": 14436
+          }
+        },
+        {
+          "table": "daily_demand_versions",
+          "row_count": 2406,
+          "content_sha256": "5431b205dc82c06173ddcadd0d64bb6d7aa83b4747197a87d6d8bf5064639210",
+          "data_class": "source_observation",
+          "date_range": {
+            "date_end": "2026-08-01",
+            "date_start": "2026-04-21",
+            "value_count": 4812
+          }
+        }
+      ],
+      "process_wall_seconds": 35.773902333996375
+    }
+  ]
+}

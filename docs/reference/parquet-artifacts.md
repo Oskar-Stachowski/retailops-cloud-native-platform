@@ -82,7 +82,8 @@ zależności. Kopia source manifest zachowuje dotychczasową identity/provenance
 Git śledzi demo CSV, maksymalnie jeden bieżący fixture pod `data/fixtures/`
 oraz archiwa regresji poprzednich source schemas. Łączny limit fixtures to
 **5 MiB po rozpakowaniu**, także dla ZIP. Obecnie archiwa mają 2435356 B;
-bieżący fixture cross-repo zostanie dodany w 03.3. `data/synthetic/`,
+[bieżący fixture cross-repo](source-snapshot-handoff.md) ma 2048665 B;
+łączny budżet wynosi 4484021 B. `data/synthetic/`,
 `data/generated/` i `data/replay/` są ignorowane. Eksport small wyłączono ze
 śledzenia; lokalne pliki zostały zachowane. `api-seed-small` i `compose-seed`
 generują brakujące seed CSV; kompletne istniejące CSV pozostają bez zmian,

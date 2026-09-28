@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 odebrany lokalnie i zdalnie; 03.1 Parquet i 03.2 immutable exporter mają lokalny odbiór. Następny zakres: 03.3 handoff fixture. Aktualizacja: 28.09.2026.**
+**Status: etap 02 odebrany lokalnie i zdalnie; 03.1–03.3 mają lokalny odbiór. Następny zakres: 03.4 typed importer w repo AI. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -24,10 +24,13 @@ potwierdza zdalny odbiór tej publikacji.
 chunked writes, date partitions, politykę Git/cleanup i bramkę zasobów obu smoke.
 [AI 03.2](../../evidence/ai/03/03.2/README.md) dodaje kwalifikowany,
 atomowy eksport 25 tabel, opcjonalną osobną evaluation truth, identity i
-idempotencję. Następna implementacja to **03.3 handoff fixture**
-w [etapie 03](etapy/03-snapshot-curated.md);
-równolegle kontynuujemy [pozostały zakres RAG 11](../../evidence/ai/11/README.md).
-Fundament offline działa, ale odbiór jakości i użytkowa aktywacja pozostają otwarte.
+idempotencję. [AI 03.3](../../evidence/ai/03/03.3/README.md) dostarcza pełny mały
+fixture, wspólny kontrakt i niezależną walidację konsumenta bez generatora.
+Następna implementacja to **03.4 typed importer w repo AI**
+w [etapie 03](etapy/03-snapshot-curated.md).
+[RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
+oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
+i test doubles agenta 12; pełny agent czeka na 10.
 Modele i inventory nadal nie są gotowe.
 [Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)

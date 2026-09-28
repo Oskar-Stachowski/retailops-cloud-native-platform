@@ -50,27 +50,26 @@ zgodne bajty demo i zachowanie IDs archiwów 2.0–2.5.
 replay cross-repo mają własne dalsze bramki.
 
 [AI 03.1/03.2](evidence/ai/03/03.2/README.md) mają lokalny odbiór typed Parquet,
-polityki artefaktów i niezmiennego eksportu w RetailOps. Następny zakres to
-03.3 handoff fixture, następnie importer i curated w AI. Publikacja brancha
-i zdalne Required CI 03 pozostają otwarte. Równolegle repo AI kontynuuje
-pozostały zakres 11. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
+polityki artefaktów i niezmiennego eksportu w RetailOps.
+[03.3 handoff](reference/source-snapshot-handoff.md) ma lokalny odbiór wspólnego
+kontraktu i samowystarczalnego fixture. Następnie 03.4 typed importer i curated
+w AI. Publikacja branchy i zdalne Required CI 03 pozostają otwarte. RAG 11 jest odebrany; równolegle
+można przygotować interfejsy i test doubles 12. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
 przypisuje etapy 03–17 do repozytoriów i podaje kolejność oraz możliwości
 pracy równoległej. [Backlog](plans/ai/backlog.md) opisuje najbliższe zadania,
 a [otwarte ustalenia](audits/open-findings.md) potwierdzone problemy.
 Dowód zdalnego Required CI i publikacji na main: [audyt](evidence/ai/02/audit/README.md).
 
-## Etap AI 11 — zakres i braki
+## Etap AI 11 — odebrany semantyczny RAG
 
-[Odbiór Etapu 11](evidence/ai/11/README.md) dotyczy implementacji w
-`retailops-ai-intelligence`, opublikowanej na `origin/main` (`1c3b65e`)
-po zielonym Required CI PR i push na main. Fundament offline obejmuje zatwierdzony korpus
-29 dokumentów, 451 fragmentów, fake embeddings, pgvector, testową aktywację
-i rollback, retrieval z filtrami uprawnień/statusów oraz trwałe runy i raporty
-dla 44 pytań golden. Pełny lokalny odbiór ma 627 testów, audyt dodatkowo 104.
+[Odbiór Etapu 11](evidence/ai/11/README.md) obejmuje rzeczywiste embeddings
+Amazon Titan V2, 29 dokumentów / 451 fragmentów, jakość na 44 pytaniach,
+użytkową kwalifikację, aktywację i rollback. Zakres jest opublikowany na
+`origin/main` repo AI (`abf3f69`). Recall@5 0,852941 i MRR 0,661275 przechodzą
+zamrożone progi; kontrole krytyczne i cytaty mają 100%.
 
-**Etap pozostaje w realizacji.** Brakuje ścieżki rzeczywistego providera
-embeddings, użytkowej kwalifikacji/aktywacji/rollback oraz zaliczenia jakości
-semantycznej. Fake Recall@5 i MRR wynoszą 0,0441176471 przy progach 0,80 i 0,60;
-9/9 kontroli krytycznych nie zastępuje tych progów. Wyszukiwanie użytkowe
-pozostaje zablokowane. Integracja real embeddings i smoke Bedrock należą do
-12; pełny agent wymaga również ukończenia 10.
+Końcowe evidence właściciela repo AI opisuje pomiar Bedrock/PostgreSQL/HTTP,
+643 testy i kontrole awarii. Integracja z handoff 03.3 ma ponowioną regresję
+658 testów. Nie wykonano w tej sesji nowych pomiarów AWS ani ponownej kontroli
+zdalnego CI RAG. Odpowiedzi i narzędzia agenta należą do 12; pełny agent czeka
+na 10. Zmiany dokumentacji wymagają nowego zatwierdzonego snapshotu korpusu.

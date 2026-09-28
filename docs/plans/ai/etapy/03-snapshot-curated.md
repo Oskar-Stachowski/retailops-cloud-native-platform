@@ -1,6 +1,6 @@
 # 03. Zbuduj snapshot, importer i curated
 
-**Status: 03.1 i 03.2 odebrane lokalnie; następny zakres 03.3 handoff fixture. Repo: RetailOps + AI, osobne PR-y. Zależność: 02.**
+**Status: 03.1–03.3 odebrane lokalnie; następny zakres 03.4 typed importer w repo AI. Repo: RetailOps + AI, osobne PR-y. Zależność: 02.**
 
 Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ścieżka to lokalny niezmienny eksport plików; kompletny REST/event integration powstaje w etapie 10. Ani działająca baza RetailOps, ani broker, ani AWS nie są wymagane do importu pierwszego snapshotu.
 
@@ -19,7 +19,11 @@ Zapis ma jawne `snapshot_ready=false`; odbiór 03.1 nie otwiera jeszcze 04/06.
 [runbook snapshotów](../../../reference/ai-snapshots.md) opisują istniejący
 `python -m data.export.ai_snapshot`: allowlistę, przeliczone bramki, atomową
 publikację, pełną walidację i niezmienny re-export. To lokalny odbiór eksportera;
-handoff/importer/curated oraz bramka cross-repo pozostają do wykonania.
+importer/curated oraz bramka cross-repo pozostają do wykonania.
+[Handoff 03.3](../../../reference/source-snapshot-handoff.md) dodaje jeden
+samowystarczalny fixture, schema/expected manifest i niezależny checker w repo AI.
+[Evidence](../../../evidence/ai/03/03.3/README.md) rozróżnia odbiór kontraktu
+i transportu od przyszłego typed importu i curated.
 
 ## Kolejność małych PR-ów
 
