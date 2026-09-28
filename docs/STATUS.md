@@ -31,7 +31,8 @@ Projekt służy do lokalnego demo i weryfikacji praktyk DevOps. Przełączanie
 porty do loopback zgodnie z [instrukcją](guides/local-development.md).
 
 Działa lokalny MLflow w repo AI. Nie ma potwierdzonego produkcyjnego wdrożenia
-AWS/EKS, produkcyjnego model serving, RAG ani agenta Bedrock. Te elementy
+AWS/EKS ani produkcyjnego model serving lub agenta Bedrock. Lokalny RAG ma
+[odbiór AI 11](evidence/ai/11/README.md). Dalsze wdrożenia
 opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
@@ -50,25 +51,27 @@ zgodne bajty demo i zachowanie IDs archiwów 2.0–2.5.
 replay cross-repo mają własne dalsze bramki.
 
 Pierwszy zakres 03 to typed Parquet, polityka artefaktów i niezmienny eksport
-w RetailOps, następnie importer i curated w AI. Równolegle repo AI kontynuuje
-pozostały zakres 11. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
+w RetailOps, następnie importer i curated w AI. Etap 11 jest odebrany;
+równolegle można przygotować interfejsy i test doubles etapu 12. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
 przypisuje etapy 03–17 do repozytoriów i podaje kolejność oraz możliwości
 pracy równoległej. [Backlog](plans/ai/backlog.md) opisuje najbliższe zadania,
 a [otwarte ustalenia](audits/open-findings.md) potwierdzone problemy.
 Dowód zdalnego Required CI i publikacji na main: [audyt](evidence/ai/02/audit/README.md).
 
-## Etap AI 11 — zakres i braki
+## Etap AI 11 — odebrany RAG
 
-[Odbiór Etapu 11](evidence/ai/11/README.md) dotyczy implementacji w
-`retailops-ai-intelligence`, opublikowanej na `origin/main` (`1c3b65e`)
-po zielonym Required CI PR i push na main. Fundament offline obejmuje zatwierdzony korpus
-29 dokumentów, 451 fragmentów, fake embeddings, pgvector, testową aktywację
-i rollback, retrieval z filtrami uprawnień/statusów oraz trwałe runy i raporty
-dla 44 pytań golden. Pełny lokalny odbiór ma 627 testów, audyt dodatkowo 104.
+[Odbiór Etapu 11](evidence/ai/11/README.md) dotyczy `retailops-ai-intelligence`.
+Zatwierdzony korpus ma 29 dokumentów i 451 fragmentów; rzeczywisty provider
+Amazon Titan Text Embeddings V2 tworzy wektory 1024-wymiarowe z kontekstem nagłówków.
+Na niezmienionych 44 pytaniach i progach: **Recall@5 85,3%, MRR 66,1%,
+krytyczne 9/9, cytaty 100%**. Właściwy run ma `succeeded`, lokalny indeks
+jest kwalifikowany i aktywny; SQL odtworzył wszystkie 44 wyniki.
 
-**Etap pozostaje w realizacji.** Brakuje ścieżki rzeczywistego providera
-embeddings, użytkowej kwalifikacji/aktywacji/rollback oraz zaliczenia jakości
-semantycznej. Fake Recall@5 i MRR wynoszą 0,0441176471 przy progach 0,80 i 0,60;
-9/9 kontroli krytycznych nie zastępuje tych progów. Wyszukiwanie użytkowe
-pozostaje zablokowane. Integracja real embeddings i smoke Bedrock należą do
-12; pełny agent wymaga również ukończenia 10.
+Działają filtrowanie uprawnień/statusów, ograniczony context, trwałe runy,
+retencja raportu przy niezaliczonym progu, kwalifikacja, atomowa aktywacja
+oraz rollback. Lokalna regresja: 643 testy i pełny Compose z migracją
+`0008_rag_semantic`, testami negatywnymi SQL, awariami i restartami.
+Nie pozostały otwarte warunki Etapu 11. Agent, groundedness odpowiedzi
+oraz wykonanie narzędzi należą do AI 12; pełny agent wymaga również AI 10.
+Nie jest to wdrożenie AWS/EKS. Zmiana dokumentacji nie aktualizuje samoczynnie
+zatwierdzonego indeksu — wymaga nowego snapshotu i oceny.
