@@ -417,7 +417,7 @@ def report_metadata(
                 "size_bytes": path.stat().st_size,
                 "policy_version": "forecast-source-acceptance-1.0.0"
                 if name.startswith("source_report")
-                else "observed-sales-realism-1.0.0"
+                else "observed-sales-realism-1.1.0"
                 if uses_separation(profile, schema_version) and name.startswith("realism_report")
                 else DIMENSIONS_VERSION
                 if name == "dimensions_report.json"

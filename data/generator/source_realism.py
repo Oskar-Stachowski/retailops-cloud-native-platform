@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
-REALISM_POLICY = "observed-sales-realism-1.0.0"
+REALISM_POLICY = "observed-sales-realism-1.1.0"
+MIN_SEGMENT_SAMPLE = 30
 
 
 def _metric(
@@ -27,6 +28,61 @@ def _metric(
         "description": reason,
         "evidence": "realism_report.json",
     }
+
+
+def _segment_metrics(tables: dict) -> list[dict]:
+    products = {r["id"]: r["category"] for r in tables["products"]}
+    buckets = {r["product_id"]: r["demand_class"] for r in tables["product_simulation_parameters"]}
+
+    def segment(row: dict) -> tuple[str, str, str]:
+        return buckets[row["product_id"]], products[row["product_id"]], row["channel"]
+
+    open_days, zero_days = defaultdict(int), defaultdict(int)
+    for row in tables["daily_demand_observations"]:
+        key = segment(row)
+        open_days[key] += row["location_open"] == "true"
+        zero_days[key] += row["observation_status"] == "observed_zero"
+    sales = {r["id"]: r for r in tables["sales"]}
+    sold, refunded = defaultdict(int), defaultdict(int)
+    for row in sales.values():
+        sold[segment(row)] += int(row["quantity"])
+    for row in tables["return_events"]:
+        if row["status"] == "refunded":
+            refunded[segment(sales[row["sale_id"]])] += int(row["quantity"])
+    metrics = []
+    for name, numerators, denominators, description in (
+        (
+            "open_panel_zero_rate",
+            zero_days,
+            open_days,
+            "Open active days only; closed/missing are not zero observations.",
+        ),
+        (
+            "final_refunded_unit_rate",
+            refunded,
+            sold,
+            "Qualified refunded units over original sold units, including mature tail; no historical label rewrite.",
+        ),
+    ):
+        for key, sample in sorted(denominators.items()):
+            value = numerators[key] / sample if sample else None
+            metric = _metric(
+                name + ":" + "/".join(key),
+                sample,
+                value,
+                {"min": 0, "max": 1, "minimum_sample": MIN_SEGMENT_SAMPLE},
+                "not_evaluable"
+                if sample < MIN_SEGMENT_SAMPLE
+                else "passed"
+                if 0 <= value <= 1
+                else "warning",
+                description,
+            )
+            metric["segment"] = dict(
+                zip(("demand_bucket", "category", "channel"), key, strict=True)
+            )
+            metrics.append(metric)
+    return metrics
 
 
 def build_source_realism(profile: str, seed: int, tables: dict) -> dict:
@@ -50,11 +106,11 @@ def build_source_realism(profile: str, seed: int, tables: dict) -> dict:
             "top_20_percent_catalog_revenue_share",
             len(revenue),
             share,
-            {"min": 0.2, "max": 0.95},
+            {"min": 0.45, "max": 0.80, "minimum_sample": 50},
             "not_evaluable"
             if len(revenue) < 50 or share is None
             else "passed"
-            if 0.2 <= share <= 0.95
+            if 0.45 <= share <= 0.80
             else "warning",
             "Denominator includes unsold catalog products; fewer than 50 products is diagnostic only.",
         ),
@@ -62,8 +118,12 @@ def build_source_realism(profile: str, seed: int, tables: dict) -> dict:
             "average_distinct_order_items",
             len(tables["orders"]),
             basket,
-            {"min": 1, "max": 5},
-            "not_evaluable" if basket is None else "passed" if 1 <= basket <= 5 else "warning",
+            {"min": 1.2, "max": 3.5, "minimum_sample": MIN_SEGMENT_SAMPLE},
+            "not_evaluable"
+            if len(tables["orders"]) < MIN_SEGMENT_SAMPLE
+            else "passed"
+            if 1.2 <= basket <= 3.5
+            else "warning",
             "One row per distinct product in an order; units are not item count.",
         ),
         _metric(
@@ -91,26 +151,7 @@ def build_source_realism(profile: str, seed: int, tables: dict) -> dict:
             "Inventory ledger is not qualified before AI-06.",
         ),
     ]
-    products = {r["id"]: r["category"] for r in tables["products"]}
-    sales = {r["id"]: r for r in tables["sales"]}
-    sold, refunded = defaultdict(int), defaultdict(int)
-    for row in sales.values():
-        sold[(products[row["product_id"]], row["channel"])] += int(row["quantity"])
-    for row in tables["return_events"]:
-        if row["status"] == "refunded":
-            sale = sales[row["sale_id"]]
-            refunded[(products[sale["product_id"]], sale["channel"])] += int(row["quantity"])
-    for key, units in sorted(sold.items()):
-        metrics.append(
-            _metric(
-                "final_refunded_unit_rate:" + "/".join(key),
-                units,
-                refunded[key] / units,
-                {"min": 0, "max": 1},
-                "passed" if 0 <= refunded[key] / units <= 1 else "warning",
-                "Qualified refunded quantities over original sold units; includes mature return tail, not historical net labels.",
-            )
-        )
+    metrics.extend(_segment_metrics(tables))
     return {
         "policy_version": REALISM_POLICY,
         "profile": profile,

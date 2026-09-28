@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import csv
 import json
 from pathlib import Path
 from zipfile import ZipFile
@@ -105,6 +106,28 @@ def test_feature_entry_requires_an_explicit_accepted_source(tmp_path):
         admit_feature_source(source, replace(CONFIG, seed=43))
 
 
+def test_source_change_during_admission_cannot_get_the_old_parent_identity(tmp_path, monkeypatch):
+    generate_demo_dataset(tmp_path, CONFIG)
+    original_loader = load_source_manifest_v2
+
+    def mutate_after_validation(source_dir):
+        manifest = original_loader(source_dir)
+        path = source_dir / "product_catalog.csv"
+        with path.open(newline="") as stream:
+            reader = csv.DictReader(stream)
+            fields, rows = reader.fieldnames, list(reader)
+        rows[0]["brand"] = "changed-after-validation"
+        with path.open("w", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(rows)
+        return manifest
+
+    monkeypatch.setattr("data.generator.feature_admission.load_source_manifest_v2", mutate_after_validation)
+    with pytest.raises(ValueError, match="checksum"):
+        admit_feature_source(tmp_path, CONFIG)
+
+
 def test_worker_is_actually_isolated_and_returns_only_facts(tables, monkeypatch):
     monkeypatch.setenv("RETAILOPS_TRUTH_CANARY", "private-source-value")
     assert all(verify_runtime_isolation().values())
@@ -133,6 +156,27 @@ def test_realism_uses_observed_denominators_without_fabricated_truth(tables):
     assert metrics["stockout_rate"]["value"] is None
     assert metrics["causal_promotion_uplift"]["value"] is None
     assert metrics["stockout_rate"]["status"] == "not_ready"
+
+
+def test_segment_realism_reconciles_open_days_and_final_refunds(tables):
+    metrics = build_source_realism(CONFIG.profile, CONFIG.seed, tables)["metrics"]
+    zero = [r for r in metrics if r["metric_id"].startswith("open_panel_zero_rate:")]
+    returns = [r for r in metrics if r["metric_id"].startswith("final_refunded_unit_rate:")]
+    assert sum(r["sample_size"] for r in zero) == sum(r["location_open"] == "true" for r in tables["daily_demand_observations"])
+    assert sum(r["sample_size"] for r in returns) == sum(int(r["quantity"]) for r in tables["sales"])
+    expected_refunds = sum(int(r["quantity"]) for r in tables["return_events"] if r["status"] == "refunded")
+    assert sum(r["value"] * r["sample_size"] for r in returns) == pytest.approx(expected_refunds)
+    assert all(set(r["segment"]) == {"demand_bucket", "category", "channel"} for r in [*zero,*returns])
+
+
+def test_closed_segment_is_unknown_and_small_samples_are_not_evaluable():
+    from datetime import date
+    config = DatasetGenerationConfig(profile="ai-smoke", days=1, products=1, stores=1, warehouses=1,end_date=date(2026,7,5))
+    report = build_source_realism(config.profile, config.seed, build_dataset(config))
+    zero = next(r for r in report["metrics"] if r["metric_id"].startswith("open_panel_zero_rate:"))
+    assert zero["sample_size"] == 0 and zero["value"] is None and zero["status"] == "not_evaluable"
+    basket = next(r for r in report["metrics"] if r["metric_id"] == "average_distinct_order_items")
+    assert basket["value"] is None and basket["status"] == "not_evaluable"
 
 
 def test_historical_source_2_4_and_feature_3_0_keep_exact_identity(tmp_path):
