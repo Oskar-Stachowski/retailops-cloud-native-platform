@@ -219,8 +219,6 @@ ci-cd/reports/**
 # Generated synthetic datasets.
 # Keep the small seed profile versioned for CI/local reproducibility.
 data/synthetic/*
-!data/synthetic/small/
-!data/synthetic/small/**
 data/generated/
 data/replay/
 
