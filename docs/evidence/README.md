@@ -6,7 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| Fundament, HTTP i persistence AI 01 | 2026-09-28 | [Osobne repo AI](ai/01/README.md): 77 testów i Compose na czystym checkoutcie, PostgreSQL/pgvector, MLflow, jawne migracje, crash/restart, trwałość i DB outage/recovery. Nowy zakres zweryfikowany lokalnie; CI baseline na GitHub ma success, CI nowych commitów czeka na push. |
+| Fundament, persistence i kontrakty AI 01 | 2026-09-28 | [Osobne repo AI](ai/01/README.md): 208 testów, schemas/PIT/lineage i wheel na czystym checkoutcie. Osobny wcześniejszy pomiar rzeczywistego Compose: PostgreSQL/pgvector, MLflow, migracje, trwałość i DB outage/recovery. CI nowych commitów czeka na push. |
 | Audyt AI 00 | 2026-09-27 | [Stan wyjściowy `cbf28b2`](ai/00/README.md): dwa `small`, kontrast 100/20, dane/ML/event/API, 138 testów, RF reload i CI źródłowego SHA. Następny etap 01; źródło wymaga poprawek w 02. |
 | Izolacja seeda | 2026-09-27 | [Próby PostgreSQL](pre-ai-00/2026-09-27-seed-isolation.md) na kodzie `667f349`: 27 testów bez DB, pięć przebiegów DB i sprzątanie po błędzie; osobny zakres wobec audytu AI 00. |
 | Monitoring | 2026-09-26 | [ARM64/AMD64](observability/2026-09-26-validation.md): próbki, Grafana, pending/firing/resolution alertu; 24 zadania Required CI. |

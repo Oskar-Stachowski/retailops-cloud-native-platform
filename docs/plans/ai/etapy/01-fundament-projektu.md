@@ -3,22 +3,28 @@
 **Repo:** oba; nowe komponenty w AI. **Zależność:** 00. **Rezultat:** działający fundament lokalny bez deklaracji gotowych modeli.
 
 **Stan bieżący:** osobne repo `retailops-ai-intelligence` zawiera pakiet,
-settings, CLI i bazowy HTTP w warstwach api/domain/pipelines/adapters.
-Działają PostgreSQL/pgvector dla AI oraz oddzielna baza i rola MLflow, jawne
-migracje i lokalny Compose z trwałymi wolumenami.
-[Dowody](../../../evidence/ai/01/README.md) obejmują 77 testów i czysty checkout
-z rzeczywistymi próbami crash/restart, DB outage/recovery i zachowania artefaktów.
-Repo jest na GitHub, main chronione przez required-result, CI bazowego 7d67530
-ma success. Commity persistence są lokalne, ich zdalny CI czeka na push.
-Cały etap jest `in_progress`; poniżej pozostaje zakres do wykonania.
+settings, CLI, HTTP oraz PostgreSQL/pgvector AI i oddzielną bazę/rolę MLflow.
+Działają migracje, Compose i wersjonowane kontrakty danych/run/tool z fixtures
+oraz semantyczną walidacją offline. [Dowody](../../../evidence/ai/01/README.md)
+obejmują 208 testów na czystym checkoutcie i wheel poza źródłami; osobny wcześniejszy
+pomiar persistence potwierdza rzeczywisty crash/restart i DB outage/recovery.
+Main na GitHub ma required-result, CI bazowego 7d67530 ma success.
+Nowe commity są lokalne i czekają na zdalny CI po push. Etap pozostaje in_progress.
 
-Przeczytaj [architekturę](../architektura.md) i wspólne kontrakty w `../kontrakty/`. Model danych/ziarno/availability uzgodnij przed implementacją pipeline’ów; pełne zdarzenia zostaną uruchomione w 10.
+Przeczytaj [architekturę](../architektura.md) i wspólne kontrakty w `../kontrakty/`.
+Grain/identity/availability pierwszej prognozy są wykonywalne w v1 repo AI;
+importer, model training, auth i pełne zdarzenia wymagają własnych implementacji.
 
-## Praca w małych PR-ach
+## Pozostała praca
 
-6. **Wspólne kontrakty.** Nadaj wersje dataset/feature/label/prediction/run/tool schemas; wzory w tym pakiecie przełóż na wykonywalne modele i fixtures w repo. Zapisz semantykę braków, zer, czasu i source ownership. Event schema inventory jeszcze nie oznacza działającego streamingu.
-7. **Rozwój CI i zabezpieczeń.** Rozszerz istniejące lint/type/package/test/docs/contracts i secret scan na nowe komponenty bez pomijania ich ścieżek. Po push nowych commitów odbierz ich zdalne CI z nowym jobem persistence; zachowaj wymaganą ochronę main przez `required-result`. Własne endpointy administracyjne od początku mają granicę dostępu. Sekrety poza Git i logami. Używaj ról o ograniczonym zakresie, nie demo admina RetailOps jako domyślnej tożsamości agenta.
-8. **Status i polecenia.** Rozwijaj istniejące `make bootstrap`, `make test` i `make ci-local` wraz z aplikacją. Rozwijaj działające polecenia Compose i smoke wraz z nowymi rolami. Nie dopisuj pustych targetów udających działający trening/deploy. Aktualizuj rejestr etapu i evidence.
+7. **Tożsamość, uprawnienia i zdalny CI.** Zweryfikuj principal i egzekwuj
+   role/scopes nowych endpointów aplikacyjnych od ich pierwszej implementacji.
+   Odrzucaj próby rozszerzenia scope, tokeny poza Git/logami. Token metryk i
+   caller-supplied user_id nie są tożsamością użytkownika. Nie używaj demo-admina
+   RetailOps jako domyślnej tożsamości agenta. Rozwijaj bramki nowych komponentów;
+   po push odbierz ich Required CI, w tym persistence. Zachowaj ochronę main.
+8. **Status i polecenia.** Rozwijaj istniejące make/CLI/Compose razem z aplikacją,
+   bez pustych targetów training/deploy. Aktualizuj rejestr etapu i evidence.
 
 ## Ustawienia i granice
 
@@ -26,27 +32,30 @@ Konfiguracja docelowa obejmuje APP_ENV, DATABASE_URL, MLFLOW_TRACKING_URI, RETAI
 
 W fazie K1 wykonanie jest lokalne. Brak źródła RetailOps powoduje kontrolowany błąd importu; brak opcjonalnego LLM — czytelny status degraded. Nie ukrywaj awarii użyciem przypadkowego modelu ani danych syntetycznych, których użytkownik API nie zamówił.
 
-## Kontrole odbioru
+## Kontrole następnego zakresu
 
-- Czysty checkout daje działający import pakietu i powtarzalną instalację z lockfile.
-- Compose podnosi API, PostgreSQL i MLflow; restart zachowuje trwałe dane w wymaganych wolumenach.
-- Odłączenie DB pogarsza readiness; `/health` nie wykonuje kosztownych testów wszystkich usług.
-- Logi mają correlation ID i nie mają haseł/tokenów. `/version` nie ujawnia sekretów.
-- CI wykrywa błędny kontrakt i nie pomija nowej ścieżki; docs nie deklarują nieistniejących funkcji.
-- Testy provider fakes nie wymagają konta AWS; migracje wykonują się jawnie.
+- Verified principal i brak/niepoprawne poświadczenia → 401; brak prawa → 403.
+- Scope produktu/selling location/kanału jest egzekwowany, role/body/query nie
+  rozszerzają uprawnień. Nowe endpointy administracyjne wymagają właściwej roli.
+- Tokeny i prywatne dane nie występują w błędach/logach. Kontraktowe odmowy
+  nie zmieniają bezpiecznej diagnostyki health/readiness/version.
+- Pozytywne i negatywne testy auth działają bez konta AWS, w lokalnym required CI.
+- Dotychczasowy bootstrap, kontrakty, package, HTTP/DB sondy i migracje przechodzą;
+  po push nowy zdalny Required CI ma success i main zachowuje required-result.
 
 Zapisz ADR-y, listę uruchomionych poleceń i ograniczenia. Etap odblokowuje dane02, RAG11 oraz projektowanie16A po określeniu infrastrukturalnego input contract.
 
 ## Prompt
 
 ```text
-Zaimplementuj kolejny mały fragment etapu01: wykonywalne wersjonowane kontrakty
-dataset/feature/label/prediction/run/tool, fixtures oraz reguły kompatybilności.
-Zachowaj architektura.md i wspólne kontrakty. Uzgodnij grain, identity, lineage,
-availability/as-of oraz braki i zera przed importerem i pipeline ML.
-Utrzymaj działający pakiet, HTTP, DB/MLflow, migracje, Compose i required CI.
-Uprawnienia nowych endpointów mają działać od pierwszej implementacji.
-Nie kopiuj generatora/UI/operacyjnej DB RetailOps ani nie deklaruj modeli lub
-streamingu na podstawie schema. Zapisz pozytywne i negatywne testy, evidence
-i aktualny status; po push odbierz wymagane zdalne kontrole.
+Zaimplementuj kolejny mały zakres etapu01: tożsamość i uprawnienia pierwszych
+endpointów aplikacyjnych. Uzgodnij verified principal, role/scopes i źródło
+poświadczeń. Egzekwuj dostęp od pierwszej implementacji; caller-supplied ID,
+body/query i token metryk nie mogą zastąpić zweryfikowanej tożsamości.
+Testuj 401/403, scope produktu/selling location/kanału, próby podmiany roli
+oraz brak sekretów w odpowiedziach/logach, bez AWS.
+Utrzymaj pakiet, kontrakty v1, HTTP, DB/MLflow, migracje, Compose i required CI.
+Nie kopiuj demo-admin RetailOps ani nie deklaruj production IAM, agenta lub
+serving na podstawie warstwy auth. Zapisz evidence i aktualny status;
+po push odbierz wymagane zdalne kontrole nowych commitów.
 ```

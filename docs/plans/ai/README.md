@@ -3,8 +3,9 @@
 **Status: etap 01 w realizacji. Aktualizacja: 28.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
-pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow i Compose z jawnymi migracjami.
-Następny zakres to wykonywalne kontrakty danych/run/tool i zgodność wersji.
+pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
+kontrakty danych/run/tool z walidacją offline. Następny zakres to tożsamość
+i uprawnienia pierwszych endpointów aplikacyjnych.
 [Backlog](backlog.md) podaje pozostałą pracę 01 i pierwszy mały PR 02.
 Pozostała część 01 oraz etapy 02–17 opisują rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.

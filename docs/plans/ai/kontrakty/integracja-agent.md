@@ -4,6 +4,11 @@
 
 Wspólne typy run, błędów, nagłówków, list, metadanych modelu, idempotency oraz REST ML definiuje [ML API i lifecycle](ml-api-lifecycle.md). Dane i PIT definiuje [kontrakt czasu](dane-i-czas.md). W tym pliku obowiązują integracja źródła, zdarzenia, RAG, narzędzia, Assistant API, administracja indeksu oraz struktura sugestii. Definicji ML nie kopiujemy do drugiego kontraktu.
 
+W etapie 01 wdrożono wybrany forecast wire contract v1 oraz walidację offline
+dataset/feature/label/split/model/prediction/run/tool/bundle w repo AI.
+[Odbiór](../../../evidence/ai/01/README.md) wskazuje kod i ograniczenia: schemas
+nie implementują importu, workerów, modeli, tool executora, auth ani streamingu.
+
 ## 1. Mapa integracji z API RetailOps
 
 Poniższe ścieżki są zasobami RetailOps, a nie AI `/api/v1`. Bazowy adres należy odczytać z konfiguracji deploymentu; nie dopisywać automatycznie prefiksu AI.

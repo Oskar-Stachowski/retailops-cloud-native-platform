@@ -1,44 +1,39 @@
 # Najbliższe prace po audycie AI 00
 
 Baza: [pomiary na `cbf28b2`](../../evidence/ai/00/README.md), 27.09.2026.
-**Etap 01 w realizacji; następny zakres: wykonywalne kontrakty danych i runów.**
-[Pakiet, HTTP i persistence](../../evidence/ai/01/README.md) działają w osobnym
-repo `retailops-ai-intelligence`.
+**Etap 01 w realizacji; następny zakres: tożsamość i uprawnienia API.**
+[Pakiet, HTTP, persistence i kontrakty](../../evidence/ai/01/README.md) działają
+w osobnym repo `retailops-ai-intelligence`. Kontrakty mają wersję 1.0, fixtures,
+semantyczną walidację offline i wymaganą bramkę CI.
 Ten plik zawiera otwartą pracę, a [audyt](../../audits/open-findings.md)
-dowody błędów i kryteria ich zamknięcia. Etap 01 pozostaje częściowy, 02–17 są planowane;
-brak nowej funkcji z planu nie jest sam w sobie błędem istniejącego demo.
+dowody błędów i kryteria ich zamknięcia. 01 pozostaje częściowy, 02–17 planowane.
 
 ## Następny mały PR etapu 01
 
 **Repo:** `retailops-ai-intelligence`, branch `ai/implementation`.
-Działa lokalny stos API/PostgreSQL/MLflow z jawnymi migracjami i trwałością
-potwierdzoną po crash/restart i awarii DB. [Dowody](../../evidence/ai/01/README.md)
-wskazują commity i ograniczenia. Uruchomienie: `docs/local-stack.md` w repo AI.
+[Działający fundament](../../evidence/ai/01/README.md) obejmuje pełny lokalny stos
+oraz kontrakty danych/run/tool. Instrukcje obsługi i walidacji są w docs repo AI.
 
-**Zakres:** wykonywalne, wersjonowane kontrakty dataset/feature/label/prediction/run/tool
-oraz fixtures i reguły kompatybilności. Uzgodnić identity/provenance, grain,
-availability/as-of, braki i zera oraz własność źródła przed importerem lub pipeline ML.
-Nie kopiować generatora ani modeli operacyjnej DB do repo AI.
+**Zakres:** warstwa tożsamości i uprawnień pierwszych endpointów aplikacyjnych,
+zanim udostępnimy dane biznesowe. Uzgodnić verified principal, role/scopes oraz
+bezpieczne odpowiedzi odmowy i rozdzielić je od tokenu metryk.
+Nie używać caller-supplied user_id lub demo-admin RetailOps jako zaufanej tożsamości.
 
 **Odbiór tego PR:**
 
-- Jeden kontrakt w kodzie i schematach opisuje każdą rodzinę; poprawne przykłady
-  przechodzą walidację, a niepełne/błędne wersje i niezgodna lineage są odrzucane.
-- Osobne source/curated/feature/label/split/model/run IDs i wersje, bez mylenia
-  tożsamości logicznej z checksumem pliku. Rozdzielić obserwowane fakty, simulation
-  truth i etykiety; braku danych nie zastępować zerem.
-- Grain pierwszej prognozy odpowiada observed_sales_units i selling location/kanał,
-  origin/target date; availability nie przekracza origin. Nie zadeklarować
-  inventory ani nowych zdarzeń jako gotowych tylko na podstawie schema.
-- Opisać politykę zmian wersji i zgodność fixtures/OpenAPI/JSON Schema; testy
-  kontraktów muszą wykryć ich celowe osłabienie. Kontrole i evidence obejmują nowe pliki.
+- Principal pochodzi ze zweryfikowanych poświadczeń. Brak/niepoprawne poświadczenie
+  daje 401, brak wymaganego uprawnienia 403, bez wycieku danych lub tokenu.
+- Scope produktu/selling location/kanału jest egzekwowany; podmiana ID lub roli
+  w parametrach/body nie rozszerza dostępu. Nowe endpointy administracyjne są chronione.
+- Testy pozytywne i odmowy, bez AWS, obejmują nowy kod i required CI.
+  Zachować dotychczasowe HTTP, sondy, kontrakty, CLI, DB/MLflow i migracje.
+- Opisać bezpieczne uruchomienie, granice lokalnego auth i evidence. Nie deklarować
+  produkcyjnego IAM, działającego agenta lub serving na podstawie warstwy auth.
 
-Pozostała praca **tego samego etapu 01**: uprawnienia pierwszych endpointów
-aplikacyjnych od ich pierwszej implementacji. Token metryk nie jest systemem
-tożsamości użytkowników, a MLflow ma tylko lokalną granicę sieciową.
-Repo AI jest na GitHub; odczyt 28.09.2026 potwierdził ochronę main z required-result
-i udany CI bazowego 7d67530. Nowe commity persistence są lokalne; po push trzeba
-odebrać ich zdalny CI, w tym nowy job persistence. Cały etap 01 pozostaje otwarty.
+Po push odebrać zdalny Required CI nowych commitów, w tym job persistence.
+Main ma required-result, a CI bazowego 7d67530 ma success; lokalne nowe commity
+nie mają jeszcze zdalnego odbioru. Token metryk nie jest auth użytkowników,
+MLflow ma lokalną granicę sieciową. Cały etap 01 pozostaje otwarty.
 
 ## Pierwszy mały PR etapu 02
 

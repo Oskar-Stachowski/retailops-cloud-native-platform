@@ -25,9 +25,9 @@
       "status": "in_progress",
       "evidence": "../../evidence/ai/01/README.md",
       "implementation_repository": "retailops-ai-intelligence",
-      "implementation_commit": "7e0978b7a3d14ba222c7c305d8b995e960369fc1",
-      "evidence_commit": "7bd17e65a3bb5416620526a8b48e14986923d140",
-      "next_scope": "Wykonywalne kontrakty dataset/feature/label/prediction/run/tool i zgodność wersji; uprawnienia nowych endpointów; po push CI nowych commitów."
+      "implementation_commit": "ae21d4e37dc56fb6d12c53f103190aa663b9a0f0",
+      "evidence_commit": "40ad85c39551f00546b994e902e476f0b171ac07",
+      "next_scope": "Tożsamość i uprawnienia pierwszych endpointów aplikacyjnych; po push zdalny Required CI nowych commitów, w tym persistence."
     },
     {
       "id": "02",

@@ -1,9 +1,10 @@
-# Fundament AI 01 — HTTP i persistence
+# Fundament AI 01 — persistence i kontrakty
 
-Aktualizacja: **2026-09-28**. Działa pakiet, diagnostyka HTTP i lokalny
-stos PostgreSQL/pgvector/MLflow z jawnymi migracjami. Cały etap 01 pozostaje
-`in_progress`. [Raport persistence](persistence.json) dotyczy implementacji
-`7e0978b`; wcześniejszy HTTP miał bazę `5da5fdc` i plan RetailOps `c89da89`.
+Aktualizacja: **2026-09-28**. Działa pakiet, HTTP, lokalny stos
+PostgreSQL/pgvector/MLflow i wykonywalne kontrakty danych/run/tool z walidacją offline.
+[Raport kontraktów](contracts.json) dotyczy implementacji `ae21d4e` i dowodów
+`40ad85c`; osobny [raport persistence](persistence.json) implementacji `7e0978b`.
+Cały etap 01 pozostaje `in_progress`.
 
 ## Repo i wersje
 
@@ -17,12 +18,52 @@ tego zakresu pozostają lokalne.
 | `7d67530ca574e4acf60405c22fdde1ec59f1f174` | Dowody czystego checkoutu, blokady błędnego kontraktu i działania HTTP z zainstalowanej paczki wheel. |
 | `7e0978b7a3d14ba222c7c305d8b995e960369fc1` | PostgreSQL/pgvector AI, oddzielny MLflow, migracje, Compose, rzeczywista sonda DB oraz 77 testów. |
 | `7bd17e65a3bb5416620526a8b48e14986923d140` | Dowody czystego checkoutu i nowych wolumenów oraz odczyt bieżącego stanu GitHub. |
+| `ae21d4e37dc56fb6d12c53f103190aa663b9a0f0` | Kontrakty v1 dataset/feature/label/split/model/prediction/run/tool/bundle, schemas, fixtures, semantyczny CLI i wymagana bramka CI; 208 testów. |
+| `40ad85c39551f00546b994e902e476f0b171ac07` | Odbiór czystego checkoutu, paczki wheel poza źródłami oraz blokady celowo błędnego schema. |
 
 Pełne komendy, wyniki i sumy kodu/artefaktów są w repo AI:
-`docs/evidence/01-http.md/json` i `docs/evidence/01-persistence.md/json`.
+`docs/evidence/01-http.md/json`, `01-persistence.md/json` i `01-contracts.md/json`.
 Bieżące uruchomienie i ograniczenia opisują `docs/http-service.md`,
-`docs/local-stack.md`, `docs/development.md` oraz `docs/STATUS.md`. Ten wpis wskazuje dowody
+`docs/local-stack.md`, `docs/data-contracts.md`, `docs/development.md` i `docs/STATUS.md`. Ten wpis wskazuje dowody
 między repozytoriami; nie tworzy drugiej instrukcji obsługi.
+
+## Kontrakty — aktualny odbiór 28.09.2026
+
+Czysty checkout `ae21d4e`, nowy venv: `make bootstrap ci-local` — exit 0,
+**208 passed in 9.56s**, bez pominięć. Ruff/format, Mypy strict (40 plików),
+linki/CI, snapshots, wheel/sdist, Compose config i skany Gitleaks przechodzą.
+Actionlint przechodzi; poprawiono wyrażenie wyniku persistence w required-result
+oraz dodano guard workflow. Diagnostyczne HTTP/OpenAPI fixtures pozostają zgodne.
+
+- 10 rodzin schema Draft 2020-12, dokładna wersja 1.0, brak unknown fields/coercji.
+  Pozytywne przykłady są sprawdzane przez niezależny jsonschema oraz Pydantic.
+  55 ręcznych negatywnych fixtures rozróżnia odrzucenie struktury i semantyki.
+- Full forecast grain, UTC/end-of-day/horizon, granica mikrosekundy availability,
+  znane plany vs przyszłe facts, jawne null/missing/censored vs obserwowane zero.
+- Oddzielne content IDs każdej roli oraz byte checksums, requested/resolved config,
+  provenance i source ownership. Truth/raw/operational outputs nie są feature input.
+- Zamknięty graf source → curated → features/labels → split → training/model →
+  inference/prediction: rodzice, logical content, rows, daty i complete output.
+  Kontrola maturity, training label availability i selection przed testem.
+- Legalne przejścia runa, przypięte wejścia, brak partial output i przepisywania
+  terminalnych wyników; bounded read tool z no_data/error, scope i freshness.
+- Offline CLI odrzuca duplicate JSON keys/nonfinite/za duży dokument,
+  nie pokazuje wejścia w błędzie i nie wymaga konfiguracji usług.
+  Celowe osłabienie schema daje niezerowy exit bramki, bez auto-poprawy w CI.
+
+Wheel działa w osobnym venv, poza checkoutem, z hash-verified produkcyjnymi
+zależnościami z uv.lock; `uv pip check` przechodzi, import z site-packages,
+bez dev jsonschema. Valid bundle → exit 0, late feature → exit 2,
+prywatne wejście → stały błąd bez wartości; brak katalogu artefaktów.
+Po fast-forward do docelowego repo: locked bootstrap, **137 testów kontraktów/CI
+in 2.14s** i bundle CLI przechodzą. Branch ai/implementation i worktree są czyste.
+
+Przykłady to syntetyczne metadane: checksums/model/run i passed flags ilustrują
+format, nie odpowiadają fizycznym plikom ani treningowi. Walidacja nie weryfikuje
+byte checksums, source gates lub rzeczywistego użycia splitu. Run nie jest workerem,
+tool nie ma executora/auth/agenta. Import/ML/streaming wymagają późniejszych etapów.
+Nie ponawiano Compose crash/restart dla tej zmiany kontraktów; osobny pomiar niżej
+zachowuje datę i zakres. Nowe commity nie zostały wypchnięte — zdalny CI pozostaje otwarty.
 
 ## Persistence — rzeczywisty lokalny runtime
 
@@ -54,7 +95,7 @@ a worktree pozostał czysty.
 Odczyt GitHub 28.09.2026: main chronione z wymaganym required-result,
 [Required CI bazowego 7d67530 ma success](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36383297184).
 Zdalnego CI nowej implementacji nie wykonano, bo nowe commity nie zostały wypchnięte.
-Cały etap 01 pozostaje otwarty: [kontrakty i uprawnienia](../../../plans/ai/backlog.md).
+Cały etap 01 pozostaje otwarty: [tożsamość, uprawnienia i zdalny CI](../../../plans/ai/backlog.md).
 Nie odebrano Linux x86_64 runtime, backup/restore, modeli, RAG, OTLP ani AWS.
 
 ## HTTP — wcześniejszy pomiar 27.09.2026
