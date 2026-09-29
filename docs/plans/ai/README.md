@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap03 jest na main obu repo; AI 06.6b.2b ma lokalny odbiór lifecycle/coverage source 2.7 na branchu RetailOps. Następny zakres: 06.6b.2c — nowa publikacja 03 i przełączenie domyślnego source. Równolegle04 w AI. Aktualizacja: 29.09.2026.**
+**Status: etap03 jest na main obu repo; AI 06.6b.2c.1 ma lokalny odbiór snapshot 1.1 i importu2.7 na osobnych branchach. Następny zakres: 06.6b.2c.2 — curated, pełna publikacja03 i przełączenie domyślnego source. Równolegle04 w AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -75,8 +75,9 @@ czytniki 2.0–2.6 oraz zgodność demo i frozen fixtures.
 [Lifecycle/coverage06.6b.2b](../../reference/inventory-label-qualification.md)
 ma [lokalny odbiór](../../evidence/ai/06/06.6b.2b/README.md): private windows
 z parent source ID, eligibility/coverage/maturity i obiema klasami w obu smoke.
-Następne 06.6b.2c obejmuje nowy snapshot/import/curated dla source2.7 oraz
-qualification1.0, przełączenie domyślnego source i pełne gates DATA-06.
+[Snapshot/import06.6b.2c.1](../../reference/inventory-snapshots.md) ma
+[lokalny odbiór](../../evidence/ai/06/06.6b.2c.1/README.md) obu profili i powtórzeń.
+Następne 06.6b.2c.2 obejmuje curated 1.1, pełny pipeline i przełączenie domyślnego source.
 `source_ready`, `inventory_ready` i `model_ready` tego source są false.
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)

@@ -45,11 +45,12 @@ uzgodnienia. Nie jest domyślnym source, eksportem AI ani wejściem loadera seed
 materializować i odczytać z uzgodnieniem CSV/Parquet.
 [Source 2.7 — 06.6b.2a](../reference/inventory-source-dataset.md) tworzy osobny
 niezmienny source z 58 tabelami CSV, manifestem i 36 bramek. Ma własne CLI
-oraz `facts_ready`; exporter/importer03 nie przyjmuje jeszcze tego kontraktu.
+oraz `facts_ready`. Jawny [eksport/import1.1](../reference/inventory-snapshots.md) przyjmuje ten kontrakt; domyślna ścieżka03 nadal używa2.6.
 [Lifecycle/coverage06.6b.2b](../reference/inventory-label-qualification.md)
 tworzy osobną prywatną kwalifikację okien, z parent source ID i ponownym
-uzgodnieniem po odczycie. Przełączenie domyślnej ścieżki AI, eksport/import
-qualification1.0 i nowa publikacja 03 pozostają w otwartym zakresie06.6b.2c.
+uzgodnieniem po odczycie. [Odbiór06.6b.2c.1](../evidence/ai/06/06.6b.2c.1/README.md)
+obejmuje nowy snapshot i import. Curated, pełna bramka03 i przełączenie
+domyślnej ścieżki AI pozostają w zakresie06.6b.2c.2.
 
 Przykład profilu AI z kontrolą integralności źródła i cech:
 

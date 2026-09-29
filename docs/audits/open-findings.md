@@ -31,8 +31,8 @@ selling/stock location, uzgodnienie bilansu ruchów/sprzedaży/dostaw/zwrotów,
 availability snapshotów i testy braku/przyszłego zapasu. Dopiero wtedy labels stockout.
 Nie blokuje forecast-only AI 04–05, gdzie inventory features są pominięte.
 [Source 2.7](../reference/inventory-source-dataset.md) ma lokalny odbiór 58 tabel
-i 36 bramek. Otwarte pozostają nowy snapshot/import/curated 03 dla source2.7
-i prywatnej qualification1.0, pełny odbiór cross-repo, przełączenie domyślnej
+i 36 bramek. Otwarte pozostają curated 1.1 dla source 2.7 i qualification 1.0,
+pełny odbiór source → snapshot → import → curated, przełączenie domyślnej
 ścieżki AI oraz zależne oceny04/05.
 
 ## Runtime i bezpieczeństwo

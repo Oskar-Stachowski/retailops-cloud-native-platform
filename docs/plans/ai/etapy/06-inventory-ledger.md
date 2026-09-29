@@ -1,6 +1,6 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.6b.2b ma lokalny odbiór lifecycle/coverage i prywatnych okien stockout source 2.7. Następny zakres: 06.6b.2c — nowy exporter/importer/curated 03 i przełączenie domyślnego źródła AI. Repo: RetailOps, następnie oba. Zależność: 03.**
+**Status: w realizacji; 06.6b.2c.1 ma lokalny odbiór snapshot 1.1 i typed import source 2.7 w obu repo. Następny zakres: 06.6b.2c.2 — curated, pełny pipeline i przełączenie domyślnego źródła AI. Zależność:03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
@@ -56,7 +56,9 @@ przypadki. Profile mają obie klasy; kwalifikacja źródła nie odbiera modelu08
 Frozen report2.7 zachowuje `not_evaluated`; aktualna kwalifikacja ma własny
 kontrakt/ID i pozostaje poza operational facts i cechami.
 
-1. **06.6b.2c:** rozszerzyć exporter/importer/curated 03 dla source 2.7 i jawnej qualification1.0, następnie przełączyć domyślną ścieżkę AI po odbiorze. Opublikować NOWY source/snapshot/curated z allowlistą operational facts, oddzielnym evaluation truth, parent lineage, typed parity, powtórzeniami, bramką cross-repo i pełnym budżetem. Zachować czytniki 2.0–2.7, snapshoty 03 i demo/API. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
+[Snapshot/import06.6b.2c.1](../../../reference/inventory-snapshots.md) mają [lokalny odbiór](../../../evidence/ai/06/06.6b.2c.1/README.md): nowe IDs, 43 worker facts/plans, 12 private tables i qualification opt-in, typed parity, niezależny ledger/snapshot oraz oba profile dwukrotnie.
+
+1. **06.6b.2c.2:** rozszerzyć curated 1.1 o native grain, causal availability i historyczny as-of. Odebrać pełny source → qualification → snapshot → import → curated z oddzielnym evaluation truth, lineage, powtórzeniami i budżetem. Następnie przełączyć domyślną ścieżkę AI. Zachować czytniki2.0–2.7, snapshoty03 i demo/API. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
 2. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
 
 ## Minimalny zestaw ruchów i uzgodnienie

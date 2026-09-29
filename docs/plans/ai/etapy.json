@@ -1,5 +1,5 @@
 {
-  "version": "1.16",
+  "version": "1.17",
   "date": "2026-09-29",
   "stages": [
     {
@@ -136,24 +136,26 @@
       "id": "06",
       "slug": "inventory-ledger",
       "title": "Zbuduj spójny zapas i dostawy",
-      "repo": "RetailOps",
+      "repo": "oba",
       "depends_on": [
         "03"
       ],
       "path": "etapy/06-inventory-ledger.md",
       "status": "in_progress",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1–06.6b.2a inventory runtime, native tables and immutable source 2.7; 06.6b.2b private qualification 1.0 with parent lineage, historical lifecycle/routing, physical coverage and mature labels; default generator/API/handoff remains 2.6",
-      "next_scope": "06.6b.2c extend exporter/importer/curated03 for source 2.7 and evaluation qualification 1.0, new snapshot, full cross-repo acceptance and default AI source switch; dependent 04/05 reevaluation",
+      "implementation_scope": "06.1–06.6b.2b inventory source 2.7 and qualification1.0; 06.6b.2c.1 snapshot1.1 and typed import with independent native/ledger/snapshot checks; default generator/API/full handoff remains2.6",
+      "next_scope": "06.6b.2c.2 curated1.1 with native grain and historical as-of, full cross-repo pipeline/budget and default AI source switch; dependent04/05 reevaluation",
       "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.6b.2b/README.md",
-      "implementation_commit": "125219f602a800a4da42435f1b40c6a7a01cd00a",
-      "verification": "../../evidence/ai/06/06.6b.2b/verification.json",
-      "acceptance_runtime_commit": "125219f602a800a4da42435f1b40c6a7a01cd00a",
+      "evidence": "../../evidence/ai/06/06.6b.2c.1/README.md",
+      "implementation_commit": "6b40f11086dc810d31a79bf6c0e6483a5834ed23",
+      "verification": "../../evidence/ai/06/06.6b.2c.1/verification.json",
+      "acceptance_runtime_commit": "6b40f11086dc810d31a79bf6c0e6483a5834ed23",
       "source_ready": false,
       "model_ready": false,
       "label_qualification": "qualified_for_standard_source_profiles_only",
-      "model08_qualification": "not_evaluated"
+      "model08_qualification": "not_evaluated",
+      "consumer_branch": "ai/06-inventory-handoff",
+      "consumer_implementation_commit": "891a7615466e467e1a37454a0f2af5a464605bbd"
     },
     {
       "id": "07",

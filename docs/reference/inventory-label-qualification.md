@@ -104,6 +104,7 @@ services/api/.venv/bin/python -m scripts.data.verify_ai06_qualification \
 ```
 
 Budżet 300 s / 1024 MiB obejmuje świeży generator, source CSV, gates/readback
-i kwalifikację/readback. Pełny exporter/importer/curated03 pozostaje kolejnym
-zakresem 06.6b.2c wraz z przełączeniem domyślnego źródła. Następnie potrzebne
-są zgodne oceny04/05 na nowych IDs; DATA-06 i model08 pozostają otwarte.
+i kwalifikację/readback. [Snapshot/import06.6b.2c.1](inventory-snapshots.md) mają
+[lokalny odbiór](../evidence/ai/06/06.6b.2c.1/README.md). Curated, pełny pipeline
+i przełączenie domyślnego źródła pozostają zakresem 06.6b.2c.2. Następnie potrzebne
+są zgodne oceny04/05 na nowych IDs; DATA-06 i model 08 pozostają otwarte.

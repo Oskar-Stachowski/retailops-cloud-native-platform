@@ -103,8 +103,8 @@ services/api/.venv/bin/python -m scripts.data.verify_ai06_tables \
 [Source2.7 — 06.6b.2a](inventory-source-dataset.md) włącza te modele w osobny
 wersjonowany source: identity, konfigurację, manifest oraz quality/realism.
 [Kwalifikacja 06.6b.2b](inventory-label-qualification.md) ma lokalny odbiór
-osobnych prywatnych okien powiązanych z source ID. Następne 06.6b.2c wymaga
-przełączenia domyślnej ścieżki AI, nowego immutable snapshotu i rozszerzenia
-importera na osobnym branchu repo AI oraz odbioru curated i pełnego budżetu cross-repo.
+osobnych prywatnych okien powiązanych z source ID. [Snapshot/import1.1](inventory-snapshots.md)
+mają lokalny odbiór na osobnych branchach obu repo. Następne 06.6b.2c.2 wymaga
+curated 1.1, pełnego pipeline/budżetu i przełączenia domyślnej ścieżki AI.
 Reevaluation 04/05 i kwalifikacja modelu 08 pozostają odrębnymi bramkami.
 DATA-06 jest nadal otwarte; pełny odbiór AI 06 nie został zadeklarowany.

@@ -112,10 +112,10 @@ dotyczy tego lokalnego etapu, bez eksportu/importu/curated 03.
 ## Otwarte warunki
 
 [Kwalifikacja 06.6b.2b](inventory-label-qualification.md) ma lokalny odbiór
-źródłowych okien. Następny zakres to rozszerzone, wersjonowane
-exporter/importer/curated 03 dla source2.7 + qualification1.0, typed parity,
-parent lineage, truth isolation,
-powtórzenia i pełny budżet cross-repo oraz przełączenie domyślnej ścieżki AI
+źródłowych okien. [Snapshot/import1.1](inventory-snapshots.md) mają lokalny odbiór.
+Następny zakres 06.6b.2c.2 to curated 1.1 i historyczny as-of, pełny pipeline
+source → snapshot → import → curated, truth isolation i budżet cross-repo
+oraz przełączenie domyślnej ścieżki AI
 na 2.7. Reevaluation04/05 użyje nowych IDs; metryki poprzednich danych
 pozostają przypięte do swoich snapshotów. DATA-06 jest nadal otwarte.
 
