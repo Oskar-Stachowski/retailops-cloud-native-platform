@@ -58,12 +58,17 @@ Wszystkie przebiegi mieszczą się w 300 s / 1024 MiB.
 Zakres [06.1](reference/inventory-ledger.md) dostarcza oddzielny kontrakt ledgeru,
 jednorazowe opening, deterministic replay i adapter legacy. Nie jest jeszcze
 podłączony do source 2.6; `inventory_ready=false`. Następne w tym strumieniu:
-[06.3 — deterministyczna polityka uzupełniania](plans/ai/etapy/06-inventory-ledger.md).
+[06.4 — chronologiczny symulator](plans/ai/etapy/06-inventory-ledger.md).
 [06.2](reference/replenishment.md) dodaje minimalnych dostawców, oferty,
 wersjonowane terminy, częściowe/opóźnione przyjęcia i uzgodnienie z ledgerem.
 Status zamówienia wynika z faktów dostępnych w cutoff; parametry symulatora
 pozostają w osobnym truth. [Odbiór](evidence/ai/06/06.2/README.md) ma lokalne testy
 i provenance. Źródło nie korzysta jeszcze z nowych encji.
+[06.3](reference/reorder-policy.md) dodaje przegląd znanego stock position,
+pełne okna historii, resolved MOQ i osobny proces partial/delayed fulfillment.
+[Odbiór](evidence/ai/06/06.3/README.md) potwierdza, że seed/truth oraz przyszłe
+fakty nie zmieniają wcześniejszej decyzji. Moduły czekają na podłączenie do
+chronologicznego generatora; DATA-06 pozostaje otwarte.
 Pierwszy forecasting korzysta z obserwowanej sprzedaży, bez inventory features.
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.

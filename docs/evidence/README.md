@@ -7,7 +7,8 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
 | AI 03.6 — pełny cross-repo | 2026-09-29 | [Odbiór obu repo](ai/03/03.6/README.md): oba standardowe smoke dwukrotnie na Darwin/Linux, osobny późny fakt, parity/IDs/as-of, budżet oraz [publikacja na main obu repo z Required CI](ai/03/03.6/main-publication.json). Otwiera 04 i 06. |
-| AI 06.2 — dostawcy i rzeczywiste przyjęcia | 2026-09-29 | [Odbiór lokalny](ai/06/06.2/README.md): oferty, MOQ, wersje znanych terminów, partial/delayed receipts, uzgodnienie z ledgerem i oddzielna supplier truth. Generator 2.6 zachowuje IDs; inventory nadal false. Następny zakres 06.3. |
+| AI 06.3 — polityka i realizacja dostaw | 2026-09-29 | [Odbiór lokalny](ai/06/06.3/README.md): znany stock position i historia, explicit config/MOQ/cadence, idempotencja, osobna deterministyczna symulacja partial/delayed receipts oraz uzgodnienie z ledgerem. Generator 2.6 zachowuje IDs; inventory nadal false. Następny zakres 06.4. |
+| AI 06.2 — dostawcy i rzeczywiste przyjęcia | 2026-09-29 | [Odbiór lokalny](ai/06/06.2/README.md): oferty, MOQ, wersje znanych terminów, partial/delayed receipts, uzgodnienie z ledgerem i oddzielna supplier truth. Generator 2.6 zachowuje IDs; inventory nadal false. |
 | AI 06.1 — kontrakt ledgeru | 2026-09-29 | [Opening, ruchy, replay i adapter legacy](ai/06/06.1/README.md): lokalny odbiór oddzielnego fixture; generator 2.6 zachowuje IDs, inventory nadal false. |
 | AI 03.5 — curated w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.5/README.md): 743 testy, typed normalization/mapping/quarantine, immutable IDs, as-of, oba smoke i truth dwukrotnie oraz odłączony wheel. |
 | AI 03.4 — typed importer w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.4/README.md): 706 testów, oba smoke i truth dwukrotnie, atomowość/idempotencja/typed parity oraz odłączony wheel. |

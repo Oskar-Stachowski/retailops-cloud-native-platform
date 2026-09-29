@@ -1,6 +1,6 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.1 ma ledger, a 06.2 dostawców, zamówienia, wersje terminów i uzgodnione receipts. Następny zakres: 06.3 — deterministyczna polityka uzupełniania. Repo: RetailOps. Zależność: 03.**
+**Status: w realizacji; 06.1 ma ledger, 06.2 kontrakt dostaw, a 06.3 politykę przeglądu i osobny proces realizacji dostaw. Następny zakres: 06.4 — chronologiczny symulator. Repo: RetailOps. Zależność: 03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
@@ -8,7 +8,11 @@ Przeczytaj [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kon
 
 ## Kolejność małych PR-ów
 
-3. **Deterministyczna polityka uzupełniania.** Parametry reorder point, safety stock, review cadence, MOQ i lead-time variation; wszystkie w effective config. Zamówienie powstaje na podstawie obserwowalnego stanu/historycznej sprzedaży, nie oracle przyszłego latent demand. Supplier reliability działa w procesie realizacji dostawy. Parametry prawdziwego rozkładu lead time/reliability symulatora są truth; do operational features dopuszcza się wyłącznie jawnie znane quoted lead time albo estymatę z historii sprzed cutoff, z pochodzeniem. Wersje planowanego terminu zachowują available time. Rozbudowany approval/procurement optimization nie należy do tego etapu.
+[Polityka i proces dostaw 06.3](../../../reference/reorder-policy.md) mają
+[lokalny odbiór](../../../evidence/ai/06/06.3/README.md). Zamówienie korzysta
+wyłącznie z dostępnych faktów; seed i true lead-time/reliability sterują
+oddzielną realizacją. Te moduły trzeba teraz podłączyć do przebiegu poniżej.
+
 4. **Chronologiczny symulator.** W każdej dobie zastosować wersjonowaną kolejność due receipts, kwalifikowanych returns/adjustments, arrival popytu i transakcji, wydania sprzedażowego, write-offs/transfers, zamknięcia i nowych zamówień. Jeśli występuje zdarzenie intraday, kolejność wynika z czasu i deterministic sequence, nie tylko typu. Jeden zasób wspólny kanałom jest konsumowany kolejno jeden raz. `observed_sales=min(latent_demand, available_inventory)`; niezaspokojony popyt i jego przyczyny pozostają truth.
 5. **Snapshoty, rezerwacje i stockout truth.** Snapshot budować wyłącznie z ledgeru. MVP może jawnie ustalić `reserved_qty=0` i natychmiastowy fulfillment; nie deklarować działania rezerwacji. Jeżeli je wprowadzasz, zdefiniuj state machine reserve/release/fulfill, aby ta sama sprzedaż nie pomniejszała stanu dwa razy. Zwrot do sprzedaży ma jawne warunki jakości; nie każdy zwrot jest return_to_stock. Zdefiniuj epizod dostępności zero, jego początek/koniec i affected scopes; policz duration/lost-sales diagnostycznie. Zero przed origin należy później do `already_stockout`.
 6. **Ponowna publikacja danych.** Rozszerzyć quality/realism/readiness, przeliczyć source dataset i eksport/import03. Dopiero po przejściu gates ustawić `inventory_ready=true`. Nowy proces censoringu zmienia source/curated IDs. Ponownie wykonać04/05 na nowych danych i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.

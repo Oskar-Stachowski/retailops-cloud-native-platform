@@ -3,8 +3,9 @@
 **Zakres:** działający kontrakt, walidacja, jednorazowe opening, odtwarzanie salda
 i adapter do dotychczasowego CSV. Generator source 2.6 nie używa jeszcze ledgeru;
 `inventory_ready=false`. [Dostawcy i receipt reconciliation 06.2](replenishment.md)
-rozszerzają ten kontrakt na osobnym fixture. Polityka zamówień, chronologiczne
-ograniczanie sprzedaży, snapshoty i nowa publikacja source należą do
+rozszerzają ten kontrakt na osobnym fixture. [Polityka 06.3](reorder-policy.md)
+korzysta z dostępnego salda i historii. Chronologiczne ograniczanie sprzedaży,
+snapshoty i nowa publikacja source należą do
 [pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).
 
 Źródłem struktury jest [strict runtime model](../../data/inventory/contract.py),

@@ -4,7 +4,8 @@
 implementacja `8fd2e3f`.** Środowisko: macOS ARM64, Python z `services/api/.venv`.
 [Rejestr odbioru](verification.json) wiąże commit, checksums, komendy,
 rzeczywiste CLI i wyniki. [Kontrakt i uruchomienie](../../../../reference/replenishment.md)
-opisują aktualne zachowanie. Następny zakres to **06.3 — polityka uzupełniania**.
+opisują aktualne zachowanie. [Odrębny odbiór polityki 06.3](../06.3/README.md)
+wskazuje aktualny punkt wznowienia: **06.4 — chronologiczny symulator**.
 
 ## Działające zachowanie
 
@@ -57,8 +58,8 @@ To odbiór osobnego kontraktu i uzgodnienia, bez podłączenia do generatora 2.6
 `inventory_ready=false`, DATA-06 pozostaje otwarte. Nie ma nowego source,
 snapshotu ani curated; wcześniejsze metryki modeli zachowują swój zakres danych.
 
-Reorder policy i effective config, losowa realizacja dostaw, chronologiczna
-wspólna pula zapasu, fulfillment sprzedaży, return eligibility, snapshoty
+[Odbiór 06.3](../06.3/README.md) sprawdza politykę, effective config i osobną
+realizację dostaw. Chronologiczna wspólna pula zapasu, fulfillment sprzedaży, return eligibility, snapshoty
 i końcowe source gates pozostają w [instrukcji AI 06](../../../../plans/ai/etapy/06-inventory-ledger.md).
 Nie ma anulowania/approval workflow ani konwersji walut lub jednostek.
 Nie wykonano zdalnego Required CI ani publikacji AI 06 na main.
