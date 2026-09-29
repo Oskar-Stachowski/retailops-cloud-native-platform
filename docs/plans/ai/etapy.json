@@ -1,5 +1,5 @@
 {
-  "version": "1.17",
+  "version": "1.18",
   "date": "2026-09-29",
   "stages": [
     {
@@ -141,21 +141,21 @@
         "03"
       ],
       "path": "etapy/06-inventory-ledger.md",
-      "status": "in_progress",
+      "status": "completed",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1–06.6b.2b inventory source 2.7 and qualification1.0; 06.6b.2c.1 snapshot1.1 and typed import with independent native/ledger/snapshot checks; default generator/API/full handoff remains2.6",
-      "next_scope": "06.6b.2c.2 curated1.1 with native grain and historical as-of, full cross-repo pipeline/budget and default AI source switch; dependent04/05 reevaluation",
-      "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.6b.2c.1/README.md",
-      "implementation_commit": "6b40f11086dc810d31a79bf6c0e6483a5834ed23",
-      "verification": "../../evidence/ai/06/06.6b.2c.1/verification.json",
-      "acceptance_runtime_commit": "6b40f11086dc810d31a79bf6c0e6483a5834ed23",
-      "source_ready": false,
+      "implementation_scope": "06.1–06.6: default source 2.7, qualified labels, snapshot/import/curated 1.1 and historical as-of",
+      "next_scope": "04/05 acceptance on new dataset IDs before 07/08; model 08 separately",
+      "inventory_ready": true,
+      "evidence": "../../evidence/ai/06/final/README.md",
+      "implementation_commit": "f07ba22555a48b6c750f865f609e0893dfc129e0",
+      "verification": "../../evidence/ai/06/final/verification.json",
+      "acceptance_runtime_commit": "f07ba22555a48b6c750f865f609e0893dfc129e0",
+      "source_ready": true,
       "model_ready": false,
       "label_qualification": "qualified_for_standard_source_profiles_only",
       "model08_qualification": "not_evaluated",
       "consumer_branch": "ai/06-inventory-handoff",
-      "consumer_implementation_commit": "891a7615466e467e1a37454a0f2af5a464605bbd"
+      "consumer_implementation_commit": "2574c06794b7b4f86393f23db1d9e97c16413706"
     },
     {
       "id": "07",
@@ -301,6 +301,6 @@
     }
   ],
   "status": "in_progress",
-  "next_stage": "03",
+  "next_stage": "04",
   "execution_map": "kolejnosc-i-repozytoria.md"
 }

@@ -1,12 +1,11 @@
 # Kontrakt ledgeru zapasu AI 06.1
 
-**Zakres:** działający kontrakt, walidacja, jednorazowe opening, odtwarzanie salda
-i adapter do dotychczasowego CSV. Generator source 2.6 nie używa jeszcze ledgeru;
-`inventory_ready=false`. [Dostawcy i receipt reconciliation 06.2](replenishment.md)
-rozszerzają ten kontrakt na osobnym fixture. [Polityka 06.3](reorder-policy.md)
-korzysta z dostępnego salda i historii. Chronologiczne ograniczanie sprzedaży,
-snapshoty i nowa publikacja source należą do
-[pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).
+**Zakres:** kontrakt, walidacja, jednorazowe opening, odtwarzanie salda
+i adapter do dotychczasowego CSV. [Dostawy](replenishment.md),
+[polityka uzupełniania](reorder-policy.md) i [symulator](chronological-inventory.md)
+korzystają z tego ledgeru. [Końcowy AI 06](../evidence/ai/06/final/README.md)
+publikuje go przez domyślne źródło 2.7 i snapshot/curated 1.1.
+Historyczny wariant source 2.6 zachowuje własny kontrakt zgodności.
 
 Źródłem struktury jest [strict runtime model](../../data/inventory/contract.py),
 z którego powstaje [JSON Schema v1](../../data/contracts/inventory_ledger.v1.schema.json).

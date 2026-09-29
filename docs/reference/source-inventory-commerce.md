@@ -3,7 +3,7 @@
 Proces `source-inventory-commerce-1.0.0` łączy istniejący generator popytu,
 cen i koszyków z [symulatorem wspólnego zapasu](chronological-inventory.md).
 To wykonywalny kandydat integracji, z osobnym poleceniem i raportem.
-Domyślny generator pozostaje source 2.6; ten raport nie jest nowym source
+Sam ten raport nie jest nowym source
 manifestem ani snapshotem AI. `source_ready=false`, `inventory_ready=false`
 i `model_ready=false` dotyczą kandydata, do czasu pełnego odbioru publikacji.
 
@@ -102,10 +102,7 @@ Fingerprint obejmuje generator, inventory runtime, kontrakty, worker i zależno�
 
 [Typowane tabele 06.6b.1](inventory-source-tables.md) materializują ten wynik
 i pełne projekcje 06.5, z oddzielnym facts/truth i uzgodnieniem po odczycie.
-Następny zakres 06.6b.2 obejmuje integrację tabel z wersjonowanym domyślnym source,
-manifesty/identity, lifecycle i kwalifikację coverage inventory, pełne source
-quality/realism/readiness oraz nowy eksport/import/curated przez ścieżkę 03.
-To także nowa publikacja projekcji i diagnostyki 06.5 przez ścieżkę 03.
-Dopiero taki odbiór może zamknąć DATA-06. Zmieniony censoring wymaga nowej
-oceny 04/05 i zgodnego feature schema przed wykorzystaniem prognoz przez 07/08;
-dotychczasowe metryki modeli nie przenoszą się na nowy dataset.
+Wersjonowany [source 2.7](inventory-source-dataset.md) i [snapshot/curated 1.1](inventory-snapshots.md)
+łączą ten proces z domyślną ścieżką AI. [Końcowy odbiór](../evidence/ai/06/final/README.md)
+wiąże source, qualification, snapshot, curated i historyczny as-of.
+Zmieniony censoring wymaga oceny 04/05 na nowych IDs przed 07/08.

@@ -3,15 +3,14 @@
 [Odbiór 03](../../evidence/ai/03/03.6/README.md) obejmuje pełną ścieżkę
 generator → kwalifikacja → eksport → import → curated na przypiętych rewizjach,
 oba smoke dwukrotnie i Required CI obu repo. Pierwsza ścieżka używa plików;
-forecast source jest gotowy przy inventory false. AI 03 jest na main obu repo;
+Ten historyczny wariant forecast source nie obejmował inventory; aktualny odbiór danych podaje [AI 06](../../evidence/ai/06/final/README.md). AI 03 jest na main obu repo;
 [zapis publikacji](../../evidence/ai/03/03.6/main-publication.json) podaje commity i CI.
 Ten plik zawiera wyłącznie otwartą pracę; [audyt](../../audits/open-findings.md)
 opisuje potwierdzone problemy i kryteria ich zamknięcia.
 
 ## Następny zakres — AI 04
 
-**Repo:** AI-intelligence. **Wejście:** odebrany source 2.6, snapshot/handoff 1.0
-i curated 1.0 z [karty danych](../../evidence/ai/03/03.6/dataset-card.md).
+**Repo:** AI-intelligence. **Wejście:** odebrany source 2.7 oraz snapshot/curated 1.1 z [karty danych AI 06](../../evidence/ai/06/final/dataset-card.md).
 [Instrukcja 04](etapy/04-forecasting.md) zaczyna od kanonicznego panelu,
 cech znanych w origin i jawnych splitów. Następnie baseline/RF/HGB mają wspólne
 rekordy oceny, zamrożony test i politykę dopuszczenia. Inventory features są
@@ -19,9 +18,6 @@ wyłączone; target opisuje obserwowaną sprzedaż.
 
 ## Praca równoległa od obecnego punktu
 
-- **Repo RetailOps + AI / AI 06.6b.2c.2:** curated 1.1 dla source 2.7 i qualification 1.0,
-  historyczny as-of, pełny source → snapshot → import → curated budget/truth isolation
-  oraz przełączenie domyślnego source; następnie zależne oceny04/05.
 - **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
   limity, freshness i audyt. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
   pełne narzędzia, odpowiedzi i integracja użytkowa wymagają również 10.
@@ -40,9 +36,8 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 |---|---|
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
-| **06 — inventory** | 06.6b.2c.2: curated 1.1, historyczny as-of, pełny pipeline/truth isolation i przełączenie domyślnej ścieżki AI; pełne gates DATA-06 i zgodne oceny04/05. |
 | **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne scenariusze truth i dojrzałe labels, dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
-| **08 — stockout** | DATA-06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
+| **08 — stockout** | Odebrany ledger 06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |
 | **10 — integracja** | OPS-03/07: jeden wykonywalny kontrakt, snapshot/version-aware event identity, legacy v1 oraz nowe intelligence.v2, trwałe ACK/kwarantanna, inbox/outbox, dedup/replay. Domenowe projekcje wyników, zgodne API/UI i rzeczywiste auth/scope. Testy z brokerem i awariami wymagane przed odbiorem. |
 | **12 — agent** | Po 10/11: narzędzia read-only z auth, limitami, freshness i audytem; bez domyślnego demo-admin i mutacji operacyjnych. |

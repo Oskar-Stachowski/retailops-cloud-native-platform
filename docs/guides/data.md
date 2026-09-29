@@ -43,22 +43,18 @@ realizuje źródłowe koszyki przez chronologiczny ledger i tworzy prywatny rapo
 uzgodnienia. Nie jest domyślnym source, eksportem AI ani wejściem loadera seeda.
 [Typowane tabele 06.6b.1](../reference/inventory-source-tables.md) można osobno
 materializować i odczytać z uzgodnieniem CSV/Parquet.
-[Source 2.7 — 06.6b.2a](../reference/inventory-source-dataset.md) tworzy osobny
-niezmienny source z 58 tabelami CSV, manifestem i 36 bramek. Ma własne CLI
-oraz `facts_ready`. Jawny [eksport/import1.1](../reference/inventory-snapshots.md) przyjmuje ten kontrakt; domyślna ścieżka03 nadal używa2.6.
-[Lifecycle/coverage06.6b.2b](../reference/inventory-label-qualification.md)
-tworzy osobną prywatną kwalifikację okien, z parent source ID i ponownym
-uzgodnieniem po odczycie. [Odbiór06.6b.2c.1](../evidence/ai/06/06.6b.2c.1/README.md)
-obejmuje nowy snapshot i import. Curated, pełna bramka03 i przełączenie
-domyślnej ścieżki AI pozostają w zakresie06.6b.2c.2.
+[Source 2.7](../reference/inventory-source-dataset.md) i [pełny pipeline AI 06](../reference/inventory-snapshots.md)
+są domyślną ścieżką CLI AI: source → qualification → snapshot/import/curated 1.1.
+[Końcowy odbiór](../evidence/ai/06/final/README.md) potwierdza historyczny as-of,
+truth isolation, oba profile i budżet. Demo/API/seeder zachowują zgodność.
 
-Przykład profilu AI z kontrolą integralności źródła i cech:
+Przykład jawnej ścieżki zgodności 2.6 i historycznego feature buildera:
 
 ```bash
 docker pull python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff
 data_ai_dir=$(mktemp -d /tmp/retailops-ai-smoke.XXXXXX)
 services/api/.venv/bin/python -m data.generator.main \
-  --profile ai-smoke --end-date 2026-07-31 --output-dir "$data_ai_dir"
+  --source-version 2.6 --profile ai-smoke --end-date 2026-07-31 --output-dir "$data_ai_dir"
 services/api/.venv/bin/python -m data.generator.manifest_v2 --data-dir "$data_ai_dir"
 services/api/.venv/bin/python -m ml.features.demand_forecast \
   --profile ai-smoke --end-date 2026-07-31 --source-dir "$data_ai_dir" \

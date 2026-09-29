@@ -2,10 +2,10 @@
 
 **Zakres:** działająca polityka przeglądu zapasu i osobna symulacja realizacji
 dostaw na małym fixture. Wykorzystuje [ledger 06.1](inventory-ledger.md)
-i [kontrakt dostaw 06.2](replenishment.md). Source 2.6 nie korzysta jeszcze
-z tych modułów; `inventory_ready=false`. [Symulator 06.4](chronological-inventory.md)
+i [kontrakt dostaw 06.2](replenishment.md). Historyczny source 2.6
+zachowuje własny kontrakt zgodności; domyślny source 2.7 korzysta z tych modułów. [Symulator 06.4](chronological-inventory.md)
 korzysta z nich na osobnym scenariuszu. [Projekcje 06.5](inventory-projections.md)
-tworzą snapshoty i stockout truth; następny zakres to **06.6 — integracja i publikacja danych**.
+tworzą snapshoty i stockout truth; integracja i publikacja mają [końcowy odbiór AI 06](../evidence/ai/06/final/README.md).
 
 ## Konfiguracja i decyzja
 
@@ -130,4 +130,4 @@ oraz potwierdza, że przyszłe przyjęcia nie zmieniają salda w origin.
 wykonanie, shared stock, routing i zwroty. [Projekcje 06.5](inventory-projections.md)
 dodają snapshoty i epizody; do [06.6](../plans/ai/etapy/06-inventory-ledger.md)
 pozostają integracja oraz nowa publikacja i readiness.
-DATA-06 pozostaje otwarte.
+Pełną publikację potwierdza [końcowy odbiór AI 06](../evidence/ai/06/final/README.md).

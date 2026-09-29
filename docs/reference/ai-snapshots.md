@@ -1,6 +1,8 @@
 # Niezmienny eksport do AI — 03.2
 
-Eksporter `data.export.ai_snapshot` publikuje kwalifikowane źródło **2.6.0**
+Ten dokument opisuje jawny tryb zgodności `--source-version 2.6`.
+Domyślna ścieżka AI jest opisana w [inventory snapshot/curated 1.1](inventory-snapshots.md).
+Eksporter publikuje w trybie zgodności kwalifikowane źródło **2.6.0**
 pod `data/generated/snapshots/<source_dataset_id>/`. Wersja snapshot manifestu
 to **1.0.0**, polityka `retailops-ai-snapshot-1.0.0`, format
 `retailops-parquet-1.0.0`. [Schemat JSON](../../data/contracts/ai_snapshot.v1.schema.json)
@@ -15,7 +17,7 @@ Z katalogu głównego repo, po `make data-parquet-install`:
 
 ```bash
 services/api/.venv/bin/python -m data.export.ai_snapshot \
-  --profile ai-smoke --seed 42 --end-date 2026-07-31 \
+  --source-version 2.6 --profile ai-smoke --seed 42 --end-date 2026-07-31 \
   --output-root data/generated/snapshots
 ```
 

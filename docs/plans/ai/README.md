@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap03 jest na main obu repo; AI 06.6b.2c.1 ma lokalny odbiór snapshot 1.1 i importu2.7 na osobnych branchach. Następny zakres: 06.6b.2c.2 — curated, pełna publikacja03 i przełączenie domyślnego source. Równolegle04 w AI. Aktualizacja: 29.09.2026.**
+**Status: AI 06 ma końcowy odbiór pełnego pipeline’u source 2.7 → curated 1.1. AI 04/05 wymagają zgodnej oceny na nowych IDs przed 07/08. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -32,53 +32,19 @@ niezmienny reimport i atomową publikację w osobnym branchu repo AI.
 jawne mappings, quarantine i historyczny odczyt as-of.
 [AI 03.6](../../evidence/ai/03/03.6/README.md) potwierdza pełną bramkę cross-repo
 na obu smoke dwukrotnie, późną korektę i Required CI obu repo.
-Można rozpocząć **04 forecasting** oraz równolegle **06 ledger**.
+Odbiór 03 otworzył **04 forecasting** i **06 ledger**; AI 06 jest już odebrany.
 [Publikacja na main obu repo](../../evidence/ai/03/03.6/main-publication.json)
 zachowuje commity merge i Required CI dla push na main.
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
 i test doubles agenta 12; pełny agent czeka na 10.
-[Kontrakt 06.1](../../reference/inventory-ledger.md) dodaje jednorazowe opening,
-replay i adapter legacy na oddzielnym fixture. Generator source 2.6 nie używa
-jeszcze ledgeru; modele i inventory nadal nie są gotowe.
-[Kontrakt 06.2](../../reference/replenishment.md) dodaje oferty dostawców,
-zamówienia, wersje obiecanego terminu i rzeczywiste partial/delayed receipts.
-Uzgodnienie z ledgerem odrzuca brakujące/nadmiarowe przyjęcia oraz użycie pełnej
-ilości zamówienia zamiast częściowej dostawy. [Odbiór lokalny](../../evidence/ai/06/06.2/README.md)
-zachowuje rozdzielenie planu, dostępnych faktów i supplier truth.
-[Polityka 06.3](../../reference/reorder-policy.md) korzysta ze znanego stock
-position i pokrytych okien historii. Osobny moduł generatora realizuje dostawy
-z wersjonowanym seedem i truth, bez ujawniania rzeczywistego terminu w decyzji.
-[Odbiór lokalny](../../evidence/ai/06/06.3/README.md) obejmuje MOQ, cadence,
-pending/partial orders, brakujące dane, powtarzalność i uzgodnienie przyjęć.
-[Symulator 06.4](../../reference/chronological-inventory.md) łączy ledger,
-sprzedaż, kwalifikowane zwroty i dostawy w jednym porządku czasu/sequence.
-Kanały korzystają ze wspólnego fizycznego zapasu, routing jest historyczny,
-a przegląd nie zna przyszłych realizacji. [Odbiór lokalny](../../evidence/ai/06/06.4/README.md)
-zachowuje osobne operational/truth, uzgodnienie i regresję source 2.6.
-[Projekcje 06.5](../../reference/inventory-projections.md) tworzą snapshoty
-znanego ledgeru, fizyczne epizody zero i osobną diagnostykę lost sales.
-[Odbiór lokalny](../../evidence/ai/06/06.5/README.md) rozróżnia already stockout,
-niepełny tail, maturity i brak obu klas, bez deklaracji gotowości modelu 08.
-[Integracja koszyków 06.6a](../../reference/source-inventory-commerce.md)
-uzgadnia rzeczywiste sprzedaże, ceny częściowych realizacji, finansowe/quality
-zwroty, panel/history/cohorts i snapshoty ledgeru na standardowych source profiles.
-[Odbiór](../../evidence/ai/06/06.6a/README.md) dotyczy osobnego kandydata;
-domyślny source 2.6 i publikacja 03 pozostają niezmienione.
-[Typowane tabele 06.6b.1](../../reference/inventory-source-tables.md) mają
-27 ścisłych schemas/grains, oddzielne facts/truth, powtarzalne native CSV/Parquet
-i niezależne uzgodnienie. [Odbiór](../../evidence/ai/06/06.6b.1/README.md)
-przygotował [source 2.7 — 06.6b.2a](../../reference/inventory-source-dataset.md):
-58 tabel, własne ID/config/manifest i 36 bramek przeliczanych po odczycie.
-[Odbiór](../../evidence/ai/06/06.6b.2a/README.md) potwierdza powtórzenia profili,
-czytniki 2.0–2.6 oraz zgodność demo i frozen fixtures.
-[Lifecycle/coverage06.6b.2b](../../reference/inventory-label-qualification.md)
-ma [lokalny odbiór](../../evidence/ai/06/06.6b.2b/README.md): private windows
-z parent source ID, eligibility/coverage/maturity i obiema klasami w obu smoke.
-[Snapshot/import06.6b.2c.1](../../reference/inventory-snapshots.md) ma
-[lokalny odbiór](../../evidence/ai/06/06.6b.2c.1/README.md) obu profili i powtórzeń.
-Następne 06.6b.2c.2 obejmuje curated 1.1, pełny pipeline i przełączenie domyślnego source.
-`source_ready`, `inventory_ready` i `model_ready` tego source są false.
+[Końcowy odbiór AI 06](../../evidence/ai/06/final/README.md) obejmuje ledger,
+dostawy, realizację sprzedaży/zwrotów, znane snapshoty, osobną kwalifikację
+labeli i pełną ścieżkę do curated 1.1. Domyślne CLI AI generuje 2.7.
+[Runbook](../../reference/inventory-snapshots.md) i [karta danych](../../evidence/ai/06/final/dataset-card.md)
+podają komendy i IDs. Ukończenie 06 nie zależy od 04/05; zgodne prognozy
+oraz lifecycle są osobnym warunkiem rozpoczęcia 07/08.
+
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.

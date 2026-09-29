@@ -2,10 +2,10 @@
 
 **Zakres:** kontrakt dostawców, ofert, zamówień, wersji terminów i rzeczywistych
 przyjęć oraz uzgodnienie z [ledgerem 06.1](inventory-ledger.md).
-Generator source 2.6 nie korzysta jeszcze z tych encji; `inventory_ready=false`.
+Domyślny [source 2.7 i curated 1.1](inventory-snapshots.md) korzystają z tych encji.
 [Polityka 06.3](reorder-policy.md) i [symulator 06.4](chronological-inventory.md)
 wykorzystują te encje; [projekcje 06.5](inventory-projections.md) tworzą snapshoty
-i stockout truth. Następny zakres projektu to integracja i publikacja **06.6**.
+i stockout truth. Integrację i publikację potwierdza [końcowy odbiór AI 06](../evidence/ai/06/final/README.md).
 
 ## Kontrakty i podział wiedzy
 

@@ -109,16 +109,10 @@ oba standardowe profile wykonuje dwukrotnie. Obejmuje supply-poor,
 zero opening, late availability i źródło bez popytu. Budżet 300 s / 1024 MiB
 dotyczy tego lokalnego etapu, bez eksportu/importu/curated 03.
 
-## Otwarte warunki
+## Pełny odbiór AI 06
 
-[Kwalifikacja 06.6b.2b](inventory-label-qualification.md) ma lokalny odbiór
-źródłowych okien. [Snapshot/import1.1](inventory-snapshots.md) mają lokalny odbiór.
-Następny zakres 06.6b.2c.2 to curated 1.1 i historyczny as-of, pełny pipeline
-source → snapshot → import → curated, truth isolation i budżet cross-repo
-oraz przełączenie domyślnej ścieżki AI
-na 2.7. Reevaluation04/05 użyje nowych IDs; metryki poprzednich danych
-pozostają przypięte do swoich snapshotów. DATA-06 jest nadal otwarte.
-
-Frozen CSV/archives/snapshot 03 pozostają niezmienione. Nowe generowanie 2.6
-może nadać inne ID po zmianie fingerprintu czytnika; nie oznacza to
-przepisania historycznych artefaktów ani zmiany ich zapisanych IDs.
+[Snapshot/curated 1.1](inventory-snapshots.md) publikuje tę warstwę przez
+domyślną ścieżkę AI. [Końcowy audyt i odbiór](../evidence/ai/06/final/README.md)
+obejmuje source/qualification/export/import/curated i historyczny as-of.
+Frozen artefakty oraz manifest źródła zachowują dawne IDs i flagi; aktualne
+readiness zapisują curated i końcowy receipt. Modele 04/05/08 mają własne gates.

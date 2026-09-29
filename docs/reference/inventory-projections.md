@@ -4,11 +4,11 @@
 [chronologicznego symulatora](chronological-inventory.md). Operacyjne snapshoty
 są oddzielone od fizycznych sald i epizodów w `simulation_truth`.
 [Odbiór](../evidence/ai/06/06.5/README.md) podaje kod i kontrole.
-Domyślny source 2.6 nadal nie korzysta z tej ścieżki; `inventory_ready=false`.
-[Typowane tabele 06.6b.1](inventory-source-tables.md) materializują te projekcje
-na source profiles. Następny zakres 06.6b.2c to integracja domyślnego source
-i nowa publikacja danych. [Kwalifikacja lifecycle/coverage06.6b.2b](inventory-label-qualification.md)
-ma lokalny odbiór osobnych private windows z parent source ID.
+[Typowane tabele](inventory-source-tables.md) i [source 2.7](inventory-source-dataset.md)
+publikują projekcje przez domyślny [snapshot/curated 1.1](inventory-snapshots.md).
+[Kwalifikacja lifecycle/coverage](inventory-label-qualification.md) tworzy
+osobne private windows z parent source ID. [Końcowy odbiór AI 06](../evidence/ai/06/final/README.md)
+obejmuje pełną ścieżkę i historyczny as-of.
 
 ## Snapshot i czas wiedzy
 
@@ -108,4 +108,4 @@ services/api/.venv/bin/python -m data.inventory.run_inventory_projection \
 nieznane snapshoty lub brakujące dane parent execution; `failed`/exit 1 oznacza
 błąd kontraktu, integralności lub procesu. Sam `not_evaluable` diagnostyki modelu
 nie jest uszkodzeniem poprawnej projekcji. Pełny raport zawiera private truth,
-nie jest eksportem API/cech. DATA-06 i nowa publikacja source/curated pozostają otwarte.
+nie jest eksportem API/cech. Pełna publikacja source/curated ma osobny końcowy receipt AI 06.

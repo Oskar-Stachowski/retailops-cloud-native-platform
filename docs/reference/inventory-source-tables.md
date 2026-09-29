@@ -6,10 +6,10 @@
 [projekcji ledgeru](inventory-projections.md), z własnym fizycznym grainem.
 [Odbiór lokalny](../evidence/ai/06/06.6b.1/README.md) dotyczy tego rozszerzenia.
 
-To kandydat tabel przygotowany do włączenia w nową wersję source. Domyślny
-source 2.6, exporter/importer 03 i curated 1.0 nadal używają dotychczasowych
-kontraktów. Tego katalogu nie przekazuj loaderowi demo ani importerowi 03.
-`source_ready`, `inventory_ready` i `model_ready` pozostają `false`.
+To samodzielny kontrakt tabel wykorzystywany przez [source 2.7](inventory-source-dataset.md).
+Pełna publikacja jest opisana w [snapshot/curated 1.1](inventory-snapshots.md).
+Samego katalogu tabel nie przekazuj loaderowi demo ani importerowi snapshotów;
+jego lokalne flagi readiness nie zastępują końcowego receipt pipeline'u.
 
 ## Tabele i rozdzielenie informacji
 
@@ -98,13 +98,10 @@ services/api/.venv/bin/python -m scripts.data.verify_ai06_tables \
   --output ci-cd/reports/data/ai06-06b1/acceptance.json
 ```
 
-## Następny zakres
+## Pełny odbiór AI 06
 
-[Source2.7 — 06.6b.2a](inventory-source-dataset.md) włącza te modele w osobny
-wersjonowany source: identity, konfigurację, manifest oraz quality/realism.
-[Kwalifikacja 06.6b.2b](inventory-label-qualification.md) ma lokalny odbiór
-osobnych prywatnych okien powiązanych z source ID. [Snapshot/import1.1](inventory-snapshots.md)
-mają lokalny odbiór na osobnych branchach obu repo. Następne 06.6b.2c.2 wymaga
-curated 1.1, pełnego pipeline/budżetu i przełączenia domyślnej ścieżki AI.
-Reevaluation 04/05 i kwalifikacja modelu 08 pozostają odrębnymi bramkami.
-DATA-06 jest nadal otwarte; pełny odbiór AI 06 nie został zadeklarowany.
+[Snapshot/curated 1.1](inventory-snapshots.md) publikuje tę warstwę przez
+domyślną ścieżkę AI. [Końcowy audyt i odbiór](../evidence/ai/06/final/README.md)
+obejmuje source/qualification/export/import/curated i historyczny as-of.
+Frozen artefakty oraz manifest źródła zachowują dawne IDs i flagi; aktualne
+readiness zapisują curated i końcowy receipt. Modele 04/05/08 mają własne gates.

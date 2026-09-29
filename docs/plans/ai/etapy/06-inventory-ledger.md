@@ -1,65 +1,26 @@
-# 06. Zbuduj spójny zapas i dostawy
+# 06 — Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.6b.2c.1 ma lokalny odbiór snapshot 1.1 i typed import source 2.7 w obu repo. Następny zakres: 06.6b.2c.2 — curated, pełny pipeline i przełączenie domyślnego źródła AI. Zależność:03.**
+**Status: ukończony zakres AI 06. Repo: oba. Zależność: 03.**
+[Końcowy audyt i odbiór](../../../evidence/ai/06/final/README.md) potwierdza
+pełną ścieżkę source → qualification → snapshot → import → curated/as-of.
+[Runbook](../../../reference/inventory-snapshots.md) opisuje komendy użytkowe;
+[karta danych](../../../evidence/ai/06/final/dataset-card.md) podaje nowe IDs.
 
-Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
+Ledger, wspólna fizyczna pula zapasu, sprzedaż, zwroty, dostawy i stockout wynikają
+z jednego chronologicznego procesu. Źródło 2.7 ma 58 tabel i 36 bramek,
+snapshot/curated 1.1 udostępniają 43 facts/plans z causal availability.
+Prywatne parametry/outcomes i kwalifikacja labeli pozostają poza cechami.
+Domyślne CLI profili AI używa 2.7; jawny `--source-version 2.6` zachowuje kompatybilność.
+Demo/API i frozen dane nie są przepisywane. DATA-06 nie ma otwartych warunków.
 
-Przeczytaj [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md), manifest/snapshot/curated contracts03 i [integrację koszyków 06.6a](../../../reference/source-inventory-commerce.md). Domyślny source 2.6 nadal nie publikuje nowego ledgeru; `inventory_ready=false` i DATA-06 pozostają otwarte.
+## Granica ukończenia i dalsze zależności
 
-## Obecny punkt integracji
-
-[Polityka i proces dostaw 06.3](../../../reference/reorder-policy.md) mają
-[lokalny odbiór](../../../evidence/ai/06/06.3/README.md). Zamówienie korzysta
-wyłącznie z dostępnych faktów; seed i true lead-time/reliability sterują
-oddzielną realizacją. [Chronologiczny symulator 06.4](../../../reference/chronological-inventory.md)
-łączy te moduły z ograniczeniem sprzedaży, historycznym mappingiem i eligibility
-zwrotów; [odbiór](../../../evidence/ai/06/06.4/README.md) dotyczy osobnego
-scenariusza, bez przełączenia domyślnego generatora 2.6.
-[Snapshoty i stockout truth 06.5](../../../reference/inventory-projections.md)
-mają [lokalny odbiór](../../../evidence/ai/06/06.5/README.md): znany ledger,
-osobne salda fizyczne, granice epizodów i lost-sales impacts oraz dojrzałość
-diagnostycznych okien. Model 08 i pełna gotowość źródła pozostają poza tym odbiorem.
-
-[Integracja 06.6a](../../../reference/source-inventory-commerce.md) wykonuje
-koszyki popytu przez tę samą pulę fizycznego zapasu, przelicza ceny dla faktycznej
-ilości i refundy dla faktycznych zakupów. Rozdziela finansową eligibility,
-quality restock i ogon zwrotów, a panel/history/cohort korzystają z causal
-availability. [Odbiór lokalny](../../../evidence/ai/06/06.6a/README.md) obejmuje
-standardowe profile i niezależne uzgodnienie facts/ledger/snapshotów.
-To kandydat z własnym execution ID, bez opublikowanego source/snapshot/curated.
-
-[Kontrakt tabel 06.6b.1](../../../reference/inventory-source-tables.md) rozdziela
-19 operational facts/plans i 8 private truth tables. Native CSV/Parquet
-zachowuje typy, nulle, grain i historyczne availability; odczyt ponownie uzgadnia
-cały proces oraz projekcje 06.5. [Odbiór lokalny](../../../evidence/ai/06/06.6b.1/README.md)
-obejmuje powtórzenia profili i kontrolowane uszkodzenia. To nadal kandydat tabel;
-kwalifikacja modelu 08 wymaga własnego odbioru.
-
-## Następny zakres — 06.6b.2
-
-[Source 2.7 — 06.6b.2a](../../../reference/inventory-source-dataset.md)
-łączy 46 facts/plans i 12 private truth tables w niezmienny source ID,
-z własnymi konfiguracją/contextem, manifestem, quality/realism oraz odczytem
-ponownie wyliczającym 36 bramek. [Odbiór](../../../evidence/ai/06/06.6b.2a/README.md)
-obejmuje oba standardowe profile dwukrotnie, supplier-poor, zero opening,
-no demand i late availability. `facts_ready` dotyczy tego lokalnego zakresu;
-pełne source/inventory/model readiness pozostają false.
-Domyślny generator/API i ścieżka 03 nadal używają2.6.
-
-[Kwalifikacja 06.6b.2b](../../../reference/inventory-label-qualification.md)
-tworzy osobne immutable private windows powiązane z parent source ID.
-Historyczny lifecycle i routing, stream certificate tej samej fizycznej pozycji,
-kompletny panel i maturity kwalifikują label 0/1; already stockout, inactive,
-missing i immature pozostają bez labelu. [Odbiór](../../../evidence/ai/06/06.6b.2b/README.md)
-obejmuje oba standardowe profile ze świeżymi powtórzeniami i kontrolowane
-przypadki. Profile mają obie klasy; kwalifikacja źródła nie odbiera modelu08.
-Frozen report2.7 zachowuje `not_evaluated`; aktualna kwalifikacja ma własny
-kontrakt/ID i pozostaje poza operational facts i cechami.
-
-[Snapshot/import06.6b.2c.1](../../../reference/inventory-snapshots.md) mają [lokalny odbiór](../../../evidence/ai/06/06.6b.2c.1/README.md): nowe IDs, 43 worker facts/plans, 12 private tables i qualification opt-in, typed parity, niezależny ledger/snapshot oraz oba profile dwukrotnie.
-
-1. **06.6b.2c.2:** rozszerzyć curated 1.1 o native grain, causal availability i historyczny as-of. Odebrać pełny source → qualification → snapshot → import → curated z oddzielnym evaluation truth, lineage, powtórzeniami i budżetem. Następnie przełączyć domyślną ścieżkę AI. Zachować czytniki2.0–2.7, snapshoty03 i demo/API. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
-2. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
+AI 06 można ukończyć niezależnie od 04/05. Gotowość inventory dotyczy danych
+oraz odebranego pipeline'u, a nie wytrenowanego modelu lub serving.
+Przed 07/08 wymagane są ukończone 04/05 oraz forecast oceniony na nowych IDs
+z tej ścieżki. Jeśli 04/05 jeszcze nie ukończono, będzie to pierwszy zgodny
+odbiór na nowym źródle; wcześniejszych metryk nie przepisuje się na inne dane.
+Model ryzyka stockout jest zakresem 08.
 
 ## Minimalny zestaw ruchów i uzgodnienie
 
@@ -85,7 +46,7 @@ Stockout truth oznacza zdarzenie procesu zapasu; zwykły brak popytu i zero sprz
 
 Schematy ledger/suppliers/replenishments/mapping, udokumentowana kolejność i polityka rezerwacji, passing/failing fixtures, reconciliations, source/curated manifests, inventory/lost-sales/stockout diagnostics, zaktualizowana dataset card oraz evidence ponownego uruchomienia03. Wydajność measured na smoke, a dev/training poza zwykłym CI.
 
-Gotowość źródłowa do07/08 wymaga bramek powyżej, nowego snapshotu i zgodnych prognoz po ponownej ewaluacji04/05. Zaawansowane zakupy, optymalizacja dostawców i złożone transfer networks pozostają rozszerzeniem po portfolio v1.
+Przejście do 07/08 wymaga, oprócz odbioru 06, zgodnych prognoz i lifecycle po ocenie 04/05 na nowym snapshotcie. Zaawansowane zakupy, optymalizacja dostawców i złożone transfer networks pozostają rozszerzeniem po portfolio v1.
 
 ## Prompt dla Codex
 

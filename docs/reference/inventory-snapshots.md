@@ -1,10 +1,25 @@
-# Snapshot inventory 1.1 — AI 06.6b.2c.1
+# Snapshot i curated inventory 1.1 — AI 06
 
-[Lokalny odbiór](../evidence/ai/06/06.6b.2c.1/README.md) obejmuje exporter
+[Końcowy odbiór](../evidence/ai/06/final/README.md) obejmuje exporter
 w RetailOps i niezależny importer w repo AI. Wejściem są
 [source 2.7](inventory-source-dataset.md) oraz
 [qualification 1.0](inventory-label-qualification.md). Snapshot1.0/source 2.6
-zachowuje osobne schemas i ścieżkę03; domyślny generator/API nadal korzysta z2.6.
+zachowuje osobne schemas i jawny tryb zgodności `--source-version 2.6`. Domyślne CLI AI generuje 2.7; demo/API i seeder zachowują wcześniejszy kontrakt.
+
+## Najprostsza pełna ścieżka
+
+W RetailOps, po `make data-parquet-install`:
+
+```sh
+services/api/.venv/bin/python -m data.export.ai_snapshot \
+  --profile ai-smoke --seed 42 --end-date 2026-07-31 \
+  --output-root data/generated/inventory-snapshots
+```
+
+Komenda generuje source 2.7, kwalifikuje prywatne okna i publikuje snapshot 1.1.
+Zwrócone `path` i source ID są wejściem importu poniżej. Sam generator
+`python -m data.generator.main --profile ai-smoke` publikuje źródło pod
+`data/generated/sources/<source_id>`; `--output-dir` wybiera katalog nadrzędny.
 
 ## Eksport
 
@@ -93,22 +108,43 @@ commerce quantity/revenue, refund/restock oraz supply orders/plans/receipts.
 Nie regeneruje prywatnego popytu, całych36 gates ani pełnej kwalifikacji labeli.
 Sprawdza qualification schema/lineage/checksums i report aggregates.
 
-## Odbiór i pozostały zakres
+## Curated i historyczny odczyt w repo AI
+
+```sh
+.venv/bin/python -m retailops_ai.curated.cli build \
+  --import-dir data/generated/snapshots/<source_id> --generated-root data/generated
+.venv/bin/python -m retailops_ai.curated.cli as-of \
+  --curated-dir data/generated/curated/<curated_id> \
+  --origin 2026-07-31T23:59:59.999999+00:00 --table inventory_daily_snapshots
+```
+
+Curated zachowuje 43 facts/plans i fizyczny grain product × stock × business date.
+Sales używa availability native sale; return oryginalnego magazynu, snapshot
+własnego cutoff. Plany dostaw są wybierane według wersji znanej w origin,
+rzeczywiste receipts dopiero po dostępności. Bez informacji o czasie rekord
+pozostaje `not_recorded`, a brak historycznego stanu nie jest zerem ani
+fallbackiem do przyszłego snapshotu. Private import wymaga opt-in także przy
+build; żadne truth table lub label nie wchodzi do curated.
+
+Czytnik `CuratedReader` weryfikuje zbiór raz i przechowuje jego manifest prywatnie.
+Każde zapytanie sprawdza hash/count/grain odczytywanej tabeli przed zwróceniem
+wyniku. Podmiana plików po walidacji nie zmienia zaakceptowanego widoku.
+Curated ma nowy ID i `inventory_ready=true` wyłącznie bez odrzuconych rekordów.
+Modelowe readiness pozostają `not_ready`. Frozen source 2.7 zachowuje swoje
+pierwotne false flags; późniejszy odbiór jest osobnym receipt, nie zmianą źródła.
+
+## Odtwarzalny odbiór
 
 ```sh
 services/api/.venv/bin/python -m scripts.data.verify_ai06_snapshot \
-  --ai-repo /path/to/isolated/retailops-ai-intelligence \
-  --ai-python /path/to/isolated/retailops-ai-intelligence/.venv/bin/python \
+  --ai-repo /absolute/path/to/retailops-ai-intelligence \
+  --ai-python /absolute/path/to/retailops-ai-intelligence/.venv/bin/python \
   --output ci-cd/reports/data/ai06/new-run/acceptance.json
 ```
 
-Wybierz nowy katalog przebiegu, aby worker sprawdził fresh import, następnie
-reimport/verify. Odbiór wymaga clean runtime, obu standardowych profili dwukrotnie,
-identycznych IDs i budget 300s/1024MiB dla source/qualification/export/import.
-Nie obejmuje pending curated i nie jest pełnym odbiorem DATA-06.
-
-**Następny zakres 06.6b.2c.2** to curated 1.1 z native grain, causal availability,
-historycznym as-of i truth isolation, pełny pipeline/budget oraz przełączenie
-domyślnego source AI. Curated1.0 odrzuca snapshot 1.1 jawnym kodem błędu.
-Frozen source 2.7 zachowuje source/inventory/model readiness=false.
-Nowe IDs wymagają ponownej oceny04/05; model 08 ma własne gates.
+Wybierz nowy katalog przebiegu. Odbiór wymaga clean runtime, obu standardowych
+profili dwukrotnie i identycznych IDs. Budżet 300 s / 1024 MiB obejmuje source,
+qualification, eksport, import, curated oraz niezależne as-of. Instalacja jest
+poza pomiarem. Reimport/rebuild i private isolation mają osobne testy regresji.
+[Końcowy audyt](../evidence/ai/06/final/README.md) zamyka zakres AI 06 i DATA-06.
+Ocena 04/05 na nowych IDs jest wymagana przed 07/08, a model 08 ma własne gates.

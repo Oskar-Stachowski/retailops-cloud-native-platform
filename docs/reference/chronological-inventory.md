@@ -3,10 +3,10 @@
 [Symulator](../../data/inventory/simulator.py) łączy [ledger](inventory-ledger.md),
 [dostawy](replenishment.md) i [politykę przeglądu](reorder-policy.md) w wykonywalny
 przebieg sprzedaży ograniczonej wspólnym zapasem. Działa na osobnym scenariuszu;
-domyślny generator source 2.6 nadal korzysta z dotychczasowej ścieżki.
-`inventory_ready=false`. [Odbiór](../evidence/ai/06/06.4/README.md) zawiera
+historyczny wariant source 2.6 zachowuje dotychczasową ścieżkę.
+Domyślny [source 2.7](inventory-snapshots.md) używa tego procesu. [Odbiór](../evidence/ai/06/06.4/README.md) zawiera
 wyniki i wersję kodu. [Projekcje 06.5](inventory-projections.md) tworzą snapshoty
-i epizody stockout. Następny zakres to 06.6: integracja i publikacja danych.
+i epizody stockout. Pełną integrację potwierdza [końcowy odbiór AI 06](../evidence/ai/06/final/README.md).
 
 ## Wejście i kolejność
 
@@ -55,7 +55,7 @@ Dodatnia realizacja tworzy jeden order sprzedażowy, jedną sale i jedno wydanie
 ledgeru. Zero nie tworzy fikcyjnej transakcji. Kolejne kanały korzystają z już
 pomniejszonego wspólnego stanu. Cena dodatnia, jednostka i waluta są jawne;
 revenue/refund liczone są w całkowitych groszach. Zewnętrzna ścieżka cen,
-koszyków i panelu source 2.6 zostanie połączona z tym przebiegiem w 06.6.
+koszyków i panelu została połączona z tym przebiegiem w source 2.7.
 
 ## Zwroty i czas wiedzy
 
@@ -116,4 +116,4 @@ CLI zwraca `passed`/exit 0, `not_ready`/exit 1 przy nieznanych danych potrzebnyc
 do review albo `failed`/exit 1 przy błędnym procesie/kontrakcie.
 Końcowe salda tego runnera są diagnostyką. [Osobny odbiór 06.5](../evidence/ai/06/06.5/README.md)
 obejmuje snapshoty i epizody stockout. Source/readiness gates, nowa publikacja 03
-oraz zależne oceny 04/05 pozostają poza tym zakresem. DATA-06 jest nadal otwarte.
+oraz zależne oceny 04/05 pozostają poza tym zakresem. Pełna publikacja ma osobny końcowy receipt AI 06.

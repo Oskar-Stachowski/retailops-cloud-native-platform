@@ -54,33 +54,16 @@ przypadek późnej korekty zachowują IDs, 25 tabel, typed CSV/Parquet parity
 i historyczny as-of. Source przechodzi 46 hard gates; repo AI ma 747 testów.
 Wszystkie przebiegi mieszczą się w 300 s / 1024 MiB.
 
-**AI 06.6b.2c.1 ma lokalny odbiór snapshot 1.1 i typed import source 2.7 w obu repo; równolegle można realizować AI 04.**
-[Chronologiczna realizacja koszyków](reference/source-inventory-commerce.md)
-łączy ledger, znany reorder, częściowe/opóźnione dostawy, faktyczną sprzedaż
-i eligibility zwrotów. Przelicza cenę częściowej realizacji, kwoty koszyka,
-panel/history/cohorts według dostępnych faktów oraz snapshoty z ledgeru.
-[Odbiór lokalny](evidence/ai/06/06.6a/README.md) dotyczy osobnego kandydata,
-bez nowego opublikowanego snapshot/curated. Historyczne artefakty i demo
-pozostają niezmienione. `inventory_ready=false` i DATA-06 pozostają otwarte.
-[Kontrakt 27 tabel](reference/inventory-source-tables.md) ma oddzielne facts/truth,
-native CSV/Parquet parity i niezależne uzgodnienie po odczycie.
-[Odbiór](evidence/ai/06/06.6b.1/README.md) nadal dotyczy kandydata tabel.
-[Source 2.7](reference/inventory-source-dataset.md) łączy58 tabel z własnym
-source ID, konfiguracją, manifestem i 36 bramek ponownie liczonymi po odczycie.
-[Odbiór06.6b.2a](evidence/ai/06/06.6b.2a/README.md) potwierdza oba smoke
-dwukrotnie, oddzielne fakty/truth, zgodność czytniki 2.0–2.6 i frozen fixtures.
-Domyślny generator/API i pełna ścieżka03 nadal używają2.6. Jawny eksport/import1.1 przyjmuje2.7.
-[Lifecycle/coverage06.6b.2b](reference/inventory-label-qualification.md)
-ma [lokalny odbiór](evidence/ai/06/06.6b.2b/README.md): obie klasy prywatnych
-labeli na obu profilach; brak coverage/aktywności/maturity i aktualny stockout
-pozostawiają label pusty. Źródło2.7 i frozen snapshots nie są przepisywane.
-[Snapshot 1.1 i import06.6b.2c.1](reference/inventory-snapshots.md) mają
-[lokalny odbiór](evidence/ai/06/06.6b.2c.1/README.md): 43 facts/plans, private opt-in,
-niezależne uzgodnienia i oba profile dwukrotnie. Następny zakres 06.6b.2c.2
-rozszerza curated, odbiera pełny pipeline i przełącza domyślne source AI.
-Source/inventory/model readiness pozostają false.
-Po zmianie źródła trzeba ponowić 04/05; starych metryk nie przenosimy na nowe IDs.
-Pierwszy forecasting korzysta z obserwowanej sprzedaży, bez inventory features.
+**AI 06 ma [końcowy audyt i odbiór](evidence/ai/06/final/README.md).**
+Domyślne CLI AI publikuje source 2.7 i snapshot 1.1; importer i curated 1.1
+zachowują 43 facts/plans, native grain, causal availability i historyczny as-of.
+Pełny pipeline obu profili dwukrotnie spełnia budżet 300 s / 1024 MiB.
+Źródło/warstwa inventory są gotowe, modele wymagają własnego odbioru.
+Frozen manifest źródła nadal ma pierwotne flagi false; readiness kolejnych
+warstw zapisują curated i końcowy receipt. [Nowa karta danych](evidence/ai/06/final/dataset-card.md)
+wiąże source/qualification/snapshot/curated IDs. Demo/API zachowują zgodność.
+AI 04/05 należy odebrać na tych nowych IDs przed realizacją 07/08.
+
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.
 AI 03 jest na `origin/main` obu repozytoriów po scaleniu PR #65 i #5.
