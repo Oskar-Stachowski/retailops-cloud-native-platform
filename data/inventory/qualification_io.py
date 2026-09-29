@@ -56,6 +56,19 @@ def descriptor(rows: list[dict], report: dict, parent: dict, provenance: dict) -
 
 
 def read_qualification(directory: Path, source: Path) -> tuple[list[dict], dict, dict]:
+    tables, parent = read_source_dataset(source)
+    return read_sealed_qualification(directory, tables, parent)
+
+
+def read_sealed_qualification(
+    directory: Path, tables: dict, parent: dict
+) -> tuple[list[dict], dict, dict]:
+    """Requalify an immutable, private source already fully verified by its caller.
+
+    Export seals source files and calls read_source_dataset on that copy first.
+    Reuse those verified in-memory tables instead of reading/rechecking all 58
+    source files again. The public path-based reader still verifies its source.
+    """
     require(
         not directory.is_symlink() and not any(p.is_symlink() for p in directory.rglob("*")),
         "Symlink in inventory qualification.",
@@ -76,7 +89,9 @@ def read_qualification(directory: Path, source: Path) -> tuple[list[dict], dict,
             "Qualification provenance differs.",
         )
     require(provenance["python_version"] == desc["python_version"], "Qualification Python differs.")
-    rows, report, parent = build_qualification(source)
+    context = TableContext.model_validate(parent["descriptor"]["context"])
+    rows = qualify_windows(tables, context)
+    report = qualification_report(rows, parent)
     require(
         desc == descriptor(rows, report, parent, provenance),
         "Qualification differs from verified parent facts.",

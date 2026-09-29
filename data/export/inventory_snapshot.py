@@ -39,10 +39,15 @@ from data.inventory.qualification import qualification_report, qualify_windows
 from data.inventory.qualification_contract import MANIFEST as QUAL_MANIFEST
 from data.inventory.qualification_contract import REPORT as QUAL_REPORT
 from data.inventory.qualification_contract import WINDOWS as QUAL_WINDOWS
-from data.inventory.qualification_io import read_qualification
+from data.inventory.qualification_io import read_sealed_qualification
 from data.inventory.simulation_reconciliation import reconcile_simulation
 from data.inventory.snapshots import daily_snapshots
-from data.inventory.source_dataset_contract import MANIFEST_FILENAME, data_class, grain
+from data.inventory.source_dataset_contract import (
+    MANIFEST_FILENAME,
+    SourceManifest,
+    data_class,
+    grain,
+)
 from data.inventory.source_dataset_io import (
     CONFIG_PATH,
     REPORT_NAMES,
@@ -67,7 +72,13 @@ def copy_file(source: Path, target: Path) -> None:
 
 
 def seal_source(source: Path, target: Path, dataset_id: str) -> tuple[dict, dict]:
-    _, original = read_source_dataset(source)
+    require(
+        not source.is_symlink() and not any(p.is_symlink() for p in source.rglob("*")),
+        "Symlink in source input.",
+    )
+    payload = load_json(safe_file(source, MANIFEST_FILENAME))
+    original = SourceManifest.model_validate(payload).model_dump()
+    require(original == payload, "Noncanonical source input manifest.")
     require(original["dataset_id"] == dataset_id, "Explicit source ID differs.")
     names = [
         MANIFEST_FILENAME,
@@ -75,6 +86,10 @@ def seal_source(source: Path, target: Path, dataset_id: str) -> tuple[dict, dict
         *REPORT_NAMES,
         *(r["path"] for r in original["artifacts"].values()),
     ]
+    require(
+        {p.relative_to(source).as_posix() for p in source.rglob("*") if p.is_file()} == set(names),
+        "Unallowlisted source input file.",
+    )
     for name in names:
         copy_file(safe_file(source, name), target / name)
     tables, sealed = read_source_dataset(target)
@@ -84,11 +99,20 @@ def seal_source(source: Path, target: Path, dataset_id: str) -> tuple[dict, dict
 
 
 def seal_qualification(
-    source: Path, target: Path, sealed_source: Path
+    source: Path, target: Path, tables: dict, parent: dict
 ) -> tuple[list[dict], dict, dict]:
+    require(
+        not source.is_symlink() and not any(p.is_symlink() for p in source.rglob("*")),
+        "Symlink in qualification input.",
+    )
+    require(
+        {p.relative_to(source).as_posix() for p in source.rglob("*") if p.is_file()}
+        == {QUAL_MANIFEST, QUAL_REPORT, QUAL_WINDOWS},
+        "Unallowlisted qualification input file.",
+    )
     for name in (QUAL_MANIFEST, QUAL_REPORT, QUAL_WINDOWS):
         copy_file(safe_file(source, name), target / name)
-    return read_qualification(target, sealed_source)
+    return read_sealed_qualification(target, tables, parent)
 
 
 def metadata_names(manifest: dict) -> set[str]:
@@ -357,7 +381,7 @@ def export_inventory_snapshot(
     with TemporaryDirectory(prefix="inventory-export-", dir=staging) as temporary:
         work = Path(temporary)
         tables, parent = seal_source(source, work / "source", dataset_id)
-        _, _, qmanifest = seal_qualification(qualification, work / "qualification", work / "source")
+        _, _, qmanifest = seal_qualification(qualification, work / "qualification", tables, parent)
         bundle = work / "bundle"
         bundle.mkdir(mode=0o700)
         for name in REPORT_NAMES:

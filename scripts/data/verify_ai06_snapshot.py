@@ -96,12 +96,6 @@ def run(args: argparse.Namespace) -> dict:
             import_seconds = imported["seconds"]
             total = source["seconds"] + exported["seconds"] + import_seconds
             require(
-                total < 300
-                and max(source["peak_rss_mib"], exported["peak_rss_mib"], imported["peak_rss_mib"])
-                < 1024,
-                "Fresh export/import pipeline exceeds acceptance budget.",
-            )
-            require(
                 exported["tables"] == imported["tables"] == 43
                 and imported["snapshot_id"] == exported["snapshot_id"]
                 and imported["typed_parity"] == "passed",
@@ -127,6 +121,13 @@ def run(args: argparse.Namespace) -> dict:
                     report_root / (label + "-qualification.json")
                 ),
             }
+            peak = max(item["producer_peak_rss_mib"], item["consumer_peak_rss_mib"])
+            item["status"] = "passed" if total < 300 and peak < 1024 else "failed"
+            (report_root / (label + "-pipeline.json")).write_text(json.dumps(item, indent=2) + "\n")
+            require(
+                item["status"] == "passed",
+                f"Fresh export/import budget failed: {total:.2f}s, {peak:.2f} MiB.",
+            )
             repeats.append(item)
             print(  # noqa: T201 - acceptance progress
                 f"{label}: source -> qualification -> snapshot -> import passed in {total:.2f}s",

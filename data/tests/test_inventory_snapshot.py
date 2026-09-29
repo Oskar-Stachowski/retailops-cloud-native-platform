@@ -23,6 +23,7 @@ from data.export.policy import GENERATED_ROOT
 from data.generator.configuration import DatasetGenerationConfig
 from data.generator.identity import canonical_json, file_sha256, json_sha256
 from data.inventory.qualification_io import write_qualification
+from data.inventory import qualification_io
 from data.inventory.run_source_dataset import build_source_dataset, default_inventory_config
 from data.inventory.source_dataset_io import write_source_dataset
 
@@ -223,3 +224,49 @@ def test_rejected_export_and_invalid_outputs_leave_no_publication(snapshot, tmp_
         exporter.export_inventory_snapshot(source, source.name, broken, base / "broken-output")
     assert not (base / "broken-output" / source.name).exists()
     assert not list((base / "broken-output/.staging").iterdir())
+
+
+def test_sealing_checks_full_source_once_and_requalifies_verified_copy(snapshot, monkeypatch):
+    base, source, qualification, _, _ = snapshot
+    original = exporter.read_source_dataset
+    checks = []
+
+    def checked(path):
+        checks.append(path)
+        return original(path)
+
+    def must_not_reread(path):
+        raise AssertionError("Verified private source should not be recomputed by qualification IO")
+
+    monkeypatch.setattr(exporter, "read_source_dataset", checked)
+    monkeypatch.setattr(qualification_io, "read_source_dataset", must_not_reread)
+    result = exporter.export_inventory_snapshot(source, source.name, qualification, base / "once")
+    assert result["publication"] == "published"
+    assert len(checks) == 1 and checks[0] != source
+    assert not list((base / "once/.staging").iterdir())
+
+
+@pytest.mark.parametrize(
+    "fault", ["source_bytes", "source_extra", "qualification_extra", "explicit_id"]
+)
+def test_sealing_optimization_does_not_trust_unverified_input(snapshot, fault):
+    base, source, qualification, _, _ = snapshot
+    changed_source = Path(shutil.copytree(source, base / (fault + "-source")))
+    changed_qualification = Path(shutil.copytree(qualification, base / (fault + "-qualification")))
+    identifier = source.name
+    if fault == "source_bytes":
+        path = changed_source / "facts/inventory_ledger.csv"
+        path.write_bytes(path.read_bytes() + b"corruption\n")
+    elif fault == "source_extra":
+        (changed_source / "unknown.json").write_text("{}")
+    elif fault == "qualification_extra":
+        (changed_qualification / "unknown.json").write_text("{}")
+    else:
+        identifier = "source-sha256-" + "a" * 64
+    output = base / (fault + "-rejected")
+    with pytest.raises(ValueError):
+        exporter.export_inventory_snapshot(
+            changed_source, identifier, changed_qualification, output
+        )
+    assert not (output / identifier).exists()
+    assert not list((output / ".staging").iterdir())
