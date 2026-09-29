@@ -1,0 +1,282 @@
+{
+  "status": "passed",
+  "scope": "AI06 complete source/qualification/export/import/curated/as-of",
+  "producer_commit": "a433553ac015b0afc971c2aa208024fcbd8dbc2e",
+  "consumer_commit": "2574c06794b7b4f86393f23db1d9e97c16413706",
+  "cases": [
+    {
+      "case": "ai-smoke-first",
+      "profile": "ai-smoke",
+      "source_id": "source-sha256-70f155b79f449d9b7be6c3798dba839383a02b9afd50bd19d98bb1ff283b666a",
+      "qualification_id": "inventory-labels-sha256-6084d3465a9841df163efa80a92412b5a63c05a01c60cde01af7a7a337219d0c",
+      "snapshot_id": "snapshot-sha256-10ebfa41adc95966a785876565c3fa391006726184975b0d4d823fe2d083d6a4",
+      "source_seconds": 43.818088847,
+      "qualification_seconds": 16.942033558999995,
+      "export_seconds": 13.392599144000002,
+      "import_curated_as_of_seconds": 52.183791411,
+      "curated_id": "curated-sha256-4f3457a8557879ccfe8263d7f4080e9eb24d3ed009c4b605ab286add27bfc0bb",
+      "seconds": 126.336512961,
+      "producer_peak_rss_mib": 248.671875,
+      "consumer_peak_rss_mib": 149.671875,
+      "source_receipt_sha256": "dc237a54dea38eff6afddd6e6de2b88b663ecbd3eb679396004b7ce5f6ff4f4c",
+      "qualification_receipt_sha256": "c370de9da25f902ebd205ca113a041eebd91bec783ad686d7c7f0fdd3d96dfb6",
+      "status": "passed",
+      "identical_ids_to_local": {
+        "source_id": true,
+        "qualification_id": true,
+        "snapshot_id": true,
+        "curated_id": true
+      },
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecast_model": "not_ready",
+        "forecast_source": "passed",
+        "inventory_ready": true,
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "as_of_checks": [
+        {
+          "origin": "2026-07-08T23:59:59+00:00",
+          "selected_observations": 294,
+          "source_versions": 1612,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "selected_observations": 1561,
+          "source_versions": 1612,
+          "status": "passed"
+        }
+      ],
+      "inventory_as_of_checks": [
+        {
+          "origin": "2026-07-02T23:59:59.999998+00:00",
+          "physical_positions": 0,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "physical_positions": 40,
+          "status": "passed"
+        }
+      ],
+      "rows": 31729,
+      "tables": 43,
+      "quarantine_rows": 0,
+      "evaluation_truth_in_curated": false,
+      "input_unchanged": true
+    },
+    {
+      "case": "ai-smoke-repeat",
+      "profile": "ai-smoke",
+      "source_id": "source-sha256-70f155b79f449d9b7be6c3798dba839383a02b9afd50bd19d98bb1ff283b666a",
+      "qualification_id": "inventory-labels-sha256-6084d3465a9841df163efa80a92412b5a63c05a01c60cde01af7a7a337219d0c",
+      "snapshot_id": "snapshot-sha256-10ebfa41adc95966a785876565c3fa391006726184975b0d4d823fe2d083d6a4",
+      "source_seconds": 44.08723055200002,
+      "qualification_seconds": 17.21258363199999,
+      "export_seconds": 13.234151159000021,
+      "import_curated_as_of_seconds": 51.857347395999994,
+      "curated_id": "curated-sha256-4f3457a8557879ccfe8263d7f4080e9eb24d3ed009c4b605ab286add27bfc0bb",
+      "seconds": 126.39131273900003,
+      "producer_peak_rss_mib": 249.8671875,
+      "consumer_peak_rss_mib": 150.29296875,
+      "source_receipt_sha256": "12d7cd667de7fcb5527247d10a3de8ef809a3977c2c10a9642486908e5e7e0af",
+      "qualification_receipt_sha256": "566f0df8bbfc292bbbae02da1cf3ce510d9e3c73b9ff300e4e7cfa5fb22f36cf",
+      "status": "passed",
+      "identical_ids_to_local": {
+        "source_id": true,
+        "qualification_id": true,
+        "snapshot_id": true,
+        "curated_id": true
+      },
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecast_model": "not_ready",
+        "forecast_source": "passed",
+        "inventory_ready": true,
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "as_of_checks": [
+        {
+          "origin": "2026-07-08T23:59:59+00:00",
+          "selected_observations": 294,
+          "source_versions": 1612,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "selected_observations": 1561,
+          "source_versions": 1612,
+          "status": "passed"
+        }
+      ],
+      "inventory_as_of_checks": [
+        {
+          "origin": "2026-07-02T23:59:59.999998+00:00",
+          "physical_positions": 0,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "physical_positions": 40,
+          "status": "passed"
+        }
+      ],
+      "rows": 31729,
+      "tables": 43,
+      "quarantine_rows": 0,
+      "evaluation_truth_in_curated": false,
+      "input_unchanged": true
+    },
+    {
+      "case": "ai-temporal-smoke-first",
+      "profile": "ai-temporal-smoke",
+      "source_id": "source-sha256-d76d0942c703ceaefd9fde5c921560886fe9b8c833693ee32eb12eb594b8867f",
+      "qualification_id": "inventory-labels-sha256-a697f24ab5c735e49557fe901b620e341cb936403c755608fdf5e4b018c3ef12",
+      "snapshot_id": "snapshot-sha256-f36775eed4a0a6df8be8e8baa17821324b072f647330547dffa6747e3e1edce3",
+      "source_seconds": 113.92368980000003,
+      "qualification_seconds": 39.657295772,
+      "export_seconds": 29.738812584000016,
+      "import_curated_as_of_seconds": 95.18253350200007,
+      "curated_id": "curated-sha256-a23ae90c556a0c69e808fcbb886a137ee1f5fc1316e41eecda963f3d540df5f6",
+      "seconds": 278.5023316580001,
+      "producer_peak_rss_mib": 356.14453125,
+      "consumer_peak_rss_mib": 166.89453125,
+      "source_receipt_sha256": "a59ae4697beefabd7fa801b10940affe44af6ea74dfbf1bc1a322a1d85b1471b",
+      "qualification_receipt_sha256": "e4e12d254f46cd3ffd47b980dc63be87275ec610595411647ff8cd722d7ba710",
+      "status": "passed",
+      "identical_ids_to_local": {
+        "source_id": true,
+        "qualification_id": true,
+        "snapshot_id": true,
+        "curated_id": true
+      },
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecast_model": "not_ready",
+        "forecast_source": "passed",
+        "inventory_ready": true,
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "as_of_checks": [
+        {
+          "origin": "2026-05-18T23:59:59+00:00",
+          "selected_observations": 627,
+          "source_versions": 2406,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "selected_observations": 2385,
+          "source_versions": 2406,
+          "status": "passed"
+        }
+      ],
+      "inventory_as_of_checks": [
+        {
+          "origin": "2026-04-21T23:59:59.999998+00:00",
+          "physical_positions": 0,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "physical_positions": 16,
+          "status": "passed"
+        }
+      ],
+      "rows": 56533,
+      "tables": 43,
+      "quarantine_rows": 0,
+      "evaluation_truth_in_curated": false,
+      "input_unchanged": true
+    },
+    {
+      "case": "ai-temporal-smoke-repeat",
+      "profile": "ai-temporal-smoke",
+      "source_id": "source-sha256-d76d0942c703ceaefd9fde5c921560886fe9b8c833693ee32eb12eb594b8867f",
+      "qualification_id": "inventory-labels-sha256-a697f24ab5c735e49557fe901b620e341cb936403c755608fdf5e4b018c3ef12",
+      "snapshot_id": "snapshot-sha256-f36775eed4a0a6df8be8e8baa17821324b072f647330547dffa6747e3e1edce3",
+      "source_seconds": 112.40767934099995,
+      "qualification_seconds": 40.96586672199999,
+      "export_seconds": 29.853962999000032,
+      "import_curated_as_of_seconds": 95.97861070600004,
+      "curated_id": "curated-sha256-a23ae90c556a0c69e808fcbb886a137ee1f5fc1316e41eecda963f3d540df5f6",
+      "seconds": 279.206119768,
+      "producer_peak_rss_mib": 356.3671875,
+      "consumer_peak_rss_mib": 164.75390625,
+      "source_receipt_sha256": "2ce628fb2e420bb9908c51fd2bdda3b9e6c6288d3c5fc0fecb0b62b8c0e74367",
+      "qualification_receipt_sha256": "cf43ad7b5b6d3add561e2f797fa7a55ebcb40cb7d1a9b096fb7d5fb6c1feb319",
+      "status": "passed",
+      "identical_ids_to_local": {
+        "source_id": true,
+        "qualification_id": true,
+        "snapshot_id": true,
+        "curated_id": true
+      },
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecast_model": "not_ready",
+        "forecast_source": "passed",
+        "inventory_ready": true,
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "as_of_checks": [
+        {
+          "origin": "2026-05-18T23:59:59+00:00",
+          "selected_observations": 627,
+          "source_versions": 2406,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "selected_observations": 2385,
+          "source_versions": 2406,
+          "status": "passed"
+        }
+      ],
+      "inventory_as_of_checks": [
+        {
+          "origin": "2026-04-21T23:59:59.999998+00:00",
+          "physical_positions": 0,
+          "status": "passed"
+        },
+        {
+          "origin": "2026-07-31T23:59:59+00:00",
+          "physical_positions": 16,
+          "status": "passed"
+        }
+      ],
+      "rows": 56533,
+      "tables": 43,
+      "quarantine_rows": 0,
+      "evaluation_truth_in_curated": false,
+      "input_unchanged": true
+    }
+  ],
+  "limits": {
+    "seconds": 300,
+    "rss_mib": 1024
+  },
+  "curated": "passed",
+  "default_ai_source": "2.7.0",
+  "source_ready": true,
+  "inventory_ready": true,
+  "model_ready": false,
+  "origin": {
+    "workflow_run": 36607012268,
+    "url": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36607012268",
+    "artifact_id": 11052500581,
+    "artifact_name": "ai06-cross-repo-evidence",
+    "artifact_sha256": "c9cdf8cc9d290ecde518842ae65b4d74d0e4ed815568a80b46617a6e831a6f11",
+    "raw_acceptance_sha256": "eb899e3e267c77c44b17232af9b190291fc2ce9f910ab07ae6595ac716694bac",
+    "platform": "Linux AMD64"
+  }
+}

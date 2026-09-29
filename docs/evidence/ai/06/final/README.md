@@ -64,7 +64,28 @@ zachowują dotychczasowy kontrakt. Smoke nie jest odbiorem dev/training ani mode
 
 ## Publikacja
 
+Cały etap opublikowano 2026-09-29 na chronionym `origin/main` obu repozytoriów:
+[RetailOps PR #69](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/69)
+→ `a433553ac015b0afc971c2aa208024fcbd8dbc2e`,
+[AI PR #6](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/6)
+→ `e2a80d2d02d569d658226a0331c857fa3592d97d`.
+Required CI PR oraz push na main przeszło w obu repozytoriach:
+[RetailOps — 26 kontroli](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36607012268),
+[AI](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36605934684).
+[Receipt publikacji](main-publication.json) wiąże dokładne commity i wyniki.
+W PR RetailOps jednorazowy timeout startu starego dashboardu w Kubernetes
+ustąpił po ponowieniu nieudanego joba. CI na main przeszło za pierwszym razem.
+
 Pełny pipeline AI 06 jest obowiązkowym jobem Data CI, z przypiętym konsumentem.
-Publikacja na chroniony main przechodzi Required CI PR i następnie Required CI push.
-Stan zdalnego odbioru: [RetailOps](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/workflows/required-ci.yml),
-[AI](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/workflows/required-ci.yml).
+[Odbiór Linux na main](linux-acceptance.json) odtworzył wszystkie cztery zestawy
+source/qualification/snapshot/curated IDs identycznie jak odbiór lokalny:
+
+| Profil i powtórzenie | Pełny czas [s] | Szczyt RSS [MiB] |
+|---|---:|---:|
+| ai-smoke-first | 126.34 | 248.67 |
+| ai-smoke-repeat | 126.39 | 249.87 |
+| ai-temporal-smoke-first | 278.50 | 356.14 |
+| ai-temporal-smoke-repeat | 279.21 | 356.37 |
+
+Wszystkie przebiegi mieszczą się w limicie 300 s / 1024 MiB.
+Receipt zapisuje również hash pobranego artefaktu CI i surowego raportu.

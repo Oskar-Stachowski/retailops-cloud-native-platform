@@ -155,7 +155,20 @@
       "label_qualification": "qualified_for_standard_source_profiles_only",
       "model08_qualification": "not_evaluated",
       "consumer_branch": "ai/06-inventory-handoff",
-      "consumer_implementation_commit": "2574c06794b7b4f86393f23db1d9e97c16413706"
+      "consumer_implementation_commit": "2574c06794b7b4f86393f23db1d9e97c16413706",
+      "accepted_main_commits": {
+        "retailops-cloud-native-platform": "a433553ac015b0afc971c2aa208024fcbd8dbc2e",
+        "retailops-ai-intelligence": "e2a80d2d02d569d658226a0331c857fa3592d97d"
+      },
+      "remote_required_ci": {
+        "status": "success",
+        "producer_pr_run": 36604059175,
+        "consumer_pr_run": 36604053964,
+        "producer_main_push_run": 36607012268,
+        "consumer_main_push_run": 36605934684,
+        "evidence": "../../evidence/ai/06/final/main-publication.json",
+        "linux_acceptance": "../../evidence/ai/06/final/linux-acceptance.json"
+      }
     },
     {
       "id": "07",
