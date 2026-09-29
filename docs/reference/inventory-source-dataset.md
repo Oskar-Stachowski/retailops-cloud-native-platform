@@ -29,7 +29,9 @@ Panel, append-only history, cohorts i dzienne ceny używają causal availability
 Surowe sale ingestion pozostaje w transakcji; adapter nie przepisuje faktów.
 Finansowy ogon zwrotów nie rozszerza fizycznego okna inventory.
 Stockout episodes i diagnostyczne okna pozostają prywatnym truth;
-`label_qualification=not_evaluated` oznacza brak kwalifikacji lifecycle/coverage dla 08.
+Frozen `label_qualification=not_evaluated` dotyczy tych raw diagnostyk.
+Aktualna [kwalifikacja lifecycle/coverage](inventory-label-qualification.md)
+ma osobny immutable artefakt z parent source ID; nie przepisuje tego raportu.
 
 ## Identity, konfiguracja i odczyt
 
@@ -109,9 +111,10 @@ dotyczy tego lokalnego etapu, bez eksportu/importu/curated 03.
 
 ## Otwarte warunki
 
-Najbliższy zakres to kwalifikacja lifecycle/coverage w fizycznym grainie
-inventory i dojrzałych okien 08. Następnie potrzebne są rozszerzone,
-wersjonowane exporter/importer/curated 03, typed parity, truth isolation,
+[Kwalifikacja 06.6b.2b](inventory-label-qualification.md) ma lokalny odbiór
+źródłowych okien. Następny zakres to rozszerzone, wersjonowane
+exporter/importer/curated 03 dla source2.7 + qualification1.0, typed parity,
+parent lineage, truth isolation,
 powtórzenia i pełny budżet cross-repo oraz przełączenie domyślnej ścieżki AI
 na 2.7. Reevaluation04/05 użyje nowych IDs; metryki poprzednich danych
 pozostają przypięte do swoich snapshotów. DATA-06 jest nadal otwarte.

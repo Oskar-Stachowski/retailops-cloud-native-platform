@@ -1,5 +1,5 @@
 {
-  "version": "1.15",
+  "version": "1.16",
   "date": "2026-09-29",
   "stages": [
     {
@@ -143,16 +143,17 @@
       "path": "etapy/06-inventory-ledger.md",
       "status": "in_progress",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1–06.6b.1 inventory runtime and strict native tables; 06.6b.2a immutable source 2.7 CSV, 58 tables, configuration/identity/manifests, 36 independently recomputed quality gates and realism; default generator/API/handoff remains 2.6",
-      "next_scope": "06.6b.2b qualify inventory lifecycle/coverage and mature diagnostic windows; 06.6b.2c extend exporter/importer/curated03 and switch default AI source, full cross-repo acceptance; dependent 04/05 reevaluation",
+      "implementation_scope": "06.1–06.6b.2a inventory runtime, native tables and immutable source 2.7; 06.6b.2b private qualification 1.0 with parent lineage, historical lifecycle/routing, physical coverage and mature labels; default generator/API/handoff remains 2.6",
+      "next_scope": "06.6b.2c extend exporter/importer/curated03 for source 2.7 and evaluation qualification 1.0, new snapshot, full cross-repo acceptance and default AI source switch; dependent 04/05 reevaluation",
       "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.6b.2a/README.md",
-      "implementation_commit": "f47765955f2207f36e8c60c5a2f35391dce61dab",
-      "verification": "../../evidence/ai/06/06.6b.2a/verification.json",
-      "acceptance_runtime_commit": "5f1b76206071c72ba2d062dcba9a08d6878b4dc5",
+      "evidence": "../../evidence/ai/06/06.6b.2b/README.md",
+      "implementation_commit": "125219f602a800a4da42435f1b40c6a7a01cd00a",
+      "verification": "../../evidence/ai/06/06.6b.2b/verification.json",
+      "acceptance_runtime_commit": "125219f602a800a4da42435f1b40c6a7a01cd00a",
       "source_ready": false,
       "model_ready": false,
-      "label_qualification": "not_evaluated"
+      "label_qualification": "qualified_for_standard_source_profiles_only",
+      "model08_qualification": "not_evaluated"
     },
     {
       "id": "07",

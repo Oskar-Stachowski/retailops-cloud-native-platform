@@ -1,6 +1,6 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.6b.2a ma lokalny odbiór wersjonowanego source 2.7 z 58 tabelami i 36 bramkami. Następny zakres: 06.6b.2b — kwalifikacja lifecycle/coverage inventory. Repo: RetailOps. Zależność: 03.**
+**Status: w realizacji; 06.6b.2b ma lokalny odbiór lifecycle/coverage i prywatnych okien stockout source 2.7. Następny zakres: 06.6b.2c — nowy exporter/importer/curated 03 i przełączenie domyślnego źródła AI. Repo: RetailOps, następnie oba. Zależność: 03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
@@ -33,7 +33,7 @@ To kandydat z własnym execution ID, bez opublikowanego source/snapshot/curated.
 zachowuje typy, nulle, grain i historyczne availability; odczyt ponownie uzgadnia
 cały proces oraz projekcje 06.5. [Odbiór lokalny](../../../evidence/ai/06/06.6b.1/README.md)
 obejmuje powtórzenia profili i kontrolowane uszkodzenia. To nadal kandydat tabel;
-kwalifikacja lifecycle/coverage modelu 08 ma `not_evaluated`.
+kwalifikacja modelu 08 wymaga własnego odbioru.
 
 ## Następny zakres — 06.6b.2
 
@@ -46,9 +46,18 @@ no demand i late availability. `facts_ready` dotyczy tego lokalnego zakresu;
 pełne source/inventory/model readiness pozostają false.
 Domyślny generator/API i ścieżka 03 nadal używają2.6.
 
-1. **06.6b.2b:** zakwalifikować lifecycle/coverage inventory i projekcje06.5 w rzeczywistych source profiles, w tym no demand, zero stock, niedojrzały tail, przyszłe/niedostępne ruchy i supplier-poor. Sam pełny panel sprzedaży nie kwalifikuje labels08.
-2. **06.6b.2c:** rozszerzyć exporter/importer/curated 03 dla source 2.7 i przełączyć domyślną ścieżkę AI po odbiorze. Opublikować NOWY source/snapshot/curated z allowlistą operational facts, oddzielnym truth, typed parity, powtórzeniami, bramką cross-repo i pełnym budżetem. Zachować czytniki 2.0–2.6, snapshoty 03 i demo/API. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
-3. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
+[Kwalifikacja 06.6b.2b](../../../reference/inventory-label-qualification.md)
+tworzy osobne immutable private windows powiązane z parent source ID.
+Historyczny lifecycle i routing, stream certificate tej samej fizycznej pozycji,
+kompletny panel i maturity kwalifikują label 0/1; already stockout, inactive,
+missing i immature pozostają bez labelu. [Odbiór](../../../evidence/ai/06/06.6b.2b/README.md)
+obejmuje oba standardowe profile ze świeżymi powtórzeniami i kontrolowane
+przypadki. Profile mają obie klasy; kwalifikacja źródła nie odbiera modelu08.
+Frozen report2.7 zachowuje `not_evaluated`; aktualna kwalifikacja ma własny
+kontrakt/ID i pozostaje poza operational facts i cechami.
+
+1. **06.6b.2c:** rozszerzyć exporter/importer/curated 03 dla source 2.7 i jawnej qualification1.0, następnie przełączyć domyślną ścieżkę AI po odbiorze. Opublikować NOWY source/snapshot/curated z allowlistą operational facts, oddzielnym evaluation truth, parent lineage, typed parity, powtórzeniami, bramką cross-repo i pełnym budżetem. Zachować czytniki 2.0–2.7, snapshoty 03 i demo/API. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
+2. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
 
 ## Minimalny zestaw ruchów i uzgodnienie
 
