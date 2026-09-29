@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 odebrany lokalnie i w Required CI, opublikowany na main obu repo. Następne zakresy: 04 w AI i równolegle 06 w RetailOps. Aktualizacja: 29.09.2026.**
+**Status: etap 03 jest na main obu repo; AI 06 jest w realizacji na osobnym branchu RetailOps. Następne zakresy: 06.2 — dostawcy i receipts oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -38,7 +38,9 @@ zachowuje commity merge i Required CI dla push na main.
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
 i test doubles agenta 12; pełny agent czeka na 10.
-Modele i inventory nadal nie są gotowe.
+[Kontrakt 06.1](../../reference/inventory-ledger.md) dodaje jednorazowe opening,
+replay i adapter legacy na oddzielnym fixture. Generator source 2.6 nie używa
+jeszcze ledgeru; modele i inventory nadal nie są gotowe.
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.

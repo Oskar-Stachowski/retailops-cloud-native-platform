@@ -54,7 +54,11 @@ przypadek późnej korekty zachowują IDs, 25 tabel, typed CSV/Parquet parity
 i historyczny as-of. Source przechodzi 46 hard gates; repo AI ma 747 testów.
 Wszystkie przebiegi mieszczą się w 300 s / 1024 MiB.
 
-**Można rozpocząć AI 04 w repo AI oraz równolegle AI 06 w RetailOps.**
+**AI 06 jest w realizacji w RetailOps; równolegle można rozpocząć AI 04 w repo AI.**
+Zakres [06.1](reference/inventory-ledger.md) dostarcza oddzielny kontrakt ledgeru,
+jednorazowe opening, deterministic replay i adapter legacy. Nie jest jeszcze
+podłączony do source 2.6; `inventory_ready=false`. Następne w tym strumieniu:
+dostawcy, zamówienia i receipts według [06.2](plans/ai/etapy/06-inventory-ledger.md).
 Pierwszy forecasting korzysta z obserwowanej sprzedaży, bez inventory features.
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.

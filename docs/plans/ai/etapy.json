@@ -1,5 +1,5 @@
 {
-  "version": "1.7",
+  "version": "1.8",
   "date": "2026-09-29",
   "stages": [
     {
@@ -141,7 +141,14 @@
         "03"
       ],
       "path": "etapy/06-inventory-ledger.md",
-      "status": "planned"
+      "status": "in_progress",
+      "branch": "ai/06-01-inventory-ledger",
+      "implementation_scope": "06.1 strict inventory movement contract, single opening per declared product/physical location, immutable deterministic replay with UTC knowledge cutoffs, explicit transit and versioned legacy projection; not wired to source generator",
+      "next_scope": "06.2 suppliers, product suppliers, replenishment orders and receipts",
+      "inventory_ready": false,
+      "evidence": "../../evidence/ai/06/06.1/README.md",
+      "implementation_commit": "b7d11c7ece7eb9a978b06d09af9382a5acea0ea2",
+      "verification": "../../evidence/ai/06/06.1/verification.json"
     },
     {
       "id": "07",

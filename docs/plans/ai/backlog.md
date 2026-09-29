@@ -19,8 +19,10 @@ wyłączone; target opisuje obserwowaną sprzedaż.
 
 ## Praca równoległa od obecnego punktu
 
-- **Repo RetailOps / AI 06:** ledger, jedno otwarcie zapasu, ruchy i dostawy,
-  historyczny fulfillment mapping oraz nowe bramki źródła. Po zmianie danych
+- **Repo RetailOps / AI 06.2:** minimalni dostawcy, product suppliers,
+  zamówienia i receipts z partial/delayed fulfillment. Następnie reorder policy,
+  podłączenie ledgeru 06.1 do chronologicznego symulatora, historyczny fulfillment
+  mapping, snapshoty i nowe bramki źródła. Po zmianie danych
   tworzymy nowe IDs i ponawiamy import oraz zależne oceny 04/05.
 - **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
   limity, freshness i audyt. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
@@ -40,7 +42,7 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 |---|---|
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
-| **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |
+| **06 — inventory** | 06.2: suppliers/orders/receipts. Następnie policy i podłączenie ledgeru, historyczny fulfillment mapping, snapshoty i uzgodnienie źródła DATA-06. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |
 | **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne scenariusze truth i dojrzałe labels, dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
 | **08 — stockout** | DATA-06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |
