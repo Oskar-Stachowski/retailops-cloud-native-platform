@@ -89,7 +89,12 @@ def run(args: argparse.Namespace) -> dict:
                     "--snapshot-dir",
                     exported["path"],
                     "--workspace",
-                    str(args.ai_repo / args.output.parent.name / label / "data/generated"),
+                    str(
+                        args.ai_repo
+                        / "data/generated/ai06-acceptance"
+                        / args.output.parent.name
+                        / label
+                    ),
                 ],
                 args.ai_repo,
             )
