@@ -1,0 +1,77 @@
+{
+  "contract_version": "replenishment-1.0.0",
+  "over_receipt_policy": "reject",
+  "products": [
+    {
+      "id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "unit_of_measure": "pcs"
+    }
+  ],
+  "stock_locations": [
+    {
+      "id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "location_code": "WH-0001"
+    },
+    {
+      "id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "location_code": "WH-0002"
+    }
+  ],
+  "suppliers": [
+    {
+      "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+      "supplier_code": "SUP-0001",
+      "country_code": "PL",
+      "status": "active",
+      "minimum_order_quantity": 5,
+      "available_at": "2026-06-01T00:00:00Z"
+    },
+    {
+      "supplier_id": "08264179-52a0-57c1-ab4d-c647ff09d219",
+      "supplier_code": "SUP-0002",
+      "country_code": "DE",
+      "status": "inactive",
+      "minimum_order_quantity": 5,
+      "available_at": "2026-06-01T00:00:00Z"
+    }
+  ],
+  "product_suppliers": [
+    {
+      "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+      "unit_of_measure": "pcs",
+      "unit_cost": "5.00",
+      "currency": "PLN",
+      "priority": 1,
+      "effective_from": "2026-06-01",
+      "effective_to": "2026-08-01",
+      "quoted_lead_time_days": 2,
+      "lead_time_basis": "supplier_quote",
+      "quote_reference": "supplier-quote:Q-0001",
+      "known_at": "2026-06-01T00:01:00Z",
+      "ingested_at": "2026-06-01T00:02:00Z",
+      "available_at": "2026-06-01T00:03:00Z"
+    },
+    {
+      "product_supplier_id": "5b15d699-45b9-5018-b7c2-2b1b78e145c3",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "supplier_id": "08264179-52a0-57c1-ab4d-c647ff09d219",
+      "unit_of_measure": "pcs",
+      "unit_cost": "1.25",
+      "currency": "EUR",
+      "priority": 2,
+      "effective_from": "2026-06-01",
+      "effective_to": "2026-08-01",
+      "quoted_lead_time_days": 2,
+      "lead_time_basis": "supplier_quote",
+      "quote_reference": "supplier-quote:Q-0002",
+      "known_at": "2026-06-01T00:01:00Z",
+      "ingested_at": "2026-06-01T00:02:00Z",
+      "available_at": "2026-06-01T00:03:00Z"
+    }
+  ],
+  "replenishment_orders": [],
+  "delivery_plan_versions": [],
+  "replenishment_receipts": []
+}

@@ -1,0 +1,28 @@
+{
+  "contract_version": "reorder-config-1.0.0",
+  "policy_version": "periodic-review-stock-position-1.0.0",
+  "business_timezone": "UTC",
+  "review_anchor_at": "2026-07-03T00:00:00Z",
+  "known_at": "2026-06-01T00:00:00Z",
+  "available_at": "2026-06-01T00:00:00Z",
+  "rules": [
+    {
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "reorder_point": 5,
+      "safety_stock": 3,
+      "review_cadence_days": 1,
+      "history_window_days": 2,
+      "minimum_order_quantity": 5
+    },
+    {
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "reorder_point": 5,
+      "safety_stock": 3,
+      "review_cadence_days": 1,
+      "history_window_days": 2,
+      "minimum_order_quantity": 5
+    }
+  ]
+}

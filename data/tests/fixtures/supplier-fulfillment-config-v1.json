@@ -1,0 +1,14 @@
+{
+  "contract_version": "supplier-fulfillment-config-1.0.0",
+  "data_class": "simulation_truth",
+  "process_version": "supplier-fulfillment-two-point-1.0.0",
+  "seed": 42,
+  "lead_time_distribution": "two_point_mean_plus_minus_std",
+  "minimum_lead_days": 1,
+  "maximum_lead_days": 30,
+  "disruption_delay_days": 2,
+  "partial_fraction": "0.5",
+  "partial_receipt_gap_days": 2,
+  "ingestion_delay_seconds": 120,
+  "availability_delay_seconds": 60
+}

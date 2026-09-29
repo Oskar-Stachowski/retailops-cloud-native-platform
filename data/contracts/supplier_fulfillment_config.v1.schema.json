@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "supplier-fulfillment-config-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "data_class": {
+      "const": "simulation_truth",
+      "title": "Data Class",
+      "type": "string"
+    },
+    "process_version": {
+      "const": "supplier-fulfillment-two-point-1.0.0",
+      "title": "Process Version",
+      "type": "string"
+    },
+    "seed": {
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "lead_time_distribution": {
+      "const": "two_point_mean_plus_minus_std",
+      "title": "Lead Time Distribution",
+      "type": "string"
+    },
+    "minimum_lead_days": {
+      "exclusiveMinimum": 0,
+      "title": "Minimum Lead Days",
+      "type": "integer"
+    },
+    "maximum_lead_days": {
+      "exclusiveMinimum": 0,
+      "title": "Maximum Lead Days",
+      "type": "integer"
+    },
+    "disruption_delay_days": {
+      "exclusiveMinimum": 0,
+      "title": "Disruption Delay Days",
+      "type": "integer"
+    },
+    "partial_fraction": {
+      "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+      "title": "Partial Fraction",
+      "type": "string"
+    },
+    "partial_receipt_gap_days": {
+      "exclusiveMinimum": 0,
+      "title": "Partial Receipt Gap Days",
+      "type": "integer"
+    },
+    "ingestion_delay_seconds": {
+      "minimum": 0,
+      "title": "Ingestion Delay Seconds",
+      "type": "integer"
+    },
+    "availability_delay_seconds": {
+      "minimum": 0,
+      "title": "Availability Delay Seconds",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "contract_version",
+    "data_class",
+    "process_version",
+    "seed",
+    "lead_time_distribution",
+    "minimum_lead_days",
+    "maximum_lead_days",
+    "disruption_delay_days",
+    "partial_fraction",
+    "partial_receipt_gap_days",
+    "ingestion_delay_seconds",
+    "availability_delay_seconds"
+  ],
+  "title": "FulfillmentConfig",
+  "type": "object"
+}
