@@ -18,7 +18,8 @@ Chunked Parquet i niezmienny exporter mają lokalny odbiór 03.1/03.2.
 [Snapshot 03.2](../../../reference/ai-snapshots.md) przelicza bramki źródła
 i dopuszcza wyłącznie gotowe wymagane use cases. Handoff/import/curated mają
 [lokalny odbiór 03.3–03.5](../../../evidence/ai/03/03.5/README.md);
-pełna bramka cross-repo, Required CI i dalsze bramki modeli pozostają otwarte.
+[pełna bramka 03.6](../../../evidence/ai/03/03.6/README.md) ma lokalny
+i zdalny odbiór na opublikowanych branchach. Dalsze bramki modeli pozostają otwarte.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 
@@ -47,7 +48,9 @@ Development używa seed 42. Końcowa robustness policy obejmuje wcześniej zamro
   Polityka `ai03-snapshot-budget-1.0.0` wymusza 5 minut i 1 GiB peak RSS na każdy
   kompletny profil: generacja/kwalifikacja/export/verify/reexport, bez instalacji
   zależności. [Benchmark 03.2](../../../evidence/ai/03/03.2/README.md)
-  potwierdza lokalny zapas; zdalny wynik wymaga uruchomienia CI nowego brancha.
+  potwierdza lokalny zapas; [03.6](../../../evidence/ai/03/03.6/README.md)
+  potwierdza zdalny benchmark i dodatkową pełną bramkę obu repo (300 s / 1024 MiB
+  na pojedynczy pipeline, z instalacją zależności poza pomiarem).
 - Maksymalny śledzony fixture: 5 MiB po rozpakowaniu; co najwyżej jeden bieżący `ai-smoke`, bez pełnego training export. Małe archiwa wcześniejszych wersji służą wyłącznie regresji odczytu i łącznie mieszczą się w tym limicie, zgodnie z [polityką plików](dane-i-czas.md). Bieżące smoke i temporal smoke są generowane w temp. Ciężkie seedy/scenariusze są lokalne/manualne lub w osobnym jobie.
 - `ai-dev` i `ai-training` zapisuje się chunkami. Raport mierzy czas, peak memory, rows/s oraz bytes. Jeżeli pełny profil przekracza zasoby, poprawić zapis/przetwarzanie lub jawnie stworzyć nowy mniejszy profil; nie nazywać go dotychczasowym `ai-training`.
 - Koszt zależności, pobierania obrazów, treningu TensorFlow i calls do Bedrock raportować oddzielnie; smoke dataset nie jest budżetem całej platformy.

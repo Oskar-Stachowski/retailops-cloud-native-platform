@@ -1,14 +1,15 @@
 # Otwarte ustalenia audytowe
 
 Pomiary bazowe: **27.09.2026**, baza `cbf28b2a66e7e5f205cf73d9bfe620c491e22d93`.
-Aktualizacja otwartego zakresu: **28.09.2026**.
+Aktualizacja otwartego zakresu: **29.09.2026**.
 Poniżej są wyłącznie otwarte problemy potwierdzone w źródłach lub reprodukcji.
 [Audyt AI 00](../evidence/ai/00/README.md) rozdziela pomiary, 138 testów,
-przegląd statyczny i odczyt CI. Pozwala rozpocząć AI 01;
-nie potwierdza gotowości wszystkich dalszych etapów ani wdrożenia produkcyjnego.
+przegląd statyczny i odczyt CI; nie potwierdza gotowości wszystkich dalszych
+etapów ani wdrożenia produkcyjnego.
 Kolejność pracy i pierwsze małe PR-y: [backlog AI](../plans/ai/backlog.md).
 [Audyt AI 02](../evidence/ai/02/audit/README.md) potwierdza
-gotowość źródła 2.6 do rozpoczęcia AI 03.
+gotowość źródła 2.6. [Odbiór AI 03](../evidence/ai/03/03.6/README.md)
+otwiera forecasting 04 oraz ledger 06; poniższe problemy mają własne dalsze bramki.
 
 **P1** oznacza ryzyko utraty danych, naruszenia granicy dostępu lub niewiarygodnej
 oceny modelu. **P2** oznacza problem odtwarzalności, izolacji lub diagnostyki.

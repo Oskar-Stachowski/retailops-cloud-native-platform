@@ -1,6 +1,6 @@
 # 03. Zbuduj snapshot, importer i curated
 
-**Status: 03.1–03.5 odebrane lokalnie; następny zakres 03.6 bramka cross-repo. Repo: RetailOps + AI, osobne PR-y. Zależność: 02.**
+**Status: odebrany lokalnie i w Required CI na opublikowanych branchach obu repo. Repo: RetailOps + AI, osobne PR-y bez merge na main. Następne zakresy: 04 i 06 równolegle. Zależność: 02.**
 
 Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ścieżka to lokalny niezmienny eksport plików; kompletny REST/event integration powstaje w etapie 10. Ani działająca baza RetailOps, ani broker, ani AWS nie są wymagane do importu pierwszego snapshotu.
 
@@ -27,7 +27,11 @@ i transportu od typed importu i curated.
 Parquet, pełne byte/canonical checks, atomową publikację i idempotencję w AI.
 [Odbiór 03.5](../../../evidence/ai/03/03.5/README.md) obejmuje curated,
 normalizację, jawne mappings, quarantine i as-of z pełnej historii wersji.
-Pełny cross-repo flow i publikacja/Required CI pozostają do wykonania.
+[Końcowy odbiór 03.6](../../../evidence/ai/03/03.6/README.md) potwierdza
+pełny cross-repo flow, powtórzenia, zasoby i Required CI obu repo.
+[Runbook](../../../reference/ai03-cross-repo.md) opisuje odtworzenie;
+[karta](../../../evidence/ai/03/03.6/dataset-card.md) określa dopuszczone dane.
+Poniższy kontrakt pozostaje instrukcją utrzymania i ponowienia po 06/07.
 
 ## Kolejność małych PR-ów
 

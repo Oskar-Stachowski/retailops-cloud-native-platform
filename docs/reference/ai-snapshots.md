@@ -131,4 +131,5 @@ Writer, sort hashy i indeks dat są porcjowane/dyskowe. Generator oraz pełna
 walidacja źródła nadal materializują tabele w pamięci. Wyniki smoke nie kwalifikują
 pełnego ai-dev/ai-training. Snapshot jest gotowym eksportem, nie gotowym curated
 datasetem ani modelem. 03.3 dostarcza mały handoff bez generatora, 03.4 typed
-importer w AI. 03.5 dostarcza curated, a 03.6 dopiero otworzy 04 i 06.
+importer w AI. 03.5 dostarcza curated; [pełny odbiór 03.6](ai03-cross-repo.md)
+otwiera 04 i 06 na odebranych branchach.

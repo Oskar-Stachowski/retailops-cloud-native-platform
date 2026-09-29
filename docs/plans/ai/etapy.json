@@ -1,5 +1,5 @@
 {
-  "version": "1.5",
+  "version": "1.6",
   "date": "2026-09-29",
   "stages": [
     {
@@ -68,22 +68,38 @@
         "02"
       ],
       "path": "etapy/03-snapshot-curated.md",
-      "status": "in_progress",
-      "evidence": "../../evidence/ai/03/03.5/README.md",
-      "implementation_scope": "03.1 typed Parquet and artifact policy; 03.2 immutable qualified exporter; 03.3 self-contained handoff contract/fixture and independent pinned consumer acceptance; 03.4 independent typed importer, atomic immutable publication and idempotent consumer acceptance; 03.5 normalized immutable curated, explicit mappings/quarantine, full quantity revisions and as-of",
-      "acceptance_scope": "Local source export/import/curated smoke acceptance; full cross-repo gate 03.6 and remote Required CI remain open",
-      "next_scope": "03.6",
+      "status": "completed",
+      "evidence": "../../evidence/ai/03/03.6/README.md",
+      "implementation_scope": "03.1–03.5 typed Parquet, immutable qualified exporter, versioned independent handoff/importer, normalized immutable curated with mapping/quarantine and as-of; 03.6 full pinned cross-repo acceptance and required CI gate",
+      "acceptance_scope": "Published independent PR branches; both full smoke profiles twice plus separate controlled late-fact fixture twice, on Darwin ARM64 and Linux AMD64; no main merge or model qualification",
+      "next_scope": "04 / 06 in parallel",
       "implementation_commits": {
-        "retailops-cloud-native-platform": "e26faa2e4733397ce7e561ebf19b65966a0d909f",
-        "retailops-ai-intelligence": "073b22e38953472e622f6f2c44a95963f7717136"
+        "retailops-cloud-native-platform": "25fb0b887503c119055af86b63991299465096b9",
+        "retailops-ai-intelligence": "cb053cc29c1906d79108cba2c70f88b56e454211"
       },
-      "remote_required_ci": "not_run",
+      "remote_required_ci": {
+        "status": "success",
+        "producer_pr_run": 36540743369,
+        "consumer_pr_run": 36541696909,
+        "evidence": "../../evidence/ai/03/03.6/verification.json"
+      },
       "consumer_branch": "ai/03-04-importer",
       "consumer_implementation_commits": [
         "4e4717b9304a8668103aa4c0f5d65de46a57453a",
-        "073b22e38953472e622f6f2c44a95963f7717136"
+        "073b22e38953472e622f6f2c44a95963f7717136",
+        "cb053cc29c1906d79108cba2c70f88b56e454211"
       ],
-      "consumer_evidence_commit": "ab03a1fea0669dd437f9147815aad8e46e9c0237"
+      "producer_branch": "ai/03-01-parquet",
+      "consumer_documentation_commit": "7dd00cce51497d8cd7b90615309b3e9b67b6e513",
+      "publication": {
+        "producer_pr": 65,
+        "consumer_pr": 5,
+        "scope": "published independent PR branches; no main merge"
+      },
+      "next_unblocked_stages": [
+        "04",
+        "06"
+      ]
     },
     {
       "id": "04",

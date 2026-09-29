@@ -75,7 +75,8 @@ Profile AI nie rozszerzają listy profili seeda. [AI 03.1](parquet-artifacts.md)
 dodaje konwersję do chunked typed Parquet z date partitions i benchmark obu
 smoke profili. Generacja źródła nadal buduje tabele w pamięci;
 pełnych ai-dev/ai-training nie zmierzono. Kwalifikowany niezmienny eksport
-opisuje [AI 03.2](ai-snapshots.md); importer i curated pozostają do wykonania.
+opisuje [AI 03.2](ai-snapshots.md). Importer/curated i
+[pełna bramka cross-repo](ai03-cross-repo.md) mają odbiór obu smoke.
 
 ## Manifest v2 i identity
 

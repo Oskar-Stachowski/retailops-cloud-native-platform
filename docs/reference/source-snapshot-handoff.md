@@ -124,9 +124,11 @@ dwukrotnie. Sprawdza schema, wersje, identity, allowlistę i wszystkie byte hash
 [Typed importer 03.4](../evidence/ai/03/03.4/README.md) ma lokalny odbiór
 Parquet/canonical hashes i atomowej publikacji do generated w repo AI.
 [Curated 03.5](../evidence/ai/03/03.5/README.md) ma własne immutable IDs,
-mapping/quarantine i historyczny odczyt as-of; pełny flow pozostaje w 03.6.
+mapping/quarantine i historyczny odczyt as-of.
+[Pełny odbiór 03.6](ai03-cross-repo.md) wiąże oba repo i standardowe profile.
 
 Zmiany upstream i konsumenta mają osobne commity/branche ze wspólną wersją.
 Najpierw dostarcz upstream fixture/contract, potem consumer registry/testy.
 [Evidence 03.3](../evidence/ai/03/03.3/README.md) wskazuje rewizje i lokalne kontrole.
-Curated to 03.5, pełna bramka obu repo to 03.6; dopiero ona otwiera 04 i 06.
+[Końcowe evidence](../evidence/ai/03/03.6/README.md) podaje decyzję wejścia
+do 04/06, przypięte rewizje, Required CI i zakres publikacji.

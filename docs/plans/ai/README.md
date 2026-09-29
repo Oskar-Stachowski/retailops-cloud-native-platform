@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 odebrany lokalnie i zdalnie; 03.1–03.5 mają lokalny odbiór. Następny zakres: 03.6 bramka cross-repo. Aktualizacja: 29.09.2026.**
+**Status: etap 03 odebrany lokalnie i w Required CI na opublikowanych branchach obu repo. Następne zakresy: 04 w AI i równolegle 06 w RetailOps. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -30,16 +30,18 @@ fixture, wspólny kontrakt i niezależną walidację konsumenta bez generatora.
 niezmienny reimport i atomową publikację w osobnym branchu repo AI.
 [AI 03.5](../../evidence/ai/03/03.5/README.md) dodaje normalized curated,
 jawne mappings, quarantine i historyczny odczyt as-of.
-Następny zakres to **03.6 bramka cross-repo**
-w [etapie 03](etapy/03-snapshot-curated.md).
+[AI 03.6](../../evidence/ai/03/03.6/README.md) potwierdza pełną bramkę cross-repo
+na obu smoke dwukrotnie, późną korektę i Required CI obu repo.
+Można rozpocząć **04 forecasting** oraz równolegle **06 ledger**.
+Publikacja dotyczy osobnych PR-ów; nie wykonano ich merge na main.
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
 i test doubles agenta 12; pełny agent czeka na 10.
 Modele i inventory nadal nie są gotowe.
-[Backlog](backlog.md) podaje zakres 03 i granice równoległych strumieni.
+[Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.
-Etapy 03–17 opisują rozwój do wdrożenia; nie potwierdzają
+Etapy 04–17 opisują dalszy rozwój do wdrożenia; nie potwierdzają
 istnienia planowanych komponentów ani zatwierdzenia kosztów lub infrastruktury.
 
 Istniejący RetailOps ma [lokalną ocenę RF](../../evidence/ml/fixed-origin-rf-2026-09-27/README.md) i politykę decyzji; ostatni wynik to `rejected`. Przy rozpoczęciu rozbudowy AI wykorzystaj kontrakt cech, protokół czasowy i te dowody. Pełny serwis AI i etap 07 dotyczący anomalii pozostają osobnym zakresem.
