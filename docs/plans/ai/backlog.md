@@ -11,22 +11,18 @@ potwierdzone problemy i kryteria ich zamknięcia.
 
 ## Kolejny mały PR etapu 03
 
-**Repo:** RetailOps AI Intelligence. **Zależność:** source 2.6, handoff 1.0.0
-oraz [typed importer 03.4](../../evidence/ai/03/03.4/README.md).
-**03.5 — curated builder.** Normalizować typy, UTC/business dates, jednostki,
-waluty i słowniki; uzgodnić grain oraz jawne product/location/channel mappings.
-Zachować wszystkie wersje i availability. Brak mappingu, data-gap lub błędny
-rekord trafia do kwarantanny z reason/lineage; nie uzupełniać losowym zerem,
-store ani warehouse. Odczyt historyczny wybiera wersję znaną w origin.
-Publikować immutable Parquet i manifest curated ID, parent source/snapshot,
-transform code/lock/config SHA, counts/rejected/checksums i use-case readiness.
-Zachować osobny evaluation truth; nie dołączać go do cech ani runtime.
-Następnie 03.6: generator → qualification → export → import → curated na obu
-smoke dwukrotnie, z as-of, idempotencją, błędami i resource gates.
+**Repo:** oba repozytoria. **Zależność:** source 2.6, handoff 1.0.0
+oraz [curated 03.5](../../evidence/ai/03/03.5/README.md).
+**03.6 — bramka cross-repo.** Uruchomić generator → qualification → export →
+import → curated na obu smoke dwukrotnie, z jawnie przypiętymi rewizjami obu
+repo. Potwierdzić source/snapshot/curated IDs, CSV/Parquet parity, as-of i late
+corrections, idempotencję, błędy, oddzielną truth oraz pełny resource gate.
+Zaktualizować końcowe evidence etapu 03 i wykonać publikację/Required CI obu repo.
+Dopiero pełny odbiór otwiera 04 i 06.
 
 ## Praca równoległa od obecnego punktu
 
-- **Etap 03:** curated w repo AI; [03.4](../../evidence/ai/03/03.4/README.md) ma lokalny odbiór typed importera. Publikacja branchy 03 i zdalne Required CI obu repo pozostają do wykonania.
+- **Etap 03:** pełna bramka cross-repo; [03.5](../../evidence/ai/03/03.5/README.md) ma lokalny odbiór curated. Publikacja branchy 03 i zdalne Required CI obu repo pozostają do wykonania.
 - **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
   limity, freshness i audyt. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
   pełne narzędzia, odpowiedzi i integracja użytkowa wymagają również 10.
@@ -44,7 +40,7 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **03 — snapshot/curated** | Curated/label IDs i pełna lineage transformacji, mapping/quarantine, wersje/as-of korekt oraz końcowa bramka cross-repo. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
+| **03 — snapshot/curated** | Końcowa bramka cross-repo i zdalny Required CI obu repo. Pierwsza ścieżka przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |

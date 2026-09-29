@@ -6,6 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| AI 03.5 — curated w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.5/README.md): 743 testy, typed normalization/mapping/quarantine, immutable IDs, as-of, oba smoke i truth dwukrotnie oraz odłączony wheel. Kolejny zakres 03.6. |
 | AI 03.4 — typed importer w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.4/README.md): 706 testów, oba smoke i truth dwukrotnie, atomowość/idempotencja/typed parity oraz odłączony wheel. Następny zakres 03.5 curated. |
 | AI 03.3 — kontrakt handoff | 2026-09-28 | [Odbiór lokalny](ai/03/03.3/README.md): pełny mały fixture, wspólna wersja/schema/expected manifest, budget i niezależny checker konsumenta bez generatora. Typed importer jest następnym zakresem 03.4. |
 | AI 03.2 — niezmienny exporter | 2026-09-28 | [Odbiór lokalny](ai/03/03.2/README.md): allowlista 25 tabel, opcjonalna evaluation truth, przeliczone 46 hard gates, atomowa publikacja, checksums/parity, idempotencja i dwa przebiegi obu smoke. Handoff/importer/curated oraz zdalne CI pozostają otwarte. |

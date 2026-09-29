@@ -34,8 +34,9 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
 
 ## Zalecana kolejność od obecnego punktu
 
-1. **Teraz AI 03.5 w AI-intelligence:** curated, następnie końcowy odbiór rzeczywistego eksportu/importu między repozytoriami.
-   Typed Parquet, exporter, handoff i typed importer 03.1–03.4 mają lokalny odbiór.
+1. **Teraz AI 03.6 w obu repo:** końcowy odbiór generatora, kwalifikacji,
+   eksportu, importu i curated na przypiętych rewizjach oraz publikacja/Required CI.
+   Parquet, exporter, handoff, importer i curated 03.1–03.5 mają lokalny odbiór.
    AI 11 jest odebrany i opublikowany w repo AI. Równolegle można przygotować
    interfejsy i test doubles 12; nie zamyka to pełnego agenta.
 2. **Po 03:** równolegle 04 w AI-intelligence oraz 06 w cloud-native.

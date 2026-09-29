@@ -55,7 +55,9 @@ polityki artefaktów i niezmiennego eksportu w RetailOps.
 kontraktu i samowystarczalnego fixture.
 [03.4 typed importer](evidence/ai/03/03.4/README.md) jest odebrany lokalnie
 w repo AI, na osobnym branchu `ai/03-04-importer`: 706 testów, oba smoke
-i optional truth dwukrotnie. Następnie 03.5 curated i 03.6 bramka cross-repo.
+i optional truth dwukrotnie. [03.5 curated](evidence/ai/03/03.5/README.md)
+dodaje mapping, kwarantannę, niezmienne curated IDs i historyczny as-of;
+pełna regresja repo AI ma 743 testy. Następnie 03.6 bramka cross-repo.
 Publikacja branchy i zdalne Required CI 03 pozostają otwarte. RAG 11 jest odebrany; równolegle
 można przygotować interfejsy i test doubles 12. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
 przypisuje etapy 03–17 do repozytoriów i podaje kolejność oraz możliwości
@@ -72,7 +74,7 @@ użytkową kwalifikację, aktywację i rollback. Zakres jest opublikowany na
 zamrożone progi; kontrole krytyczne i cytaty mają 100%.
 
 Końcowe evidence właściciela repo AI opisuje pomiar Bedrock/PostgreSQL/HTTP,
-643 testy i kontrole awarii. Branch typed importera 03.4 ma ponowioną regresję
-706 testów. Nie wykonano w tej sesji nowych pomiarów AWS ani ponownej kontroli
+643 testy i kontrole awarii. Branch AI 03 ma ponowioną regresję
+743 testów po dodaniu curated 03.5. Nie wykonano w tej sesji nowych pomiarów AWS ani ponownej kontroli
 zdalnego CI RAG. Odpowiedzi i narzędzia agenta należą do 12; pełny agent czeka
 na 10. Zmiany dokumentacji wymagają nowego zatwierdzonego snapshotu korpusu.

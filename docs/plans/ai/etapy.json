@@ -69,17 +69,21 @@
       ],
       "path": "etapy/03-snapshot-curated.md",
       "status": "in_progress",
-      "evidence": "../../evidence/ai/03/03.4/README.md",
-      "implementation_scope": "03.1 typed Parquet and artifact policy; 03.2 immutable qualified exporter; 03.3 self-contained handoff contract/fixture and independent pinned consumer acceptance; 03.4 independent typed importer, atomic immutable publication and idempotent consumer acceptance",
-      "acceptance_scope": "Local source export/import smoke acceptance; curated 03.5 and full cross-repo gate 03.6 remain open",
-      "next_scope": "03.5",
+      "evidence": "../../evidence/ai/03/03.5/README.md",
+      "implementation_scope": "03.1 typed Parquet and artifact policy; 03.2 immutable qualified exporter; 03.3 self-contained handoff contract/fixture and independent pinned consumer acceptance; 03.4 independent typed importer, atomic immutable publication and idempotent consumer acceptance; 03.5 normalized immutable curated, explicit mappings/quarantine, full quantity revisions and as-of",
+      "acceptance_scope": "Local source export/import/curated smoke acceptance; full cross-repo gate 03.6 and remote Required CI remain open",
+      "next_scope": "03.6",
       "implementation_commits": {
         "retailops-cloud-native-platform": "e26faa2e4733397ce7e561ebf19b65966a0d909f",
-        "retailops-ai-intelligence": "aadd145e6f023078dcc34783247213d6fe8fdde5"
+        "retailops-ai-intelligence": "073b22e38953472e622f6f2c44a95963f7717136"
       },
       "remote_required_ci": "not_run",
-      "consumer_evidence_commit": "7d0f7198519c8df414c53900fc1a34e037a90ca3",
-      "consumer_branch": "ai/03-04-importer"
+      "consumer_branch": "ai/03-04-importer",
+      "consumer_implementation_commits": [
+        "4e4717b9304a8668103aa4c0f5d65de46a57453a",
+        "073b22e38953472e622f6f2c44a95963f7717136"
+      ],
+      "consumer_evidence_commit": "ab03a1fea0669dd437f9147815aad8e46e9c0237"
     },
     {
       "id": "04",

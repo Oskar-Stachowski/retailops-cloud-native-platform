@@ -16,8 +16,9 @@ ma siedem bramek chronologii/zwrotów, dwa cutoffy i 39-dniowy ogon.
 46 hard gates, rozdzielone parametry i izolowany worker z czterema projekcjami faktów oraz historią obserwacji as-of.
 Chunked Parquet i niezmienny exporter mają lokalny odbiór 03.1/03.2.
 [Snapshot 03.2](../../../reference/ai-snapshots.md) przelicza bramki źródła
-i dopuszcza wyłącznie gotowe wymagane use cases. Handoff/import/curated
-i dalsze bramki wymagają implementacji.
+i dopuszcza wyłącznie gotowe wymagane use cases. Handoff/import/curated mają
+[lokalny odbiór 03.3–03.5](../../../evidence/ai/03/03.5/README.md);
+pełna bramka cross-repo, Required CI i dalsze bramki modeli pozostają otwarte.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 

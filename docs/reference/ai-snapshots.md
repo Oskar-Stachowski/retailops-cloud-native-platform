@@ -7,7 +7,7 @@ to **1.0.0**, polityka `retailops-ai-snapshot-1.0.0`, format
 odpowiada wykonywalnemu modelowi. [Evidence](../evidence/ai/03/03.2/README.md)
 opisuje lokalny odbiór. [Kontrakt handoff 03.3](source-snapshot-handoff.md)
 jest dostępny; [importer 03.4](../evidence/ai/03/03.4/README.md) ma lokalny odbiór,
-a curated pozostaje kolejnym zakresem.
+a [curated 03.5](../evidence/ai/03/03.5/README.md) ma własny lokalny odbiór.
 
 ## Uruchomienie
 
@@ -131,4 +131,4 @@ Writer, sort hashy i indeks dat są porcjowane/dyskowe. Generator oraz pełna
 walidacja źródła nadal materializują tabele w pamięci. Wyniki smoke nie kwalifikują
 pełnego ai-dev/ai-training. Snapshot jest gotowym eksportem, nie gotowym curated
 datasetem ani modelem. 03.3 dostarcza mały handoff bez generatora, 03.4 typed
-importer w AI. 03.5 doda curated, a 03.6 dopiero otworzy 04 i 06.
+importer w AI. 03.5 dostarcza curated, a 03.6 dopiero otworzy 04 i 06.

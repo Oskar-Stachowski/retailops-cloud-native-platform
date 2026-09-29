@@ -123,6 +123,8 @@ expected manifest i fixture; ma test odłączonego pakietu uruchomionego z `pyth
 dwukrotnie. Sprawdza schema, wersje, identity, allowlistę i wszystkie byte hashes.
 [Typed importer 03.4](../evidence/ai/03/03.4/README.md) ma lokalny odbiór
 Parquet/canonical hashes i atomowej publikacji do generated w repo AI.
+[Curated 03.5](../evidence/ai/03/03.5/README.md) ma własne immutable IDs,
+mapping/quarantine i historyczny odczyt as-of; pełny flow pozostaje w 03.6.
 
 Zmiany upstream i konsumenta mają osobne commity/branche ze wspólną wersją.
 Najpierw dostarcz upstream fixture/contract, potem consumer registry/testy.
