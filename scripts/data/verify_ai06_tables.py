@@ -146,7 +146,7 @@ def run(output: Path) -> dict:
         elif label == "zero-opening":
             config["stock"]["opening_quantity"] = 0
         else:
-            config["sale_availability_delay_seconds"] = 9 * 86400
+            config["sale_availability_delay_seconds"] = 86400
         cases.append(
             _case(
                 directory,
