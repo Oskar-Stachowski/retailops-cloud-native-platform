@@ -299,7 +299,7 @@ def main() -> None:  # noqa: PLR0915 - sequential acceptance with always-written
                         msg = "repeated_typed_identity_changed"
                         raise ValueError(msg)
                     previous = identity(result)
-                    print(
+                    print(  # noqa: T201 - CLI progress
                         json.dumps(
                             {
                                 "profile": profile,
@@ -310,7 +310,7 @@ def main() -> None:  # noqa: PLR0915 - sequential acceptance with always-written
                             }
                         ),
                         flush=True,
-                    )  # noqa: T201 - CLI progress
+                    )
                 pinned(ROOT, args.producer_revision)
                 pinned(consumer, args.consumer_revision)
         report["status"] = "passed"
