@@ -5,7 +5,9 @@
 są oddzielone od fizycznych sald i epizodów w `simulation_truth`.
 [Odbiór](../evidence/ai/06/06.5/README.md) podaje kod i kontrole.
 Domyślny source 2.6 nadal nie korzysta z tej ścieżki; `inventory_ready=false`.
-Następny zakres to 06.6: integracja generatora i nowa publikacja danych.
+[Typowane tabele 06.6b.1](inventory-source-tables.md) materializują te projekcje
+na source profiles. Następny zakres 06.6b.2 to integracja domyślnego source,
+kwalifikacja lifecycle/coverage i nowa publikacja danych.
 
 ## Snapshot i czas wiedzy
 

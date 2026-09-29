@@ -41,7 +41,9 @@ i niezmienny re-export opisuje [runbook AI 03.2](../reference/ai-snapshots.md).
 Osobna [ścieżka integracji inventory 06.6a](../reference/source-inventory-commerce.md)
 realizuje źródłowe koszyki przez chronologiczny ledger i tworzy prywatny raport
 uzgodnienia. Nie jest domyślnym source, eksportem AI ani wejściem loadera seeda.
-Nowy wersjonowany source i publikacja przez 03 należą do 06.6b.
+[Typowane tabele 06.6b.1](../reference/inventory-source-tables.md) można osobno
+materializować i odczytać z uzgodnieniem CSV/Parquet. Integracja z nowym
+domyślnym source, pełne gates i publikacja przez 03 należą do 06.6b.2.
 
 Przykład profilu AI z kontrolą integralności źródła i cech:
 

@@ -100,10 +100,12 @@ prywatne arrivals/truth i nie jest wejściem API, loadera seeda ani feature work
 Fingerprint obejmuje generator, inventory runtime, kontrakty, worker i zależności.
 [Odbiór lokalny](../evidence/ai/06/06.6a/README.md) wiąże wyniki z commitem.
 
-Następny zakres 06.6b obejmuje wersjonowany domyślny source, typed tables,
+[Typowane tabele 06.6b.1](inventory-source-tables.md) materializują ten wynik
+i pełne projekcje 06.5, z oddzielnym facts/truth i uzgodnieniem po odczycie.
+Następny zakres 06.6b.2 obejmuje integrację tabel z wersjonowanym domyślnym source,
 manifesty/identity, lifecycle i kwalifikację coverage inventory, pełne source
 quality/realism/readiness oraz nowy eksport/import/curated przez ścieżkę 03.
-To także publikacja projekcji i diagnostyki 06.5 w nowym kontrakcie danych.
+To także nowa publikacja projekcji i diagnostyki 06.5 przez ścieżkę 03.
 Dopiero taki odbiór może zamknąć DATA-06. Zmieniony censoring wymaga nowej
 oceny 04/05 i zgodnego feature schema przed wykorzystaniem prognoz przez 07/08;
 dotychczasowe metryki modeli nie przenoszą się na nowy dataset.

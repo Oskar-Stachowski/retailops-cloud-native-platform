@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 jest na main obu repo; AI 06.6a ma lokalny odbiór integracji koszyków na osobnym branchu RetailOps. Następne zakresy: 06.6b — wersjonowany source i publikacja danych oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
+**Status: etap 03 jest na main obu repo; AI 06.6b.1 ma lokalny odbiór typowanych tabel na osobnym branchu RetailOps. Następne zakresy: 06.6b.2 — integracja z wersjonowanym source i publikacja danych oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -65,6 +65,11 @@ uzgadnia rzeczywiste sprzedaże, ceny częściowych realizacji, finansowe/qualit
 zwroty, panel/history/cohorts i snapshoty ledgeru na standardowych source profiles.
 [Odbiór](../../evidence/ai/06/06.6a/README.md) dotyczy osobnego kandydata;
 domyślny source 2.6 i publikacja 03 pozostają niezmienione.
+[Typowane tabele 06.6b.1](../../reference/inventory-source-tables.md) mają
+27 ścisłych schemas/grains, oddzielne facts/truth, powtarzalne native CSV/Parquet
+i niezależne uzgodnienie. [Odbiór](../../evidence/ai/06/06.6b.1/README.md)
+przygotowuje integrację source/manifest/gates w 06.6b.2;
+`inventory_ready=false`, nowy snapshot/import/curated i DATA-06 pozostają otwarte.
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.

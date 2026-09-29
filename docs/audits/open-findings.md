@@ -33,6 +33,8 @@ Nie blokuje forecast-only AI 04–05, gdzie inventory features są pominięte.
 [Kandydat integracji 06.6a](../reference/source-inventory-commerce.md) ma osobną
 ścieżkę koszyków i uzgodnienia; otwarty zakres obejmuje domyślny wersjonowany
 source, lifecycle/coverage, pełne gates i nową publikację snapshot/import/curated.
+[Typowane tabele 06.6b.1](../reference/inventory-source-tables.md) mają odrębny
+odbiór; otwarte pozostaje ich włączenie do domyślnego source i ścieżki 03.
 
 ## Runtime i bezpieczeństwo
 

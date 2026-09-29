@@ -1,6 +1,6 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.6a realizuje koszyki źródłowe przez chronologiczny ledger w osobnej ścieżce. Następny zakres: 06.6b — wersjonowany domyślny source i publikacja danych. Repo: RetailOps. Zależność: 03.**
+**Status: w realizacji; 06.6b.1 ma lokalny odbiór 27 typowanych tabel inventory. Następny zakres: 06.6b.2 — integracja tabel z wersjonowanym domyślnym source i publikacja danych. Repo: RetailOps. Zależność: 03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
@@ -28,9 +28,16 @@ availability. [Odbiór lokalny](../../../evidence/ai/06/06.6a/README.md) obejmuj
 standardowe profile i niezależne uzgodnienie facts/ledger/snapshotów.
 To kandydat z własnym execution ID, bez opublikowanego source/snapshot/curated.
 
-## Następny zakres — 06.6b
+[Kontrakt tabel 06.6b.1](../../../reference/inventory-source-tables.md) rozdziela
+19 operational facts/plans i 8 private truth tables. Native CSV/Parquet
+zachowuje typy, nulle, grain i historyczne availability; odczyt ponownie uzgadnia
+cały proces oraz projekcje 06.5. [Odbiór lokalny](../../../evidence/ai/06/06.6b.1/README.md)
+obejmuje powtórzenia profili i kontrolowane uszkodzenia. To nadal kandydat tabel;
+kwalifikacja lifecycle/coverage modelu 08 ma `not_evaluated`.
 
-1. Wersjonować nowy domyślny source: typed inventory/supply/return-disposition tables, konfiguracje, identity, manifesty i pełne quality/realism/readiness. Zachować czytniki 2.0–2.6 i niezmienne snapshoty 03 oraz demo/API compatibility.
+## Następny zakres — 06.6b.2
+
+1. Włączyć typowane inventory/supply/return-disposition tables w nowy domyślny source: konfiguracje, wersję, identity, manifesty i pełne quality/realism/readiness. Zachować czytniki 2.0–2.6 i niezmienne snapshoty 03 oraz demo/API compatibility.
 2. Zakwalifikować lifecycle/coverage inventory i projekcje 06.5 w rzeczywistych source profiles, w tym no demand, zero stock, niedojrzały tail, przyszłe/niedostępne ruchy i supplier-poor. Sam pełny panel sprzedaży nie kwalifikuje labels 08.
 3. Opublikować NOWY source/snapshot/curated przez rozszerzony exporter i importer03, z allowlistą operational facts, oddzielnym truth, typed parity, powtórzeniami oraz bramką cross-repo i pomiarem budżetu. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
 4. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.

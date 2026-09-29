@@ -1,5 +1,5 @@
 {
-  "version": "1.13",
+  "version": "1.14",
   "date": "2026-09-29",
   "stages": [
     {
@@ -143,12 +143,13 @@
       "path": "etapy/06-inventory-ledger.md",
       "status": "in_progress",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1–06.5 inventory runtime/projections; 06.6a unpublished source-commerce integration: fulfilled baskets, quantity-aware pricing, financial versus quality returns, causal daily observations/history/cohorts and reconciled snapshots; default source 2.6 unchanged",
-      "next_scope": "06.6b versioned default source, typed tables/identity/manifests, inventory lifecycle/coverage and source gates; new immutable export/import/curated acceptance and dependent 04/05 reevaluation",
+      "implementation_scope": "06.1–06.6a inventory runtime and source-commerce candidate; 06.6b.1 strict native inventory tables, isolated facts/truth, CSV/Parquet roundtrip and independent process/projection reconciliation; default source 2.6 unchanged",
+      "next_scope": "06.6b.2 integrate native inventory tables into versioned default source/identity/manifests and full gates; qualify lifecycle/coverage; new immutable snapshot/import/curated and dependent 04/05 reevaluation",
       "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.6a/README.md",
-      "implementation_commit": "01c417028f3eb826132c1aae0484099d56fe6ae0",
-      "verification": "../../evidence/ai/06/06.6a/verification.json"
+      "evidence": "../../evidence/ai/06/06.6b.1/README.md",
+      "implementation_commit": "5184ec9cbb227c35f25ecbf4652b114d3f073599",
+      "verification": "../../evidence/ai/06/06.6b.1/verification.json",
+      "acceptance_runtime_commit": "b52a4220a3c7942773c52a777d8f6b3fe86c6a10"
     },
     {
       "id": "07",
