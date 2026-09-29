@@ -5,7 +5,8 @@ implementacja `a3ead60`.** Środowisko: macOS ARM64, Python 3.11.15
 z `services/api/.venv`. [Rejestr](verification.json) zawiera commit,
 checksums, komendy, konfigurację, przypadki CLI i wyniki.
 [Kontrakt i uruchomienie](../../../../reference/reorder-policy.md) opisują
-aktualne zachowanie. Następny zakres to **06.4 — chronologiczny symulator**.
+aktualne zachowanie. [Odrębny odbiór symulatora 06.4](../06.4/README.md)
+wskazuje aktualny punkt wznowienia: **06.5 — snapshoty i stockout truth**.
 
 ## Działające zachowanie
 

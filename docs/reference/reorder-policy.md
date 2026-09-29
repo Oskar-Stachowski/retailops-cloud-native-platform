@@ -3,8 +3,9 @@
 **Zakres:** działająca polityka przeglądu zapasu i osobna symulacja realizacji
 dostaw na małym fixture. Wykorzystuje [ledger 06.1](inventory-ledger.md)
 i [kontrakt dostaw 06.2](replenishment.md). Source 2.6 nie korzysta jeszcze
-z tych modułów; `inventory_ready=false`. Następny zakres to **06.4 —
-chronologiczny symulator wspólnego zapasu i sprzedaży**.
+z tych modułów; `inventory_ready=false`. [Symulator 06.4](chronological-inventory.md)
+korzysta z nich na osobnym scenariuszu. Następny zakres to **06.5 — snapshoty
+i stockout truth**.
 
 ## Konfiguracja i decyzja
 
@@ -55,7 +56,7 @@ deklaruje pokrycie strumienia obserwowanego ledgeru, jego przedział, availabili
 i provenance. Dowód musi pokrywać całe okno i być dostępny w origin; nie może
 deklarować historii sprzed opening. To deklaracja pokrycia danych operacyjnych,
 bez dostępu do latent demand i bez obietnicy znajomości późniejszych zdarzeń
-lub korekt. Generator w 06.4 musi ją wyprowadzać z rzeczywiście przetworzonych
+lub korekt. Symulator 06.4 wyprowadza ją z rzeczywiście przetworzonych
 okien, a nie z maksimum timestampu w sparse sprzedaży.
 
 Bez coverage wynik ma `history_missing`, a liczba sprzedaży pozostaje null.
@@ -125,6 +126,7 @@ Runner waliduje połączony book, projekcję receipts i pełny ledger przez 06.2
 oraz potwierdza, że przyszłe przyjęcia nie zmieniają salda w origin.
 
 [Odbiór 06.3](../evidence/ai/06/06.3/README.md) podaje testy i rzeczywiste CLI.
-Do [06.4–06.6](../plans/ai/etapy/06-inventory-ledger.md) pozostają chronologiczne
-wykonanie, sprzedaż ograniczona wspólną pulą, fulfillment mapping, eligibility
-zwrotów, snapshoty oraz nowa publikacja i readiness. DATA-06 pozostaje otwarte.
+[Odbiór symulatora 06.4](../evidence/ai/06/06.4/README.md) obejmuje wielodniowe
+wykonanie, shared stock, routing i zwroty. Do [06.5–06.6](../plans/ai/etapy/06-inventory-ledger.md)
+pozostają snapshoty, epizody stockout oraz nowa publikacja i readiness.
+DATA-06 pozostaje otwarte.

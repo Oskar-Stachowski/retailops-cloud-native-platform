@@ -92,6 +92,7 @@ i raport `failed` dla błędnego kontraktu lub bilansu.
 
 [Odbiór 06.1](../evidence/ai/06/06.1/README.md) podaje testy i provenance.
 Sam walidator ledgeru nie sprawdza encji supplier/order/receipt;
-[walidator 06.2](replenishment.md) dodaje to uzgodnienie. Historyczny fulfillment
-do konkretnej sprzedaży i return eligibility pozostają dalszą pracą,
-konieczną przed source `inventory_ready=true`.
+[walidator 06.2](replenishment.md) dodaje to uzgodnienie.
+[Symulator 06.4](chronological-inventory.md) uzgadnia także historyczny
+fulfillment konkretnej sprzedaży i return eligibility. Snapshoty, epizody
+stockout i pełny odbiór źródła pozostają wymagane przed `inventory_ready=true`.

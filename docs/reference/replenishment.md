@@ -3,8 +3,8 @@
 **Zakres:** kontrakt dostawców, ofert, zamówień, wersji terminów i rzeczywistych
 przyjęć oraz uzgodnienie z [ledgerem 06.1](inventory-ledger.md).
 Generator source 2.6 nie korzysta jeszcze z tych encji; `inventory_ready=false`.
-[Polityka 06.3](reorder-policy.md) wykorzystuje te encje; następny zakres
-projektu to chronologiczny symulator **06.4**.
+[Polityka 06.3](reorder-policy.md) i [symulator 06.4](chronological-inventory.md)
+wykorzystują te encje; następny zakres projektu to snapshoty i stockout truth **06.5**.
 
 ## Kontrakty i podział wiedzy
 
@@ -96,6 +96,7 @@ CLI zwraca exit 0 i raport `passed` albo exit 1 i raport `failed`.
 Raport zachowuje checksums, znane zamówienia, salda, reconciliation i provenance
 kodu. [Odbiór 06.2](../evidence/ai/06/06.2/README.md) podaje wyniki kontroli.
 [Polityka reorder i osobny proces realizacji dostaw](reorder-policy.md) mają
-odrębny odbiór 06.3. Symulator wspólnego zapasu,
-fulfillment sprzedaży, return eligibility, snapshoty i publikacja nowego source
-nadal należą do [pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).
+odrębny odbiór 06.3. [Odbiór 06.4](../evidence/ai/06/06.4/README.md) obejmuje
+symulator wspólnego zapasu, fulfillment sprzedaży i return eligibility.
+Snapshoty, stockout truth i publikacja nowego source nadal należą do
+[pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).

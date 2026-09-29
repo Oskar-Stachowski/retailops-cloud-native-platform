@@ -4,8 +4,8 @@
 implementacja `8fd2e3f`.** Środowisko: macOS ARM64, Python z `services/api/.venv`.
 [Rejestr odbioru](verification.json) wiąże commit, checksums, komendy,
 rzeczywiste CLI i wyniki. [Kontrakt i uruchomienie](../../../../reference/replenishment.md)
-opisują aktualne zachowanie. [Odrębny odbiór polityki 06.3](../06.3/README.md)
-wskazuje aktualny punkt wznowienia: **06.4 — chronologiczny symulator**.
+opisują aktualne zachowanie. [Odrębny odbiór symulatora 06.4](../06.4/README.md)
+wskazuje aktualny punkt wznowienia: **06.5 — snapshoty i stockout truth**.
 
 ## Działające zachowanie
 

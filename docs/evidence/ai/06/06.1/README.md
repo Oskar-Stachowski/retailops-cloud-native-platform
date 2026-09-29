@@ -1,8 +1,8 @@
 # AI 06.1 — kontrakt ruchów i jednorazowe opening
 
 **Odbiór lokalny 29.09.2026 na branchu `ai/06-01-inventory-ledger`.**
-Etap AI 06 jest w realizacji. [Odbiór polityki 06.3](../06.3/README.md)
-wskazuje aktualny punkt wznowienia: **06.4 — chronologiczny symulator**.
+Etap AI 06 jest w realizacji. [Odbiór symulatora 06.4](../06.4/README.md)
+wskazuje aktualny punkt wznowienia: **06.5 — snapshoty i stockout truth**.
 [Kontrakt i uruchomienie](../../../../reference/inventory-ledger.md)
 opisują aktualne zachowanie. [Rejestr odbioru](verification.json) zapisuje commit
 implementacji, fingerprints, fixture, rzeczywiste CLI i wyniki kontroli.

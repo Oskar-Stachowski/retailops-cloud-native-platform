@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 jest na main obu repo; AI 06 jest w realizacji na osobnym branchu RetailOps. Następne zakresy: 06.4 — chronologiczny symulator oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
+**Status: etap 03 jest na main obu repo; AI 06 jest w realizacji na osobnym branchu RetailOps. Następne zakresy: 06.5 — snapshoty i stockout truth oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -51,6 +51,11 @@ position i pokrytych okien historii. Osobny moduł generatora realizuje dostawy
 z wersjonowanym seedem i truth, bez ujawniania rzeczywistego terminu w decyzji.
 [Odbiór lokalny](../../evidence/ai/06/06.3/README.md) obejmuje MOQ, cadence,
 pending/partial orders, brakujące dane, powtarzalność i uzgodnienie przyjęć.
+[Symulator 06.4](../../reference/chronological-inventory.md) łączy ledger,
+sprzedaż, kwalifikowane zwroty i dostawy w jednym porządku czasu/sequence.
+Kanały korzystają ze wspólnego fizycznego zapasu, routing jest historyczny,
+a przegląd nie zna przyszłych realizacji. [Odbiór lokalny](../../evidence/ai/06/06.4/README.md)
+zachowuje osobne operational/truth, uzgodnienie i regresję source 2.6.
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.
