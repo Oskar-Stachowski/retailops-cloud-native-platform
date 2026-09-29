@@ -258,7 +258,9 @@ def main() -> None:  # noqa: PLR0915 - explicit versioned CLI dispatch
         parser.add_argument("--" + option, type=int)
     parser.add_argument("--output-root", type=Path, default=GENERATED_ROOT / "snapshots")
     parser.add_argument("--include-evaluation-truth", action="store_true")
-    parser.add_argument("--require-use-case", action="append", choices=USE_CASES)
+    parser.add_argument(
+        "--require-use-case", action="append", choices=(*USE_CASES, "inventory_source")
+    )
     parser.add_argument("--chunk-rows", type=int, default=DEFAULT_CHUNK_ROWS)
     parser.add_argument("--partition-min-rows", type=int, default=PARTITION_MIN_ROWS)
     parser.add_argument("--source-version", choices=("2.6", "2.7"), default=None)

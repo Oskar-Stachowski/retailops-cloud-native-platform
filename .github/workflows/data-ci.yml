@@ -107,8 +107,8 @@ jobs:
           CONSUMER_REVISION: ${{ env.AI06_CONSUMER_REVISION }}
         run: |
           services/api/.venv/bin/python -m scripts.data.verify_ai06_snapshot \
-            --ai-repo data/generated/ai06-ci-consumer \
-            --ai-python data/generated/ai06-ci-consumer/.venv/bin/python \
+            --ai-repo "${GITHUB_WORKSPACE}/data/generated/ai06-ci-consumer" \
+            --ai-python "${GITHUB_WORKSPACE}/data/generated/ai06-ci-consumer/.venv/bin/python" \
             --output ci-cd/reports/data/ai06-final-linux/acceptance.json
       - name: Upload full cross-repo evidence
         if: always()

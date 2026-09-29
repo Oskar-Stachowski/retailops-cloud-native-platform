@@ -39,6 +39,8 @@ def test_default_ai_export_cli_and_explicit_frozen_snapshot(version):
         args = ["--profile", "ai-smoke", "--seed", "42", "--end-date", "2026-07-31", "--days", "10", "--products", "3", "--stores", "3", "--warehouses", "2", "--output-root", str(Path(tmp)/"snapshots")]
         if version:
             args.extend(["--source-version",version])
+        else:
+            args.extend(["--require-use-case", "inventory_source"])
         result = json.loads(cli("data.export.ai_snapshot", args))
         manifest = result["manifest"]
         assert manifest["schema_version"] == ("1.0.0" if version else "1.1.0")
