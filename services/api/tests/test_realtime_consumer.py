@@ -1,6 +1,9 @@
+from unittest.mock import Mock
+
 import pytest
 
 from app.core.config import Settings
+from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
 from app.services.realtime_consumer import (
     RealtimeEventConsumer,
     RealtimeEventEnvelope,
@@ -12,6 +15,7 @@ def sample_event(event_type: str = "sale_completed") -> dict[str, object]:
     return {
         "event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV2",
         "event_type": event_type,
+        "topic": "retailops.sales.v1",
         "schema_version": "1.0",
         "source": "retailops.synthetic-generator",
         "correlation_id": "order_8f4f7f4b",
@@ -20,6 +24,10 @@ def sample_event(event_type: str = "sale_completed") -> dict[str, object]:
         "payload": {
             "sale_id": "sale-1",
             "product_id": "product-1",
+            "store_id": "store-1",
+            "channel": "online",
+            "quantity": "2",
+            "total_amount": "14",
         },
     }
 
@@ -173,3 +181,14 @@ def test_consumer_snapshot_includes_broker_settings() -> None:
     assert snapshot["client_id"] == "retailops-api"
     assert snapshot["consumer_name"] == "retailops-realtime-consumer"
     assert "sale_completed" in snapshot["supported_event_types"]
+
+
+def test_consumer_rejects_mismatched_transport_topic_before_metrics() -> None:
+    repository = Mock(spec=RealtimeMetricsRepository)
+    consumer = RealtimeEventConsumer(repository=repository)
+
+    result = consumer.process_event(sample_event(), transport_topic="retailops.inventory.v1")
+
+    assert result["status"] == "failed_dead_lettered"
+    assert "Transport topic mismatch" in result["error"]
+    repository.replace_metric_observations.assert_not_called()

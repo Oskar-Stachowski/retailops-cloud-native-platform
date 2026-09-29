@@ -70,7 +70,10 @@ class FakeEventConsumer:
     def stop(self) -> None:
         self.stopped = True
 
-    def process_event(self, event: dict[str, object]) -> dict[str, str]:
+    def process_event(
+        self, event: dict[str, object], *, transport_topic: str | None = None
+    ) -> dict[str, str]:
+        assert transport_topic == "retailops.sales.v1"
         self.events.append(event)
         return {"status": "processed"}
 

@@ -48,7 +48,7 @@ Typowany klient sprawdza schemat i świeżość, propaguje `X-Correlation-ID`/`t
 
 ## 3. Topics, envelope i kompatybilność
 
-Proponowana decyzja **ADR-09** zachowuje legacy v1 oraz oddziela bogate wyniki AI na `retailops.intelligence.v2`. Wymaga zgodnej konfiguracji topic-init, schematów i projektora. Źródłowe registry należy uzgodnić z działającym generatorem/konsumentem oraz poniższą mapą docelową. Ewentualne wpisy `retailops.orders.v1` i `retailops.ml.v1` trzeba rozstrzygnąć jawnie, aby nie utrzymywać sprzecznych standardów.
+Proponowana decyzja **ADR-09** zachowuje legacy v1 oraz oddziela bogate wyniki AI na `retailops.intelligence.v2`. OPS-07 uzgadnia źródłowe legacy v1 z działającym generatorem, konsumentem, topic-init i wykonywalnym JSON Schema. Bogate v2 nadal wymaga osobnych schematów, konfiguracji i projektora.
 
 | Topic docelowy | Event types | Obsługa |
 |---|---|---|

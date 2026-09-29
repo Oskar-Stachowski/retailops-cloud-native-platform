@@ -52,27 +52,3 @@ nie identyfikuje zatem jednoznacznie wszystkich wejść przyszłego builda.
 **Kryterium zamknięcia:** pełne SHA dla zewnętrznych actions oraz digesty bazowych
 obrazów, aktualizowane kontrolowanym PR z walidacją. Dowód wydania zapisuje
 rozwiązane tożsamości wejść i wynikowych artefaktów.
-
-### OPS-07 · P2 · Kontrakt zdarzeń JSON odbiega od generatora i consumera
-
-**Dowód:** [kontrakt JSON](../../events/contracts/retailops-realtime-events.v1.contract.json)
-deklaruje tematy `retailops.orders.v1` i `retailops.ml.v1`, pomija typy
-`return_completed` oraz `replenishment_completed` i wymaga pola `topic`.
-[Generator](../../data/generator/realtime.py) i
-[consumer](../../services/api/app/services/realtime_consumer.py) używają dla
-tych przepływów `retailops.sales.v1` i `retailops.intelligence.v1` oraz obsługują
-oba dodatkowe typy; consumer nie wymaga `topic` w envelope. Konsument kierujący
-się plikiem kontraktu może otrzymać inny zakres niż działający runtime.
-[AI 00](../evidence/ai/00/contracts.json) odtworzył 49 856 zdarzeń i potwierdził
-zgodność generatora z topic init/consumerem, ale parser akceptuje brak/błędny temat,
-wersję `999` i pusty payload. W dwóch różnych snapshotach 8501 event IDs ma różną
-treść: tożsamość nie obejmuje wersji snapshotu/payloadu.
-
-**Kryterium zamknięcia:** jeden wersjonowany kontrakt określa tematy, typy,
-wymagane pola i regułę wyznaczania tematu. Generator, inicjalizacja brokera,
-consumer oraz testy walidują zgodność z nim. Zmiana zachowuje świadomie wybraną
-kompatybilność; test wykrywa rozbieżności mapowania i pól.
-Walidować payload/version/topic transportu i rozdzielić replay tego samego zdarzenia
-od nowej wersji danych. Etap AI 10 musi zachować legacy v1 i osobny kontrakt
-`intelligence.v2`; pełne domain projectors są nową funkcją z planu, nie istniejącą
-gwarancją konsumenta metryk.

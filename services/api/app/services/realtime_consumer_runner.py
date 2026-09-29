@@ -132,7 +132,7 @@ class RealtimeKafkaConsumerRunner:
     def _handle_message(self, message: KafkaMessage) -> None:
         try:
             event = decode_message_value(message.value())
-            result = self.event_consumer.process_event(event)
+            result = self.event_consumer.process_event(event, transport_topic=message.topic())
             logger.info(
                 "Processed realtime event status=%s topic=%s partition=%s offset=%s",
                 result.get("status"),
