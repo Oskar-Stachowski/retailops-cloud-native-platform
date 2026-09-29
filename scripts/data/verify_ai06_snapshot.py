@@ -1,4 +1,4 @@
-"""AI06.6b.2c.1 fresh cross-repo export/import acceptance; curated remains pending."""
+"""AI06 fresh source/qualification/export/import/curated and historical as-of acceptance."""
 
 # ruff: noqa: INP001 - standalone acceptance CLI
 
@@ -84,8 +84,9 @@ def run(args: argparse.Namespace) -> dict:
             imported = execute(
                 [
                     str(args.ai_python),
-                    "scripts/check_snapshot_import.py",
+                    "scripts/check_curated.py",
                     "--worker",
+                    "--pipeline-only",
                     "--snapshot-dir",
                     exported["path"],
                     "--workspace",
@@ -103,7 +104,10 @@ def run(args: argparse.Namespace) -> dict:
             require(
                 exported["tables"] == imported["tables"] == 43
                 and imported["snapshot_id"] == exported["snapshot_id"]
-                and imported["typed_parity"] == "passed",
+                and imported["status"] == "passed"
+                and imported["readiness"]["inventory_ready"]
+                and imported["inventory_as_of_checks"]
+                and imported["evaluation_truth_in_curated"] is False,
                 "Cross-repo typed import differs.",
             )
             item = {
@@ -115,7 +119,8 @@ def run(args: argparse.Namespace) -> dict:
                 "source_seconds": source["source_seconds"],
                 "qualification_seconds": source["qualification_seconds"],
                 "export_seconds": exported["seconds"],
-                "import_seconds": import_seconds,
+                "import_curated_as_of_seconds": import_seconds,
+                "curated_id": imported["curated_dataset_id"],
                 "seconds": total,
                 "producer_peak_rss_mib": max(source["peak_rss_mib"], exported["peak_rss_mib"]),
                 "consumer_peak_rss_mib": imported["peak_rss_mib"],
@@ -131,17 +136,17 @@ def run(args: argparse.Namespace) -> dict:
             (report_root / (label + "-pipeline.json")).write_text(json.dumps(item, indent=2) + "\n")
             require(
                 item["status"] == "passed",
-                f"Fresh export/import budget failed: {total:.2f}s, {peak:.2f} MiB.",
+                f"Fresh full pipeline budget failed: {total:.2f}s, {peak:.2f} MiB.",
             )
             repeats.append(item)
             print(  # noqa: T201 - acceptance progress
-                f"{label}: source -> qualification -> snapshot -> import passed in {total:.2f}s",
+                f"{label}: source -> qualification -> snapshot -> import -> curated/as-of passed in {total:.2f}s",
                 flush=True,
             )
         require(
             all(
                 repeats[0][k] == repeats[1][k]
-                for k in ("source_id", "qualification_id", "snapshot_id")
+                for k in ("source_id", "qualification_id", "snapshot_id", "curated_id")
             )
             and repeats[0]["export"]["descriptor"] == repeats[1]["export"]["descriptor"],
             "Fresh cross-repo repeats differ.",
@@ -149,15 +154,15 @@ def run(args: argparse.Namespace) -> dict:
         results.extend(repeats)
     return {
         "status": "passed",
-        "scope": "AI06.6b.2c.1 source/qualification/export/import; curated and default switch pending",
+        "scope": "AI06 complete source/qualification/export/import/curated/as-of",
         "producer_commit": commit,
         "consumer_commit": ai_commit,
         "cases": results,
         "limits": {"seconds": 300, "rss_mib": 1024},
-        "curated": "not_evaluated",
-        "default_ai_source": "2.6.0",
-        "source_ready": False,
-        "inventory_ready": False,
+        "curated": "passed",
+        "default_ai_source": "2.7.0",
+        "source_ready": True,
+        "inventory_ready": True,
         "model_ready": False,
     }
 
