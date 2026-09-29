@@ -1,6 +1,6 @@
 # 03. Zbuduj snapshot, importer i curated
 
-**Status: odebrany lokalnie i w Required CI na opublikowanych branchach obu repo. Repo: RetailOps + AI, osobne PR-y bez merge na main. Następne zakresy: 04 i 06 równolegle. Zależność: 02.**
+**Status: odebrany lokalnie i w Required CI, opublikowany na main obu repo przez osobne PR-y. Repo: RetailOps + AI. Następne zakresy: 04 i 06 równolegle. Zależność: 02.**
 
 Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ścieżka to lokalny niezmienny eksport plików; kompletny REST/event integration powstaje w etapie 10. Ani działająca baza RetailOps, ani broker, ani AWS nie są wymagane do importu pierwszego snapshotu.
 

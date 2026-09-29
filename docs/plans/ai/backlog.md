@@ -3,8 +3,8 @@
 [Odbiór 03](../../evidence/ai/03/03.6/README.md) obejmuje pełną ścieżkę
 generator → kwalifikacja → eksport → import → curated na przypiętych rewizjach,
 oba smoke dwukrotnie i Required CI obu repo. Pierwsza ścieżka używa plików;
-forecast source jest gotowy przy inventory false. Publikacja jest na osobnych
-branchach/PR-ach, bez merge na main.
+forecast source jest gotowy przy inventory false. AI 03 jest na main obu repo;
+[zapis publikacji](../../evidence/ai/03/03.6/main-publication.json) podaje commity i CI.
 Ten plik zawiera wyłącznie otwartą pracę; [audyt](../../audits/open-findings.md)
 opisuje potwierdzone problemy i kryteria ich zamknięcia.
 
