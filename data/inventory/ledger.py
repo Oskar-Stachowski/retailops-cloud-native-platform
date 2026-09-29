@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import asdict, dataclass
+from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from data.generator.common import deterministic_uuid
@@ -44,9 +45,17 @@ class InventoryMovement:
     def position(self) -> Position:
         return self.product_id, self.stock_location_id
 
-    @property
+    @cached_property
+    def occurred_time(self) -> datetime:
+        return utc_timestamp(self.occurred_at)
+
+    @cached_property
+    def available_time(self) -> datetime:
+        return utc_timestamp(self.available_at)
+
+    @cached_property
     def ordering_key(self) -> tuple[datetime, int]:
-        return utc_timestamp(self.occurred_at), self.sequence
+        return self.occurred_time, self.sequence
 
     def record(self) -> dict[str, Any]:
         return asdict(self)
@@ -244,8 +253,7 @@ class InventoryLedger:
         return tuple(
             m
             for m in self.movements
-            if utc_timestamp(m.occurred_at) <= happened
-            and (known is None or utc_timestamp(m.available_at) <= known)
+            if m.occurred_time <= happened and (known is None or m.available_time <= known)
         )
 
     def balances_at(

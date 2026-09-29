@@ -38,6 +38,7 @@ def run(generation: DatasetGenerationConfig, inventory_config_path: Path) -> dic
         "inventory_projection_config",
         "inventory_projection",
         "source_inventory_config",
+        "inventory_source_tables",
     )
     fingerprint = code_fingerprint(
         (*files, *(f"data/contracts/{name}.v1.schema.json" for name in contracts))

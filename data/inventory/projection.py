@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
@@ -22,14 +23,12 @@ if TYPE_CHECKING:
 def validate_window(ledger: InventoryLedger, config: ProjectionConfig) -> None:
     start, end = utc_timestamp(config.start_at), utc_timestamp(config.end_at)
     require(
-        all(start <= utc_timestamp(m.occurred_at) < end for m in ledger.movements),
+        all(start <= m.occurred_time < end for m in ledger.movements),
         "Ledger outside projection observation window.",
     )
     require(
         all(
-            utc_timestamp(m.occurred_at) == start
-            for m in ledger.movements
-            if m.movement_type == "opening_stock"
+            m.occurred_time == start for m in ledger.movements if m.movement_type == "opening_stock"
         ),
         "Projection start differs from opening.",
     )
@@ -39,13 +38,14 @@ def physical_daily_balances(
     ledger: InventoryLedger, config: ProjectionConfig
 ) -> list[dict[str, Any]]:
     rows = []
+    by_position = defaultdict(list)
+    for movement in ledger.movements:
+        by_position[movement.position].append(movement)
     for midnight, start, end in day_periods(config):
         for product, location in ledger.scope:
-            movements = [m for m in ledger.movements if m.position == (product, location)]
-            preceding = sum(
-                m.quantity_delta for m in movements if utc_timestamp(m.occurred_at) < start
-            )
-            included = [m for m in movements if start <= utc_timestamp(m.occurred_at) < end]
+            movements = by_position[product, location]
+            preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
+            included = [m for m in movements if start <= m.occurred_time < end]
             opening = sum(m.quantity_delta for m in included if m.movement_type == "opening_stock")
             delta = sum(m.quantity_delta for m in included if m.movement_type != "opening_stock")
             rows.append(
@@ -124,6 +124,9 @@ def _reconcile_daily(
     expected = {(day, *position) for day in periods for position in ledger.scope}
     snapshots = output["operational"]
     physical = output["simulation_truth"]["physical_daily_balances"]
+    by_position = defaultdict(list)
+    for movement in ledger.movements:
+        by_position[movement.position].append(movement)
     for rows in (snapshots, physical):
         keys = [(r["business_date"], r["product_id"], r["stock_location_id"]) for r in rows]
         require(
@@ -143,10 +146,8 @@ def _reconcile_daily(
         )
         visible = [
             m
-            for m in ledger.movements
-            if m.position == (row["product_id"], row["stock_location_id"])
-            and utc_timestamp(m.occurred_at) <= cutoff
-            and utc_timestamp(m.available_at) <= cutoff
+            for m in by_position[row["product_id"], row["stock_location_id"]]
+            if m.occurred_time <= cutoff and m.available_time <= cutoff
         ]
         known = any(m.movement_type == "opening_stock" for m in visible)
         quantity = sum(m.quantity_delta for m in visible) if known else None
@@ -160,9 +161,7 @@ def _reconcile_daily(
             and row["last_inventory_event_id"]
             == (visible[-1].inventory_event_id if visible else None)
             and row["source_available_at"]
-            == (
-                max(utc_timestamp(m.available_at) for m in visible).isoformat() if visible else None
-            ),
+            == (max(m.available_time for m in visible).isoformat() if visible else None),
             "Snapshot source lineage is inconsistent.",
         )
         require(
@@ -182,17 +181,13 @@ def _reconcile_daily(
         )
     for row in physical:
         _day, start, end = periods[row["business_date"]]
-        movements = [
-            m
-            for m in ledger.movements
-            if m.position == (row["product_id"], row["stock_location_id"])
-        ]
-        closing = sum(m.quantity_delta for m in movements if utc_timestamp(m.occurred_at) < end)
-        preceding = sum(m.quantity_delta for m in movements if utc_timestamp(m.occurred_at) < start)
+        movements = by_position[row["product_id"], row["stock_location_id"]]
+        closing = sum(m.quantity_delta for m in movements if m.occurred_time < end)
+        preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
         opening = sum(
             m.quantity_delta
             for m in movements
-            if m.movement_type == "opening_stock" and start <= utc_timestamp(m.occurred_at) < end
+            if m.movement_type == "opening_stock" and start <= m.occurred_time < end
         )
         require(
             utc_timestamp(row["snapshot_at"]) == end - timedelta(microseconds=1)
@@ -252,7 +247,7 @@ def reconcile_projection(
         maturity = max(
             close + timedelta(seconds=config.truth_delay_seconds),
             *(
-                utc_timestamp(m.available_at)
+                m.available_time
                 for m in ledger.movements
                 if m.position == onset.position and m.ordering_key <= end_key
             ),
@@ -355,15 +350,18 @@ def reconcile_projection(
         == {(r["snapshot_at"], r["product_id"], r["stock_location_id"]) for r in snapshots},
         "Missing/duplicate diagnostic origin grain.",
     )
-    for row in diagnostics:
-        expected_row = next(
-            r
+    expected_windows = {}
+    for origin, evaluation in {(r["origin"], r["evaluated_at"]) for r in diagnostics}:
+        expected_windows[origin, evaluation] = {
+            (r["product_id"], r["stock_location_id"]): r
             for r in diagnose_windows(
-                ledger, config, episodes, origin=row["origin"], evaluated_at=row["evaluated_at"]
+                ledger, config, episodes, origin=origin, evaluated_at=evaluation
             )
-            if (r["product_id"], r["stock_location_id"])
-            == (row["product_id"], row["stock_location_id"])
-        )
+        }
+    for row in diagnostics:
+        expected_row = expected_windows[row["origin"], row["evaluated_at"]][
+            row["product_id"], row["stock_location_id"]
+        ]
         require(row == expected_row, "Window diagnostic ignores eligibility or maturity.")
     return {
         "snapshots": len(snapshots),

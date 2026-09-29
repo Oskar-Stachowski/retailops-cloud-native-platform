@@ -113,7 +113,7 @@ def stockout_episodes(
             if episode["end_available_at"] is not None
             else close,
             *(
-                utc_timestamp(m.available_at)
+                m.available_time
                 for m in ledger.movements
                 if m.position == (episode["product_id"], episode["stock_location_id"])
                 and m.ordering_key <= end_key
@@ -151,16 +151,12 @@ def diagnose_windows(
     for balance in known:
         position = balance["product_id"], balance["stock_location_id"]
         movements = [
-            m
-            for m in ledger.movements
-            if m.position == position and utc_timestamp(m.occurred_at) <= finish
+            m for m in ledger.movements if m.position == position and m.occurred_time <= finish
         ]
         status, reason, incident, available = "not_evaluable", None, None, None
         if balance["on_hand"] is None:
             reason = "inventory_unknown"
-        elif any(
-            utc_timestamp(m.occurred_at) <= stamp < utc_timestamp(m.available_at) for m in movements
-        ):
+        elif any(m.occurred_time <= stamp < m.available_time for m in movements):
             reason = "origin_state_unavailable"
         elif balance["available_qty"] == 0:
             status = "already_stockout"
@@ -169,7 +165,7 @@ def diagnose_windows(
         else:
             available = max(
                 finish + timedelta(seconds=config.truth_delay_seconds),
-                *(utc_timestamp(m.available_at) for m in movements),
+                *(m.available_time for m in movements),
             )
             if evaluation < available:
                 reason = "outcomes_not_available"

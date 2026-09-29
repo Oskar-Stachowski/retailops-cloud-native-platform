@@ -54,7 +54,7 @@ def snapshot_at(
                 "snapshot_at": stamp.isoformat(),
                 "as_of_time": known.isoformat(),
                 "unit_of_measure": units[position["product_id"]],
-                "source_available_at": max(utc_timestamp(m.available_at) for m in rows).isoformat()
+                "source_available_at": max(m.available_time for m in rows).isoformat()
                 if rows
                 else None,
                 "last_inventory_event_id": rows[-1].inventory_event_id if rows else None,

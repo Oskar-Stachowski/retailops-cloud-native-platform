@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from bisect import bisect_left
 from collections import defaultdict
 from typing import Any
 
@@ -157,6 +158,12 @@ def verify_demand_outcomes(
     arrivals: tuple[DemandArrival, ...] | None = None,
 ) -> dict[str, int]:
     ledger = InventoryLedger.from_payload(operational["ledger"])
+    position_keys = defaultdict(list)
+    position_balances: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0])
+    for movement in ledger.movements:
+        position_keys[movement.position].append(movement.ordering_key)
+        balances = position_balances[movement.position]
+        balances.append(balances[-1] + movement.quantity_delta)
     sales = {s["source_reference"]: s for s in operational["sales"]}
     require(len(sales) == len(operational["sales"]), "Duplicate fulfilled demand reference.")
     outcomes = truth["demand_outcomes"]
@@ -216,11 +223,7 @@ def verify_demand_outcomes(
         position = row["product_id"], row["stock_location_id"]
         require(position in ledger.scope, "Demand outcome references unknown stock position.")
         key = utc_timestamp(row["occurred_at"]), row["sequence"]
-        before = sum(
-            m.quantity_delta
-            for m in ledger.movements
-            if m.position == position and m.ordering_key < key
-        )
+        before = position_balances[position][bisect_left(position_keys[position], key)]
         observed = min(before, row["latent_quantity"])
         require(
             (
