@@ -16,8 +16,9 @@ import subprocess
 import sys
 import tempfile
 import time
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = ("ai-smoke", "ai-temporal-smoke")
@@ -48,7 +49,51 @@ def hashes(root: Path) -> dict[str, str]:
     }
 
 
-def producer(profile: str, workspace: Path) -> dict:
+def late_fact_source(source: Path) -> dict:
+    """Delay one real generated sale in a controlled fixture and run all real gates."""
+    from data.generator import main as generation
+    from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
+    from data.generator.demand_panel import build_daily_panel
+    from data.generator.observation_history import build_daily_versions
+    from data.generator.pricing_plans import daily_price_observations
+
+    original_build = generation.build_dataset
+    probe = {}
+
+    def delayed_build(config: DatasetGenerationConfig) -> dict:
+        tables = original_build(config)
+        effective = resolve_generation_config(config)
+        sale = min(tables["sales"], key=lambda row: (row["sold_at"], row["id"]))
+        sold = datetime.fromisoformat(sale["sold_at"])
+        delayed = datetime.combine(
+            sold.date() + timedelta(days=1), datetime.min.time(), UTC
+        ) + timedelta(hours=1)
+        sale["ingested_at"] = delayed.isoformat()
+        tables["daily_price_observations"] = daily_price_observations(
+            tables["sales"], tables["sale_price_references"]
+        )
+        tables["daily_demand_observations"] = build_daily_panel(tables, effective)
+        tables["daily_demand_versions"] = build_daily_versions(tables, effective)
+        probe.update(
+            sale_id=sale["id"],
+            ingested_at=sale["ingested_at"],
+            transformation="one generated sale delayed until day close + 1 hour; all dependent observations rebuilt and all 46 source gates recomputed",
+        )
+        return tables
+
+    # Only fixture construction is injected. Export, qualification, import,
+    # curated and as-of all execute their production implementations.
+    with patch.object(generation, "build_dataset", side_effect=delayed_build):
+        generation.generate_demo_dataset(
+            source,
+            DatasetGenerationConfig(
+                profile="ai-smoke", days=8, products=2, seed=42, end_date=date(2026, 7, 31)
+            ),
+        )
+    return probe
+
+
+def producer(profile: str, workspace: Path, *, late_fact: bool = False) -> dict:
     # The consumer is a separate interpreter/repository, never an import here.
     from data.export.ai_snapshot import export_snapshot
     from data.export.hashing import ContentHash
@@ -60,9 +105,11 @@ def producer(profile: str, workspace: Path) -> dict:
 
     started = time.monotonic()
     source = workspace / "csv"
-    generate_demo_dataset(
-        source, DatasetGenerationConfig(profile=profile, seed=42, end_date=date(2026, 7, 31))
-    )
+    probe = late_fact_source(source) if late_fact else None
+    if not late_fact:
+        generate_demo_dataset(
+            source, DatasetGenerationConfig(profile=profile, seed=42, end_date=date(2026, 7, 31))
+        )
     generated = time.monotonic()
     manifest = json.loads((source / MANIFEST_V2_FILENAME).read_text())
     source_bytes = hashes(source)
@@ -138,6 +185,7 @@ def producer(profile: str, workspace: Path) -> dict:
         "seconds": time.monotonic() - started,
         "peak_rss_mib": rss,
         "python": platform.python_version(),
+        "controlled_late_fact": probe,
     }
 
 
@@ -187,7 +235,7 @@ def enforce(run: dict) -> None:
         msg = "qualification_quarantine_truth_failed"
         raise ValueError(msg)
     if (
-        run["profile"] == "ai-temporal-smoke"
+        run["profile"] == "controlled-late-fact"
         and downstream["late_correction"]["status"] != "passed"
     ):
         msg = "real_late_correction_not_exercised"
@@ -204,12 +252,13 @@ def main() -> None:  # noqa: PLR0915 - sequential acceptance with always-written
         "--output", type=Path, default=ROOT / "ci-cd/reports/data/ai03-cross-repo.json"
     )
     parser.add_argument("--producer-worker", choices=PROFILES, help=argparse.SUPPRESS)
+    parser.add_argument("--late-fact", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--workspace", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.producer_worker:
         if args.workspace is None:
             parser.error("workspace required")
-        print(json.dumps(producer(args.producer_worker, args.workspace)))  # noqa: T201 - worker protocol
+        print(json.dumps(producer(args.producer_worker, args.workspace, late_fact=args.late_fact)))  # noqa: T201 - worker protocol
         return
     if any(
         v is None
@@ -235,11 +284,12 @@ def main() -> None:  # noqa: PLR0915 - sequential acceptance with always-written
         "limits": {"seconds_per_full_run": MAX_SECONDS, "peak_process_rss_mib": MAX_RSS_MIB},
         "resource_scope": "Wall time of both sequential fresh workers including process startup; conservative sum of orchestrator peak RSS and maximum worker RSS (workers do not overlap). Dependency installation excluded.",
         "environment": {"platform": platform.platform(), "architecture": platform.machine()},
+        "gate_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "runs": [],
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     try:
-        for profile in PROFILES:
+        for profile in (*PROFILES, "controlled-late-fact"):
             previous = None
             for repeat in range(2):
                 pinned(ROOT, args.producer_revision)
@@ -252,9 +302,10 @@ def main() -> None:  # noqa: PLR0915 - sequential acceptance with always-written
                             sys.executable,
                             str(Path(__file__).resolve()),
                             "--producer-worker",
-                            profile,
+                            "ai-smoke" if profile == "controlled-late-fact" else profile,
                             "--workspace",
                             str(workspace),
+                            *(["--late-fact"] if profile == "controlled-late-fact" else []),
                         ],
                         ROOT,
                         MAX_SECONDS,
@@ -276,12 +327,32 @@ def main() -> None:  # noqa: PLR0915 - sequential acceptance with always-written
                         consumer,
                         remaining,
                     )
+                    artifacts = args.output.with_suffix("") / profile / str(repeat + 1)
+                    artifacts.mkdir(parents=True, exist_ok=True)
+                    manifests = {
+                        "source": workspace / "csv/dataset_manifest.v2.json",
+                        "snapshot": Path(upstream["snapshot_path"]) / "snapshot_manifest.json",
+                        "curated": workspace
+                        / "consumer/data/generated/curated"
+                        / downstream["curated_dataset_id"]
+                        / "curated_manifest.json",
+                    }
+                    references = {}
+                    for kind, path in manifests.items():
+                        copied = artifacts / (kind + "_manifest.json")
+                        shutil.copyfile(path, copied)
+                        references[kind] = {
+                            "path": copied.relative_to(args.output.parent).as_posix(),
+                            "sha256": hashlib.sha256(copied.read_bytes()).hexdigest(),
+                            "bytes": copied.stat().st_size,
+                        }
                     upstream.pop("snapshot_path")
                     result = {
                         "profile": profile,
                         "repeat": repeat + 1,
                         "producer": upstream,
                         "consumer": downstream,
+                        "manifests": references,
                         "seconds": time.monotonic() - started,
                         "peak_rss_mib": max(upstream["peak_rss_mib"], downstream["peak_rss_mib"])
                         + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss

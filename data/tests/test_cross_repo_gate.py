@@ -1,5 +1,7 @@
 from copy import deepcopy
 import importlib.util
+import csv
+import json
 from pathlib import Path
 
 import pytest
@@ -12,7 +14,7 @@ enforce, identity, pinned = gate.enforce, gate.identity, gate.pinned
 
 def accepted():
     return {
-        "profile": "ai-temporal-smoke", "seconds": 299, "peak_rss_mib": 1023,
+        "profile": "controlled-late-fact", "seconds": 299, "peak_rss_mib": 1023,
         "producer": {
             "source_dataset_id": "source", "snapshot_id": "snapshot",
             "hard_gates": 46, "inventory_ready": False,
@@ -66,3 +68,16 @@ def test_pin_requires_exact_sha_and_clean_tree(monkeypatch, tmp_path):
         pinned(tmp_path, revision)
     with pytest.raises(ValueError, match="full_git_sha"):
         pinned(tmp_path, "a" * 7)
+
+
+def test_controlled_late_fact_is_really_qualified_and_preserves_initial_quantity(tmp_path):
+    source = tmp_path / "source"
+    probe = gate.late_fact_source(source)
+    report = json.loads((source / "source_report.json").read_text())
+    assert report["status"] == "passed" and len(report["checks"]) == 46
+    with (source / "daily_demand_versions.csv").open() as stream:
+        versions = list(csv.DictReader(stream))
+    correction = next(row for row in versions if row["version"] == "2")
+    initial = next(row for row in versions if row["observation_id"] == correction["observation_id"] and row["version"] == "1")
+    assert initial["available_at"] < correction["available_at"] == probe["ingested_at"]
+    assert int(initial["observed_units"]) < int(correction["observed_units"])
