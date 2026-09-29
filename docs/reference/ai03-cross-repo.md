@@ -67,8 +67,8 @@ Job jest wymagany: failure propaguje przez `data-gate` do `required-result`.
 Repo AI ma własny Required CI, pełne testy i rzeczywisty Compose/persistence.
 Zmiana zachowania konsumenta wymaga jawnej aktualizacji pinu i ponownego odbioru.
 
-[Końcowe evidence AI 03.6](../evidence/ai/03/03.6/README.md) rozróżnia odbiór
-na opublikowanych branchach/PR-ach od merge na main. Forecast source jest ready,
+[Końcowe evidence AI 03.6](../evidence/ai/03/03.6/README.md) zawiera odbiór
+cross-repo oraz publikację na main obu repo z Required CI. Forecast source jest ready,
 inventory pozostaje false; model, anomaly, stockout i replay mają dalsze bramki.
 Po ledgerze 06 i scenariuszach 07 wykonaj tę ścieżkę na nowych IDs i ponów
 zależne oceny. Zachowaj niezmienność wcześniejszych snapshotów.

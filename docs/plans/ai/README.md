@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 odebrany lokalnie i w Required CI na opublikowanych branchach obu repo. Następne zakresy: 04 w AI i równolegle 06 w RetailOps. Aktualizacja: 29.09.2026.**
+**Status: etap 03 odebrany lokalnie i w Required CI, opublikowany na main obu repo. Następne zakresy: 04 w AI i równolegle 06 w RetailOps. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -33,7 +33,8 @@ jawne mappings, quarantine i historyczny odczyt as-of.
 [AI 03.6](../../evidence/ai/03/03.6/README.md) potwierdza pełną bramkę cross-repo
 na obu smoke dwukrotnie, późną korektę i Required CI obu repo.
 Można rozpocząć **04 forecasting** oraz równolegle **06 ledger**.
-Publikacja dotyczy osobnych PR-ów; nie wykonano ich merge na main.
+[Publikacja na main obu repo](../../evidence/ai/03/03.6/main-publication.json)
+zachowuje commity merge i Required CI dla push na main.
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
 i test doubles agenta 12; pełny agent czeka na 10.

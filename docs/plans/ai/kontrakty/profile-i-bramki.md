@@ -19,7 +19,8 @@ Chunked Parquet i niezmienny exporter mają lokalny odbiór 03.1/03.2.
 i dopuszcza wyłącznie gotowe wymagane use cases. Handoff/import/curated mają
 [lokalny odbiór 03.3–03.5](../../../evidence/ai/03/03.5/README.md);
 [pełna bramka 03.6](../../../evidence/ai/03/03.6/README.md) ma lokalny
-i zdalny odbiór na opublikowanych branchach. Dalsze bramki modeli pozostają otwarte.
+i zdalny odbiór oraz [publikację na main obu repo](../../../evidence/ai/03/03.6/main-publication.json).
+Dalsze bramki modeli pozostają otwarte.
 Wartości są założeniami dla tego projektu syntetycznego, nie dowodem realizmu rynku.
 Zmiana polityki wymaga jawnego diffu i nowej wersji, przed oglądaniem final testu.
 

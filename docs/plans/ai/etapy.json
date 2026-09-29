@@ -1,5 +1,5 @@
 {
-  "version": "1.6",
+  "version": "1.7",
   "date": "2026-09-29",
   "stages": [
     {
@@ -71,7 +71,7 @@
       "status": "completed",
       "evidence": "../../evidence/ai/03/03.6/README.md",
       "implementation_scope": "03.1–03.5 typed Parquet, immutable qualified exporter, versioned independent handoff/importer, normalized immutable curated with mapping/quarantine and as-of; 03.6 full pinned cross-repo acceptance and required CI gate",
-      "acceptance_scope": "Published independent PR branches; both full smoke profiles twice plus separate controlled late-fact fixture twice, on Darwin ARM64 and Linux AMD64; no main merge or model qualification",
+      "acceptance_scope": "Published on main in both repositories; both full smoke profiles twice plus separate controlled late-fact fixture twice, on Darwin ARM64 and Linux AMD64; no model qualification",
       "next_scope": "04 / 06 in parallel",
       "implementation_commits": {
         "retailops-cloud-native-platform": "25fb0b887503c119055af86b63991299465096b9",
@@ -81,7 +81,11 @@
         "status": "success",
         "producer_pr_run": 36540743369,
         "consumer_pr_run": 36541696909,
-        "evidence": "../../evidence/ai/03/03.6/verification.json"
+        "evidence": "../../evidence/ai/03/03.6/verification.json",
+        "producer_final_pr_run": 36543846350,
+        "producer_main_push_run": 36546235649,
+        "consumer_main_push_run": 36546199968,
+        "main_push_evidence": "../../evidence/ai/03/03.6/main-publication.json"
       },
       "consumer_branch": "ai/03-04-importer",
       "consumer_implementation_commits": [
@@ -94,12 +98,17 @@
       "publication": {
         "producer_pr": 65,
         "consumer_pr": 5,
-        "scope": "published independent PR branches; no main merge"
+        "scope": "merged independent PRs to main; Required CI for each main push",
+        "evidence": "../../evidence/ai/03/03.6/main-publication.json"
       },
       "next_unblocked_stages": [
         "04",
         "06"
-      ]
+      ],
+      "accepted_main_commits": {
+        "retailops-cloud-native-platform": "44e916567b5b82ba0e00b4ffa1d824589fd30676",
+        "retailops-ai-intelligence": "9eb873a0ae6ec75e444d20aad3bebb7f8820beba"
+      }
     },
     {
       "id": "04",

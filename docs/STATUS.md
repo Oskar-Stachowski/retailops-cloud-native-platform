@@ -22,7 +22,7 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 | Monitoring | Metryki API/DB/stream, Prometheus, Grafana i próba rzeczywistego firing/resolution alertu. SLO dotyczy scrape metryk; brak dowodu dostępności żądań użytkownika przez 30 dni i dostarczania powiadomień. |
 | Jenkins | Rzeczywiste lokalne wykonanie pipeline z 2026-09-26; dodatkowa walidacja, bez wdrażania do chmury. |
 | ML | Lokalna generacja cech, ocena RF z trzema oknami walidacyjnymi i odłożonym testem całego horyzontu oraz zweryfikowana ścieżka artefaktu do batchu, metadanych i metryk. [Ocena z 27.09.2026](evidence/ml/fixed-origin-rf-2026-09-27/README.md) odrzuciła RF wobec średniej ruchomej; brak kwalifikacji do serving. |
-| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. Kontrakty danych/run/tool, walidacja offline i lokalne uprawnienia API: 267 testów na czystym checkoutcie oraz rzeczywisty HTTP z wheel poza źródłami. Principal pochodzi z prywatnych poświadczeń, cały scope jest egzekwowany; admin nie dziedziczy odczytów. Osobny wcześniejszy pomiar Compose: crash, trwałość, awaria DB i recovery. Etap 01 ma odbiór lokalny i zdalny: Required CI PR oraz push na main obu repo przechodzi, w tym persistence na Linux AMD64; dodatkowe testy bramki CI zwiększają zestaw do 273 testów. Zmiana grants/revoked wymaga restartu API; nie ma OIDC/production IAM lub serving. Źródło 2.6 ma lokalny i zdalny odbiór AI 02; snapshot/importer/curated AI 03 mają [odbiór cross-repo](evidence/ai/03/03.6/README.md) na osobnych opublikowanych branchach. |
+| Rozbudowa AI | [Fundament AI 01](evidence/ai/01/README.md) w osobnym repo: pakiet/CLI, HTTP/telemetry, PostgreSQL/pgvector, oddzielny MLflow i jawne migracje. Kontrakty danych/run/tool, walidacja offline i lokalne uprawnienia API: 267 testów na czystym checkoutcie oraz rzeczywisty HTTP z wheel poza źródłami. Principal pochodzi z prywatnych poświadczeń, cały scope jest egzekwowany; admin nie dziedziczy odczytów. Osobny wcześniejszy pomiar Compose: crash, trwałość, awaria DB i recovery. Etap 01 ma odbiór lokalny i zdalny: Required CI PR oraz push na main obu repo przechodzi, w tym persistence na Linux AMD64; dodatkowe testy bramki CI zwiększają zestaw do 273 testów. Zmiana grants/revoked wymaga restartu API; nie ma OIDC/production IAM lub serving. Źródło 2.6 ma lokalny i zdalny odbiór AI 02; snapshot/importer/curated AI 03 mają [odbiór cross-repo](evidence/ai/03/03.6/README.md) oraz publikację na main obu repo. |
 
 ## Zakres użycia
 
@@ -37,7 +37,7 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
-[AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md)**.
+[AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md).
 Źródło 2.6 przechodzi 46 hard gates; cechy AI 3.1 powstają w izolowanym workerze
 z czterech projekcji faktów. Fingerprint obejmuje cały wykonywany kod, a wersje
 obserwacji zachowują stan znany w historycznym origin. Późna sprzedaż lub
@@ -58,8 +58,9 @@ Wszystkie przebiegi mieszczą się w 300 s / 1024 MiB.
 Pierwszy forecasting korzysta z obserwowanej sprzedaży, bez inventory features.
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.
-Branche 03 są opublikowane w osobnych PR-ach i mają Required CI;
-nie wykonano ich merge na main. RAG 11 jest odebrany; prace AI 12 mają osobny worktree.
+AI 03 jest na `origin/main` obu repozytoriów po scaleniu PR #65 i #5.
+[Zapis publikacji](evidence/ai/03/03.6/main-publication.json) wiąże commity merge
+z Required CI dla push na main. RAG 11 jest odebrany; prace AI 12 mają osobny worktree.
 [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md) podaje kolejność i podział repo.
 [Backlog](plans/ai/backlog.md) zawiera najbliższe zadania,
 a [otwarte ustalenia](audits/open-findings.md) potwierdzone problemy.

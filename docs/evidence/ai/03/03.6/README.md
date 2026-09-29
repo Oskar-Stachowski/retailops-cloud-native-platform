@@ -1,7 +1,7 @@
 # AI 03.6 — odbiór danych między repozytoriami
 
-**Odebrany 29.09.2026 lokalnie i na Linux CI, na osobnych opublikowanych
-branchach/PR-ach. Można rozpocząć AI 04 oraz równolegle AI 06.**
+**Odebrany 29.09.2026 lokalnie i na Linux CI, opublikowany na main obu
+repozytoriów. Można rozpocząć AI 04 oraz równolegle AI 06.**
 
 Generator → reports/przeliczona kwalifikacja → eksport → typed CSV/Parquet
 parity → niezależny import → curated → pełna weryfikacja → as-of przechodzi
@@ -30,8 +30,13 @@ SHA schematów oraz references/checksums każdego manifestu.
 
 Oba checkouty były czyste i przypięte przed każdym przebiegiem i po nim.
 Consumer używa własnego interpretera, bez generatora i operacyjnej DB RetailOps.
-Prace AI 12 pozostały w odrębnym worktree. Publikacja brancha/PR i zaliczenie
-Required CI nie oznaczają merge na main; nie wykonano takiego merge.
+Prace AI 12 pozostały w odrębnym worktree.
+
+PR #65 i #5 są scalone do main. [Zapis publikacji](main-publication.json)
+podaje commity merge, wyniki Required CI dla push na main i wszystkie wymagane
+jobs. Poniższe pomiary oraz `verification.json` zachowują rewizje rzeczywistych
+prób sprzed merge; nie zmieniamy ich na nowszy SHA. Od przypiętych rewizji kodu
+do commitów merge zmieniła się wyłącznie dokumentacja.
 
 ## Pomiary pełnej ścieżki
 
