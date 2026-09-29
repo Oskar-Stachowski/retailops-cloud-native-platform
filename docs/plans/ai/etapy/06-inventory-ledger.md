@@ -1,12 +1,12 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.1–06.5 mają ledger, dostawy, chronologiczną sprzedaż, snapshoty i stockout truth na osobnych wejściach. Następny zakres: 06.6 — integracja generatora i publikacja danych. Repo: RetailOps. Zależność: 03.**
+**Status: w realizacji; 06.6a realizuje koszyki źródłowe przez chronologiczny ledger w osobnej ścieżce. Następny zakres: 06.6b — wersjonowany domyślny source i publikacja danych. Repo: RetailOps. Zależność: 03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
-Przeczytaj [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md) oraz manifest/snapshot/curated contracts03. [Kontrakt ledgeru 06.1](../../../reference/inventory-ledger.md) i [dostawy 06.2](../../../reference/replenishment.md) działają na oddzielnych fixtures i nie są jeszcze podłączone do generatora. [Odbiór 06.2](../../../evidence/ai/06/06.2/README.md) zapisuje testy, as-of i reconciliation. Potwierdź mapowanie product/selling location/channel → fizyczna stock location. Aktualne legacy snapshoty oraz cykliczne `initial_stock` nie są pełnym ledgerem; `inventory_ready=false`.
+Przeczytaj [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md), manifest/snapshot/curated contracts03 i [integrację koszyków 06.6a](../../../reference/source-inventory-commerce.md). Domyślny source 2.6 nadal nie publikuje nowego ledgeru; `inventory_ready=false` i DATA-06 pozostają otwarte.
 
-## Kolejność małych PR-ów
+## Obecny punkt integracji
 
 [Polityka i proces dostaw 06.3](../../../reference/reorder-policy.md) mają
 [lokalny odbiór](../../../evidence/ai/06/06.3/README.md). Zamówienie korzysta
@@ -20,7 +20,20 @@ mają [lokalny odbiór](../../../evidence/ai/06/06.5/README.md): znany ledger,
 osobne salda fizyczne, granice epizodów i lost-sales impacts oraz dojrzałość
 diagnostycznych okien. Model 08 i pełna gotowość źródła pozostają poza tym odbiorem.
 
-6. **Ponowna publikacja danych.** Rozszerzyć quality/realism/readiness, przeliczyć source dataset i eksport/import03. Dopiero po przejściu gates ustawić `inventory_ready=true`. Nowy proces censoringu zmienia source/curated IDs. Ponownie wykonać04/05 na nowych danych i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
+[Integracja 06.6a](../../../reference/source-inventory-commerce.md) wykonuje
+koszyki popytu przez tę samą pulę fizycznego zapasu, przelicza ceny dla faktycznej
+ilości i refundy dla faktycznych zakupów. Rozdziela finansową eligibility,
+quality restock i ogon zwrotów, a panel/history/cohort korzystają z causal
+availability. [Odbiór lokalny](../../../evidence/ai/06/06.6a/README.md) obejmuje
+standardowe profile i niezależne uzgodnienie facts/ledger/snapshotów.
+To kandydat z własnym execution ID, bez opublikowanego source/snapshot/curated.
+
+## Następny zakres — 06.6b
+
+1. Wersjonować nowy domyślny source: typed inventory/supply/return-disposition tables, konfiguracje, identity, manifesty i pełne quality/realism/readiness. Zachować czytniki 2.0–2.6 i niezmienne snapshoty 03 oraz demo/API compatibility.
+2. Zakwalifikować lifecycle/coverage inventory i projekcje 06.5 w rzeczywistych source profiles, w tym no demand, zero stock, niedojrzały tail, przyszłe/niedostępne ruchy i supplier-poor. Sam pełny panel sprzedaży nie kwalifikuje labels 08.
+3. Opublikować NOWY source/snapshot/curated przez rozszerzony exporter i importer03, z allowlistą operational facts, oddzielnym truth, typed parity, powtórzeniami oraz bramką cross-repo i pomiarem budżetu. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
+4. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
 
 ## Minimalny zestaw ruchów i uzgodnienie
 

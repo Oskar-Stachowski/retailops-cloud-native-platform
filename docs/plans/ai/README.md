@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 jest na main obu repo; AI 06 jest w realizacji na osobnym branchu RetailOps. Następne zakresy: 06.6 — integracja i publikacja danych oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
+**Status: etap 03 jest na main obu repo; AI 06.6a ma lokalny odbiór integracji koszyków na osobnym branchu RetailOps. Następne zakresy: 06.6b — wersjonowany source i publikacja danych oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -60,6 +60,11 @@ zachowuje osobne operational/truth, uzgodnienie i regresję source 2.6.
 znanego ledgeru, fizyczne epizody zero i osobną diagnostykę lost sales.
 [Odbiór lokalny](../../evidence/ai/06/06.5/README.md) rozróżnia already stockout,
 niepełny tail, maturity i brak obu klas, bez deklaracji gotowości modelu 08.
+[Integracja koszyków 06.6a](../../reference/source-inventory-commerce.md)
+uzgadnia rzeczywiste sprzedaże, ceny częściowych realizacji, finansowe/quality
+zwroty, panel/history/cohorts i snapshoty ledgeru na standardowych source profiles.
+[Odbiór](../../evidence/ai/06/06.6a/README.md) dotyczy osobnego kandydata;
+domyślny source 2.6 i publikacja 03 pozostają niezmienione.
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.

@@ -7,7 +7,7 @@
 | Dane syntetyczne | [Profile](data-profiles.md), [wymiary i kalendarz AI](retail-dimensions.md), [ceny/promocje AI](retail-pricing.md), [popyt/panel/koszyki AI](daily-demand.md), [chronologia/zwroty AI](retail-returns.md), [odbiór źródła i izolacja workera](source-acceptance.md), [kontrakty danych](data-contracts.md), [historyczne fixtures](source-compatibility-fixtures.md) |
 | Streaming | [Zdarzenia](events.md), [trwałość metryk](live-metrics-persistence.md) |
 | Eksport do AI | [Parquet i polityka artefaktów](parquet-artifacts.md), [niezmienne snapshoty](ai-snapshots.md), [handoff do repo AI](source-snapshot-handoff.md), [pełna bramka cross-repo](ai03-cross-repo.md) |
-| Zapas AI 06 | [Kontrakt ledgeru, opening, replay i adapter legacy](inventory-ledger.md), [dostawcy, zamówienia i rzeczywiste przyjęcia](replenishment.md), [polityka uzupełniania i realizacja dostaw](reorder-policy.md), [chronologiczny wspólny zapas i sprzedaż](chronological-inventory.md), [snapshoty i epizody stockout](inventory-projections.md) |
+| Zapas AI 06 | [Kontrakt ledgeru, opening, replay i adapter legacy](inventory-ledger.md), [dostawcy, zamówienia i rzeczywiste przyjęcia](replenishment.md), [polityka uzupełniania i realizacja dostaw](reorder-policy.md), [chronologiczny wspólny zapas i sprzedaż](chronological-inventory.md), [snapshoty i epizody stockout](inventory-projections.md), [realizacja koszyków źródłowych](source-inventory-commerce.md) |
 | ML | [Kontrakt cech](ml-features.md), [lokalna polityka dopuszczenia RF](ml-admission-policy.md) |
 | Konwencje | [Nazwy i tagi](conventions.md) |
 | Terraform | [Mapa modułów](../guides/infrastructure.md), [backend state](terraform-state-backend.md) |

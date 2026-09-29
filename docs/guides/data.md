@@ -38,6 +38,11 @@ i bezpieczny cleanup opisuje [runbook AI 03.1](../reference/parquet-artifacts.md
 Kwalifikowaną atomową publikację, allowlistę faktów, opcjonalną evaluation truth
 i niezmienny re-export opisuje [runbook AI 03.2](../reference/ai-snapshots.md).
 
+Osobna [ścieżka integracji inventory 06.6a](../reference/source-inventory-commerce.md)
+realizuje źródłowe koszyki przez chronologiczny ledger i tworzy prywatny raport
+uzgodnienia. Nie jest domyślnym source, eksportem AI ani wejściem loadera seeda.
+Nowy wersjonowany source i publikacja przez 03 należą do 06.6b.
+
 Przykład profilu AI z kontrolą integralności źródła i cech:
 
 ```bash

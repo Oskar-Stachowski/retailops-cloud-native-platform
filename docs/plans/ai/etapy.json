@@ -1,5 +1,5 @@
 {
-  "version": "1.12",
+  "version": "1.13",
   "date": "2026-09-29",
   "stages": [
     {
@@ -143,12 +143,12 @@
       "path": "etapy/06-inventory-ledger.md",
       "status": "in_progress",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1 ledger, 06.2 supply, 06.3 reorder, 06.4 chronological shared-stock fulfillment, 06.5 known-ledger daily snapshots and private physical stockout/lost-sales/mature-window diagnostics; default source generator unchanged",
-      "next_scope": "06.6 default generator integration, lifecycle/coverage, source gates and new immutable source/snapshot/curated publication",
+      "implementation_scope": "06.1–06.5 inventory runtime/projections; 06.6a unpublished source-commerce integration: fulfilled baskets, quantity-aware pricing, financial versus quality returns, causal daily observations/history/cohorts and reconciled snapshots; default source 2.6 unchanged",
+      "next_scope": "06.6b versioned default source, typed tables/identity/manifests, inventory lifecycle/coverage and source gates; new immutable export/import/curated acceptance and dependent 04/05 reevaluation",
       "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.5/README.md",
-      "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
-      "verification": "../../evidence/ai/06/06.5/verification.json"
+      "evidence": "../../evidence/ai/06/06.6a/README.md",
+      "implementation_commit": "01c417028f3eb826132c1aae0484099d56fe6ae0",
+      "verification": "../../evidence/ai/06/06.6a/verification.json"
     },
     {
       "id": "07",
