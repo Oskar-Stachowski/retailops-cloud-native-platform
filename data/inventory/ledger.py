@@ -106,7 +106,7 @@ def build_opening_movements(
     return rows
 
 
-def _validate_movement(
+def validate_movement(
     movement: InventoryMovement, units: dict[str, str], scope: set[Position]
 ) -> None:
     require(movement.position in scope, "Movement is outside the declared inventory scope.")
@@ -141,7 +141,7 @@ def _validate_movement(
     )
 
 
-def _transfer_pairs(
+def transfer_pairs(
     movements: tuple[InventoryMovement, ...],
 ) -> tuple[tuple[InventoryMovement, InventoryMovement], ...]:
     groups = defaultdict(list)
@@ -198,7 +198,7 @@ class InventoryLedger:
         opening_at = utc_timestamp(payload["opening_at"])
         movements = tuple(InventoryMovement.from_record(row) for row in payload["movements"])
         for movement in movements:
-            _validate_movement(movement, units, scope)
+            validate_movement(movement, units, scope)
         require(
             len({m.inventory_event_id for m in movements}) == len(movements),
             "Duplicate inventory event ID.",
@@ -218,7 +218,7 @@ class InventoryLedger:
         )
         ordered = tuple(sorted(movements, key=lambda m: m.ordering_key))
         result = cls(
-            ordered, tuple(sorted(scope)), tuple(sorted(codes.items())), _transfer_pairs(ordered)
+            ordered, tuple(sorted(scope)), tuple(sorted(codes.items())), transfer_pairs(ordered)
         )
         result._balances(ordered)
         return result

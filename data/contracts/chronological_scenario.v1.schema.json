@@ -1,0 +1,516 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "DemandArrival": {
+      "additionalProperties": false,
+      "properties": {
+        "demand_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Demand Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "selling_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Selling Location Id",
+          "type": "string"
+        },
+        "channel": {
+          "enum": [
+            "store",
+            "online",
+            "marketplace",
+            "wholesale"
+          ],
+          "title": "Channel",
+          "type": "string"
+        },
+        "latent_quantity": {
+          "minimum": 0,
+          "title": "Latent Quantity",
+          "type": "integer"
+        },
+        "unit_price": {
+          "pattern": "^(?:0|[1-9][0-9]*)\\.[0-9]{2}$",
+          "title": "Unit Price",
+          "type": "string"
+        },
+        "currency": {
+          "enum": [
+            "PLN",
+            "EUR"
+          ],
+          "title": "Currency",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_reference": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "demand_id",
+        "product_id",
+        "selling_location_id",
+        "channel",
+        "latent_quantity",
+        "unit_price",
+        "currency",
+        "occurred_at",
+        "sequence",
+        "source_reference"
+      ],
+      "title": "DemandArrival",
+      "type": "object"
+    },
+    "FulfillmentRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "exclusiveMinimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "selling_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Selling Location Id",
+          "type": "string"
+        },
+        "channel": {
+          "enum": [
+            "store",
+            "online",
+            "marketplace",
+            "wholesale"
+          ],
+          "title": "Channel",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Effective To",
+          "type": "string"
+        },
+        "available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Available At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "selling_location_id",
+        "channel",
+        "stock_location_id",
+        "effective_from",
+        "effective_to",
+        "available_at"
+      ],
+      "title": "FulfillmentRoute",
+      "type": "object"
+    },
+    "MovementRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "inventory_event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Inventory Event Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "movement_type": {
+          "enum": [
+            "opening_stock",
+            "replenishment_received",
+            "sale",
+            "return_to_stock",
+            "write_off",
+            "transfer_in",
+            "transfer_out",
+            "inventory_adjustment"
+          ],
+          "title": "Movement Type",
+          "type": "string"
+        },
+        "quantity_delta": {
+          "title": "Quantity Delta",
+          "type": "integer"
+        },
+        "unit_of_measure": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Unit Of Measure",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "ingested_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Ingested At",
+          "type": "string"
+        },
+        "available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Available At",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_process": {
+          "enum": [
+            "opening",
+            "replenishment",
+            "sale",
+            "return",
+            "write_off",
+            "transfer",
+            "adjustment"
+          ],
+          "title": "Source Process",
+          "type": "string"
+        },
+        "source_reference": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Reference",
+          "type": "string"
+        },
+        "transfer_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Transfer Id"
+        },
+        "supplier_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Supplier Id"
+        },
+        "order_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order Id"
+        }
+      },
+      "required": [
+        "inventory_event_id",
+        "product_id",
+        "stock_location_id",
+        "movement_type",
+        "quantity_delta",
+        "unit_of_measure",
+        "occurred_at",
+        "ingested_at",
+        "available_at",
+        "sequence",
+        "source_process",
+        "source_reference",
+        "transfer_id",
+        "supplier_id",
+        "order_id"
+      ],
+      "title": "MovementRecord",
+      "type": "object"
+    },
+    "ReturnEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "return_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Return Id",
+          "type": "string"
+        },
+        "demand_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Demand Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "unit_of_measure": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Unit Of Measure",
+          "type": "string"
+        },
+        "returned_quantity": {
+          "exclusiveMinimum": 0,
+          "title": "Returned Quantity",
+          "type": "integer"
+        },
+        "quality_status": {
+          "enum": [
+            "accepted",
+            "rejected"
+          ],
+          "title": "Quality Status",
+          "type": "string"
+        },
+        "returned_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Returned At",
+          "type": "string"
+        },
+        "ingested_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Ingested At",
+          "type": "string"
+        },
+        "available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Available At",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_reference": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "return_id",
+        "demand_id",
+        "product_id",
+        "stock_location_id",
+        "unit_of_measure",
+        "returned_quantity",
+        "quality_status",
+        "returned_at",
+        "ingested_at",
+        "available_at",
+        "sequence",
+        "source_reference"
+      ],
+      "title": "ReturnEvent",
+      "type": "object"
+    },
+    "SellingLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "location_code": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Location Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "location_code"
+      ],
+      "title": "SellingLocation",
+      "type": "object"
+    },
+    "SimulationSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "process_version": {
+          "const": "chronological-shared-stock-1.0.0",
+          "title": "Process Version",
+          "type": "string"
+        },
+        "business_timezone": {
+          "const": "UTC",
+          "title": "Business Timezone",
+          "type": "string"
+        },
+        "start_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Start At",
+          "type": "string"
+        },
+        "end_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "End At",
+          "type": "string"
+        },
+        "event_order": {
+          "const": "occurred_at_sequence_then_review",
+          "title": "Event Order",
+          "type": "string"
+        },
+        "reservation_policy": {
+          "const": "none",
+          "title": "Reservation Policy",
+          "type": "string"
+        },
+        "fulfillment_policy": {
+          "const": "instant_partial_fulfillment",
+          "title": "Fulfillment Policy",
+          "type": "string"
+        },
+        "sale_ingestion_delay_seconds": {
+          "minimum": 0,
+          "title": "Sale Ingestion Delay Seconds",
+          "type": "integer"
+        },
+        "sale_availability_delay_seconds": {
+          "minimum": 0,
+          "title": "Sale Availability Delay Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "process_version",
+        "business_timezone",
+        "start_at",
+        "end_at",
+        "event_order",
+        "reservation_policy",
+        "fulfillment_policy",
+        "sale_ingestion_delay_seconds",
+        "sale_availability_delay_seconds"
+      ],
+      "title": "SimulationSettings",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "chronological-scenario-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "settings": {
+      "$ref": "#/$defs/SimulationSettings"
+    },
+    "selling_locations": {
+      "items": {
+        "$ref": "#/$defs/SellingLocation"
+      },
+      "minItems": 1,
+      "title": "Selling Locations",
+      "type": "array"
+    },
+    "fulfillment_routes": {
+      "items": {
+        "$ref": "#/$defs/FulfillmentRoute"
+      },
+      "title": "Fulfillment Routes",
+      "type": "array"
+    },
+    "demand_class": {
+      "const": "simulation_truth",
+      "title": "Demand Class",
+      "type": "string"
+    },
+    "demand_arrivals": {
+      "items": {
+        "$ref": "#/$defs/DemandArrival"
+      },
+      "title": "Demand Arrivals",
+      "type": "array"
+    },
+    "return_events": {
+      "items": {
+        "$ref": "#/$defs/ReturnEvent"
+      },
+      "title": "Return Events",
+      "type": "array"
+    },
+    "inventory_actions": {
+      "items": {
+        "$ref": "#/$defs/MovementRecord"
+      },
+      "title": "Inventory Actions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "settings",
+    "selling_locations",
+    "fulfillment_routes",
+    "demand_class",
+    "demand_arrivals",
+    "return_events",
+    "inventory_actions"
+  ],
+  "title": "ChronologicalScenario",
+  "type": "object"
+}
