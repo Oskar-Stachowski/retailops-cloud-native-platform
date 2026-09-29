@@ -1,5 +1,5 @@
 {
-  "version": "1.3",
+  "version": "1.5",
   "date": "2026-09-29",
   "stages": [
     {
@@ -181,21 +181,15 @@
       "evidence": "../../evidence/ai/11/README.md",
       "implementation_repository": "retailops-ai-intelligence",
       "implementation_commit": "6790f485cfa879b0336dbf1f710f30adea06c6d0",
-      "acceptance_scope": "Local semantic RAG: real Titan V2 embeddings, approved 44-question golden quality, user qualification/activation/rollback, PostgreSQL/HTTP and crash persistence. Agent answers/tools and deployment remain later scopes.",
-      "accepted_main_commit": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9",
-      "completion_evidence": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/abf3f69a6a78c444b5a8a910fef8b3b43ba047a9/docs/evidence/11-completion.md",
-      "foundation_remote_ci": {
+      "acceptance_scope": "Approved corpus, real Bedrock embeddings, filtered pgvector retrieval, 44-case golden acceptance, durable jobs, user qualification, activation and rollback; local scope, no agent or cloud deployment",
+      "remaining": [],
+      "remote_ci": {
         "status": "success",
-        "pr": 3,
-        "pr_run": 36449464231,
-        "main_push_run": 36449971211,
-        "merge_commit": "1c3b65e2bff68a920c45a5fbfd39b64c2bc80d95",
-        "evidence": "../../evidence/ai/11/remote-ci.json"
-      },
-      "completion_publication": {
         "pr": 4,
+        "pr_run": 36460532011,
+        "main_push_run": 36461392661,
         "merge_commit": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9",
-        "remote_ci_reverification_in_ai03_3": "not_performed"
+        "evidence": "../../evidence/ai/11/remote-ci.json"
       }
     },
     {

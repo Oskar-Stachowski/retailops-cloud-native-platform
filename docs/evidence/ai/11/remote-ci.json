@@ -1,96 +1,96 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "stage": "11",
-  "scope": "offline_rag_foundation_publication_not_full_stage_completion",
+  "scope": "completed_stage_11_local_semantic_rag_publication",
   "repository": "Oskar-Stachowski/retailops-ai-intelligence",
-  "verified_at": "2026-09-28T16:21:11.354195+00:00",
+  "verified_at": "2026-09-28T17:57:20.188502+00:00",
   "pull_request": {
-    "number": 3,
-    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/3",
+    "number": 4,
+    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/4",
     "merged": true,
-    "head_sha": "6936621ee8cce0d28c9218dca7d79fdadf3f2139",
-    "merge_commit": "1c3b65e2bff68a920c45a5fbfd39b64c2bc80d95"
+    "head_sha": "72abb8b222f00fa4660288eb37d8d68443374cd6",
+    "merge_commit": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9"
   },
   "required_ci": {
     "pull_request": {
-      "id": 36449464231,
-      "head_sha": "6936621ee8cce0d28c9218dca7d79fdadf3f2139",
-      "head_branch": "ai/rag-corpus",
+      "id": 36460532011,
+      "head_sha": "72abb8b222f00fa4660288eb37d8d68443374cd6",
+      "head_branch": "ai/11-completion",
       "event": "pull_request",
       "status": "completed",
       "conclusion": "success",
-      "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36460532011",
       "jobs": [
         {
-          "id": 109020176540,
+          "id": 109057635071,
           "name": "checks",
           "status": "completed",
           "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109020176540"
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36460532011/job/109057635071"
         },
         {
-          "id": 109020176963,
-          "name": "persistence",
-          "status": "completed",
-          "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109020176963"
-        },
-        {
-          "id": 109020177023,
+          "id": 109057635566,
           "name": "secrets",
           "status": "completed",
           "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109020177023"
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36460532011/job/109057635566"
         },
         {
-          "id": 109021360688,
+          "id": 109057635675,
+          "name": "persistence",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36460532011/job/109057635675"
+        },
+        {
+          "id": 109058794814,
           "name": "required-result",
           "status": "completed",
           "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449464231/job/109021360688"
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36460532011/job/109058794814"
         }
       ],
-      "observed_at": "2026-09-28T16:20:02.819588+00:00"
+      "observed_at": "2026-09-28T17:53:31.532852+00:00"
     },
     "main_push": {
-      "id": 36449971211,
-      "head_sha": "1c3b65e2bff68a920c45a5fbfd39b64c2bc80d95",
+      "id": 36461392661,
+      "head_sha": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9",
       "head_branch": "main",
       "event": "push",
       "status": "completed",
       "conclusion": "success",
-      "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211",
+      "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36461392661",
       "jobs": [
         {
-          "id": 109021911994,
-          "name": "secrets",
-          "status": "completed",
-          "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109021911994"
-        },
-        {
-          "id": 109021912138,
-          "name": "checks",
-          "status": "completed",
-          "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109021912138"
-        },
-        {
-          "id": 109021912190,
+          "id": 109060543501,
           "name": "persistence",
           "status": "completed",
           "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109021912190"
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36461392661/job/109060543501"
         },
         {
-          "id": 109023033659,
+          "id": 109060543845,
+          "name": "checks",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36461392661/job/109060543845"
+        },
+        {
+          "id": 109060543865,
+          "name": "secrets",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36461392661/job/109060543865"
+        },
+        {
+          "id": 109061654951,
           "name": "required-result",
           "status": "completed",
           "conclusion": "success",
-          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36449971211/job/109023033659"
+          "html_url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36461392661/job/109061654951"
         }
       ],
-      "observed_at": "2026-09-28T16:21:11.354195+00:00"
+      "observed_at": "2026-09-28T17:57:20.188502+00:00"
     }
   },
   "main_protection": {
@@ -106,13 +106,11 @@
   "runtime": "GitHub Actions Ubuntu 24.04 / Linux AMD64",
   "checks_command": "make bootstrap check",
   "persistence_command": "make bootstrap compose-smoke",
-  "user_retrieval_activated": false,
-  "semantic_quality_accepted": false,
-  "stage_complete": false,
-  "aws_executed": false,
-  "remaining": [
-    "real_embedding_provider_path",
-    "user_qualification_activation_and_rollback",
-    "real_embedding_golden_quality_acceptance"
-  ]
+  "user_retrieval_activated": true,
+  "semantic_quality_accepted": true,
+  "stage_complete": true,
+  "aws_executed": true,
+  "remaining": [],
+  "activation_scope": "local/retrieval",
+  "aws_scope": "Bounded Titan embedding calls only; no cloud infrastructure deployment"
 }

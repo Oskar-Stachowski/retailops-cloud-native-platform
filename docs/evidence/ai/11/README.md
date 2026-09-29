@@ -1,52 +1,60 @@
 # Etap AI 11 — odebrany semantyczny RAG
 
-Aktualizacja: **2026-09-28**. Implementacja znajduje się w
-`retailops-ai-intelligence`, na **`origin/main`, commit `abf3f69`** po
-scaleniu [PR #4](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/4).
-**Etap 11 ma odbiór lokalnego semantycznego RAG.** RetailOps dostarcza część
-zatwierdzonego korpusu i utrzymuje tę informację o stanie.
+**2026-09-28 · completed.** Implementacja należy do
+`retailops-ai-intelligence`; cloud-native dostarcza część zatwierdzonego korpusu
+oraz utrzymuje ten status. [PR #4](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/4)
+opublikował pełne domknięcie na `origin/main` (`abf3f69`).
+Required CI [PR](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36460532011) i [push na main](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/36461392661)
+ma `success`, łącznie z persistence. Ochrona main pozostała włączona.
+Szczegóły: [zapis zdalny](remote-ci.json).
 
-Źródłem wyników jest
-[końcowy odbiór repo AI](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/abf3f69a6a78c444b5a8a910fef8b3b43ba047a9/docs/evidence/11-completion.md),
-[rejestr pomiarów](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/abf3f69a6a78c444b5a8a910fef8b3b43ba047a9/docs/evidence/11-completion.json)
-i [instrukcja](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/abf3f69a6a78c444b5a8a910fef8b3b43ba047a9/docs/knowledge-semantic.md).
-Implementacja: `6790f485cfa879b0336dbf1f710f30adea06c6d0`.
+## Odbiór
 
-## Dostępny zakres
+Zatwierdzony korpus ma 29 dokumentów, 451 fragmentów i 451 embeddings z kontekstem
+nagłówków. Provider to **Amazon Titan Text Embeddings V2**, `eu-north-1`,
+1024 wymiary. Przypięte są model, region, wymiar, normalizacja i transformacja;
+zmiana konfiguracji tworzy inną przestrzeń oraz nowy indeks.
 
-Zatwierdzony snapshot obejmuje 29 dokumentów i 451 fragmentów z obu repo,
-checksums, source status, access i cytaty do przypiętych rewizji.
-Rzeczywisty provider to Amazon Titan Text Embeddings V2 w `eu-north-1`,
-1024 wymiary. Build i query zachowują tę samą konfigurację przestrzeni.
+Na tych samych 44 pytaniach, bez zmiany etykiet ani progów:
 
-Golden set ma 44 zatwierdzone pytania i 9 przypadków krytycznych, bez zmiany
-pytań ani zamrożonych progów. Końcowy odbiór podaje Recall@5 **0,8529411765**
-przy progu 0,80, MRR **0,6612745098** przy 0,60, kontrole krytyczne **9/9**
-i powiązanie cytatów **100%**. P95 pełnego API → Bedrock → PostgreSQL
-wynosi 359,12 ms przy limicie 1000 ms.
+| Metryka | Wynik | Próg |
+|---|---:|---:|
+| Recall@5 | 0,852941 | ≥ 0,80 |
+| MRR | 0,661275 | ≥ 0,60 |
+| Krytyczne / cytaty | 100% / 100% | 100% / 100% |
+| P95 API → Bedrock → PostgreSQL | 359,12 ms | ≤ 1000 ms |
 
-Działają trwałe runy i raporty, kwalifikacja, atomowa użytkowa aktywacja,
-CAS/idempotencja, rollback oraz przypięcie niezmiennego indeksu.
-Aktualny lokalny indeks ma generację 1 w `local/retrieval`. PostgreSQL
-i API z rzeczywistym Bedrock odtworzyły wyniki wszystkich 44 pytań.
-Odbiór obejmuje scope/auth, awarie workera, restart DB i retencję raportów.
+Właściwy run `run-ad4e22256eee6be6fe415bb848e46589` ma `succeeded`.
+Kwalifikowany indeks `index-sha256-d193c015d0815215725156145cef5ed21553452e1c235d0c8e4cabece96d9f46`
+został aktywowany w `local/retrieval`, generacja 1. PostgreSQL odtworzył wszystkie
+44 wyniki; odbiór przez API z rzeczywistym Bedrock zachował dokładne chunk IDs.
+38 żądań dotarło do modelu; niedozwolony scope odrzucono przed AWS.
+
+Działają trwałe profile/runy, retencja raportów przy niezaliczonym progu,
+kwalifikacja jakości, atomowa aktywacja, CAS, retry, rollback i stare piny.
+Konfiguracja query pochodzi z zaakceptowanego release. Fake nie uprawnia
+użytkowej aktywacji, a udany run wymaga osobnej kwalifikacji i aktywacji.
 
 ## Dowody i granice
 
-Końcowy odbiór właściciela repo obejmuje 643 testy regresji, 77 dodatkowych
-kontroli i rzeczywisty Compose/PostgreSQL/HTTP. Ruff, Mypy, kontrakty, linki,
-pakiet i Gitleaks przechodzą. Podczas AI 03.3 odczytano te dowody i scalono
-opublikowane `abf3f69` do lokalnego brancha handoff; ponowiona pełna regresja
-ma 658 testów, w tym 15 nowych handoff. Nie powtarzano pomiaru jakości ani
-wywołań AWS. Zdalnego Required CI PR #4 nie sprawdzano ponownie w AI 03.3.
+- [Końcowy odbiór AI](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72abb8b222f00fa4660288eb37d8d68443374cd6/docs/evidence/11-completion.md)
+  oraz [pomiary/checksums](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72abb8b222f00fa4660288eb37d8d68443374cd6/docs/evidence/11-completion.json).
+- Implementacja `6790f485cfa879b0336dbf1f710f30adea06c6d0`; 643 testy regresji,
+  77 testów po dopracowaniu current/report, Ruff, strict Mypy, schemas,
+  docs, wheel/sdist i Gitleaks.
+- Pełny Compose: `0008_rag_semantic`, rzeczywisty pgvector/HTTP, negatywne SQL gates,
+  aktywacja/rollback, awarie, SIGKILL/down-up i retencja danych. CI bez AWS;
+  syntetyczne fixture nie są dowodem jakości modelu.
+- [Instrukcja użytkowa](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72abb8b222f00fa4660288eb37d8d68443374cd6/docs/knowledge-semantic.md)
+  opisuje poświadczenia, jawny opt-in AWS, limity, cache, reindex i rollback.
 
-Etap 11 kończy wyszukiwanie wiedzy. Groundedness odpowiedzi, narzędzia
-i pełny agent należą do [12](../../../plans/ai/etapy/12-agent-bedrock.md),
-który wymaga także 10. Korpus nie odświeża się po każdej zmianie main;
-kolejny snapshot potrzebuje przeglądu i ewaluacji. Odbiór nie jest wdrożeniem
-AWS/EKS. Produkcyjny IAM i wdrożenie pozostają dalszym zakresem.
+**Nie ma otwartych blokad AI 11.** Korpus jest konkretnym snapshotem;
+zmiany `main` nie aktualizują go automatycznie. Groundedness odpowiedzi,
+narzędzia i integracja agenta należą do AI 12, którego pełne zamknięcie wymaga
+również AI 10. Produkcyjne role, wspólne budżety replik oraz wdrożenie AWS/EKS
+należą do późniejszych etapów. W tym odbiorze wykonano ograniczone wywołania
+Bedrock, bez wdrażania infrastruktury chmurowej.
 
-[Zapis zdalnego odbioru fundamentu](remote-ci.json) dotyczy wcześniejszej
-publikacji `1c3b65e` i PR #3, nie bieżącego odbioru semantycznego.
-Aktualną pracę opisują [backlog](../../../plans/ai/backlog.md)
-i [mapa etapów/repozytoriów](../../../plans/ai/kolejnosc-i-repozytoria.md).
+[Backlog](../../../plans/ai/backlog.md) i [mapa etapów](../../../plans/ai/kolejnosc-i-repozytoria.md)
+podają dalszą kolejność. Aktualny główny strumień to AI 03; interfejsy/test doubles
+AI 12 można przygotowywać równolegle.

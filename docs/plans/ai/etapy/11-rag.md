@@ -1,10 +1,11 @@
 # Etap 11 — Zbuduj wersjonowaną wiedzę i RAG
 
-**Stan realizacji:** etap odebrany w repo AI i opublikowany na `origin/main`
-(`abf3f69`). [Aktualny odbiór](../../../evidence/ai/11/README.md) obejmuje
-rzeczywiste embeddings, jakość semantyczną, kwalifikację, aktywację i rollback.
-Poniższa instrukcja opisuje kontrakt etapu; punkt wznowienia podaje
-[backlog](../backlog.md). Odpowiedzi i narzędzia agenta należą do 12.
+**Stan realizacji: completed.** [Odbiór](../../../evidence/ai/11/README.md)
+obejmuje rzeczywiste embeddings, użytkową kwalifikację/aktywację/rollback
+oraz zaliczone progi 44 pytań golden. Poniższa instrukcja opisuje kontrakt
+etapu; dalszą pracę podaje [backlog](../backlog.md).
+Ograniczony odbiór embeddings Bedrock wykonano już tutaj; generowanie
+odpowiedzi i narzędzia agenta nadal wymagają odbioru w 12.
 
 **Repozytorium:** RetailOps AI. **Wymagany etap:** 01. Może przebiegać równolegle z danymi/ML; działający agent jest odbierany dopiero w etapie 12. Dokument nadrzędny: [kontrakt integracji i agenta](../kontrakty/integracja-agent.md).
 
@@ -20,7 +21,7 @@ Odtwarzać wyszukiwanie wiedzy po zatwierdzonym korpusie Markdown i przedstawia�
 4. **Dodaj adapter embeddings i PostgreSQL + pgvector.** Najpierw deterministyczny fake do testów offline; docelowo konfigurowalny adapter Bedrock. Manifest przypina provider, model/inference profile, region, wymiar, normalizację, odległość i wersję transformacji. Kolumna wektorowa i zapytania mają ten sam wymiar. Błąd długości embeddingu zatrzymuje budowę. Nie mieszaj przestrzeni różnych modeli w jednym indeksie i nie zmieniaj modelu pod niezmiennym ID. Zmiana modelu/wymiaru wymaga nowego indeksu; parametr modelu zweryfikuj dla wybranego regionu przy implementacji.
 5. **Wprowadź immutable candidate index i atomową aktywację.** Wygeneruj `corpus_manifest.json`, `chunk_manifest.json`, `index_manifest.json` i kandydacki indeks o stałym ID. Upsert wykorzystuje checksum niezmienionych chunków; usunięte/wyłączone dokumenty nie wchodzą do nowej rewizji. Sprawdź kompletność, access metadata i golden set przed aktywacją. Zweryfikowana zmiana wskaźnika aktywnego indeksu następuje atomowo w jednej transakcji, przez kontrolowany CLI/CI. Żądanie agentowe przypina jedną wersję indeksu na cały run. Stary indeks pozostaje do rollback; nie aktualizuj połowy aktywnego indeksu w miejscu.
 6. **Zaimplementuj ograniczony retrieval.** MVP: dense cosine exact search w pgvector, filtry repozytorium/typu/statusu/access class, deterministyczne top-k i tie-break po chunk ID, dywersyfikacja źródeł oraz maksymalny rozmiar kontekstu. Uprawnienia filtruj przed zwróceniem chunków, również przy cache. Kontekst oznacz jako niezaufany materiał referencyjny, a nie instrukcje. Brak właściwego źródła skutkuje `insufficient_evidence`. FTS/RRF, HNSW i reranking dodawaj tylko po pomiarze jakości/czasu; oddzielna usługa wektorowa pozostaje opcją po wykazaniu ograniczeń pgvector.
-7. **Zamknij golden set, raport i administrację.** Przygotuj 30–50 wersjonowanych pytań obejmujących dokumentację, modele, operacje, brak danych, konflikt i próby injection. Dla każdego zapisz oczekiwane dokumenty/sekcje, forbidden sources, answerability, role i doc status, a także wymagane/zabronione narzędzia dla etapu 12. Przypnij progi przed ewaluacją. Zaimplementuj administracyjne index runs i read current według kontraktu; zwykły operator i agent nie mogą indeksować. Testy CI są bez AWS; rzeczywiste embeddings i pełna jakość retrieval wymagają osobnego ograniczonego odbioru w 11. Odpowiedzi i narzędzia Bedrock mają własny odbiór w 12.
+7. **Zamknij golden set, raport i administrację.** Przygotuj 30–50 wersjonowanych pytań obejmujących dokumentację, modele, operacje, brak danych, konflikt i próby injection. Dla każdego zapisz oczekiwane dokumenty/sekcje, forbidden sources, answerability, role i doc status, a także wymagane/zabronione narzędzia dla etapu 12. Przypnij progi przed ewaluacją. Zaimplementuj administracyjne index runs i read current według kontraktu; zwykły operator i agent nie mogą indeksować. Testy CI są bez AWS; rzeczywiste embeddings Bedrock mają ograniczony odbiór jakości w tym etapie. Etap 12 osobno potwierdza generowanie odpowiedzi i użycie narzędzi.
 
 ## Kontrole i testy negatywne
 
@@ -39,7 +40,7 @@ Odtwarzać wyszukiwanie wiedzy po zatwierdzonym korpusie Markdown i przedstawia�
 - Przykładowe cytaty i udokumentowana reguła „plan ≠ wdrożenie”; approved path/status/access filters sprawdzone testem.
 - DoD: pipeline jest odtwarzalny, nie indeksuje zakazanych danych, usuwa nieaktualne fragmenty, przypina jedną wersję i przy błędzie zachowuje poprzedni aktywny indeks. Od początku zachowaj manifesty potrzebne do porównania konfiguracji RAG i driftu w etapie 13.
 
-Proponowane interfejsy do implementacji, a nie obecnie istniejące polecenia: `make rag-index PROVIDER=fake`, `make rag-evaluate`, `make rag-activate INDEX_ID=<zatwierdzone-id>` i `make rag-rollback INDEX_ID=<poprzednie-id>`. Aktywacja jest kontrolą wdrożenia; nie należy do katalogu narzędzi agenta.
+Dostępne polecenia przygotowania, ewaluacji, kwalifikacji, aktywacji i rollback opisuje [instrukcja użytkowa w repo AI](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72abb8b222f00fa4660288eb37d8d68443374cd6/docs/knowledge-semantic.md). Aktywacja jest kontrolą wdrożenia; nie należy do katalogu narzędzi agenta.
 
 ## Prompt do Codex
 

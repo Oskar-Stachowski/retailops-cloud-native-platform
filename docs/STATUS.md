@@ -31,7 +31,8 @@ Projekt służy do lokalnego demo i weryfikacji praktyk DevOps. Przełączanie
 porty do loopback zgodnie z [instrukcją](guides/local-development.md).
 
 Działa lokalny MLflow w repo AI. Nie ma potwierdzonego produkcyjnego wdrożenia
-AWS/EKS, produkcyjnego model serving, RAG ani agenta Bedrock. Te elementy
+AWS/EKS ani produkcyjnego model serving lub agenta Bedrock. Lokalny RAG ma
+[odbiór AI 11](evidence/ai/11/README.md). Dalsze wdrożenia
 opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
@@ -65,16 +66,20 @@ pracy równoległej. [Backlog](plans/ai/backlog.md) opisuje najbliższe zadania,
 a [otwarte ustalenia](audits/open-findings.md) potwierdzone problemy.
 Dowód zdalnego Required CI i publikacji na main: [audyt](evidence/ai/02/audit/README.md).
 
-## Etap AI 11 — odebrany semantyczny RAG
+## Etap AI 11 — odebrany RAG
 
-[Odbiór Etapu 11](evidence/ai/11/README.md) obejmuje rzeczywiste embeddings
-Amazon Titan V2, 29 dokumentów / 451 fragmentów, jakość na 44 pytaniach,
-użytkową kwalifikację, aktywację i rollback. Zakres jest opublikowany na
-`origin/main` repo AI (`abf3f69`). Recall@5 0,852941 i MRR 0,661275 przechodzą
-zamrożone progi; kontrole krytyczne i cytaty mają 100%.
+[Odbiór Etapu 11](evidence/ai/11/README.md) dotyczy `retailops-ai-intelligence`.
+Zatwierdzony korpus ma 29 dokumentów i 451 fragmentów; rzeczywisty provider
+Amazon Titan Text Embeddings V2 tworzy wektory 1024-wymiarowe z kontekstem nagłówków.
+Na niezmienionych 44 pytaniach i progach: **Recall@5 85,3%, MRR 66,1%,
+krytyczne 9/9, cytaty 100%**. Właściwy run ma `succeeded`, lokalny indeks
+jest kwalifikowany i aktywny; SQL odtworzył wszystkie 44 wyniki.
 
-Końcowe evidence właściciela repo AI opisuje pomiar Bedrock/PostgreSQL/HTTP,
-643 testy i kontrole awarii. Branch AI 03 ma ponowioną regresję
-743 testów po dodaniu curated 03.5. Nie wykonano w tej sesji nowych pomiarów AWS ani ponownej kontroli
-zdalnego CI RAG. Odpowiedzi i narzędzia agenta należą do 12; pełny agent czeka
-na 10. Zmiany dokumentacji wymagają nowego zatwierdzonego snapshotu korpusu.
+Działają filtrowanie uprawnień/statusów, ograniczony context, trwałe runy,
+retencja raportu przy niezaliczonym progu, kwalifikacja, atomowa aktywacja
+oraz rollback. Lokalna regresja: 643 testy i pełny Compose z migracją
+`0008_rag_semantic`, testami negatywnymi SQL, awariami i restartami.
+Nie pozostały otwarte warunki Etapu 11. Agent, groundedness odpowiedzi
+oraz wykonanie narzędzi należą do AI 12; pełny agent wymaga również AI 10.
+Nie jest to wdrożenie AWS/EKS. Zmiana dokumentacji nie aktualizuje samoczynnie
+zatwierdzonego indeksu — wymaga nowego snapshotu i oceny.

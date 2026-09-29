@@ -49,9 +49,9 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
    i uzgodnionych kontraktów.
 5. **Po 10 i gotowym indeksie 11:** pełny zakres **12**. Może trwać równolegle
    z pozostałymi pracami 09. Adaptery i test doubles 12 można przygotować
-   wcześniej. Rzeczywiste embeddings i jakość wyszukiwania odebrano w 11.
-   Odbiór 12 musi dodatkowo sprawdzić odpowiedzi i wykonanie narzędzi;
-   smoke nie zastępuje ich golden set ani pełnej bramki integracji 10.
+   wcześniej. Rzeczywiste embeddings i ich odbiór jakości zaliczono w 11.
+   W 12 pozostają rzeczywiste generowanie odpowiedzi, groundedness,
+   narzędzia i integracja z RetailOps. Odbiór embeddings nie zastępuje tych bramek.
 6. **Po 09 i 12:** zamknąć **13**, następnie **14**, potem **15**.
    Logowanie, bezpieczeństwo, CI i podstawowe metryki rozwijamy od początku;
    te późniejsze numery oznaczają pełny odbiór, nie początek dbania o jakość.

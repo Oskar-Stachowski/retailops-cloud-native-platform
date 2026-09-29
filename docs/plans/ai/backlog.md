@@ -32,7 +32,7 @@ Dopiero pełny odbiór otwiera 04 i 06.
 Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
 kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
 Etap 03 ma spełnioną lokalną i zdalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
-a pełny agent 12 na 10.
+a pełny agent 12 czeka jeszcze na 10.
 Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
 Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc-i-repozytoria.md).
 
