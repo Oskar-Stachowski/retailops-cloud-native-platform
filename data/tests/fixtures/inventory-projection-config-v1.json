@@ -1,0 +1,13 @@
+{
+  "contract_version": "inventory-projection-config-1.0.0",
+  "process_version": "inventory-projection-1.0.0",
+  "business_timezone": "UTC",
+  "start_at": "2026-07-01T00:00:00Z",
+  "end_at": "2026-07-10T00:00:00Z",
+  "snapshot_policy": "utc_day_last_microsecond",
+  "reservation_policy": "none",
+  "stock_measure": "available_qty",
+  "episode_policy": "zero_after_event_including_instantaneous",
+  "diagnostic_horizon_days": 7,
+  "truth_delay_seconds": 180
+}
