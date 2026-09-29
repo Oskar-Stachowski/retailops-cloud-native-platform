@@ -5,7 +5,8 @@ implementacja `b776adf`.** Środowisko: macOS ARM64, Python 3.11.15
 z `services/api/.venv`. [Rejestr odbioru](verification.json) zawiera pełne SHA,
 checksums, konfigurację, wyniki i rzeczywiste komendy CLI.
 [Kontrakt i uruchomienie](../../../../reference/chronological-inventory.md)
-opisują aktualne zachowanie. Następny zakres to **06.5 — snapshoty i stockout truth**.
+opisują aktualne zachowanie. [Odrębny odbiór projekcji 06.5](../06.5/README.md)
+wskazuje aktualny punkt wznowienia: **06.6 — integracja i publikacja danych**.
 
 ## Działający przebieg
 

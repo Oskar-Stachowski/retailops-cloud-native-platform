@@ -4,7 +4,8 @@
 przyjęć oraz uzgodnienie z [ledgerem 06.1](inventory-ledger.md).
 Generator source 2.6 nie korzysta jeszcze z tych encji; `inventory_ready=false`.
 [Polityka 06.3](reorder-policy.md) i [symulator 06.4](chronological-inventory.md)
-wykorzystują te encje; następny zakres projektu to snapshoty i stockout truth **06.5**.
+wykorzystują te encje; [projekcje 06.5](inventory-projections.md) tworzą snapshoty
+i stockout truth. Następny zakres projektu to integracja i publikacja **06.6**.
 
 ## Kontrakty i podział wiedzy
 
@@ -98,5 +99,6 @@ kodu. [Odbiór 06.2](../evidence/ai/06/06.2/README.md) podaje wyniki kontroli.
 [Polityka reorder i osobny proces realizacji dostaw](reorder-policy.md) mają
 odrębny odbiór 06.3. [Odbiór 06.4](../evidence/ai/06/06.4/README.md) obejmuje
 symulator wspólnego zapasu, fulfillment sprzedaży i return eligibility.
-Snapshoty, stockout truth i publikacja nowego source nadal należą do
+[Odbiór 06.5](../evidence/ai/06/06.5/README.md) dodaje snapshoty i stockout truth.
+Integracja i publikacja nowego source nadal należą do
 [pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).

@@ -5,7 +5,8 @@
 przebieg sprzedaży ograniczonej wspólnym zapasem. Działa na osobnym scenariuszu;
 domyślny generator source 2.6 nadal korzysta z dotychczasowej ścieżki.
 `inventory_ready=false`. [Odbiór](../evidence/ai/06/06.4/README.md) zawiera
-wyniki i wersję kodu. Następny zakres to 06.5: snapshoty i epizody stockout.
+wyniki i wersję kodu. [Projekcje 06.5](inventory-projections.md) tworzą snapshoty
+i epizody stockout. Następny zakres to 06.6: integracja i publikacja danych.
 
 ## Wejście i kolejność
 
@@ -113,6 +114,6 @@ egzekwuje typy; reguły biznesowe pozostają w walidatorze.
 
 CLI zwraca `passed`/exit 0, `not_ready`/exit 1 przy nieznanych danych potrzebnych
 do review albo `failed`/exit 1 przy błędnym procesie/kontrakcie.
-Końcowe salda są diagnostyką, nie odbiorem snapshotów 06.5.
-Epizody stockout, source/readiness gates, nowa publikacja 03 oraz zależne oceny
-04/05 pozostają poza tym zakresem. DATA-06 jest nadal otwarte.
+Końcowe salda tego runnera są diagnostyką. [Osobny odbiór 06.5](../evidence/ai/06/06.5/README.md)
+obejmuje snapshoty i epizody stockout. Source/readiness gates, nowa publikacja 03
+oraz zależne oceny 04/05 pozostają poza tym zakresem. DATA-06 jest nadal otwarte.

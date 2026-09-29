@@ -4,8 +4,8 @@
 dostaw na małym fixture. Wykorzystuje [ledger 06.1](inventory-ledger.md)
 i [kontrakt dostaw 06.2](replenishment.md). Source 2.6 nie korzysta jeszcze
 z tych modułów; `inventory_ready=false`. [Symulator 06.4](chronological-inventory.md)
-korzysta z nich na osobnym scenariuszu. Następny zakres to **06.5 — snapshoty
-i stockout truth**.
+korzysta z nich na osobnym scenariuszu. [Projekcje 06.5](inventory-projections.md)
+tworzą snapshoty i stockout truth; następny zakres to **06.6 — integracja i publikacja danych**.
 
 ## Konfiguracja i decyzja
 
@@ -127,6 +127,7 @@ oraz potwierdza, że przyszłe przyjęcia nie zmieniają salda w origin.
 
 [Odbiór 06.3](../evidence/ai/06/06.3/README.md) podaje testy i rzeczywiste CLI.
 [Odbiór symulatora 06.4](../evidence/ai/06/06.4/README.md) obejmuje wielodniowe
-wykonanie, shared stock, routing i zwroty. Do [06.5–06.6](../plans/ai/etapy/06-inventory-ledger.md)
-pozostają snapshoty, epizody stockout oraz nowa publikacja i readiness.
+wykonanie, shared stock, routing i zwroty. [Projekcje 06.5](inventory-projections.md)
+dodają snapshoty i epizody; do [06.6](../plans/ai/etapy/06-inventory-ledger.md)
+pozostają integracja oraz nowa publikacja i readiness.
 DATA-06 pozostaje otwarte.

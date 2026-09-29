@@ -1,0 +1,1648 @@
+{
+  "stage_id": "06.5",
+  "status": "passed",
+  "verified_at_utc": "2026-09-29T11:37:33.511919+00:00",
+  "acceptance_scope": "Local ledger-derived snapshots and private stockout diagnostics; not source publication or AI 08 acceptance",
+  "branch": "ai/06-01-inventory-ledger",
+  "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+  "environment": {
+    "os": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.15",
+    "runtime": "services/api/.venv/bin/python",
+    "working_directory": "repository root"
+  },
+  "code_provenance": {
+    "code_sha256": "ab6c3b436f7d007f860c720595f60f2dee5105e6cc16e0c041bb6bebcc28e674",
+    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+    "code_files": {
+      "data/__init__.py": "62078b0694e368b88c30debae09e3b68046782e471ae194d5df9e5d6f26d42d8",
+      "data/contracts/chronological_scenario.v1.schema.json": "1e2e1af0c8e776c4b7d8be2c288f2455fb6f3cef248f5a64ab1ea18dccc431b0",
+      "data/contracts/inventory_commerce_output.v1.schema.json": "643c7e5e2df42ff5f7a3e651f0833ea886506b775dc4e156be765fc80160632c",
+      "data/contracts/inventory_fulfillment_routes.v1.schema.json": "643cd08aa734799371c254bc46b85f08ea62ec76db4d0835297f6c452bc3dd28",
+      "data/contracts/inventory_history_coverage.v1.schema.json": "42d551860611445e63d37c0d6b94f6dae60ea7d586aa72d034292f13ff6c97d3",
+      "data/contracts/inventory_ledger.v1.schema.json": "ba1f371590e4494873d2c2cd7a03c8ce231bcd03548da3598c7c9186d376cfd7",
+      "data/contracts/inventory_projection.v1.schema.json": "0cfcc6031744d6d5d9537efc44ababb5559d36ac0e1d1151a053fec966775cd0",
+      "data/contracts/inventory_projection_config.v1.schema.json": "b670afd03c29fd39f5a22e7115bcb641c7a802b9da35cf86c28a41d607185837",
+      "data/contracts/observation_history.v1.schema.json": "bbacb688c9cdb6e1cd93f18cfffa624c9888c65fb99024bd796e303c4b6a523a",
+      "data/contracts/reorder_config.v1.schema.json": "ff9b010eb1e1c2b607e3044b9b46da4600e27f7045db68fb021f55bcff8efbb4",
+      "data/contracts/replenishment.v1.schema.json": "bb815e3fe2ffa8753e6806e85ffeb3c4915d8248ad48c7c4ce2d05def0cd7083",
+      "data/contracts/retail_demand.v1.schema.json": "06974ef2292024a62b0e5ae0caf95facd69b9f1fda47c480286900f18bd3c1b6",
+      "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+      "data/contracts/retail_pricing.v1.schema.json": "de5043a4a12c52b60612da61f0a164cca9335be8887abae0848c71e92159b6ce",
+      "data/contracts/retail_returns.v1.schema.json": "51fcbbd30cbfefc089d53d802764a4bcf921bab3a6ee760a2a3d22d040f14ffa",
+      "data/contracts/retail_simulation.v1.schema.json": "f7ef44b745b0cec09489435e5f535681833f018b996328435e2d1d086e98a8ee",
+      "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+      "data/contracts/source_dataset_manifest.v2.schema.json": "ce7a4c6192a41a5fbe4d52865321715d4b968c742ee7691ba3ec4714bd079d77",
+      "data/contracts/supplier_fulfillment_config.v1.schema.json": "815d5f437f34f5edc16156c8d6d27e74e6ddd77bd98d56a3b75a49409dcc5ad3",
+      "data/contracts/supplier_simulation_truth.v1.schema.json": "3f8c40f3ad9d2bb107445993fee5991640035f848100dc87ffff37ead95f0bfa",
+      "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+      "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+      "data/generator/commerce_pricing.py": "bdde3f7e353d57573a5b1626f31cd3aaa850b32801a83e99d3c691cfbedd6148",
+      "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+      "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+      "data/generator/csv_writer.py": "82dd485a0cd9ada2a8de9df563f3be69bf33dfafff202054eb0bd8d176fa22a8",
+      "data/generator/demand_commerce.py": "c943d3233835e8b3f885a0c380616858e2bedcb84593ed443811d60413031776",
+      "data/generator/demand_contract.py": "261193e148dbef1af0434a8489c0fc9afa65705667b6645fe1974537bce7305d",
+      "data/generator/demand_grid.py": "74c4070da96bc25c67f51828832450a2ffaa5d6646db8ccd9bfc7a9a5de8db1e",
+      "data/generator/demand_model.py": "7c3b4cbf629d3fdf433d297ea587abcc333f704d0e347c0b3f863a57566c4e21",
+      "data/generator/demand_panel.py": "40e5a324b87d8fe9697cc6da88b2683ba476f320b174c052e6e29a6b9db8883f",
+      "data/generator/demand_quality.py": "e86d32f45138c453ce3dcb07e94acd87f3305aff32776e4b01a040c31999f8f9",
+      "data/generator/demand_schema.py": "9cc993a6e7874afe3f09e0f1bd46a3b3e154ba1112f35d455a4129f5e2a0437c",
+      "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+      "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+      "data/generator/dimension_schema.py": "7fb6543d4f266c3faca9e56abe4cb773e1ad07a5446eb5a7e82cee1618c05566",
+      "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+      "data/generator/feature_admission.py": "3bbff5bbe7a12737a91b5bbce1897fbda0a040b8847c7ef264e11014531a9f66",
+      "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+      "data/generator/identity.py": "a183cb7ec1b177b2a8eb71a94693f0498eb3391fc04dd1e359c76faf93cb31db",
+      "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+      "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+      "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+      "data/generator/main.py": "fa46fa4cba9907234ee877fa74301796e8452cbf539f4aafa2842e481f6759a1",
+      "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+      "data/generator/manifest_v2.py": "11f96fc5ab9e0a824e37d2450fee614b93a4892a520dc78df09ccc36d6ec0a30",
+      "data/generator/observation_history.py": "033c436351a60f2a4260e03a6b5be5c8a356c472f7b56dc7c9891cc17a1b806f",
+      "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+      "data/generator/price_resolver.py": "544e7ee10aa820af1cc4151a1ff8df43ed65fcfdb72f40d462763d7a12305df0",
+      "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+      "data/generator/pricing_contract.py": "d10a5651562feda96af33ebc05dec6c3c594279e7a303afb07b7440cd835990f",
+      "data/generator/pricing_plans.py": "72449ccd99beca4cf579cd88d8c9db77f54501050736492cc7ed2bd1580d6a4e",
+      "data/generator/pricing_quality.py": "aa90663b7139be6c1d1c7b5df03c3bc740ee6a4c5e492dfc4f68839cde5e70bb",
+      "data/generator/pricing_schema.py": "522d4621b6cb52e34b03c5db794e546d2a065d776c1d39b790bb166cf1075368",
+      "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+      "data/generator/profile_engine.py": "36468742c5e7ae030dafa534cae4330d1441aa87183e91873b8c1dbd9b72b209",
+      "data/generator/promotion_truth.py": "c78590d97c82aabe54168d0adc62eda86e06aec60e0758a1fc03b406060f6124",
+      "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+      "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+      "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+      "data/generator/return_contract.py": "93274f39f520ddbbb32c2c1d18e4b219ee353258f19fa91eedb4ec465da14704",
+      "data/generator/return_events.py": "c69149d66e224d45565014389160a193d1f9a931a8c4177a7ae6d2d78c33db9e",
+      "data/generator/return_quality.py": "303f6225438ae20e371d63144cd529ba721913828b16fb2a8943cecedc0b68cb",
+      "data/generator/return_reconciliation.py": "44ec00274f4a26d6f38bef564d9f187c23fd092020d82afa9b3b72d7a4407f1c",
+      "data/generator/return_schema.py": "cb32585b5e0e811359fd41b496192765256da84d219d180ac6d7d0032409c806",
+      "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+      "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+      "data/generator/simulation.py": "ae49169bf2fa3a8016d2932a7c324dd10312c9d7f52c7c51fe7ed8bfcc1a7c27",
+      "data/generator/simulation_schema.py": "16676968d639c4864b3334bba62de74748873fd9906338381d91fc977a8171a1",
+      "data/generator/source_quality.py": "8ccaf9f5883c86f5bed87f4e8b7e1ee2da215f4c108536bcbedbaad9aba1ba16",
+      "data/generator/source_realism.py": "0aded25b26494563c28b3dad0a79dd057e39edd6cd68877e64fa6c49757d89bf",
+      "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+      "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5",
+      "data/inventory/__init__.py": "dd584782ff30d43ffd3932f45158140a13c2bcb7da4dc1aecc4b52e609892dba",
+      "data/inventory/contract.py": "60b982ef171af43f148bd4c587a1813e03fa09bfb8bd603cd3529449e8b46482",
+      "data/inventory/fulfillment_routes.py": "612230ed0e61a4e4ca5c72bab31cbc3647e19d7b1d97eeb7bf0a484be3f90b36",
+      "data/inventory/ledger.py": "378ed70906d33bd8834dc6b007c3904203e689bf2ac6d457643ffbc4cd371c57",
+      "data/inventory/legacy.py": "5a6a1fc79dd49a543a8dc24cae20b2ac5f72479d9147a8f33f126af6693eb546",
+      "data/inventory/projection.py": "a9fdfce9779096de7ebe308b5ce0156e6c6d42c34094e3ed7297106f370386d1",
+      "data/inventory/projection_contract.py": "e66b9b402c23da71de9a0a1118c4531faa6e014464eb0f57f7cb7f1cae3043ef",
+      "data/inventory/reorder.py": "c254f9904bb2d98b254503a4a4e37a49f14279147dea49f03c6511e525e033a8",
+      "data/inventory/reorder_contract.py": "205ab7b64c698c268791ed05658f012109b7591e5c5015170914071863f34b3a",
+      "data/inventory/replenishment.py": "ea96d42ac5e357803575ff296c2ebd350283637fe9558bbebccbb4e52d7c8528",
+      "data/inventory/replenishment_contract.py": "147da537cc80e5e9880dd9f4918f9e6310b9330107995835217112cd4ccbbcdb",
+      "data/inventory/run_inventory_projection.py": "174d6704d15092a2cf537b19c6a80a4f5ceff66a55ba9acf92c49443b6b91d82",
+      "data/inventory/run_reorder.py": "eaa2fc444a268a94f77ba345125a13a6906570c42e2db47729fe0d3afed8090a",
+      "data/inventory/run_simulation.py": "f3976ca133072527bc1619a79ce37e21c69ce29b6fc56f2b582e693d0135244f",
+      "data/inventory/simulation_contract.py": "3d53ffbc9787e1554eceb62f0d2414e31d4501a9cd29bc9d437728fef2e1ef2b",
+      "data/inventory/simulation_reconciliation.py": "5a79cacfd03febac00c5c6d2a72ee805bbb8ac8448acc1a9e9c5c0eb3d974845",
+      "data/inventory/simulator.py": "6b2e9dc44e5c0888da11d03fccb6a6f005b68a6f70db65f7a60779744b8ad78c",
+      "data/inventory/snapshots.py": "90328542e74e175778d0f6ff77f71510fa8859279c105063449fbf0c0ba4cf0e",
+      "data/inventory/stockout.py": "224cfffaae62380f6421b031c70a0640e5bdd54d219e245c2eb396c06453978f",
+      "data/inventory/supplier_fulfillment.py": "2ed74f52cc1ea4ce8d633d70e4cae33bc6ee6dea374a72dfeb5b81eb6b7fd350",
+      "data/inventory/supplier_truth.py": "d4ac2c38f015714af2d40c6b053000cc7ea5f2438fa770a653487b64ee967a43",
+      "data/inventory/verify.py": "a7677f069ad72c1db0acbf421ae47c7718d4aa648b77907fc47f4c476a93ea67",
+      "data/inventory/verify_replenishment.py": "04b180d9171e01070ee0aae770dba8d2c21724e5c94f8dce2f9bb414a22111bf",
+      "ml/__init__.py": "e616a63471aa3ff14e59387c47a03d6b6cfa95b45829d438d1246ca1650b16f0",
+      "ml/features/__init__.py": "ca11028661773d127a536afa94c7afff4f627235c03bf14442132617d5bb380c",
+      "ml/features/ai_demand.py": "650de047ea257a704832a4a60c0b4f613792612665f442f6138156891c292243",
+      "ml/features/fact_input.py": "a1c1bca45b1dabff8a1a1ac67bcf7c43078f15d777f3ecd3576a2758a3dec162",
+      "ml/features/observation_history.py": "bee3503917b9c9a18e2283e8b6ef0fff890a371b5e0e16f6edf2ff0e936b6fa3",
+      "ml/features/worker.py": "23a1b7bf099057e9ee1a035a796750302ddab69789df3e43e736d187526f5f21"
+    },
+    "dependency_files": {
+      "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3",
+      "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63"
+    },
+    "python_version": "3.11.15",
+    "git_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+    "code_state": "clean"
+  },
+  "process_version": "inventory-projection-1.0.0",
+  "effective_configuration": {
+    "contract_version": "inventory-projection-config-1.0.0",
+    "process_version": "inventory-projection-1.0.0",
+    "business_timezone": "UTC",
+    "start_at": "2026-07-01T00:00:00+00:00",
+    "end_at": "2026-07-10T00:00:00+00:00",
+    "snapshot_policy": "utc_day_last_microsecond",
+    "reservation_policy": "none",
+    "stock_measure": "available_qty",
+    "episode_policy": "zero_after_event_including_instantaneous",
+    "diagnostic_horizon_days": 7,
+    "truth_delay_seconds": 180
+  },
+  "evaluated_at": "2026-07-11T00:00:00+00:00",
+  "parent_execution": {
+    "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+    "operational_sha256": "7f7c0a1696097eba90dc80e6444a13c3f74d9126d8b919f940c8631c3061d400",
+    "simulation_sha256": "e40bb87cb03456fa7392831428e923bbe71ea304eac6acbf36ceca6d86ca30b3"
+  },
+  "fixtures": [
+    {
+      "path": "data/tests/fixtures/chronological-opening-v1.json",
+      "sha256": "b79e1b4908ec1cf2f4f80e5348e5c3d51cd8cf3726d1ab02de7643220f64ee03"
+    },
+    {
+      "path": "data/tests/fixtures/reorder-supply-v1.json",
+      "sha256": "34c3af0584b28908f3572a8eb4b8abbba19f73f008b14c0397cac58fedd6204b"
+    },
+    {
+      "path": "data/tests/fixtures/chronological-scenario-v1.json",
+      "sha256": "f6e35d5c05abf8c23ca31b56f5e9ada95c17aa927417bd41f7649d9e84fdb0de"
+    },
+    {
+      "path": "data/tests/fixtures/reorder-config-v1.json",
+      "sha256": "71b2b4b2bb3841aaf6e26e702867f39c45ff2b19568953c3190b14836bc36bf3"
+    },
+    {
+      "path": "data/tests/fixtures/supplier-fulfillment-config-v1.json",
+      "sha256": "3e0e21bc7680a4511fa2e7a09815d5a9aeb8f29717ea18b0f0f2a8256c0fcdbe"
+    },
+    {
+      "path": "data/tests/fixtures/chronological-supplier-truth-v1.json",
+      "sha256": "7d0ba808ad80433fafb6850616cce20b984f4c87d4d5456ebbc5977b9ba9f7f9"
+    },
+    {
+      "path": "data/tests/fixtures/inventory-projection-config-v1.json",
+      "sha256": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+    }
+  ],
+  "tests": {
+    "command": "services/api/.venv/bin/python -m pytest -q data/tests --junitxml=ci-cd/reports/data/ai06-05-tests.xml",
+    "passed": 545,
+    "projection_tests": 60,
+    "previous_data_tests": 485,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 178.578,
+    "junit_sha256": "742a8b72580dfe1d75460e03bd0f1e12386b82ae773007cd393ad31b59db70cd",
+    "test_source_sha256": "00724841780eed629a50d59888eb8c3d577f93d139125009d7ce6da4319b9a5c"
+  },
+  "static_checks": {
+    "ruff_check": "passed: data/inventory",
+    "ruff_format_check": "passed: data/inventory and test_inventory_projection.py",
+    "mypy": "passed: --follow-imports=silent data/inventory (23 source files)",
+    "schema_runtime_parity": "passed: both new schemas"
+  },
+  "cli_cases": [
+    {
+      "name": "normal-supply",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/normal-supply/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/normal-supply/projection.json"
+      ],
+      "report_sha256": "b4eee1f6b39d14c89cb72ee920542931d84dfc31fb551f186a79220628e81751",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "6fa94953f9612e13cae98381081beed07494aa1e1fd0ed8aeb5f26d687d6f200",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "7f7c0a1696097eba90dc80e6444a13c3f74d9126d8b919f940c8631c3061d400",
+        "simulation_sha256": "e40bb87cb03456fa7392831428e923bbe71ea304eac6acbf36ceca6d86ca30b3"
+      },
+      "operational_sha256": "23b3fcf55615a5d5ccbe772835689a8aa89d97491fa2fba1386b4772489d3f72",
+      "simulation_sha256": "258c71800db3082e9ac4b5e0daa0581cc4ac1bea801be47873b2ab35aa85cc51",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 3,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 1,
+        "lost_sales_quantity": 4,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "single_class",
+        "eligible_windows": 1,
+        "class_0": 1,
+        "class_1": 0
+      },
+      "seconds": 0.03663649999361951,
+      "peak_rss_mib": 42.390625,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 1,
+        "already_stockout": 4,
+        "not_evaluable": 13
+      }
+    },
+    {
+      "name": "repeat-same-inputs",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/repeat-same-inputs/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/repeat-same-inputs/projection.json"
+      ],
+      "report_sha256": "7ae87212a806d6c91fc1440c3943c8b770556119796e4c1c0c6f818cee15d145",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "6fa94953f9612e13cae98381081beed07494aa1e1fd0ed8aeb5f26d687d6f200",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "7f7c0a1696097eba90dc80e6444a13c3f74d9126d8b919f940c8631c3061d400",
+        "simulation_sha256": "e40bb87cb03456fa7392831428e923bbe71ea304eac6acbf36ceca6d86ca30b3"
+      },
+      "operational_sha256": "23b3fcf55615a5d5ccbe772835689a8aa89d97491fa2fba1386b4772489d3f72",
+      "simulation_sha256": "258c71800db3082e9ac4b5e0daa0581cc4ac1bea801be47873b2ab35aa85cc51",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 3,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 1,
+        "lost_sales_quantity": 4,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "single_class",
+        "eligible_windows": 1,
+        "class_0": 1,
+        "class_1": 0
+      },
+      "seconds": 0.031239374991855584,
+      "peak_rss_mib": 40.640625,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 1,
+        "already_stockout": 4,
+        "not_evaluable": 13
+      }
+    },
+    {
+      "name": "poor-partial-delayed-supply",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/poor-partial-delayed-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/poor-partial-delayed-supply/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/poor-partial-delayed-supply/projection.json"
+      ],
+      "report_sha256": "e257e667e5503ef9e0f657ac03411998c3cf07f2da206af0efe4e466f36982b1",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "01cfad3a5f426ea6fd4bcf67f2ccb66f775e83d6d39cb5da8d3d38626399c35f",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "149a4f7dc7e72b7d8f830836f9ae281a024cce15d64f3ae7673bf2430e160f19",
+        "simulation_sha256": "1a325e349bd587efff9c5ea83fe6309bee6363c0a1eb50143c92db8b63939109"
+      },
+      "operational_sha256": "e112b90c28ae95a38856f63eae48d7d3b015cb427f457ffb4f427cb4d62d276b",
+      "simulation_sha256": "c14d354c334cb998016983031183e8e04e7e28b3e04b538a08625eaaf78230f4",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 5,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 4,
+        "lost_sales_quantity": 19,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "single_class",
+        "eligible_windows": 1,
+        "class_0": 0,
+        "class_1": 1
+      },
+      "seconds": 0.0698875839880202,
+      "peak_rss_mib": 41.46875,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-05T00:01:00+00:00",
+          "start_sequence": 12,
+          "end_at": "2026-07-07T00:00:00+00:00",
+          "end_sequence": 0,
+          "duration_microseconds": 172740000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 13
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-06T10:00:00+00:00",
+          "start_sequence": 14,
+          "end_at": "2026-07-07T00:00:00+00:00",
+          "end_sequence": 1,
+          "duration_microseconds": 50400000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 2
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 1,
+        "already_stockout": 7,
+        "not_evaluable": 10
+      }
+    },
+    {
+      "name": "no-demand-zero-floor",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/no-demand-zero-floor/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/no-demand-zero-floor/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/no-demand-zero-floor/projection.json"
+      ],
+      "report_sha256": "b465559a453614758e195b63d6b59eccedce1d998a026a8e175ceaa8c083b5a2",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "830fd290960be0b842a916298780fb11d00667476d40318275ae90d623ed8523",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "470a22608b6eaed01d483e8c3ff82b4a2d7f002515fc789588555b4dfd7b5e2c",
+        "simulation_sha256": "280e5aa66269f2ee5cf0ed15b0cb69080511dc67753b3223cd632ae12a7448de"
+      },
+      "operational_sha256": "990b940d32cb602225459eef5e77383ec9ba236fa5fabf7797f0749c60ae3ac0",
+      "simulation_sha256": "cf085efa3f1d22fe5d25a664a8ea20eb9f29bca6b2e1d6d7bccb1fc21147dbbf",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 1,
+        "right_censored_episodes": 1,
+        "lost_sales_impacts": 0,
+        "lost_sales_quantity": 0,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "single_class",
+        "eligible_windows": 2,
+        "class_0": 2,
+        "class_1": 0
+      },
+      "seconds": 0.017172624997328967,
+      "peak_rss_mib": 40.875,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": null,
+          "end_sequence": null,
+          "duration_microseconds": 777600000000,
+          "left_censored": true,
+          "right_censored": true,
+          "lost_sales_quantity": 0
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 2,
+        "already_stockout": 9,
+        "not_evaluable": 7
+      }
+    },
+    {
+      "name": "zero-stock-with-positive-demand",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/zero-stock-with-positive-demand/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/zero-stock-with-positive-demand/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/zero-stock-with-positive-demand/projection.json"
+      ],
+      "report_sha256": "70ecf3ed09c9f5b9940258f70236804f5d018d1da315bec22c6636d4786a8eac",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "e7bf253f27b47304848ceb8721fdd32407befc03abc85234b769dc264dc50135",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "ee70cae831dcd36b05d971e90d8373405cec3d7feda07d085417d2c580596add",
+        "simulation_sha256": "d5682a3d2588ca706d150f5089e7274572d5b8143a193b897dd30f1aad4b643f"
+      },
+      "operational_sha256": "d83edcbcf06e95cc56618686fbe4d7785fb17364c52d39e5a3ee8c17686fbd1f",
+      "simulation_sha256": "71cc710d1246fbea4301df72f0899a3775acbfb2b033d21a90935fe69393f355",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 3,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 3,
+        "lost_sales_quantity": 18,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "no_eligible_windows",
+        "eligible_windows": 0,
+        "class_0": 0,
+        "class_1": 0
+      },
+      "seconds": 0.028168375007226132,
+      "peak_rss_mib": 40.515625,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 0,
+          "end_at": "2026-07-05T00:00:00+00:00",
+          "end_sequence": 0,
+          "duration_microseconds": 345600000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 12
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-05T00:00:00+00:00",
+          "end_sequence": 1,
+          "duration_microseconds": 345600000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-05T10:00:00+00:00",
+          "start_sequence": 13,
+          "end_at": "2026-07-08T00:00:00+00:00",
+          "end_sequence": 0,
+          "duration_microseconds": 223200000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 6
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 0,
+        "already_stockout": 11,
+        "not_evaluable": 7
+      }
+    },
+    {
+      "name": "incomplete-seven-day-tail",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/incomplete-seven-day-tail/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/incomplete-seven-day-tail/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/incomplete-seven-day-tail/projection.json"
+      ],
+      "report_sha256": "156672754027de18bdaa7e3101d7ff651202044869b2200d157d4081e5897e8d",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-05T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "6c4a9d61720b0eb0feecf1b52fda2343db64eb1fabc0c280d91a03a69c6291c6",
+        "configuration": "be6e2966e81c247bb337bd1cc8bea0177fb5ad0589b320717700217085550d2b"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "db64b2184412aebff762acf36373b595e9d0d5034de20393f6e868244c9180a9",
+        "simulation_sha256": "b89625df9155c0d1ab3828b723584b39323e45cd121daecfe68a7bc5aec0ff8b"
+      },
+      "operational_sha256": "f9d4a27557f8c29448dbe9445d5170cc73fbdef8066ba7b209b7ec4a095a6d00",
+      "simulation_sha256": "de82dfeabaace407af257a911335b3cde6e8e24c6c7cf6588e681382b08a4a98",
+      "reconciliation": {
+        "snapshots": 8,
+        "physical_daily_balances": 8,
+        "stockout_episodes": 3,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 1,
+        "lost_sales_quantity": 4,
+        "window_diagnostics": 8
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "no_eligible_windows",
+        "eligible_windows": 0,
+        "class_0": 0,
+        "class_1": 0
+      },
+      "seconds": 0.02034079100121744,
+      "peak_rss_mib": 42.234375,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 0,
+        "already_stockout": 4,
+        "not_evaluable": 4
+      }
+    },
+    {
+      "name": "instantaneous-zero-sequence",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/instantaneous-zero-sequence/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/instantaneous-zero-sequence/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/instantaneous-zero-sequence/projection.json"
+      ],
+      "report_sha256": "fd013bf68ec639af998455281db248be456554845f65705b6ff566d89dbbf613",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "e7fe812acbe1fed5ccd1f98b982e518e50506280231979d357aecfc2b7ca45e6",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "db5bcd0bf8b411824119b5ed77348e440506f728524b645e68c139a53b8bccc8",
+        "simulation_sha256": "7d6c1682aa9358b6b45ddaa70a92e3da4613a8d34d08d85f8e0e00d32357103c"
+      },
+      "operational_sha256": "d7599b1bd5cc08de6cf1df72149a6455a3901bb42486122ccd6b5ffafb6307d9",
+      "simulation_sha256": "da8133efe898d32e2fb03343a41452c2320b0cbc605413809cfebe26c3d20746",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 2,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 1,
+        "lost_sales_quantity": 4,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "single_class",
+        "eligible_windows": 2,
+        "class_0": 2,
+        "class_1": 0
+      },
+      "seconds": 0.025638457998866215,
+      "peak_rss_mib": 42.140625,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-05T00:00:00+00:00",
+          "end_sequence": 1,
+          "duration_microseconds": 345600000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-01T10:00:00+00:00",
+          "end_sequence": 12,
+          "duration_microseconds": 0,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 2,
+        "already_stockout": 4,
+        "not_evaluable": 12
+      }
+    },
+    {
+      "name": "future-demand-preserves-prior-snapshots",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/future-demand-preserves-prior-snapshots/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/future-demand-preserves-prior-snapshots/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/future-demand-preserves-prior-snapshots/projection.json"
+      ],
+      "report_sha256": "3fabbe752434cc6e6a21f3194b9afcaf1a893e9b241cfbbca0b82e9efe9cb13c",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "faa4dd52bd017b2d71a958c221a70fea72fb3f4f77eaf7b2e0b8d88f76d0baa5",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "e5f9ac49776804ab0dffde2c870baee9ced4f559e2d62c591927ace9dcb6a024",
+        "simulation_sha256": "760d9e0500b47f69a6fc9787cfc4194f6f5cb7a71326010cd2fb75f9c31c8360"
+      },
+      "operational_sha256": "3c423fe20b2fced8c54727e24712c204b281ed3bc393d11c4e7358cd23e1e813",
+      "simulation_sha256": "a449f1421ce8a033d004c1129f5485e7d8ef291658c17aca0b4df3b954f9b4c6",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 4,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 2,
+        "lost_sales_quantity": 103,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "single_class",
+        "eligible_windows": 1,
+        "class_0": 0,
+        "class_1": 1
+      },
+      "seconds": 0.026046833998407237,
+      "peak_rss_mib": 41.3125,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-07T10:00:00+00:00",
+          "start_sequence": 15,
+          "end_at": "2026-07-08T00:00:00+00:00",
+          "end_sequence": 0,
+          "duration_microseconds": 50400000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 99
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 1,
+        "already_stockout": 5,
+        "not_evaluable": 12
+      }
+    },
+    {
+      "name": "immature-outcomes-no-negative-label",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/immature-outcomes-no-negative-label/projection-config.json",
+        "--evaluated-at",
+        "2026-07-10T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/immature-outcomes-no-negative-label/projection.json"
+      ],
+      "report_sha256": "bdfde2f9690a80ac30a3e7473651a95f7062c5e13cf4c0037e21979e57ff7a83",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 86400
+      },
+      "evaluated_at": "2026-07-10T00:00:00Z",
+      "input_sha256": {
+        "simulation": "6fa94953f9612e13cae98381081beed07494aa1e1fd0ed8aeb5f26d687d6f200",
+        "configuration": "ae9ecab5e0c90b17958ccc4864a1ad53ca79b303e9e59af6013b543560de4bff"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "7f7c0a1696097eba90dc80e6444a13c3f74d9126d8b919f940c8631c3061d400",
+        "simulation_sha256": "e40bb87cb03456fa7392831428e923bbe71ea304eac6acbf36ceca6d86ca30b3"
+      },
+      "operational_sha256": "23b3fcf55615a5d5ccbe772835689a8aa89d97491fa2fba1386b4772489d3f72",
+      "simulation_sha256": "0f0feda4f858fde14982ddf0fe08c2805f19d95dd619396187cb1ee7cfa2965b",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 3,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 1,
+        "lost_sales_quantity": 4,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "no_eligible_windows",
+        "eligible_windows": 0,
+        "class_0": 0,
+        "class_1": 0
+      },
+      "seconds": 0.04037658301240299,
+      "peak_rss_mib": 41.640625,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 0,
+        "already_stockout": 4,
+        "not_evaluable": 14
+      }
+    },
+    {
+      "name": "both-diagnostic-classes-no-model-acceptance",
+      "status": "passed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/both-diagnostic-classes-no-model-acceptance/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/both-diagnostic-classes-no-model-acceptance/projection-config.json",
+        "--evaluated-at",
+        "2026-07-21T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/both-diagnostic-classes-no-model-acceptance/projection.json"
+      ],
+      "report_sha256": "942afc7b22f077618e83edaaae9a85caff5b0a86a0c51abe4890d26334a5b50e",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-20T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-21T00:00:00Z",
+      "input_sha256": {
+        "simulation": "5263edb6b6c1ef73df0e84d692ded3a656fb57f2dd945fbdabe781298d29e9b9",
+        "configuration": "69a6b107b6ccf2811b1792456b78c7effd9c58910c9b02fc895e8df47793adb7"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "9b3dd5727f65d45f5df0dab3972cb208733b7c6165713ad6b7d55f1c157d356f",
+        "simulation_sha256": "760d9e0500b47f69a6fc9787cfc4194f6f5cb7a71326010cd2fb75f9c31c8360"
+      },
+      "operational_sha256": "34a49c0bf3c6a661b5a00a3d170f095337da3f56fffb66000968d6a8d05248f3",
+      "simulation_sha256": "6f1df2e489792a8fe8de9b4ab51479a27236d88249c76acfa9f876759f24bc60",
+      "reconciliation": {
+        "snapshots": 38,
+        "physical_daily_balances": 38,
+        "stockout_episodes": 4,
+        "right_censored_episodes": 0,
+        "lost_sales_impacts": 2,
+        "lost_sales_quantity": 103,
+        "window_diagnostics": 38
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "evaluable",
+        "reason": null,
+        "eligible_windows": 19,
+        "class_0": 14,
+        "class_1": 5
+      },
+      "seconds": 0.04697199999645818,
+      "peak_rss_mib": 42.25,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-07T10:00:00+00:00",
+          "start_sequence": 15,
+          "end_at": "2026-07-08T00:00:00+00:00",
+          "end_sequence": 0,
+          "duration_microseconds": 50400000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 99
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 19,
+        "already_stockout": 5,
+        "not_evaluable": 14
+      }
+    },
+    {
+      "name": "unknown-opening-null-snapshots",
+      "status": "not_ready",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/unknown-opening-null-snapshots/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/unknown-opening-null-snapshots/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/unknown-opening-null-snapshots/projection.json"
+      ],
+      "report_sha256": "58faa7e836e95c8b16e5bb0bbc8d7a71678f6fe0e65f0dca9728d83d3a129c3a",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "input_sha256": {
+        "simulation": "d8fcf8a6ebc764d6c99e7119796f90ef82021dacd7235c82bbeb9ed7a60f2cc2",
+        "configuration": "50a63ff8f0ec8907aa3447e4c9dc5227ed374e4b89641d6745d40ab54eee7ece"
+      },
+      "parent_execution": {
+        "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+        "operational_sha256": "fb33bce49b0ef7fa6cc33c89f0e4a944397506a3881c7eabab9ba98cf219c383",
+        "simulation_sha256": "88f92d18c7a9546eb9412ed3753492063bb40f1866a7c132227a071c4a578346"
+      },
+      "operational_sha256": "0aaf73a419a975338cd891ef2dbd9faa1db41758b58d8365536d4a55565bc919",
+      "simulation_sha256": "4be941edf91d25a8b1c952afd210510c24aa14b73c7f46bbda66aca821ce6197",
+      "reconciliation": {
+        "snapshots": 18,
+        "physical_daily_balances": 18,
+        "stockout_episodes": 5,
+        "right_censored_episodes": 2,
+        "lost_sales_impacts": 4,
+        "lost_sales_quantity": 19,
+        "window_diagnostics": 18
+      },
+      "stockout_model_readiness": {
+        "model_ready": false,
+        "label_diagnostics_status": "not_evaluable",
+        "reason": "no_eligible_windows",
+        "eligible_windows": 0,
+        "class_0": 0,
+        "class_1": 0
+      },
+      "seconds": 0.023049791998346336,
+      "peak_rss_mib": 41.125,
+      "episodes": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-01T00:00:00+00:00",
+          "start_sequence": 1,
+          "end_at": "2026-07-04T12:00:00+00:00",
+          "end_sequence": 22,
+          "duration_microseconds": 302400000000,
+          "left_censored": true,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-01T10:00:00+00:00",
+          "start_sequence": 11,
+          "end_at": "2026-07-02T09:00:00+00:00",
+          "end_sequence": 30,
+          "duration_microseconds": 82800000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 4
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-02T12:00:00+00:00",
+          "start_sequence": 21,
+          "end_at": "2026-07-02T13:00:00+00:00",
+          "end_sequence": 23,
+          "duration_microseconds": 3600000000,
+          "left_censored": false,
+          "right_censored": false,
+          "lost_sales_quantity": 0
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "start_at": "2026-07-05T00:01:00+00:00",
+          "start_sequence": 12,
+          "end_at": null,
+          "end_sequence": null,
+          "duration_microseconds": 431940000000,
+          "left_censored": false,
+          "right_censored": true,
+          "lost_sales_quantity": 13
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "start_at": "2026-07-06T10:00:00+00:00",
+          "start_sequence": 14,
+          "end_at": null,
+          "end_sequence": null,
+          "duration_microseconds": 309600000000,
+          "left_censored": false,
+          "right_censored": true,
+          "lost_sales_quantity": 2
+        }
+      ],
+      "diagnostic_status_counts": {
+        "evaluable": 0,
+        "already_stockout": 0,
+        "not_evaluable": 18
+      }
+    },
+    {
+      "name": "unsupported-stock-measure",
+      "status": "failed",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/unsupported-stock-measure/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/unsupported-stock-measure/projection.json"
+      ],
+      "report_sha256": "78b6d26811033aa71383405a7b283b9554a33fc2522d404277b139b672e8bc6c",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "on_hand",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "error": "Invalid inventory projection configuration."
+    },
+    {
+      "name": "wrong-observation-window",
+      "status": "failed",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/wrong-observation-window/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/wrong-observation-window/projection.json"
+      ],
+      "report_sha256": "babb03673d60b87f31edd6abb2f28f0228b46514df699f9ae7ec6f8749da5e16",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-11T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "error": "Projection window differs from parent execution."
+    },
+    {
+      "name": "parent-content-hash-mismatch",
+      "status": "failed",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/corrupted-parent.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/parent-content-hash-mismatch/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/parent-content-hash-mismatch/projection.json"
+      ],
+      "report_sha256": "dfbb5fac0f7315e90dc78fb0f83f2984e05297c9294b76f634d53c9351943171",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "error": "Parent execution content hash mismatch."
+    },
+    {
+      "name": "evaluation-before-observation-end",
+      "status": "failed",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/evaluation-before-observation-end/projection-config.json",
+        "--evaluated-at",
+        "2026-07-09T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/evaluation-before-observation-end/projection.json"
+      ],
+      "report_sha256": "a7f7e5769f5003b8e6fe7249945449c22a936963630b335b159ea765f421ad9e",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": 180
+      },
+      "evaluated_at": "2026-07-09T00:00:00Z",
+      "error": "Projection evaluation must reach observation end."
+    },
+    {
+      "name": "noninteger-truth-delay",
+      "status": "failed",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.run_inventory_projection",
+        "--simulation",
+        "ci-cd/reports/data/ai06-05/normal-supply/simulation.json",
+        "--config",
+        "ci-cd/reports/data/ai06-05/noninteger-truth-delay/projection-config.json",
+        "--evaluated-at",
+        "2026-07-11T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-05/noninteger-truth-delay/projection.json"
+      ],
+      "report_sha256": "78b6d26811033aa71383405a7b283b9554a33fc2522d404277b139b672e8bc6c",
+      "effective_config": {
+        "contract_version": "inventory-projection-config-1.0.0",
+        "process_version": "inventory-projection-1.0.0",
+        "business_timezone": "UTC",
+        "start_at": "2026-07-01T00:00:00Z",
+        "end_at": "2026-07-10T00:00:00Z",
+        "snapshot_policy": "utc_day_last_microsecond",
+        "reservation_policy": "none",
+        "stock_measure": "available_qty",
+        "episode_policy": "zero_after_event_including_instantaneous",
+        "diagnostic_horizon_days": 7,
+        "truth_delay_seconds": true
+      },
+      "evaluated_at": "2026-07-11T00:00:00Z",
+      "error": "Invalid inventory projection configuration."
+    }
+  ],
+  "source_compatibility": {
+    "base_commit": "68fe5d98758f5c39e54044d93a1d09f7e60d8dac",
+    "source_runtime_fingerprint_unchanged": true,
+    "source_code_sha256": "0f702a65ebcdb3d78770b08a4f20c901b06211f04b0fe8b2d8d22aa0e5aa6d3b",
+    "legacy_baseline": "docs/evidence/ai/02/data01/legacy-baseline.json",
+    "demo_csv_files": 17,
+    "tracked_demo_files_unchanged": 19,
+    "demo_bytes_unchanged": true,
+    "report_sha256": "0b14f7f5fffad864c90551f17305929fc21e409e9fc4997807a68480476b0735"
+  },
+  "source_profiles": [
+    {
+      "profile": "ai-smoke",
+      "source_dataset_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00",
+      "repeated_identical": true,
+      "runs": 2,
+      "source_hard_gates": 46,
+      "inventory_ready": false,
+      "csv_files": 40
+    },
+    {
+      "profile": "ai-temporal-smoke",
+      "source_dataset_id": "source-sha256-94829460645140b79a6f68e87194f74d2c8e55392e2702a9fecbe6b771116d22",
+      "repeated_identical": true,
+      "runs": 2,
+      "source_hard_gates": 46,
+      "inventory_ready": false,
+      "csv_files": 40
+    }
+  ],
+  "performance": {
+    "scope": "Single product / two warehouses / nine full UTC days / 18 snapshots only; not standard smoke/dev/training benchmark",
+    "seconds": 0.03663649999361951,
+    "peak_rss_mib": 42.390625
+  },
+  "controls": {
+    "repeat_logical_hashes_identical": true,
+    "all_daily_grains_reconcile": true,
+    "opening_not_repeated": true,
+    "past_snapshot_unchanged_by_future_demand": true,
+    "instant_zero_retains_loss": true,
+    "unknown_is_not_zero": true,
+    "tail_and_maturity_never_create_negative_label": true,
+    "single_class_not_evaluable": true,
+    "both_classes_do_not_accept_model": true
+  },
+  "inventory_ready": false,
+  "stockout_model_ready": false,
+  "next_scope": "06.6 default generator integration, lifecycle/coverage, source gates and new immutable source/snapshot/curated publication",
+  "limitations": [
+    "Default source 2.6 and existing published snapshots remain unchanged; standalone projection consumes chronological execution.",
+    "No active-assortment/lifecycle eligibility, source readiness or exported label set in this bounded scope.",
+    "Reservation policy none; known available quantity equals known on-hand; no reserve/release state machine.",
+    "Episodes include instantaneous zero and zero opening; right-censored duration ends at exclusive observation end without claiming recovery.",
+    "Diagnostic windows require full seven-day observation and maturity. Unknown origin, current zero and incomplete tail are never negative labels.",
+    "Both classes are a diagnostic condition only; AI 08 features/splits/training/calibration/serving are not implemented or accepted.",
+    "Full projection report contains separate private truth; no API/feature export or publication of physical future facts.",
+    "DATA-06, new dataset IDs, export/import 03 and dependent model re-evaluation 04/05 remain open.",
+    "Local branch commits only; no remote Required CI or main publication for AI 06.5."
+  ]
+}

@@ -1,6 +1,6 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.1–06.4 mają ledger, dostawy, politykę przeglądu i chronologiczny symulator wspólnej sprzedaży. Następny zakres: 06.5 — snapshoty i stockout truth. Repo: RetailOps. Zależność: 03.**
+**Status: w realizacji; 06.1–06.5 mają ledger, dostawy, chronologiczną sprzedaż, snapshoty i stockout truth na osobnych wejściach. Następny zakres: 06.6 — integracja generatora i publikacja danych. Repo: RetailOps. Zależność: 03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
@@ -15,8 +15,11 @@ oddzielną realizacją. [Chronologiczny symulator 06.4](../../../reference/chron
 łączy te moduły z ograniczeniem sprzedaży, historycznym mappingiem i eligibility
 zwrotów; [odbiór](../../../evidence/ai/06/06.4/README.md) dotyczy osobnego
 scenariusza, bez przełączenia domyślnego generatora 2.6.
+[Snapshoty i stockout truth 06.5](../../../reference/inventory-projections.md)
+mają [lokalny odbiór](../../../evidence/ai/06/06.5/README.md): znany ledger,
+osobne salda fizyczne, granice epizodów i lost-sales impacts oraz dojrzałość
+diagnostycznych okien. Model 08 i pełna gotowość źródła pozostają poza tym odbiorem.
 
-5. **Snapshoty, rezerwacje i stockout truth.** Snapshot budować wyłącznie z ledgeru. MVP może jawnie ustalić `reserved_qty=0` i natychmiastowy fulfillment; nie deklarować działania rezerwacji. Jeżeli je wprowadzasz, zdefiniuj state machine reserve/release/fulfill, aby ta sama sprzedaż nie pomniejszała stanu dwa razy. Zwrot do sprzedaży ma jawne warunki jakości; nie każdy zwrot jest return_to_stock. Zdefiniuj epizod dostępności zero, jego początek/koniec i affected scopes; policz duration/lost-sales diagnostycznie. Zero przed origin należy później do `already_stockout`.
 6. **Ponowna publikacja danych.** Rozszerzyć quality/realism/readiness, przeliczyć source dataset i eksport/import03. Dopiero po przejściu gates ustawić `inventory_ready=true`. Nowy proces censoringu zmienia source/curated IDs. Ponownie wykonać04/05 na nowych danych i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
 
 ## Minimalny zestaw ruchów i uzgodnienie

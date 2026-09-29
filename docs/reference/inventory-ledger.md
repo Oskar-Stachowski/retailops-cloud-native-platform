@@ -94,5 +94,6 @@ i raport `failed` dla błędnego kontraktu lub bilansu.
 Sam walidator ledgeru nie sprawdza encji supplier/order/receipt;
 [walidator 06.2](replenishment.md) dodaje to uzgodnienie.
 [Symulator 06.4](chronological-inventory.md) uzgadnia także historyczny
-fulfillment konkretnej sprzedaży i return eligibility. Snapshoty, epizody
-stockout i pełny odbiór źródła pozostają wymagane przed `inventory_ready=true`.
+fulfillment konkretnej sprzedaży i return eligibility.
+[Projekcje 06.5](inventory-projections.md) uzgadniają snapshoty i epizody stockout.
+Integracja generatora i pełny odbiór źródła pozostają wymagane przed `inventory_ready=true`.

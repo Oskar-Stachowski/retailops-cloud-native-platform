@@ -1,5 +1,5 @@
 {
-  "version": "1.11",
+  "version": "1.12",
   "date": "2026-09-29",
   "stages": [
     {
@@ -143,12 +143,12 @@
       "path": "etapy/06-inventory-ledger.md",
       "status": "in_progress",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1 ledger, 06.2 supply contracts, 06.3 known-fact periodic reorder and isolated supplier fulfillment, 06.4 chronological shared-stock sales/returns/physical actions with historical routing and independent reconciliation; default source generator unchanged",
-      "next_scope": "06.5 ledger-derived snapshots, zero-availability episodes and stockout truth diagnostics",
+      "implementation_scope": "06.1 ledger, 06.2 supply, 06.3 reorder, 06.4 chronological shared-stock fulfillment, 06.5 known-ledger daily snapshots and private physical stockout/lost-sales/mature-window diagnostics; default source generator unchanged",
+      "next_scope": "06.6 default generator integration, lifecycle/coverage, source gates and new immutable source/snapshot/curated publication",
       "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.4/README.md",
-      "implementation_commit": "b776adfa92b704cb1b5023711c09bb6482552e23",
-      "verification": "../../evidence/ai/06/06.4/verification.json"
+      "evidence": "../../evidence/ai/06/06.5/README.md",
+      "implementation_commit": "daa906a915c4f61a36b45a518c3db2f8affaeb8d",
+      "verification": "../../evidence/ai/06/06.5/verification.json"
     },
     {
       "id": "07",
