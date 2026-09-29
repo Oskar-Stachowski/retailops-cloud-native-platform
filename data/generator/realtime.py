@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -16,27 +17,18 @@ from data.generator.main import (
 
 ISO_DATE_LENGTH = 10
 
-SCHEMA_VERSION = "1.0"
 DEFAULT_SOURCE = "retailops.synthetic-generator"
 DEFAULT_MAX_EVENTS = 1000
 EVENTS_FILENAME = "events.jsonl"
 MANIFEST_FILENAME = "event_manifest.json"
 
-EVENT_TOPICS: dict[str, str] = {
-    "order_created": "retailops.sales.v1",
-    "sale_completed": "retailops.sales.v1",
-    "return_completed": "retailops.sales.v1",
-    "stock_changed": "retailops.inventory.v1",
-    "inventory_snapshot_recorded": "retailops.inventory.v1",
-    "replenishment_completed": "retailops.inventory.v1",
-    "price_changed": "retailops.pricing.v1",
-    "promotion_started": "retailops.pricing.v1",
-    "promotion_ended": "retailops.pricing.v1",
-    "forecast_generated": "retailops.intelligence.v1",
-    "anomaly_detected": "retailops.intelligence.v1",
-    "alert_created": "retailops.operations.v1",
-    "workflow_action_performed": "retailops.operations.v1",
-}
+_CONTRACT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "services/api/app/contracts/retailops-realtime-events.v1.contract.json"
+)
+_CONTRACT = json.loads(_CONTRACT_PATH.read_text(encoding="utf-8"))
+EVENT_TOPICS: dict[str, str] = _CONTRACT["event_type_topics"]
+SCHEMA_VERSION = _CONTRACT["supported_schema_versions"][0]
 
 
 @dataclass(frozen=True)
@@ -63,10 +55,27 @@ def validate_event_generation_config(
         raise ValueError(msg)
 
 
-def _event_id(seed: int, event_type: str, natural_key: str) -> str:
+def _event_id(
+    seed: int,
+    source: str,
+    event_type: str,
+    natural_key: str,
+    *,
+    occurred_at: str,
+    ingested_at: str,
+    payload: dict[str, Any],
+) -> str:
+    revision = hashlib.sha256(
+        json.dumps(
+            {"occurred_at": occurred_at, "ingested_at": ingested_at, "payload": payload},
+            sort_keys=True,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8"),
+    ).hexdigest()
     return deterministic_uuid(
         "event",
-        f"{seed}:{event_type}:{natural_key}",
+        f"{seed}:{source}:{event_type}:{natural_key}:{revision}",
     )
 
 
@@ -109,7 +118,15 @@ def _event(
     )
 
     return {
-        "event_id": _event_id(seed, event_type, natural_key),
+        "event_id": _event_id(
+            seed,
+            source,
+            event_type,
+            natural_key,
+            occurred_at=normalized_occurred_at,
+            ingested_at=normalized_ingested_at,
+            payload=payload,
+        ),
         "event_type": event_type,
         "schema_version": SCHEMA_VERSION,
         "source": source,

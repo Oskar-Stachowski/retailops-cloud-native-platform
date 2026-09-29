@@ -82,12 +82,20 @@ def streaming() -> dict:
     event = {
         "event_id": event_id,
         "event_type": "sale_completed",
+        "topic": "retailops.sales.v1",
         "schema_version": "1.0",
         "source": "kubernetes-drill",
         "correlation_id": event_id,
         "occurred_at": now,
         "ingested_at": now,
-        "payload": {"quantity": 2, "unit_price": 7, "total_amount": 14},
+        "payload": {
+            "product_id": "kubernetes-drill-product",
+            "store_id": "kubernetes-drill-store",
+            "channel": "online",
+            "quantity": "2",
+            "unit_price": "7",
+            "total_amount": "14",
+        },
     }
     producer = Producer({"bootstrap.servers": "redpanda:9092"})
     errors = []

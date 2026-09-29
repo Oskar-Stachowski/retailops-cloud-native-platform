@@ -9,53 +9,13 @@ from typing import Any, Protocol
 from app.core.config import Settings
 from app.core.config import settings as default_settings
 from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
+from app.services.realtime_contract import (
+    EVENT_TOPICS,
+    SUPPORTED_EVENT_TYPES,
+    validate_event,
+)
 
 logger = logging.getLogger(__name__)
-
-SUPPORTED_EVENT_TYPES = frozenset(
-    {
-        "order_created",
-        "sale_completed",
-        "return_completed",
-        "stock_changed",
-        "inventory_snapshot_recorded",
-        "replenishment_completed",
-        "price_changed",
-        "promotion_started",
-        "promotion_ended",
-        "forecast_generated",
-        "anomaly_detected",
-        "alert_created",
-        "workflow_action_performed",
-    },
-)
-
-REQUIRED_EVENT_FIELDS = (
-    "event_id",
-    "event_type",
-    "schema_version",
-    "source",
-    "correlation_id",
-    "occurred_at",
-    "ingested_at",
-    "payload",
-)
-
-EVENT_TOPICS = {
-    "order_created": "retailops.sales.v1",
-    "sale_completed": "retailops.sales.v1",
-    "return_completed": "retailops.sales.v1",
-    "stock_changed": "retailops.inventory.v1",
-    "inventory_snapshot_recorded": "retailops.inventory.v1",
-    "replenishment_completed": "retailops.inventory.v1",
-    "price_changed": "retailops.pricing.v1",
-    "promotion_started": "retailops.pricing.v1",
-    "promotion_ended": "retailops.pricing.v1",
-    "forecast_generated": "retailops.intelligence.v1",
-    "anomaly_detected": "retailops.intelligence.v1",
-    "alert_created": "retailops.operations.v1",
-    "workflow_action_performed": "retailops.operations.v1",
-}
 
 
 class EventHandler(Protocol):
@@ -66,6 +26,7 @@ class EventHandler(Protocol):
 class RealtimeEventEnvelope:
     event_id: str
     event_type: str
+    topic: str
     schema_version: str
     source: str
     correlation_id: str
@@ -74,36 +35,21 @@ class RealtimeEventEnvelope:
     payload: dict[str, Any]
 
     @classmethod
-    def from_dict(cls, event: dict[str, Any]) -> RealtimeEventEnvelope:
-        missing = [
-            field_name
-            for field_name in REQUIRED_EVENT_FIELDS
-            if field_name not in event or event[field_name] in (None, "")
-        ]
-
-        if missing:
-            msg = f"Missing required event fields: {', '.join(missing)}"
-            raise ValueError(msg)
-
-        event_type = str(event["event_type"])
-        if event_type not in SUPPORTED_EVENT_TYPES:
-            msg = f"Unsupported event type: {event_type}"
-            raise ValueError(msg)
-
-        payload = event["payload"]
-        if not isinstance(payload, dict):
-            msg = "payload must be a JSON object"
-            raise TypeError(msg)
+    def from_dict(
+        cls, event: dict[str, Any], *, transport_topic: str | None = None
+    ) -> RealtimeEventEnvelope:
+        validate_event(event, transport_topic=transport_topic)
 
         return cls(
             event_id=str(event["event_id"]),
-            event_type=event_type,
+            event_type=event["event_type"],
+            topic=event["topic"],
             schema_version=str(event["schema_version"]),
             source=str(event["source"]),
             correlation_id=str(event["correlation_id"]),
             occurred_at=str(event["occurred_at"]),
             ingested_at=str(event["ingested_at"]),
-            payload=payload,
+            payload=event["payload"],
         )
 
 
@@ -189,12 +135,14 @@ class RealtimeEventConsumer:
     def supported_event_types(self) -> tuple[str, ...]:
         return tuple(sorted(self.handlers))
 
-    def process_event(self, event: dict[str, Any]) -> dict[str, Any]:
+    def process_event(
+        self, event: dict[str, Any], *, transport_topic: str | None = None
+    ) -> dict[str, Any]:
         self.state.received_events += 1
         raw_event_id = self._safe_event_id(event)
 
         try:
-            envelope = RealtimeEventEnvelope.from_dict(event)
+            envelope = RealtimeEventEnvelope.from_dict(event, transport_topic=transport_topic)
 
             if self.repository.is_event_processed(envelope.event_id):
                 self.state.ignored_events += 1
@@ -212,7 +160,7 @@ class RealtimeEventConsumer:
             self.repository.record_event_log(
                 event_id=envelope.event_id,
                 event_type=envelope.event_type,
-                topic=self._resolve_topic(envelope.event_type),
+                topic=envelope.topic,
                 schema_version=envelope.schema_version,
                 source=envelope.source,
                 correlation_id=envelope.correlation_id,
@@ -238,7 +186,7 @@ class RealtimeEventConsumer:
             self.repository.record_event_log(
                 event_id=envelope.event_id,
                 event_type=envelope.event_type,
-                topic=self._resolve_topic(envelope.event_type),
+                topic=envelope.topic,
                 schema_version=envelope.schema_version,
                 source=envelope.source,
                 correlation_id=envelope.correlation_id,
