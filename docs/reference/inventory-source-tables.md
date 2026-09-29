@@ -100,9 +100,10 @@ services/api/.venv/bin/python -m scripts.data.verify_ai06_tables \
 
 ## Następny zakres
 
-06.6b.2 włącza te modele w nowy domyślny source: jego wersję, identity,
-manifesty, quality/realism/readiness i kwalifikację inventory lifecycle/coverage.
-Następnie trzeba opublikować nowy immutable snapshot, rozszerzyć importer
+[Source2.7 — 06.6b.2a](inventory-source-dataset.md) włącza te modele w osobny
+wersjonowany source: identity, konfigurację, manifest oraz quality/realism.
+Następne 06.6b.2b kwalifikuje lifecycle/coverage; potem trzeba przełączyć
+domyślną ścieżkę AI, opublikować nowy immutable snapshot i rozszerzyć importer
 na osobnym branchu repo AI i odebrać curated oraz pełny budżet cross-repo.
 Reevaluation 04/05 i kwalifikacja modelu 08 pozostają odrębnymi bramkami.
 DATA-06 jest nadal otwarte; pełny odbiór AI 06 nie został zadeklarowany.

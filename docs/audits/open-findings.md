@@ -30,11 +30,9 @@ mapping. Kod: [inventory i stock movements](../../data/generator/profile_engine.
 selling/stock location, uzgodnienie bilansu ruchów/sprzedaży/dostaw/zwrotów,
 availability snapshotów i testy braku/przyszłego zapasu. Dopiero wtedy labels stockout.
 Nie blokuje forecast-only AI 04–05, gdzie inventory features są pominięte.
-[Kandydat integracji 06.6a](../reference/source-inventory-commerce.md) ma osobną
-ścieżkę koszyków i uzgodnienia; otwarty zakres obejmuje domyślny wersjonowany
-source, lifecycle/coverage, pełne gates i nową publikację snapshot/import/curated.
-[Typowane tabele 06.6b.1](../reference/inventory-source-tables.md) mają odrębny
-odbiór; otwarte pozostaje ich włączenie do domyślnego source i ścieżki 03.
+[Source 2.7](../reference/inventory-source-dataset.md) ma lokalny odbiór 58 tabel
+i 36 bramek. Otwarte pozostają lifecycle/coverage, nowy snapshot/import/curated 03,
+pełny odbiór cross-repo, przełączenie domyślnej ścieżki AI oraz zależne oceny04/05.
 
 ## Runtime i bezpieczeństwo
 

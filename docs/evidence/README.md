@@ -6,6 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| AI 06.6b.2a — wersjonowany source 2.7 | 2026-09-29 | [Odbiór lokalny](ai/06/06.6b.2a/README.md): 58 tabel, 46 facts/plans i 12 private truth, niezmienne source ID/config/manifest,36 bramek liczone po odczycie, oba smoke dwukrotnie. Lifecycle/coverage, domyślne przełączenie i nowa publikacja 03 pozostają otwarte. |
 | AI 06.6b.1 — typowane tabele inventory | 2026-09-29 | [Odbiór lokalny](ai/06/06.6b.1/README.md): 27 tabel, oddzielne facts/truth, native CSV/Parquet parity, niezależne uzgodnienie procesu i projekcji na obu profilach. Kandydat tabel; domyślny source, manifesty/gates i nowa publikacja 03 pozostają otwarte. |
 | AI 06.6a — realizacja koszyków źródłowych | 2026-09-29 | [Odbiór lokalny](ai/06/06.6a/README.md): sprzedaż ograniczona wspólnym stock, poprawne ceny częściowej realizacji, refund versus quality restock, causal panel/history/cohorts i uzgodnione snapshoty. Osobny kandydat; publikacja source/snapshot/curated i inventory readiness pozostają otwarte. |
 | AI 03.6 — pełny cross-repo | 2026-09-29 | [Odbiór obu repo](ai/03/03.6/README.md): oba standardowe smoke dwukrotnie na Darwin/Linux, osobny późny fakt, parity/IDs/as-of, budżet oraz [publikacja na main obu repo z Required CI](ai/03/03.6/main-publication.json). Otwiera 04 i 06. |

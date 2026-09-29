@@ -42,8 +42,12 @@ Osobna [ścieżka integracji inventory 06.6a](../reference/source-inventory-comm
 realizuje źródłowe koszyki przez chronologiczny ledger i tworzy prywatny raport
 uzgodnienia. Nie jest domyślnym source, eksportem AI ani wejściem loadera seeda.
 [Typowane tabele 06.6b.1](../reference/inventory-source-tables.md) można osobno
-materializować i odczytać z uzgodnieniem CSV/Parquet. Integracja z nowym
-domyślnym source, pełne gates i publikacja przez 03 należą do 06.6b.2.
+materializować i odczytać z uzgodnieniem CSV/Parquet.
+[Source 2.7 — 06.6b.2a](../reference/inventory-source-dataset.md) tworzy osobny
+niezmienny source z 58 tabelami CSV, manifestem i 36 bramek. Ma własne CLI
+oraz `facts_ready`; exporter/importer03 nie przyjmuje jeszcze tego kontraktu.
+Lifecycle/coverage, przełączenie domyślnej ścieżki AI i nowa publikacja 03
+pozostają w otwartym zakresie06.6b.2b/c.
 
 Przykład profilu AI z kontrolą integralności źródła i cech:
 

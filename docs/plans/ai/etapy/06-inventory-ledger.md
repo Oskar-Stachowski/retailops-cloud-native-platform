@@ -1,6 +1,6 @@
 # 06. Zbuduj spójny zapas i dostawy
 
-**Status: w realizacji; 06.6b.1 ma lokalny odbiór 27 typowanych tabel inventory. Następny zakres: 06.6b.2 — integracja tabel z wersjonowanym domyślnym source i publikacja danych. Repo: RetailOps. Zależność: 03.**
+**Status: w realizacji; 06.6b.2a ma lokalny odbiór wersjonowanego source 2.7 z 58 tabelami i 36 bramkami. Następny zakres: 06.6b.2b — kwalifikacja lifecycle/coverage inventory. Repo: RetailOps. Zależność: 03.**
 
 Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
 
@@ -37,10 +37,18 @@ kwalifikacja lifecycle/coverage modelu 08 ma `not_evaluated`.
 
 ## Następny zakres — 06.6b.2
 
-1. Włączyć typowane inventory/supply/return-disposition tables w nowy domyślny source: konfiguracje, wersję, identity, manifesty i pełne quality/realism/readiness. Zachować czytniki 2.0–2.6 i niezmienne snapshoty 03 oraz demo/API compatibility.
-2. Zakwalifikować lifecycle/coverage inventory i projekcje 06.5 w rzeczywistych source profiles, w tym no demand, zero stock, niedojrzały tail, przyszłe/niedostępne ruchy i supplier-poor. Sam pełny panel sprzedaży nie kwalifikuje labels 08.
-3. Opublikować NOWY source/snapshot/curated przez rozszerzony exporter i importer03, z allowlistą operational facts, oddzielnym truth, typed parity, powtórzeniami oraz bramką cross-repo i pomiarem budżetu. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
-4. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
+[Source 2.7 — 06.6b.2a](../../../reference/inventory-source-dataset.md)
+łączy 46 facts/plans i 12 private truth tables w niezmienny source ID,
+z własnymi konfiguracją/contextem, manifestem, quality/realism oraz odczytem
+ponownie wyliczającym 36 bramek. [Odbiór](../../../evidence/ai/06/06.6b.2a/README.md)
+obejmuje oba standardowe profile dwukrotnie, supplier-poor, zero opening,
+no demand i late availability. `facts_ready` dotyczy tego lokalnego zakresu;
+pełne source/inventory/model readiness pozostają false.
+Domyślny generator/API i ścieżka 03 nadal używają2.6.
+
+1. **06.6b.2b:** zakwalifikować lifecycle/coverage inventory i projekcje06.5 w rzeczywistych source profiles, w tym no demand, zero stock, niedojrzały tail, przyszłe/niedostępne ruchy i supplier-poor. Sam pełny panel sprzedaży nie kwalifikuje labels08.
+2. **06.6b.2c:** rozszerzyć exporter/importer/curated 03 dla source 2.7 i przełączyć domyślną ścieżkę AI po odbiorze. Opublikować NOWY source/snapshot/curated z allowlistą operational facts, oddzielnym truth, typed parity, powtórzeniami, bramką cross-repo i pełnym budżetem. Zachować czytniki 2.0–2.6, snapshoty 03 i demo/API. Dopiero pełne gates pozwalają ustawić `inventory_ready=true` i zamknąć DATA-06.
+3. Ponownie wykonać04/05 na nowych IDs i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
 
 ## Minimalny zestaw ruchów i uzgodnienie
 
@@ -60,7 +68,7 @@ Stockout truth oznacza zdarzenie procesu zapasu; zwykły brak popytu i zero sprz
 - Ledger nie produkuje nieuzasadnionego ujemnego stanu. Nie tworzyć stockout przez ustawienie przypadkowej flagi oderwanej od procesu.
 - Plan dostawy known w origin może być cechą, rzeczywiste opóźnienie znane dopiero później — nie. Późny receipt lub correction nie zmienia historycznych cech.
 - Supply-poor, supply-normal, partial/delayed receipt, no demand i zero-at-origin mają oddzielne fixtures. Readiness08 jest not_evaluable przy niedojrzałym tailu/braku klas, nie automatycznie passed.
-- Zmiana procesu symulacji tworzy nowe immutable dane, a istniejący snapshot03 pozostaje nienaruszony. Zachować demo/API compatibility.
+- Zmiana procesu symulacji tworzy nowe immutable dane, a istniejący snapshot 03 pozostaje nienaruszony. Zachować demo/API compatibility.
 
 ## Artefakty i Definition of Done
 
@@ -79,7 +87,7 @@ orders/receipts, deterministyczną reorder policy i chronologiczną wspólną pu
 Opening licz jeden raz. Snapshot ma wynikać z ledgeru; nie koryguj błędów losowym adjustment.
 Utrzymuj source/available time, mapping lokalizacji i truth poza cechami. Przetestuj
 partial/delayed receipt, return eligibility, transfer, shared inventory i future fallback.
-Opublikuj NOWY snapshot przez ścieżkę03 i zapisz readiness/evidence. Zgłoś obowiązkowe
+Opublikuj NOWY snapshot przez ścieżkę 03 i zapisz readiness/evidence. Zgłoś obowiązkowe
 ponowienie04/05 po zmianie źródeł i cech; nie aktualizuj starych wyników bez re-evaluacji.
 Nie trenuj tu klasyfikatora08 i nie wdrażaj rozbudowanego procurement ani cloud.
 ```

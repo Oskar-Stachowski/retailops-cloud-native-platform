@@ -54,19 +54,25 @@ przypadek późnej korekty zachowują IDs, 25 tabel, typed CSV/Parquet parity
 i historyczny as-of. Source przechodzi 46 hard gates; repo AI ma 747 testów.
 Wszystkie przebiegi mieszczą się w 300 s / 1024 MiB.
 
-**AI 06.6b.1 ma lokalny odbiór typowanych tabel w RetailOps; równolegle można rozpocząć AI 04 w repo AI.**
+**AI 06.6b.2a ma lokalny odbiór wersjonowanego source 2.7 w RetailOps; równolegle można realizować AI 04 w repo AI.**
 [Chronologiczna realizacja koszyków](reference/source-inventory-commerce.md)
 łączy ledger, znany reorder, częściowe/opóźnione dostawy, faktyczną sprzedaż
 i eligibility zwrotów. Przelicza cenę częściowej realizacji, kwoty koszyka,
 panel/history/cohorts według dostępnych faktów oraz snapshoty z ledgeru.
 [Odbiór lokalny](evidence/ai/06/06.6a/README.md) dotyczy osobnego kandydata,
-bez nowego opublikowanego source/snapshot/curated. Domyślne dane 2.6 oraz demo
-zachowują IDs i bajty. `inventory_ready=false` i DATA-06 pozostają otwarte.
+bez nowego opublikowanego snapshot/curated. Historyczne artefakty i demo
+pozostają niezmienione. `inventory_ready=false` i DATA-06 pozostają otwarte.
 [Kontrakt 27 tabel](reference/inventory-source-tables.md) ma oddzielne facts/truth,
 native CSV/Parquet parity i niezależne uzgodnienie po odczycie.
 [Odbiór](evidence/ai/06/06.6b.1/README.md) nadal dotyczy kandydata tabel.
-Następny zakres [06.6b.2](plans/ai/etapy/06-inventory-ledger.md): domyślny
-wersjonowany source, manifesty/gates, lifecycle/coverage i nowa publikacja 03.
+[Source 2.7](reference/inventory-source-dataset.md) łączy58 tabel z własnym
+source ID, konfiguracją, manifestem i 36 bramek ponownie liczonymi po odczycie.
+[Odbiór06.6b.2a](evidence/ai/06/06.6b.2a/README.md) potwierdza oba smoke
+dwukrotnie, oddzielne fakty/truth, zgodność czytniki 2.0–2.6 i frozen fixtures.
+Domyślny generator/API i exporter/importer03 nadal używają2.6.
+Następny [06.6b.2b](plans/ai/etapy/06-inventory-ledger.md) kwalifikuje
+lifecycle/coverage; następnie trzeba odebrać nową publikację 03 i przełączyć
+domyślną ścieżkę AI. Source/inventory/model readiness 2.7 pozostają false.
 Po zmianie źródła trzeba ponowić 04/05; starych metryk nie przenosimy na nowe IDs.
 Pierwszy forecasting korzysta z obserwowanej sprzedaży, bez inventory features.
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;

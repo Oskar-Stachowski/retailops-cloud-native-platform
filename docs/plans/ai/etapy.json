@@ -1,5 +1,5 @@
 {
-  "version": "1.14",
+  "version": "1.15",
   "date": "2026-09-29",
   "stages": [
     {
@@ -143,13 +143,16 @@
       "path": "etapy/06-inventory-ledger.md",
       "status": "in_progress",
       "branch": "ai/06-01-inventory-ledger",
-      "implementation_scope": "06.1–06.6a inventory runtime and source-commerce candidate; 06.6b.1 strict native inventory tables, isolated facts/truth, CSV/Parquet roundtrip and independent process/projection reconciliation; default source 2.6 unchanged",
-      "next_scope": "06.6b.2 integrate native inventory tables into versioned default source/identity/manifests and full gates; qualify lifecycle/coverage; new immutable snapshot/import/curated and dependent 04/05 reevaluation",
+      "implementation_scope": "06.1–06.6b.1 inventory runtime and strict native tables; 06.6b.2a immutable source 2.7 CSV, 58 tables, configuration/identity/manifests, 36 independently recomputed quality gates and realism; default generator/API/handoff remains 2.6",
+      "next_scope": "06.6b.2b qualify inventory lifecycle/coverage and mature diagnostic windows; 06.6b.2c extend exporter/importer/curated03 and switch default AI source, full cross-repo acceptance; dependent 04/05 reevaluation",
       "inventory_ready": false,
-      "evidence": "../../evidence/ai/06/06.6b.1/README.md",
-      "implementation_commit": "5184ec9cbb227c35f25ecbf4652b114d3f073599",
-      "verification": "../../evidence/ai/06/06.6b.1/verification.json",
-      "acceptance_runtime_commit": "b52a4220a3c7942773c52a777d8f6b3fe86c6a10"
+      "evidence": "../../evidence/ai/06/06.6b.2a/README.md",
+      "implementation_commit": "f47765955f2207f36e8c60c5a2f35391dce61dab",
+      "verification": "../../evidence/ai/06/06.6b.2a/verification.json",
+      "acceptance_runtime_commit": "5f1b76206071c72ba2d062dcba9a08d6878b4dc5",
+      "source_ready": false,
+      "model_ready": false,
+      "label_qualification": "not_evaluated"
     },
     {
       "id": "07",

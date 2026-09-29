@@ -19,9 +19,9 @@ wyłączone; target opisuje obserwowaną sprzedaż.
 
 ## Praca równoległa od obecnego punktu
 
-- **Repo RetailOps / AI 06.6b.2:** włączenie typowanych tabel inventory/supply
-  do wersjonowanego domyślnego source, manifesty/identity, kwalifikacja lifecycle/coverage i pełne
-  bramki źródła. Nowy niezmienny eksport/import/curated oraz zależne oceny 04/05.
+- **Repo RetailOps / AI 06.6b.2b:** kwalifikacja lifecycle/coverage source 2.7
+  i dojrzałych okien 08. Następnie 06.6b.2c: rozszerzony eksport/import/curated 03,
+  przełączenie domyślnego source, pełne gates cross-repo i zależne oceny04/05.
 - **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
   limity, freshness i audyt. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
   pełne narzędzia, odpowiedzi i integracja użytkowa wymagają również 10.
@@ -40,7 +40,7 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 |---|---|
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
-| **06 — inventory** | 06.6b.2: integracja typowanych tabel z domyślnym wersjonowanym source, manifesty/identity, inventory lifecycle/coverage i pełne gates DATA-06; nowy snapshot/import/curated oraz zgodne oceny 04/05. |
+| **06 — inventory** | 06.6b.2b: lifecycle/coverage source 2.7; 06.6b.2c: exporter/importer/curated 03 i przełączenie domyślnej ścieżki AI, pełne gates DATA-06; zgodne oceny04/05. |
 | **07 — anomaly/DQ** | Po bramkach źródła i ledgeru: oddzielne scenariusze truth i dojrzałe labels, dojrzałe okna, baseline i oceniony detektor. Scenariusze demo nie zastępują oceny. |
 | **08 — stockout** | DATA-06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |

@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 jest na main obu repo; AI 06.6b.1 ma lokalny odbiór typowanych tabel na osobnym branchu RetailOps. Następne zakresy: 06.6b.2 — integracja z wersjonowanym source i publikacja danych oraz równolegle 04 w AI. Aktualizacja: 29.09.2026.**
+**Status: etap03 jest na main obu repo; AI 06.6b.2a ma lokalny odbiór wersjonowanego source 2.7 na branchu RetailOps. Następny zakres: 06.6b.2b — lifecycle/coverage, następnie publikacja 03 i przełączenie source. Równolegle04 w AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -68,8 +68,13 @@ domyślny source 2.6 i publikacja 03 pozostają niezmienione.
 [Typowane tabele 06.6b.1](../../reference/inventory-source-tables.md) mają
 27 ścisłych schemas/grains, oddzielne facts/truth, powtarzalne native CSV/Parquet
 i niezależne uzgodnienie. [Odbiór](../../evidence/ai/06/06.6b.1/README.md)
-przygotowuje integrację source/manifest/gates w 06.6b.2;
-`inventory_ready=false`, nowy snapshot/import/curated i DATA-06 pozostają otwarte.
+przygotował [source 2.7 — 06.6b.2a](../../reference/inventory-source-dataset.md):
+58 tabel, własne ID/config/manifest i 36 bramek przeliczanych po odczycie.
+[Odbiór](../../evidence/ai/06/06.6b.2a/README.md) potwierdza powtórzenia profili,
+czytniki 2.0–2.6 oraz zgodność demo i frozen fixtures.
+Następne 06.6b.2b kwalifikuje lifecycle/coverage; nowy snapshot/import/curated,
+przełączenie domyślnego source i DATA-06 pozostają otwarte.
+`source_ready`, `inventory_ready` i `model_ready` tego source są false.
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.
