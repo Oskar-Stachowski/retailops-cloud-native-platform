@@ -1,0 +1,102 @@
+{
+  "contract_version": "inventory-ledger-1.0.0",
+  "opening_policy": "single_opening_movement",
+  "reservation_policy": "none",
+  "opening_at": "2026-07-01T00:00:00+00:00",
+  "products": [
+    {
+      "id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "unit_of_measure": "pcs"
+    }
+  ],
+  "stock_locations": [
+    {
+      "id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "location_code": "WH-0001"
+    },
+    {
+      "id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "location_code": "WH-0002"
+    }
+  ],
+  "inventory_scope": [
+    {
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea"
+    },
+    {
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3"
+    }
+  ],
+  "movements": [
+    {
+      "inventory_event_id": "3605b2f0-4f74-53f8-ab5e-fc634e517616",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "movement_type": "opening_stock",
+      "quantity_delta": 0,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-01T00:00:00+00:00",
+      "ingested_at": "2026-07-01T00:00:00+00:00",
+      "available_at": "2026-07-01T00:00:00+00:00",
+      "sequence": 0,
+      "source_process": "opening",
+      "source_reference": "opening:e275c721-4f0d-597b-b0f1-93ec6e2e3f41:514ff762-6bf9-536a-a7e2-538e01731fea",
+      "transfer_id": null,
+      "supplier_id": null,
+      "order_id": null
+    },
+    {
+      "inventory_event_id": "8e121963-728c-5d64-b9b5-f55da2bae8b1",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "movement_type": "opening_stock",
+      "quantity_delta": 0,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-01T00:00:00+00:00",
+      "ingested_at": "2026-07-01T00:00:00+00:00",
+      "available_at": "2026-07-01T00:00:00+00:00",
+      "sequence": 1,
+      "source_process": "opening",
+      "source_reference": "opening:e275c721-4f0d-597b-b0f1-93ec6e2e3f41:7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "transfer_id": null,
+      "supplier_id": null,
+      "order_id": null
+    },
+    {
+      "inventory_event_id": "64405133-74e8-5af1-8603-b36b0b5a848d",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "movement_type": "replenishment_received",
+      "quantity_delta": 5,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-03T10:00:00+00:00",
+      "ingested_at": "2026-07-03T10:02:00+00:00",
+      "available_at": "2026-07-03T10:03:00+00:00",
+      "sequence": 2,
+      "source_process": "replenishment",
+      "source_reference": "7481e2f4-a29e-5e38-81f5-751182d29461",
+      "transfer_id": null,
+      "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+      "order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3"
+    },
+    {
+      "inventory_event_id": "a896fd21-5157-57ee-8297-9e30a13610d7",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "movement_type": "replenishment_received",
+      "quantity_delta": 7,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-06T10:00:00+00:00",
+      "ingested_at": "2026-07-06T10:02:00+00:00",
+      "available_at": "2026-07-06T10:03:00+00:00",
+      "sequence": 3,
+      "source_process": "replenishment",
+      "source_reference": "aacbb6b9-4c20-5c32-a50d-f0c10e314257",
+      "transfer_id": null,
+      "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+      "order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3"
+    }
+  ]
+}

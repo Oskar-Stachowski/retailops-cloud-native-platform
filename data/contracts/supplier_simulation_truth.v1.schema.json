@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "SupplierTruth": {
+      "additionalProperties": false,
+      "properties": {
+        "supplier_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Supplier Id",
+          "type": "string"
+        },
+        "reliability": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Reliability",
+          "type": "string"
+        },
+        "lead_time_mean_days": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Lead Time Mean Days",
+          "type": "string"
+        },
+        "lead_time_std_days": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Lead Time Std Days",
+          "type": "string"
+        }
+      },
+      "required": [
+        "supplier_id",
+        "reliability",
+        "lead_time_mean_days",
+        "lead_time_std_days"
+      ],
+      "title": "SupplierTruth",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "supplier-simulation-truth-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "data_class": {
+      "const": "simulation_truth",
+      "title": "Data Class",
+      "type": "string"
+    },
+    "suppliers": {
+      "items": {
+        "$ref": "#/$defs/SupplierTruth"
+      },
+      "minItems": 1,
+      "title": "Suppliers",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "data_class",
+    "suppliers"
+  ],
+  "title": "SupplierTruthPayload",
+  "type": "object"
+}
