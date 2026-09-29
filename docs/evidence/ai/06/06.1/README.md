@@ -1,8 +1,9 @@
 # AI 06.1 — kontrakt ruchów i jednorazowe opening
 
 **Odbiór lokalny 29.09.2026 na branchu `ai/06-01-inventory-ledger`.**
-Etap AI 06 jest w realizacji; następny zakres to **06.2 — dostawcy, zamówienia
-i receipts**. [Kontrakt i uruchomienie](../../../../reference/inventory-ledger.md)
+Etap AI 06 jest w realizacji. [Odrębny odbiór dostaw 06.2](../06.2/README.md)
+wskazuje aktualny punkt wznowienia: **06.3 — polityka uzupełniania**.
+[Kontrakt i uruchomienie](../../../../reference/inventory-ledger.md)
 opisują aktualne zachowanie. [Rejestr odbioru](verification.json) zapisuje commit
 implementacji, fingerprints, fixture, rzeczywiste CLI i wyniki kontroli.
 
@@ -44,9 +45,10 @@ Ledger nie jest jeszcze podłączony do generatora ani publikowany jako nowy sou
 lub snapshot. `inventory_ready=false`, DATA-06 pozostaje otwarte. Źródło 2.6
 zachowuje dotychczasowe IDs; wcześniejsze snapshoty i metryki modeli nie są zmieniane.
 
-Supplier/order/receipt reconciliation, historyczny fulfillment dla konkretnej
-sprzedaży, return eligibility, reorder policy, wspólne ograniczenie sprzedaży,
-snapshoty i końcowe quality/readiness należą do pozostałych zakresów AI 06.
+Ten odbiór 06.1 nie obejmował supplier/order/receipt reconciliation;
+[odbiór 06.2](../06.2/README.md) sprawdza je odrębnie. Historyczny fulfillment
+dla konkretnej sprzedaży, return eligibility, reorder policy, wspólne ograniczenie
+sprzedaży, snapshoty i końcowe quality/readiness pozostają dalszymi zakresami AI 06.
 Nie ma nowego zdalnego Required CI ani merge tego brancha na main.
 
 Kod i testy są w commicie implementacji; osobny commit dokumentacji dodaje

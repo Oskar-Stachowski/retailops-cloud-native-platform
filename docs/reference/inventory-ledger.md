@@ -2,8 +2,10 @@
 
 **Zakres:** działający kontrakt, walidacja, jednorazowe opening, odtwarzanie salda
 i adapter do dotychczasowego CSV. Generator source 2.6 nie używa jeszcze ledgeru;
-`inventory_ready=false`. Dostawcy, polityka zamówień, chronologiczne ograniczanie
-sprzedaży, snapshoty i nowa publikacja source należą do [pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).
+`inventory_ready=false`. [Dostawcy i receipt reconciliation 06.2](replenishment.md)
+rozszerzają ten kontrakt na osobnym fixture. Polityka zamówień, chronologiczne
+ograniczanie sprzedaży, snapshoty i nowa publikacja source należą do
+[pozostałego AI 06](../plans/ai/etapy/06-inventory-ledger.md).
 
 Źródłem struktury jest [strict runtime model](../../data/inventory/contract.py),
 z którego powstaje [JSON Schema v1](../../data/contracts/inventory_ledger.v1.schema.json).
@@ -88,6 +90,7 @@ W końcowym stanie WH-0001 ma 8 sztuk, WH-0002 ma 3; po outbound, przed inbound,
 i raport `failed` dla błędnego kontraktu lub bilansu.
 
 [Odbiór 06.1](../evidence/ai/06/06.1/README.md) podaje testy i provenance.
-Supplier/order/receipt reconciliation, historyczny fulfillment do konkretnej
-sprzedaży i return eligibility nie są jeszcze sprawdzane przez ten kontrakt.
-Ich wdrożenie jest konieczne przed source `inventory_ready=true`.
+Sam walidator ledgeru nie sprawdza encji supplier/order/receipt;
+[walidator 06.2](replenishment.md) dodaje to uzgodnienie. Historyczny fulfillment
+do konkretnej sprzedaży i return eligibility pozostają dalszą pracą,
+konieczną przed source `inventory_ready=true`.
