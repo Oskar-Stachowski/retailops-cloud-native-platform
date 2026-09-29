@@ -1,0 +1,2 @@
+# Optional data export group; API/demo/isolated fact worker do not require Arrow.
+pyarrow==25.0.1

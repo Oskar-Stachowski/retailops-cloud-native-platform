@@ -1,0 +1,18 @@
+{
+  "kind": "writer_scale_only",
+  "qualified_source": false,
+  "status": "passed",
+  "rows": 1460000,
+  "chunk_rows": 8192,
+  "parity": "passed",
+  "write_and_verify_seconds": 211.60990920900076,
+  "rows_per_second": 6899.487861686108,
+  "peak_rss_mib": 76.578125,
+  "csv_bytes": 205097930,
+  "parquet_bytes": 8254062,
+  "parquet_files": 542,
+  "content_sha256": "01a582e7b48f510812de3dd1534618faae9e679018a4ee5c0c8f6ccf26078e27",
+  "python": "3.11.15",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "code_sha256": "59afea9ceafc6bdb32ce5ca9986ec97acb9a2cc0c86aa7b9b9536537ddaf7051"
+}

@@ -1,0 +1,3720 @@
+{
+  "format_version": "retailops-parquet-1.0.0",
+  "status": "format_only",
+  "snapshot_ready": false,
+  "source_dataset_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00",
+  "source_commit": "439d1c05600cd07fadc604f2dd50a20f45aa726e",
+  "source_schema_version": "2.6.0",
+  "chunk_rows": 8192,
+  "partition_min_rows": 50000,
+  "max_chunk_bytes": 8388608,
+  "max_record_bytes": 65536,
+  "writer": {
+    "pyarrow": "25.0.1",
+    "python": "3.11.15",
+    "compression": "zstd",
+    "code_sha256": "59afea9ceafc6bdb32ce5ca9986ec97acb9a2cc0c86aa7b9b9536537ddaf7051",
+    "dependency_sha256": "820f9d976a43690862abdf91c6b6a7af27b86201ef39e58ef0dc09b76d6d6f44"
+  },
+  "tables": [
+    {
+      "table": "products",
+      "data_class": "source_observation",
+      "row_count": 20,
+      "content_sha256": "738aff059a93227edf51e59247ee35ced077850b909e699fc61da23d7ea73e39",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "sku",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "brand",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/products/part-000000.parquet",
+          "bytes": 3167,
+          "sha256": "ce42860a0ad1c6353a674a8e97182328e2606d23e1c65bdb4bf123922a63e826",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "users",
+      "data_class": "source_observation",
+      "row_count": 4,
+      "content_sha256": "1e104292530521c0d7f099b5de59574e40c42207cf258a94b212ef9b2f8683db",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "login",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "display_name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "team",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/users/part-000000.parquet",
+          "bytes": 2548,
+          "sha256": "052ecd00c964b7cf6c71b1c4f51c3c6a9776e3c5ef30a9149494fde9b1948115",
+          "row_count": 4
+        }
+      ]
+    },
+    {
+      "table": "stores",
+      "data_class": "source_observation",
+      "row_count": 3,
+      "content_sha256": "31d474709d97f3765d58b2f21dfa797ae562f99a391ea63a6216f77d070b146f",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "store_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "city",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/stores/part-000000.parquet",
+          "bytes": 2984,
+          "sha256": "5c07013a53601a354b177a71bc149d5f23409632f0f5d848b6a3f92cfeb7ef3a",
+          "row_count": 3
+        }
+      ]
+    },
+    {
+      "table": "warehouses",
+      "data_class": "source_observation",
+      "row_count": 2,
+      "content_sha256": "c3b8310aa832bf9064ec2e7831818a262f9da69e98c3b860fa3f535c2f1e8a99",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "warehouse_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "city",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/warehouses/part-000000.parquet",
+          "bytes": 2631,
+          "sha256": "a96cc78c66d20c2e9a467faf50e188f80c58487ce219427f5a4157882f2a8d8f",
+          "row_count": 2
+        }
+      ]
+    },
+    {
+      "table": "orders",
+      "data_class": "source_observation",
+      "row_count": 3244,
+      "content_sha256": "590ca9ffeb4f0ad36db453970d26c37ae54ee14fe8b2eaa2fa0519055f09361b",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 6488
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 3244
+        },
+        "ordered_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 3244
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_reference",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "store_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_total",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "ordered_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/orders/part-000000.parquet",
+          "bytes": 106524,
+          "sha256": "3945e9152a5ef57f1e0840fd9873c6ee60ba8cf1df4b7b9ea0765b3855692e1c",
+          "row_count": 3244
+        }
+      ]
+    },
+    {
+      "table": "order_items",
+      "data_class": "source_observation",
+      "row_count": 6096,
+      "content_sha256": "7b0879b14475b3353cd53820c4173104898b2b2343248ef2caee467414f6693c",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "unit_price",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "total_amount",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/order_items/part-000000.parquet",
+          "bytes": 221109,
+          "sha256": "e31286970a5fb8a03c65bb2954e2ef224925a9f0289f76856779b804314611e0",
+          "row_count": 6096
+        }
+      ]
+    },
+    {
+      "table": "price_history",
+      "data_class": "source_plan",
+      "row_count": 90,
+      "content_sha256": "b291dec742934918d5282948f89b42d772158706bd80c1ddb58cf72d26241f8f",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-08-14",
+        "value_count": 270
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 90
+        },
+        "valid_from": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-08-01",
+          "value_count": 90
+        },
+        "valid_to": {
+          "date_start": "2026-07-16",
+          "date_end": "2026-08-14",
+          "value_count": 90
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "price",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "valid_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "valid_to",
+          "type": "date32[day]",
+          "nullable": true
+        },
+        {
+          "name": "price_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/price_history/part-000000.parquet",
+          "bytes": 6316,
+          "sha256": "7a514d2fa5052dc53471e7d9d91bd8d0ef22da3531edebe3cc5b79e36a8ea21d",
+          "row_count": 90
+        }
+      ]
+    },
+    {
+      "table": "promotions",
+      "data_class": "source_plan",
+      "row_count": 32,
+      "content_sha256": "96bcac9618094bb3a0d2e20a31f3e7b4d230ce8c8a43ab5786e8629b1725303e",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-12",
+        "date_end": "2026-07-21",
+        "value_count": 64
+      },
+      "field_ranges": {
+        "ends_at": {
+          "date_start": "2026-07-18",
+          "date_end": "2026-07-21",
+          "value_count": 32
+        },
+        "starts_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-15",
+          "value_count": 32
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "promotion_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "promotion_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "discount_percent",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "starts_at",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "ends_at",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/promotions/part-000000.parquet",
+          "bytes": 5180,
+          "sha256": "da6ef052e9853c0d8d48424d0a5ded06a704ac64057ddb44250416af8a53de4b",
+          "row_count": 32
+        }
+      ]
+    },
+    {
+      "table": "stock_movements",
+      "data_class": "source_observation",
+      "row_count": 6196,
+      "content_sha256": "45b71a1c0a62692c38904ba0c2abc8e7cf29eae512b9fef95a3c77970ce4685d",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 12392
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 6196
+        },
+        "occurred_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 6196
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "warehouse_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "warehouse_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "movement_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "unit_of_measure",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "source_reference",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/stock_movements/part-000000.parquet",
+          "bytes": 182909,
+          "sha256": "c66f07f2141a636db59736e98a73949d0cf5c167165e019f899aa34bd3f35fde",
+          "row_count": 6196
+        }
+      ]
+    },
+    {
+      "table": "returns",
+      "data_class": "source_observation",
+      "row_count": 591,
+      "content_sha256": "6a6b0f30500e6e3da66b822f0877a1667504deb606fda709862598107d435e27",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-03",
+        "date_end": "2026-07-31",
+        "value_count": 591
+      },
+      "field_ranges": {
+        "returned_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-07-31",
+          "value_count": 591
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_item_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "refund_amount",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "returned_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/returns/part-000000.parquet",
+          "bytes": 42550,
+          "sha256": "916f31992d3aba8451c7546bfeac9005414e36180ef9d1c188526a85b485f857",
+          "row_count": 591
+        }
+      ]
+    },
+    {
+      "table": "sales",
+      "data_class": "source_observation",
+      "row_count": 6096,
+      "content_sha256": "4a7c75bb6b8cb1fd77f1c2f4d54018d04c91d0228bfca3ed2f4383b9d3c29e00",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 12192
+      },
+      "field_ranges": {
+        "ingested_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 6096
+        },
+        "sold_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 6096
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "unit_price",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "total_amount",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "sold_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "order_reference",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "observed_sales",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "promotion_applied",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "data_quality_status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "ingested_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/sales/part-000000.parquet",
+          "bytes": 190525,
+          "sha256": "bbb45b60ba5a0274d759cb34178583d1a176bcd645eca15c9ddf7848d2a022b2",
+          "row_count": 6096
+        }
+      ]
+    },
+    {
+      "table": "inventory_snapshots",
+      "data_class": "source_observation",
+      "row_count": 100,
+      "content_sha256": "b4c2d4aa348caab8f097b16e662738e3518099133dbe236d9d372fed3564c8f6",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-03",
+        "date_end": "2026-07-31",
+        "value_count": 300
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-07-31",
+          "value_count": 100
+        },
+        "ingested_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-07-31",
+          "value_count": 100
+        },
+        "recorded_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-07-31",
+          "value_count": 100
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "stock_quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "unit_of_measure",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "warehouse_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "recorded_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "ingested_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/inventory_snapshots/part-000000.parquet",
+          "bytes": 6878,
+          "sha256": "ba453c3c3a5fb56038390c18320586c85fe5874cecbb493a9e561b31682228d1",
+          "row_count": 100
+        }
+      ]
+    },
+    {
+      "table": "forecasts",
+      "data_class": "source_operational_output",
+      "row_count": 140,
+      "content_sha256": "bf6f6c361475b46b2292f4dab2a0192371ff0cbbb6dcccfcbe249bd9246301dd",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-31",
+        "date_end": "2026-08-13",
+        "value_count": 420
+      },
+      "field_ranges": {
+        "forecast_period_end": {
+          "date_start": "2026-08-07",
+          "date_end": "2026-08-13",
+          "value_count": 140
+        },
+        "forecast_period_start": {
+          "date_start": "2026-08-01",
+          "date_end": "2026-08-07",
+          "value_count": 140
+        },
+        "generated_at": {
+          "date_start": "2026-07-31",
+          "date_end": "2026-07-31",
+          "value_count": 140
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "forecast_period_start",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "forecast_period_end",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "predicted_quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "unit_of_measure",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "generated_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "confidence_level",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "operational_outputs/forecasts/part-000000.parquet",
+          "bytes": 8745,
+          "sha256": "ed2906d958c53f0996cdd76536da3d24d07a414703c71bc135aa4babf426602d",
+          "row_count": 140
+        }
+      ]
+    },
+    {
+      "table": "anomalies",
+      "data_class": "source_operational_output",
+      "row_count": 20,
+      "content_sha256": "45ef7a8c64afc4b822468d2d3545be0d82ccf7a96d5372965c123d2990c27382",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-11",
+        "date_end": "2026-07-31",
+        "value_count": 60
+      },
+      "field_ranges": {
+        "detected_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        },
+        "period_end": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        },
+        "period_start": {
+          "date_start": "2026-07-11",
+          "date_end": "2026-07-30",
+          "value_count": 20
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "anomaly_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "metric_name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "actual_value",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "expected_value",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "deviation_percent",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "impact_value",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "impact_unit",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "severity",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "period_start",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "period_end",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "detected_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "operational_outputs/anomalies/part-000000.parquet",
+          "bytes": 7713,
+          "sha256": "ce2478bf121668fa8f7193ed6aa0b828e6c5fc01fa9d2f8bb86259e81bf6d700",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "alerts",
+      "data_class": "source_operational_output",
+      "row_count": 20,
+      "content_sha256": "a527f9b7ba78d6ed6cd1795cce8e5295fc6e5a6f67c660e3e1472c46c0763eca",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-12",
+        "date_end": "2026-07-31",
+        "value_count": 40
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        },
+        "updated_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "anomaly_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "assigned_to_user_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "alert_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "severity",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "recommended_action",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "operational_outputs/alerts/part-000000.parquet",
+          "bytes": 6346,
+          "sha256": "a100896986b2a0fdd33bb26a29c788ff03f1cb82d087b9ee8de44a83ccdd8811",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "recommendations",
+      "data_class": "source_operational_output",
+      "row_count": 20,
+      "content_sha256": "2778ffcfc4fe30ff9f85f28c20677617af545bacbb9631b3a9c5eb2175bb783f",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-12",
+        "date_end": "2026-07-31",
+        "value_count": 40
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        },
+        "expires_at": {
+          "date_start": null,
+          "date_end": null,
+          "value_count": 0
+        },
+        "generated_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "forecast_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "anomaly_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "alert_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "recommendation_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "recommended_action",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "rationale",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "generated_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "operational_outputs/recommendations/part-000000.parquet",
+          "bytes": 6856,
+          "sha256": "0a6663aa54cec7269c7e563817898efd6438026cdf73c194573aaea8baeec3ae",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "workflow_actions",
+      "data_class": "source_operational_output",
+      "row_count": 20,
+      "content_sha256": "0e229920b33d3bb77ddcbf5f83c48b5f920065f733dec1c4d9ba707989b01be4",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-12",
+        "date_end": "2026-07-31",
+        "value_count": 40
+      },
+      "field_ranges": {
+        "created_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        },
+        "performed_at": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-31",
+          "value_count": 20
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "alert_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "performed_by_user_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "action_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "comment",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "previous_status",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "new_status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "performed_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "operational_outputs/workflow_actions/part-000000.parquet",
+          "bytes": 4842,
+          "sha256": "dc9faeee397b5a7a46a6cbc9dd58c9b96c283772c3a5c577aac2405ba6c01089",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "catalog_categories",
+      "data_class": "source_observation",
+      "row_count": 8,
+      "content_sha256": "d35204563b4bd16d8b4f505f68f4c09f84959d3be932921b016f18164fbd987e",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "category_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "department",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "segment",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "seasonal_months",
+          "type": "string",
+          "nullable": true
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/catalog_categories/part-000000.parquet",
+          "bytes": 2704,
+          "sha256": "eec083cf75631010cd455c6c05717dbc6d2c8b165c6d97ddf36d58ac7df3c8e3",
+          "row_count": 8
+        }
+      ]
+    },
+    {
+      "table": "product_catalog",
+      "data_class": "source_observation",
+      "row_count": 20,
+      "content_sha256": "44e5cfe788116f30be4b2cf684bcbb7f56cd3d6da5da6543458b2410469517ca",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-07-25",
+        "value_count": 42
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 20
+        },
+        "discontinue_date": {
+          "date_start": "2026-07-25",
+          "date_end": "2026-07-25",
+          "value_count": 2
+        },
+        "launch_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-09",
+          "value_count": 20
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "sku",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "sku_policy_version",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "category_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "brand",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "launch_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "discontinue_date",
+          "type": "date32[day]",
+          "nullable": true
+        },
+        {
+          "name": "unit_of_measure",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "pack_quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "pack_unit",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "unit_cost",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "margin_band",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/product_catalog/part-000000.parquet",
+          "bytes": 6698,
+          "sha256": "331dc4977758dba89631c817a7e1db85cce1b8e0b172e59d695fe6ed49392ede",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "selling_locations",
+      "data_class": "source_observation",
+      "row_count": 2,
+      "content_sha256": "5dce504d88d06044e022e6efab378f75b56ac1fe067455efec2b2009ba211036",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "location_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "region_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "city",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "calendar_jurisdiction",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "local_timezone",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_timezone",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/selling_locations/part-000000.parquet",
+          "bytes": 3340,
+          "sha256": "fae84772f937fce3be9b6c2ff615d7b4bd7e15eae82f7a412dc7c82ce5725e1f",
+          "row_count": 2
+        }
+      ]
+    },
+    {
+      "table": "stock_locations",
+      "data_class": "source_observation",
+      "row_count": 2,
+      "content_sha256": "3d58d59dbe0ff25b3a5603bb2f409c937752e485b52dfa146464f06033218e6a",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "location_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "region_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "city",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "location_type",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/stock_locations/part-000000.parquet",
+          "bytes": 2698,
+          "sha256": "18c07b58312afe1d102f8eee5662efd0a44650384d76adadbb4f8f0067a97da8",
+          "row_count": 2
+        }
+      ]
+    },
+    {
+      "table": "channel_assignments",
+      "data_class": "source_plan",
+      "row_count": 6,
+      "content_sha256": "6197b4a24f7e0ff133ecf0d10f402a6ffd60f1f8d5b2b26c5e10e03b8b245cda",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-08-01",
+        "value_count": 18
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 6
+        },
+        "effective_from": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-17",
+          "value_count": 6
+        },
+        "effective_to": {
+          "date_start": "2026-07-17",
+          "date_end": "2026-08-01",
+          "value_count": 6
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "assignment_key",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "legacy_store_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "effective_to",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/channel_assignments/part-000000.parquet",
+          "bytes": 4008,
+          "sha256": "0e9b1552644cf292b1196b8756c6a93035f5ffad47108c92be0369841955dded",
+          "row_count": 6
+        }
+      ]
+    },
+    {
+      "table": "fulfillment_routes",
+      "data_class": "source_plan",
+      "row_count": 6,
+      "content_sha256": "5b2d966eda850d4b2a967fddd2e3c2d632625cfc7c4ba8fb8c05126b4eda4bb5",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-08-01",
+        "value_count": 18
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 6
+        },
+        "effective_from": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-17",
+          "value_count": 6
+        },
+        "effective_to": {
+          "date_start": "2026-07-17",
+          "date_end": "2026-08-01",
+          "value_count": 6
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "route_key",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "stock_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "effective_to",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/fulfillment_routes/part-000000.parquet",
+          "bytes": 3979,
+          "sha256": "8cb73c3cb124ed4f06641000ae3865c595ecf10d513b31d85300c88eca5c7afa",
+          "row_count": 6
+        }
+      ]
+    },
+    {
+      "table": "assortment",
+      "data_class": "source_plan",
+      "row_count": 114,
+      "content_sha256": "86cca33bb6b669a6a51287cff5692322232bb19b5013afc13e504802d71d40e9",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-08-01",
+        "value_count": 342
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 114
+        },
+        "effective_from": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-17",
+          "value_count": 114
+        },
+        "effective_to": {
+          "date_start": "2026-07-17",
+          "date_end": "2026-08-01",
+          "value_count": 114
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "assortment_key",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "effective_to",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/assortment/part-000000.parquet",
+          "bytes": 7503,
+          "sha256": "dadc3e6783f8fa6d2381808b26f77c2ae306450feb3204a0e72e4556aec8e7ca",
+          "row_count": 114
+        }
+      ]
+    },
+    {
+      "table": "business_calendar",
+      "data_class": "source_plan",
+      "row_count": 90,
+      "content_sha256": "228a2f388a271deb86fb585dde647d9eff0e0abd28a0223e4136e9f0c93681c3",
+      "grain": [
+        "business_date",
+        "selling_location_id",
+        "channel"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-08-01",
+        "value_count": 540
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 90
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 90
+        },
+        "business_day_end_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-08-01",
+          "value_count": 90
+        },
+        "business_day_start_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 90
+        },
+        "local_day_end_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 90
+        },
+        "local_day_start_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-30",
+          "value_count": 90
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "assignment_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "calendar_version",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "calendar_jurisdiction",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_timezone",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "local_timezone",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "day_of_week",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "week_of_year",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "month",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "quarter",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "is_weekend",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "is_public_holiday",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "holiday_names",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "is_easter",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "is_christmas",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "is_black_friday",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "is_cyber_monday",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "location_open",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "opening_policy",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_day_start_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "business_day_end_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "local_day_start_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "local_day_end_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/business_calendar/part-000000.parquet",
+          "bytes": 12509,
+          "sha256": "445011597c5125b909303a10e0382d3f4aed09b9d3fda0495892a550418398c1",
+          "row_count": 90
+        }
+      ]
+    },
+    {
+      "table": "category_calendar",
+      "data_class": "source_plan",
+      "row_count": 240,
+      "content_sha256": "eba465347e92344acb93fb8938158575233a8451bda2697fcbb5fc7cc3c8cb61",
+      "grain": [
+        "business_date",
+        "category_id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-07-31",
+        "value_count": 480
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 240
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 240
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "category_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "calendar_version",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "is_category_season",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/category_calendar/part-000000.parquet",
+          "bytes": 7898,
+          "sha256": "35892503c2df6913b5bb6e665dcdb24d308c615614edbbe3a62e61ae7d9d1735",
+          "row_count": 240
+        }
+      ]
+    },
+    {
+      "table": "price_plans",
+      "data_class": "source_plan",
+      "row_count": 90,
+      "content_sha256": "c1ddd52b09f99fc32155a45fe302d4d972fa32ad13c6d8880d81b01d114525c2",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-08-15",
+        "value_count": 360
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 90
+        },
+        "effective_from": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-08-01",
+          "value_count": 90
+        },
+        "effective_to": {
+          "date_start": "2026-07-17",
+          "date_end": "2026-08-15",
+          "value_count": 90
+        },
+        "known_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 90
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "plan_key",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "effective_to",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "known_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "price",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "pricing_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/price_plans/part-000000.parquet",
+          "bytes": 8952,
+          "sha256": "b5c341bd0e3a9ad4fd10f8836dc93900150e6d51e6119517c398148a9728aec8",
+          "row_count": 90
+        }
+      ]
+    },
+    {
+      "table": "promotion_plans",
+      "data_class": "source_plan",
+      "row_count": 32,
+      "content_sha256": "0a9a70edbb37d6e92a2eabe61cdefaab25b9011913584aa8c3d28e3c910d2492",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-06-29",
+        "date_end": "2026-07-22",
+        "value_count": 128
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-06-29",
+          "date_end": "2026-06-30",
+          "value_count": 32
+        },
+        "effective_from": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-15",
+          "value_count": 32
+        },
+        "effective_to": {
+          "date_start": "2026-07-19",
+          "date_end": "2026-07-22",
+          "value_count": 32
+        },
+        "known_at": {
+          "date_start": "2026-06-29",
+          "date_end": "2026-06-30",
+          "value_count": 32
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "promotion_key",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "effective_to",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "known_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "promotion_type",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "discount_percent",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "minimum_quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "priority",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "stacking_policy",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "pricing_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/promotion_plans/part-000000.parquet",
+          "bytes": 8698,
+          "sha256": "b09c90ad3a87551dac847e633fd7013884bbfd7cb6e06673a27eeaf95b4d74d7",
+          "row_count": 32
+        }
+      ]
+    },
+    {
+      "table": "promotion_effect_truth",
+      "data_class": "simulation_truth",
+      "row_count": 96,
+      "content_sha256": "ec097039d5c0b223fa644bda5ea83bd86e3c8b304373e636d44816de87937670",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-09",
+        "date_end": "2026-07-26",
+        "value_count": 192
+      },
+      "field_ranges": {
+        "effective_from": {
+          "date_start": "2026-07-09",
+          "date_end": "2026-07-22",
+          "value_count": 96
+        },
+        "effective_to": {
+          "date_start": "2026-07-12",
+          "date_end": "2026-07-26",
+          "value_count": 96
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "promotion_plan_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "phase",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "effective_to",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "demand_multiplier",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "truth_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "truth/promotion_effect_truth/part-000000.parquet",
+          "bytes": 6160,
+          "sha256": "fe0d567fb4fa7817b105d5172b330c2d4ef5f5ba97adb4fec02b021f93d5e795",
+          "row_count": 96
+        }
+      ]
+    },
+    {
+      "table": "sale_price_references",
+      "data_class": "source_observation",
+      "row_count": 6096,
+      "content_sha256": "5de93ffe77d011a58b975ea22717550b88f1f7366c23fe137312dbab1c06a6db",
+      "grain": [
+        "sale_id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 12192
+      },
+      "field_ranges": {
+        "as_of_time": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 6096
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 6096
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "sale_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_item_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "as_of_time",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "price_plan_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "promotion_plan_id",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "pricing_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/sale_price_references/part-000000.parquet",
+          "bytes": 416225,
+          "sha256": "238f233b018dbf6bd33f645210569e82d2ce85478c1e9b19aaa018c49e999d66",
+          "row_count": 6096
+        }
+      ]
+    },
+    {
+      "table": "daily_price_observations",
+      "data_class": "source_observation",
+      "row_count": 1292,
+      "content_sha256": "6944de51ad76eee221641fa433177404e0994523458f283c70eef517fc5f8c06",
+      "grain": [
+        "business_date",
+        "product_id",
+        "selling_location_id",
+        "channel"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 2584
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 1292
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 1292
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "gross_revenue",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "realized_unit_price",
+          "type": "decimal128(38, 2)",
+          "nullable": true
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "price_plan_ids",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "promotion_plan_ids",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "pricing_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/daily_price_observations/part-000000.parquet",
+          "bytes": 45691,
+          "sha256": "bb21bfe17bfabdd8baa3251f085d3635cbf1ae21cd608ca67e7367d1f5b62a73",
+          "row_count": 1292
+        }
+      ]
+    },
+    {
+      "table": "daily_demand_observations",
+      "data_class": "source_observation",
+      "row_count": 1612,
+      "content_sha256": "b355983abd67a0214e410ffcea54d85884ace8cc86a2fb85d64079d34c8dd2c7",
+      "grain": [
+        "business_date",
+        "product_id",
+        "selling_location_id",
+        "channel"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-08-01",
+        "value_count": 3224
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-08-01",
+          "value_count": 1612
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 1612
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "observed_units",
+          "type": "int64",
+          "nullable": true
+        },
+        {
+          "name": "observed_orders",
+          "type": "int64",
+          "nullable": true
+        },
+        {
+          "name": "gross_revenue",
+          "type": "decimal128(38, 2)",
+          "nullable": true
+        },
+        {
+          "name": "net_revenue",
+          "type": "decimal128(38, 2)",
+          "nullable": true
+        },
+        {
+          "name": "return_units",
+          "type": "int64",
+          "nullable": true
+        },
+        {
+          "name": "return_data_complete",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "realized_unit_price",
+          "type": "decimal128(38, 2)",
+          "nullable": true
+        },
+        {
+          "name": "promotion_plan_ids",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "is_active_assortment",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "location_open",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "source_data_complete",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "observation_status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quality_status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "demand_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/daily_demand_observations/part-000000.parquet",
+          "bytes": 52768,
+          "sha256": "102a0795a47e3d50d9dc7593b97891188e75e6c0396ce7c571ddb2d52e422154",
+          "row_count": 1612
+        }
+      ]
+    },
+    {
+      "table": "daily_demand_exclusions",
+      "data_class": "source_observation",
+      "row_count": 188,
+      "content_sha256": "7d63ec36ac6baa39a90c74d98d7528730ea20b7a410f466a4000e713351be058",
+      "grain": [
+        "business_date",
+        "product_id",
+        "selling_location_id",
+        "channel"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 188
+      },
+      "field_ranges": {
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 188
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "observation_status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "exclusion_reason",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "demand_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/daily_demand_exclusions/part-000000.parquet",
+          "bytes": 7717,
+          "sha256": "4e260551cb3851596297d3f4e8d958bd33372bdeb54b21bbb9e93341d7170418",
+          "row_count": 188
+        }
+      ]
+    },
+    {
+      "table": "daily_demand_truth",
+      "data_class": "simulation_truth",
+      "row_count": 1469,
+      "content_sha256": "4cf22f8ae80bc655818e80c74ae05e9e61a896f1cd76a892202ec4f75060a6c1",
+      "grain": [
+        "business_date",
+        "product_id",
+        "selling_location_id",
+        "channel"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-07-31",
+        "value_count": 1469
+      },
+      "field_ranges": {
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 1469
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "base_rate",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "product_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "location_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "weekly_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "seasonal_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "lifecycle_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "price_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "promotion_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "anomaly_factor",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "noise",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "expected_rate",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "rounding_draw",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "latent_units",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "demand_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "truth/daily_demand_truth/part-000000.parquet",
+          "bytes": 122570,
+          "sha256": "4dd7026fd7fef852c0200dcbfa98dcd5e8e9829c8d3fb478cbaebbc57b2e526f",
+          "row_count": 1469
+        }
+      ]
+    },
+    {
+      "table": "return_policies",
+      "data_class": "source_plan",
+      "row_count": 32,
+      "content_sha256": "28c2687f1a11f3047ec206f8cfb82b8feb1bac510b992c3715eb9634374dfaf3",
+      "grain": [
+        "category_id",
+        "channel"
+      ],
+      "date_range": {
+        "date_start": "2026-07-01",
+        "date_end": "2026-07-01",
+        "value_count": 32
+      },
+      "field_ranges": {
+        "known_at": {
+          "date_start": "2026-07-01",
+          "date_end": "2026-07-01",
+          "value_count": 32
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "category_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "window_days",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "max_ingestion_delay_days",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "known_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "returns_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/return_policies/part-000000.parquet",
+          "bytes": 3941,
+          "sha256": "f5ed08aa542b534275e240355c4f1793df0176feb1ef4cc4251084935cd8194b",
+          "row_count": 32
+        }
+      ]
+    },
+    {
+      "table": "return_events",
+      "data_class": "source_observation",
+      "row_count": 1044,
+      "content_sha256": "8ea9f5ad1eaf63b511e2fdc87695e028b4084bfa294b016f6c130b0e4231afea",
+      "grain": [
+        "id"
+      ],
+      "date_range": {
+        "date_start": "2026-07-03",
+        "date_end": "2026-09-03",
+        "value_count": 3132
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-04",
+          "date_end": "2026-09-03",
+          "value_count": 1044
+        },
+        "ingested_at": {
+          "date_start": "2026-07-04",
+          "date_end": "2026-09-03",
+          "value_count": 1044
+        },
+        "returned_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-09-02",
+          "value_count": 1044
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "sale_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "order_item_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "policy_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "quantity",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "refund_amount",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "returned_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "ingested_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "returns_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/return_events/part-000000.parquet",
+          "bytes": 108834,
+          "sha256": "e75a6f8615adc0564ed455fbf417cbb1cc7988609a6e3cc654992247daddc94e",
+          "row_count": 1044
+        }
+      ]
+    },
+    {
+      "table": "daily_return_cohorts",
+      "data_class": "source_observation",
+      "row_count": 3224,
+      "content_sha256": "29ab2393b7806443de5814ba70d23a96d3af8ee19196520e1cf627dc482b1e43",
+      "grain": [
+        "business_date",
+        "product_id",
+        "selling_location_id",
+        "channel",
+        "as_of_time"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-09-09",
+        "value_count": 9672
+      },
+      "field_ranges": {
+        "as_of_time": {
+          "date_start": "2026-08-01",
+          "date_end": "2026-09-09",
+          "value_count": 3224
+        },
+        "available_at": {
+          "date_start": "2026-08-01",
+          "date_end": "2026-09-09",
+          "value_count": 3224
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 3224
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "snapshot_kind",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "as_of_time",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "observed_units",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "return_units",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "net_units",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "gross_revenue",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "refund_amount",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "net_revenue",
+          "type": "decimal128(38, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "return_data_complete",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "returns_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/daily_return_cohorts/part-000000.parquet",
+          "bytes": 90046,
+          "sha256": "cf92f48728cd22b5b2a2a76ba4337d73db8ff99c924133be01e18cc513ddf862",
+          "row_count": 3224
+        }
+      ]
+    },
+    {
+      "table": "product_simulation_parameters",
+      "data_class": "simulation_truth",
+      "row_count": 20,
+      "content_sha256": "cd8253beca245dd4f556481fffed78922957024f4d8e65a23f6252605b343f4e",
+      "grain": [
+        "product_id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "demand_class",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "demand_weight",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "price_elasticity",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "seasonal_pattern",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "return_rate",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "simulation_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "truth/product_simulation_parameters/part-000000.parquet",
+          "bytes": 5637,
+          "sha256": "279e0ed7bbe40c9b59b82698da4e9b75cd8465388b9152bd568ab97062159505",
+          "row_count": 20
+        }
+      ]
+    },
+    {
+      "table": "store_simulation_parameters",
+      "data_class": "simulation_truth",
+      "row_count": 3,
+      "content_sha256": "b823ff096715d557cd85ea7f0d903d906c9338ae10a8c4939c84628282f2564a",
+      "grain": [
+        "legacy_store_id"
+      ],
+      "date_range": {
+        "date_start": null,
+        "date_end": null,
+        "value_count": 0
+      },
+      "field_ranges": {},
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "legacy_store_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "traffic_multiplier",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "promo_sensitivity",
+          "type": "decimal256(76, 40)",
+          "nullable": false
+        },
+        {
+          "name": "simulation_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "truth/store_simulation_parameters/part-000000.parquet",
+          "bytes": 3106,
+          "sha256": "835db04fde205ed3f7760f95fd950d2b51cd13e58b04ae81adb7fdaf86a1618f",
+          "row_count": 3
+        }
+      ]
+    },
+    {
+      "table": "daily_demand_versions",
+      "data_class": "source_observation",
+      "row_count": 1612,
+      "content_sha256": "b2aeb1efcef107df240b0b8bbc683eef9c167d4ffd25f0e51cf281931fbfae21",
+      "grain": [
+        "business_date",
+        "product_id",
+        "selling_location_id",
+        "channel",
+        "version"
+      ],
+      "date_range": {
+        "date_start": "2026-07-02",
+        "date_end": "2026-08-01",
+        "value_count": 3224
+      },
+      "field_ranges": {
+        "available_at": {
+          "date_start": "2026-07-03",
+          "date_end": "2026-08-01",
+          "value_count": 1612
+        },
+        "business_date": {
+          "date_start": "2026-07-02",
+          "date_end": "2026-07-31",
+          "value_count": 1612
+        }
+      },
+      "partition_source_field": null,
+      "schema": [
+        {
+          "name": "id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "observation_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "business_date",
+          "type": "date32[day]",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "selling_location_id",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "nullable": false
+        },
+        {
+          "name": "observed_units",
+          "type": "int64",
+          "nullable": true
+        },
+        {
+          "name": "observation_status",
+          "type": "string",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp[us, tz=UTC]",
+          "nullable": false
+        },
+        {
+          "name": "history_policy_version",
+          "type": "string",
+          "nullable": false
+        }
+      ],
+      "files": [
+        {
+          "path": "facts/daily_demand_versions/part-000000.parquet",
+          "bytes": 75219,
+          "sha256": "3862735428f1f08f9d973b115878473668b3f82bc5838f57b9c33c757830f8fb",
+          "row_count": 1612
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "path": "manifests/dataset_manifest.json",
+      "sha256": "e9d3bbf5a9070cea3c64195632dcb0d43a8bc6a4fd486f74220d023161ea892d"
+    },
+    {
+      "path": "reports/quality_report.json",
+      "sha256": "e19eb715274a11f63c661ee3d775227d5c2d55268a52230ea3c2ce18438840f9"
+    },
+    {
+      "path": "reports/realism_report.json",
+      "sha256": "f31fbf65545bd46f6fb203b7f34b22490ff93c5c84c96a9e8b2b55cf9744f6ba"
+    },
+    {
+      "path": "reports/dimensions_report.json",
+      "sha256": "3a177f088f9d8bdb17578d39cb4ae0caaa26c2231f7fcbb370599c5ce712b96b"
+    },
+    {
+      "path": "reports/pricing_report.json",
+      "sha256": "76461085af9387c650941e4653cdc3fb449be14416abb501040ab57cc491a256"
+    },
+    {
+      "path": "reports/pricing_report.md",
+      "sha256": "13b580e923e39f38ee9d4cd2f988ab7441dfca1cbabb0a14fa154ee685597419"
+    },
+    {
+      "path": "reports/demand_report.json",
+      "sha256": "3845f8994cd8baf5fde911cabfec02fee02aec5a5e028cf494d65ca1e6d1bb27"
+    },
+    {
+      "path": "reports/demand_report.md",
+      "sha256": "4a991a6f06666fdd69a42db03951bae14d30054fb424e4ea2d3573069974cb6a"
+    },
+    {
+      "path": "reports/returns_report.json",
+      "sha256": "a7feff96f6759f391041f28cc517b0361f01e9810113ff3ec1259fc8378f657b"
+    },
+    {
+      "path": "reports/returns_report.md",
+      "sha256": "c7fae424ae07fdf6966c40d99006320bdfc1390a19d78275e89eb6cd9ff5ca52"
+    },
+    {
+      "path": "reports/source_report.json",
+      "sha256": "c0416c584f1e94e1db8fe90fd3f6e5cea30980a21e1658ef44e0b1e7700888c9"
+    },
+    {
+      "path": "reports/source_report.md",
+      "sha256": "5d7635a5b55601163910a04a046d331f838236381b1a2f0f5508f10ecd93053b"
+    },
+    {
+      "path": "reports/realism_report.md",
+      "sha256": "74a0163cd2724a6c8810587773f91079d58c10bdedd9d5df8e229b4bd65895e0"
+    }
+  ],
+  "source_manifest_sha256": "3650cf0a621056867ceaa24a2e35889707056603f6e95117577f1f22791dc590"
+}

@@ -45,11 +45,11 @@ nie wyznaczaj ich z daty uruchomienia ani dawnego opisu katalogu `small`.
 
 ## Zapis i wersjonowanie
 
-- `data/demo/` i referencyjny `data/synthetic/small/` są śledzone w Git.
-- `medium`, `large`, `data/generated/` i `data/replay/` są ignorowane.
+- `data/demo/` jest śledzone w Git; wszystkie `data/synthetic/`,
+  `data/generated/` i `data/replay/` są ignorowane.
 - Nowy eksperyment zapisuj przez `--output-dir` do osobnego katalogu.
-  Wyjątek ignorowania dla `small` obejmuje także nowe podkatalogi, więc duże
-  wyniki ML w tym miejscu wymagają świadomego pozostawienia poza commitem.
+- [Polityka AI 03.1](parquet-artifacts.md) ogranicza fixtures do 5 MiB po
+  rozpakowaniu i najwyżej jednego bieżącego fixture; archiwa regresji zachowujemy.
 - Każdy profil zapisuje CSV, `dataset_manifest.json`, `dataset_manifest.v2.json` i `quality_report.json`.
   Profile skalowane zapisują również `realism_report.json`.
 - Profile AI zapisują dodatkowo dziewięć kanonicznych tabel CSV i `dimensions_report.json`;
@@ -71,8 +71,12 @@ wskazać własny katalog CSV. `large` nie jest obsługiwanym profilem loadera.
 Loader zastępuje zawartość tabel aplikacji danymi z wybranego katalogu.
 
 Instrukcje generowania i ładowania: [praca z danymi](../guides/data.md).
-Profile AI nie rozszerzają listy profili seeda. Duże profile nadal używają
-pamięci i CSV; chunked Parquet i pełny benchmark pozostają do wdrożenia.
+Profile AI nie rozszerzają listy profili seeda. [AI 03.1](parquet-artifacts.md)
+dodaje konwersję do chunked typed Parquet z date partitions i benchmark obu
+smoke profili. Generacja źródła nadal buduje tabele w pamięci;
+pełnych ai-dev/ai-training nie zmierzono. Kwalifikowany niezmienny eksport
+opisuje [AI 03.2](ai-snapshots.md). Importer/curated i
+[pełna bramka cross-repo](ai03-cross-repo.md) mają odbiór obu smoke.
 
 ## Manifest v2 i identity
 

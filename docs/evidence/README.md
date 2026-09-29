@@ -1,12 +1,18 @@
 # Dowody weryfikacji
 
-Indeks przeglądany 2026-09-28. Poniżej znajdują się ostatnie zachowane wyniki
+Indeks przeglądany 2026-09-29. Poniżej znajdują się ostatnie zachowane wyniki
 potrzebne do opisania obecnych możliwości projektu. Każdy raport dotyczy
 konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| AI 11 — fundament offline RAG | 2026-09-28 | [Odbiór i publikacja w repo AI](ai/11/README.md): korpus, indeks pgvector, filtrowany retrieval, golden i administracyjne runy. Otwarta ścieżka real embeddings, użytkowa kwalifikacja i jakość semantyczna. |
+| AI 03.6 — pełny cross-repo | 2026-09-29 | [Odbiór obu repo](ai/03/03.6/README.md): oba standardowe smoke dwukrotnie na Darwin/Linux, osobny późny fakt, parity/IDs/as-of, budżet i Required CI na opublikowanych PR-ach. Otwiera 04 i 06. |
+| AI 03.5 — curated w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.5/README.md): 743 testy, typed normalization/mapping/quarantine, immutable IDs, as-of, oba smoke i truth dwukrotnie oraz odłączony wheel. |
+| AI 03.4 — typed importer w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.4/README.md): 706 testów, oba smoke i truth dwukrotnie, atomowość/idempotencja/typed parity oraz odłączony wheel. |
+| AI 03.3 — kontrakt handoff | 2026-09-28 | [Odbiór lokalny](ai/03/03.3/README.md): pełny mały fixture, wspólna wersja/schema/expected manifest, budget i niezależny checker konsumenta bez generatora. |
+| AI 03.2 — niezmienny exporter | 2026-09-28 | [Odbiór lokalny](ai/03/03.2/README.md): allowlista 25 tabel, opcjonalna evaluation truth, przeliczone 46 hard gates, atomowa publikacja, checksums/parity, idempotencja i dwa przebiegi obu smoke. |
+| AI 03.1 — format i artefakty | 2026-09-28 | [Odbiór lokalny](ai/03/03.1/README.md): typed Parquet wszystkich 40 tabel, porcje/partycje, polityka Git/fixture/cleanup oraz duży writer. |
+| AI 11 — semantyczny RAG | 2026-09-28 | [Końcowy odbiór i publikacja w repo AI](ai/11/README.md): real Titan V2, zaliczone golden quality, użytkowa kwalifikacja/aktywacja/rollback i trwałość. Odpowiedzi i narzędzia agenta należą do 12. |
 | Audyt AI 02 → AI 03 | 2026-09-28 | [Gotowość do rozpoczęcia 03](ai/02/audit/README.md): pełny fingerprint workera, historia obserwacji as-of, ponowny odbiór źródła i pełne testy na PostgreSQL. Required CI PR i push na main ma success; audyt zawiera SHA i wyniki kontroli. |
 | Źródło i izolacja AI 02 / DATA-05 | 2026-09-28 | [Odbiór](ai/02/data05/README.md): source 2.6, 46 hard gates, osobne parametry symulacji, izolowany worker, powtórzenia profili, zgodne demo i archiwa 2.0–2.5. Źródło do AI 03; modele/inventory mają dalsze bramki. |
 | Chronologia i zwroty AI 02 / DATA-03 | 2026-09-28 | [Odbiór lokalny](ai/02/data03/README.md): konkretne pozycje, częściowe ilości, okna kategorii/kanałów, refundacje według zapłaconej ceny i 39-dniowy ogon; siedem hard gates, dwa snapshot cutoffy, zgodne demo i odczyt source 2.0–2.3. Końcowy odbiór źródła: DATA-05. |

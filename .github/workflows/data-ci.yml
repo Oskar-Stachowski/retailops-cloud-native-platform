@@ -27,10 +27,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ai03-cross-repo:
+    name: AI 03 full cross-repo gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      AI03_CONSUMER_REVISION: cb053cc29c1906d79108cba2c70f88b56e454211
+    steps:
+      - name: Checkout producer
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Checkout pinned independent consumer
+        uses: actions/checkout@v6
+        with:
+          repository: Oskar-Stachowski/retailops-ai-intelligence
+          ref: ${{ env.AI03_CONSUMER_REVISION }}
+          path: data/generated/ai03-ci-consumer
+          persist-credentials: false
+      - name: Set up locked Python toolchains
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.19"
+          python-version: "3.11.15"
+      - name: Install dependencies outside the measured flow
+        run: |
+          uv venv services/api/.venv --python 3.11.15
+          uv pip install --python services/api/.venv/bin/python -r services/api/requirements-dev.txt -r data/requirements-parquet.txt
+          uv sync --directory data/generated/ai03-ci-consumer --locked --extra snapshot
+      - name: Run both full smoke profiles twice
+        env:
+          CONSUMER_REVISION: ${{ env.AI03_CONSUMER_REVISION }}
+        run: |
+          services/api/.venv/bin/python scripts/data/verify_ai03_cross_repo.py \
+            --consumer-root data/generated/ai03-ci-consumer \
+            --consumer-python data/generated/ai03-ci-consumer/.venv/bin/python \
+            --producer-revision "$(git rev-parse HEAD)" \
+            --consumer-revision "${CONSUMER_REVISION}"
+      - name: Upload full cross-repo evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: ai03-cross-repo-evidence
+          path: |
+            ci-cd/reports/data/ai03-cross-repo.json
+            ci-cd/reports/data/ai03-cross-repo/**
+          if-no-files-found: error
+
   data-quality:
     name: Synthetic data quality gate
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     env:
       DATA_PROFILE: ${{ inputs.data_profile || 'small' }}
@@ -45,9 +92,16 @@ jobs:
         uses: ./.github/actions/setup-python-ci
         with:
           install-command: ""
+          cache-dependency-path: |
+            services/api/requirements.txt
+            services/api/requirements-dev.txt
+            data/requirements-parquet.txt
 
       - name: Run data readiness gates
         run: make data-generate data-quality data-contracts data-scenario-report DATA_PROFILE="${DATA_PROFILE}"
+
+      - name: Verify Parquet, immutable snapshots and profile resource budgets
+        run: make data-parquet-check
 
       - name: Write data CI summary
         if: always()
@@ -62,6 +116,8 @@ jobs:
             echo "| Generated dataset | \`ci-cd/reports/data/generated/${DATA_PROFILE}/\` |"
             echo "| Contract report | \`ci-cd/reports/data/data-contract-report.json\` |"
             echo "| Scenario coverage | \`ci-cd/reports/data/scenario-coverage-report.json\` |"
+            echo "| Parquet and immutable snapshot tests | \`ci-cd/reports/data/ai03-tests.xml\` |"
+            echo "| Generate / qualify / export / verify / reexport, both smokes twice, max 300s / 1024 MiB per run | \`ci-cd/reports/data/ai03-benchmark.json\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload data quality evidence

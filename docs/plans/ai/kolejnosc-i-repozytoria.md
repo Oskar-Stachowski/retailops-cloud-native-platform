@@ -1,6 +1,6 @@
 # Gdzie realizować etapy AI i co można robić równolegle
 
-Aktualizacja: **2026-09-28**. To pisemna mapa wykonania oparta na
+Aktualizacja: **2026-09-29**. To pisemna mapa wykonania oparta na
 [rejestrze zależności](etapy.json) i instrukcjach poszczególnych etapów.
 [Status projektu](../../STATUS.md) oraz [odbiór RAG 11](../../evidence/ai/11/README.md)
 opisują faktycznie dostępne funkcje. Numer etapu nie oznacza jednego repozytorium.
@@ -34,15 +34,13 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
 
 ## Zalecana kolejność od obecnego punktu
 
-1. **Teraz AI 03** w obu repo. Pierwszy zakres powstaje w cloud-native:
-   typed Parquet i polityka artefaktów, potem immutable exporter.
-   Po uzgodnieniu fixture/kontraktu AI rozwija importer i curated; końcowy
-   odbiór 03 sprawdza rzeczywisty eksport/import między repozytoriami.
-   **AI 11 jest zamknięty.** Równolegle można przygotować interfejsy,
-   limity i test doubles AI 12. Jego pełna integracja czeka jeszcze na AI 10.
-2. **Po 03:** równolegle 04 w AI-intelligence oraz 06 w cloud-native.
-   Po 04 można przejść do 05, nawet jeśli 06 jeszcze trwa. Pierwszy
-   forecasting opisuje obserwowaną sprzedaż i pomija niegotowe cechy inventory.
+1. **Teraz AI 04 w AI-intelligence oraz równolegle AI 06 w cloud-native.**
+   [Odbiór 03](../../evidence/ai/03/03.6/README.md) potwierdza snapshoty,
+   import/curated, pełną bramkę i Required CI na opublikowanych PR-ach.
+   Pierwszy forecasting opisuje obserwowaną sprzedaż i pomija inventory.
+2. **Po 04:** rozpocząć 05, nawet jeśli 06 jeszcze trwa.
+   AI 11 jest odebrany i opublikowany; interfejsy i test doubles 12 można
+   rozwijać w osobnym worktree. Pełny agent wymaga również 10.
 3. **Po 06:** ponowić eksport/import i zależne oceny 04/05 na nowym snapshotcie.
    Gdy 04, 05 i 06 mają zgodne odbiory, rozwijać równolegle **07 i 08**.
 4. **Po 07 i 08:** równolegle **09 i 10**. Zmiany modeli w 09 nie powinny

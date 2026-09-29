@@ -1,47 +1,43 @@
 # Najbliższe prace AI
 
-[Fundament 01](../../evidence/ai/01/README.md) ma odbiór lokalny i zdalny:
-Required CI PR oraz push na main obu repozytoriów ma success.
-Główny punkt wznowienia to [AI 03 — snapshot i curated](etapy/03-snapshot-curated.md).
-[Odbiór źródła 02](../../evidence/ai/02/data05/README.md) obejmuje identity,
-wymiary/kalendarz, ceny/promocje, pełny panel/koszyki, chronologię/zwroty,
-separację symulacji oraz rzeczywisty worker bez dostępu do truth.
-Ten plik zawiera otwartą pracę; [audyt](../../audits/open-findings.md) opisuje
-potwierdzone problemy i kryteria ich zamknięcia.
+[Odbiór 03](../../evidence/ai/03/03.6/README.md) obejmuje pełną ścieżkę
+generator → kwalifikacja → eksport → import → curated na przypiętych rewizjach,
+oba smoke dwukrotnie i Required CI obu repo. Pierwsza ścieżka używa plików;
+forecast source jest gotowy przy inventory false. Publikacja jest na osobnych
+branchach/PR-ach, bez merge na main.
+Ten plik zawiera wyłącznie otwartą pracę; [audyt](../../audits/open-findings.md)
+opisuje potwierdzone problemy i kryteria ich zamknięcia.
 
-## Kolejny mały PR etapu 03
+## Następny zakres — AI 04
 
-**Repo:** RetailOps. **Zależność:** odebrane źródło 2.6 i bramki forecast-source.
-Zaimplementować typed Parquet przez jawną grupę zależności, date partitions i
-chunked writes dla dużych faktów. Rozdzielić facts/truth/raw/reports/manifests
-w layout eksportu; zachować CSV demo i fixtures. Kontrolowany cleanup ma
-odmawiać usuwania tracked fixture i plików poza generated root. Zmierzyć
-czas, peak RSS, rows/s, bytes oraz CSV/Parquet parity na ograniczonych profilach.
-Następny slice to niezmienny exporter z allowlistą faktów i atomową publikacją.
-Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
-importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as-of.
+**Repo:** AI-intelligence. **Wejście:** odebrany source 2.6, snapshot/handoff 1.0
+i curated 1.0 z [karty danych](../../evidence/ai/03/03.6/dataset-card.md).
+[Instrukcja 04](etapy/04-forecasting.md) zaczyna od kanonicznego panelu,
+cech znanych w origin i jawnych splitów. Następnie baseline/RF/HGB mają wspólne
+rekordy oceny, zamrożony test i politykę dopuszczenia. Inventory features są
+wyłączone; target opisuje obserwowaną sprzedaż.
 
 ## Praca równoległa od obecnego punktu
 
-- **RetailOps / etap 03:** typed Parquet, polityka artefaktów, następnie immutable export i handoff.
-- **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, limity,
-  kontrakty i test doubles. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
-  pełne zamknięcie agenta nadal wymaga AI 10.
-- **Opcjonalnie 16A:** projekt inputs/ownership i wariantu infrastruktury,
-  walidacja oraz kosztorys po ustaleniu tych wejść; bez automatycznej zgody na apply.
+- **Repo RetailOps / AI 06:** ledger, jedno otwarcie zapasu, ruchy i dostawy,
+  historyczny fulfillment mapping oraz nowe bramki źródła. Po zmianie danych
+  tworzymy nowe IDs i ponawiamy import oraz zależne oceny 04/05.
+- **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
+  limity, freshness i audyt. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
+  pełne narzędzia, odpowiedzi i integracja użytkowa wymagają również 10.
+- **Opcjonalnie 16A:** projekt inputs/ownership i infrastruktury, walidacja
+  oraz kosztorys po ustaleniu wejść; bez automatycznej zgody na apply.
 
 Każdy strumień ma osobny branch/worktree i PR, jednego właściciela wspólnych
 kontraktów oraz własne evidence. Zmiany rejestru/statusu integrujemy kolejno.
-Etap 03 ma spełnioną lokalną i zdalną bramkę źródła; 04–05 czekają na właściwe snapshoty,
-a pełny agent 12 czeka jeszcze na 10.
-Po 03 można rozdzielić 04 i 06, po 04/05/06 — 07 i 08.
+Po 04 można rozpocząć 05 bez oczekiwania na ledger 06. Po zgodnym odbiorze
+04/05/06 można rozdzielić 07 i 08.
 Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc-i-repozytoria.md).
 
 ## Przypisanie warunków do etapów
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **03 — snapshot/curated** | Rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |

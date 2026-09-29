@@ -1,6 +1,6 @@
 # 03. Zbuduj snapshot, importer i curated
 
-**Status: plan wdrożenia. Repo: RetailOps + AI, osobne PR-y. Zależność: 02.**
+**Status: odebrany lokalnie i w Required CI na opublikowanych branchach obu repo. Repo: RetailOps + AI, osobne PR-y bez merge na main. Następne zakresy: 04 i 06 równolegle. Zależność: 02.**
 
 Cel: zbudować powtarzalną granicę między dwoma repozytoriami. Pierwsza ścieżka to lokalny niezmienny eksport plików; kompletny REST/event integration powstaje w etapie 10. Ani działająca baza RetailOps, ani broker, ani AWS nie są wymagane do importu pierwszego snapshotu.
 
@@ -10,6 +10,28 @@ Normatywne dokumenty: [dane i czas](../kontrakty/dane-i-czas.md), [profile i bra
 źródła 2.6. Fingerprint obejmuje cały wykonywany bundle; historia ilości jest
 append-only i odczytywana według stanu znanego w origin. Eksport, importer i
 curated mają zachować te gwarancje oraz brak historii zgłaszać jawnie.
+
+[Evidence 03.1](../../../evidence/ai/03/03.1/README.md) i
+[aktualny runbook formatu](../../../reference/parquet-artifacts.md) opisują
+40 typed tabel, porcje/partycje, checksums/parity, politykę Git i cleanup.
+Zapis ma jawne `snapshot_ready=false`; odbiór 03.1 nie otwiera jeszcze 04/06.
+[Evidence 03.2](../../../evidence/ai/03/03.2/README.md) i
+[runbook snapshotów](../../../reference/ai-snapshots.md) opisują istniejący
+`python -m data.export.ai_snapshot`: allowlistę, przeliczone bramki, atomową
+publikację, pełną walidację i niezmienny re-export. To lokalny odbiór eksportera.
+[Handoff 03.3](../../../reference/source-snapshot-handoff.md) dodaje jeden
+samowystarczalny fixture, schema/expected manifest i niezależny checker w repo AI.
+[Evidence](../../../evidence/ai/03/03.3/README.md) rozróżnia odbiór kontraktu
+i transportu od typed importu i curated.
+[Odbiór 03.4](../../../evidence/ai/03/03.4/README.md) dodaje niezależny importer
+Parquet, pełne byte/canonical checks, atomową publikację i idempotencję w AI.
+[Odbiór 03.5](../../../evidence/ai/03/03.5/README.md) obejmuje curated,
+normalizację, jawne mappings, quarantine i as-of z pełnej historii wersji.
+[Końcowy odbiór 03.6](../../../evidence/ai/03/03.6/README.md) potwierdza
+pełny cross-repo flow, powtórzenia, zasoby i Required CI obu repo.
+[Runbook](../../../reference/ai03-cross-repo.md) opisuje odtworzenie;
+[karta](../../../evidence/ai/03/03.6/dataset-card.md) określa dopuszczone dane.
+Poniższy kontrakt pozostaje instrukcją utrzymania i ponowienia po 06/07.
 
 ## Kolejność małych PR-ów
 

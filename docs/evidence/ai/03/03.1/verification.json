@@ -1,0 +1,60 @@
+{
+  "stage_id": "03.1",
+  "status": "accepted_locally",
+  "verified_at": "2026-09-28T17:09:00.557369+00:00",
+  "branch": "ai/03-01-parquet",
+  "implementation_commit": "439d1c05600cd07fadc604f2dd50a20f45aa726e",
+  "source_base_commit": "adbed9da776a67240f2efddd076c8d3452bf4345",
+  "checks": [
+    {
+      "name": "format_policy_seed",
+      "status": "passed",
+      "tests": 33,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "name": "legacy_compatibility",
+      "status": "passed",
+      "tests": 39,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "name": "ruff_check",
+      "status": "passed"
+    },
+    {
+      "name": "ruff_format",
+      "status": "passed"
+    },
+    {
+      "name": "bandit_high_high",
+      "status": "passed"
+    },
+    {
+      "name": "gitleaks_staged",
+      "status": "passed"
+    },
+    {
+      "name": "git_diff_check",
+      "status": "passed"
+    },
+    {
+      "name": "make_data_parquet_check",
+      "status": "passed"
+    }
+  ],
+  "ci_equivalent_command": "make -o api-install -o data-parquet-install data-parquet-check",
+  "dependency_setup": "Existing API venv plus pip install -r data/requirements-parquet.txt; Make prerequisites skipped only after installation.",
+  "remote_ci": "not_run_for_this_branch",
+  "next_scope": "03.2 immutable exporter",
+  "limitations": [
+    "Format conversion only; snapshot_ready=false.",
+    "Full ai-dev/ai-training generation not benchmarked; generator still materializes tables.",
+    "Large writer scale benchmark is not a qualified source/profile.",
+    "Benchmarks ran concurrently on local macOS arm64; not a Linux CI measurement."
+  ]
+}

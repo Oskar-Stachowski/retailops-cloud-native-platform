@@ -25,13 +25,18 @@ services/api/.venv/bin/python -m data.generator.main \
 Bez `--output-dir` generator zapisuje `demo` w `data/demo/`, a profil skalowany
 w `data/synthetic/<profile>/`. `demo` ma stały scenariusz i ignoruje opcje rozmiaru.
 `make data-generate` regeneruje właśnie referencyjne `data/demo/`.
-Dane `small` są również śledzone w Git; domyślny zapis może zmienić pliki projektu.
+Dane skalowane, w tym `small`, są ignorowane przez Git. Demo pozostaje śledzone.
 
 Każdy przebieg dodaje `dataset_manifest.v2.json` obok dotychczasowego manifestu
 i raportu jakości; wszystkie profile skalowane mają też `realism_report.json`.
 V2 opisuje efektywną konfigurację, source ID, hashe oraz rzeczywiste daty tabel.
 Domyślny koniec profili AI to `2026-07-31`, legacy — `2026-04-30`.
 Datę można zmienić jawnie; generator nie używa dzisiejszej daty komputera.
+
+Eksport AI do typed Parquet, układ facts/truth/reports/manifests, benchmark
+i bezpieczny cleanup opisuje [runbook AI 03.1](../reference/parquet-artifacts.md).
+Kwalifikowaną atomową publikację, allowlistę faktów, opcjonalną evaluation truth
+i niezmienny re-export opisuje [runbook AI 03.2](../reference/ai-snapshots.md).
 
 Przykład profilu AI z kontrolą integralności źródła i cech:
 
@@ -96,7 +101,7 @@ Po uruchomieniu bazy i migracjach wybierz **jedno** polecenie:
 | Polecenie | Dane |
 |---|---|
 | `make api-seed-demo` | `data/demo/` |
-| `make api-seed-small` | `data/synthetic/small/` |
+| `make api-seed-small` | `data/synthetic/small/`; generuje brakujące pliki na świeżym checkoutcie |
 | `make api-seed-medium` | `data/synthetic/medium/`, po wygenerowaniu |
 
 `make api-seed` jest aliasem `api-seed-small`. Loader czyści tabele aplikacji

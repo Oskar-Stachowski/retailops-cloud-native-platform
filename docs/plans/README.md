@@ -1,14 +1,15 @@
 # Dalsze prace
 
-Najbliższy etap to [AI 03 / snapshot i curated](ai/etapy/03-snapshot-curated.md), według
-[backlogu po audycie AI 00](ai/backlog.md).
+Najbliższy etap to [AI 04 / forecasting](ai/etapy/04-forecasting.md) w repo AI;
+równolegle można realizować [AI 06 / ledger](ai/etapy/06-inventory-ledger.md)
+w RetailOps, według [backlogu](ai/backlog.md).
 Ocena ML została zapisana w [dowodach](../evidence/ml/fixed-origin-rf-2026-09-27/README.md);
 jej wynik `rejected` nie oznacza dopuszczenia modelu do serving. Pozostałe
 kierunki mają własny zakres i zależności.
 
 | Potrzeba | Dokument | Kiedy korzystać |
 |---|---|---|
-| Najbliższe prace AI | [Backlog 03–16](ai/backlog.md) | Zakres pierwszych PR-ów i przypisanie warunków do etapów |
+| Najbliższe prace AI | [Backlog 04–16](ai/backlog.md) | Zakres pierwszych PR-ów i przypisanie warunków do etapów |
 | Kolejność i repozytoria AI | [Pisemna mapa 03–17](ai/kolejnosc-i-repozytoria.md) | Podział cloud-native/AI-intelligence i praca równoległa |
 | Potwierdzone problemy obecnego kodu | [Otwarte ustalenia](../audits/open-findings.md) | Przy wyborze poprawki i jej kryteriów odbioru |
 | Rozbudowa o osobny serwis AI | [Plan AI](ai/README.md) | Po wyborze tej rozbudowy; z wykorzystaniem wyników prac ML |

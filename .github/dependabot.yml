@@ -26,6 +26,22 @@ updates:
         update-types:
           - "version-update:semver-major"
 
+  # Optional Parquet export dependencies (no Arrow in the API or isolated worker).
+  - package-ecosystem: "pip"
+    directory: "/data"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:10"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
   # Frontend dependencies.
   # Safe mode: one grouped PR for non-major updates.
   - package-ecosystem: "npm"

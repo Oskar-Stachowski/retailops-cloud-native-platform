@@ -68,6 +68,12 @@ jobs:
           docker --version
           docker compose version
 
+      - name: Set up Python for explicit seed, recovery and rollback
+        uses: ./.github/actions/setup-python-ci
+        with:
+          python-version: "3.11.15"
+          install-command: ""
+
       - name: Set up browser test dependencies
         uses: ./.github/actions/setup-node-ci
 

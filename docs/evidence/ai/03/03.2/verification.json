@@ -1,0 +1,72 @@
+{
+  "verified_at_utc": "2026-09-28T17:43:20.385333+00:00",
+  "implementation_commit": "6561481506d9e5ec9f7fc48bbe54a80567420128",
+  "branch": "ai/03-01-parquet",
+  "base_commit": "d721125",
+  "status": "passed_locally",
+  "remote_required_ci": "not_run",
+  "test_suites": {
+    "ai03-tests.xml": {
+      "tests": "71",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "265.398"
+    },
+    "ai03-02-compatibility.xml": {
+      "tests": "84",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "141.282"
+    }
+  },
+  "commands": [
+    "services/api/.venv/bin/python -m pytest -q data/tests --junitxml=ci-cd/reports/data/ai03-tests.xml --maxfail=2",
+    "env PYTHONPATH=services/api:. services/api/.venv/bin/python -m pytest -q services/api/tests/test_data_identity_v2.py services/api/tests/test_observation_history.py services/api/tests/test_data_generator_cli.py --junitxml=ci-cd/reports/data/ai03-02-compatibility.xml --maxfail=2",
+    "services/api/.venv/bin/python -m data.export.benchmark --snapshot --repeats 2 --max-seconds 300 --max-rss-mib 1024 --output ci-cd/reports/data/ai03-02-benchmark.json",
+    "services/api/.venv/bin/python -m bandit --severity-level high --confidence-level high -q -r data/export data/seed_files.py -f json -o ci-cd/reports/data/bandit-ai03.json",
+    "services/api/.venv/bin/ruff check data/export --output-format concise",
+    "services/api/.venv/bin/ruff format --check data/export data/seed_files.py",
+    "services/api/.venv/bin/python -m data.export.ai_snapshot --profile ai-smoke --seed 42 --end-date 2026-07-31 --output-root data/generated/ai03-02/acceptance",
+    "services/api/.venv/bin/python -m data.export.ai_snapshot --profile ai-temporal-smoke --seed 42 --end-date 2026-07-31 --output-root data/generated/ai03-02/acceptance",
+    "gitleaks protect --staged --redact --report-format json --report-path ci-cd/reports/data/ai03-02-gitleaks.json",
+    "git diff --check"
+  ],
+  "linux_atomic_probe": {
+    "image": "python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff",
+    "network": "none",
+    "root_filesystem": "read_only",
+    "user": "65534:65534",
+    "probe": "linux-atomic.json",
+    "scope": "Actual production atomic.py: empty destination refusal, no overwrite, complete directory rename and fsync. No PyArrow pipeline in this container.",
+    "atomic_source_sha256": "1a9f313247d47eed762b0355bf9f35deab0185a5d131b7e0c758ec97df10bb84",
+    "probe_script_sha256": "4884953df16cdcd0d03c7db6294f2c11bd25d326b1ebfb1b654dd2ae20a3afe0",
+    "command": "docker run --rm --pull=never --network=none --read-only --user=65534:65534 --cap-drop=ALL --security-opt=no-new-privileges --tmpfs /tmp:rw,size=16m,mode=1777 --mount type=bind,source=/Users/oskarstachowski/retailops-cloud-native-platform/data/export/atomic.py,target=/worker/atomic.py,readonly --mount type=bind,source=/private/tmp/retailops_ai03_atomic_probe.py,target=/worker/probe.py,readonly python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff python -I -B /worker/probe.py"
+  },
+  "checks": {
+    "byte_and_typed_logical_parity": "passed",
+    "source_and_snapshot_unchanged_reexport": "passed",
+    "both_smokes_fresh_processes_twice": "passed",
+    "full_manifest_cli_on_implementation_commit": "passed",
+    "concurrent_exports_one_publication": "passed",
+    "failed_source_gates_block_publication": "passed",
+    "forged_passed_report_recomputed": "passed",
+    "source_copy_seals_writer_input": "passed",
+    "corruption_missing_paths_versions_identity_conflicts": "passed",
+    "truth_optional_namespace_permissions_no_runtime_mount": "passed",
+    "atomic_no_replace_macos_and_linux": "passed",
+    "history_null_zero_versions_utc_and_existing_asof_compatibility": "passed",
+    "ruff_check_and_format": "passed",
+    "bandit_high_high": "passed",
+    "gitleaks_staged": "passed",
+    "relative_documentation_links": "passed: 13 changed/new Markdown documents, zero missing targets"
+  },
+  "limitations": [
+    "Local branch only; no remote Required CI, push or merge in this step.",
+    "Full source generation and qualification materialize tables; ai-dev/ai-training not accepted end-to-end.",
+    "Fixture/handoff (03.3), downstream importer (03.4), curated (03.5) and cross-repo gate (03.6) remain open.",
+    "Only forecast_source ready; forecasting/anomaly/stockout/replay not_ready, rag not_applicable, inventory_ready=false.",
+    "Truth separation is explicit namespaces and private filesystem modes; same-UID processes share access."
+  ]
+}
