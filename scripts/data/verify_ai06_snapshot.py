@@ -42,9 +42,9 @@ def export_worker(args: argparse.Namespace) -> dict:
 
 
 def execute(command: list[str], cwd: Path) -> dict:
-    completed = subprocess.run(
+    completed = subprocess.run(  # noqa: S603 - fixed local CLI, individual arguments
         command, cwd=cwd, text=True, capture_output=True, timeout=300, check=False
-    )  # noqa: S603 - individual fixed CLI arguments
+    )
     require(
         completed.returncode == 0, "Cross-repo CLI failed: " + completed.stdout + completed.stderr
     )
@@ -56,8 +56,10 @@ def run(args: argparse.Namespace) -> dict:
     report_root.mkdir(parents=True, exist_ok=True)
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()  # noqa: S607 - fixed read-only Git
     ai_commit = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=args.ai_repo, text=True
-    ).strip()  # noqa: S607
+        ["git", "rev-parse", "HEAD"],  # noqa: S607 - read-only Git
+        cwd=args.ai_repo,
+        text=True,
+    ).strip()
     results = []
     for profile in ("ai-smoke", "ai-temporal-smoke"):
         repeats = []
@@ -79,38 +81,30 @@ def run(args: argparse.Namespace) -> dict:
                 str(ROOT / "data/generated" / args.output.parent.name / label / "snapshots"),
             ]
             exported = execute(command, ROOT)
-            started = perf_counter()
             imported = execute(
                 [
                     str(args.ai_python),
-                    "-m",
-                    "retailops_ai.source_snapshot.cli",
-                    "import",
+                    "scripts/check_snapshot_import.py",
+                    "--worker",
                     "--snapshot-dir",
                     exported["path"],
-                    "--generated-root",
-                    str(
-                        args.ai_repo
-                        / "data/generated"
-                        / args.output.parent.name
-                        / label
-                        / "data/generated"
-                    ),
-                    "--require-use-case",
-                    "inventory_source",
+                    "--workspace",
+                    str(args.ai_repo / args.output.parent.name / label / "data/generated"),
                 ],
                 args.ai_repo,
             )
-            import_seconds = perf_counter() - started
+            import_seconds = imported["seconds"]
             total = source["seconds"] + exported["seconds"] + import_seconds
             require(
-                total < 300 and max(source["peak_rss_mib"], exported["peak_rss_mib"]) < 1024,
+                total < 300
+                and max(source["peak_rss_mib"], exported["peak_rss_mib"], imported["peak_rss_mib"])
+                < 1024,
                 "Fresh export/import pipeline exceeds acceptance budget.",
             )
             require(
                 exported["tables"] == imported["tables"] == 43
                 and imported["snapshot_id"] == exported["snapshot_id"]
-                and imported["typed_canonical_parity"] == "passed",
+                and imported["typed_parity"] == "passed",
                 "Cross-repo typed import differs.",
             )
             item = {
@@ -125,6 +119,7 @@ def run(args: argparse.Namespace) -> dict:
                 "import_seconds": import_seconds,
                 "seconds": total,
                 "producer_peak_rss_mib": max(source["peak_rss_mib"], exported["peak_rss_mib"]),
+                "consumer_peak_rss_mib": imported["peak_rss_mib"],
                 "export": exported,
                 "import": imported,
                 "source_receipt_sha256": file_sha256(report_root / (label + "-source.json")),
@@ -133,10 +128,10 @@ def run(args: argparse.Namespace) -> dict:
                 ),
             }
             repeats.append(item)
-            print(
+            print(  # noqa: T201 - acceptance progress
                 f"{label}: source -> qualification -> snapshot -> import passed in {total:.2f}s",
                 flush=True,
-            )  # noqa: T201 - acceptance progress
+            )
         require(
             all(
                 repeats[0][k] == repeats[1][k]
