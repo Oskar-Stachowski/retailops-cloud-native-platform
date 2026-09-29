@@ -7,10 +7,10 @@ joblib==1.6.0
 psycopg[binary]==3.3.6
 prometheus-client==0.26.0
 scikit-learn==1.9.1
-SQLAlchemy==2.1.0
+SQLAlchemy==2.1.1
 alembic==1.20.0
 
-opentelemetry-api==1.44.0
-opentelemetry-sdk==1.44.0
-opentelemetry-exporter-otlp-proto-http==1.44.0
-opentelemetry-instrumentation-fastapi==0.65b0
+opentelemetry-api==1.45.0
+opentelemetry-sdk==1.45.0
+opentelemetry-exporter-otlp-proto-http==1.45.0
+opentelemetry-instrumentation-fastapi==0.66b0
