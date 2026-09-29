@@ -36,7 +36,7 @@ from data.generator.pricing_plans import daily_price_observations
 @pytest.fixture(scope="module")
 def sample():
     generation = DatasetGenerationConfig(
-        profile="ai-smoke", days=10, products=4, stores=2, warehouses=2
+        profile="ai-smoke", days=10, products=4, stores=3, warehouses=2
     )
     config = default_inventory_config(generation)
     tables, context = build_source_dataset(generation, config)

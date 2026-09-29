@@ -13,6 +13,7 @@ from data.generator.demand_grid import demand_grid
 from data.generator.demand_model import daily_demand
 from data.generator.demand_quality import build_demand_report
 from data.generator.dimension_quality import build_dimensions_report
+from data.generator.dimension_schema import CHANNELS
 from data.generator.dimensions import DimensionIndex
 from data.generator.observation_history import build_daily_versions
 from data.generator.pricing_quality import build_pricing_report
@@ -51,6 +52,17 @@ def commerce_view(tables: dict) -> dict:
         **tables,
         "return_events": [{**r, "quantity": str(r["quantity"])} for r in tables["return_events"]],
     }
+    # Legacy PAIR numbering follows selling-location/channel order, rather than
+    # physical CSV row order. Source 2.7 sorts each table by its declared grain.
+    locations = {r["id"]: r["location_code"] for r in tables["selling_locations"]}
+    legacy["channel_assignments"] = sorted(
+        tables["channel_assignments"],
+        key=lambda r: (
+            CHANNELS.index(r["channel"]),
+            locations[r["selling_location_id"]],
+            int(r["version"]),
+        ),
+    )
     return known_commerce_view(legacy, tables["inventory_sales"])
 
 
