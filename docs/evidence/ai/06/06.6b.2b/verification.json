@@ -1,0 +1,1143 @@
+{
+  "verified_at": "2026-09-29T14:29:11.058040+00:00",
+  "scope": "AI 06.6b.2b local lifecycle/coverage acceptance",
+  "status": "passed",
+  "branch": "ai/06-01-inventory-ledger",
+  "implementation_commit": "125219f602a800a4da42435f1b40c6a7a01cd00a",
+  "acceptance_runtime_commit": "125219f602a800a4da42435f1b40c6a7a01cd00a",
+  "source_ready": false,
+  "inventory_ready": false,
+  "model_ready": false,
+  "label_qualification": "qualified_for_standard_source_profiles_only",
+  "model08_qualification": "not_evaluated",
+  "source_version": "2.7.0",
+  "qualification_version": "inventory-label-qualification-1.0.0",
+  "qualification_policy": "active-physical-window-1.0.0",
+  "default_generator_api_handoff_version": "2.6.0",
+  "qualification_contract": "data/contracts/inventory_label_qualification.v1.schema.json",
+  "qualification_contract_sha256": "4b795786692a382e1d2a6dce382edb1355e170c5c11cb0a91f9db38f58c2263e",
+  "source_contract_sha256": "22938590dcf0183e8c5a7f83a648a7e037dad794e71a0e26158bb6aef43f75a9",
+  "environment": {
+    "python": "3.11.15",
+    "pyarrow": "25.0.1",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "architecture": "arm64"
+  },
+  "acceptance_command": [
+    "services/api/.venv/bin/python",
+    "-m",
+    "scripts.data.verify_ai06_qualification",
+    "--output",
+    "ci-cd/reports/data/ai06-06b2b/final/acceptance.json"
+  ],
+  "acceptance_report_sha256": "032b77b1f3758f8dfe79ab5fab6b69452509233e2742199b7e7ec40e9a5448dc",
+  "fresh_repeat_identity_and_bytes": true,
+  "source_27_standard_csv_and_reports_byte_identical_to_b2a": true,
+  "new_fresh_source_ids_bind_extended_code_fingerprint": true,
+  "budget": {
+    "seconds": 300,
+    "peak_rss_mib": 1024,
+    "scope": "fresh generation + source CSV + gates/readback + qualification/readback; excludes exporter/importer/curated03"
+  },
+  "cases": [
+    {
+      "case": "ai-smoke-first",
+      "profile": "ai-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-first-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-first-source.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-first-sources/source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-first-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-first-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+      "qualification_id": "inventory-labels-sha256-2e9071ff3e25612ad74b194c8474bc07a4f2e8b65c4b313b22467402cb250ca7",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 30,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 1800,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 20,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-02",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 51797,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "2957b65918f3a3ab3f363654f2c813695315b13c90521cb3398cb5790e1a7f4a",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "7e9753a88efb7c1cb132a2306ab38a934503fa5af72b779b9951faec8fed69f2",
+        "role": "inventory_label_qualification",
+        "rows": 1200,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "848192907dab4ee4517cae479a5735b80f54d7757785eb8dccd2002a024fdb77"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "54fa99eb951fe4374f20b85781afa9572f8249a9bf5538f54df85101ea133148",
+          "size_bytes": 662766
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "71140983aa2a7cbae5e389ef1f62231c235385fcf1b9b51e9895b2c09ea6b1d6",
+          "size_bytes": 724
+        }
+      },
+      "source_manifest_sha256": "8a433b9cb5a62c5cb6923c209b516061ca201b69ff02b6d1410db23313a63394",
+      "source_receipt_sha256": "2fc56702eaa8c90f979082a17a0a60e2d3c91b235622b10ecfc0680762f75f8e",
+      "qualification_manifest_sha256": "dbb736ead8aaee1873a2ac01d20baff44f19d8186918d9414beb1002a2b65e17",
+      "qualification_receipt_sha256": "ef22fe028fffc150f4af5c46c8fcd52b8fe92b289b2f12c6329ae1f238e0016e",
+      "report": {
+        "class_qualification_reason": null,
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "qualified",
+        "model_ready": false,
+        "negative_labels": 337,
+        "parent_source_id": "source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 250,
+        "reasons": {
+          "inactive_assortment": 30,
+          "inactive_lifecycle": 70,
+          "incomplete_window": 182,
+          "window_inactive_lifecycle": 24
+        },
+        "rows": 1200,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 307,
+          "evaluable": 587,
+          "not_evaluable": 306
+        }
+      },
+      "source_seconds": 25.03049145800469,
+      "qualification_seconds": 9.615428749995772,
+      "total_seconds": 34.64592020800046,
+      "peak_rss_mib": 220.796875
+    },
+    {
+      "case": "ai-smoke-repeat",
+      "profile": "ai-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-repeat-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-repeat-source.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-repeat-sources/source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-repeat-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-smoke-repeat-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+      "qualification_id": "inventory-labels-sha256-2e9071ff3e25612ad74b194c8474bc07a4f2e8b65c4b313b22467402cb250ca7",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 30,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 1800,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 20,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-02",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 51797,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "2957b65918f3a3ab3f363654f2c813695315b13c90521cb3398cb5790e1a7f4a",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "7e9753a88efb7c1cb132a2306ab38a934503fa5af72b779b9951faec8fed69f2",
+        "role": "inventory_label_qualification",
+        "rows": 1200,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "848192907dab4ee4517cae479a5735b80f54d7757785eb8dccd2002a024fdb77"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "54fa99eb951fe4374f20b85781afa9572f8249a9bf5538f54df85101ea133148",
+          "size_bytes": 662766
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "71140983aa2a7cbae5e389ef1f62231c235385fcf1b9b51e9895b2c09ea6b1d6",
+          "size_bytes": 724
+        }
+      },
+      "source_manifest_sha256": "13ab91ced934ed4d5b453954978476a28e075000b70f707af112c25a1916be1d",
+      "source_receipt_sha256": "8367ed9dfaf121188c628de89e7e2f375172ca6ae076178bf8cdc2262d2c72bd",
+      "qualification_manifest_sha256": "dbb736ead8aaee1873a2ac01d20baff44f19d8186918d9414beb1002a2b65e17",
+      "qualification_receipt_sha256": "165c70f9e17bf036e6d461b6d5825051087ef2a024a3a81a6ea879b8bc6bbc3c",
+      "report": {
+        "class_qualification_reason": null,
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "qualified",
+        "model_ready": false,
+        "negative_labels": 337,
+        "parent_source_id": "source-sha256-379a9a4aab1d2c90cad25bfdc4d484ff00f9bec36438d6a53ee1b35a03ce9b30",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 250,
+        "reasons": {
+          "inactive_assortment": 30,
+          "inactive_lifecycle": 70,
+          "incomplete_window": 182,
+          "window_inactive_lifecycle": 24
+        },
+        "rows": 1200,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 307,
+          "evaluable": 587,
+          "not_evaluable": 306
+        }
+      },
+      "source_seconds": 25.844785249995766,
+      "qualification_seconds": 10.663930415990762,
+      "total_seconds": 36.50871566598653,
+      "peak_rss_mib": 203.28125
+    },
+    {
+      "case": "ai-temporal-smoke-first",
+      "profile": "ai-temporal-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-temporal-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-first-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-first-source.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-first-sources/source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-first-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-first-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+      "qualification_id": "inventory-labels-sha256-29c81fe80adb4a013a5d8864978970e64668123bfb9abb71298c6d72ded71b14",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 102,
+        "end_date": "2026-07-31",
+        "label_tail_days": 14,
+        "max_daily_rows": 2448,
+        "origin_days": 60,
+        "output_format": "csv",
+        "products": 8,
+        "profile": "ai-temporal-smoke",
+        "seed": 42,
+        "start_date": "2026-04-21",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 28
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 89836,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "b53a31370a10407a0e9ef10ec37914d6be736915098bcc682a6f6c699b40cace",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "db0006023413aefff20c5b6a6490f187bd76a475094b93597b0295e84af1669a",
+        "role": "inventory_label_qualification",
+        "rows": 1632,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "e981d5315103ca6b9bc754a4f566c2da63e46684fd457880036d8d95f2858703"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "22dc498f4e4f35870aa8162d6e5b6d21c16c988b4920bcec82ffe0837eb1f55c",
+          "size_bytes": 927742
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "46395c52d35f6ecdcf87de11bf96aeb09de2141fcbd86bc363dd9f42642c85ac",
+          "size_bytes": 699
+        }
+      },
+      "source_manifest_sha256": "372af6c0ac521187630b6c2a19aa1b9af54686d36fd4ab4032e4dc221ebe5fb8",
+      "source_receipt_sha256": "af27cb98e610d0b63443d20d3144b65bb9d4d9c0a29f071409e7653aa71c794d",
+      "qualification_manifest_sha256": "04440427c53eeb541efe07a8fcc03515c1fc74c474e58c9885e669af48feec64",
+      "qualification_receipt_sha256": "4019bb1d936409a91bf7aa6050fe4bb305d678d7784af01e4811761f9bc8b9de",
+      "report": {
+        "class_qualification_reason": null,
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "qualified",
+        "model_ready": false,
+        "negative_labels": 611,
+        "parent_source_id": "source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 472,
+        "reasons": {
+          "inactive_lifecycle": 28,
+          "incomplete_window": 77,
+          "window_inactive_lifecycle": 12
+        },
+        "rows": 1632,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 432,
+          "evaluable": 1083,
+          "not_evaluable": 117
+        }
+      },
+      "source_seconds": 72.7211807499989,
+      "qualification_seconds": 27.86736808299611,
+      "total_seconds": 100.588548832995,
+      "peak_rss_mib": 294.703125
+    },
+    {
+      "case": "ai-temporal-smoke-repeat",
+      "profile": "ai-temporal-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-temporal-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-repeat-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-repeat-source.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-repeat-sources/source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-repeat-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/ai-temporal-smoke-repeat-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+      "qualification_id": "inventory-labels-sha256-29c81fe80adb4a013a5d8864978970e64668123bfb9abb71298c6d72ded71b14",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 102,
+        "end_date": "2026-07-31",
+        "label_tail_days": 14,
+        "max_daily_rows": 2448,
+        "origin_days": 60,
+        "output_format": "csv",
+        "products": 8,
+        "profile": "ai-temporal-smoke",
+        "seed": 42,
+        "start_date": "2026-04-21",
+        "stores": 3,
+        "warehouses": 2,
+        "warmup_days": 28
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 89836,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "b53a31370a10407a0e9ef10ec37914d6be736915098bcc682a6f6c699b40cace",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "db0006023413aefff20c5b6a6490f187bd76a475094b93597b0295e84af1669a",
+        "role": "inventory_label_qualification",
+        "rows": 1632,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "e981d5315103ca6b9bc754a4f566c2da63e46684fd457880036d8d95f2858703"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "22dc498f4e4f35870aa8162d6e5b6d21c16c988b4920bcec82ffe0837eb1f55c",
+          "size_bytes": 927742
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "46395c52d35f6ecdcf87de11bf96aeb09de2141fcbd86bc363dd9f42642c85ac",
+          "size_bytes": 699
+        }
+      },
+      "source_manifest_sha256": "da05b1b1f7c98a67bc43425c2d6782d894bce3ffea4798bae890bfb71c722388",
+      "source_receipt_sha256": "351b4cd375dd770fa58146a933da7ffc18cdca2d7f2d4d6dc30d5bebfbf7b5dc",
+      "qualification_manifest_sha256": "04440427c53eeb541efe07a8fcc03515c1fc74c474e58c9885e669af48feec64",
+      "qualification_receipt_sha256": "9c2e8829dc7744e6993d06b2ee528e0eb19768ce758a814f7c9b594297be424d",
+      "report": {
+        "class_qualification_reason": null,
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "qualified",
+        "model_ready": false,
+        "negative_labels": 611,
+        "parent_source_id": "source-sha256-810174034ee459f14b71eff3e81b4d14ba6ee61408be8695c685f812ca86cb2e",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 472,
+        "reasons": {
+          "inactive_lifecycle": 28,
+          "incomplete_window": 77,
+          "window_inactive_lifecycle": 12
+        },
+        "rows": 1632,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 432,
+          "evaluable": 1083,
+          "not_evaluable": 117
+        }
+      },
+      "source_seconds": 71.03964354100754,
+      "qualification_seconds": 27.585294167001848,
+      "total_seconds": 98.62493770800938,
+      "peak_rss_mib": 332.1875
+    },
+    {
+      "case": "supplier-poor",
+      "profile": "ai-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/supplier-poor-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/supplier-poor-source.json",
+          "--days",
+          "10",
+          "--products",
+          "4",
+          "--stores",
+          "2",
+          "--warehouses",
+          "2",
+          "--inventory-config",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/supplier-poor-configuration.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/supplier-poor-sources/source-sha256-be132241789917998aaf78b7efd803825ac3e6e5e281f4153fb2b20944ff4d35",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/supplier-poor-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/supplier-poor-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-be132241789917998aaf78b7efd803825ac3e6e5e281f4153fb2b20944ff4d35",
+      "qualification_id": "inventory-labels-sha256-3af95f142c879c326a679632dae0b52bc46b386e21546a861f9faa9b05cbc38e",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 10,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 80,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 4,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-22",
+        "stores": 2,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 1893,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "431a76d1528c12b5e8971754627ac35b504998a94a173a8c150e95317cbf3ef5",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-be132241789917998aaf78b7efd803825ac3e6e5e281f4153fb2b20944ff4d35",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "319cea8e44e4dc86f4d2a5e53fee488a585d41df357fac49beddf53517d29ebe",
+        "role": "inventory_label_qualification",
+        "rows": 80,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "e1759212fea5ff90c0276996258308de074188ff7a0474752d7e7873365e8297"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "8985498ecb8e84b6e23090006b3ecedfc7de0935445c4de2a1d7d564850b0c41",
+          "size_bytes": 40338
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "80d46fe7ab6c14e09ff420a995475d82bac19ffa4730b2380ab47f6214d87475",
+          "size_bytes": 658
+        }
+      },
+      "source_manifest_sha256": "d0556c1197441e246e89704b6027c254e6fecfd733f488ea498b3bac06cd9fbe",
+      "source_receipt_sha256": "d5e9ee86460ab1db79855e0204020a14709b46c7366654b79238b4f561812d59",
+      "qualification_manifest_sha256": "58f379a88622c7c8801d0a64acc6a17dd7b6eebe49fd9c52c34e0b43b68af0b0",
+      "qualification_receipt_sha256": "8ae19de89ee5942bf2aca3359c2248c51fd0e1cb3ff9defee3913849544f6c74",
+      "report": {
+        "class_qualification_reason": null,
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "qualified",
+        "model_ready": false,
+        "negative_labels": 5,
+        "parent_source_id": "source-sha256-be132241789917998aaf78b7efd803825ac3e6e5e281f4153fb2b20944ff4d35",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 10,
+        "reasons": {
+          "inactive_lifecycle": 4,
+          "incomplete_window": 28
+        },
+        "rows": 80,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 33,
+          "evaluable": 15,
+          "not_evaluable": 32
+        }
+      },
+      "source_seconds": 0.7447040840052068,
+      "qualification_seconds": 0.4780599999940023,
+      "total_seconds": 1.222764083999209,
+      "peak_rss_mib": 80.90625
+    },
+    {
+      "case": "zero-opening",
+      "profile": "ai-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/zero-opening-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/zero-opening-source.json",
+          "--days",
+          "10",
+          "--products",
+          "4",
+          "--stores",
+          "2",
+          "--warehouses",
+          "2",
+          "--inventory-config",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/zero-opening-configuration.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/zero-opening-sources/source-sha256-4450f053249b8e66254a5c327a9b79394a2afd5ad97b15419406a5b5a61792ac",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/zero-opening-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/zero-opening-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-4450f053249b8e66254a5c327a9b79394a2afd5ad97b15419406a5b5a61792ac",
+      "qualification_id": "inventory-labels-sha256-5f0cf87cd947c124bbaf90361d5dfa912044d3af51a0e5405163d6bb1ee11403",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 10,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 80,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 4,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-22",
+        "stores": 2,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 2012,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "25197301a357fe3f2ab553b53f2038ad6ad5faead0466b76a974c3052b85e5c6",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-4450f053249b8e66254a5c327a9b79394a2afd5ad97b15419406a5b5a61792ac",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "0b0749310c8959885fd415bfc00e2d5cd83a1faa5b86351210dcad8e2593d181",
+        "role": "inventory_label_qualification",
+        "rows": 80,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "03d9d9fac1c3b530416327b9c258eb4b8d9615e825e4b4c053d3d5909fbef7ee"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "651147bbb420d688ae9205b0136ec4723c4c9056a7c0a4404898860775767900",
+          "size_bytes": 38610
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "89a7bb43b0c450f3c35c988f6a55799ad5997e7ff8c0c550e29789e7256bab5d",
+          "size_bytes": 664
+        }
+      },
+      "source_manifest_sha256": "c1f0a25010dc2b6fc9b27e8a2efaf863e8a530312626abe1a1a2c9ae0202f871",
+      "source_receipt_sha256": "10ccd6dc2c529fc3e34d3e20fffbf1c37f9aa3c383cbeedcee2e2b0fdb5e1614",
+      "qualification_manifest_sha256": "5498d026bfd70882e18ca07f18907b1a6c5a0dbdcc3b52650ce40d6d2c747ac7",
+      "qualification_receipt_sha256": "02195283c278da956543f65d8595733daee51d1e2c1b42a7bc8a63a509dfba6f",
+      "report": {
+        "class_qualification_reason": "insufficient_classes",
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "not_evaluable",
+        "model_ready": false,
+        "negative_labels": 0,
+        "parent_source_id": "source-sha256-4450f053249b8e66254a5c327a9b79394a2afd5ad97b15419406a5b5a61792ac",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 0,
+        "reasons": {
+          "inactive_lifecycle": 4,
+          "incomplete_window": 39
+        },
+        "rows": 80,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 37,
+          "not_evaluable": 43
+        }
+      },
+      "source_seconds": 0.746918666001875,
+      "qualification_seconds": 0.42060345799836796,
+      "total_seconds": 1.167522124000243,
+      "peak_rss_mib": 81.265625
+    },
+    {
+      "case": "late-availability",
+      "profile": "ai-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/late-availability-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/late-availability-source.json",
+          "--days",
+          "10",
+          "--products",
+          "4",
+          "--stores",
+          "2",
+          "--warehouses",
+          "2",
+          "--inventory-config",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/late-availability-configuration.json"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/late-availability-sources/source-sha256-bb71951a1ea72bdb711545198418dac64b533c4f32641a2d703cbce0287229ed",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/late-availability-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/late-availability-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-bb71951a1ea72bdb711545198418dac64b533c4f32641a2d703cbce0287229ed",
+      "qualification_id": "inventory-labels-sha256-38f31792c178d9c7d0d98bf1a5566b390acf96c1ab8fcf542d3d73f835d2b205",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 10,
+        "end_date": "2026-07-31",
+        "label_tail_days": 0,
+        "max_daily_rows": 80,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 4,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-22",
+        "stores": 2,
+        "warehouses": 2,
+        "warmup_days": 0
+      },
+      "source_facts_ready": false,
+      "source_tables": 58,
+      "source_rows": 2260,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "c268972a90f63f3560600757b756d17630fd43c662482b745bb365e9868f93a5",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-08-01T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-bb71951a1ea72bdb711545198418dac64b533c4f32641a2d703cbce0287229ed",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "3e47b376f05437c0aec8885cfb9360117723de6ebbde462442dff7da983d0e0f",
+        "role": "inventory_label_qualification",
+        "rows": 80,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "4de69877e3147a732d9d2f7bde37d3fb71cbf412821aefc2efaf44570f085605"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "3d5fe9b8d625aa3df4b21cd01d54c45627bf805e39f2c8855ac9f5da89ff3953",
+          "size_bytes": 39380
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "4ab51f1e826fbb101c782b71bf8ba7998aa63645116d296999489f436e4571ff",
+          "size_bytes": 738
+        }
+      },
+      "source_manifest_sha256": "0df2ba0c4d2546bbcef952d9174cdc05932860d4c2710d888efc928359114bd9",
+      "source_receipt_sha256": "f90deca3457489234afe27d199f0a243b72017b107b1f92235f9a77369e0eaa4",
+      "qualification_manifest_sha256": "7f65ed2400a52d7e0426181c1652e409bbe434f2cb6aee54697b5ed4e6e452fc",
+      "qualification_receipt_sha256": "caab3c55270be575337330f8fd821088612537372fc3a006aad3c408ec006d2a",
+      "report": {
+        "class_qualification_reason": "source_facts_not_ready",
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "not_evaluable",
+        "model_ready": false,
+        "negative_labels": 1,
+        "parent_source_id": "source-sha256-bb71951a1ea72bdb711545198418dac64b533c4f32641a2d703cbce0287229ed",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 0,
+        "reasons": {
+          "inactive_lifecycle": 4,
+          "incomplete_window": 17,
+          "origin_state_unavailable": 47,
+          "outcomes_not_available": 1
+        },
+        "rows": 80,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": false,
+        "source_ready": false,
+        "statuses": {
+          "already_stockout": 10,
+          "evaluable": 1,
+          "not_evaluable": 69
+        }
+      },
+      "source_seconds": 0.8442565000004834,
+      "qualification_seconds": 0.4697465839999495,
+      "total_seconds": 1.3140030840004329,
+      "peak_rss_mib": 82.765625
+    },
+    {
+      "case": "no-demand",
+      "profile": "ai-smoke",
+      "commands": [
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_source_dataset",
+          "--profile",
+          "ai-smoke",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/no-demand-sources",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/no-demand-source.json",
+          "--days",
+          "1",
+          "--products",
+          "1",
+          "--stores",
+          "1",
+          "--warehouses",
+          "1",
+          "--end-date",
+          "2026-07-26"
+        ],
+        [
+          "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+          "-m",
+          "data.inventory.run_qualification",
+          "--source",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/no-demand-sources/source-sha256-a5a6874e9838dea040d60eba967c24c7410562c3466e0993ed5ec3b17c33f6af",
+          "--output-root",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/no-demand-qualifications",
+          "--output",
+          "ci-cd/reports/data/ai06-06b2b/final/acceptance/no-demand-qualification.json"
+        ]
+      ],
+      "source_id": "source-sha256-a5a6874e9838dea040d60eba967c24c7410562c3466e0993ed5ec3b17c33f6af",
+      "qualification_id": "inventory-labels-sha256-71a22c9958fa22c1c8f858ba3e78afff9cfe871a34b85ec19b1d6aa9b125447e",
+      "resolved_parameters": {
+        "business_timezone": "UTC",
+        "days": 1,
+        "end_date": "2026-07-26",
+        "label_tail_days": 0,
+        "max_daily_rows": 1,
+        "origin_days": 0,
+        "output_format": "csv",
+        "products": 1,
+        "profile": "ai-smoke",
+        "seed": 42,
+        "start_date": "2026-07-26",
+        "stores": 1,
+        "warehouses": 1,
+        "warmup_days": 0
+      },
+      "source_facts_ready": true,
+      "source_tables": 58,
+      "source_rows": 92,
+      "source_unchanged_by_qualification": true,
+      "source_table_hashes_sha256": "32f586f291e48a78310d06b25b2d85bb932b0d3424ed772bc99410dfce9b2d3e",
+      "qualification_descriptor": {
+        "code_sha256": "821120b37980a62bf49903827aa8ce74dc83d16d1af1f224b9ce19c90ad64974",
+        "data_class": "simulation_truth",
+        "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+        "evaluated_at": "2026-07-27T00:00:00+00:00",
+        "grain": [
+          "product_id",
+          "stock_location_id",
+          "origin"
+        ],
+        "horizon_days": 7,
+        "parent_source_id": "source-sha256-a5a6874e9838dea040d60eba967c24c7410562c3466e0993ed5ec3b17c33f6af",
+        "policy_version": "active-physical-window-1.0.0",
+        "python_version": "3.11.15",
+        "qualification_schema_sha256": "451ce05bae5252cad2220a28295cfe273be1ca84b18dbe4eee681ebe646f47e8",
+        "report_sha256": "582077c41992f190763cedc3f386f31302612d21d7851431bf94db9aa4f3fb0e",
+        "role": "inventory_label_qualification",
+        "rows": 1,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "windows_sha256": "7a96b62536ac2a605c99c4537472e4008b8eda86e4863c767ad48d933448d1ef"
+      },
+      "qualification_artifacts": {
+        "windows": {
+          "path": "simulation_truth/inventory_qualified_windows.json",
+          "sha256": "916e2474d62b4870f2942ee9ea9eb92283790007f0e33b3d12241e2ac8d8ed91",
+          "size_bytes": 492
+        },
+        "report": {
+          "path": "qualification_report.json",
+          "sha256": "e0eaf041cc809ca91f0eac461e9f9ec17f5206a35a27fdd90fceab84d12098c4",
+          "size_bytes": 616
+        }
+      },
+      "source_manifest_sha256": "150e76a0846e10681a5c9901919827ad181f67a81b4225e8a46ecc19aac987b1",
+      "source_receipt_sha256": "bfaf4bcf07ae0504e2a4b36ce11cb6da10bdcc32dddc2c48956e5a4747739802",
+      "qualification_manifest_sha256": "e9c0c339ccd83426830e0e3ed1b1ead56d7182f28998cba17e6c2cadbbbb602f",
+      "qualification_receipt_sha256": "9468cf5a89da168b7969b52ef2d938eac3c01804bfc7af080b1f86b9bd050b6a",
+      "report": {
+        "class_qualification_reason": "insufficient_classes",
+        "data_class": "simulation_truth",
+        "inventory_ready": false,
+        "label_qualification": "not_evaluable",
+        "model_ready": false,
+        "negative_labels": 0,
+        "parent_source_id": "source-sha256-a5a6874e9838dea040d60eba967c24c7410562c3466e0993ed5ec3b17c33f6af",
+        "policy_version": "active-physical-window-1.0.0",
+        "positive_labels": 0,
+        "reasons": {
+          "incomplete_window": 1
+        },
+        "rows": 1,
+        "schema_version": "inventory-label-qualification-1.0.0",
+        "scope": "source lifecycle/coverage only; model08 and temporal splits not qualified",
+        "source_facts_ready": true,
+        "source_ready": false,
+        "statuses": {
+          "not_evaluable": 1
+        }
+      },
+      "source_seconds": 0.13111229200148955,
+      "qualification_seconds": 0.09614587500982452,
+      "total_seconds": 0.22725816701131407,
+      "peak_rss_mib": 72.640625
+    }
+  ],
+  "tests": {
+    "tests": 704,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 704,
+    "new_qualification_tests": 40,
+    "seconds": 164.366,
+    "command": [
+      "services/api/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "data/tests",
+      "--junitxml=ci-cd/reports/data/ai06-06b2b/final/all-tests.xml"
+    ],
+    "junit_sha256": "733712cfa7ba78c339aae380a8a553175c48b2d9e8b5797f96d9cdb33cd725fd"
+  },
+  "checks": {
+    "ruff_check": "passed for data and qualification acceptance script",
+    "ruff_format": "passed for five new runtime/acceptance files and test module",
+    "mypy": "passed for 45 inventory/manifest/acceptance files",
+    "schema_matches_executable_model": true,
+    "git_diff_check": "passed",
+    "relative_markdown_links_checked": 230
+  },
+  "compatibility": {
+    "baseline_commit": "68fe5d98758f5c39e54044d93a1d09f7e60d8dac",
+    "historical_sources": {
+      "2.0.0": {
+        "source_id": "source-sha256-b4d2a6cf560129ce23374841340e65897a7b09becbe4749e1352c3f150bc1309",
+        "feature_id": "features-sha256-bdb259d15fd67e0af15dbce1465ff480ae93421125bde83231b0bf5730a9db13",
+        "identity_and_parent_unchanged": true
+      },
+      "2.1.0": {
+        "source_id": "source-sha256-ae37e69c364eb75d0db8d994c3096313d216046d3dc413b77d9896528823da50",
+        "feature_id": "features-sha256-a6de899cb7a6940f93941a1ef0ce67824aa765c9ba9fa78ff9921a99843130ed",
+        "identity_and_parent_unchanged": true
+      },
+      "2.2.0": {
+        "source_id": "source-sha256-b8d99ab8e08f59d344be2cc42599e138b80f31d213cca4a89ddc1688e334135b",
+        "feature_id": "features-sha256-3b61cd73d4e27488b767004d6a4fa90a66f58a9591541f85920a67ade27db1f0",
+        "identity_and_parent_unchanged": true
+      },
+      "2.3.0": {
+        "source_id": "source-sha256-f93e0b7c0949fce7e1893f2dff63ef818b3c8fa7989bead422c5febe0a33260d",
+        "feature_id": "features-sha256-f813965e89e513871a77ee5e8ca23080faa22dc9efc82e295fd79f90eacd3b20",
+        "identity_and_parent_unchanged": true
+      },
+      "2.4.0": {
+        "source_id": "source-sha256-d6562b0397df3a18a45c9fe419910f11b086c99cfd498b5d55881f2d67e81e2c",
+        "feature_id": "features-sha256-daf83f0b54c4ba8901bc6fd0050735c35614c1ba800cdfcbe418d0484e52f6db",
+        "identity_and_parent_unchanged": true
+      },
+      "2.5.0": {
+        "source_id": "source-sha256-608e4b784829f05628195c52ab403409ccbd61ada13ac1e1b34c5392a585e4d8",
+        "feature_id": "features-sha256-662447c8a6002cde3084489bf7eb7157d1dcbf29ad56acc52e9481d5ae9f7f07",
+        "identity_and_parent_unchanged": true
+      }
+    },
+    "demo_csv_count": 17,
+    "small_csv_count": 17,
+    "tracked_demo_files_unchanged": 19,
+    "current_2.6": {
+      "source_id": "source-sha256-9fb6fc8cc0e2fe2d54383bdc17075d1b88f89087cdb04b8ea1f704f86c18b7db",
+      "source_gates": 46,
+      "reader": "passed",
+      "fresh_id_may_change_with_code_fingerprint": true
+    },
+    "frozen_handoff": {
+      "handoff_contract_version": "1.0.0",
+      "snapshot_id": "snapshot-sha256-4d856185ebbe3a8f07dc468468c54eacf69aa40b7d49bfff7e39af8ddde815a4",
+      "source_dataset_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00",
+      "source_schema_version": "2.6.0",
+      "snapshot_schema_version": "1.0.0",
+      "snapshot_manifest_sha256": "bab737bd0de3e84ade04973254920115c479807ef349666a3a8c4b03d0244bfc",
+      "table_count": 25,
+      "rows": 31171,
+      "readiness": {
+        "anomaly": "not_ready",
+        "forecast_source": "ready",
+        "forecasting": "not_ready",
+        "rag": "not_applicable",
+        "replay": "not_ready",
+        "stockout": "not_ready"
+      },
+      "inventory_ready": false,
+      "file_count": 74,
+      "full_verification_sha256": "40aba8a7966c55a320c6512bccd103d6b1f425079a7b75ef08e55019f731e6a2"
+    },
+    "frozen_files_byte_identical": 84,
+    "frozen_2.7": {
+      "source_id": "source-sha256-47a6607069b8c7d8d5c25300fc237fc649ad6283e426fd41cab1f7b8d11762cd",
+      "reader": "passed",
+      "inventory_ready": false
+    },
+    "status": "passed"
+  },
+  "compatibility_report_sha256": "487944299d585d9ce2defffeeb4755c6bb27c41fe2bc0e4d3a486eb5459e3192",
+  "other_worktrees": {
+    "ai_root": {
+      "commit": "abf3f69a6a78c444b5a8a910fef8b3b43ba047a9",
+      "clean": true,
+      "modified_by_this_scope": false
+    },
+    "ai12": {
+      "commit": "a14b7899d9366c6ae555c0b6be4a8d027514ca91",
+      "clean": true,
+      "modified_by_this_scope": false
+    }
+  },
+  "remaining": [
+    "new exporter/importer/curated03 for source2.7 and evaluation qualification1.0 with parent lineage",
+    "new immutable snapshot, typed parity, truth isolation, repeats and full cross-repo resource budget",
+    "default AI source switch after complete handoff gates; DATA-06 closure",
+    "dependent04/05 reevaluation on new IDs and model08 temporal/split qualification"
+  ],
+  "remote_required_ci_performed": false,
+  "published_to_main_or_origin": false
+}

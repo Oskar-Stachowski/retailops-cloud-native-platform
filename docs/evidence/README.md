@@ -6,6 +6,7 @@ konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| AI 06 — pełny odbiór i audyt | 2026-09-29 | [Końcowy odbiór](ai/06/final/README.md), [karta danych](ai/06/final/dataset-card.md): source 2.7 → qualification → snapshot/import/curated 1.1, historyczny as-of, truth isolation, oba profile dwukrotnie i domyślna ścieżka AI. |
 | AI 03.6 — pełny cross-repo | 2026-09-29 | [Odbiór obu repo](ai/03/03.6/README.md): oba standardowe smoke dwukrotnie na Darwin/Linux, osobny późny fakt, parity/IDs/as-of, budżet oraz [publikacja na main obu repo z Required CI](ai/03/03.6/main-publication.json). Otwiera 04 i 06. |
 | AI 03.5 — curated w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.5/README.md): 743 testy, typed normalization/mapping/quarantine, immutable IDs, as-of, oba smoke i truth dwukrotnie oraz odłączony wheel. |
 | AI 03.4 — typed importer w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.4/README.md): 706 testów, oba smoke i truth dwukrotnie, atomowość/idempotencja/typed parity oraz odłączony wheel. |

@@ -1,0 +1,18 @@
+{
+  "contract_version": "supplier-simulation-truth-1.0.0",
+  "data_class": "simulation_truth",
+  "suppliers": [
+    {
+      "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+      "reliability": "1",
+      "lead_time_mean_days": "2",
+      "lead_time_std_days": "0"
+    },
+    {
+      "supplier_id": "08264179-52a0-57c1-ab4d-c647ff09d219",
+      "reliability": "1",
+      "lead_time_mean_days": "2",
+      "lead_time_std_days": "0"
+    }
+  ]
+}

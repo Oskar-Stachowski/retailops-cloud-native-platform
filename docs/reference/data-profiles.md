@@ -2,7 +2,8 @@
 
 Aktualne wartości definiują [generator](../../data/generator/main.py)
 i [konfiguracja 1.0.0](../../data/generator/configuration.py).
-To profile syntetycznych danych do demonstracji i testów.
+To profile syntetycznych danych do demonstracji i testów. CLI AI domyślnie
+używa [źródła 2.7](inventory-snapshots.md); `--source-version 2.6` wybiera wariant historyczny.
 
 | Profil | Historia w dniach | Produkty | Sklepy legacy / ważne pary AI | Magazyny | Domyślny katalog |
 |---|---:|---:|---:|---:|---|
@@ -10,11 +11,11 @@ To profile syntetycznych danych do demonstracji i testów.
 | `small` | 90 | 100 | 5 | 3 | `data/synthetic/small/` |
 | `medium` | 180 | 500 | 20 | 6 | `data/synthetic/medium/` |
 | `large` | 365 | 1 000 | 50 | 10 | `data/synthetic/large/` |
-| `ai-smoke` | 30 | 20 | 3 | 2 | `data/synthetic/ai-smoke/` |
-| `ai-temporal-smoke` | 102 | 8 | 3 | 2 | `data/synthetic/ai-temporal-smoke/` |
-| `ai-dev` | 365 | 100 | 5 | 3 | `data/synthetic/ai-dev/` |
-| `ai-training` | 730 | 200 | 10 | 4 | `data/synthetic/ai-training/` |
-| `ai-load` | Jawne | Jawne | Jawne | Jawne | `data/synthetic/ai-load/` |
+| `ai-smoke` | 30 | 20 | 3 | 2 | `data/generated/sources/<source_id>/` |
+| `ai-temporal-smoke` | 102 | 8 | 3 | 2 | `data/generated/sources/<source_id>/` |
+| `ai-dev` | 365 | 100 | 5 | 3 | `data/generated/sources/<source_id>/` |
+| `ai-training` | 730 | 200 | 10 | 4 | `data/generated/sources/<source_id>/` |
+| `ai-load` | Jawne | Jawne | Jawne | Jawne | `data/generated/sources/<source_id>/` |
 
 `demo` ignoruje rozmiary, limit siatki i seed, wyświetlając ostrzeżenie;
 zachowuje stały scenariusz i seed 42. Profile skalowane przyjmują nadpisania oraz `--seed`

@@ -1,0 +1,692 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "InventorySnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "business_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Business Date",
+          "type": "string"
+        },
+        "period_from_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Period From At",
+          "type": "string"
+        },
+        "period_to_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Period To At",
+          "type": "string"
+        },
+        "is_full_business_day": {
+          "title": "Is Full Business Day",
+          "type": "boolean"
+        },
+        "snapshot_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Snapshot At",
+          "type": "string"
+        },
+        "as_of_time": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "As Of Time",
+          "type": "string"
+        },
+        "unit_of_measure": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Unit Of Measure",
+          "type": "string"
+        },
+        "on_hand": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "On Hand"
+        },
+        "reserved_qty": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reserved Qty"
+        },
+        "available_qty": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Available Qty"
+        },
+        "status": {
+          "enum": [
+            "known",
+            "not_available"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source_available_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Available At"
+        },
+        "last_inventory_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Inventory Event Id"
+        },
+        "movement_count": {
+          "minimum": 0,
+          "title": "Movement Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "product_id",
+        "stock_location_id",
+        "business_date",
+        "period_from_at",
+        "period_to_at",
+        "is_full_business_day",
+        "snapshot_at",
+        "as_of_time",
+        "unit_of_measure",
+        "on_hand",
+        "reserved_qty",
+        "available_qty",
+        "status",
+        "source_available_at",
+        "last_inventory_event_id",
+        "movement_count"
+      ],
+      "title": "InventorySnapshot",
+      "type": "object"
+    },
+    "LostSalesImpact": {
+      "additionalProperties": false,
+      "properties": {
+        "episode_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "demand_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Demand Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "selling_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Selling Location Id",
+          "type": "string"
+        },
+        "channel": {
+          "enum": [
+            "store",
+            "online",
+            "marketplace",
+            "wholesale"
+          ],
+          "title": "Channel",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "lost_sales_quantity": {
+          "exclusiveMinimum": 0,
+          "title": "Lost Sales Quantity",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "episode_id",
+        "demand_id",
+        "product_id",
+        "stock_location_id",
+        "selling_location_id",
+        "channel",
+        "occurred_at",
+        "sequence",
+        "lost_sales_quantity"
+      ],
+      "title": "LostSalesImpact",
+      "type": "object"
+    },
+    "PhysicalDailyBalance": {
+      "additionalProperties": false,
+      "properties": {
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "business_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Business Date",
+          "type": "string"
+        },
+        "snapshot_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Snapshot At",
+          "type": "string"
+        },
+        "balance_before_period": {
+          "minimum": 0,
+          "title": "Balance Before Period",
+          "type": "integer"
+        },
+        "opening_quantity": {
+          "minimum": 0,
+          "title": "Opening Quantity",
+          "type": "integer"
+        },
+        "movement_delta": {
+          "title": "Movement Delta",
+          "type": "integer"
+        },
+        "closing_quantity": {
+          "minimum": 0,
+          "title": "Closing Quantity",
+          "type": "integer"
+        },
+        "reserved_qty": {
+          "minimum": 0,
+          "title": "Reserved Qty",
+          "type": "integer"
+        },
+        "available_qty": {
+          "minimum": 0,
+          "title": "Available Qty",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "product_id",
+        "stock_location_id",
+        "business_date",
+        "snapshot_at",
+        "balance_before_period",
+        "opening_quantity",
+        "movement_delta",
+        "closing_quantity",
+        "reserved_qty",
+        "available_qty"
+      ],
+      "title": "PhysicalDailyBalance",
+      "type": "object"
+    },
+    "ProjectionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "inventory-projection-config-1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "process_version": {
+          "const": "inventory-projection-1.0.0",
+          "title": "Process Version",
+          "type": "string"
+        },
+        "business_timezone": {
+          "const": "UTC",
+          "title": "Business Timezone",
+          "type": "string"
+        },
+        "start_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Start At",
+          "type": "string"
+        },
+        "end_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "End At",
+          "type": "string"
+        },
+        "snapshot_policy": {
+          "const": "utc_day_last_microsecond",
+          "title": "Snapshot Policy",
+          "type": "string"
+        },
+        "reservation_policy": {
+          "const": "none",
+          "title": "Reservation Policy",
+          "type": "string"
+        },
+        "stock_measure": {
+          "const": "available_qty",
+          "title": "Stock Measure",
+          "type": "string"
+        },
+        "episode_policy": {
+          "const": "zero_after_event_including_instantaneous",
+          "title": "Episode Policy",
+          "type": "string"
+        },
+        "diagnostic_horizon_days": {
+          "const": 7,
+          "title": "Diagnostic Horizon Days",
+          "type": "integer"
+        },
+        "truth_delay_seconds": {
+          "minimum": 0,
+          "title": "Truth Delay Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contract_version",
+        "process_version",
+        "business_timezone",
+        "start_at",
+        "end_at",
+        "snapshot_policy",
+        "reservation_policy",
+        "stock_measure",
+        "episode_policy",
+        "diagnostic_horizon_days",
+        "truth_delay_seconds"
+      ],
+      "title": "ProjectionConfig",
+      "type": "object"
+    },
+    "ProjectionTruth": {
+      "additionalProperties": false,
+      "properties": {
+        "data_class": {
+          "const": "simulation_truth",
+          "title": "Data Class",
+          "type": "string"
+        },
+        "physical_daily_balances": {
+          "items": {
+            "$ref": "#/$defs/PhysicalDailyBalance"
+          },
+          "title": "Physical Daily Balances",
+          "type": "array"
+        },
+        "stockout_episodes": {
+          "items": {
+            "$ref": "#/$defs/StockoutEpisode"
+          },
+          "title": "Stockout Episodes",
+          "type": "array"
+        },
+        "lost_sales_impacts": {
+          "items": {
+            "$ref": "#/$defs/LostSalesImpact"
+          },
+          "title": "Lost Sales Impacts",
+          "type": "array"
+        },
+        "window_diagnostics": {
+          "items": {
+            "$ref": "#/$defs/WindowDiagnostic"
+          },
+          "title": "Window Diagnostics",
+          "type": "array"
+        }
+      },
+      "required": [
+        "data_class",
+        "physical_daily_balances",
+        "stockout_episodes",
+        "lost_sales_impacts",
+        "window_diagnostics"
+      ],
+      "title": "ProjectionTruth",
+      "type": "object"
+    },
+    "StockoutEpisode": {
+      "additionalProperties": false,
+      "properties": {
+        "episode_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "unit_of_measure": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Unit Of Measure",
+          "type": "string"
+        },
+        "start_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Start At",
+          "type": "string"
+        },
+        "start_sequence": {
+          "minimum": 0,
+          "title": "Start Sequence",
+          "type": "integer"
+        },
+        "start_event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Start Event Id",
+          "type": "string"
+        },
+        "start_available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Start Available At",
+          "type": "string"
+        },
+        "onset_kind": {
+          "enum": [
+            "opening_zero",
+            "depleted_by_movement"
+          ],
+          "title": "Onset Kind",
+          "type": "string"
+        },
+        "end_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End At"
+        },
+        "end_sequence": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Sequence"
+        },
+        "end_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Event Id"
+        },
+        "end_available_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Available At"
+        },
+        "observed_through_exclusive_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Observed Through Exclusive At",
+          "type": "string"
+        },
+        "duration_microseconds": {
+          "minimum": 0,
+          "title": "Duration Microseconds",
+          "type": "integer"
+        },
+        "left_censored": {
+          "title": "Left Censored",
+          "type": "boolean"
+        },
+        "right_censored": {
+          "title": "Right Censored",
+          "type": "boolean"
+        },
+        "diagnostic_available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Diagnostic Available At",
+          "type": "string"
+        },
+        "lost_sales_quantity": {
+          "minimum": 0,
+          "title": "Lost Sales Quantity",
+          "type": "integer"
+        },
+        "affected_demand_count": {
+          "minimum": 0,
+          "title": "Affected Demand Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "episode_id",
+        "product_id",
+        "stock_location_id",
+        "unit_of_measure",
+        "start_at",
+        "start_sequence",
+        "start_event_id",
+        "start_available_at",
+        "onset_kind",
+        "end_at",
+        "end_sequence",
+        "end_event_id",
+        "end_available_at",
+        "observed_through_exclusive_at",
+        "duration_microseconds",
+        "left_censored",
+        "right_censored",
+        "diagnostic_available_at",
+        "lost_sales_quantity",
+        "affected_demand_count"
+      ],
+      "title": "StockoutEpisode",
+      "type": "object"
+    },
+    "WindowDiagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "origin": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Origin",
+          "type": "string"
+        },
+        "window_end_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Window End At",
+          "type": "string"
+        },
+        "evaluated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Evaluated At",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "evaluable",
+            "already_stockout",
+            "not_evaluable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "enum": [
+                "inventory_unknown",
+                "origin_state_unavailable",
+                "incomplete_window",
+                "outcomes_not_available"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "incident_stockout": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Incident Stockout"
+        },
+        "label_available_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Label Available At"
+        }
+      },
+      "required": [
+        "product_id",
+        "stock_location_id",
+        "origin",
+        "window_end_at",
+        "evaluated_at",
+        "status",
+        "reason",
+        "incident_stockout",
+        "label_available_at"
+      ],
+      "title": "WindowDiagnostic",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "inventory-projection-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "configuration": {
+      "$ref": "#/$defs/ProjectionConfig"
+    },
+    "operational": {
+      "items": {
+        "$ref": "#/$defs/InventorySnapshot"
+      },
+      "title": "Operational",
+      "type": "array"
+    },
+    "simulation_truth": {
+      "$ref": "#/$defs/ProjectionTruth"
+    }
+  },
+  "required": [
+    "contract_version",
+    "configuration",
+    "operational",
+    "simulation_truth"
+  ],
+  "title": "ProjectionOutput",
+  "type": "object"
+}

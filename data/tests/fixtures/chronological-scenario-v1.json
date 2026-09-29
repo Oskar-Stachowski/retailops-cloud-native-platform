@@ -1,0 +1,227 @@
+{
+  "contract_version": "chronological-scenario-1.0.0",
+  "settings": {
+    "process_version": "chronological-shared-stock-1.0.0",
+    "business_timezone": "UTC",
+    "start_at": "2026-07-01T00:00:00Z",
+    "end_at": "2026-07-10T00:00:00Z",
+    "event_order": "occurred_at_sequence_then_review",
+    "reservation_policy": "none",
+    "fulfillment_policy": "instant_partial_fulfillment",
+    "sale_ingestion_delay_seconds": 30,
+    "sale_availability_delay_seconds": 30
+  },
+  "selling_locations": [
+    {
+      "id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "location_code": "SELL-SHARED-0001"
+    }
+  ],
+  "fulfillment_routes": [
+    {
+      "id": "b26af6d2-e3d6-595e-abe8-f937d5fc72f5",
+      "version": 1,
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "store",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "effective_from": "2026-07-01",
+      "effective_to": "2026-08-01",
+      "available_at": "2026-06-01T00:00:00Z"
+    },
+    {
+      "id": "44b8a519-99eb-5016-9282-1328ce0b3ebd",
+      "version": 1,
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "online",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "effective_from": "2026-07-01",
+      "effective_to": "2026-08-01",
+      "available_at": "2026-06-01T00:00:00Z"
+    },
+    {
+      "id": "45e286ea-c8bf-5433-b594-af0a8d94a7b5",
+      "version": 1,
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "marketplace",
+      "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "effective_from": "2026-07-01",
+      "effective_to": "2026-08-01",
+      "available_at": "2026-06-01T00:00:00Z"
+    }
+  ],
+  "demand_class": "simulation_truth",
+  "demand_arrivals": [
+    {
+      "demand_id": "505bfa48-3159-5a02-a999-4f0669f10ef4",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "store",
+      "latent_quantity": 6,
+      "unit_price": "2.50",
+      "currency": "PLN",
+      "occurred_at": "2026-07-01T10:00:00Z",
+      "sequence": 10,
+      "source_reference": "latent-arrival:store-first"
+    },
+    {
+      "demand_id": "d2fe8a3b-8929-5795-8e3e-5db778bd47bb",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "online",
+      "latent_quantity": 6,
+      "unit_price": "2.50",
+      "currency": "PLN",
+      "occurred_at": "2026-07-01T10:00:00Z",
+      "sequence": 11,
+      "source_reference": "latent-arrival:online-second"
+    },
+    {
+      "demand_id": "153cb95b-1206-57af-afc6-0119a129b8a5",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "store",
+      "latent_quantity": 4,
+      "unit_price": "2.50",
+      "currency": "PLN",
+      "occurred_at": "2026-07-05T00:01:00Z",
+      "sequence": 12,
+      "source_reference": "latent-arrival:near-receipt"
+    },
+    {
+      "demand_id": "e5ed0f7d-11bb-5772-ab83-aa84bb0d959f",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "online",
+      "latent_quantity": 10,
+      "unit_price": "2.50",
+      "currency": "PLN",
+      "occurred_at": "2026-07-05T10:00:00Z",
+      "sequence": 13,
+      "source_reference": "latent-arrival:after-receipt"
+    },
+    {
+      "demand_id": "3455adce-a200-5c05-bf1b-697622ee99c4",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "marketplace",
+      "latent_quantity": 3,
+      "unit_price": "2.50",
+      "currency": "PLN",
+      "occurred_at": "2026-07-06T10:00:00Z",
+      "sequence": 14,
+      "source_reference": "latent-arrival:other-stock"
+    },
+    {
+      "demand_id": "1188d42b-0c76-5bf7-b33f-8399d7a9fe05",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "selling_location_id": "c6e54070-6eb4-5013-973e-70bc6595529d",
+      "channel": "online",
+      "latent_quantity": 0,
+      "unit_price": "2.50",
+      "currency": "PLN",
+      "occurred_at": "2026-07-07T10:00:00Z",
+      "sequence": 15,
+      "source_reference": "latent-arrival:zero-demand"
+    }
+  ],
+  "return_events": [
+    {
+      "return_id": "eb650e5d-ab84-5a03-9e5b-1017105c7236",
+      "demand_id": "505bfa48-3159-5a02-a999-4f0669f10ef4",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "unit_of_measure": "pcs",
+      "returned_quantity": 2,
+      "quality_status": "accepted",
+      "returned_at": "2026-07-02T09:00:00Z",
+      "ingested_at": "2026-07-02T09:01:00Z",
+      "available_at": "2026-07-02T09:02:00Z",
+      "sequence": 30,
+      "source_reference": "inspection:accepted"
+    },
+    {
+      "return_id": "00967db8-a23e-5ec2-9f46-96fe74a34558",
+      "demand_id": "505bfa48-3159-5a02-a999-4f0669f10ef4",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "unit_of_measure": "pcs",
+      "returned_quantity": 1,
+      "quality_status": "rejected",
+      "returned_at": "2026-07-02T10:00:00Z",
+      "ingested_at": "2026-07-02T10:01:00Z",
+      "available_at": "2026-07-02T10:02:00Z",
+      "sequence": 31,
+      "source_reference": "inspection:rejected"
+    }
+  ],
+  "inventory_actions": [
+    {
+      "inventory_event_id": "419be931-febf-5cb2-9e54-a12112ee528a",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "movement_type": "write_off",
+      "quantity_delta": -1,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-02T11:00:00Z",
+      "ingested_at": "2026-07-02T11:00:00Z",
+      "available_at": "2026-07-02T11:00:00Z",
+      "sequence": 20,
+      "source_process": "write_off",
+      "source_reference": "physical-document:write-off",
+      "transfer_id": null,
+      "supplier_id": null,
+      "order_id": null
+    },
+    {
+      "inventory_event_id": "92d6c0c6-f669-5f86-b383-51fe2e87bb91",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "movement_type": "transfer_out",
+      "quantity_delta": -1,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-02T12:00:00Z",
+      "ingested_at": "2026-07-02T12:00:00Z",
+      "available_at": "2026-07-02T12:00:00Z",
+      "sequence": 21,
+      "source_process": "transfer",
+      "source_reference": "physical-document:transfer-out",
+      "transfer_id": "f0ba5fc8-4e8c-53c6-bd55-bd55fe85a814",
+      "supplier_id": null,
+      "order_id": null
+    },
+    {
+      "inventory_event_id": "d2f74e6a-3bbd-5550-b3d1-b502a15d01bd",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "movement_type": "transfer_in",
+      "quantity_delta": 1,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-04T12:00:00Z",
+      "ingested_at": "2026-07-04T12:00:00Z",
+      "available_at": "2026-07-04T12:00:00Z",
+      "sequence": 22,
+      "source_process": "transfer",
+      "source_reference": "physical-document:transfer-in",
+      "transfer_id": "f0ba5fc8-4e8c-53c6-bd55-bd55fe85a814",
+      "supplier_id": null,
+      "order_id": null
+    },
+    {
+      "inventory_event_id": "3086c7d6-8a6f-5ced-8d2a-101b933a1947",
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "movement_type": "inventory_adjustment",
+      "quantity_delta": 1,
+      "unit_of_measure": "pcs",
+      "occurred_at": "2026-07-02T13:00:00Z",
+      "ingested_at": "2026-07-02T13:00:00Z",
+      "available_at": "2026-07-02T13:00:00Z",
+      "sequence": 23,
+      "source_process": "adjustment",
+      "source_reference": "physical-document:count-adjustment",
+      "transfer_id": null,
+      "supplier_id": null,
+      "order_id": null
+    }
+  ]
+}

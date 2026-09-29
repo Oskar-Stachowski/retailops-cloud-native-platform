@@ -54,8 +54,16 @@ przypadek późnej korekty zachowują IDs, 25 tabel, typed CSV/Parquet parity
 i historyczny as-of. Source przechodzi 46 hard gates; repo AI ma 747 testów.
 Wszystkie przebiegi mieszczą się w 300 s / 1024 MiB.
 
-**Można rozpocząć AI 04 w repo AI oraz równolegle AI 06 w RetailOps.**
-Pierwszy forecasting korzysta z obserwowanej sprzedaży, bez inventory features.
+**AI 06 ma [końcowy audyt i odbiór](evidence/ai/06/final/README.md).**
+Domyślne CLI AI publikuje source 2.7 i snapshot 1.1; importer i curated 1.1
+zachowują 43 facts/plans, native grain, causal availability i historyczny as-of.
+Pełny pipeline obu profili dwukrotnie spełnia budżet 300 s / 1024 MiB.
+Źródło/warstwa inventory są gotowe, modele wymagają własnego odbioru.
+Frozen manifest źródła nadal ma pierwotne flagi false; readiness kolejnych
+warstw zapisują curated i końcowy receipt. [Nowa karta danych](evidence/ai/06/final/dataset-card.md)
+wiąże source/qualification/snapshot/curated IDs. Demo/API zachowują zgodność.
+AI 04/05 należy odebrać na tych nowych IDs przed realizacją 07/08.
+
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.
 AI 03 jest na `origin/main` obu repozytoriów po scaleniu PR #65 i #5.

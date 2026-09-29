@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "FulfillmentConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "supplier-fulfillment-config-1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "data_class": {
+          "const": "simulation_truth",
+          "title": "Data Class",
+          "type": "string"
+        },
+        "process_version": {
+          "const": "supplier-fulfillment-two-point-1.0.0",
+          "title": "Process Version",
+          "type": "string"
+        },
+        "seed": {
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "lead_time_distribution": {
+          "const": "two_point_mean_plus_minus_std",
+          "title": "Lead Time Distribution",
+          "type": "string"
+        },
+        "minimum_lead_days": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Lead Days",
+          "type": "integer"
+        },
+        "maximum_lead_days": {
+          "exclusiveMinimum": 0,
+          "title": "Maximum Lead Days",
+          "type": "integer"
+        },
+        "disruption_delay_days": {
+          "exclusiveMinimum": 0,
+          "title": "Disruption Delay Days",
+          "type": "integer"
+        },
+        "partial_fraction": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Partial Fraction",
+          "type": "string"
+        },
+        "partial_receipt_gap_days": {
+          "exclusiveMinimum": 0,
+          "title": "Partial Receipt Gap Days",
+          "type": "integer"
+        },
+        "ingestion_delay_seconds": {
+          "minimum": 0,
+          "title": "Ingestion Delay Seconds",
+          "type": "integer"
+        },
+        "availability_delay_seconds": {
+          "minimum": 0,
+          "title": "Availability Delay Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contract_version",
+        "data_class",
+        "process_version",
+        "seed",
+        "lead_time_distribution",
+        "minimum_lead_days",
+        "maximum_lead_days",
+        "disruption_delay_days",
+        "partial_fraction",
+        "partial_receipt_gap_days",
+        "ingestion_delay_seconds",
+        "availability_delay_seconds"
+      ],
+      "title": "FulfillmentConfig",
+      "type": "object"
+    },
+    "SourceStockPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "opening_quantity": {
+          "minimum": 0,
+          "title": "Opening Quantity",
+          "type": "integer"
+        },
+        "reorder_point": {
+          "minimum": 0,
+          "title": "Reorder Point",
+          "type": "integer"
+        },
+        "safety_stock": {
+          "minimum": 0,
+          "title": "Safety Stock",
+          "type": "integer"
+        },
+        "history_window_days": {
+          "exclusiveMinimum": 0,
+          "title": "History Window Days",
+          "type": "integer"
+        },
+        "review_cadence_days": {
+          "exclusiveMinimum": 0,
+          "title": "Review Cadence Days",
+          "type": "integer"
+        },
+        "minimum_order_quantity": {
+          "exclusiveMinimum": 0,
+          "title": "Minimum Order Quantity",
+          "type": "integer"
+        },
+        "quoted_lead_time_days": {
+          "minimum": 0,
+          "title": "Quoted Lead Time Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "opening_quantity",
+        "reorder_point",
+        "safety_stock",
+        "history_window_days",
+        "review_cadence_days",
+        "minimum_order_quantity",
+        "quoted_lead_time_days"
+      ],
+      "title": "SourceStockPolicy",
+      "type": "object"
+    },
+    "SourceSupplierParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "data_class": {
+          "const": "simulation_truth",
+          "title": "Data Class",
+          "type": "string"
+        },
+        "reliability": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Reliability",
+          "type": "string"
+        },
+        "lead_time_mean_days": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Lead Time Mean Days",
+          "type": "string"
+        },
+        "lead_time_std_days": {
+          "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "title": "Lead Time Std Days",
+          "type": "string"
+        }
+      },
+      "required": [
+        "data_class",
+        "reliability",
+        "lead_time_mean_days",
+        "lead_time_std_days"
+      ],
+      "title": "SourceSupplierParameters",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "source-inventory-config-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "process_version": {
+      "const": "source-inventory-commerce-1.0.0",
+      "title": "Process Version",
+      "type": "string"
+    },
+    "business_timezone": {
+      "const": "UTC",
+      "title": "Business Timezone",
+      "type": "string"
+    },
+    "reservation_policy": {
+      "const": "none",
+      "title": "Reservation Policy",
+      "type": "string"
+    },
+    "return_quality_policy": {
+      "const": "refunded_undamaged_returns_only",
+      "title": "Return Quality Policy",
+      "type": "string"
+    },
+    "return_tail_policy": {
+      "const": "financial_tail_without_inventory_extension",
+      "title": "Return Tail Policy",
+      "type": "string"
+    },
+    "stock": {
+      "$ref": "#/$defs/SourceStockPolicy"
+    },
+    "sale_ingestion_delay_seconds": {
+      "minimum": 0,
+      "title": "Sale Ingestion Delay Seconds",
+      "type": "integer"
+    },
+    "sale_availability_delay_seconds": {
+      "minimum": 0,
+      "title": "Sale Availability Delay Seconds",
+      "type": "integer"
+    },
+    "return_inventory_ingestion_delay_seconds": {
+      "minimum": 0,
+      "title": "Return Inventory Ingestion Delay Seconds",
+      "type": "integer"
+    },
+    "return_inventory_availability_delay_seconds": {
+      "minimum": 0,
+      "title": "Return Inventory Availability Delay Seconds",
+      "type": "integer"
+    },
+    "supplier_parameters": {
+      "$ref": "#/$defs/SourceSupplierParameters"
+    },
+    "fulfillment": {
+      "$ref": "#/$defs/FulfillmentConfig"
+    }
+  },
+  "required": [
+    "contract_version",
+    "process_version",
+    "business_timezone",
+    "reservation_policy",
+    "return_quality_policy",
+    "return_tail_policy",
+    "stock",
+    "sale_ingestion_delay_seconds",
+    "sale_availability_delay_seconds",
+    "return_inventory_ingestion_delay_seconds",
+    "return_inventory_availability_delay_seconds",
+    "supplier_parameters",
+    "fulfillment"
+  ],
+  "title": "SourceInventoryConfig",
+  "type": "object"
+}

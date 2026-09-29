@@ -1,0 +1,996 @@
+{
+  "stage_id": "06.2",
+  "verified_at_utc": "2026-09-29T10:09:46.266502+00:00",
+  "status": "passed",
+  "acceptance_scope": "Local standalone supply contract and receipt-ledger reconciliation; source generator unchanged and not inventory-qualified",
+  "branch": "ai/06-01-inventory-ledger",
+  "implementation_commit": "8fd2e3fcb4b0d0cb0de720866dc9cb118c0bfcbf",
+  "code_provenance": {
+    "code_sha256": "baaa5ba99e54ad686540e7ed286d7b19bc8b177a126b2ffe53d21588f7c99196",
+    "dependency_sha256": "665fb35182ec9e1513629a4fc73d98be8b32497195d62e58ac35fc4a29a65911",
+    "code_files": {
+      "data/__init__.py": "62078b0694e368b88c30debae09e3b68046782e471ae194d5df9e5d6f26d42d8",
+      "data/contracts/inventory_ledger.v1.schema.json": "ba1f371590e4494873d2c2cd7a03c8ce231bcd03548da3598c7c9186d376cfd7",
+      "data/contracts/observation_history.v1.schema.json": "bbacb688c9cdb6e1cd93f18cfffa624c9888c65fb99024bd796e303c4b6a523a",
+      "data/contracts/replenishment.v1.schema.json": "bb815e3fe2ffa8753e6806e85ffeb3c4915d8248ad48c7c4ce2d05def0cd7083",
+      "data/contracts/retail_demand.v1.schema.json": "06974ef2292024a62b0e5ae0caf95facd69b9f1fda47c480286900f18bd3c1b6",
+      "data/contracts/retail_dimensions.v1.schema.json": "86a03d53a097457c89ab99045a5ce39c78103297d524039d75a5ed65311eb61d",
+      "data/contracts/retail_pricing.v1.schema.json": "de5043a4a12c52b60612da61f0a164cca9335be8887abae0848c71e92159b6ce",
+      "data/contracts/retail_returns.v1.schema.json": "51fcbbd30cbfefc089d53d802764a4bcf921bab3a6ee760a2a3d22d040f14ffa",
+      "data/contracts/retail_simulation.v1.schema.json": "f7ef44b745b0cec09489435e5f535681833f018b996328435e2d1d086e98a8ee",
+      "data/contracts/retailops_seed_dataset.contract.json": "4d75e5aa11ec1b64a2ab4f428b3eaaa97b3e46120448107964950e167f08fe2f",
+      "data/contracts/source_dataset_manifest.v2.schema.json": "ce7a4c6192a41a5fbe4d52865321715d4b968c742ee7691ba3ec4714bd079d77",
+      "data/contracts/supplier_simulation_truth.v1.schema.json": "3f8c40f3ad9d2bb107445993fee5991640035f848100dc87ffff37ead95f0bfa",
+      "data/generator/__init__.py": "9afe455a670bfd6b1d477d9d2b34c2729d3518fcd927bf237d1d6b4e85f62b11",
+      "data/generator/business_calendar.py": "0b4478800f6654957259d136a119367370d8e6915736b17e0927fa8550d40e34",
+      "data/generator/commerce_pricing.py": "bdde3f7e353d57573a5b1626f31cd3aaa850b32801a83e99d3c691cfbedd6148",
+      "data/generator/common.py": "e60a7003424088f5dd45dc1901c8f080185bc99e3f021fc8478a7923cc503915",
+      "data/generator/configuration.py": "e9112f996d5666a982cead6ba9eee2e67ea45054580410b16e8f957075879168",
+      "data/generator/csv_writer.py": "82dd485a0cd9ada2a8de9df563f3be69bf33dfafff202054eb0bd8d176fa22a8",
+      "data/generator/demand_commerce.py": "c943d3233835e8b3f885a0c380616858e2bedcb84593ed443811d60413031776",
+      "data/generator/demand_contract.py": "261193e148dbef1af0434a8489c0fc9afa65705667b6645fe1974537bce7305d",
+      "data/generator/demand_grid.py": "74c4070da96bc25c67f51828832450a2ffaa5d6646db8ccd9bfc7a9a5de8db1e",
+      "data/generator/demand_model.py": "7c3b4cbf629d3fdf433d297ea587abcc333f704d0e347c0b3f863a57566c4e21",
+      "data/generator/demand_panel.py": "40e5a324b87d8fe9697cc6da88b2683ba476f320b174c052e6e29a6b9db8883f",
+      "data/generator/demand_quality.py": "e86d32f45138c453ce3dcb07e94acd87f3305aff32776e4b01a040c31999f8f9",
+      "data/generator/demand_schema.py": "9cc993a6e7874afe3f09e0f1bd46a3b3e154ba1112f35d455a4129f5e2a0437c",
+      "data/generator/dimension_contract.py": "1cd5a2e467a9e121ac61d4b6657424fe0782b38cb05ad2c92b581b6518f5b3ca",
+      "data/generator/dimension_quality.py": "a98195ec372b223b0845c419b3a7251e4ead36a0910e54b65239430dbbd57fb6",
+      "data/generator/dimension_schema.py": "7fb6543d4f266c3faca9e56abe4cb773e1ad07a5446eb5a7e82cee1618c05566",
+      "data/generator/dimensions.py": "41a88f0edfb4022169688fa8986e5c46bf4f65276d82457eb50531941b537767",
+      "data/generator/feature_admission.py": "3bbff5bbe7a12737a91b5bbce1897fbda0a040b8847c7ef264e11014531a9f66",
+      "data/generator/forecasts.py": "463f8b4848e47c1c907a977022fdb451adaea816c6c2ac203d4389cd7bda3c76",
+      "data/generator/identity.py": "a183cb7ec1b177b2a8eb71a94693f0498eb3391fc04dd1e359c76faf93cb31db",
+      "data/generator/incidents.py": "58f9ff2f9378d1672b047417ae9180479d60ec7b521af223aea5750e4de1d29c",
+      "data/generator/inventory.py": "66365910541722606831e87d0100ded6f6269e76b18c8d7d8bb29668060ca4a2",
+      "data/generator/locations.py": "169831754b9d0605aa853fa79fb0de10381de89a4d88596682b5637256ac9d3b",
+      "data/generator/main.py": "fa46fa4cba9907234ee877fa74301796e8452cbf539f4aafa2842e481f6759a1",
+      "data/generator/manifest.py": "45e1a8fee0d41431596c4893716c2ee09f008ec91c35a70fd3efda194aa99382",
+      "data/generator/manifest_v2.py": "11f96fc5ab9e0a824e37d2450fee614b93a4892a520dc78df09ccc36d6ec0a30",
+      "data/generator/observation_history.py": "033c436351a60f2a4260e03a6b5be5c8a356c472f7b56dc7c9891cc17a1b806f",
+      "data/generator/orders.py": "880f594d2929cc40799e910dba395ddd90bdbad42b72c91712039cb45dee89cd",
+      "data/generator/price_resolver.py": "544e7ee10aa820af1cc4151a1ff8df43ed65fcfdb72f40d462763d7a12305df0",
+      "data/generator/pricing.py": "1c639c4b887f673970b11ff96f455321be4cca57df696df4042c7bae0667a58c",
+      "data/generator/pricing_contract.py": "d10a5651562feda96af33ebc05dec6c3c594279e7a303afb07b7440cd835990f",
+      "data/generator/pricing_plans.py": "72449ccd99beca4cf579cd88d8c9db77f54501050736492cc7ed2bd1580d6a4e",
+      "data/generator/pricing_quality.py": "aa90663b7139be6c1d1c7b5df03c3bc740ee6a4c5e492dfc4f68839cde5e70bb",
+      "data/generator/pricing_schema.py": "522d4621b6cb52e34b03c5db794e546d2a065d776c1d39b790bb166cf1075368",
+      "data/generator/products.py": "a8f8ea58832e81e3007aa37a301fba39ca3910562622b04e136c38b2d9ff93df",
+      "data/generator/profile_engine.py": "36468742c5e7ae030dafa534cae4330d1441aa87183e91873b8c1dbd9b72b209",
+      "data/generator/promotion_truth.py": "c78590d97c82aabe54168d0adc62eda86e06aec60e0758a1fc03b406060f6124",
+      "data/generator/quality.py": "ec8e0293c858ed0cd74c36aec5d6f1f4812c78cd54e4e3c6ffcd590d9c997259",
+      "data/generator/realism_report.py": "74c5afcda227cde8c56d004087e8ca67da224cfa75dbed005cb4d528e030b5ac",
+      "data/generator/realtime.py": "90bc9aa9c1a50b27ebff7403f0f998b4e4f35f30af0014398848ffe1eacee92d",
+      "data/generator/return_contract.py": "93274f39f520ddbbb32c2c1d18e4b219ee353258f19fa91eedb4ec465da14704",
+      "data/generator/return_events.py": "c69149d66e224d45565014389160a193d1f9a931a8c4177a7ae6d2d78c33db9e",
+      "data/generator/return_quality.py": "303f6225438ae20e371d63144cd529ba721913828b16fb2a8943cecedc0b68cb",
+      "data/generator/return_reconciliation.py": "44ec00274f4a26d6f38bef564d9f187c23fd092020d82afa9b3b72d7a4407f1c",
+      "data/generator/return_schema.py": "cb32585b5e0e811359fd41b496192765256da84d219d180ac6d7d0032409c806",
+      "data/generator/sales.py": "d6d0569ebc560e6af9921fc7626e7ebcd3d7a1df8dedc41950dd29872b2d1d4c",
+      "data/generator/scenarios.py": "473575c090d9039da64eb183d975d72a06400954f9a81abbb31ed96893809729",
+      "data/generator/simulation.py": "ae49169bf2fa3a8016d2932a7c324dd10312c9d7f52c7c51fe7ed8bfcc1a7c27",
+      "data/generator/simulation_schema.py": "16676968d639c4864b3334bba62de74748873fd9906338381d91fc977a8171a1",
+      "data/generator/source_quality.py": "8ccaf9f5883c86f5bed87f4e8b7e1ee2da215f4c108536bcbedbaad9aba1ba16",
+      "data/generator/source_realism.py": "0aded25b26494563c28b3dad0a79dd057e39edd6cd68877e64fa6c49757d89bf",
+      "data/generator/stock.py": "e542e09d367cb20e4a082ca16e4e31b791bcb3201773d7cded81d2c8e654c9ca",
+      "data/generator/users.py": "281b37c9110296494fb3fab2d0edfc8507376b1ea08d198f4f7762a4f2b6c2a5",
+      "data/inventory/__init__.py": "dd584782ff30d43ffd3932f45158140a13c2bcb7da4dc1aecc4b52e609892dba",
+      "data/inventory/contract.py": "60b982ef171af43f148bd4c587a1813e03fa09bfb8bd603cd3529449e8b46482",
+      "data/inventory/ledger.py": "3876a09eb8848a780d3df85d5d4a9eea1edf12dd687dd4be0ccb29da7035088f",
+      "data/inventory/legacy.py": "5a6a1fc79dd49a543a8dc24cae20b2ac5f72479d9147a8f33f126af6693eb546",
+      "data/inventory/replenishment.py": "ea96d42ac5e357803575ff296c2ebd350283637fe9558bbebccbb4e52d7c8528",
+      "data/inventory/replenishment_contract.py": "147da537cc80e5e9880dd9f4918f9e6310b9330107995835217112cd4ccbbcdb",
+      "data/inventory/supplier_truth.py": "d4ac2c38f015714af2d40c6b053000cc7ea5f2438fa770a653487b64ee967a43",
+      "data/inventory/verify.py": "a7677f069ad72c1db0acbf421ae47c7718d4aa648b77907fc47f4c476a93ea67",
+      "data/inventory/verify_replenishment.py": "04b180d9171e01070ee0aae770dba8d2c21724e5c94f8dce2f9bb414a22111bf",
+      "ml/__init__.py": "e616a63471aa3ff14e59387c47a03d6b6cfa95b45829d438d1246ca1650b16f0",
+      "ml/features/__init__.py": "ca11028661773d127a536afa94c7afff4f627235c03bf14442132617d5bb380c",
+      "ml/features/ai_demand.py": "650de047ea257a704832a4a60c0b4f613792612665f442f6138156891c292243",
+      "ml/features/fact_input.py": "a1c1bca45b1dabff8a1a1ac67bcf7c43078f15d777f3ecd3576a2758a3dec162",
+      "ml/features/observation_history.py": "bee3503917b9c9a18e2283e8b6ef0fff890a371b5e0e16f6edf2ff0e936b6fa3",
+      "ml/features/worker.py": "23a1b7bf099057e9ee1a035a796750302ddab69789df3e43e736d187526f5f21"
+    },
+    "dependency_files": {
+      "services/api/requirements.txt": "65395e760cf79ba4807e60370d111afa0cbc20ea8c36326ef902d851f6a388d3",
+      "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63"
+    },
+    "python_version": "3.11.15",
+    "git_commit": "8fd2e3fcb4b0d0cb0de720866dc9cb118c0bfcbf",
+    "code_state": "clean"
+  },
+  "contract_version": "replenishment-1.0.0",
+  "supplier_truth_contract_version": "supplier-simulation-truth-1.0.0",
+  "fixtures": [
+    {
+      "path": "data/tests/fixtures/replenishment-v1.json",
+      "sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac"
+    },
+    {
+      "path": "data/tests/fixtures/replenishment-ledger-v1.json",
+      "sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364"
+    },
+    {
+      "path": "data/tests/fixtures/supplier-simulation-truth-v1.json",
+      "sha256": "69fa5b7eabe8adaecb8bdb95fe58d6ba84b70c3493a54cadd0a036081feb1f77"
+    }
+  ],
+  "fixture_counts": {
+    "products": 1,
+    "physical_stock_locations": 2,
+    "suppliers": 2,
+    "product_suppliers": 2,
+    "orders": 1,
+    "delivery_plan_versions": 2,
+    "receipts": 2,
+    "ordered_quantity": 12,
+    "received_quantities": [
+      5,
+      7
+    ]
+  },
+  "tests": {
+    "command": "services/api/.venv/bin/python -m pytest -q data/tests --junitxml=ci-cd/reports/data/ai06-02-tests.xml",
+    "passed": 324,
+    "supply_tests": 146,
+    "ledger_tests": 89,
+    "existing_data_tests": 89,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 174.57,
+    "junit_sha256": "87b4391491d8b0dec6b76b0111d963722950c6202250c54230795524b1e98556",
+    "supply_test_source_sha256": "b7c5cf63b15d102c0c50db551cfc2101d24cd1f13f1155509d4a81bab7a5ddee"
+  },
+  "static_checks": {
+    "ruff_check": "passed: data/inventory",
+    "ruff_format_check": "passed: data/inventory (9 files)",
+    "mypy": "passed: --follow-imports=silent data/inventory (9 source files)",
+    "schema_runtime_parity": "passed: both new schemas"
+  },
+  "cli_cases": [
+    {
+      "name": "complete-delayed",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "a85f4baee7992848d5da0e7198a826180745f05d41eec81154b07f0870732e6b",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/complete-delayed-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/complete-delayed-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/complete-delayed-report.json"
+      ],
+      "known_orders_sha256": "4b3d6e6353538a1ac7ed2bcacb8c90b73ea2b690dddd5d731a1eb58758872140",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-05T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "received",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 2,
+          "received_quantity": 12,
+          "outstanding_quantity": 0
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 12,
+          "reserved_qty": 0,
+          "available_qty": 12,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "receipt-before-availability",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "daa2b4bd150f21547402a14190607875ee2e06241e2efa442127ae62b0b9b72f",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/receipt-before-availability-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/receipt-before-availability-ledger.json",
+        "--known-at",
+        "2026-07-03T10:02:59Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/receipt-before-availability-report.json"
+      ],
+      "known_orders_sha256": "e190b15013b4c392256167cf4af5616227bf86eae75e331109cbe7383337fda3",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-03T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "ordered",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 1,
+          "received_quantity": 0,
+          "outstanding_quantity": 12
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "partial-at-availability",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "ba20970898ea3290a19eef03fe418655a60c954cb3ddd9b088b1e44169dd2175",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/partial-at-availability-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/partial-at-availability-ledger.json",
+        "--known-at",
+        "2026-07-03T10:03:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/partial-at-availability-report.json"
+      ],
+      "known_orders_sha256": "e43b41af382a21395fe8b3de5c4dae33df712e0f8041234632f660436c414656",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-03T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "partially_received",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 1,
+          "received_quantity": 5,
+          "outstanding_quantity": 7
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 5,
+          "reserved_qty": 0,
+          "available_qty": 5,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "promise-before-availability",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "2ae1866ee33cd6f2ac41bb5d268aa916198e5200bca815e43df3ff6192f33667",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/promise-before-availability-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/promise-before-availability-ledger.json",
+        "--known-at",
+        "2026-07-04T09:01:59Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/promise-before-availability-report.json"
+      ],
+      "known_orders_sha256": "e43b41af382a21395fe8b3de5c4dae33df712e0f8041234632f660436c414656",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-03T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "partially_received",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 1,
+          "received_quantity": 5,
+          "outstanding_quantity": 7
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 5,
+          "reserved_qty": 0,
+          "available_qty": 5,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "promise-at-availability",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "3d2121469617da4308e50d58c1a2d14494b0800ad62c3f9becd5b99a175da138",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/promise-at-availability-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/promise-at-availability-ledger.json",
+        "--known-at",
+        "2026-07-04T09:02:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/promise-at-availability-report.json"
+      ],
+      "known_orders_sha256": "ba657fcd853e185be8afefc8ffc2db676648e5b7e058abedfe3bddf47bd37eb9",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-05T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "partially_received",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 2,
+          "received_quantity": 5,
+          "outstanding_quantity": 7
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 5,
+          "reserved_qty": 0,
+          "available_qty": 5,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "final-before-availability",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "1b6158611681ced03246dd2238643302e25139c3d5e07fbfc41b8c3757860eae",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/final-before-availability-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/final-before-availability-ledger.json",
+        "--known-at",
+        "2026-07-06T10:02:59Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/final-before-availability-report.json"
+      ],
+      "known_orders_sha256": "ba657fcd853e185be8afefc8ffc2db676648e5b7e058abedfe3bddf47bd37eb9",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-05T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "partially_received",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 2,
+          "received_quantity": 5,
+          "outstanding_quantity": 7
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 5,
+          "reserved_qty": 0,
+          "available_qty": 5,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "final-at-availability",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "5d5372e5c9d57a71fd8a1d85816bb1d2dbf9047be31dfed7f43ebb6ceb273f1b",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/final-at-availability-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/final-at-availability-ledger.json",
+        "--known-at",
+        "2026-07-06T10:03:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/final-at-availability-report.json"
+      ],
+      "known_orders_sha256": "4b3d6e6353538a1ac7ed2bcacb8c90b73ea2b690dddd5d731a1eb58758872140",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [
+        {
+          "replenishment_order_id": "1b124338-abbe-5d1f-9347-993a96d7e8f3",
+          "product_supplier_id": "eaeeedd5-ad2f-5889-bc38-089aa95c78bd",
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "supplier_id": "4cb6edc0-8142-503e-a6e3-e13673434dfd",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "ordered_quantity": 12,
+          "unit_of_measure": "pcs",
+          "ordered_at": "2026-07-01T10:00:00+00:00",
+          "expected_delivery_at": "2026-07-05T10:00:00+00:00",
+          "ingested_at": "2026-07-01T10:00:30+00:00",
+          "available_at": "2026-07-01T10:01:00+00:00",
+          "status": "received",
+          "source_reference": "purchase-order:PO-0001",
+          "delivery_plan_version": 2,
+          "received_quantity": 12,
+          "outstanding_quantity": 0
+        }
+      ],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 12,
+          "reserved_qty": 0,
+          "available_qty": 12,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "unknown-order-no-fallback",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "f564b04593c33725fd049cbd8d589725b68ee2be69fc9b34cbcfd7ee431dfabd",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/unknown-order-no-fallback-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/unknown-order-no-fallback-ledger.json",
+        "--known-at",
+        "2026-07-01T10:00:59Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/unknown-order-no-fallback-report.json"
+      ],
+      "known_orders_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "receipt_movements_sha256": "70dea3a473361c48f671046cd900d74d1c6f60afa1730dcc80862be92376b377",
+      "known_orders": [],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 1,
+        "receipts": 2,
+        "receipt_movements": 2,
+        "received_quantity": 12
+      }
+    },
+    {
+      "name": "no-orders-no-inventory",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "passed",
+      "input_sha256": "34c3af0584b28908f3572a8eb4b8abbba19f73f008b14c0397cac58fedd6204b",
+      "ledger_sha256": "a7d66cf21d460f33017f915e2b2c7a17f0a42458d12d86f92156766fe5497915",
+      "report_sha256": "5cf80bdbadaa1ac63a81a533fda5c616a4379831b0625459e464c8048611cb61",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/no-orders-no-inventory-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/no-orders-no-inventory-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/no-orders-no-inventory-report.json"
+      ],
+      "known_orders_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "receipt_movements_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "known_orders": [],
+      "positions": [
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        },
+        {
+          "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+          "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+          "on_hand": 0,
+          "reserved_qty": 0,
+          "available_qty": 0,
+          "status": "known"
+        }
+      ],
+      "reconciliation": {
+        "orders": 0,
+        "receipts": 0,
+        "receipt_movements": 0,
+        "received_quantity": 0
+      }
+    },
+    {
+      "name": "over-receipt",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "failed",
+      "input_sha256": "7ab0da22b839a522a35004d5d5955d73dbcc924ea5cad94cde3380e7979a7f7c",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "244dc9d896002c4aef9deb65f39a015b9e354c7fe0255c293abecc2127d77828",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/over-receipt-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/over-receipt-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/over-receipt-report.json"
+      ],
+      "error": "Cumulative receipts exceed ordered quantity."
+    },
+    {
+      "name": "receipt-before-order",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "failed",
+      "input_sha256": "4e60134a65f5860cc30228c251d083f8951abc3ca88761151e8fdaab9652a3dd",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "f9fa5ac20db1ceb3a247c5f351975a031f025d58c7482e8dba9f89e3275b7972",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/receipt-before-order-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/receipt-before-order-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/receipt-before-order-report.json"
+      ],
+      "error": "Receipt precedes order."
+    },
+    {
+      "name": "future-quote",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "failed",
+      "input_sha256": "06de094a4b81fd5d82cf64858c715dda65c89261dfb2c0b0f3d824f457324e5c",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "15b1789a955eb9a18c141a949aebce8de880c0eb501019d77bf3b8ae7a8ce3c9",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/future-quote-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/future-quote-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/future-quote-report.json"
+      ],
+      "error": "Order quote is inactive, out of period or unavailable at ordering."
+    },
+    {
+      "name": "truth-in-operational-supplier",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "failed",
+      "input_sha256": "b2477183f95a2df55c444908c52cc9bb009351ffc258883726945e499b460012",
+      "ledger_sha256": "0e7e937f489625addc5fe7974c16619679f9a51293809e79211688d2dae68364",
+      "report_sha256": "a597d202a2e68b3edeb137a45a9b242ac055a6ee4e5ce95772dd7e5923f1c355",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/truth-in-operational-supplier-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/truth-in-operational-supplier-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/truth-in-operational-supplier-report.json"
+      ],
+      "error": "Replenishment contract violation at suppliers/0/reliability: Extra inputs are not permitted"
+    },
+    {
+      "name": "missing-receipt-movement",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "failed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "c2a541521ed2d0edd8360f57ab70ae9b3b957c4b4f17e0cc94a7fe39803ff0eb",
+      "report_sha256": "dec89651fcfa6d7326af7a200ee719db91bb110afb1397ba04d5f794173be69a",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/missing-receipt-movement-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/missing-receipt-movement-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/missing-receipt-movement-report.json"
+      ],
+      "error": "Ledger replenishments must match actual receipts exactly once."
+    },
+    {
+      "name": "partial-counted-as-full-order",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "failed",
+      "input_sha256": "889dba433e538e6699210120b71680c634adace2fe37d67a95e76e97e8cfaaac",
+      "ledger_sha256": "19310da4e1b089c3047d24f82891b090f3b3af8cf297814ab71aed3c36f26184",
+      "report_sha256": "dec89651fcfa6d7326af7a200ee719db91bb110afb1397ba04d5f794173be69a",
+      "command": [
+        "services/api/.venv/bin/python",
+        "-m",
+        "data.inventory.verify_replenishment",
+        "--input",
+        "ci-cd/reports/data/ai06-02/partial-counted-as-full-order-supply.json",
+        "--ledger",
+        "ci-cd/reports/data/ai06-02/partial-counted-as-full-order-ledger.json",
+        "--known-at",
+        "2026-07-07T00:00:00Z",
+        "--output",
+        "ci-cd/reports/data/ai06-02/partial-counted-as-full-order-report.json"
+      ],
+      "error": "Ledger replenishments must match actual receipts exactly once."
+    }
+  ],
+  "source_compatibility": {
+    "base_commit": "68fe5d98758f5c39e54044d93a1d09f7e60d8dac",
+    "source_runtime_fingerprint_unchanged": true,
+    "source_code_sha256": "0f702a65ebcdb3d78770b08a4f20c901b06211f04b0fe8b2d8d22aa0e5aa6d3b",
+    "legacy_baseline": "docs/evidence/ai/02/data01/legacy-baseline.json",
+    "demo_csv_files": 17,
+    "tracked_demo_files_unchanged": 19,
+    "demo_bytes_unchanged": true,
+    "report_sha256": "0b14f7f5fffad864c90551f17305929fc21e409e9fc4997807a68480476b0735"
+  },
+  "source_profiles": [
+    {
+      "profile": "ai-smoke",
+      "source_dataset_id": "source-sha256-a12866e1099c3ae2ae7c73cac5c533a35733618d85a3728cd5f0e1c7b527fc00",
+      "repeated_identical": true,
+      "runs": 2,
+      "source_hard_gates": 46,
+      "inventory_ready": false,
+      "csv_files": 40,
+      "table_counts": {
+        "products": 20,
+        "users": 4,
+        "stores": 3,
+        "warehouses": 2,
+        "orders": 3244,
+        "order_items": 6096,
+        "price_history": 90,
+        "promotions": 32,
+        "stock_movements": 6196,
+        "returns": 591,
+        "sales": 6096,
+        "inventory_snapshots": 100,
+        "forecasts": 140,
+        "anomalies": 20,
+        "alerts": 20,
+        "recommendations": 20,
+        "workflow_actions": 20,
+        "catalog_categories": 8,
+        "product_catalog": 20,
+        "selling_locations": 2,
+        "stock_locations": 2,
+        "channel_assignments": 6,
+        "fulfillment_routes": 6,
+        "assortment": 114,
+        "business_calendar": 90,
+        "category_calendar": 240,
+        "price_plans": 90,
+        "promotion_plans": 32,
+        "promotion_effect_truth": 96,
+        "sale_price_references": 6096,
+        "daily_price_observations": 1292,
+        "daily_demand_observations": 1612,
+        "daily_demand_exclusions": 188,
+        "daily_demand_truth": 1469,
+        "return_policies": 32,
+        "return_events": 1044,
+        "daily_return_cohorts": 3224,
+        "product_simulation_parameters": 20,
+        "store_simulation_parameters": 3,
+        "daily_demand_versions": 1612
+      }
+    },
+    {
+      "profile": "ai-temporal-smoke",
+      "source_dataset_id": "source-sha256-94829460645140b79a6f68e87194f74d2c8e55392e2702a9fecbe6b771116d22",
+      "repeated_identical": true,
+      "runs": 2,
+      "source_hard_gates": 46,
+      "inventory_ready": false,
+      "csv_files": 40,
+      "table_counts": {
+        "products": 8,
+        "users": 4,
+        "stores": 3,
+        "warehouses": 2,
+        "orders": 5993,
+        "order_items": 10817,
+        "price_history": 36,
+        "promotions": 14,
+        "stock_movements": 10945,
+        "returns": 1499,
+        "sales": 10817,
+        "inventory_snapshots": 120,
+        "forecasts": 56,
+        "anomalies": 8,
+        "alerts": 8,
+        "recommendations": 8,
+        "workflow_actions": 8,
+        "catalog_categories": 8,
+        "product_catalog": 8,
+        "selling_locations": 2,
+        "stock_locations": 2,
+        "channel_assignments": 6,
+        "fulfillment_routes": 6,
+        "assortment": 48,
+        "business_calendar": 306,
+        "category_calendar": 816,
+        "price_plans": 36,
+        "promotion_plans": 14,
+        "promotion_effect_truth": 42,
+        "sale_price_references": 10817,
+        "daily_price_observations": 1865,
+        "daily_demand_observations": 2406,
+        "daily_demand_exclusions": 42,
+        "daily_demand_truth": 2146,
+        "return_policies": 32,
+        "return_events": 1701,
+        "daily_return_cohorts": 4812,
+        "product_simulation_parameters": 8,
+        "store_simulation_parameters": 3,
+        "daily_demand_versions": 2406
+      }
+    }
+  ],
+  "inventory_ready": false,
+  "next_scope": "06.3 deterministic reorder policy, effective config and supplier fulfillment simulation",
+  "limitations": [
+    "Not wired to source 2.6; no new source/snapshot/curated publication or inventory-qualified forecasting features.",
+    "Supplier reliability and true lead-time distribution are separate generator truth; operational lead time is an explicit known quote.",
+    "Raw order status records immutable creation; historical progress is derived from receipts available at cutoff. No cancellation/approval workflow.",
+    "Over-receipt policy rejects excess; product-supplier offer periods cannot overlap; no currency/unit conversion.",
+    "Reorder policy, chronological shared inventory, sale fulfillment, return eligibility, snapshots and final source gates remain later AI 06 scopes.",
+    "DATA-06 remains open until generator integration and full source acceptance.",
+    "Local branch commits only; no remote Required CI or main merge for AI 06.2."
+  ],
+  "environment": {
+    "os": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.15",
+    "runtime": "services/api/.venv/bin/python",
+    "working_directory": "repository root"
+  }
+}

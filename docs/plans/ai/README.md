@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 odebrany lokalnie i w Required CI, opublikowany na main obu repo. Następne zakresy: 04 w AI i równolegle 06 w RetailOps. Aktualizacja: 29.09.2026.**
+**Status: AI 06 ma końcowy odbiór pełnego pipeline’u source 2.7 → curated 1.1. AI 04/05 wymagają zgodnej oceny na nowych IDs przed 07/08. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -32,13 +32,19 @@ niezmienny reimport i atomową publikację w osobnym branchu repo AI.
 jawne mappings, quarantine i historyczny odczyt as-of.
 [AI 03.6](../../evidence/ai/03/03.6/README.md) potwierdza pełną bramkę cross-repo
 na obu smoke dwukrotnie, późną korektę i Required CI obu repo.
-Można rozpocząć **04 forecasting** oraz równolegle **06 ledger**.
+Odbiór 03 otworzył **04 forecasting** i **06 ledger**; AI 06 jest już odebrany.
 [Publikacja na main obu repo](../../evidence/ai/03/03.6/main-publication.json)
 zachowuje commity merge i Required CI dla push na main.
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
 i test doubles agenta 12; pełny agent czeka na 10.
-Modele i inventory nadal nie są gotowe.
+[Końcowy odbiór AI 06](../../evidence/ai/06/final/README.md) obejmuje ledger,
+dostawy, realizację sprzedaży/zwrotów, znane snapshoty, osobną kwalifikację
+labeli i pełną ścieżkę do curated 1.1. Domyślne CLI AI generuje 2.7.
+[Runbook](../../reference/inventory-snapshots.md) i [karta danych](../../evidence/ai/06/final/dataset-card.md)
+podają komendy i IDs. Ukończenie 06 nie zależy od 04/05; zgodne prognozy
+oraz lifecycle są osobnym warunkiem rozpoczęcia 07/08.
+
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.

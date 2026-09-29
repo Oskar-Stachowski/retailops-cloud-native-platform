@@ -1,0 +1,41 @@
+{
+  "contract_version": "source-inventory-config-1.0.0",
+  "process_version": "source-inventory-commerce-1.0.0",
+  "business_timezone": "UTC",
+  "reservation_policy": "none",
+  "return_quality_policy": "refunded_undamaged_returns_only",
+  "return_tail_policy": "financial_tail_without_inventory_extension",
+  "stock": {
+    "opening_quantity": 12,
+    "reorder_point": 8,
+    "safety_stock": 4,
+    "history_window_days": 2,
+    "review_cadence_days": 1,
+    "minimum_order_quantity": 4,
+    "quoted_lead_time_days": 2
+  },
+  "sale_ingestion_delay_seconds": 30,
+  "sale_availability_delay_seconds": 30,
+  "return_inventory_ingestion_delay_seconds": 30,
+  "return_inventory_availability_delay_seconds": 30,
+  "supplier_parameters": {
+    "data_class": "simulation_truth",
+    "reliability": "1",
+    "lead_time_mean_days": "2",
+    "lead_time_std_days": "0"
+  },
+  "fulfillment": {
+    "contract_version": "supplier-fulfillment-config-1.0.0",
+    "data_class": "simulation_truth",
+    "process_version": "supplier-fulfillment-two-point-1.0.0",
+    "seed": 42,
+    "lead_time_distribution": "two_point_mean_plus_minus_std",
+    "minimum_lead_days": 1,
+    "maximum_lead_days": 30,
+    "disruption_delay_days": 3,
+    "partial_fraction": "0.5",
+    "partial_receipt_gap_days": 2,
+    "ingestion_delay_seconds": 60,
+    "availability_delay_seconds": 60
+  }
+}

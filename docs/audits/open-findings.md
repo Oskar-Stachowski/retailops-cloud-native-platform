@@ -20,17 +20,6 @@ Priorytet dotyczy wskazanego zastosowania, a nie deklaracji gotowości produkcyj
 Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measurements.json),
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
-### DATA-06 · P1 · Snapshoty wielokrotnie otwierają inventory bez uzgodnionego ledgeru
-
-**Dowód:** 1300 `initial_stock` dla 300 par produkt/magazyn, 1000 nadmiarowych otwarć.
-Movement sprzedaży dobiera magazyn przez indeks modulo, bez historycznego fulfillment
-mapping. Kod: [inventory i stock movements](../../data/generator/profile_engine.py).
-
-**Kryterium zamknięcia — AI 06, przed 08:** jedno otwarcie, wersjonowane mapowanie
-selling/stock location, uzgodnienie bilansu ruchów/sprzedaży/dostaw/zwrotów,
-availability snapshotów i testy braku/przyszłego zapasu. Dopiero wtedy labels stockout.
-Nie blokuje forecast-only AI 04–05, gdzie inventory features są pominięte.
-
 ## Runtime i bezpieczeństwo
 
 ### OPS-03 · P1 · Consumer zatwierdza offset także po błędzie przetwarzania

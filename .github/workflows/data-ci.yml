@@ -74,6 +74,51 @@ jobs:
             ci-cd/reports/data/ai03-cross-repo/**
           if-no-files-found: error
 
+  ai06-cross-repo:
+    name: AI 06 full cross-repo gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      AI06_CONSUMER_REVISION: 2574c06794b7b4f86393f23db1d9e97c16413706
+    steps:
+      - name: Checkout producer
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Checkout pinned independent consumer
+        uses: actions/checkout@v6
+        with:
+          repository: Oskar-Stachowski/retailops-ai-intelligence
+          ref: ${{ env.AI06_CONSUMER_REVISION }}
+          path: data/generated/ai06-ci-consumer
+          persist-credentials: false
+      - name: Set up locked Python toolchains
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.19"
+          python-version: "3.11.15"
+      - name: Install dependencies outside the measured flow
+        run: |
+          uv venv services/api/.venv --python 3.11.15
+          uv pip install --python services/api/.venv/bin/python -r services/api/requirements-dev.txt -r data/requirements-parquet.txt
+          uv sync --directory data/generated/ai06-ci-consumer --locked --extra snapshot
+      - name: Run both full smoke profiles twice
+        env:
+          CONSUMER_REVISION: ${{ env.AI06_CONSUMER_REVISION }}
+        run: |
+          services/api/.venv/bin/python -m scripts.data.verify_ai06_snapshot \
+            --ai-repo "${GITHUB_WORKSPACE}/data/generated/ai06-ci-consumer" \
+            --ai-python "${GITHUB_WORKSPACE}/data/generated/ai06-ci-consumer/.venv/bin/python" \
+            --output ci-cd/reports/data/ai06-final-linux/acceptance.json
+      - name: Upload full cross-repo evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: ai06-cross-repo-evidence
+          path: |
+            ci-cd/reports/data/ai06-final-linux/**
+          if-no-files-found: error
+
   data-quality:
     name: Synthetic data quality gate
     runs-on: ubuntu-latest

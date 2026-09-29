@@ -1,19 +1,26 @@
-# 06. Zbuduj spójny zapas i dostawy
+# 06 — Zbuduj spójny zapas i dostawy
 
-**Status: plan wdrożenia. Repo: RetailOps. Zależność: 03.**
+**Status: ukończony zakres AI 06. Repo: oba. Zależność: 03.**
+[Końcowy audyt i odbiór](../../../evidence/ai/06/final/README.md) potwierdza
+pełną ścieżkę source → qualification → snapshot → import → curated/as-of.
+[Runbook](../../../reference/inventory-snapshots.md) opisuje komendy użytkowe;
+[karta danych](../../../evidence/ai/06/final/dataset-card.md) podaje nowe IDs.
 
-Cel: uzyskać faktyczny wspólny ledger zapasu, z którego wynikają sprzedaż ograniczona dostępnością, dostawy, snapshoty i epizody stockout. Ten etap można rozwijać równolegle z04/05 po ukończeniu03. Model ryzyka powstaje później w08; samo przejście bramek źródłowych nie oznacza gotowego modelu.
+Ledger, wspólna fizyczna pula zapasu, sprzedaż, zwroty, dostawy i stockout wynikają
+z jednego chronologicznego procesu. Źródło 2.7 ma 58 tabel i 36 bramek,
+snapshot/curated 1.1 udostępniają 43 facts/plans z causal availability.
+Prywatne parametry/outcomes i kwalifikacja labeli pozostają poza cechami.
+Domyślne CLI profili AI używa 2.7; jawny `--source-version 2.6` zachowuje kompatybilność.
+Demo/API i frozen dane nie są przepisywane. DATA-06 nie ma otwartych warunków.
 
-Przeczytaj [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md) oraz manifest/snapshot/curated contracts03. Potwierdź mapowanie product/selling location/channel → fizyczna stock location. Aktualne legacy snapshoty oraz cykliczne `initial_stock` nie są pełnym ledgerem.
+## Granica ukończenia i dalsze zależności
 
-## Kolejność małych PR-ów
-
-1. **Kontrakt ruchu i opening.** Dodać `inventory_event_id`, produkt, stock location, signed quantity, jednostkę, `occurred_at`, `ingested_at`, `available_at`, deterministic sequence, reference do źródłowego procesu oraz opcjonalny transfer/supplier/order ID. Wybrać jedną reprezentację otwarcia: początkowy balance albo pojedynczy opening movement. Snapshoty tygodniowe/dzienne nie generują kolejnych ruchów otwarcia. Jawnie wersjonować adapter legacy.
-2. **Minimalni dostawcy i replenishment.** Encje `suppliers`, `product_suppliers`, `replenishment_orders` oraz receipts. Supplier: kod, kraj, status, reliability, mean/std lead time, MOQ. Product supplier: jednostkowy koszt, priorytet, okres obowiązywania. Order: product, supplier, destination, ordered quantity/time, expected delivery znane w danej wersji, status. Receipt: rzeczywista ilość/time, link do order i provenance. Umożliwić partial/delayed receipt; plan nie jest faktycznym przyjęciem.
-3. **Deterministyczna polityka uzupełniania.** Parametry reorder point, safety stock, review cadence, MOQ i lead-time variation; wszystkie w effective config. Zamówienie powstaje na podstawie obserwowalnego stanu/historycznej sprzedaży, nie oracle przyszłego latent demand. Supplier reliability działa w procesie realizacji dostawy. Parametry prawdziwego rozkładu lead time/reliability symulatora są truth; do operational features dopuszcza się wyłącznie jawnie znane quoted lead time albo estymatę z historii sprzed cutoff, z pochodzeniem. Wersje planowanego terminu zachowują available time. Rozbudowany approval/procurement optimization nie należy do tego etapu.
-4. **Chronologiczny symulator.** W każdej dobie zastosować wersjonowaną kolejność due receipts, kwalifikowanych returns/adjustments, arrival popytu i transakcji, wydania sprzedażowego, write-offs/transfers, zamknięcia i nowych zamówień. Jeśli występuje zdarzenie intraday, kolejność wynika z czasu i deterministic sequence, nie tylko typu. Jeden zasób wspólny kanałom jest konsumowany kolejno jeden raz. `observed_sales=min(latent_demand, available_inventory)`; niezaspokojony popyt i jego przyczyny pozostają truth.
-5. **Snapshoty, rezerwacje i stockout truth.** Snapshot budować wyłącznie z ledgeru. MVP może jawnie ustalić `reserved_qty=0` i natychmiastowy fulfillment; nie deklarować działania rezerwacji. Jeżeli je wprowadzasz, zdefiniuj state machine reserve/release/fulfill, aby ta sama sprzedaż nie pomniejszała stanu dwa razy. Zwrot do sprzedaży ma jawne warunki jakości; nie każdy zwrot jest return_to_stock. Zdefiniuj epizod dostępności zero, jego początek/koniec i affected scopes; policz duration/lost-sales diagnostycznie. Zero przed origin należy później do `already_stockout`.
-6. **Ponowna publikacja danych.** Rozszerzyć quality/realism/readiness, przeliczyć source dataset i eksport/import03. Dopiero po przejściu gates ustawić `inventory_ready=true`. Nowy proces censoringu zmienia source/curated IDs. Ponownie wykonać04/05 na nowych danych i zgodnym feature schema, zanim forecast zasili anomaly/stockout. Nie przepisywać wcześniejszych metryk modelu na nowy dataset.
+AI 06 można ukończyć niezależnie od 04/05. Gotowość inventory dotyczy danych
+oraz odebranego pipeline'u, a nie wytrenowanego modelu lub serving.
+Przed 07/08 wymagane są ukończone 04/05 oraz forecast oceniony na nowych IDs
+z tej ścieżki. Jeśli 04/05 jeszcze nie ukończono, będzie to pierwszy zgodny
+odbiór na nowym źródle; wcześniejszych metryk nie przepisuje się na inne dane.
+Model ryzyka stockout jest zakresem 08.
 
 ## Minimalny zestaw ruchów i uzgodnienie
 
@@ -33,13 +40,13 @@ Stockout truth oznacza zdarzenie procesu zapasu; zwykły brak popytu i zero sprz
 - Ledger nie produkuje nieuzasadnionego ujemnego stanu. Nie tworzyć stockout przez ustawienie przypadkowej flagi oderwanej od procesu.
 - Plan dostawy known w origin może być cechą, rzeczywiste opóźnienie znane dopiero później — nie. Późny receipt lub correction nie zmienia historycznych cech.
 - Supply-poor, supply-normal, partial/delayed receipt, no demand i zero-at-origin mają oddzielne fixtures. Readiness08 jest not_evaluable przy niedojrzałym tailu/braku klas, nie automatycznie passed.
-- Zmiana procesu symulacji tworzy nowe immutable dane, a istniejący snapshot03 pozostaje nienaruszony. Zachować demo/API compatibility.
+- Zmiana procesu symulacji tworzy nowe immutable dane, a istniejący snapshot 03 pozostaje nienaruszony. Zachować demo/API compatibility.
 
 ## Artefakty i Definition of Done
 
 Schematy ledger/suppliers/replenishments/mapping, udokumentowana kolejność i polityka rezerwacji, passing/failing fixtures, reconciliations, source/curated manifests, inventory/lost-sales/stockout diagnostics, zaktualizowana dataset card oraz evidence ponownego uruchomienia03. Wydajność measured na smoke, a dev/training poza zwykłym CI.
 
-Gotowość źródłowa do07/08 wymaga bramek powyżej, nowego snapshotu i zgodnych prognoz po ponownej ewaluacji04/05. Zaawansowane zakupy, optymalizacja dostawców i złożone transfer networks pozostają rozszerzeniem po portfolio v1.
+Przejście do 07/08 wymaga, oprócz odbioru 06, zgodnych prognoz i lifecycle po ocenie 04/05 na nowym snapshotcie. Zaawansowane zakupy, optymalizacja dostawców i złożone transfer networks pozostają rozszerzeniem po portfolio v1.
 
 ## Prompt dla Codex
 
@@ -52,7 +59,7 @@ orders/receipts, deterministyczną reorder policy i chronologiczną wspólną pu
 Opening licz jeden raz. Snapshot ma wynikać z ledgeru; nie koryguj błędów losowym adjustment.
 Utrzymuj source/available time, mapping lokalizacji i truth poza cechami. Przetestuj
 partial/delayed receipt, return eligibility, transfer, shared inventory i future fallback.
-Opublikuj NOWY snapshot przez ścieżkę03 i zapisz readiness/evidence. Zgłoś obowiązkowe
+Opublikuj NOWY snapshot przez ścieżkę 03 i zapisz readiness/evidence. Zgłoś obowiązkowe
 ponowienie04/05 po zmianie źródeł i cech; nie aktualizuj starych wyników bez re-evaluacji.
 Nie trenuj tu klasyfikatora08 i nie wdrażaj rozbudowanego procurement ani cloud.
 ```

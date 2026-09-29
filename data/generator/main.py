@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from datetime import date
 from pathlib import Path
@@ -255,6 +256,12 @@ def parse_args() -> argparse.Namespace:
         help="Directory where CSV files should be written.",
     )
 
+    parser.add_argument(
+        "--source-version",
+        choices=("2.6", "2.7"),
+        default=None,
+        help="AI profiles default to inventory source 2.7; 2.6 is frozen compatibility.",
+    )
     return parser.parse_args()
 
 
@@ -277,6 +284,22 @@ def main() -> None:
     config = config_from_args(args)
     warn_if_demo_ignores_sizing_options(config)
 
+    if config.profile.startswith("ai-") and args.source_version != "2.6":
+        from data.inventory.run_source_dataset import (  # noqa: PLC0415 - versioned dispatch avoids dependency cycle
+            run,
+        )
+
+        result = run(
+            config,
+            args.output_dir or Path(__file__).resolve().parents[2] / "data/generated/sources",
+        )
+        print(json.dumps(result, indent=2))  # noqa: T201 - CLI receipt
+        if result["status"] != "passed":
+            raise SystemExit(1)
+        return
+    if args.source_version == "2.7":
+        message = "Source 2.7 requires an AI profile."
+        raise ValueError(message)
     counts = generate_demo_dataset(args.output_dir, config)
     output_dir = args.output_dir or default_output_dir_for_profile(
         config.profile,
