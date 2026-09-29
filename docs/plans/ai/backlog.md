@@ -11,21 +11,22 @@ potwierdzone problemy i kryteria ich zamknięcia.
 
 ## Kolejny mały PR etapu 03
 
-**Repo:** RetailOps AI Intelligence. **Zależność:** odebrane źródło 2.6,
-[exporter](../../reference/ai-snapshots.md) i [handoff 1.0.0](../../reference/source-snapshot-handoff.md).
-**03.4 — typed importer.** Dodać odczyt Parquet według zadeklarowanych schemas,
-weryfikację wszystkich byte/canonical hashes i gates wymaganych use cases.
-Publikować atomowo immutable dane pod source ID w generated; identyczny reimport
-ma zachować bajty, konflikt/uszkodzenie/path/version/failed gate musi blokować.
-Zachować osobną evaluation truth oraz dostępność wszystkich wersji obserwacji.
-Nie używać foundation unique-key hash zamiast source multiset hash.
-Następnie 03.5 curated i 03.6 bramka cross-repo.
-Nie kopiować generatora do repo AI; odbiór cross-repo następuje po kontrakcie,
-importerze i curated builderze. Zachować istniejące wersje ilości i odczyt as-of.
+**Repo:** RetailOps AI Intelligence. **Zależność:** source 2.6, handoff 1.0.0
+oraz [typed importer 03.4](../../evidence/ai/03/03.4/README.md).
+**03.5 — curated builder.** Normalizować typy, UTC/business dates, jednostki,
+waluty i słowniki; uzgodnić grain oraz jawne product/location/channel mappings.
+Zachować wszystkie wersje i availability. Brak mappingu, data-gap lub błędny
+rekord trafia do kwarantanny z reason/lineage; nie uzupełniać losowym zerem,
+store ani warehouse. Odczyt historyczny wybiera wersję znaną w origin.
+Publikować immutable Parquet i manifest curated ID, parent source/snapshot,
+transform code/lock/config SHA, counts/rejected/checksums i use-case readiness.
+Zachować osobny evaluation truth; nie dołączać go do cech ani runtime.
+Następnie 03.6: generator → qualification → export → import → curated na obu
+smoke dwukrotnie, z as-of, idempotencją, błędami i resource gates.
 
 ## Praca równoległa od obecnego punktu
 
-- **Etap 03:** typed importer w repo AI; [03.3](../../evidence/ai/03/03.3/README.md) ma lokalny odbiór handoff. Publikacja branchy 03 i zdalne Required CI obu repo pozostają do wykonania.
+- **Etap 03:** curated w repo AI; [03.4](../../evidence/ai/03/03.4/README.md) ma lokalny odbiór typed importera. Publikacja branchy 03 i zdalne Required CI obu repo pozostają do wykonania.
 - **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
   limity, freshness i audyt. [RAG 11](../../evidence/ai/11/README.md) jest odebrany;
   pełne narzędzia, odpowiedzi i integracja użytkowa wymagają również 10.
@@ -43,7 +44,7 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 
 | Etap | Otwarte warunki i zakres odbioru |
 |---|---|
-| **03 — snapshot/curated** | Rozwinąć manifest v2 o curated/label IDs i pełną lineage, immutable pliki i importer, schema/checksums, wersje/as-of korekt, idempotencja i kwarantanna. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
+| **03 — snapshot/curated** | Curated/label IDs i pełna lineage transformacji, mapping/quarantine, wersje/as-of korekt oraz końcowa bramka cross-repo. Pierwszy import przez pliki, bez operacyjnej DB i brokera. |
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **06 — inventory** | DATA-06: jedno otwarcie, uzgodnienie ruchów, physical stock location i historyczny fulfillment mapping. Nowa wersja danych i ponowienie importu/ocen zależnych od zapasu. |

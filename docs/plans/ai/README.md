@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 02 odebrany lokalnie i zdalnie; 03.1–03.3 mają lokalny odbiór. Następny zakres: 03.4 typed importer w repo AI. Aktualizacja: 28.09.2026.**
+**Status: etap 02 odebrany lokalnie i zdalnie; 03.1–03.4 mają lokalny odbiór. Następny zakres: 03.5 curated w repo AI. Aktualizacja: 29.09.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -26,7 +26,9 @@ chunked writes, date partitions, politykę Git/cleanup i bramkę zasobów obu sm
 atomowy eksport 25 tabel, opcjonalną osobną evaluation truth, identity i
 idempotencję. [AI 03.3](../../evidence/ai/03/03.3/README.md) dostarcza pełny mały
 fixture, wspólny kontrakt i niezależną walidację konsumenta bez generatora.
-Następna implementacja to **03.4 typed importer w repo AI**
+[AI 03.4](../../evidence/ai/03/03.4/README.md) dostarcza typed importer,
+niezmienny reimport i atomową publikację w osobnym branchu repo AI.
+Następna implementacja to **03.5 curated w repo AI**
 w [etapie 03](etapy/03-snapshot-curated.md).
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy

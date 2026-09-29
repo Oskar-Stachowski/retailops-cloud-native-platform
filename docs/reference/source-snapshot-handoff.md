@@ -121,7 +121,8 @@ W repo AI: `make handoff-check` lub `uv run --locked python
 scripts/check_snapshot_handoff.py`. Checker korzysta tylko z lokalnego kontraktu,
 expected manifest i fixture; ma test odłączonego pakietu uruchomionego z `python -I`
 dwukrotnie. Sprawdza schema, wersje, identity, allowlistę i wszystkie byte hashes.
-Typed importer i publikacja do generated w AI należą do **03.4**.
+[Typed importer 03.4](../evidence/ai/03/03.4/README.md) ma lokalny odbiór
+Parquet/canonical hashes i atomowej publikacji do generated w repo AI.
 
 Zmiany upstream i konsumenta mają osobne commity/branche ze wspólną wersją.
 Najpierw dostarcz upstream fixture/contract, potem consumer registry/testy.

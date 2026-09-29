@@ -1,6 +1,6 @@
 # Aktualny status RetailOps
 
-Aktualizacja: **2026-09-28**. [Audyt AI 00](evidence/ai/00/README.md) na
+Aktualizacja: **2026-09-29**. [Audyt AI 00](evidence/ai/00/README.md) na
 `cbf28b2` obejmuje dwukrotną generację `small`, kontrast 100/20 produktów,
 pomiary danych i kontraktów, **138 testów bez pominięć** oraz ponowny odczyt
 ocenionych artefaktów RF. Required CI tego SHA ma `success`.
@@ -52,8 +52,11 @@ replay cross-repo mają własne dalsze bramki.
 [AI 03.1/03.2](evidence/ai/03/03.2/README.md) mają lokalny odbiór typed Parquet,
 polityki artefaktów i niezmiennego eksportu w RetailOps.
 [03.3 handoff](reference/source-snapshot-handoff.md) ma lokalny odbiór wspólnego
-kontraktu i samowystarczalnego fixture. Następnie 03.4 typed importer i curated
-w AI. Publikacja branchy i zdalne Required CI 03 pozostają otwarte. RAG 11 jest odebrany; równolegle
+kontraktu i samowystarczalnego fixture.
+[03.4 typed importer](evidence/ai/03/03.4/README.md) jest odebrany lokalnie
+w repo AI, na osobnym branchu `ai/03-04-importer`: 706 testów, oba smoke
+i optional truth dwukrotnie. Następnie 03.5 curated i 03.6 bramka cross-repo.
+Publikacja branchy i zdalne Required CI 03 pozostają otwarte. RAG 11 jest odebrany; równolegle
 można przygotować interfejsy i test doubles 12. [Pisemna mapa](plans/ai/kolejnosc-i-repozytoria.md)
 przypisuje etapy 03–17 do repozytoriów i podaje kolejność oraz możliwości
 pracy równoległej. [Backlog](plans/ai/backlog.md) opisuje najbliższe zadania,
@@ -69,7 +72,7 @@ użytkową kwalifikację, aktywację i rollback. Zakres jest opublikowany na
 zamrożone progi; kontrole krytyczne i cytaty mają 100%.
 
 Końcowe evidence właściciela repo AI opisuje pomiar Bedrock/PostgreSQL/HTTP,
-643 testy i kontrole awarii. Integracja z handoff 03.3 ma ponowioną regresję
-658 testów. Nie wykonano w tej sesji nowych pomiarów AWS ani ponownej kontroli
+643 testy i kontrole awarii. Branch typed importera 03.4 ma ponowioną regresję
+706 testów. Nie wykonano w tej sesji nowych pomiarów AWS ani ponownej kontroli
 zdalnego CI RAG. Odpowiedzi i narzędzia agenta należą do 12; pełny agent czeka
 na 10. Zmiany dokumentacji wymagają nowego zatwierdzonego snapshotu korpusu.
