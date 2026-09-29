@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      AI03_CONSUMER_REVISION: b2c19e88a1f7b367a09a14dfc589fdbd1a5aaa5e
+      AI03_CONSUMER_REVISION: cb053cc29c1906d79108cba2c70f88b56e454211
     steps:
       - name: Checkout producer
         uses: actions/checkout@v6
