@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
-from functools import cached_property
+from functools import cached_property, lru_cache
 from itertools import pairwise
 from typing import TYPE_CHECKING, Any, TypeVar
 
@@ -40,6 +40,7 @@ def _index(rows: Iterable[Record], field: str) -> dict[str, Record]:
     return result
 
 
+@lru_cache(maxsize=32768)
 def _normalize(row: Record, fields: tuple[str, ...]) -> Record:
     values = {field: utc_timestamp(getattr(row, field)).isoformat() for field in fields}
     return row.model_copy(update=values)
