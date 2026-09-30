@@ -37,6 +37,8 @@ scoped credential supplied through your normal secret-handling mechanism.
 The evidence bundle contains the signed registry manifest, four SPDX SBOMs,
 four image provenance bundles, four signed SBOM bundles, scanner results,
 Required CI references, build-side and registry-side drill reports, and checksums.
+For manifest v3 it also includes hashed BuildKit metadata for each image and
+the declared/resolved inputs, source input hashes and harness Action identities.
 The separate `release-verification.json` binds successful registry verification
 to the immutable signed manifest; it does not modify that signed manifest.
 
@@ -70,6 +72,9 @@ python3 scripts/release/drill.py \
 `registry.py pull` enforces the signer workflow, source commit/ref, digest,
 SBOM signature/content, OCI labels and Docker image identity. Imported manifests
 also must match migration fingerprints and version metadata exported from Git.
+For images carrying `build_inputs`, their Dockerfile/dependency hashes and base
+declarations must also match that source; metadata checksums are verified before
+pulling the artifact.
 There is no fallback to mutable tags or to a local image build.
 
 The pinned scanner emits SPDX 2.3 and verification requires the versioned

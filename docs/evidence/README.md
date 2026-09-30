@@ -1,12 +1,14 @@
 # Dowody weryfikacji
 
-Indeks przeglądany 2026-09-29. Poniżej znajdują się ostatnie zachowane wyniki
+Indeks przeglądany 2026-09-30. Poniżej znajdują się ostatnie zachowane wyniki
 potrzebne do opisania obecnych możliwości projektu. Każdy raport dotyczy
 konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
-| OPS-07 — kontrakt zdarzeń v1 | 2026-09-29 | [Odbiór lokalny](ops/07/README.md): 13 typów, pięć topiców, wykonywalny JSON Schema, zgodność generatora, brokera i konsumenta oraz IDs rozróżniające rewizje. Trwałe ACK/DLQ pozostaje OPS-03. |
+| OPS-06 — wejścia builda i workflow | 2026-09-30 | [Odbiór lokalny](ops/06/README.md): pełne SHA Actions, digesty zewnętrznych obrazów, kontrola 171 referencji, receipts BuildKit i rzeczywisty upgrade/awaria/rollback. Aktualizacje przez kontrolowany PR. |
+| OPS-03 — trwałe ACK i odtwarzanie | 2026-09-30 | [Odbiór lokalny](ops/03/README.md): 1424 passed, 40 istniejących DB tests skipped; wszystkie 17 real-broker cases passed. Raw quarantine, DB/handler failures, atomic rollback, SIGKILL przed ACK i reviewed replay. |
+| OPS-07 — kontrakt zdarzeń v1 | 2026-09-29 | [Odbiór lokalny](ops/07/README.md): 13 typów, pięć topiców, wykonywalny JSON Schema, zgodność generatora, brokera i konsumenta oraz IDs rozróżniające rewizje. Trwałe ACK/kwarantannę opisuje oddzielny odbiór OPS-03. |
 | AI 06 — pełny odbiór i audyt | 2026-09-29 | [Końcowy odbiór](ai/06/final/README.md), [karta danych](ai/06/final/dataset-card.md): source 2.7 → qualification → snapshot/import/curated 1.1, historyczny as-of, truth isolation, oba profile dwukrotnie i domyślna ścieżka AI. |
 | AI 03.6 — pełny cross-repo | 2026-09-29 | [Odbiór obu repo](ai/03/03.6/README.md): oba standardowe smoke dwukrotnie na Darwin/Linux, osobny późny fakt, parity/IDs/as-of, budżet oraz [publikacja na main obu repo z Required CI](ai/03/03.6/main-publication.json). Otwiera 04 i 06. |
 | AI 03.5 — curated w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.5/README.md): 743 testy, typed normalization/mapping/quarantine, immutable IDs, as-of, oba smoke i truth dwukrotnie oraz odłączony wheel. |

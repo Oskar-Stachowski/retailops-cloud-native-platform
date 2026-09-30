@@ -13,8 +13,6 @@ concurrency:
 
 env:
   CHECKOV_VERSION: "3.2.520"
-  KUBECONFORM_VERSION: "0.7.0"
-  CONFTEST_VERSION: "0.56.0"
 
 jobs:
   kubernetes-policy:
@@ -24,12 +22,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Set up kubectl with Kustomize
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede # v4.0.1
         with:
           version: v1.31.0
 
@@ -45,11 +43,11 @@ jobs:
           mkdir -p "${RUNNER_TEMP}/retailops-bin"
           printf '%s\n' \
             '#!/usr/bin/env bash' \
-            "exec docker run --rm -i ghcr.io/yannh/kubeconform:v${KUBECONFORM_VERSION} \"\$@\"" \
+            "exec docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0@sha256:85dbef6b4b312b99133decc9c6fc9495e9fc5f92293d4ff3b7e1b30f5611823c \"\$@\"" \
             > "${RUNNER_TEMP}/retailops-bin/kubeconform"
           printf '%s\n' \
             '#!/usr/bin/env bash' \
-            "exec docker run --rm -v \"\${PWD}:\${PWD}\" -w \"\${PWD}\" openpolicyagent/conftest:v${CONFTEST_VERSION} \"\$@\"" \
+            "exec docker run --rm -v \"\${PWD}:\${PWD}\" -w \"\${PWD}\" openpolicyagent/conftest:v0.56.0@sha256:9204b38318a7b4be4e49403d81a6c53ed81a99d0c3dd770a216a65edb9a412c7 \"\$@\"" \
             > "${RUNNER_TEMP}/retailops-bin/conftest"
           chmod +x \
             "${RUNNER_TEMP}/retailops-bin/kubeconform" \
@@ -76,13 +74,13 @@ jobs:
     timeout-minutes: 35
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede # v4.0.1
         with:
           version: v1.35.0
 

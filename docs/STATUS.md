@@ -1,6 +1,6 @@
 # Aktualny status RetailOps
 
-Aktualizacja: **2026-09-29**. [Audyt AI 00](evidence/ai/00/README.md) na
+Aktualizacja: **2026-09-30**. [Audyt AI 00](evidence/ai/00/README.md) na
 `cbf28b2` obejmuje dwukrotną generację `small`, kontrast 100/20 produktów,
 pomiary danych i kontraktów, **138 testów bez pominięć** oraz ponowny odczyt
 ocenionych artefaktów RF. Required CI tego SHA ma `success`.
@@ -13,8 +13,8 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 | Obszar | Obecny zakres |
 |---|---|
 | Aplikacja lokalna | React, FastAPI, PostgreSQL, migracje i seed; widoki danych, Product 360, decyzje alertów i rekomendacji, historia operacji oraz role demonstracyjne. |
-| Dane i zdarzenia | Deterministyczny generator, walidacja kontraktów, Redpanda, konsument zdarzeń i trwały model odczytu w PostgreSQL. Pełna ścieżka generator → broker → konsument wymaga osobnej weryfikacji. |
-| CI i ochrona repozytorium | Required CI wybiera pełne kontrole obszarów i agreguje wynik `required-result`. Polityka `main` i jej ostatni zapis znajdują się w [governance](governance/branch-protection.md). |
+| Dane i zdarzenia | Deterministyczny generator, walidacja kontraktów, Redpanda, konsument zdarzeń z atomową projekcją metryk, trwałą raw kwarantanną i [odtwarzaniem przed ACK](runbooks/realtime-recovery.md). Pełna ścieżka generator → broker → konsument wymaga osobnej weryfikacji. |
+| CI i ochrona repozytorium | Required CI wybiera pełne kontrole obszarów, egzekwuje SHA Actions/digesty zewnętrznych obrazów i agreguje wynik `required-result`. [Aktualizacja wejść](runbooks/build-input-updates.md) odbywa się przez PR. Polityka `main` i jej ostatni zapis znajdują się w [governance](governance/branch-protection.md). |
 | Wydania | Udokumentowane `v0.2.1`: obrazy Linux AMD64 w GHCR, podpisane provenance i SBOM, pobranie po digest oraz zgodny schematowo rollback. |
 | Baza i rollback | Izolowane próby backup/restore oraz zmiany i przywrócenia wersji aplikacji; brak dowodu odwracalności dowolnych migracji schematu. |
 | Kubernetes | Lokalny kind na ARM64/AMD64: ingress, NetworkPolicy, jobs, PVC, testy przeglądarkowe, restart i rollback. Ścieżka używa lokalnie budowanych obrazów. |

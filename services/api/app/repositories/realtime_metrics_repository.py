@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from datetime import datetime
 
 from psycopg.rows import dict_row
@@ -18,6 +20,22 @@ class RealtimeMetricsRepository:
 
     def __init__(self, connection: object | None = None) -> None:
         self.connection = connection
+
+    @contextmanager
+    def event_transaction(self, event_id: str) -> Iterator[RealtimeMetricsRepository]:
+        """Commit the projection and processed marker together, serializing replays."""
+        if self.connection is not None:
+            with self.connection.transaction():
+                self._execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0));", (event_id,))
+                yield self
+            return
+
+        with get_connection() as connection:
+            repository = RealtimeMetricsRepository(connection=connection)
+            repository._execute(
+                "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0));", (event_id,)
+            )
+            yield repository
 
     def _fetch_one(
         self,

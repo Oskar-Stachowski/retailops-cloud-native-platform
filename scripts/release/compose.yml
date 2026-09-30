@@ -1,7 +1,7 @@
 # Private disposable database; only the frontend has an ephemeral loopback port.
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
     environment:
       POSTGRES_USER: recovery
       POSTGRES_PASSWORD: recovery_disposable_only

@@ -16,3 +16,10 @@ condition = "AND"
 paths = ['''(^|/)docs/evidence/releases/2026-09-25-rollback\.json$''']
 regexTarget = "secret"
 regexes = ['''^sha-(44f7404010b55eba3d9bacd888d2dc7bb9797180|977c776ed7cf80ae2229e1522dba8a44e3827a75)$''']
+
+[[rules.allowlists]]
+description = "Public SHA-256 of api-ci.yml in OPS-03 evidence; independently recomputable file digest."
+condition = "AND"
+paths = ['''(^|/)docs/evidence/ops/03/local-verification\.json$''']
+regexTarget = "secret"
+regexes = ['''^88b2b15221c99aea3dae9092895f432dd52c551a48b7531b94ae725076f6849d$''']

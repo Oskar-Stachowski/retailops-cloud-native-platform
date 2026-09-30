@@ -1,0 +1,614 @@
+{
+  "measured_at": "2026-09-30T08:30:19.917068+00:00",
+  "code_commit": "4ab97e6632e2b78a3b98c7c7a51cfd21dca7df3a",
+  "scope": "external Actions and images; local release build/upgrade/outage/rollback",
+  "environment": {
+    "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.13",
+    "image_platform": "linux/arm64",
+    "buildx": "v0.32.1-desktop.1"
+  },
+  "inventory": {
+    "status": "passed",
+    "references": 171,
+    "counts": {
+      "action": 118,
+      "image": 53
+    },
+    "unique_action_pins": 16,
+    "unique_image_pins": 16
+  },
+  "tests": [
+    {
+      "suite": "release refusal/identity checks",
+      "passed": 20
+    },
+    {
+      "suite": "immutable reference policy",
+      "passed": 11
+    },
+    {
+      "suite": "required CI path matrix",
+      "passed": 16
+    }
+  ],
+  "other_checks": [
+    "Ruff check/format",
+    "actionlint 1.7.7 by verified image digest",
+    "Compose config and all profiles",
+    "YAML parse",
+    "git diff --check"
+  ],
+  "runtime": {
+    "status": "passed",
+    "cleanup": "passed",
+    "working_tree_dirty": false,
+    "negative_checks": {
+      "changed_migration_history": "blocked",
+      "unknown_database_head": "blocked",
+      "api_outage": "HTTP 502 detected"
+    },
+    "timings_seconds": {
+      "upgrade_and_verification": 26.424,
+      "rollback_and_verification": 20.747,
+      "total": 113.974
+    }
+  },
+  "runtime_report_sha256": "413ac459a4bf6b85c6671d19f4fa3dcab5aa438f9b6565f3d651e44de6b8fa37",
+  "stages": [
+    {
+      "name": "previous",
+      "source_commit": "75f59c9243ec75930ebec1c9b6e2d1d132be3eab",
+      "api": {
+        "http_health_readiness": "passed",
+        "decisions": 3,
+        "idempotent_actions": 5,
+        "data_schema_unchanged": true
+      },
+      "browser": {
+        "dashboard": "passed",
+        "product360_decisions": 3,
+        "reload": "passed"
+      }
+    },
+    {
+      "name": "upgraded",
+      "source_commit": "4ab97e6632e2b78a3b98c7c7a51cfd21dca7df3a",
+      "api": {
+        "http_health_readiness": "passed",
+        "decisions": 3,
+        "idempotent_actions": 5,
+        "data_schema_unchanged": true
+      },
+      "browser": {
+        "dashboard": "passed",
+        "product360_decisions": 3,
+        "reload": "passed"
+      }
+    },
+    {
+      "name": "rolled_back",
+      "source_commit": "75f59c9243ec75930ebec1c9b6e2d1d132be3eab",
+      "api": {
+        "http_health_readiness": "passed",
+        "decisions": 3,
+        "idempotent_actions": 5,
+        "data_schema_unchanged": true
+      },
+      "browser": {
+        "dashboard": "passed",
+        "product360_decisions": 3,
+        "reload": "passed"
+      }
+    }
+  ],
+  "releases": [
+    {
+      "role": "previous",
+      "source_commit": "75f59c9243ec75930ebec1c9b6e2d1d132be3eab",
+      "version": "0.2.1+git.75f59c9243ec",
+      "migration": {
+        "head": "6b0f1c2d3e4a",
+        "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+      },
+      "images": [
+        {
+          "component": "api",
+          "image_id": "sha256:3047ded7b658022cec83260ac702a722d1606fe1ff6594cf3cb736e52ddf4562",
+          "platform": "linux/arm64",
+          "build_inputs": {
+            "declared_bases": [
+              "python:3.11-slim"
+            ],
+            "source_files_sha256": {
+              "Dockerfile": "43e4705bb4cce65b0df817afcb9942caf914292e912b2d01ac1a7a8c2d7a7e84",
+              ".dockerignore": "40eb4ec894a97521848dfcf06c466655f38b2ed1b607d50064445258ec74eace",
+              "requirements.txt": "cb92c29105f31f95b5406ed0992ab2dce30b37a8c22f2a8c7c037065b4e21110"
+            },
+            "materials": [
+              {
+                "uri": "pkg:docker/python@3.11-slim?platform=linux%2Farm64",
+                "digest": {
+                  "sha256": "e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e"
+                }
+              }
+            ],
+            "exported_image_digest": "sha256:3047ded7b658022cec83260ac702a722d1606fe1ff6594cf3cb736e52ddf4562",
+            "config_digest": null,
+            "platform": "linux/arm64",
+            "metadata": {
+              "file": "75f59c9243ec75930ebec1c9b6e2d1d132be3eab-api-build.json",
+              "sha256": "71e56fd71ca29562d503f5992d717a2d0cba5041589c3ad006c7588ce13592f9"
+            }
+          }
+        },
+        {
+          "component": "frontend",
+          "image_id": "sha256:6062e61aa5ad3f0f72548f1ed0cb8a0341cceb8dbf730a653130c665a6418d03",
+          "platform": "linux/arm64",
+          "build_inputs": {
+            "declared_bases": [
+              "node:22-alpine",
+              "nginxinc/nginx-unprivileged:1.31-alpine"
+            ],
+            "source_files_sha256": {
+              "Dockerfile": "175a4aaf237c805d3aa065ea13b33a599d7030221d7c575d3c41ff370a8b789f",
+              ".dockerignore": "5cfad48a4bd4fcb03810b2e144b5cc801df89cd2a62b795e43686a2cc9bc852b",
+              "package.json": "d8c5c5707ddda07ea72a6779951ac278326acfaa34e082f3f2342d3877b13160",
+              "package-lock.json": "e503a4371863490d6c9f441f5846e34753638394690d2ac926a156275474e4f1"
+            },
+            "materials": [
+              {
+                "uri": "pkg:docker/node@22-alpine?platform=linux%2Farm64",
+                "digest": {
+                  "sha256": "0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402"
+                }
+              },
+              {
+                "uri": "pkg:docker/nginxinc/nginx-unprivileged@1.31-alpine?platform=linux%2Farm64",
+                "digest": {
+                  "sha256": "26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af"
+                }
+              }
+            ],
+            "exported_image_digest": "sha256:6062e61aa5ad3f0f72548f1ed0cb8a0341cceb8dbf730a653130c665a6418d03",
+            "config_digest": null,
+            "platform": "linux/arm64",
+            "metadata": {
+              "file": "75f59c9243ec75930ebec1c9b6e2d1d132be3eab-frontend-build.json",
+              "sha256": "a5f4dc82e30ec4c39f4bde8ce35ea746569125e79d0a2bd2c92a55b13eb41f92"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "candidate",
+      "source_commit": "4ab97e6632e2b78a3b98c7c7a51cfd21dca7df3a",
+      "version": "0.2.1+git.4ab97e6632e2",
+      "migration": {
+        "head": "6b0f1c2d3e4a",
+        "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+      },
+      "images": [
+        {
+          "component": "api",
+          "image_id": "sha256:1252f206c9ec91b6fabbcd780b7ac53b3ef322cb9ecb94e98b6e4129ddce07da",
+          "platform": "linux/arm64",
+          "build_inputs": {
+            "declared_bases": [
+              "python:3.11-slim@sha256:e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e"
+            ],
+            "source_files_sha256": {
+              "Dockerfile": "d583e306ad07bbd534c2650fca2387340c8480c4836b36a6553f51f7b39291d1",
+              ".dockerignore": "40eb4ec894a97521848dfcf06c466655f38b2ed1b607d50064445258ec74eace",
+              "requirements.txt": "cb92c29105f31f95b5406ed0992ab2dce30b37a8c22f2a8c7c037065b4e21110"
+            },
+            "materials": [
+              {
+                "uri": "pkg:docker/python@3.11-slim?digest=sha256:e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e&platform=linux%2Farm64",
+                "digest": {
+                  "sha256": "e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e"
+                }
+              }
+            ],
+            "exported_image_digest": "sha256:1252f206c9ec91b6fabbcd780b7ac53b3ef322cb9ecb94e98b6e4129ddce07da",
+            "config_digest": null,
+            "platform": "linux/arm64",
+            "metadata": {
+              "file": "4ab97e6632e2b78a3b98c7c7a51cfd21dca7df3a-api-build.json",
+              "sha256": "ce63f475d4a036d95f56f71ba1e676d0b25aae8bc90bb5623b95e4ff1c917626"
+            }
+          }
+        },
+        {
+          "component": "frontend",
+          "image_id": "sha256:28ad838a4836bbd2f0e16abb2e0c701c759736b42e724cb40fbd736b8fd6e299",
+          "platform": "linux/arm64",
+          "build_inputs": {
+            "declared_bases": [
+              "node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402",
+              "nginxinc/nginx-unprivileged:1.31-alpine@sha256:26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af"
+            ],
+            "source_files_sha256": {
+              "Dockerfile": "35ca47b7f6101cae41a17f534b89f4f44f284f8c9d05f7538a39e7202ae1c442",
+              ".dockerignore": "5cfad48a4bd4fcb03810b2e144b5cc801df89cd2a62b795e43686a2cc9bc852b",
+              "package.json": "d8c5c5707ddda07ea72a6779951ac278326acfaa34e082f3f2342d3877b13160",
+              "package-lock.json": "e503a4371863490d6c9f441f5846e34753638394690d2ac926a156275474e4f1"
+            },
+            "materials": [
+              {
+                "uri": "pkg:docker/node@22-alpine?digest=sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402&platform=linux%2Farm64",
+                "digest": {
+                  "sha256": "0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402"
+                }
+              },
+              {
+                "uri": "pkg:docker/nginxinc/nginx-unprivileged@1.31-alpine?digest=sha256:26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af&platform=linux%2Farm64",
+                "digest": {
+                  "sha256": "26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af"
+                }
+              }
+            ],
+            "exported_image_digest": "sha256:28ad838a4836bbd2f0e16abb2e0c701c759736b42e724cb40fbd736b8fd6e299",
+            "config_digest": null,
+            "platform": "linux/arm64",
+            "metadata": {
+              "file": "4ab97e6632e2b78a3b98c7c7a51cfd21dca7df3a-frontend-build.json",
+              "sha256": "67dfa8151d1e7fe410124b2463aac94d50cc0f2e45a6cf320c59bd3afb8cf22b"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "observed_ref": "actions/attest-build-provenance@v2",
+      "sha": "e8998f949152b193b063cb0ec769d69d929409be",
+      "version": "v2.4.0",
+      "source": "https://github.com/actions/attest-build-provenance/commit/e8998f949152b193b063cb0ec769d69d929409be"
+    },
+    {
+      "observed_ref": "actions/attest-build-provenance@v3",
+      "sha": "977bb373ede98d70efdf65b84cb5f73e068dcc2a",
+      "version": "v3.0.0",
+      "source": "https://github.com/actions/attest-build-provenance/commit/977bb373ede98d70efdf65b84cb5f73e068dcc2a"
+    },
+    {
+      "observed_ref": "actions/attest-sbom@v3",
+      "sha": "4651f806c01d8637787e274ac3bdf724ef169f34",
+      "version": "v3.0.0",
+      "source": "https://github.com/actions/attest-sbom/commit/4651f806c01d8637787e274ac3bdf724ef169f34"
+    },
+    {
+      "observed_ref": "actions/checkout@v6",
+      "sha": "d23441a48e516b6c34aea4fa41551a30e30af803",
+      "version": "v6.1.0",
+      "source": "https://github.com/actions/checkout/commit/d23441a48e516b6c34aea4fa41551a30e30af803"
+    },
+    {
+      "observed_ref": "actions/download-artifact@v4",
+      "sha": "d3f86a106a0bac45b974a628896c90dbdf5c8093",
+      "version": "v4.3.0",
+      "source": "https://github.com/actions/download-artifact/commit/d3f86a106a0bac45b974a628896c90dbdf5c8093"
+    },
+    {
+      "observed_ref": "actions/setup-node@v6",
+      "sha": "249970729cb0ef3589644e2896645e5dc5ba9c38",
+      "version": "v6.5.0",
+      "source": "https://github.com/actions/setup-node/commit/249970729cb0ef3589644e2896645e5dc5ba9c38"
+    },
+    {
+      "observed_ref": "actions/setup-python@v6",
+      "sha": "ece7cb06caefa5fff74198d8649806c4678c61a1",
+      "version": "v6.3.0",
+      "source": "https://github.com/actions/setup-python/commit/ece7cb06caefa5fff74198d8649806c4678c61a1"
+    },
+    {
+      "observed_ref": "actions/upload-artifact@v4",
+      "sha": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "version": "v4.6.2",
+      "source": "https://github.com/actions/upload-artifact/commit/ea165f8d65b6e75b540449e92b4886f43607fa02"
+    },
+    {
+      "observed_ref": "aquasecurity/trivy-action@v0.36.0",
+      "sha": "ed142fd0673e97e23eac54620cfb913e5ce36c25",
+      "version": "v0.36.0",
+      "source": "https://github.com/aquasecurity/trivy-action/commit/ed142fd0673e97e23eac54620cfb913e5ce36c25"
+    },
+    {
+      "observed_ref": "astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+      "sha": "c771a70e6277c0a99b617c7a806ffedaca235ff9",
+      "version": "v9.0.0",
+      "source": "https://github.com/astral-sh/setup-uv/commit/c771a70e6277c0a99b617c7a806ffedaca235ff9"
+    },
+    {
+      "observed_ref": "aws-actions/configure-aws-credentials@v5",
+      "sha": "61815dcd50bd041e203e49132bacad1fd04d2708",
+      "version": "v5.1.1",
+      "source": "https://github.com/aws-actions/configure-aws-credentials/commit/61815dcd50bd041e203e49132bacad1fd04d2708"
+    },
+    {
+      "observed_ref": "azure/setup-kubectl@v4",
+      "sha": "776406bce94f63e41d621b960d78ee25c8b76ede",
+      "version": "v4.0.1",
+      "source": "https://github.com/azure/setup-kubectl/commit/776406bce94f63e41d621b960d78ee25c8b76ede"
+    },
+    {
+      "observed_ref": "docker/login-action@v3",
+      "sha": "c94ce9fb468520275223c153574b00df6fe4bcc9",
+      "version": "v3.7.0",
+      "source": "https://github.com/docker/login-action/commit/c94ce9fb468520275223c153574b00df6fe4bcc9"
+    },
+    {
+      "observed_ref": "gitleaks/gitleaks-action@v2.3.9",
+      "sha": "ff98106e4c7b2bc287b24eaf42907196329070c7",
+      "version": "v2.3.9",
+      "source": "https://github.com/gitleaks/gitleaks-action/commit/ff98106e4c7b2bc287b24eaf42907196329070c7"
+    },
+    {
+      "observed_ref": "hashicorp/setup-terraform@v3",
+      "sha": "b9cd54a3c349d3f38e8881555d616ced269862dd",
+      "version": "v3.1.2",
+      "source": "https://github.com/hashicorp/setup-terraform/commit/b9cd54a3c349d3f38e8881555d616ced269862dd"
+    },
+    {
+      "observed_ref": "terraform-linters/setup-tflint@v4",
+      "sha": "90f302c255ef959cbfb4bd10581afecdb7ece3e6",
+      "version": "v4.1.1",
+      "source": "https://github.com/terraform-linters/setup-tflint/commit/90f302c255ef959cbfb4bd10581afecdb7ece3e6"
+    }
+  ],
+  "image_indexes": [
+    {
+      "observed_ref": "aquasec/trivy:0.74.0",
+      "digest": "sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:55ad20f8a239a3e95427e60b8aaea38788550c18a3f1772976bebf732e6ae166"
+        }
+      ]
+    },
+    {
+      "observed_ref": "ghcr.io/yannh/kubeconform:v0.7.0",
+      "digest": "sha256:85dbef6b4b312b99133decc9c6fc9495e9fc5f92293d4ff3b7e1b30f5611823c",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:7426d17ca19f3731d2a6287c868005f052f2682800141f20e83d3109f5c8faa1"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:cb8ca5a6e9bfb60b1858d65cba57c27f8080befcd5282b21518b860192b91e31"
+        }
+      ]
+    },
+    {
+      "observed_ref": "grafana/grafana:12.4.3",
+      "digest": "sha256:2e986801428cd689c2358605289c90ab37d2b39e24808874971f54c99bcdc412",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:6b2185720c70337fdc8422944d88c44ca684ba013e34a4aa063257d6f912341b"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:3e98c239d7600a250a60d1e34c217f4973d0c8f7a1bbdd060751d89b4415fd61"
+        }
+      ]
+    },
+    {
+      "observed_ref": "nginxinc/nginx-unprivileged:1.31-alpine",
+      "digest": "sha256:26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:c18d735d33a1c3ccb5ef201d504e5b4aa4d003e81f034b329011267f4c4d0f58"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:235aa76ead1fa92bb600d92182f30466d024e17caa646cfd761ecd65f0107afb"
+        }
+      ]
+    },
+    {
+      "observed_ref": "node:22-alpine",
+      "digest": "sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:2c752226d477b4a886378baa95b9af252be59301b725fdb0b7e15208131505a8"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "digest": "sha256:85cdd100016a2e09927c0776bb7ebebcfefce5cd0af49893ada91cbc4d78ee22"
+        }
+      ]
+    },
+    {
+      "observed_ref": "openpolicyagent/conftest:v0.56.0",
+      "digest": "sha256:9204b38318a7b4be4e49403d81a6c53ed81a99d0c3dd770a216a65edb9a412c7",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:6e3fe2e577e745ad30dedc651806ba009f66cf62e12b06fdb99b840c1048ec76"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:983ed4a5c0e1ae2072fbc34c7862cd2a8e4a13331c57d25c97d0b83350a0f8b4"
+        }
+      ]
+    },
+    {
+      "observed_ref": "postgres:16",
+      "digest": "sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:a85daf0dbd5e79586e850e3fe4b21b796799828ad015ce2166aeb98cc24da61c"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "digest": "sha256:1a43e6bb8872ccce507f8467e549a6166e8ff132ad26b49879f5ec86ee612868"
+        }
+      ]
+    },
+    {
+      "observed_ref": "postgres:16-alpine",
+      "digest": "sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:1a66d744c1b459e13b05a8fca341da84cb63383e99ce262210efee5a319d4551"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "digest": "sha256:2c942175a1255a9abe0366e48c1b401d9f50f835b04dfea13f111609b5530df7"
+        }
+      ]
+    },
+    {
+      "observed_ref": "prom/prometheus:v3.7.3",
+      "digest": "sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:6573196e5dbe834779ac4d34cb053113cc502a69e9e20ba3be96d37f33e81545"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:d2b94e94102d52b6330f062d3e27778ff2f2e77b7de0d25d168d0a65ff7f129e"
+        }
+      ]
+    },
+    {
+      "observed_ref": "python:3.11-slim",
+      "digest": "sha256:e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:174bec68e0451bffabbb08c7d5d21c6b253f772d81d52b9558af97bb3159b761"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "digest": "sha256:8b29ec24b5f3c929a79b55772b95c93311b7133f1cf7fa0a6141ef621f8e3c57"
+        }
+      ]
+    },
+    {
+      "observed_ref": "redpandadata/redpanda:v25.3.6",
+      "digest": "sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:71e36e10eb03b780844357a75b19896b8463ff1f4d2000940327539974189f6e"
+        },
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:359ef6f11bc6e7223467c3775129c513f88634e1d360464a2af72e529c286750"
+        }
+      ]
+    },
+    {
+      "observed_ref": "rhysd/actionlint:1.7.7",
+      "digest": "sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9",
+      "platforms": [
+        {
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "digest": "sha256:1d74bfc9fd1963af8f89a7c22afaaafd42f49aad711a09951d02cb996398f61d"
+        },
+        {
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          },
+          "digest": "sha256:2ed5f65788d18230778f7187b1917bf5d3fcd6cb68bbc811a004078b9c935f27"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "not a registry publication",
+    "not a hermetic byte-reproducible build",
+    "historical predecessor declarations remain unchanged; actual resolved materials recorded"
+  ]
+}

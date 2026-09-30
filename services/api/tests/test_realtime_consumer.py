@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from unittest.mock import Mock
 
 import pytest
@@ -5,6 +6,7 @@ import pytest
 from app.core.config import Settings
 from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
 from app.services.realtime_consumer import (
+    InvalidRealtimeEventError,
     RealtimeEventConsumer,
     RealtimeEventEnvelope,
     build_realtime_event_consumer,
@@ -13,7 +15,7 @@ from app.services.realtime_consumer import (
 
 def sample_event(event_type: str = "sale_completed") -> dict[str, object]:
     return {
-        "event_id": "01HXZ7M8E5K9Q3Q76W7J7Y5YV2",
+        "event_id": "10c72395-4d9c-4f07-a940-c220c7f3aaf3",
         "event_type": event_type,
         "topic": "retailops.sales.v1",
         "schema_version": "1.0",
@@ -53,8 +55,12 @@ def test_consumer_processes_known_event_and_updates_state() -> None:
             self.records: list[tuple[str, dict[str, object]]] = []
             self.processed = False
 
-        def is_event_processed(self, event_id: str) -> bool:
-            return self.processed
+        @contextmanager
+        def event_transaction(self, event_id):
+            yield self
+
+        def get_event_record(self, event_id):
+            return {"status": "processed"} if self.processed else None
 
         def record_event_log(self, **kwargs):
             self.records.append(("event_log", kwargs))
@@ -81,7 +87,7 @@ def test_consumer_processes_known_event_and_updates_state() -> None:
     result = consumer.process_event(sample_event())
 
     assert result["status"] == "processed"
-    assert observed == ["01HXZ7M8E5K9Q3Q76W7J7Y5YV2"]
+    assert observed == ["10c72395-4d9c-4f07-a940-c220c7f3aaf3"]
     assert consumer.state.received_events == 1
     assert consumer.state.processed_events == 1
     assert consumer.state.failed_events == 0
@@ -100,8 +106,12 @@ def test_consumer_ignores_duplicate_processed_events() -> None:
         def __init__(self) -> None:
             self.records: list[tuple[str, dict[str, object]]] = []
 
-        def is_event_processed(self, event_id: str) -> bool:
-            return True
+        @contextmanager
+        def event_transaction(self, event_id):
+            yield self
+
+        def get_event_record(self, event_id):
+            return {"status": "processed"}
 
         def record_event_log(self, **kwargs):
             self.records.append(("event_log", kwargs))
@@ -128,41 +138,21 @@ def test_consumer_ignores_duplicate_processed_events() -> None:
     assert repository.records[0][0] == "state"
 
 
-def test_consumer_records_failed_dead_letter_for_validation_error() -> None:
-    class RecordingRepository:
-        def __init__(self) -> None:
-            self.records: list[tuple[str, dict[str, object]]] = []
-
-        def is_event_processed(self, event_id: str) -> bool:
-            return False
-
-        def record_event_log(self, **kwargs):
-            self.records.append(("event_log", kwargs))
-            return kwargs
-
-        def replace_metric_observations(self, **kwargs):
-            self.records.append(("metrics", kwargs))
-            return len(kwargs["observations"])
-
-        def upsert_consumer_state(self, **kwargs):
-            self.records.append(("state", kwargs))
-            return kwargs
-
-    repository = RecordingRepository()
+def test_consumer_validation_error_is_not_a_durable_dead_letter() -> None:
+    repository = Mock(spec=RealtimeMetricsRepository)
     consumer = build_realtime_event_consumer(repository=repository)
     broken_event = sample_event()
     broken_event.pop("payload")
 
-    result = consumer.process_event(broken_event)
+    with pytest.raises(InvalidRealtimeEventError, match="Missing required"):
+        consumer.process_event(broken_event)
 
-    assert result["status"] == "failed_dead_lettered"
     assert consumer.state.received_events == 1
     assert consumer.state.processed_events == 0
     assert consumer.state.failed_events == 1
-    assert consumer.state.dead_lettered_events == 1
-    assert consumer.state.last_error
-    assert repository.records[0][0] == "event_log"
-    assert repository.records[-1][0] == "state"
+    assert consumer.state.dead_lettered_events == 0
+    repository.record_event_log.assert_not_called()
+    repository.replace_metric_observations.assert_not_called()
 
 
 def test_consumer_snapshot_includes_broker_settings() -> None:
@@ -187,8 +177,19 @@ def test_consumer_rejects_mismatched_transport_topic_before_metrics() -> None:
     repository = Mock(spec=RealtimeMetricsRepository)
     consumer = RealtimeEventConsumer(repository=repository)
 
-    result = consumer.process_event(sample_event(), transport_topic="retailops.inventory.v1")
-
-    assert result["status"] == "failed_dead_lettered"
-    assert "Transport topic mismatch" in result["error"]
+    with pytest.raises(InvalidRealtimeEventError, match="Transport topic mismatch"):
+        consumer.process_event(sample_event(), transport_topic="retailops.inventory.v1")
     repository.replace_metric_observations.assert_not_called()
+
+
+@pytest.mark.parametrize("field", ["payload", "event_type", "schema_version"])
+def test_validation_diagnostics_do_not_copy_untrusted_content(field) -> None:
+    repository = Mock(spec=RealtimeMetricsRepository)
+    consumer = RealtimeEventConsumer(repository=repository)
+    invalid = sample_event()
+    content = "untrusted-payload-must-stay-in-raw-quarantine"
+    invalid[field] = {"private_context": content} if field == "payload" else content
+    with pytest.raises(InvalidRealtimeEventError) as captured:
+        consumer.process_event(invalid)
+    assert content not in str(captured.value)
+    assert content not in repository.upsert_consumer_state.call_args.kwargs["last_error"]

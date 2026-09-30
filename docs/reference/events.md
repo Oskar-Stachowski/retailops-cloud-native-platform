@@ -9,7 +9,8 @@ Konsument wymaga `event_id`, `event_type`, `topic`, `schema_version`, `source`,
 Obsługiwana wersja to dokładnie `1.0`; inny major lub niezatwierdzony minor jest
 odrzucany. Schemat ma osobny payload dla każdego z 13 typów i odrzuca nieznane pola.
 
-`event_id` jest kluczem deduplikacji. Generator wyznacza go z seed, source,
+`event_id` jest UUID i kluczem deduplikacji zgodnym z typem kolumny PostgreSQL.
+Generator wyznacza go z seed, source,
 typu, naturalnego klucza i skrótu kanonicznej wersji payloadu oraz czasów.
 Powtórzenie tej samej wersji ma ten sam ID; zmieniona zawartość albo availability
 otrzymuje nowy ID. Zewnętrzni producenci podają własny ID zgodny z kontraktem.
@@ -42,9 +43,14 @@ miały oddzielny `retailops.intelligence.v2` w etapie 10.
 - [Proces brokera](../../services/api/scripts/run_realtime_consumer.py) pobiera komunikaty z Redpandy.
 - PostgreSQL przechowuje `realtime_event_log`, `live_metric_observations` i `realtime_consumer_state`; szczegóły w [opisie trwałości](live-metrics-persistence.md).
 
-Przetwarzanie lokalne i test deduplikacji nie dowodzą dokładnie jednokrotnego
-dostarczenia w całym systemie. Problem potwierdzania offsetu po błędzie
-pozostaje [OPS-03](../audits/open-findings.md); walidacja kontraktu nie jest
-odbiorem trwałego ACK ani DLQ.
+Runner zatwierdza offset synchronicznie po trwałej transakcji metryk i statusu
+albo po zachowaniu surowej wiadomości w kwarantannie PostgreSQL. Awaria DB,
+handlera, kwarantanny lub ACK zatrzymuje proces przed pobraniem kolejnego komunikatu.
+Replay po zapisie i przed ACK korzysta z deduplikacji po UUID.
+Source `retailops.consumer.quarantine` jest zarezerwowany dla wpisów transportowych.
+[Procedura awarii i odtwarzania](../runbooks/realtime-recovery.md) opisuje
+zachowane bajty, kontrolowany replay i ograniczenia. To dostarczanie co najmniej
+raz z idempotentną projekcją metryk; wyniki AI v2 i projekcje domenowe mają
+osobny odbiór w etapie 10.
 
 Uruchamianie brokera i sprawdzanie metryk: [instrukcja streamingu](../guides/streaming.md).
