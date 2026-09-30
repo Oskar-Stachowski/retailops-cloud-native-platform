@@ -115,7 +115,8 @@
     "services/api/app/contracts/realtime-events.v1.schema.json": "e8bdf016a3f8362a81c5ee2b6cde21bce07991c5692d8aebd3e3f40b700b078e",
     "services/api/scripts/realtime_quarantine.py": "c0afb5457071599a75efeab9dfd9ce4d3b8c7871ae0ee6fb57f5258756e688e2",
     "services/api/tests/test_realtime_durability.py": "4351cb7a7f672c57e4ae0b649375886cae1be9b087786509e0f89768eb03deea",
-    ".github/workflows/api-ci.yml": "88b2b15221c99aea3dae9092895f432dd52c551a48b7531b94ae725076f6849d"
+    ".github/workflows/api-ci.yml": "88b2b15221c99aea3dae9092895f432dd52c551a48b7531b94ae725076f6849d",
+    "services/api/app/services/realtime_contract.py": "0b6d7cb39c11c448d46b1d77c47b1ab3c7c31378236577030b8ab4b991312320"
   },
   "checks": {
     "ruff_check": "passed",
@@ -124,7 +125,8 @@
     "bandit_high_high": "passed",
     "data_contracts": "passed",
     "api_docker_build": "passed",
-    "api_container_module_cli": "passed"
+    "api_container_module_cli": "passed",
+    "gitleaks_branch_history": "passed with one exact path+public digest allowlist"
   },
   "transport_semantics": "at-least-once with atomic idempotent metrics projection; PostgreSQL raw quarantine; no automatic publication to broker DLQ topic",
   "schema_migrations": "unchanged",
@@ -132,5 +134,23 @@
     "AI v2 business projections and inbox/outbox",
     "external side effects of custom handlers",
     "retroactive raw recovery from legacy failure records"
-  ]
+  ],
+  "full_regression_commit": "da868d10a1c6dcb14074284a10eb4d7b515b699b",
+  "followup_verification": {
+    "safe_diagnostics_and_replay": {
+      "passed": 61,
+      "seconds": 0.3,
+      "junit_sha256": "93a3a12ba29800c84fe190e7ea0c2d8462c3f327a3b35fce3c2da25fa0931b8c"
+    },
+    "broker": {
+      "passed": 17,
+      "seconds": 116.65,
+      "junit_sha256": "96598f1236905d152c50fa36ab487a0edda93ae5326cdef34dbbe9fd9b6dcf69"
+    },
+    "scope": "Safe validation reasons omit untrusted values/payload; exact public workflow SHA-256 false positive exception; runtime behavior remains unchanged",
+    "file_sha256": {
+      "services/api/tests/test_realtime_consumer.py": "a9eee92a414a23fd65eb7e286bc6f1a5db4bece09392cfdf347dff4d666fe439",
+      ".gitleaks.toml": "a26de7ba406725e6de42f87930562f909229f824c879f9724feab72307f4e810"
+    }
+  }
 }

@@ -40,8 +40,15 @@ Testy jednostkowe sprawdzają także fail-stop na nieznanym wyniku, błąd commi
 partycji, zamknięcie klienta po awarii stanu, blokadę replay bez delivery receipt
 i niezgodny topic. API Required CI ustawia `REQUIRE_BROKER_TESTS=1`, więc brak
 brokera lub nieudana próba nie może być zastąpiona pominięciem.
+Pełna regresja na `da868d1`: **1424 passed, 40 skipped** (istniejące seeded DB tests).
+Po ograniczeniu diagnostyki do bezpiecznego schema reason: **61 focused tests
+i ponowne 17 real-broker cases passed**. Diagnostyka nie kopiuje untrusted
+payloadu/typu/wersji do podsumowania kwarantanny lub stanu API.
 Kontrole lokalne obejmują pełną regresję API/danych, Ruff check/format,
 mypy, Bandit, walidację kontraktów, obraz API i komendę CLI w kontenerze.
+Gitleaks wykazał false positive publicznego SHA-256 `.github/workflows/api-ci.yml`
+w raporcie. Wyjątek wymaga jednocześnie dokładnej ścieżki raportu i tej jednej
+sumy; nie pomija pliku ani reguły. Lokalny skan historii brancha przechodzi.
 
 ## Granice
 

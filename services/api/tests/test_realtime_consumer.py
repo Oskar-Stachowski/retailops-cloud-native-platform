@@ -180,3 +180,16 @@ def test_consumer_rejects_mismatched_transport_topic_before_metrics() -> None:
     with pytest.raises(InvalidRealtimeEventError, match="Transport topic mismatch"):
         consumer.process_event(sample_event(), transport_topic="retailops.inventory.v1")
     repository.replace_metric_observations.assert_not_called()
+
+
+@pytest.mark.parametrize("field", ["payload", "event_type", "schema_version"])
+def test_validation_diagnostics_do_not_copy_untrusted_content(field) -> None:
+    repository = Mock(spec=RealtimeMetricsRepository)
+    consumer = RealtimeEventConsumer(repository=repository)
+    invalid = sample_event()
+    content = "untrusted-payload-must-stay-in-raw-quarantine"
+    invalid[field] = {"private_context": content} if field == "payload" else content
+    with pytest.raises(InvalidRealtimeEventError) as captured:
+        consumer.process_event(invalid)
+    assert content not in str(captured.value)
+    assert content not in repository.upsert_consumer_state.call_args.kwargs["last_error"]
