@@ -21,6 +21,9 @@ Manifest fields include:
 
 - `manifest_version`, full source commit and `VERSION+git.<short-sha>`;
 - API/frontend local tags, immutable image IDs and platform;
+- `build_inputs`: declared base references, BuildKit materials and platform,
+  Dockerfile/dependency-file hashes, exported digest and hashed raw build metadata;
+- harness action commit references and hashes of the workflow/release files;
 - Alembic head and hash of the complete migration history;
 - explicit validation status and a CI run link when executed in GitHub Actions.
 
@@ -30,9 +33,13 @@ checks pass. CI still needs to complete all required gates.
 
 Local Docker `sha256:` image IDs identify artifacts in the current engine.
 The manifest does not treat them as published registry digests or evidence of
-registry publication, signing or SBOM attestation. Rebuilding a commit may produce a different image because
-base tags and build metadata can change. Rollback uses the already-built image
+registry publication, signing or SBOM attestation. Base images and directly
+declared external Actions are pinned to digests/full commits and checked by
+Required CI. Rebuilding may still produce a different image because package
+installation and build metadata are not a hermetic byte-reproducible pipeline.
+Rollback uses the already-built image
 IDs from the previous manifest; it never rebuilds or uses `latest`.
+See the [input update procedure](../runbooks/build-input-updates.md).
 
 ## Release/tag rules
 
@@ -62,6 +69,13 @@ The source pair is built once, exercised through update/failure/rollback, and
 scanned using the repository's fixed-CRITICAL image policy. Trivy 0.74.0 generates
 SPDX SBOMs from those exact images. Only then are the same local image IDs pushed;
 no rebuild occurs between test and publication.
+
+New registry manifests use version 3 and bind the BuildKit input receipts and
+their raw metadata files to both source revisions. Publication refuses mutable
+candidate bases, missing receipts and modified metadata; import checks the source
+input hashes against Git. A historical predecessor with unpinned declarations is
+retained as such, together with its actual resolved build materials. The workflow
+still accepts signed older manifests for build-free historical replay.
 
 Registry tags include full source SHA, workflow run and attempt. They identify
 publication attempts, are never used for deployment, and are not overwritten by
