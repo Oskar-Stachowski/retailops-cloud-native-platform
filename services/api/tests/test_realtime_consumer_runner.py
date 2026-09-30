@@ -1,4 +1,5 @@
 import json
+from unittest.mock import Mock
 
 import pytest
 
@@ -7,6 +8,7 @@ from app.services.realtime_consumer_runner import (
     RealtimeConsumerRunnerConfig,
     RealtimeKafkaConsumerRunner,
     build_realtime_kafka_consumer_runner,
+    build_confluent_kafka_consumer,
     decode_message_value,
 )
 
@@ -30,6 +32,15 @@ class FakeMessage:
 
     def offset(self) -> int:
         return 42
+
+    def key(self):
+        return b"key"
+
+    def headers(self):
+        return [("test", b"header")]
+
+    def timestamp(self):
+        return (1, 1770000000000)
 
 
 class FakeKafkaConsumer:
@@ -69,6 +80,9 @@ class FakeEventConsumer:
 
     def stop(self) -> None:
         self.stopped = True
+
+    def record_quarantined(self, **kwargs):
+        self.quarantined = True
 
     def process_event(
         self, event: dict[str, object], *, transport_topic: str | None = None
@@ -120,11 +134,13 @@ def test_runner_subscribes_processes_commits_and_closes() -> None:
     assert kafka_consumer.closed is True
 
 
-def test_runner_commits_invalid_json_without_processing_event() -> None:
+def test_runner_commits_invalid_json_only_after_durable_quarantine() -> None:
     message = FakeMessage("not-json")
     kafka_consumer = FakeKafkaConsumer([message])
     event_consumer = FakeEventConsumer()
+    quarantine = Mock()
     runner = RealtimeKafkaConsumerRunner(
+        quarantine_repository=quarantine,
         kafka_consumer=kafka_consumer,
         event_consumer=event_consumer,
         config=RealtimeConsumerRunnerConfig(
@@ -139,6 +155,9 @@ def test_runner_commits_invalid_json_without_processing_event() -> None:
     handled_messages = runner.run(max_messages=1)
 
     assert handled_messages == 1
+    quarantine.store_message.assert_called_once()
+    assert quarantine.store_message.call_args.kwargs["value"] == "not-json"
+    assert event_consumer.quarantined is True
     assert event_consumer.events == []
     assert kafka_consumer.committed_messages == [message]
     assert kafka_consumer.closed is True
@@ -162,3 +181,97 @@ def test_runner_factory_accepts_injected_kafka_consumer() -> None:
 
     assert runner.config.bootstrap_servers == "redpanda:9092"
     assert runner.config.topics == ("retailops.sales.v1",)
+
+
+def make_runner(messages, event_consumer=None, quarantine=None):
+    kafka = FakeKafkaConsumer(messages)
+    runner = RealtimeKafkaConsumerRunner(
+        kafka_consumer=kafka,
+        event_consumer=event_consumer or FakeEventConsumer(),
+        quarantine_repository=quarantine or Mock(),
+        config=RealtimeConsumerRunnerConfig(
+            bootstrap_servers="broker:9092",
+            group_id="test",
+            client_id="test",
+            topics=("retailops.sales.v1",),
+            poll_timeout_seconds=0.01,
+        ),
+    )
+    return runner, kafka
+
+
+@pytest.mark.parametrize("error", [RuntimeError("DB down"), ValueError("handler failed")])
+def test_runner_stops_without_committing_or_polling_past_failure(error):
+    first, second = FakeMessage("{}"), FakeMessage("{}")
+    handler = FakeEventConsumer()
+    handler.process_event = Mock(side_effect=error)
+    runner, kafka = make_runner([first, second], handler)
+    with pytest.raises(type(error), match=str(error)):
+        runner.run(max_messages=2)
+    assert kafka.committed_messages == []
+    assert kafka.messages == [second]
+    assert kafka.closed
+
+
+def test_quarantine_failure_leaves_offset_uncommitted():
+    quarantine = Mock()
+    quarantine.store_message.side_effect = RuntimeError("quarantine unavailable")
+    runner, kafka = make_runner(
+        [FakeMessage(b"not-json"), FakeMessage("{}")], quarantine=quarantine
+    )
+    with pytest.raises(RuntimeError, match="quarantine unavailable"):
+        runner.run(max_messages=2)
+    assert kafka.committed_messages == []
+    assert len(kafka.messages) == 1
+    assert kafka.closed
+
+
+def test_unknown_processing_receipt_cannot_ack():
+    handler = FakeEventConsumer()
+    handler.process_event = Mock(return_value={"status": "failed_dead_lettered"})
+    runner, kafka = make_runner([FakeMessage("{}")], handler)
+    with pytest.raises(RuntimeError, match="durable success receipt"):
+        runner.run(max_messages=1)
+    assert kafka.committed_messages == []
+
+
+def test_commit_partition_error_stops_before_next_message():
+    runner, kafka = make_runner([FakeMessage("{}"), FakeMessage("{}")])
+    kafka.commit = Mock(return_value=[Mock(error="failed")])
+    with pytest.raises(RuntimeError, match="offset commit failed"):
+        runner.run(max_messages=2)
+    assert len(kafka.messages) == 1
+    assert kafka.closed
+
+
+def test_close_is_called_even_if_state_persistence_fails():
+    handler = FakeEventConsumer()
+    handler.start = Mock(side_effect=RuntimeError("DB down"))
+    handler.stop = Mock(side_effect=RuntimeError("DB down"))
+    runner, kafka = make_runner([], handler)
+    with pytest.raises(RuntimeError, match="DB down"):
+        runner.run(max_messages=1)
+    assert kafka.closed
+
+
+def test_factory_disables_both_automatic_offset_paths(monkeypatch):
+    import confluent_kafka
+
+    factory = Mock()
+    monkeypatch.setattr(confluent_kafka, "Consumer", factory)
+    config = RealtimeConsumerRunnerConfig(
+        bootstrap_servers="broker:9092",
+        group_id="test",
+        client_id="test",
+        topics=("retailops.sales.v1",),
+    )
+    build_confluent_kafka_consumer(config)
+    passed = factory.call_args.args[0]
+    assert passed["enable.auto.commit"] is False
+    assert passed["enable.auto.offset.store"] is False
+
+
+@pytest.mark.parametrize("raw", [None, b"\xff", "[]", "null", "not-json", '{"value":NaN}'])
+def test_decode_rejects_poison_messages(raw):
+    with pytest.raises((ValueError, TypeError)):
+        decode_message_value(raw)

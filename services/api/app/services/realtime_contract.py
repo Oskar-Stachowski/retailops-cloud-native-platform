@@ -44,12 +44,12 @@ def validate_event(event: dict[str, Any], *, transport_topic: str | None = None)
 
     event_type = event.get("event_type")
     if event_type not in EVENT_TOPICS:
-        msg = f"Unsupported event type: {event_type}"
+        msg = "Unsupported event type."
         raise ValueError(msg)
 
     version = event.get("schema_version")
     if version not in event_contract()["supported_schema_versions"]:
-        msg = f"Unsupported event schema version: {version}"
+        msg = "Unsupported event schema version."
         raise ValueError(msg)
 
     expected_topic = EVENT_TOPICS[event_type]
@@ -63,5 +63,7 @@ def validate_event(event: dict[str, Any], *, transport_topic: str | None = None)
     error = next(event_validator().iter_errors(event), None)
     if error is not None:
         path = ".".join(str(part) for part in error.absolute_path) or "envelope"
-        msg = f"Invalid realtime event at {path}: {error.message}"
+        # jsonschema messages (notably anyOf) can contain the complete payload.
+        # Keep the reason safe for quarantine summaries and diagnostic logs.
+        msg = f"Invalid realtime event at {path}: failed schema rule {error.validator}"
         raise ValueError(msg)

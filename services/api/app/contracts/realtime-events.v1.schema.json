@@ -17,6 +17,7 @@
   "properties": {
     "event_id": {
       "type": "string",
+      "format": "uuid",
       "minLength": 1
     },
     "event_type": {
@@ -52,6 +53,7 @@
     },
     "source": {
       "type": "string",
+      "not": {"const": "retailops.consumer.quarantine"},
       "minLength": 1
     },
     "correlation_id": {
