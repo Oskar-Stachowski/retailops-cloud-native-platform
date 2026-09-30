@@ -8,7 +8,7 @@ request.
 
 `realtime_event_log`
 
-- One row per source event.
+- One row per source event, plus durable transport quarantine records.
 - Stores envelope metadata, topic, processing status, attempt count, payload and
   timestamps.
 - Status values used by the consumer:
@@ -47,11 +47,30 @@ health checks.
 ## Idempotency
 
 The consumer treats already processed events as duplicates and ignores them.
-For accepted events it writes the event log first, then metric observations,
-then the final processed state.
+For accepted events the event log, metric observations and final processed
+marker share one PostgreSQL transaction. A transaction advisory lock on the
+event UUID serializes concurrent deliveries before the duplicate check.
+An interrupted transaction leaves neither partial metrics nor a processed marker.
+State counters are stored afterwards; a failure there leaves the offset pending
+and the next delivery uses the already committed marker.
 
 That keeps replay safe and lets the real-time stream be regenerated from the
 synthetic replay files without double counting live metrics.
+
+Rejected JSON/envelopes use a separate synthetic UUID derived from consumer
+group/topic/partition/offset. Their source is `retailops.consumer.quarantine`,
+type `transport_rejected`, status `failed_dead_lettered`. Their payload retains
+base64-encoded value/key/headers, the broker timestamp and transport coordinates.
+The runner confirms that immutable content from the committed database row
+before acknowledging. No message is published to `retailops.dlq.v1` in this path.
+Handler/database failures escape and stop polling without acknowledging;
+they are not reported as successful dead-letter deliveries.
+
+[Recovery and reviewed replay](../runbooks/realtime-recovery.md) preserve the
+original bytes and pin a correction before publication. External effects from
+custom handlers require their own idempotency/transaction design; current
+default handlers have no external effects. Business-key revisions and AI
+domain projections remain part of stage 10.
 
 ## API Read Model
 

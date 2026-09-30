@@ -33,8 +33,8 @@ Historyczne znaczenie pól i routing legacy v1 pozostają zgodne z demo.
 
 ## Granice
 
-OPS-07 nie kwalifikuje trwałego ACK/DLQ. [OPS-03](../../../audits/open-findings.md)
-pozostaje otwarty. `retailops.intelligence.v2`, zastępowanie wcześniejszego
+OPS-07 nie kwalifikuje trwałego ACK/DLQ; osobny bieżący odbiór tej granicy
+opisuje [OPS-03](../03/README.md). `retailops.intelligence.v2`, zastępowanie wcześniejszego
 wkładu faktu po natural key/version i przekazanie snapshot → replay należą do
 etapu AI 10. Ze względu na zmianę sposobu wyznaczania ID ponowny import
 historycznych zdarzeń do zachowanej projekcji wymaga resynchronizacji; opisuje

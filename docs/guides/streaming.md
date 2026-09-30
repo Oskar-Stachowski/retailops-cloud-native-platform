@@ -49,3 +49,9 @@ streamingu w Grafanie. Używaj jej wyłącznie na danych demonstracyjnych.
 
 Raporty robocze trafiają do `ci-cd/reports/`. Najnowsze zaakceptowane wyniki
 prób lokalnych znajdują się w [dowodach](../evidence/README.md).
+
+Awaria DB/handlera lub brak potwierdzonej kwarantanny zatrzymuje konsumenta
+bez ACK. Po naprawie zależności uruchom go ponownie z tym samym group ID.
+Błędny JSON lub schemat jest zachowany w PostgreSQL przed ACK.
+[Runbook odtwarzania](../runbooks/realtime-recovery.md) opisuje inspekcję,
+kontrolowaną poprawkę i replay bez usuwania oryginału.

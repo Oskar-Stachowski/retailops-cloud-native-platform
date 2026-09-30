@@ -1,7 +1,7 @@
 # Otwarte ustalenia audytowe
 
 Pomiary bazowe: **27.09.2026**, baza `cbf28b2a66e7e5f205cf73d9bfe620c491e22d93`.
-Aktualizacja otwartego zakresu: **29.09.2026**.
+Aktualizacja otwartego zakresu: **30.09.2026**.
 Poniżej są wyłącznie otwarte problemy potwierdzone w źródłach lub reprodukcji.
 [Audyt AI 00](../evidence/ai/00/README.md) rozdziela pomiary, 138 testów,
 przegląd statyczny i odczyt CI; nie potwierdza gotowości wszystkich dalszych
@@ -21,24 +21,6 @@ Pomiary DATA-01–06: [source-measurements.json](../evidence/ai/00/source-measur
 profil `small`, 90 dni, 100 produktów, seed 42. Nie są pomiarami danych rzeczywistych.
 
 ## Runtime i bezpieczeństwo
-
-### OPS-03 · P1 · Consumer zatwierdza offset także po błędzie przetwarzania
-
-**Dowód:** `_handle_message` w
-[runnerze consumera](../../services/api/app/services/realtime_consumer_runner.py)
-wywołuje `commit` w `finally`, także po błędzie dekodowania lub obsługi.
-[Obsługa zdarzenia](../../services/api/app/services/realtime_consumer.py) może
-zwrócić `failed_dead_lettered`; próba zapisania błędu w DB również może się nie
-powieść. Kod nie wymaga trwałego zachowania błędnej wiadomości przed commitem.
-Może to pominąć zdarzenie bez możliwości automatycznego ponowienia.
-[Próby AI 00](../evidence/ai/00/contracts.json) na prawdziwym runnerze z mockami
-potwierdziły commit przy invalid JSON oraz jednoczesnej awarii DB/kwarantanny.
-Nie są testem rzeczywistego brokera ani dowodem trwałości.
-
-**Kryterium zamknięcia:** commit dopiero po trwałym sukcesie albo potwierdzonym
-zapisie do mechanizmu odtwarzania błędów. Testy rzeczywistego brokera obejmują
-błędny payload, awarię DB/handlera, restart, ponowienie i deduplikację; wykazują
-brak utraty zdarzenia.
 
 ### OPS-06 · P2 · Zależności builda i workflow są wskazywane ruchomymi tagami
 
