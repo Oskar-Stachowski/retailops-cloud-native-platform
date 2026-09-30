@@ -25,7 +25,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: topic-init
-          image: redpandadata/redpanda:v25.3.6
+          image: redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
