@@ -2,6 +2,11 @@
 
 **Status: plan wdrożenia. Repo: RetailOps + AI. Zależności: 04, 05, 06.**
 
+Lokalne przygotowanie upstream rozpoczęto od [07.1a — trzech scenariuszy popytu](../../../reference/business-anomaly-scenarios.md).
+Kandydat ma oddzielną truth i pełne odtworzenie procesu, ale nie jest nowym
+snapshotem ani odbiorem AI 07. Return spike i inventory-censored episode,
+raw DQ, handoff oraz downstream pozostają dalszym zakresem.
+
 Cel: uzyskać oddzielne, deterministyczne scenariusze business anomalies i raw data faults, a następnie porównać seasonal-residual baseline z Isolation Forest w istniejącym lifecycle MLflow. Offline replay/curation jest częścią07. Produkcyjna trwałość brokera, ACK/DLQ i projekcje są etapem10; nie deklarować ich zaliczenia na podstawie fixture offline.
 
 Normatywne źródła: [dane i czas](../kontrakty/dane-i-czas.md), [profile i bramki](../kontrakty/profile-i-bramki.md), [ML/API lifecycle](../kontrakty/ml-api-lifecycle.md), [integracja](../kontrakty/integracja-agent.md), evidence04–06. Forecast wykorzystany jako expected value musi być ponownie oceniony dla snapshotu po06.
