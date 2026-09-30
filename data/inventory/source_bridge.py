@@ -23,6 +23,7 @@ from data.inventory.source_observations import rebuild_observations
 from data.inventory.source_reconciliation import reconcile_source_commerce
 
 if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
     from data.generator.configuration import ResolvedGenerationConfig
     from data.inventory.source_contract import SourceInventoryConfig
 
@@ -46,11 +47,15 @@ COMMERCE_TABLES = (
 
 
 def simulate_source_commerce(
-    candidate: dict, generation: ResolvedGenerationConfig, config: SourceInventoryConfig
+    candidate: dict,
+    generation: ResolvedGenerationConfig,
+    config: SourceInventoryConfig,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, Any]:
     # Only this unpublished path consumes uncapped baskets as private demand input.
     # Never write these candidate rows into an existing source/snapshot directory.
-    validate_demand(candidate, generation)
+    validate_demand(candidate, generation, anomaly_plan=anomaly_plan)
     inputs = source_foundation(candidate, generation, config)
     tables = deepcopy(candidate)
     simulator = SourceCommerceSimulator(inputs, tables, generation, config)
