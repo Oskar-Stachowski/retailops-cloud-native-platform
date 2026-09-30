@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -122,6 +122,7 @@ jobs:
             ci-cd/reports/db/recovery/*/commands.log
             ci-cd/reports/releases/*/report.json
             ci-cd/reports/releases/*/*-manifest.json
+            ci-cd/reports/releases/*/*-build.json
             ci-cd/reports/releases/*/commands.log
             ci-cd/reports/releases/*/*/failure.png
             ci-cd/reports/releases/*/*/trace.zip

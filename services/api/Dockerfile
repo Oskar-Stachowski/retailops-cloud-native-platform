@@ -1,6 +1,5 @@
-# Tag pinning is intentional for local and portfolio reproducibility.
-# Production deployment manifests should prefer digest-pinned base images.
-FROM python:3.11-slim
+# Multi-platform base digests are updated through reviewed dependency PRs.
+FROM python:3.11-slim@sha256:e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e
 
 LABEL org.opencontainers.image.title="RetailOps API"
 LABEL org.opencontainers.image.description="FastAPI backend for the RetailOps local runtime"

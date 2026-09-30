@@ -14,7 +14,7 @@ zachowuje dowód prób PostgreSQL. Pozostałe zakresy: [indeks dowodów](evidenc
 |---|---|
 | Aplikacja lokalna | React, FastAPI, PostgreSQL, migracje i seed; widoki danych, Product 360, decyzje alertów i rekomendacji, historia operacji oraz role demonstracyjne. |
 | Dane i zdarzenia | Deterministyczny generator, walidacja kontraktów, Redpanda, konsument zdarzeń z atomową projekcją metryk, trwałą raw kwarantanną i [odtwarzaniem przed ACK](runbooks/realtime-recovery.md). Pełna ścieżka generator → broker → konsument wymaga osobnej weryfikacji. |
-| CI i ochrona repozytorium | Required CI wybiera pełne kontrole obszarów i agreguje wynik `required-result`. Polityka `main` i jej ostatni zapis znajdują się w [governance](governance/branch-protection.md). |
+| CI i ochrona repozytorium | Required CI wybiera pełne kontrole obszarów, egzekwuje SHA Actions/digesty zewnętrznych obrazów i agreguje wynik `required-result`. [Aktualizacja wejść](runbooks/build-input-updates.md) odbywa się przez PR. Polityka `main` i jej ostatni zapis znajdują się w [governance](governance/branch-protection.md). |
 | Wydania | Udokumentowane `v0.2.1`: obrazy Linux AMD64 w GHCR, podpisane provenance i SBOM, pobranie po digest oraz zgodny schematowo rollback. |
 | Baza i rollback | Izolowane próby backup/restore oraz zmiany i przywrócenia wersji aplikacji; brak dowodu odwracalności dowolnych migracji schematu. |
 | Kubernetes | Lokalny kind na ARM64/AMD64: ingress, NetworkPolicy, jobs, PVC, testy przeglądarkowe, restart i rollback. Ścieżka używa lokalnie budowanych obrazów. |
