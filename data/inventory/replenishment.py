@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from functools import cached_property
 from itertools import pairwise
 from typing import TYPE_CHECKING, Any, TypeVar
 
@@ -65,6 +66,21 @@ class ReplenishmentBook:
     orders: tuple[ReplenishmentOrder, ...]
     plans: tuple[DeliveryPlanVersion, ...]
     receipts: tuple[ReplenishmentReceipt, ...]
+
+    @cached_property
+    def _quote_products(self) -> frozenset[str]:
+        return frozenset(p.id for p in self.products)
+
+    @cached_property
+    def _quote_suppliers(self) -> dict[str, Supplier]:
+        return {s.supplier_id: s for s in self.suppliers}
+
+    @cached_property
+    def _quotes_by_product(self) -> dict[str, tuple[ProductSupplier, ...]]:
+        grouped: dict[str, list[ProductSupplier]] = defaultdict(list)
+        for quote in self.product_suppliers:
+            grouped[quote.product_id].append(quote)
+        return {product: tuple(rows) for product, rows in grouped.items()}
 
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> ReplenishmentBook:
@@ -178,15 +194,14 @@ class ReplenishmentBook:
         self, product_id: str, business_date: str, *, known_at: str
     ) -> tuple[ProductSupplier, ...]:
         day, cutoff = date.fromisoformat(business_date), utc_timestamp(known_at)
-        suppliers = {s.supplier_id: s for s in self.suppliers}
-        require(product_id in {p.id for p in self.products}, "Unknown product for supplier lookup.")
+        suppliers = self._quote_suppliers
+        require(product_id in self._quote_products, "Unknown product for supplier lookup.")
         return tuple(
             sorted(
                 (
                     q
-                    for q in self.product_suppliers
-                    if q.product_id == product_id
-                    and date.fromisoformat(q.effective_from)
+                    for q in self._quotes_by_product.get(product_id, ())
+                    if date.fromisoformat(q.effective_from)
                     <= day
                     < date.fromisoformat(q.effective_to)
                     and utc_timestamp(q.available_at) <= cutoff
