@@ -17,7 +17,18 @@ from data.inventory.snapshots import daily_snapshots, day_periods
 from data.inventory.stockout import diagnose_windows, elapsed_microseconds, stockout_episodes
 
 if TYPE_CHECKING:
-    from data.inventory.ledger import Position
+    from data.inventory.ledger import InventoryMovement, Position
+
+
+def _movement_indexes(
+    ledger: InventoryLedger,
+) -> tuple[dict[str, InventoryMovement], dict[Position, list[InventoryMovement]]]:
+    events = {}
+    positions = defaultdict(list)
+    for movement in ledger.movements:
+        events[movement.inventory_event_id] = movement
+        positions[movement.position].append(movement)
+    return events, positions
 
 
 def validate_window(ledger: InventoryLedger, config: ProjectionConfig) -> None:
@@ -125,8 +136,10 @@ def _reconcile_daily(
     snapshots = output["operational"]
     physical = output["simulation_truth"]["physical_daily_balances"]
     by_position = defaultdict(list)
+    first_unit_by_product = {}
     for movement in ledger.movements:
         by_position[movement.position].append(movement)
+        first_unit_by_product.setdefault(movement.product_id, movement.unit_of_measure)
     for rows in (snapshots, physical):
         keys = [(r["business_date"], r["product_id"], r["stock_location_id"]) for r in rows]
         require(
@@ -165,10 +178,7 @@ def _reconcile_daily(
             "Snapshot source lineage is inconsistent.",
         )
         require(
-            row["unit_of_measure"]
-            == next(
-                m.unit_of_measure for m in ledger.movements if m.product_id == row["product_id"]
-            ),
+            row["unit_of_measure"] == first_unit_by_product[row["product_id"]],
             "Snapshot unit mismatch.",
         )
         require(
@@ -220,7 +230,7 @@ def reconcile_projection(
     snapshots = output["operational"]
     physical = output["simulation_truth"]["physical_daily_balances"]
     episodes = output["simulation_truth"]["stockout_episodes"]
-    events = {m.inventory_event_id: m for m in ledger.movements}
+    events, by_position = _movement_indexes(ledger)
     zero_starts = set()
     quantities: dict[Position, int] = {}
     for m in ledger.movements:
@@ -236,21 +246,13 @@ def reconcile_projection(
     )
     for episode in episodes:
         onset = events[episode["start_event_id"]]
-        later = [
-            m
-            for m in ledger.movements
-            if m.position == onset.position and m.ordering_key > onset.ordering_key
-        ]
+        later = [m for m in by_position[onset.position] if m.ordering_key > onset.ordering_key]
         recovery = next((m for m in later if m.quantity_delta > 0), None)
         end_key = recovery.ordering_key if recovery else (utc_timestamp(config.end_at), -1)
         close = end_key[0]
         maturity = max(
             close + timedelta(seconds=config.truth_delay_seconds),
-            *(
-                m.available_time
-                for m in ledger.movements
-                if m.position == onset.position and m.ordering_key <= end_key
-            ),
+            *(m.available_time for m in by_position[onset.position] if m.ordering_key <= end_key),
         )
         require(
             (
@@ -316,6 +318,7 @@ def reconcile_projection(
         "Lost demand is missing, duplicated or invented.",
     )
     episode_by_id = {e["episode_id"]: e for e in episodes}
+    by_episode = defaultdict(list)
     for row in impacts:
         require(row["episode_id"] in episode_by_id, "Unknown stockout episode for lost demand.")
         require(
@@ -335,8 +338,9 @@ def reconcile_projection(
             and lower <= (utc_timestamp(row["occurred_at"]), row["sequence"]) < upper,
             "Lost demand lies outside its physical zero episode.",
         )
+        by_episode[row["episode_id"]].append(row)
     for episode in episodes:
-        members = [r for r in impacts if r["episode_id"] == episode["episode_id"]]
+        members = by_episode[episode["episode_id"]]
         require(
             episode["lost_sales_quantity"] == sum(r["lost_sales_quantity"] for r in members)
             and episode["affected_demand_count"] == len(members),

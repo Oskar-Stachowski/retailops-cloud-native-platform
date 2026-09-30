@@ -4,6 +4,7 @@ import copy
 import json
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -123,6 +124,26 @@ def test_daily_snapshots_and_physical_balances_reconcile_every_grain(inputs, con
         == 8
     )
     assert result["operational"][-2:][0]["on_hand"] == 24
+
+
+def test_daily_projection_verification_does_not_rescan_ledger_per_snapshot(inputs, config):
+    from data.inventory.projection import _reconcile_daily
+
+    output, parent = project(inputs, config)
+    ledger = InventoryLedger.from_payload(parent["operational"]["ledger"])
+
+    class CountedTuple(tuple):
+        def __iter__(self):
+            self.scans += 1
+            return super().__iter__()
+
+    counted = CountedTuple(ledger.movements)
+    counted.scans = 0
+    assert len(output["operational"]) > 1
+    _reconcile_daily(
+        output, replace(ledger, movements=counted), ProjectionConfig.from_payload(config)
+    )
+    assert counted.scans == 1
 
 
 def test_episode_boundaries_duration_and_lost_sales_are_physical(inputs, config):
