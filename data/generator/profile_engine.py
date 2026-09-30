@@ -141,6 +141,9 @@ def profile_defaults(profile: str) -> SyntheticProfileDefaults:
 
 
 def _rng(seed: int, profile: str) -> random.Random:
+    # Paired scenario: keep catalog/location/price draws identical to ai-dev.
+    if profile == "ai-intermittent-v1":
+        profile = "ai-dev"
     return random.Random(f"retailops-{profile}-{seed}")  # noqa: S311 - deterministic demo data
 
 

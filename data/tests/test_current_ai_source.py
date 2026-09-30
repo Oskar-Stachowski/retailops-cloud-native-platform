@@ -19,8 +19,9 @@ def cli(module, arguments):
     return result.stdout
 
 
-def test_default_ai_generator_publishes_inventory_and_legacy_stays_explicit(tmp_path):
-    args = ["--profile", "ai-smoke", "--days", "10", "--products", "3", "--stores", "3", "--warehouses", "2", "--end-date", "2026-07-31"]
+@pytest.mark.parametrize("profile", ["ai-smoke", "ai-intermittent-v1"])
+def test_default_ai_generator_publishes_inventory_and_legacy_stays_explicit(tmp_path, profile):
+    args = ["--profile", profile, "--days", "10", "--products", "3", "--stores", "3", "--warehouses", "2", "--end-date", "2026-07-31"]
     result = json.loads(cli("data.generator.main", [*args, "--output-dir", str(tmp_path / "current")]))
     source = Path(result["directory"])
     manifest = json.loads((source / "dataset_manifest.v2.json").read_text())
