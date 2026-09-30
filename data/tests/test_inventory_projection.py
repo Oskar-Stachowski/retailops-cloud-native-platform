@@ -10,7 +10,7 @@ import pytest
 
 from data.generator.common import deterministic_uuid
 from data.generator.identity import json_sha256
-from data.inventory.ledger import InventoryLedger
+from data.inventory.ledger import InventoryLedger, InventoryMovement
 from data.inventory.projection import project_inventory, reconcile_projection
 from data.inventory.projection_contract import (
     ProjectionConfig,
@@ -66,6 +66,31 @@ def project(inputs, config, evaluated_at=EVALUATION):
         evaluated_at=evaluated_at,
     )
     return result, parent
+
+
+def test_snapshot_and_window_indexes_avoid_scope_times_ledger_scans(inputs, config, monkeypatch):
+    parent = simulate(inputs)
+    ledger = InventoryLedger.from_payload(parent["operational"]["ledger"])
+    position = InventoryMovement.position.fget
+    calls = []
+
+    def counted(movement):
+        calls.append(movement.inventory_event_id)
+        return position(movement)
+
+    monkeypatch.setattr(InventoryMovement, "position", property(counted))
+    cutoff = "2026-07-08T23:59:59.999999Z"
+    snapshot_at(ledger, snapshot_time=cutoff, as_of_time=cutoff)
+    assert len(calls) <= 2 * len(ledger.movements)
+    calls.clear()
+    diagnose_windows(
+        ledger,
+        ProjectionConfig.from_payload(config),
+        [],
+        origin=cutoff,
+        evaluated_at=EVALUATION,
+    )
+    assert len(calls) <= 2 * len(ledger.movements)
 
 
 def test_daily_snapshots_and_physical_balances_reconcile_every_grain(inputs, config):

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
@@ -170,6 +171,29 @@ def _order_parameters(
     return moq, target, quantity
 
 
+def _position_inputs(
+    movements: tuple[InventoryMovement, ...],
+    coverage: tuple[HistoryCoverage, ...],
+    known_orders: list[dict[str, Any]],
+) -> tuple[
+    dict[Position, list[InventoryMovement]],
+    dict[Position, list[HistoryCoverage]],
+    dict[Position, list[dict[str, Any]]],
+]:
+    # Preserve the verified input order and every cutoff check, while avoiding
+    # a full ledger/coverage/order scan for each physical position.
+    position_movements: dict[Position, list[InventoryMovement]] = defaultdict(list)
+    position_coverage: dict[Position, list[HistoryCoverage]] = defaultdict(list)
+    position_orders: dict[Position, list[dict[str, Any]]] = defaultdict(list)
+    for movement in movements:
+        position_movements[movement.position].append(movement)
+    for certificate in coverage:
+        position_coverage[certificate.product_id, certificate.stock_location_id].append(certificate)
+    for order in known_orders:
+        position_orders[order["product_id"], order["stock_location_id"]].append(order)
+    return position_movements, position_coverage, position_orders
+
+
 def review_reorder(
     ledger: InventoryLedger,
     book: ReplenishmentBook,
@@ -186,6 +210,9 @@ def review_reorder(
     }
     movements = ledger.known_movements(origin, known_at=origin)
     known_orders = book.orders_at(origin)
+    position_movements, position_coverage, position_orders = _position_inputs(
+        movements, coverage, known_orders
+    )
     suppliers = {s.supplier_id: s for s in book.suppliers}
     policy_hash = json_sha256(config.model_dump())
     decisions, new_orders, plans = [], [], []
@@ -212,7 +239,7 @@ def review_reorder(
         on_hand = balances[position]["available_qty"]
         pending = sum(
             r["outstanding_quantity"]
-            for r in known_orders
+            for r in position_orders[position]
             if (r["product_id"], r["stock_location_id"]) == position
         )
         attributes.update(on_hand=on_hand, on_order=pending, stock_position=on_hand + pending)
@@ -220,11 +247,17 @@ def review_reorder(
             r["source_reference"] == decision_id
             and (r["product_id"], r["stock_location_id"]) == position
             and r["ordered_at"] == origin
-            for r in known_orders
+            for r in position_orders[position]
         ):
             decisions.append(ReorderDecision(**attributes, status="already_ordered"))
             continue
-        history = _known_history(coverage, movements, position, cutoff, rule.history_window_days)
+        history = _known_history(
+            tuple(position_coverage[position]),
+            tuple(position_movements[position]),
+            position,
+            cutoff,
+            rule.history_window_days,
+        )
         if history is None:
             decisions.append(ReorderDecision(**attributes, status="history_missing"))
             continue
