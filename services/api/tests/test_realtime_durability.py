@@ -12,7 +12,7 @@ import time
 from types import SimpleNamespace
 from uuid import uuid4
 
-from confluent_kafka import Consumer, Producer, TopicPartition
+from confluent_kafka import Consumer, KafkaError, KafkaException, Producer, TopicPartition
 from confluent_kafka.admin import AdminClient, NewTopic
 import psycopg
 import pytest
@@ -70,6 +70,39 @@ def wait_broker(bootstrap):
         except Exception:
             time.sleep(0.2)
     pytest.fail("Isolated Redpanda did not become ready")
+
+
+def initial_offsets(client, timeout=45):
+    """Wait for real partition reads after startup/restart, before committing offsets."""
+    deadline = time.monotonic() + timeout
+    last_error = "partition offsets unavailable"
+    while time.monotonic() < deadline:
+        initial = []
+        for partition in range(2):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            try:
+                offsets = client.get_watermark_offsets(
+                    TopicPartition(TOPIC, partition), timeout=min(2, remaining), cached=False
+                )
+            except KafkaException as error:
+                if error.args[0].code() not in (
+                    KafkaError.NOT_LEADER_FOR_PARTITION,
+                    KafkaError.LEADER_NOT_AVAILABLE,
+                    KafkaError._TIMED_OUT,
+                ):
+                    raise
+                last_error = str(error)
+                break
+            if offsets is None:
+                last_error = f"partition {partition} offset query timed out"
+                break
+            initial.append(TopicPartition(TOPIC, partition, offsets[1]))
+        else:
+            return initial
+        time.sleep(min(0.2, max(0, deadline - time.monotonic())))
+    pytest.fail(f"Isolated Redpanda partition reads did not become ready: {last_error}")
 
 
 @pytest.fixture(scope="module")
@@ -156,10 +189,7 @@ def context(runtime, monkeypatch):
         }
     )
     try:
-        initial = []
-        for partition in range(2):
-            _, high = client.get_watermark_offsets(TopicPartition(TOPIC, partition), timeout=10)
-            initial.append(TopicPartition(TOPIC, partition, high))
+        initial = initial_offsets(client)
         client.commit(offsets=initial, asynchronous=False)
     finally:
         client.close()

@@ -48,6 +48,21 @@ CDN powtórzono cały drill na tym samym, czystym commicie. Za wynik odbioru
 uznano wyłącznie tę pełną próbę. Surowe wyniki pozostają w ignorowanym
 katalogu raportów lub tymczasowym; JSON powyżej zachowuje oczyszczony receipt.
 
+Required CI [PR #74](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/74)
+zaliczył wszystkie 26 bramek, w tym pełne Compose/kind na AMD64 oraz 737 testów
+API z pokryciem 84,62%. Pierwszy
+[przebieg na main](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/36692851328)
+wykazał wyścig w przygotowaniu testu po restarcie Redpandy: dostępne metadane
+brokera nie oznaczały jeszcze gotowości odczytu offsetów partycji.
+`NOT_LEADER_FOR_PARTITION` wystąpił przed wykonaniem asercji testu.
+
+Fixture czeka teraz na rzeczywisty, niebuforowany odczyt obu partycji przed
+pierwszym zapisem offsetów. Limit całego oczekiwania wynosi 45 sekund;
+ponawiane są tylko błędy braku lidera i timeout tego odczytu. Pozostałe błędy
+nadal przerywają test. Nie dodano ponowień asercji ani pomijania testów.
+**6 testów regresyjnych** oraz **17 testów awarii na rzeczywistym PostgreSQL
+i Redpandzie** zaliczono lokalnie, bez pominięć; testy awarii trwały 115,64 s.
+
 ## Granice
 
 To odbiór wejść obecnej platformy i lokalnego wydania, bez nowej publikacji
