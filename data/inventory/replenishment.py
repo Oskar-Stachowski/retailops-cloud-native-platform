@@ -319,27 +319,25 @@ class ReplenishmentBook:
 
     def orders_at(self, known_at: str) -> list[dict[str, Any]]:
         cutoff = utc_timestamp(known_at)
+        latest_plans = {}
+        received_by_order: dict[str, int] = defaultdict(int)
+        for plan in self.plans:
+            if utc_timestamp(plan.available_at) <= cutoff:
+                latest_plans[plan.replenishment_order_id] = plan
+        for receipt in self.receipts:
+            if utc_timestamp(receipt.available_at) <= cutoff:
+                received_by_order[receipt.replenishment_order_id] += receipt.received_quantity
         result = []
         for order in self.orders:
             if utc_timestamp(order.available_at) > cutoff:
                 continue
-            plans = [
-                p
-                for p in self.plans
-                if p.replenishment_order_id == order.replenishment_order_id
-                and utc_timestamp(p.available_at) <= cutoff
-            ]
-            received = sum(
-                r.received_quantity
-                for r in self.receipts
-                if r.replenishment_order_id == order.replenishment_order_id
-                and utc_timestamp(r.available_at) <= cutoff
-            )
+            plan = latest_plans[order.replenishment_order_id]
+            received = received_by_order[order.replenishment_order_id]
             result.append(
                 {
                     **order.model_dump(),
-                    "expected_delivery_at": plans[-1].expected_delivery_at,
-                    "delivery_plan_version": plans[-1].version,
+                    "expected_delivery_at": plan.expected_delivery_at,
+                    "delivery_plan_version": plan.version,
                     "received_quantity": received,
                     "outstanding_quantity": order.ordered_quantity - received,
                     "status": "ordered"
