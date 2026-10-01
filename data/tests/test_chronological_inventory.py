@@ -14,6 +14,7 @@ from data.generator.identity import json_sha256
 from data.inventory.fulfillment_routes import resolve_route
 from data.inventory.ledger import InventoryLedger
 from data.inventory.replenishment import ReplenishmentBook
+from data.inventory.replenishment_contract import ReplenishmentReceipt
 from data.inventory.run_simulation import run
 from data.inventory.simulation_contract import (
     ChronologicalScenario,
@@ -62,6 +63,58 @@ def simulate(inputs):
 def no_actions(inputs):
     inputs["scenario"]["return_events"] = []
     inputs["scenario"]["inventory_actions"] = []
+
+
+def test_receipt_validation_keeps_complete_related_history_without_reloading_other_orders(
+    inputs, monkeypatch
+):
+    original_receipt = ChronologicalSimulator._receipt
+    original_parse = ReplenishmentBook.from_payload.__func__
+    receiving = False
+    evaluated = []
+
+    def receive(self, row):
+        nonlocal receiving
+        receiving = True
+        try:
+            return original_receipt(self, row)
+        finally:
+            receiving = False
+
+    def parse(cls, payload):
+        if receiving:
+            evaluated.append(len(payload["replenishment_orders"]))
+            assert len({r["replenishment_order_id"] for r in payload["replenishment_receipts"]}) == 1
+        return original_parse(cls, payload)
+
+    monkeypatch.setattr(ChronologicalSimulator, "_receipt", receive)
+    monkeypatch.setattr(ReplenishmentBook, "from_payload", classmethod(parse))
+    result = simulate(inputs)
+    assert len(result["operational"]["supply"]["replenishment_orders"]) > 1
+    assert len(evaluated) > 1 and set(evaluated) == {1}
+
+
+@pytest.mark.parametrize("change", ["duplicate_id", "duplicate_key", "over_receipt"])
+def test_receipt_scope_preserves_global_uniqueness_and_cumulative_quantity(inputs, change):
+    simulator = ChronologicalSimulator(
+        inputs["ledger"], inputs["supply"], inputs["scenario"], inputs["policy"],
+        inputs["fulfillment"], inputs["truth"],
+    )
+    simulator.execute()
+    row = copy.deepcopy(simulator.receipts[-1])
+    row["receipt_id"] = deterministic_uuid("receipt", "invalid-extra-receipt")
+    row["sequence"] += 1
+    if change == "duplicate_id":
+        row["receipt_id"] = simulator.receipts[0]["receipt_id"]
+    elif change == "duplicate_key":
+        row["received_at"] = simulator.receipts[0]["received_at"]
+        row["sequence"] = simulator.receipts[0]["sequence"]
+    else:
+        row["received_quantity"] = 100000
+    count, balances = len(simulator.receipts), simulator.balances.copy()
+    with pytest.raises(ValueError):
+        simulator._receipt(ReplenishmentReceipt.model_validate(row))
+    assert len(simulator.receipts) == count and simulator.balances == balances
 
 
 def correction(inputs, available="2026-07-02T00:00:00Z"):

@@ -1,0 +1,162 @@
+{
+  "benchmark_limitations": [
+    "Microbenchmarks are isolated method measurements, not a full-cohort runtime promise.",
+    "The ledger benchmark recorded the simulator before later runner-only timing callbacks and early object release; the simulator logic is unchanged, and all 16 final tests passed.",
+    "The full seed710001/232-day v1 pilot was still running when this evidence was written; no completion, disk peak or qualification result is claimed.",
+    "The whole producer inventory was not frozen when that DEVELOPMENT pilot started; its v1 execution and upstream pins stayed fixed, and its final manifest must report the actual inventory fingerprint at publication."
+  ],
+  "command": "env PYTHONPATH=. /Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python -m pytest -q data/tests/test_source_cohort_batch.py data/tests/test_source_cohort_batch_v2.py --junitxml=/private/tmp/ai04-source-fast-v2-release-tests.xml",
+  "development_fixture": {
+    "days": 10,
+    "end_date": "2026-09-30",
+    "products": 8,
+    "profile": "ai-intermittent-v1",
+    "seed": 710001,
+    "stores": 2,
+    "warehouses": 2
+  },
+  "environment": {
+    "machine": "arm64",
+    "platform": "Darwin",
+    "python": "3.11.15"
+  },
+  "evidence": {
+    "development-provenance-note.json": {
+      "bytes": 1203,
+      "sha256": "352fd872865e74a6444cda68cbcc3d220e956a55d4806d1a3beff4ad50c37e1b"
+    },
+    "retained-ledger-parity.json": {
+      "bytes": 2275,
+      "sha256": "34d6d6ec2b6fbe11c87459727dcc39a477fe5d09b2aec9969d5502dab383f1bc"
+    },
+    "retained-movement-parity.json": {
+      "bytes": 1572,
+      "sha256": "aad1bfe81e6373d96b1a83fdeb64c3a8de2602901e602d088267bc9f7b8fb436"
+    },
+    "source-freeze-template.json": {
+      "bytes": 24792,
+      "sha256": "6009a9795cbbdacfa71ac2633b0f45d9e1d3e8b32ff57f30c6e8730fc2993878"
+    }
+  },
+  "files": {
+    "data/inventory/source_cohort_batch.py": "5e48b799eeecf25bde59cbae2a3e192682a11ed62baed4fc6777c61a117b91bb",
+    "data/inventory/source_cohort_batch_v2.py": "8a0061c62cd93f64905dd4681a4e0b2d408fa15b498708d847d98a62d821d411",
+    "data/tests/test_source_cohort_batch.py": "0562b005277ea18e0d5094bd225fb386a719e35fbea73b2974de9152c1704e2c",
+    "data/tests/test_source_cohort_batch_v2.py": "c5b2a208dc1ed2f21de17007ab4c34dd2eeabfe863419967978792c6524713de"
+  },
+  "final_campaign_state": {
+    "final_seeds_generated": false,
+    "holdouts_evaluated": false,
+    "old_data_regenerated_or_changed": false,
+    "quality_thresholds_changed": false
+  },
+  "implementation": "inventory-source-cached-ledger-2.0.0",
+  "parent_commit": "1d49c1afe2fab4840dbd00522d3553b03c5165a7",
+  "read_only_benchmarks": {
+    "existing_nonopening_movements": 5000,
+    "ledger_median_speedup": 21.218225737974365,
+    "movement_membership_speedup": 6.477883016039577,
+    "opening_movements": 200,
+    "source_regenerated": false
+  },
+  "recorded_at": "2026-09-30T17:15:34.462684+00:00",
+  "scope": "Development source implementation parity and metadata freeze template; no final forecast quality qualification",
+  "status": "passed",
+  "tests": {
+    "cases": [
+      {
+        "classname": "data.tests.test_source_cohort_batch",
+        "name": "test_exact_all_source_tables_and_context",
+        "seconds": 0.989
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch",
+        "name": "test_ordinary_source_writer_reader_and_bytes_are_identical",
+        "seconds": 1.781
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch",
+        "name": "test_same_duplicate_and_negative_balance_rejections_without_state_change",
+        "seconds": 0.084
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch",
+        "name": "test_new_movement_is_indexed_and_second_application_is_rejected",
+        "seconds": 0.084
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch",
+        "name": "test_upstream_code_pin_detects_drift",
+        "seconds": 0.001
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch",
+        "name": "test_entrypoint_refuses_existing_output_root_before_generation",
+        "seconds": 0.001
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_all_58_tables_and_csv_bytes_equal_ordinary_path",
+        "seconds": 3.169
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_published_runner_releases_build_state_and_fully_revalidates",
+        "seconds": 1.741
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_ledger_state_matches_after_every_review_and_final_execution",
+        "seconds": 0.345
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_pending_transfer_uses_destination_and_outbound_availability",
+        "seconds": 0.082
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_untracked_malformed_record_replacements_are_revalidated[duplicate_id]",
+        "seconds": 0.082
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_untracked_malformed_record_replacements_are_revalidated[duplicate_order]",
+        "seconds": 0.082
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_untracked_malformed_record_replacements_are_revalidated[negative_opening]",
+        "seconds": 0.084
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_untracked_malformed_record_replacements_are_revalidated[bad_identifier]",
+        "seconds": 0.092
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_untracked_malformed_record_replacements_are_revalidated[empty_reference]",
+        "seconds": 0.105
+      },
+      {
+        "classname": "data.tests.test_source_cohort_batch_v2",
+        "name": "test_cached_master_change_is_rejected",
+        "seconds": 0.086
+      }
+    ],
+    "elapsed_seconds": 9.26,
+    "failed": 0,
+    "passed": 16,
+    "raw_report": "/private/tmp/ai04-source-fast-v2-release-tests.xml",
+    "raw_report_sha256": "b263bb30482436af70c66f17127cbd6b4b340d644937a9ef8eab9d8d3904a32b"
+  },
+  "verified_contracts": [
+    "All 58 source table values, context and serialized CSV bytes match the ordinary producer on the small development fixture.",
+    "Ordinary source writer and reader retain every one of the 36 hard gates.",
+    "Every small-fixture reorder review and final simulator output matches ordinary execution.",
+    "Pending transfer availability preserves destination and outbound constraints.",
+    "Duplicate IDs/order keys, negative opening, malformed identifiers/references and stale masters reject.",
+    "The complete small runner releases build tables before the ordinary independent read and retains exact source parity."
+  ]
+}

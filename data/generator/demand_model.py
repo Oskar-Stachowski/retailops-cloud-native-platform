@@ -95,7 +95,12 @@ def daily_demand(
         else Decimal(1)
     )
     factors = {
-        "base_rate": BASE_RATES[product["demand_class"]],
+        # Explicit rare-sales scenario, independent of forecast windows or scores.
+        # The unchanged stochastic rounding produces occasional positive sales;
+        # zero observations still come through baskets, inventory and daily facts.
+        "base_rate": "0.06"
+        if config.profile == "ai-intermittent-v1" and product["demand_class"] == "long_tail"
+        else BASE_RATES[product["demand_class"]],
         "product_factor": product["demand_weight"],
         "location_factor": store["traffic_multiplier"],
         "weekly_factor": str(weekly),

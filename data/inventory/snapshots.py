@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
 
-    from data.inventory.ledger import InventoryLedger
+    from data.inventory.ledger import InventoryLedger, InventoryMovement, Position
     from data.inventory.projection_contract import ProjectionConfig
 
 
@@ -36,14 +37,13 @@ def snapshot_at(
     require(known >= stamp, "Snapshot cannot be available before its business cutoff.")
     visible = ledger.known_movements(stamp.isoformat(), known_at=known.isoformat())
     balances = ledger.balances_at(stamp.isoformat(), known_at=known.isoformat())
+    by_position: dict[Position, list[InventoryMovement]] = defaultdict(list)
+    for movement in visible:
+        by_position[movement.position].append(movement)
     result = []
     units = {m.product_id: m.unit_of_measure for m in ledger.movements}
     for position in balances:
-        rows = [
-            m
-            for m in visible
-            if m.position == (position["product_id"], position["stock_location_id"])
-        ]
+        rows = by_position[position["product_id"], position["stock_location_id"]]
         result.append(
             {
                 "snapshot_id": deterministic_uuid(

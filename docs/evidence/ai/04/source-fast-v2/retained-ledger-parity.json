@@ -1,0 +1,53 @@
+{
+  "exact_ledger_movements_scope_transfers_balances_equal": true,
+  "existing_nonopening_movements": 5000,
+  "implementation": {
+    "code_sha256": "a5470f4073b33e4ec456ecb2e6205a5e90857e5d6846c93f7f08b9fd08ef23dd",
+    "optimization": "movement_id_set_and_cached_immutable_record_schema_validation",
+    "rng_and_chronological_process": "unchanged",
+    "source_validation": "ordinary_source_2_7_writer_and_reader_all_gates",
+    "upstream_sha256": {
+      "ledger.py": "3e50ac30d3732789680461d96d5855f01619d0978de56e774d11565df884565f",
+      "run_source_dataset.py": "b169472c350b88c267cd2fd32132d41d70eef3fb81e7097dc518af4d5d9e4261",
+      "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
+      "source_bridge.py": "113e8f40c38b2cfec76afa086191cad34679071ade1acfd135bd34c043399b14",
+      "source_cohort_batch.py": "5e48b799eeecf25bde59cbae2a3e192682a11ed62baed4fc6777c61a117b91bb",
+      "source_commerce.py": "407e5dd6685b613fd44e4cedb9829b20c15632541289641d8a61cc991fdf08c9"
+    },
+    "version": "inventory-source-cached-ledger-2.0.0"
+  },
+  "median_speedup": 21.218225737974365,
+  "opening_movements": 200,
+  "output_sha256": "05779f9c9b451a365edc177d08071b48e95034cbccfcdd93ede5b39abfddeacc",
+  "scope": "read_only_ledger_views_of_exposed_retained_v11_movements_no_source_regeneration",
+  "source_dataset_id": "source-sha256-76994412fcabec320688429d7f88adcd80fe54fb70327b22c1456c27673c2d66",
+  "source_ledger_sha256": "5910c3b250eb2088ebc4663fb0343127fbe1da1528dcc9116763bdeeef81a726",
+  "status": "passed",
+  "tests": {
+    "passed": 9,
+    "report": "/private/tmp/ai04-source-fast-v2-tests.xml",
+    "sha256": "35958a24d70ed536d4e0c29faca37e643f85e99abb1c276918bf5d7760a52607"
+  },
+  "timings": {
+    "CachedLedgerSourceCommerceSimulator": {
+      "median_seconds": 0.01304829100263305,
+      "seconds": [
+        0.027663458022288978,
+        0.016865541983861476,
+        0.011070583015680313,
+        0.012177249998785555,
+        0.01304829100263305
+      ]
+    },
+    "SourceCommerceSimulator": {
+      "median_seconds": 0.2768615839886479,
+      "seconds": [
+        0.2768615839886479,
+        0.25772933298139833,
+        0.3024102500057779,
+        0.25791416701395065,
+        0.31803187500918284
+      ]
+    }
+  }
+}

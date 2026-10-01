@@ -4,13 +4,14 @@ import copy
 import json
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from data.generator.common import deterministic_uuid
 from data.generator.identity import json_sha256
-from data.inventory.ledger import InventoryLedger
+from data.inventory.ledger import InventoryLedger, InventoryMovement
 from data.inventory.projection import project_inventory, reconcile_projection
 from data.inventory.projection_contract import (
     ProjectionConfig,
@@ -68,6 +69,31 @@ def project(inputs, config, evaluated_at=EVALUATION):
     return result, parent
 
 
+def test_snapshot_and_window_indexes_avoid_scope_times_ledger_scans(inputs, config, monkeypatch):
+    parent = simulate(inputs)
+    ledger = InventoryLedger.from_payload(parent["operational"]["ledger"])
+    position = InventoryMovement.position.fget
+    calls = []
+
+    def counted(movement):
+        calls.append(movement.inventory_event_id)
+        return position(movement)
+
+    monkeypatch.setattr(InventoryMovement, "position", property(counted))
+    cutoff = "2026-07-08T23:59:59.999999Z"
+    snapshot_at(ledger, snapshot_time=cutoff, as_of_time=cutoff)
+    assert len(calls) <= 2 * len(ledger.movements)
+    calls.clear()
+    diagnose_windows(
+        ledger,
+        ProjectionConfig.from_payload(config),
+        [],
+        origin=cutoff,
+        evaluated_at=EVALUATION,
+    )
+    assert len(calls) <= 2 * len(ledger.movements)
+
+
 def test_daily_snapshots_and_physical_balances_reconcile_every_grain(inputs, config):
     result, parent = project(inputs, config)
     assert reconcile_projection(result, parent["operational"], parent["simulation_truth"]) == {
@@ -98,6 +124,26 @@ def test_daily_snapshots_and_physical_balances_reconcile_every_grain(inputs, con
         == 8
     )
     assert result["operational"][-2:][0]["on_hand"] == 24
+
+
+def test_daily_projection_verification_does_not_rescan_ledger_per_snapshot(inputs, config):
+    from data.inventory.projection import _reconcile_daily
+
+    output, parent = project(inputs, config)
+    ledger = InventoryLedger.from_payload(parent["operational"]["ledger"])
+
+    class CountedTuple(tuple):
+        def __iter__(self):
+            self.scans += 1
+            return super().__iter__()
+
+    counted = CountedTuple(ledger.movements)
+    counted.scans = 0
+    assert len(output["operational"]) > 1
+    _reconcile_daily(
+        output, replace(ledger, movements=counted), ProjectionConfig.from_payload(config)
+    )
+    assert counted.scans == 1
 
 
 def test_episode_boundaries_duration_and_lost_sales_are_physical(inputs, config):

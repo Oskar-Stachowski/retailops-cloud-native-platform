@@ -1,0 +1,193 @@
+"""Exact source/review parity and ledger invariant coverage for cached execution."""
+
+from copy import deepcopy
+from dataclasses import replace
+from datetime import timedelta
+import json
+from pathlib import Path
+
+import pytest
+
+from data.generator.common import deterministic_uuid
+from data.generator.configuration import resolve_generation_config
+from data.generator.identity import canonical_json
+from data.generator.main import build_dataset
+from data.inventory.contract import utc_timestamp
+from data.inventory.ledger import InventoryMovement
+from data.inventory.source_cohort_batch_v2 import (
+    CachedLedgerSourceCommerceSimulator,
+    build_source_dataset_fast,
+    run,
+)
+from data.inventory.source_commerce import SourceCommerceSimulator
+from data.inventory.source_dataset_contract import SOURCE_TABLES, csv_path
+from data.inventory.source_dataset_io import (
+    normalize_source,
+    read_source_dataset,
+    write_source_dataset,
+)
+from data.inventory.source_foundation import source_foundation
+from data.tests.test_source_cohort_batch import parity_sample
+
+
+@pytest.fixture(scope="module")
+def cached_sample(parity_sample):
+    tables, context = build_source_dataset_fast(
+        parity_sample["generation"], parity_sample["config"]
+    )
+    return normalize_source(tables), context
+
+
+def test_all_58_tables_and_csv_bytes_equal_ordinary_path(parity_sample, cached_sample, tmp_path):
+    tables, context = cached_sample
+    assert tables == parity_sample["ordinary"]
+    assert context == parity_sample["ordinary_context"]
+    paths = []
+    for name, records, ctx in (
+        ("ordinary", parity_sample["ordinary"], parity_sample["ordinary_context"]),
+        ("cached", tables, context),
+    ):
+        paths.append(
+            write_source_dataset(
+                records, ctx, parity_sample["generation"], parity_sample["config"], tmp_path / name
+            )
+        )
+    restored, manifest = read_source_dataset(paths[1])
+    assert restored == parity_sample["ordinary"]
+    assert manifest["facts_ready"] is True
+    for name in SOURCE_TABLES:
+        assert (paths[0] / csv_path(name)).read_bytes() == (paths[1] / csv_path(name)).read_bytes()
+    report = json.loads((paths[1] / "source_report.json").read_text())
+    assert len(report["checks"]) == 36
+    assert all(r["status"] == "passed" for r in report["checks"])
+
+
+def test_published_runner_releases_build_state_and_fully_revalidates(parity_sample, tmp_path):
+    stages = []
+    result = run(parity_sample["generation"], tmp_path / "cohort", on_stage=stages.append)
+    restored, manifest = read_source_dataset(Path(result["directory"]))
+    assert restored == parity_sample["ordinary"]
+    assert manifest["descriptor"]["context"] == parity_sample["ordinary_context"].model_dump()
+    assert result["status"] == "passed" and result["table_count"] == 58
+    assert [stage["stage"] for stage in stages] == [
+        "source_build_started",
+        "source_built",
+        "source_written_and_staging_verified",
+        "published_source_verified",
+    ]
+
+
+@pytest.fixture
+def simulators(parity_sample):
+    generation = parity_sample["generation"]
+    effective = resolve_generation_config(generation)
+    candidate = build_dataset(generation)
+    inputs = source_foundation(candidate, effective, parity_sample["config"])
+    return [
+        cls(inputs, deepcopy(candidate), effective, parity_sample["config"])
+        for cls in (SourceCommerceSimulator, CachedLedgerSourceCommerceSimulator)
+    ]
+
+
+def test_ledger_state_matches_after_every_review_and_final_execution(simulators):
+    outputs, reviews = [], []
+    for simulator in simulators:
+        capture = []
+        original = simulator._review
+
+        def review(stamp, original=original, capture=capture, simulator=simulator):
+            original(stamp)
+            ledger = simulator._ledger()
+            capture.append(
+                canonical_json(
+                    {
+                        "review": simulator.reviews[-1],
+                        "movements": [m.record() for m in ledger.movements],
+                        "balances": sorted(
+                            (list(k), v) for k, v in ledger._balances(ledger.movements).items()
+                        ),
+                    }
+                )
+            )
+
+        simulator._review = review
+        outputs.append(simulator.execute())
+        reviews.append(capture)
+    assert outputs[0] == outputs[1]
+    assert reviews[0] and reviews[0] == reviews[1]
+
+
+def test_pending_transfer_uses_destination_and_outbound_availability(simulators):
+    ledgers = []
+    for simulator in simulators:
+        first = simulator.movements[0]
+        other = next(
+            m
+            for m in simulator.movements
+            if m.product_id == first.product_id and m.stock_location_id != first.stock_location_id
+        )
+        start = utc_timestamp(first.occurred_at)
+        transfer_id = deterministic_uuid("cached-ledger-test", "transfer")
+        out = {
+            **first.record(),
+            "inventory_event_id": deterministic_uuid("cached-ledger-test", "out"),
+            "movement_type": "transfer_out",
+            "source_process": "transfer",
+            "transfer_id": transfer_id,
+            "quantity_delta": -1,
+            "occurred_at": (start + timedelta(hours=1)).isoformat(),
+            "ingested_at": (start + timedelta(hours=1)).isoformat(),
+            "available_at": (start + timedelta(hours=2)).isoformat(),
+            "sequence": 1000,
+        }
+        inbound = InventoryMovement.from_record(
+            {
+                **out,
+                "inventory_event_id": deterministic_uuid("cached-ledger-test", "in"),
+                "stock_location_id": other.stock_location_id,
+                "movement_type": "transfer_in",
+                "quantity_delta": 1,
+                "occurred_at": (start + timedelta(hours=2)).isoformat(),
+                "ingested_at": (start + timedelta(hours=2)).isoformat(),
+                "sequence": 1001,
+            }
+        )
+        simulator.transfer_inbounds[transfer_id] = inbound
+        simulator.availability[other.position] = start + timedelta(hours=3)
+        simulator._apply(out)
+        ledger = simulator._ledger()
+        pending = next(
+            m for m in ledger.movements if m.inventory_event_id == inbound.inventory_event_id
+        )
+        assert pending.available_time == start + timedelta(hours=3)
+        assert inbound.inventory_event_id not in {m.inventory_event_id for m in simulator.movements}
+        ledgers.append(ledger)
+    assert ledgers[0] == ledgers[1]
+
+
+@pytest.mark.parametrize(
+    "change",
+    ["duplicate_id", "duplicate_order", "negative_opening", "bad_identifier", "empty_reference"],
+)
+def test_untracked_malformed_record_replacements_are_revalidated(simulators, change):
+    for simulator in simulators:
+        first = simulator.movements[0]
+        if change == "duplicate_id":
+            simulator.movements.append(first)
+        elif change == "duplicate_order":
+            simulator.movements[1] = replace(simulator.movements[1], sequence=first.sequence)
+        elif change == "negative_opening":
+            simulator.movements[0] = replace(first, quantity_delta=-1)
+        elif change == "bad_identifier":
+            simulator.movements[0] = replace(first, inventory_event_id="not-a-uuid")
+        else:
+            simulator.movements[0] = replace(first, source_reference="")
+        with pytest.raises(ValueError):
+            simulator._ledger()
+
+
+def test_cached_master_change_is_rejected(simulators):
+    cached = simulators[1]
+    cached.inventory_base["stock_locations"][0]["location_code"] = "changed"
+    with pytest.raises(ValueError, match="master context changed"):
+        cached._ledger()

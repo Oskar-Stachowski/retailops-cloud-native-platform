@@ -10,7 +10,11 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from time import perf_counter
 
-from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
+from data.generator.configuration import (
+    SUPPORTED_PROFILES,
+    DatasetGenerationConfig,
+    resolve_generation_config,
+)
 from data.generator.main import build_dataset
 from data.generator.pricing_plans import daily_price_observations
 from data.inventory.contract import require
@@ -162,7 +166,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--profile",
-        choices=("ai-smoke", "ai-temporal-smoke", "ai-dev", "ai-training", "ai-load"),
+        choices=tuple(profile for profile in SUPPORTED_PROFILES if profile.startswith("ai-")),
         default="ai-smoke",
     )
     for name in ("days", "products", "stores", "warehouses", "max-daily-rows"):

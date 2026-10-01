@@ -14,6 +14,7 @@ używa [źródła 2.7](inventory-snapshots.md); `--source-version 2.6` wybiera w
 | `ai-smoke` | 30 | 20 | 3 | 2 | `data/generated/sources/<source_id>/` |
 | `ai-temporal-smoke` | 102 | 8 | 3 | 2 | `data/generated/sources/<source_id>/` |
 | `ai-dev` | 365 | 100 | 5 | 3 | `data/generated/sources/<source_id>/` |
+| `ai-intermittent-v1` | 365 | 100 | 5 | 3 | `data/generated/sources/<source_id>/` |
 | `ai-training` | 730 | 200 | 10 | 4 | `data/generated/sources/<source_id>/` |
 | `ai-load` | Jawne | Jawne | Jawne | Jawne | `data/generated/sources/<source_id>/` |
 
@@ -21,6 +22,18 @@ używa [źródła 2.7](inventory-snapshots.md); `--source-version 2.6` wybiera w
 zachowuje stały scenariusz i seed 42. Profile skalowane przyjmują nadpisania oraz `--seed`
 (domyślnie 42). Parametry liczbowe muszą być dodatnie. Profil nie jest gwarancją
 stałej liczby transakcji ani kompletnego dziennego panelu ML.
+
+`ai-intermittent-v1` jest jawnym scenariuszem testowym sprzedaży przerywanej.
+Zachowuje losowania katalogu i lokalizacji z `ai-dev`, seed oraz wszystkie
+czynniki cenowe, kalendarzowe i losowe. Tylko bazowa intensywność klasy
+`long_tail` spada z 0,6 do 0,06; pozostałe klasy zachowują dotychczasowy model.
+Stochastyczne zaokrąglanie nadal generuje rzeczywiste dodatnie zdarzenia.
+Zera powstają przez normalną ścieżkę transakcji, inventory i kompletnego panelu,
+a nie przez dopisywanie próbek lub zamianę braków danych na zera.
+Scenariusz nie zależy od okien prognozy, etykiet holdoutu ani wyników modelu.
+Nie gwarantuje liczebności każdego segmentu: wymagane są preflight i osobna
+ocena jakości. Nie dowodzi reprezentatywności produkcyjnej; wyniki muszą
+pozostać oznaczone jako syntetyczne i nie zastępują wcześniejszego `ai-dev`.
 
 Domyślny koniec legacy to `2026-04-30`, profili AI — `2026-07-31`.
 Bez początku start wynika z końca minus `days - 1`. CLI przyjmuje
