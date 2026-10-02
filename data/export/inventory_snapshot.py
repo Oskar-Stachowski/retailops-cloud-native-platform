@@ -19,6 +19,7 @@ from data.export.inventory_contract import (
     FACT_TABLES,
     FORMAT,
     GATES,
+    LEGACY_SCHEMAS,
     POLICY,
     SCHEMAS,
     TRUTH_TABLES,
@@ -69,6 +70,16 @@ def copy_file(source: Path, target: Path) -> None:
     with os.fdopen(fd, "rb") as stream, target.open("xb") as destination:
         shutil.copyfileobj(stream, destination, length=1024 * 1024)
     target.chmod(0o600)
+
+
+def export_schema_file(name: str, parent: dict) -> Path:
+    """Keep ordinary exports compatible with the pinned pre-planning consumer."""
+    filename = (
+        LEGACY_SCHEMAS.get(name, name)
+        if parent["descriptor"]["generator_version"] == "0.9.0"
+        else name
+    )
+    return ROOT / "data/contracts" / filename
 
 
 def seal_source(source: Path, target: Path, dataset_id: str) -> tuple[dict, dict]:
@@ -213,11 +224,16 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
         },
         "Schema identity differs.",
     )
-    for name in SCHEMAS:
-        require(
-            (root / "schemas" / name).read_bytes() == (ROOT / "data/contracts" / name).read_bytes(),
-            "Unreviewed snapshot schema.",
+    checked_schemas = {name: (root / "schemas" / name).read_bytes() for name in SCHEMAS}
+    allowed_schemas = [{name: (ROOT / "data/contracts" / name).read_bytes() for name in SCHEMAS}]
+    if parent["descriptor"]["generator_version"] == "0.9.0":
+        allowed_schemas.append(
+            {
+                name: (ROOT / "data/contracts" / LEGACY_SCHEMAS.get(name, name)).read_bytes()
+                for name in SCHEMAS
+            }
         )
+    require(checked_schemas in allowed_schemas, "Unreviewed snapshot schema.")
     require(
         load_json(root / "schemas/source_snapshot_handoff.v1_1.json") == handoff_contract(),
         "Unreviewed inventory handoff.",
@@ -388,7 +404,7 @@ def export_inventory_snapshot(
             copy_file(work / "source" / name, bundle / "reports" / name)
         copy_file(work / "source" / MANIFEST_FILENAME, bundle / "manifests" / MANIFEST_FILENAME)
         for name in SCHEMAS:
-            copy_file(ROOT / "data/contracts" / name, bundle / "schemas" / name)
+            copy_file(export_schema_file(name, parent), bundle / "schemas" / name)
         (bundle / "schemas/source_snapshot_handoff.v1_1.json").write_bytes(
             canonical_json(handoff_contract()) + b"\n"
         )

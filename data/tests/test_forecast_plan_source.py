@@ -4,6 +4,8 @@ from copy import deepcopy
 from dataclasses import replace
 from datetime import date, timedelta
 import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -16,6 +18,9 @@ from data.generator.configuration import (
 from data.generator.dimension_quality import validate_dimensions
 from data.generator.manifest_v2 import config_from_parameters
 from data.generator.pricing_quality import validate_pricing
+from data.export.inventory_snapshot import export_inventory_snapshot
+from data.export.policy import GENERATED_ROOT
+from data.inventory.qualification_io import write_qualification
 from data.inventory.run_source_dataset import build_source_dataset, default_inventory_config
 from data.inventory.source_dataset_io import forecast_watermarks, read_source_dataset, write_source_dataset
 
@@ -119,6 +124,23 @@ def test_source_roundtrip_binds_plan_horizon_and_recomputes_all_hard_gates(plann
     assert len(report["checks"]) == 36
     assert all(r["status"] == "passed" for r in report["checks"])
     assert manifest["facts_ready"] and not manifest["source_ready"] and not manifest["model_ready"]
+
+
+def test_only_explicit_plans_export_the_reviewed_forecast_schema_pair(planned):
+    generation, config, tables, context = planned
+    GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix="ai05-forecast-schemas-", dir=GENERATED_ROOT) as temporary:
+        root = Path(temporary)
+        source = write_source_dataset(tables, context, generation, config, root / "sources")
+        qualification = write_qualification(source, root / "qualifications")
+        result = export_inventory_snapshot(
+            source, source.name, qualification, root / "snapshots",
+            required_use_cases=("forecast_source",),
+        )
+        assert result["manifest"]["source"]["descriptor"]["generator_version"] == "0.9.1"
+        bundle = Path(result["path"])
+        for filename in ("inventory_snapshot.v1_1.schema.json", "inventory_source_dataset.v2_7.schema.json"):
+            assert (bundle / "schemas" / filename).read_bytes() == (Path("data/contracts") / filename).read_bytes()
 
 
 @pytest.mark.parametrize("fault", ["incomplete", "late"])

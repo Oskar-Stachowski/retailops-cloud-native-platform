@@ -128,3 +128,9 @@ domyślną ścieżkę AI. [Końcowy audyt i odbiór](../evidence/ai/06/final/REA
 obejmuje source/qualification/export/import/curated i historyczny as-of.
 Frozen artefakty oraz manifest źródła zachowują dawne IDs i flagi; aktualne
 readiness zapisują curated i końcowy receipt. Modele 04/05/08 mają własne gates.
+
+Zwykły eksport producenta 0.9.0 zachowuje dokładne bajty schematów przypięte
+przez dotychczasowych niezależnych importerów. Rozszerzona para schematów
+trafia do snapshotu wyłącznie przy jawnym `forecast_plan_days` producenta
+0.9.1. Weryfikacja wymaga całej zatwierdzonej pary; mieszanie lub dowolna
+podmiana schematów jest odrzucana.
