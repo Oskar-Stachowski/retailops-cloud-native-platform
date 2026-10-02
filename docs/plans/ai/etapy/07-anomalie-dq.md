@@ -2,11 +2,11 @@
 
 **Status: plan wdrożenia. Repo: RetailOps + AI. Zależności: 04, 05, 06.**
 
-Lokalne przygotowanie upstream obejmuje [07.1a/b — pięć typów scenariuszy biznesowych](../../../reference/business-anomaly-scenarios.md).
-Kandydat ma oddzielną truth i pełne odtworzenie procesu, ale nie jest nowym
-snapshotem ani odbiorem AI 07. [07.1b](../../../evidence/ai/07/07.1b/README.md)
-dodaje realne zwroty i inventory-censored episode. Raw DQ, offline curation,
-handoff oraz downstream pozostają dalszym zakresem.
+Upstream obejmuje [pięć typów scenariuszy biznesowych](../../../reference/business-anomaly-scenarios.md),
+[raw DQ i ograniczony offline replay](../../../reference/raw-dq-replay.md) oraz
+[wersjonowane źródło 2.8 i snapshot 1.2](../../../reference/anomaly-source-handoff.md).
+Odbiór handoff jest osobną częścią etapu; AI07 nadal wymaga anomaly curation,
+cech, obu detektorów, ewaluacji oraz integracji z lifecycle AI05.
 
 Cel: uzyskać oddzielne, deterministyczne scenariusze business anomalies i raw data faults, a następnie porównać seasonal-residual baseline z Isolation Forest w istniejącym lifecycle MLflow. Offline replay/curation jest częścią07. Produkcyjna trwałość brokera, ACK/DLQ i projekcje są etapem10; nie deklarować ich zaliczenia na podstawie fixture offline.
 
