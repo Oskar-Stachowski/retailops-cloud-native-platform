@@ -1,8 +1,9 @@
 # Scenariusze anomalii biznesowych
 
-Zakres AI 07.1a: lokalny producent trzech scenariuszy popytu, z niezmiennym
-kandydatem i kontrolnym przebiegiem bez injekcji. [Plan etapu](../plans/ai/etapy/07-anomalie-dq.md)
-obejmuje również zwroty, ograniczenia zapasu, raw DQ i część modelową.
+Zakres AI 07.1a/07.1b: lokalny producent trzech scenariuszy popytu oraz
+scenariuszy zwrotów i ograniczenia zapasu, z niezmiennym kandydatem i kontrolnym
+przebiegiem bez injekcji. [Plan etapu](../plans/ai/etapy/07-anomalie-dq.md)
+obejmuje następnie raw DQ, handoff i część modelową.
 Kandydat nie jest source 2.7, snapshotem AI 03 ani odbiorem modelu.
 
 ## Kontrakt i proces
@@ -42,6 +43,41 @@ próg planu. Wszystkie kontrolne czynniki popytu pozostają identyczne w obu
 przebiegach. Raport osobno wskazuje, czy ich wynik inventory też jest taki sam;
 skutków wspólnego zapasu nie maskuje się jako niezależnych czystych obserwacji.
 
+## Zwroty i ograniczenie zapasu — 07.1b
+
+[Osobny kontrakt fizyczny](../../data/contracts/business_physical_anomaly_plan.v1.schema.json)
+ma wersję `business-physical-anomaly-plan-1.0.0`, a generator
+`business-physical-anomaly-generator-1.0.0`. Nie rozszerza po cichu kontraktu
+popytu v1; czytnik kandydata wybiera kontrakt na podstawie wersji planu.
+
+| Typ | Zmieniany proces | Magnitude |
+|---|---|---|
+| `return_spike` | Prawdopodobieństwo wyboru rzeczywiście zakupionych sztuk do zwrotu, dla grain daty `returned_at` | Mnożnik większy od 1, najwyżej 20; wynikowe prawdopodobieństwo najwyżej 0,75 |
+| `inventory_censored_episode` | Fizyczny zapas produktu we wskazanej stock location, bez zmiany latent demand | Całkowity cap 0–1000000 sztuk |
+
+Zwroty zachowują deterministyczne potencjalne części zakupu, daty, statusy
+i przyczyny. Nowe części mogą zostać wybrane wyłącznie w zadanym oknie;
+łączna zwracana ilość nie przekracza rzeczywiście sprzedanej. Refundacja
+i ewentualny restock wykonują normalny proces AI 06. Restock może zwiększyć
+późniejszą realizację sprzedaży; raport nie przedstawia zwrotów jako procesu
+niezależnego od zapasu.
+
+Stock cap działa **przed każdym arrival korzystającym z tej samej fizycznej
+puli** w oknie dat UTC. Nadmiar schodzi przez rzeczywisty ujemny `write_off`
+w ledgerze, przed `sale_issue`; nowe przyjęcie/restock zostaje objęte cap przy
+kolejnym arrival. Nie oznacza to ciągłego cap między zdarzeniami popytu.
+Wszystkie kanały wspólnej puli realizują `min(latent, available)`. W facts
+pozostają normalne ID zdarzeń i operacyjne ruchy, a powiązanie z injekcją jest
+wyłącznie w truth. Raport wskazuje removed units i konkretne write-off IDs.
+
+Plan fizyczny odrzuca kilka injekcji tego samego produktu, również w różnych
+kanałach lub rozłącznych oknach: replenishment i zwroty mogą przenosić skutek
+poza okno. Wymaga poprzedzającego `clean` tego samego grain i co najmniej tej
+samej długości; porównuje jego wyniki inventory oraz zwroty w obu przebiegach.
+Każdy epizod musi dać rzeczywisty wzrost zwracanych sztuk lub spadek observed
+i wzrost lost units. `observed_sales_changes` rozlicza zmiany wszystkich grain
+historii, także poza zakresem epizodu. Latent demand całej pary jest identyczny.
+
 ## Uruchomienie
 
 Komendy zakładają root worktree oraz Python z zależnościami API/data.
@@ -52,6 +88,10 @@ PYTHON=/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv
 "$PYTHON" -m data.anomalies.run --example --products 8 \
   --output-root data/generated/ai07-candidates \
   --output ci-cd/reports/data/ai07-demand.json
+
+"$PYTHON" -m data.anomalies.run --physical-example --products 8 \
+  --output-root data/generated/ai07-physical-candidates \
+  --output ci-cd/reports/data/ai07-physical.json
 ```
 
 `--example` wybiera deterministycznie aktywny grain z 30-dniową historią;
@@ -59,12 +99,18 @@ tworzy trzy epizody i cztery rodzaje kontroli. To jawna mała receptura
 syntetyczna, wybierana przed istnieniem detektora. Nie jest reprezentatywnym
 benchmarkiem ani selekcją na podstawie wyniku modelu.
 
+`--physical-example` tworzy dwa epizody na różnych produktach oraz dwa
+poprzedzające clean controls. Wybiera scope ze źródłowego przebiegu bez
+injekcji: serię z największą sprzedażą dla zwrotów i późny rzeczywiście
+zrealizowany arrival dla cap=0. To mała kontrola działania procesu, nie
+reprezentatywny benchmark ani dobór scenariuszy do wyniku detektora.
+
 Własny plan można przekazać przez `--plan /ścieżka/plan.json`, a konfigurację
 zapasów przez `--inventory-config`. Obsługiwane CLI profiles to `ai-smoke`
 i `ai-temporal-smoke`; seed planu i injekcji musi zgadzać się z `--seed`.
 Runner odrzuca nominalną siatkę większą niż 5000 dziennych grain.
 Receptura przykładowa wymaga co najmniej 30 dni. Pojedynczy artefakt ma limit
-64 MiB. Pełne profile treningowe i performance acceptance nie należą do 07.1a.
+64 MiB. Pełne profile treningowe i performance acceptance nie należą do 07.1a/b.
 
 ## Artefakty i odczyt
 
@@ -103,6 +149,7 @@ value dla modelu ani wynikiem detektora. Etapy AI 04/05 wymagają zgodnego
 odbioru przed częścią modelową 07. Prace źródłowe AI 04 mają własny branch;
 przed wspólnym nowym snapshotem trzeba uzgodnić ich wersję generatora.
 
-Najbliższy zakres: return spike i inventory-censored episode, następnie raw DQ
-faults, wersjonowany handoff AI 03 i offline curation w repo AI. Produkcyjne
+Najbliższy zakres: raw DQ faults, offline replay/curation i wersjonowany handoff
+AI 03. [Dowód 07.1b](../evidence/ai/07/07.1b/README.md) zapisuje wyniki zwrotów
+i ograniczenia zapasu oraz zgodność z normalnymi ścieżkami generatora. Produkcyjne
 projekcje, ACK i transportowe DLQ wyników należą do AI 10.

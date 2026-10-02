@@ -8,7 +8,7 @@
 | Streaming | [Zdarzenia](events.md), [trwałość metryk](live-metrics-persistence.md) |
 | Eksport do AI | [Parquet i polityka artefaktów](parquet-artifacts.md), [niezmienne snapshoty](ai-snapshots.md), [handoff do repo AI](source-snapshot-handoff.md), [pełna bramka cross-repo](ai03-cross-repo.md), [inventory snapshot 1.1](inventory-snapshots.md) |
 | Zapas AI 06 | [Kontrakt ledgeru, opening, replay i adapter legacy](inventory-ledger.md), [dostawcy, zamówienia i rzeczywiste przyjęcia](replenishment.md), [polityka uzupełniania i realizacja dostaw](reorder-policy.md), [chronologiczny wspólny zapas i sprzedaż](chronological-inventory.md), [snapshoty i epizody stockout](inventory-projections.md), [realizacja koszyków źródłowych](source-inventory-commerce.md), [typowane tabele inventory](inventory-source-tables.md), [wersjonowany source 2.7](inventory-source-dataset.md) |
-| Anomalie AI 07 | [Lokalne scenariusze popytu, oddzielna truth i niezmienny kandydat](business-anomaly-scenarios.md) |
+| Anomalie AI 07 | [Lokalne scenariusze popytu, zwrotów i zapasu, oddzielna truth i niezmienny kandydat](business-anomaly-scenarios.md) |
 | ML | [Kontrakt cech](ml-features.md), [lokalna polityka dopuszczenia RF](ml-admission-policy.md) |
 | Konwencje | [Nazwy i tagi](conventions.md) |
 | Terraform | [Mapa modułów](../guides/infrastructure.md), [backend state](terraform-state-backend.md) |

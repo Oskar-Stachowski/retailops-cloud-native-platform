@@ -18,9 +18,9 @@ wyłączone; target opisuje obserwowaną sprzedaż.
 
 ## Praca równoległa od obecnego punktu
 
-- **Cloud-native / przygotowanie 07:** dodać return spike i inventory-censored
-  episode do [lokalnego producenta](../../reference/business-anomaly-scenarios.md),
-  następnie raw DQ i wersjonowany snapshot. Uzgodnić wspólne zmiany generatora
+- **Cloud-native / przygotowanie 07:** po [pięciu typach scenariuszy biznesowych](../../reference/business-anomaly-scenarios.md)
+  dodać raw DQ, bounded offline replay/curation i wersjonowany snapshot.
+  Uzgodnić wspólne zmiany generatora
   z aktywną kampanią AI 04, zachowując jej frozen dane. Odbiór modeli 07
   wymaga zakończonych, zgodnych AI 04/05.
 - **Repo AI / przygotowanie 12:** interfejsy narzędzi read-only, graf i test doubles,
@@ -41,7 +41,7 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 |---|---|
 | **04 — forecasting** | Użyć poprawnego panelu i kalendarza, znanych w origin cech i nowego snapshotu; wspólne rekordy baseline/RF/HGB, zamrożony test i polityka. Przenieść istniejące poprawne mechanizmy, nie przywracać dawnych lagów po wierszach ani target covariates. |
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
-| **07 — anomaly/DQ** | Return spike i inventory-censored episode, raw faults oraz nowy snapshot/handoff i offline curation. Po zgodnych 04/05: PIT expected/residual, baseline/IF, porównanie i lifecycle. Lokalny producent trzech scenariuszy popytu nie odbiera tych warunków. |
+| **07 — anomaly/DQ** | Raw faults oraz nowy snapshot/handoff i offline curation. Po zgodnych 04/05: PIT expected/residual, baseline/IF, porównanie i lifecycle. Lokalny producent pięciu typów scenariuszy biznesowych nie odbiera tych warunków. |
 | **08 — stockout** | Odebrany ledger 06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
 | **09 — TensorFlow** | Challenger na tych samych kwalifikujących się danych/splitach; ocena trzech zastosowań i odporności. Nie musi wygrać. |
 | **10 — integracja** | Legacy v1 ma kontrakt oraz [trwałe ACK/kwarantannę live metrics](../../reference/events.md). Rozszerzyć je na nowe intelligence.v2, domenowe inbox/outbox, wersje faktów i snapshot/replay. Domenowe projekcje wyników, zgodne API/UI i rzeczywiste auth/scope. Testy z brokerem i awariami wymagane przed odbiorem. |

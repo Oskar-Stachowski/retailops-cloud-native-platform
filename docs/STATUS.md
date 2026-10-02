@@ -64,14 +64,14 @@ warstw zapisują curated i końcowy receipt. [Nowa karta danych](evidence/ai/06/
 wiąże source/qualification/snapshot/curated IDs. Demo/API zachowują zgodność.
 AI 04/05 należy odebrać na tych nowych IDs przed częścią modelową 07/08.
 
-**AI 07 rozpoczęto od niezależnego przygotowania źródła 07.1a.**
-[Scenariusze popytu](reference/business-anomaly-scenarios.md) zmieniają proces
-przed koszykami i chronologiczną realizacją zapasu. Lokalny kandydat oddziela
+**AI 07 ma lokalne przygotowanie pięciu typów scenariuszy biznesowych 07.1a/b.**
+[Scenariusze](reference/business-anomaly-scenarios.md) zmieniają proces popytu,
+zwrotów lub fizycznego zapasu przed finalnymi faktami. Lokalny kandydat oddziela
 facts od planu/etykiet i wymaga powtórzenia obu procesów przy pełnym odczycie.
 To nie jest odbiór source/snapshot/model ani całego AI 07.
-Zakres dalszy: return spike, inventory-censored episode, raw DQ i nowy handoff;
+Zakres dalszy: raw DQ, offline replay/curation i nowy handoff;
 część modelowa wymaga zgodnych AI 04/05. [Dowód 07.1a](evidence/ai/07/07.1a/README.md)
-podaje rewizję i zmierzone wyniki.
+i [07.1b](evidence/ai/07/07.1b/README.md) podają rewizje i zmierzone wyniki.
 
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.
