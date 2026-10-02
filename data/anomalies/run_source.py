@@ -34,8 +34,11 @@ def main() -> None:
     parser.add_argument("--output-root", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    if args.verify and args.output.resolve().is_relative_to(args.verify.resolve()):
+    protected = args.verify or args.output_root
+    if protected and args.output.resolve().is_relative_to(protected.resolve()):
         parser.error("Verification receipt must be outside source storage")
+    if args.plan and args.output.resolve() == args.plan.resolve():
+        parser.error("Receipt must not overwrite the private input plan")
     try:
         if args.verify:
             directory = args.verify

@@ -10,8 +10,10 @@ Runtime commit: `b59aca8e2fe70a76efde2192b63b5bf839104bac`.
 See [verification.json](verification.json) for every source/snapshot identity,
 file checksum, recorded code/dependency provenance and consumer receipt, and
 [the reference](../../../../reference/anomaly-source-handoff.md) for reproduction.
-All recorded runtime file hashes match the current implementation. Source/DQ
+All recorded runtime file hashes match the pinned runtime commit. Source/DQ
 provenance records clean runtime code. No AI05 checkout, process or service changed.
+The current CLI also rejects receipt paths inside source storage or over the input
+plan before doing any work; three separate boundary tests cover that later guard.
 
 ## Physical acceptance
 
