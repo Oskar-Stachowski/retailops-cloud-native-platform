@@ -9,6 +9,7 @@ from data.generator.common import BASE_DATE
 CONFIG_VERSION = "1.0.0"
 CALENDAR_VERSION = "legacy-weekday-seasonality-1.0.0"
 AI_END_DATE = date(2026, 7, 31)
+FORECAST_PLAN_VERSION = "known-forecast-plans-1.0.0"
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,7 @@ class DatasetGenerationConfig:
     start_date: date | None = None
     end_date: date | None = None
     max_daily_rows: int | None = None
+    forecast_plan_days: int = 0
 
 
 @dataclass(frozen=True)
@@ -62,11 +64,24 @@ class ResolvedGenerationConfig:
     warmup_days: int = 0
     origin_days: int = 0
     label_tail_days: int = 0
+    forecast_plan_days: int = 0
+
+    @property
+    def planning_end_date(self) -> date:
+        return self.end_date + timedelta(days=self.forecast_plan_days)
+
+    @property
+    def planning_days(self) -> int:
+        return self.days + self.forecast_plan_days
 
     def parameters(self) -> dict[str, Any]:
         result = asdict(self)
         result["start_date"] = self.start_date.isoformat()
         result["end_date"] = self.end_date.isoformat()
+        if self.forecast_plan_days:
+            result["forecast_plan_version"] = FORECAST_PLAN_VERSION
+        else:
+            result.pop("forecast_plan_days")
         return result
 
 
@@ -74,12 +89,23 @@ def requested_parameters(config: DatasetGenerationConfig) -> dict[str, Any]:
     result = asdict(config)
     for key in ("start_date", "end_date"):
         result[key] = result[key].isoformat() if result[key] is not None else None
+    if config.forecast_plan_days:
+        result["forecast_plan_version"] = FORECAST_PLAN_VERSION
+    else:
+        result.pop("forecast_plan_days")
     return result
 
 
 def validate_generation_config(config: DatasetGenerationConfig) -> None:
     if config.profile not in SUPPORTED_PROFILES:
         msg = f"Unsupported dataset profile '{config.profile}'."
+        raise ValueError(msg)
+    if (
+        type(config.forecast_plan_days) is not int
+        or not 0 <= config.forecast_plan_days <= 14
+        or (config.forecast_plan_days and not config.profile.startswith("ai-"))
+    ):
+        msg = "Forecast plans require an AI profile and an integer horizon of 0-14 days."
         raise ValueError(msg)
     for name in (*SIZING_FIELDS, "seed", "max_daily_rows"):
         value = getattr(config, name)
@@ -143,6 +169,7 @@ def resolve_generation_config(config: DatasetGenerationConfig) -> ResolvedGenera
         start_date=start,
         end_date=end,
         max_daily_rows=limit,
+        forecast_plan_days=config.forecast_plan_days,
         **values,
         **layout,
     )

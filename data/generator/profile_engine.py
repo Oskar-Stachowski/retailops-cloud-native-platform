@@ -932,6 +932,7 @@ def build_profile_dataset(
     warehouse_count: int,
     seed: int = 42,
     clock: GenerationClock = DEFAULT_CLOCK,
+    forecast_plan_days: int = 0,
 ) -> dict[str, list[dict[str, str]]]:
     rng = _rng(seed, profile)
     products = generate_profile_products(product_count, rng)
@@ -952,6 +953,7 @@ def build_profile_dataset(
                 seed=seed,
                 end_date=clock.end_date,
                 max_daily_rows=days * product_count * store_count,
+                forecast_plan_days=forecast_plan_days,
             )
         )
         dimension_tables, products, stores, warehouses = build_dimensions(

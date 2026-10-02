@@ -245,6 +245,13 @@ def export_snapshot(
             return {"publication": "published", "path": str(destination), "manifest": verified}
 
 
+def validate_plan_mode(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.forecast_plan_days and (args.source_dir or args.source_version == "2.6"):
+        parser.error(
+            "Forecast plans require generation of source 2.7; existing sources remain immutable."
+        )
+
+
 def main() -> None:  # noqa: PLR0915 - explicit versioned CLI dispatch
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -265,7 +272,9 @@ def main() -> None:  # noqa: PLR0915 - explicit versioned CLI dispatch
     parser.add_argument("--partition-min-rows", type=int, default=PARTITION_MIN_ROWS)
     parser.add_argument("--source-version", choices=("2.6", "2.7"), default=None)
     parser.add_argument("--qualification-dir", type=Path)
+    parser.add_argument("--forecast-plan-days", type=int, choices=(0, 7, 14), default=0)
     args = parser.parse_args()
+    validate_plan_mode(parser, args)
     options = {
         "include_truth": args.include_evaluation_truth,
         "required_use_cases": tuple(args.require_use_case or ["forecast_source"]),
@@ -330,6 +339,7 @@ def main() -> None:  # noqa: PLR0915 - explicit versioned CLI dispatch
                     "stores",
                     "warehouses",
                     "max_daily_rows",
+                    "forecast_plan_days",
                 )
             }
         )

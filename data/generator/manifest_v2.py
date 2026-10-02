@@ -10,6 +10,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from data.generator.configuration import (
+    FORECAST_PLAN_VERSION,
     SUPPORTED_PROFILES,
     DatasetGenerationConfig,
     requested_parameters,
@@ -548,6 +549,13 @@ def build_source_manifest_v2(
 
 def config_from_parameters(parameters: dict[str, Any]) -> DatasetGenerationConfig:
     values = dict(parameters)
+    has_forecast_plans = "forecast_plan_days" in values or "forecast_plan_version" in values
+    plan_version = values.pop("forecast_plan_version", None)
+    if has_forecast_plans and (
+        plan_version != FORECAST_PLAN_VERSION or not values.get("forecast_plan_days")
+    ):
+        msg = "Forecast plan parameters require their explicit version and positive horizon."
+        raise ValueError(msg)
     for name in ("start_date", "end_date"):
         values[name] = date.fromisoformat(values[name]) if values[name] is not None else None
     return DatasetGenerationConfig(**values)
