@@ -1,6 +1,12 @@
 # Aktualny status RetailOps
 
-Aktualizacja: **2026-09-30**. [Audyt AI 00](evidence/ai/00/README.md) na
+**AI 05 jest `ready`: [końcowy odbiór i publikacja](evidence/ai/05/final/README.md)**
+obejmują rzeczywisty przepływ v12, oba scalone PR-y i zielony Required CI
+na `main` obu repozytoriów. AI 04 jest zamknięty na v12 z trzema przyjętymi
+odstępstwami MSE, a AI 06 ma odbiór danych inventory. Można rozpocząć AI 08
+po kontroli jego wejść i lineage; AI 07 pozostaje osobnym etapem.
+
+Aktualizacja: **2026-10-02**. [Audyt AI 00](evidence/ai/00/README.md) na
 `cbf28b2` obejmuje dwukrotną generację `small`, kontrast 100/20 produktów,
 pomiary danych i kontraktów, **138 testów bez pominięć** oraz ponowny odczyt
 ocenionych artefaktów RF. Required CI tego SHA ma `success`.
@@ -37,6 +43,12 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
+Po [odbiorze AI 05](evidence/ai/05/final/README.md) można rozpocząć
+[AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md), zaczynając od
+weryfikacji danych inventory, dojrzałych etykiet i historycznej lineage prognoz.
+AI 07 pozostaje osobnym otwartym etapem i może być kontynuowany równolegle.
+Poniższe wcześniejsze odbiory zachowują swoje wersje danych i zakresy.
+
 [AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md).
 Źródło 2.6 przechodzi 46 hard gates; cechy AI 3.1 powstają w izolowanym workerze
 z czterech projekcji faktów. Fingerprint obejmuje cały wykonywany kod, a wersje
@@ -62,7 +74,8 @@ Pełny pipeline obu profili dwukrotnie spełnia budżet 300 s / 1024 MiB.
 Frozen manifest źródła nadal ma pierwotne flagi false; readiness kolejnych
 warstw zapisują curated i końcowy receipt. [Nowa karta danych](evidence/ai/06/final/dataset-card.md)
 wiąże source/qualification/snapshot/curated IDs. Demo/API zachowują zgodność.
-AI 04/05 należy odebrać na tych nowych IDs przed realizacją 07/08.
+AI 04/05 mają [odbiór finalnego v12 i świeżego przepływu](evidence/ai/05/final/README.md).
+Nowe wejścia 07/08 nadal wymagają własnych identyfikatorów, kwalifikacji i lineage.
 
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.
