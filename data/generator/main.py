@@ -146,6 +146,7 @@ def build_dataset(
         warehouse_count=effective.warehouses,
         seed=effective.seed,
         clock=GenerationClock(effective.end_date),
+        forecast_plan_days=effective.forecast_plan_days,
     )
 
 

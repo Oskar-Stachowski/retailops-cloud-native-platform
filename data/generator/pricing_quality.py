@@ -125,8 +125,8 @@ def _coverage(tables: dict[str, list[dict[str, Any]]], config: ResolvedGeneratio
         while current.isoformat() < row["effective_to"]:
             day = current.isoformat()
             require(
-                config.start_date <= current <= config.end_date,
-                "Price denominator exceeds history.",
+                config.start_date <= current <= config.planning_end_date,
+                "Price coverage exceeds declared history and known forecast plans.",
             )
             for quantity in (0, 1, 2):
                 resolver.resolve(
@@ -134,7 +134,12 @@ def _coverage(tables: dict[str, list[dict[str, Any]]], config: ResolvedGeneratio
                     row["selling_location_id"],
                     row["channel"],
                     day,
-                    utc_midnight(current),
+                    utc_midnight(current)
+                    if current <= config.end_date
+                    else (
+                        timestamp(utc_midnight(config.end_date + timedelta(days=1)))
+                        - timedelta(seconds=1)
+                    ).isoformat(),
                     quantity,
                 )
             count += 1

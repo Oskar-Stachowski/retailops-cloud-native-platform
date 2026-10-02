@@ -141,8 +141,9 @@ def _periods(tables: dict[str, list[dict[str, Any]]], config: ResolvedGeneration
                 require(row["product_id"] in products, "Unknown assortment product.")
             require(
                 config.start_date.isoformat() <= row["effective_from"]
-                and row["effective_to"] <= (config.end_date + timedelta(days=1)).isoformat(),
-                "Effective period exceeds source history.",
+                and row["effective_to"]
+                <= (config.planning_end_date + timedelta(days=1)).isoformat(),
+                "Effective period exceeds declared history and known forecast plans.",
             )
             expected_key = f"{row['selling_location_id']}:{row['channel']}"
             require(
@@ -276,9 +277,14 @@ def _catalog_and_assortment(
             and row["effective_to"] <= assignment["effective_to"]
         ]
         require(len(matching) == 1, "Assortment has no unique channel assignment.")
-        valid_days += (
-            date.fromisoformat(row["effective_to"]) - date.fromisoformat(row["effective_from"])
-        ).days
+        # Future plans must not enlarge the denominator of observed demand.
+        valid_days += max(
+            0,
+            (
+                min(date.fromisoformat(row["effective_to"]), config.end_date + timedelta(days=1))
+                - date.fromisoformat(row["effective_from"])
+            ).days,
+        )
     require(
         valid_days <= config.days * config.products * config.stores,
         "Assortment denominator exceeds declared grid.",
@@ -295,7 +301,7 @@ def _calendar(tables: dict[str, list[dict[str, Any]]], config: ResolvedGeneratio
     }
     require(len(pairs) == config.stores, "Assignment compatibility IDs are not stable.")
     expected = {}
-    for offset in range(config.days):
+    for offset in range(config.planning_days):
         current = (config.start_date + timedelta(days=offset)).isoformat()
         for location, channel, adapter_id in pairs:
             assignment = index.assignment(
@@ -312,7 +318,7 @@ def _calendar(tables: dict[str, list[dict[str, Any]]], config: ResolvedGeneratio
         "Calendar missing/extra day or duplicate combination.",
     )
     require(
-        len(actual) == config.days * config.stores,
+        len(actual) == config.planning_days * config.stores,
         "Calendar denominator must use valid active pairs.",
     )
     known = utc_midnight(config.start_date - timedelta(days=1))
@@ -341,7 +347,8 @@ def _category_calendar(
 ) -> int:
     categories = {row["id"]: row for row in tables["catalog_categories"]}
     expected = {
-        (config.start_date + timedelta(days=offset)).isoformat() for offset in range(config.days)
+        (config.start_date + timedelta(days=offset)).isoformat()
+        for offset in range(config.planning_days)
     }
     rows = tables["category_calendar"]
     keys = {(row["business_date"], row["category_id"]) for row in rows}

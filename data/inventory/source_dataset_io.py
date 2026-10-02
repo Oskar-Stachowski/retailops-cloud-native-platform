@@ -24,6 +24,7 @@ from data.generator.source_realism import realism_markdown
 from data.inventory.contract import require
 from data.inventory.source_contract import SourceInventoryConfig
 from data.inventory.source_dataset_contract import (
+    FORECAST_GENERATOR_VERSION,
     GENERATOR_VERSION,
     MANIFEST_FILENAME,
     SOURCE_POLICY,
@@ -114,12 +115,15 @@ def descriptor(
     context: TableContext,
     provenance: dict,
 ) -> dict:
+    effective = resolve_generation_config(generation)
     return {
         "identity_version": "inventory-source-identity-1.0.0",
         "role": "source",
         "owner": "retailops-cloud-native-platform",
         "schema_version": SOURCE_VERSION,
-        "generator_version": GENERATOR_VERSION,
+        "generator_version": FORECAST_GENERATOR_VERSION
+        if effective.forecast_plan_days
+        else GENERATOR_VERSION,
         "table_contract_version": TABLE_CONTRACT_VERSION,
         "source_policy_version": SOURCE_POLICY,
         "canonicalization_version": "inventory-source-typed-csv-1.0.0",
@@ -187,6 +191,11 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         generation.profile.startswith("ai-")
         and effective.parameters() == desc["resolved_parameters"],
         "Source requested/resolved generation differs.",
+    )
+    require(
+        desc["generator_version"]
+        == (FORECAST_GENERATOR_VERSION if effective.forecast_plan_days else GENERATOR_VERSION),
+        "Source generator version disagrees with declared forecast planning mode.",
     )
     context = manifest.descriptor.context
     require(

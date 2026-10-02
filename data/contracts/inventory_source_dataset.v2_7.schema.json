@@ -26,6 +26,235 @@
       "title": "Artifact",
       "type": "object"
     },
+    "ForecastRequestedParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Days"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "forecast_plan_days": {
+          "maximum": 14,
+          "minimum": 1,
+          "title": "Forecast Plan Days",
+          "type": "integer"
+        },
+        "forecast_plan_version": {
+          "const": "known-forecast-plans-1.0.0",
+          "title": "Forecast Plan Version",
+          "type": "string"
+        },
+        "max_daily_rows": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Daily Rows"
+        },
+        "products": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Products"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "seed": {
+          "exclusiveMinimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "stores": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Stores"
+        },
+        "warehouses": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Warehouses"
+        }
+      },
+      "required": [
+        "profile",
+        "days",
+        "products",
+        "stores",
+        "warehouses",
+        "seed",
+        "start_date",
+        "end_date",
+        "max_daily_rows",
+        "forecast_plan_days",
+        "forecast_plan_version"
+      ],
+      "title": "ForecastRequestedParameters",
+      "type": "object"
+    },
+    "ForecastResolvedParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "business_timezone": {
+          "const": "UTC",
+          "title": "Business Timezone",
+          "type": "string"
+        },
+        "days": {
+          "exclusiveMinimum": 0,
+          "title": "Days",
+          "type": "integer"
+        },
+        "end_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "End Date",
+          "type": "string"
+        },
+        "forecast_plan_days": {
+          "maximum": 14,
+          "minimum": 1,
+          "title": "Forecast Plan Days",
+          "type": "integer"
+        },
+        "forecast_plan_version": {
+          "const": "known-forecast-plans-1.0.0",
+          "title": "Forecast Plan Version",
+          "type": "string"
+        },
+        "label_tail_days": {
+          "minimum": 0,
+          "title": "Label Tail Days",
+          "type": "integer"
+        },
+        "max_daily_rows": {
+          "exclusiveMinimum": 0,
+          "title": "Max Daily Rows",
+          "type": "integer"
+        },
+        "origin_days": {
+          "minimum": 0,
+          "title": "Origin Days",
+          "type": "integer"
+        },
+        "output_format": {
+          "const": "csv",
+          "title": "Output Format",
+          "type": "string"
+        },
+        "products": {
+          "exclusiveMinimum": 0,
+          "title": "Products",
+          "type": "integer"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "seed": {
+          "exclusiveMinimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Start Date",
+          "type": "string"
+        },
+        "stores": {
+          "exclusiveMinimum": 0,
+          "title": "Stores",
+          "type": "integer"
+        },
+        "warehouses": {
+          "exclusiveMinimum": 0,
+          "title": "Warehouses",
+          "type": "integer"
+        },
+        "warmup_days": {
+          "minimum": 0,
+          "title": "Warmup Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile",
+        "days",
+        "products",
+        "stores",
+        "warehouses",
+        "seed",
+        "start_date",
+        "end_date",
+        "max_daily_rows",
+        "business_timezone",
+        "output_format",
+        "warmup_days",
+        "origin_days",
+        "label_tail_days",
+        "forecast_plan_days",
+        "forecast_plan_version"
+      ],
+      "title": "ForecastResolvedParameters",
+      "type": "object"
+    },
     "PolicyHeader": {
       "additionalProperties": false,
       "properties": {
@@ -431,7 +660,10 @@
           "type": "string"
         },
         "generator_version": {
-          "const": "0.9.0",
+          "enum": [
+            "0.9.0",
+            "0.9.1"
+          ],
           "title": "Generator Version",
           "type": "string"
         },
@@ -455,7 +687,15 @@
           "type": "string"
         },
         "resolved_parameters": {
-          "$ref": "#/$defs/ResolvedParameters"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResolvedParameters"
+            },
+            {
+              "$ref": "#/$defs/ForecastResolvedParameters"
+            }
+          ],
+          "title": "Resolved Parameters"
         },
         "role": {
           "const": "source",
@@ -648,7 +888,15 @@
       "type": "object"
     },
     "requested_parameters": {
-      "$ref": "#/$defs/RequestedParameters"
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RequestedParameters"
+        },
+        {
+          "$ref": "#/$defs/ForecastRequestedParameters"
+        }
+      ],
+      "title": "Requested Parameters"
     },
     "schema_version": {
       "const": "2.7.0",
