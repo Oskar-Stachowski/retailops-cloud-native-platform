@@ -45,6 +45,9 @@ seconds; the acceptance limits are 300 seconds and 1024 MiB per case.
 ## Validation and next boundary
 
 - 55 producer source/snapshot tests passed, including 10 new anomaly tests.
+- 16 indexed/cached source parity tests passed after reviewing and refreshing
+  orchestration pins. They prove identical context, all 58 tables and serialized
+  CSV/report bytes against ordinary source 2.7, and preserve drift rejection.
 - 94 consumer regression tests and 8 new anomaly import tests passed.
 - Producer Ruff and targeted Mypy (five new/modified handoff modules) passed.
 - Consumer Ruff/format and full Mypy (193 modules) passed; wheel build/install passed.
