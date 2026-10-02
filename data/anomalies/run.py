@@ -12,6 +12,8 @@ from time import perf_counter
 
 from data.anomalies.candidate_io import read_candidate, write_candidate
 from data.anomalies.example import example_plan
+from data.anomalies.physical_contract import PHYSICAL_VERSION
+from data.anomalies.physical_scenarios import build_physical_scenario, physical_example_plan
 from data.anomalies.scenarios import build_scenario
 from data.generator.configuration import DatasetGenerationConfig
 from data.inventory.source_contract import SourceInventoryConfig
@@ -20,7 +22,7 @@ from data.inventory.source_dataset_io import load_json
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="AI 07.1a demand scenario candidate; not an AI03 handoff."
+        description="AI 07 business scenario candidate; not an AI03 handoff."
     )
     parser.add_argument("--profile", choices=("ai-smoke", "ai-temporal-smoke"), default="ai-smoke")
     for name in ("days", "products", "stores", "warehouses", "max-daily-rows"):
@@ -31,6 +33,7 @@ def main() -> None:
     plan = parser.add_mutually_exclusive_group(required=True)
     plan.add_argument("--plan", type=Path)
     plan.add_argument("--example", action="store_true")
+    plan.add_argument("--physical-example", action="store_true")
     parser.add_argument("--inventory-config", type=Path)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -53,13 +56,24 @@ def main() -> None:
                 )
             }
         )
-        payload = example_plan(generation) if args.example else load_json(args.plan)
         inventory_config = (
             SourceInventoryConfig.from_payload(load_json(args.inventory_config))
             if args.inventory_config
             else None
         )
-        candidate = build_scenario(generation, payload, inventory_config)
+        payload = (
+            physical_example_plan(generation, inventory_config)
+            if args.physical_example
+            else example_plan(generation)
+            if args.example
+            else load_json(args.plan)
+        )
+        builder = (
+            build_physical_scenario
+            if payload.get("contract_version") == PHYSICAL_VERSION
+            else build_scenario
+        )
+        candidate = builder(generation, payload, inventory_config)
         directory = write_candidate(candidate, args.output_root)
         manifest = read_candidate(directory, replay=False)
         result = {

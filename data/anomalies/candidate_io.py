@@ -8,6 +8,12 @@ from tempfile import TemporaryDirectory
 from typing import Literal
 
 from data.anomalies.contract import AnomalyPlan, plan_schema
+from data.anomalies.physical_contract import (
+    PHYSICAL_VERSION,
+    PhysicalAnomalyPlan,
+    physical_plan_schema,
+)
+from data.anomalies.physical_scenarios import build_physical_scenario
 from data.anomalies.scenarios import build_scenario
 from data.generator.configuration import resolve_generation_config
 from data.generator.identity import canonical_json, code_fingerprint, code_provenance, json_sha256
@@ -77,6 +83,20 @@ def documents(candidate: dict) -> dict[str, dict]:
     }
 
 
+def parse_candidate_plan(payload: dict) -> AnomalyPlan | PhysicalAnomalyPlan:
+    if payload.get("contract_version") == PHYSICAL_VERSION:
+        return PhysicalAnomalyPlan.from_payload(payload)
+    return AnomalyPlan.from_payload(payload)
+
+
+def candidate_plan_schema(payload: dict) -> dict:
+    return (
+        physical_plan_schema()
+        if isinstance(parse_candidate_plan(payload), PhysicalAnomalyPlan)
+        else plan_schema()
+    )
+
+
 def read_candidate(directory: Path, *, replay: bool = True) -> dict:
     require(
         not directory.is_symlink() and not any(p.is_symlink() for p in directory.rglob("*")),
@@ -107,8 +127,7 @@ def read_candidate(directory: Path, *, replay: bool = True) -> dict:
     )
     require(
         manifest["candidate_id"] == "anomaly-candidate-sha256-" + json_sha256(desc)
-        and desc["schema_version"] == VERSION
-        and desc["plan_schema_sha256"] == json_sha256(plan_schema()),
+        and desc["schema_version"] == VERSION,
         "Candidate identity or schema differs.",
     )
     require(set(manifest["artifacts"]) == set(PATHS), "Candidate artifact allowlist differs.")
@@ -128,7 +147,11 @@ def read_candidate(directory: Path, *, replay: bool = True) -> dict:
             path.read_bytes() == canonical_json(restored[relative]) + b"\n",
             "Noncanonical candidate artifact.",
         )
-    plan = AnomalyPlan.from_payload(restored[PATHS[2]]["plan"])
+    plan = parse_candidate_plan(restored[PATHS[2]]["plan"])
+    require(
+        desc["plan_schema_sha256"] == json_sha256(candidate_plan_schema(plan.model_dump())),
+        "Candidate plan schema differs.",
+    )
     require(
         json_sha256(plan.model_dump()) == desc["plan_sha256"], "Injection plan identity differs."
     )
@@ -159,7 +182,7 @@ def read_candidate(directory: Path, *, replay: bool = True) -> dict:
             "Independent candidate replay requires the recorded generator environment.",
         )
         expected = documents(
-            build_scenario(
+            (build_physical_scenario if isinstance(plan, PhysicalAnomalyPlan) else build_scenario)(
                 generation,
                 plan.model_dump(),
                 SourceInventoryConfig.from_payload(restored[PATHS[3]]["inventory_configuration"]),
@@ -192,7 +215,7 @@ def write_candidate(candidate: dict, output_root: Path) -> Path:
             "schema_version": VERSION,
             "generation": candidate["generation"],
             "plan_sha256": json_sha256(candidate["plan"]),
-            "plan_schema_sha256": json_sha256(plan_schema()),
+            "plan_schema_sha256": json_sha256(candidate_plan_schema(candidate["plan"])),
             **{k: provenance[k] for k in ("code_sha256", "dependency_sha256", "python_version")},
             "artifacts": artifacts,
         }

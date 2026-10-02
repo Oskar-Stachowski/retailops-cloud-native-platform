@@ -32,6 +32,8 @@ class SourceCommerceSimulator(ChronologicalSimulator):
         tables: dict,
         generation: ResolvedGenerationConfig,
         config: SourceInventoryConfig,
+        *,
+        return_factors: dict[tuple[str, ...], str] | None = None,
     ) -> None:
         super().__init__(
             inputs["inventory"],
@@ -43,6 +45,7 @@ class SourceCommerceSimulator(ChronologicalSimulator):
         )
         self.generation = generation
         self.config = config
+        self.return_factors = return_factors
         self.tables = tables
         self.requested_sales = {r["id"]: r for r in tables["sales"]}
         self.requested_refs = {r["sale_id"]: r for r in tables["sale_price_references"]}
@@ -111,6 +114,7 @@ class SourceCommerceSimulator(ChronologicalSimulator):
                 "sale_price_references": [self.tables["sale_price_references"][-1]],
             },
             self.generation,
+            return_factors=self.return_factors,
         )
         for event in events:
             self._schedule_financial_return(event, demand.demand_id, position)
