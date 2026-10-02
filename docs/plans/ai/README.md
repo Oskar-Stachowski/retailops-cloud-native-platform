@@ -1,6 +1,6 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: AI 06 ma końcowy odbiór pełnego pipeline’u source 2.7 → curated 1.1. AI 04/05 wymagają zgodnej oceny na nowych IDs przed 07/08. Aktualizacja: 29.09.2026.**
+**Status: AI 06 ma końcowy odbiór source 2.7 → curated 1.1. AI 07 ma lokalne przygotowanie pięciu typów scenariuszy biznesowych; część modelowa 07/08 wymaga zgodnych AI 04/05. Aktualizacja: 02.10.2026.**
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -43,7 +43,12 @@ dostawy, realizację sprzedaży/zwrotów, znane snapshoty, osobną kwalifikację
 labeli i pełną ścieżkę do curated 1.1. Domyślne CLI AI generuje 2.7.
 [Runbook](../../reference/inventory-snapshots.md) i [karta danych](../../evidence/ai/06/final/dataset-card.md)
 podają komendy i IDs. Ukończenie 06 nie zależy od 04/05; zgodne prognozy
-oraz lifecycle są osobnym warunkiem rozpoczęcia 07/08.
+oraz lifecycle są osobnym warunkiem części modelowej 07/08.
+[Lokalne scenariusze biznesowe 07.1a/b](../../reference/business-anomaly-scenarios.md)
+stanowią niezależne przygotowanie źródła z osobną truth i niezmiennym kandydatem.
+Obejmują popyt, zwroty i ograniczenie zapasu; raw DQ, offline curation i nowy
+handoff pozostają dalszym zakresem. [Odbiór 07.1b](../../evidence/ai/07/07.1b/README.md)
+potwierdza realne zmiany procesu i 190 różnych testów.
 
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)

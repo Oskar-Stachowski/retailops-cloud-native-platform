@@ -5,6 +5,7 @@ import json
 import sys
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from data.generator.common import GenerationClock
 from data.generator.configuration import (
@@ -47,6 +48,9 @@ from data.generator.source_quality import validate_source_report, write_source_r
 from data.generator.source_realism import build_source_realism, write_source_realism
 from data.generator.stock import generate_returns, generate_stock_movements
 from data.generator.users import generate_users
+
+if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
 
 
 def build_demo_dataset() -> dict[str, list[dict[str, str]]]:
@@ -132,9 +136,14 @@ def warn_if_demo_ignores_sizing_options(config: DatasetGenerationConfig) -> None
 
 def build_dataset(
     config: DatasetGenerationConfig | None = None,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     config = config or DatasetGenerationConfig()
     effective = resolve_generation_config(config)
+    if anomaly_plan is not None and not config.profile.startswith("ai-"):
+        msg = "Anomaly scenarios require an AI profile."
+        raise ValueError(msg)
     if config.profile == "demo":
         return build_demo_dataset()
 
@@ -146,6 +155,7 @@ def build_dataset(
         warehouse_count=effective.warehouses,
         seed=effective.seed,
         clock=GenerationClock(effective.end_date),
+        anomaly_plan=anomaly_plan,
     )
 
 

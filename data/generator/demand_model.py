@@ -59,6 +59,8 @@ def daily_demand(
     key: tuple[str, ...],
     pricing: CommercePricing,
     config: ResolvedGenerationConfig,
+    *,
+    anomaly_factor: str = "1",
 ) -> dict[str, str]:
     day = date.fromisoformat(key[0])
     rng = random.Random(f"demand:{config.seed}:{':'.join(key)}")  # noqa: S311 - deterministic simulation
@@ -108,7 +110,7 @@ def daily_demand(
         "lifecycle_factor": str(lifecycle),
         "price_factor": str(price_factor),
         "promotion_factor": str(promotion_factor),
-        "anomaly_factor": "1",
+        "anomaly_factor": anomaly_factor,
         "noise": str(Decimal(str(rng.uniform(0.78, 1.24)))),
     }
     rate, draw = expected_demand(factors), Decimal(str(rng.random()))
