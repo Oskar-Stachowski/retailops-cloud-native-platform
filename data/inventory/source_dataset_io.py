@@ -116,7 +116,7 @@ def descriptor(
     provenance: dict,
 ) -> dict:
     effective = resolve_generation_config(generation)
-    return {
+    result = {
         "identity_version": "inventory-source-identity-1.0.0",
         "role": "source",
         "owner": "retailops-cloud-native-platform",
@@ -133,6 +133,32 @@ def descriptor(
         "context": context.model_dump(),
         **{k: provenance[k] for k in ("code_sha256", "dependency_sha256", "python_version")},
         "tables": {n: table_identity(n, tables[n]) for n in SOURCE_TABLES},
+    }
+    if effective.forecast_plan_days:
+        result["forecast_watermarks"] = forecast_watermarks(tables, context, effective)
+    return result
+
+
+def forecast_watermarks(
+    tables: dict, context: TableContext, generation: ResolvedGenerationConfig
+) -> dict:
+    """Declare observed completeness at the real source cutoff; plans never extend it."""
+    rows = tables["daily_demand_observations"]
+    cutoff = datetime.fromisoformat(context.evaluated_at)
+    complete = bool(rows) and all(
+        r["source_data_complete"] == "true"
+        and datetime.fromisoformat(r["available_at"]) <= cutoff
+        and r["business_date"] <= generation.end_date.isoformat()
+        for r in rows
+    )
+    return {
+        "daily_demand_observations": {
+            "as_of_time": context.evaluated_at,
+            "complete_through": generation.end_date.isoformat() if complete else None,
+            "completeness_status": "complete" if complete else "not_ready",
+            "meaning": "synthetic_sales_day_close_without_return_guarantee",
+            "policy_version": "daily-demand-1.0.0",
+        }
     }
 
 
@@ -271,6 +297,15 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         tables[name] = rows
     require(normalize_source(tables) == tables, "Noncanonical source values/grain order.")
     reports = build_reports(tables, context, effective, config)
+    require(
+        desc.get("forecast_watermarks")
+        == (
+            forecast_watermarks(tables, context, effective)
+            if effective.forecast_plan_days
+            else None
+        ),
+        "Forecast watermark differs from independently recomputed observed source completeness.",
+    )
     require(set(normalized["reports"]) == set(REPORT_NAMES), "Source report allowlist differs.")
     for name, expected in reports.items():
         path = verify_artifact(

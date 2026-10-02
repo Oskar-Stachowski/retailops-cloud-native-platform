@@ -17,7 +17,7 @@ from data.generator.dimension_quality import validate_dimensions
 from data.generator.manifest_v2 import config_from_parameters
 from data.generator.pricing_quality import validate_pricing
 from data.inventory.run_source_dataset import build_source_dataset, default_inventory_config
-from data.inventory.source_dataset_io import read_source_dataset, write_source_dataset
+from data.inventory.source_dataset_io import forecast_watermarks, read_source_dataset, write_source_dataset
 
 
 @pytest.fixture(scope="module")
@@ -112,7 +112,22 @@ def test_source_roundtrip_binds_plan_horizon_and_recomputes_all_hard_gates(plann
     assert manifest["requested_parameters"]["forecast_plan_days"] == 14
     assert manifest["descriptor"]["resolved_parameters"]["end_date"] == "2026-10-01"
     assert manifest["descriptor"]["resolved_parameters"]["forecast_plan_version"] == FORECAST_PLAN_VERSION
+    watermark = manifest["descriptor"]["forecast_watermarks"]["daily_demand_observations"]
+    assert watermark["complete_through"] == "2026-10-01"
+    assert watermark["as_of_time"] == "2026-10-02T00:00:00+00:00"
     report = json.loads((path / "source_report.json").read_text())
     assert len(report["checks"]) == 36
     assert all(r["status"] == "passed" for r in report["checks"])
     assert manifest["facts_ready"] and not manifest["source_ready"] and not manifest["model_ready"]
+
+
+@pytest.mark.parametrize("fault", ["incomplete", "late"])
+def test_incomplete_or_late_observations_cannot_claim_a_complete_watermark(planned, fault):
+    generation, _, tables, context = planned
+    changed = deepcopy(tables)
+    if fault == "incomplete":
+        changed["daily_demand_observations"][-1]["source_data_complete"] = "false"
+    else:
+        changed["daily_demand_observations"][-1]["available_at"] = "2026-10-03T00:00:00+00:00"
+    watermark = forecast_watermarks(changed, context, resolve_generation_config(generation))["daily_demand_observations"]
+    assert watermark["completeness_status"] == "not_ready" and watermark["complete_through"] is None

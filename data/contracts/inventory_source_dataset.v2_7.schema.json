@@ -255,6 +255,53 @@
       "title": "ForecastResolvedParameters",
       "type": "object"
     },
+    "ForecastWatermark": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of_time": {
+          "title": "As Of Time",
+          "type": "string"
+        },
+        "complete_through": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Complete Through"
+        },
+        "completeness_status": {
+          "enum": [
+            "complete",
+            "not_ready"
+          ],
+          "title": "Completeness Status",
+          "type": "string"
+        },
+        "meaning": {
+          "const": "synthetic_sales_day_close_without_return_guarantee",
+          "title": "Meaning",
+          "type": "string"
+        },
+        "policy_version": {
+          "const": "daily-demand-1.0.0",
+          "title": "Policy Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "as_of_time",
+        "complete_through",
+        "completeness_status",
+        "meaning",
+        "policy_version"
+      ],
+      "title": "ForecastWatermark",
+      "type": "object"
+    },
     "PolicyHeader": {
       "additionalProperties": false,
       "properties": {
@@ -658,6 +705,24 @@
           "pattern": "^[0-9a-f]{64}$",
           "title": "Dependency Sha256",
           "type": "string"
+        },
+        "forecast_watermarks": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/ForecastWatermark"
+              },
+              "propertyNames": {
+                "const": "daily_demand_observations"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Forecast Watermarks"
         },
         "generator_version": {
           "enum": [

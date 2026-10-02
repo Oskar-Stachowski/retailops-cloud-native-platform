@@ -100,6 +100,14 @@ class ForecastResolvedParameters(ResolvedParameters):
     forecast_plan_version: Literal["known-forecast-plans-1.0.0"]
 
 
+class ForecastWatermark(SupplyRecord):
+    as_of_time: str
+    complete_through: str | None
+    completeness_status: Literal["complete", "not_ready"]
+    meaning: Literal["synthetic_sales_day_close_without_return_guarantee"]
+    policy_version: Literal["daily-demand-1.0.0"]
+
+
 class SourceDescriptor(SupplyRecord):
     identity_version: Literal["inventory-source-identity-1.0.0"]
     role: Literal["source"]
@@ -111,6 +119,9 @@ class SourceDescriptor(SupplyRecord):
     canonicalization_version: Literal["inventory-source-typed-csv-1.0.0"]
     table_schema_sha256: SHA256
     resolved_parameters: ResolvedParameters | ForecastResolvedParameters
+    forecast_watermarks: dict[Literal["daily_demand_observations"], ForecastWatermark] | None = (
+        Field(default=None, exclude_if=lambda value: value is None)
+    )
     inventory_configuration_sha256: SHA256
     context: TableContext
     code_sha256: SHA256
