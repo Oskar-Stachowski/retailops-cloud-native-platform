@@ -49,10 +49,10 @@ from data.inventory.source_tables import TableContext, tables_from_source
 
 FAST_PATH_VERSION = "inventory-source-indexed-movement-1.0.0"
 UPSTREAM_SHA256 = {
-    "source_bridge.py": "113e8f40c38b2cfec76afa086191cad34679071ade1acfd135bd34c043399b14",
-    "run_source_dataset.py": "b169472c350b88c267cd2fd32132d41d70eef3fb81e7097dc518af4d5d9e4261",
+    "source_bridge.py": "b3cd35d1269a09b7b44c5eaab6ff22c17c00dcc085e7c60bed90d7f2c4ba74ff",
+    "run_source_dataset.py": "6c6d3c01315a5edc8ba465db3b743a631f7700d5124fa29c50c96738981bcdb4",
     "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
-    "source_commerce.py": "407e5dd6685b613fd44e4cedb9829b20c15632541289641d8a61cc991fdf08c9",
+    "source_commerce.py": "9322d5240b1762db498929febed872bd207bd683ec3b1785cc0a0674f43e09c7",
 }
 
 

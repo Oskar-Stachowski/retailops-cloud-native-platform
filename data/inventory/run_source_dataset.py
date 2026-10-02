@@ -9,6 +9,7 @@ import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 from time import perf_counter
+from typing import TYPE_CHECKING
 
 from data.generator.configuration import (
     SUPPORTED_PROFILES,
@@ -26,6 +27,10 @@ from data.inventory.source_dataset_contract import PRIVATE_TABLES
 from data.inventory.source_dataset_io import load_json, read_source_dataset, write_source_dataset
 from data.inventory.source_observations import known_commerce_view
 from data.inventory.source_tables import TableContext, tables_from_source
+
+if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
+    from data.anomalies.physical_contract import PhysicalAnomalyPlan
 
 
 def default_inventory_config(generation: DatasetGenerationConfig) -> SourceInventoryConfig:
@@ -80,14 +85,18 @@ def build_source_dataset(
     config: SourceInventoryConfig,
     *,
     evaluated_at: str | None = None,
+    anomaly_plan: AnomalyPlan | None = None,
+    physical_plan: PhysicalAnomalyPlan | None = None,
 ) -> tuple[dict, TableContext]:
     effective = resolve_generation_config(generation)
     require(
         effective.profile.startswith("ai-"),
         "Inventory source 2.7 requires an AI profile; demo remains unchanged.",
     )
-    candidate = build_dataset(generation)
-    source = simulate_source_commerce(candidate, effective, config)
+    candidate = build_dataset(generation, anomaly_plan=anomaly_plan)
+    source = simulate_source_commerce(
+        candidate, effective, config, anomaly_plan=anomaly_plan, physical_plan=physical_plan
+    )
     settings = source["effective_configuration"]["scenario"]["settings"]
     projection_config = ProjectionConfig.from_payload(
         {
