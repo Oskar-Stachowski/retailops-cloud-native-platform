@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from services.api.app.services.realtime_contract import validate_event
 
+from data.anomalies.source_contract import AnomalySourceManifest
 from data.generator.identity import json_sha256
 from data.generator.realtime import DEFAULT_SOURCE, _event
 from data.inventory.contract import require, utc_timestamp
@@ -20,7 +21,9 @@ MAX_SOURCE_BYTES = 64 * 1024 * 1024
 
 def load_source(directory: Path) -> tuple[dict, dict]:
     payload = load_json(safe_file(directory, MANIFEST_FILENAME, limit=2 * 1024 * 1024))
-    manifest = SourceManifest.model_validate(payload)
+    manifest = (
+        AnomalySourceManifest if payload.get("schema_version") == "2.8.0" else SourceManifest
+    ).model_validate(payload)
     params = manifest.descriptor.resolved_parameters
     require(
         params.days * params.products * params.stores <= 5000,

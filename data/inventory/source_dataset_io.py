@@ -9,6 +9,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
 
+from data.anomalies.source_contract import POLICY as ANOMALY_POLICY
+from data.anomalies.source_contract import SCENARIO_PATH, AnomalySourceManifest
 from data.export.schema import table_schema, typed_row
 from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
 from data.generator.identity import (
@@ -99,6 +101,7 @@ def fingerprint() -> dict:
         for directory, pattern in (
             (root / "data/inventory", "*.py"),
             (root / "data/contracts", "*.schema.json"),
+            (root / "data/anomalies", "*.py"),
         )
         for p in sorted(directory.glob(pattern))
     )
@@ -165,14 +168,15 @@ def verify_artifact(
     return path
 
 
-def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[dict, dict]:
+def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[dict, dict]:  # noqa: PLR0912, PLR0915 - ordered source integrity and replay gates
     require(
         not directory.is_symlink() and not any(p.is_symlink() for p in directory.rglob("*")),
         "Symlink in source dataset.",
     )
     if payload is None:
         payload = load_json(safe_file(directory, MANIFEST_FILENAME, limit=MAX_METADATA_BYTES))
-    manifest = SourceManifest.model_validate(payload)
+    is_anomaly = payload.get("schema_version") == "2.8.0"
+    manifest = (AnomalySourceManifest if is_anomaly else SourceManifest).model_validate(payload)
     normalized = manifest.model_dump()
     require(normalized == payload, "Noncanonical source manifest fields/types.")
     desc = normalized["descriptor"]
@@ -199,13 +203,28 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         ).isoformat(),
         "Inventory projection window differs from source generation.",
     )
+    if is_anomaly:
+        from data.anomalies.source_process import table_contract  # noqa: PLC0415 - generator cycle
+
+        schema = table_contract()
+    else:
+        schema = table_schema_document()
     require(
-        desc["table_schema_sha256"] == json_sha256(table_schema_document())
+        desc["table_schema_sha256"] == json_sha256(schema)
         and set(desc["tables"]) == set(SOURCE_TABLES)
         and set(normalized["artifacts"]) == set(SOURCE_TABLES),
         "Source table/schema allowlist differs.",
     )
     provenance = normalized["provenance"]
+    if is_anomaly:
+        current = fingerprint()
+        require(
+            all(
+                current[k] == desc[k]
+                for k in ("code_sha256", "dependency_sha256", "python_version")
+            ),
+            "Anomaly source replay requires the recorded generator environment.",
+        )
     for kind in ("code", "dependency"):
         require(
             json_sha256(provenance[kind + "_files"])
@@ -231,6 +250,25 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         "Private source configuration differs from identity.",
     )
     require(config.fulfillment.seed == effective.seed, "Inventory and generation seeds differ.")
+    scenario = None
+    if is_anomaly:
+        from data.anomalies.candidate_io import (  # noqa: PLC0415
+            candidate_plan_schema,
+            parse_candidate_plan,
+        )
+
+        scenario = load_json(
+            verify_artifact(
+                directory, normalized["scenario"], SCENARIO_PATH, limit=MAX_METADATA_BYTES
+            )
+        )
+        plan = parse_candidate_plan(scenario["plan"])
+        require(
+            json_sha256(plan.model_dump()) == desc["scenario_plan_sha256"]
+            and json_sha256(candidate_plan_schema(plan.model_dump()))
+            == desc["scenario_schema_sha256"],
+            "Anomaly source plan binding differs.",
+        )
     tables = {}
     for name in SOURCE_TABLES:
         path = verify_artifact(directory, normalized["artifacts"][name], csv_path(name))
@@ -261,7 +299,16 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         )
         tables[name] = rows
     require(normalize_source(tables) == tables, "Noncanonical source values/grain order.")
-    reports = build_reports(tables, context, effective, config)
+    if scenario is not None:
+        from data.anomalies.source_process import scenario_document  # noqa: PLC0415
+
+        require(
+            scenario == scenario_document(tables, context, generation, config, scenario["plan"]),
+            "Anomaly effects/truth disagree with independent process replay.",
+        )
+    reports = build_reports(
+        tables, context, effective, config, scenario_plan=scenario["plan"] if scenario else None
+    )
     require(set(normalized["reports"]) == set(REPORT_NAMES), "Source report allowlist differs.")
     for name, expected in reports.items():
         path = verify_artifact(
@@ -275,6 +322,8 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         "Source facts readiness differs.",
     )
     allowed = {MANIFEST_FILENAME, CONFIG_PATH, *REPORT_NAMES, *(csv_path(n) for n in SOURCE_TABLES)}
+    if is_anomaly:
+        allowed.add(SCENARIO_PATH)
     require(
         {p.relative_to(directory).as_posix() for p in directory.rglob("*") if p.is_file()}
         == allowed,
@@ -292,8 +341,31 @@ def build_reports(
     context: TableContext,
     generation: ResolvedGenerationConfig,
     config: SourceInventoryConfig,
+    *,
+    scenario_plan: dict | None = None,
 ) -> dict[str, bytes]:
-    quality = build_source_report(tables, context, generation, config)
+    demand_plan = None
+    if scenario_plan is not None:
+        from data.anomalies.candidate_io import parse_candidate_plan  # noqa: PLC0415
+        from data.anomalies.contract import AnomalyPlan  # noqa: PLC0415
+
+        parsed = parse_candidate_plan(scenario_plan)
+        demand_plan = parsed if isinstance(parsed, AnomalyPlan) else None
+    quality = build_source_report(tables, context, generation, config, anomaly_plan=demand_plan)
+    if scenario_plan is not None:
+        quality["policy_version"] = ANOMALY_POLICY
+        for name in ("anomaly_process_replay", "anomaly_effect_reconciliation"):
+            quality["checks"].append(
+                {
+                    "check_id": name,
+                    "policy_version": ANOMALY_POLICY,
+                    "severity": "hard",
+                    "status": "passed",
+                    "sample_size": len(parsed.injections),
+                    "description": "Checked by independent complete process replay before publication/read.",
+                    "evidence": "source_report.json",
+                }
+            )
     require(
         quality["status"] != "failed",
         "Inventory source hard gate failed: "
@@ -323,13 +395,26 @@ def write_source_dataset(
     generation: DatasetGenerationConfig,
     config: SourceInventoryConfig,
     output_root: Path,
+    *,
+    scenario_plan: dict | None = None,
 ) -> Path:
     tables = normalize_source(tables)
     effective = resolve_generation_config(generation)
     provenance = code_provenance(fingerprint())
     desc = descriptor(generation, config, tables, context, provenance)
+    scenario = None
+    if scenario_plan is not None:
+        from data.anomalies.source_process import (  # noqa: PLC0415
+            extend_descriptor,
+            scenario_document,
+        )
+
+        scenario = scenario_document(tables, context, generation, config, scenario_plan)
+        desc = extend_descriptor(desc, scenario["plan"])
     identifier = "source-sha256-" + json_sha256(desc)
-    reports = build_reports(tables, context, effective, config)
+    reports = build_reports(
+        tables, context, effective, config, scenario_plan=scenario["plan"] if scenario else None
+    )
     output_root.mkdir(parents=True, exist_ok=True)
     final = output_root / identifier
     if final.exists():
@@ -347,10 +432,12 @@ def write_source_dataset(
                 writer.writeheader()
                 writer.writerows({k: _csv_value(v) for k, v in r.items()} for r in tables[name])
         (staging / CONFIG_PATH).write_bytes(canonical_json(config.model_dump()) + b"\n")
+        if scenario is not None:
+            (staging / SCENARIO_PATH).write_bytes(canonical_json(scenario) + b"\n")
         for name, value in reports.items():
             (staging / name).write_bytes(value)
         payload = {
-            "schema_version": SOURCE_VERSION,
+            "schema_version": "2.8.0" if scenario else SOURCE_VERSION,
             "dataset_name": "retailops-synthetic",
             "dataset_id": identifier,
             "descriptor": desc,
@@ -366,6 +453,8 @@ def write_source_dataset(
             "model_ready": False,
             "publication_status": "awaiting_ai03_handoff",
         }
+        if scenario is not None:
+            payload["scenario"] = artifact(staging / SCENARIO_PATH, staging)
         (staging / MANIFEST_FILENAME).write_bytes(canonical_json(payload) + b"\n")
         read_source_dataset(staging)
         staging.rename(final)
