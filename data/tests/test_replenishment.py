@@ -5,7 +5,7 @@ import json
 import random
 import subprocess
 import sys
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 
 import pytest
@@ -172,6 +172,33 @@ def test_quote_lookup_respects_period_supplier_status_and_availability(payload):
     assert book.known_quotes(product, "2026-05-31", known_at=END) == ()
     with pytest.raises(ValueError, match="Unknown product"):
         book.known_quotes(UNKNOWN, "2026-07-01", known_at=END)
+
+
+def test_repeated_quote_queries_index_each_master_collection_once(payload):
+    reference = ReplenishmentBook.from_payload(payload)
+
+    class CountedTuple(tuple):
+        def __iter__(self):
+            self.scans += 1
+            return super().__iter__()
+
+    collections = {}
+    for field in ("products", "suppliers", "product_suppliers"):
+        rows = CountedTuple(getattr(reference, field))
+        rows.scans = 0
+        collections[field] = rows
+    indexed = replace(reference, **collections)
+    for _ in range(10):
+        for product in reference.products:
+            for cutoff in ("2026-06-01T00:02:59Z", "2026-06-01T00:03:00Z", END):
+                assert indexed.known_quotes(
+                    product.id, "2026-07-01", known_at=cutoff
+                ) == reference.known_quotes(product.id, "2026-07-01", known_at=cutoff)
+    assert {name: rows.scans for name, rows in collections.items()} == {
+        "products": 1,
+        "suppliers": 1,
+        "product_suppliers": 1,
+    }
 
 
 def test_multiple_active_suppliers_have_stable_priority_order(payload):

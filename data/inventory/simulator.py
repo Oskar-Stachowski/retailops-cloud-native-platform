@@ -400,11 +400,38 @@ class ChronologicalSimulator:
                 ).isoformat()
             }
         )
-        self.receipts.append(receipt.model_dump())
-        book = ReplenishmentBook.from_payload(self._book_payload())
+        require(
+            not any(r["receipt_id"] == receipt.receipt_id for r in self.receipts),
+            "Duplicate replenishment primary key: receipt_id",
+        )
+        key = utc_timestamp(receipt.received_at), receipt.sequence
+        require(
+            not any((utc_timestamp(r["received_at"]), r["sequence"]) == key for r in self.receipts),
+            "Duplicate receipt timestamp/sequence.",
+        )
+        related = receipt.replenishment_order_id
+        record = receipt.model_dump()
+        # Masters are unchanged; every new order batch is validated in _review.
+        # Validate the affected order, its complete plan history and cumulative receipts.
+        book = ReplenishmentBook.from_payload(
+            {
+                **self.supply_base,
+                "replenishment_orders": [
+                    r for r in self.orders if r["replenishment_order_id"] == related
+                ],
+                "delivery_plan_versions": [
+                    r for r in self.plans if r["replenishment_order_id"] == related
+                ],
+                "replenishment_receipts": [
+                    *(r for r in self.receipts if r["replenishment_order_id"] == related),
+                    record,
+                ],
+            }
+        )
         movement = next(
             m for m in book.receipt_movements() if m.source_reference == receipt.receipt_id
         )
+        self.receipts.append(record)
         self._apply(movement.record())
 
     def _review(self, stamp: datetime) -> None:
@@ -435,6 +462,8 @@ class ChronologicalSimulator:
         self.reviews.append({"origin": stamp.isoformat(), **result.record()})
         self.orders.extend(o.model_dump() for o in result.orders)
         self.plans.extend(p.model_dump() for p in result.plans)
+        # Validate the complete new batch before any scheduled receipt can execute.
+        ReplenishmentBook.from_payload(self._book_payload())
         for order in result.orders:
             sample = simulate_fulfillment(
                 order, self.parameters[order.supplier_id], self.fulfillment, first_sequence=0

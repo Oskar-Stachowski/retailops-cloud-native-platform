@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from functools import cached_property, lru_cache
 from itertools import pairwise
 from typing import TYPE_CHECKING, Any, TypeVar
 
@@ -39,6 +40,7 @@ def _index(rows: Iterable[Record], field: str) -> dict[str, Record]:
     return result
 
 
+@lru_cache(maxsize=32768)
 def _normalize(row: Record, fields: tuple[str, ...]) -> Record:
     values = {field: utc_timestamp(getattr(row, field)).isoformat() for field in fields}
     return row.model_copy(update=values)
@@ -65,6 +67,21 @@ class ReplenishmentBook:
     orders: tuple[ReplenishmentOrder, ...]
     plans: tuple[DeliveryPlanVersion, ...]
     receipts: tuple[ReplenishmentReceipt, ...]
+
+    @cached_property
+    def _quote_products(self) -> frozenset[str]:
+        return frozenset(p.id for p in self.products)
+
+    @cached_property
+    def _quote_suppliers(self) -> dict[str, Supplier]:
+        return {s.supplier_id: s for s in self.suppliers}
+
+    @cached_property
+    def _quotes_by_product(self) -> dict[str, tuple[ProductSupplier, ...]]:
+        grouped: dict[str, list[ProductSupplier]] = defaultdict(list)
+        for quote in self.product_suppliers:
+            grouped[quote.product_id].append(quote)
+        return {product: tuple(rows) for product, rows in grouped.items()}
 
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> ReplenishmentBook:
@@ -178,15 +195,14 @@ class ReplenishmentBook:
         self, product_id: str, business_date: str, *, known_at: str
     ) -> tuple[ProductSupplier, ...]:
         day, cutoff = date.fromisoformat(business_date), utc_timestamp(known_at)
-        suppliers = {s.supplier_id: s for s in self.suppliers}
-        require(product_id in {p.id for p in self.products}, "Unknown product for supplier lookup.")
+        suppliers = self._quote_suppliers
+        require(product_id in self._quote_products, "Unknown product for supplier lookup.")
         return tuple(
             sorted(
                 (
                     q
-                    for q in self.product_suppliers
-                    if q.product_id == product_id
-                    and date.fromisoformat(q.effective_from)
+                    for q in self._quotes_by_product.get(product_id, ())
+                    if date.fromisoformat(q.effective_from)
                     <= day
                     < date.fromisoformat(q.effective_to)
                     and utc_timestamp(q.available_at) <= cutoff
@@ -319,27 +335,25 @@ class ReplenishmentBook:
 
     def orders_at(self, known_at: str) -> list[dict[str, Any]]:
         cutoff = utc_timestamp(known_at)
+        latest_plans = {}
+        received_by_order: dict[str, int] = defaultdict(int)
+        for plan in self.plans:
+            if utc_timestamp(plan.available_at) <= cutoff:
+                latest_plans[plan.replenishment_order_id] = plan
+        for receipt in self.receipts:
+            if utc_timestamp(receipt.available_at) <= cutoff:
+                received_by_order[receipt.replenishment_order_id] += receipt.received_quantity
         result = []
         for order in self.orders:
             if utc_timestamp(order.available_at) > cutoff:
                 continue
-            plans = [
-                p
-                for p in self.plans
-                if p.replenishment_order_id == order.replenishment_order_id
-                and utc_timestamp(p.available_at) <= cutoff
-            ]
-            received = sum(
-                r.received_quantity
-                for r in self.receipts
-                if r.replenishment_order_id == order.replenishment_order_id
-                and utc_timestamp(r.available_at) <= cutoff
-            )
+            plan = latest_plans[order.replenishment_order_id]
+            received = received_by_order[order.replenishment_order_id]
             result.append(
                 {
                     **order.model_dump(),
-                    "expected_delivery_at": plans[-1].expected_delivery_at,
-                    "delivery_plan_version": plans[-1].version,
+                    "expected_delivery_at": plan.expected_delivery_at,
+                    "delivery_plan_version": plan.version,
                     "received_quantity": received,
                     "outstanding_quantity": order.ordered_quantity - received,
                     "status": "ordered"

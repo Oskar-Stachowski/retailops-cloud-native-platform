@@ -92,6 +92,36 @@ def test_reorder_uses_stock_position_known_sales_and_explicit_floor(inputs):
     book.reconcile_ledger(InventoryLedger.from_payload(candidate["ledger"]))
 
 
+def test_indexed_review_matches_full_history_scan_and_visits_only_position_rows(inputs, monkeypatch):
+    from data.inventory import reorder
+
+    cutoff = "2026-07-03T00:00:00+00:00"
+    movements = InventoryLedger.from_payload(inputs["ledger"]).known_movements(
+        cutoff, known_at=cutoff
+    )
+    coverage = parse_history_coverage(inputs["coverage"])
+    original = reorder._known_history
+
+    def full_scan(_coverage, _movements, position, stamp, days):
+        return original(coverage, movements, position, stamp, days)
+
+    monkeypatch.setattr(reorder, "_known_history", full_scan)
+    expected = review(inputs).record()
+    inspected = []
+
+    def indexed_scan(certificates, history, position, stamp, days):
+        assert all((c.product_id, c.stock_location_id) == position for c in certificates)
+        assert all(m.position == position for m in history)
+        inspected.append((len(certificates), len(history)))
+        return original(certificates, history, position, stamp, days)
+
+    monkeypatch.setattr(reorder, "_known_history", indexed_scan)
+    assert review(inputs).record() == expected
+    assert len(inspected) == len(inputs["config"]["rules"])
+    assert sum(n for n, _ in inspected) == len(coverage)
+    assert sum(n for _, n in inspected) == len(movements)
+
+
 def test_same_review_is_idempotent_and_existing_orders_are_counted(inputs):
     initial = review(inputs)
     repeated = review(with_orders(inputs, initial))

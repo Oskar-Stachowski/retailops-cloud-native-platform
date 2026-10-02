@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
@@ -10,12 +11,19 @@ from data.inventory.contract import require, utc_timestamp
 from data.inventory.projection_contract import PROJECTION_VERSION
 
 if TYPE_CHECKING:
-    from data.inventory.ledger import InventoryLedger
+    from data.inventory.ledger import InventoryLedger, InventoryMovement, Position
     from data.inventory.projection_contract import ProjectionConfig
 
 
 def elapsed_microseconds(delta: timedelta) -> int:
     return (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
+
+
+def _position_movements(ledger: InventoryLedger) -> dict[Position, list[InventoryMovement]]:
+    result: dict[Position, list[InventoryMovement]] = defaultdict(list)
+    for movement in ledger.movements:
+        result[movement.position].append(movement)
+    return result
 
 
 def stockout_episodes(
@@ -25,11 +33,15 @@ def stockout_episodes(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     end = utc_timestamp(config.end_at)
     delay = timedelta(seconds=config.truth_delay_seconds)
+    by_position = _position_movements(ledger)
+    outcomes_by_position: dict[Position, list[dict[str, Any]]] = defaultdict(list)
+    for outcome in outcomes:
+        outcomes_by_position[outcome["product_id"], outcome["stock_location_id"]].append(outcome)
     episodes: list[dict[str, Any]] = []
     for position in ledger.scope:
         quantity = 0
         active: dict[str, Any] | None = None
-        for movement in (m for m in ledger.movements if m.position == position):
+        for movement in by_position[position]:
             quantity += movement.quantity_delta
             if quantity == 0 and active is None:
                 active = {
@@ -80,7 +92,7 @@ def stockout_episodes(
         )
         affected = [
             r
-            for r in outcomes
+            for r in outcomes_by_position[episode["product_id"], episode["stock_location_id"]]
             if (r["product_id"], r["stock_location_id"])
             == (episode["product_id"], episode["stock_location_id"])
             and start_key <= (utc_timestamp(r["occurred_at"]), r["sequence"]) < end_key
@@ -114,7 +126,7 @@ def stockout_episodes(
             else close,
             *(
                 m.available_time
-                for m in ledger.movements
+                for m in by_position[episode["product_id"], episode["stock_location_id"]]
                 if m.position == (episode["product_id"], episode["stock_location_id"])
                 and m.ordering_key <= end_key
             ),
@@ -147,12 +159,14 @@ def diagnose_windows(
     require(evaluation >= stamp, "Diagnostic evaluation precedes origin.")
     finish = stamp + timedelta(days=config.diagnostic_horizon_days)
     known = ledger.balances_at(stamp.isoformat(), known_at=stamp.isoformat())
+    by_position = _position_movements(ledger)
+    episodes_by_position: dict[Position, list[dict[str, Any]]] = defaultdict(list)
+    for episode in episodes:
+        episodes_by_position[episode["product_id"], episode["stock_location_id"]].append(episode)
     rows = []
     for balance in known:
         position = balance["product_id"], balance["stock_location_id"]
-        movements = [
-            m for m in ledger.movements if m.position == position and m.occurred_time <= finish
-        ]
+        movements = [m for m in by_position[position] if m.occurred_time <= finish]
         status, reason, incident, available = "not_evaluable", None, None, None
         if balance["on_hand"] is None:
             reason = "inventory_unknown"
@@ -175,7 +189,7 @@ def diagnose_windows(
                     any(
                         (e["product_id"], e["stock_location_id"]) == position
                         and stamp < utc_timestamp(e["start_at"]) <= finish
-                        for e in episodes
+                        for e in episodes_by_position[position]
                     )
                 )
         rows.append(

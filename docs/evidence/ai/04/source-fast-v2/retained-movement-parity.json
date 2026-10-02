@@ -1,0 +1,32 @@
+{
+  "exact_state_and_movement_bytes_equal": true,
+  "implementation": {
+    "code_sha256": "5e48b799eeecf25bde59cbae2a3e192682a11ed62baed4fc6777c61a117b91bb",
+    "optimization": "movement_id_set_membership_only",
+    "rng_and_chronological_process": "unchanged",
+    "source_validation": "ordinary_source_2_7_writer_and_reader_all_gates",
+    "upstream_sha256": {
+      "run_source_dataset.py": "b169472c350b88c267cd2fd32132d41d70eef3fb81e7097dc518af4d5d9e4261",
+      "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
+      "source_bridge.py": "113e8f40c38b2cfec76afa086191cad34679071ade1acfd135bd34c043399b14",
+      "source_commerce.py": "407e5dd6685b613fd44e4cedb9829b20c15632541289641d8a61cc991fdf08c9"
+    },
+    "version": "inventory-source-indexed-movement-1.0.0"
+  },
+  "opening_movements": 200,
+  "output_sha256": "659c15671668df671b8ce19d833217b8ec9f88a0ea5f6e5892e404c0b36fd7c7",
+  "replayed_movements": 5000,
+  "scope": "read_only_replay_of_exposed_retained_v11_movements_no_source_regeneration",
+  "seconds": {
+    "IndexedSourceCommerceSimulator": 0.17143500002566725,
+    "SourceCommerceSimulator": 1.1105358750210144
+  },
+  "source_dataset_id": "source-sha256-76994412fcabec320688429d7f88adcd80fe54fb70327b22c1456c27673c2d66",
+  "source_ledger_sha256": "5910c3b250eb2088ebc4663fb0343127fbe1da1528dcc9116763bdeeef81a726",
+  "status": "passed",
+  "tests": {
+    "passed": 6,
+    "report": "/private/tmp/ai04-source-fast-tests-r2.xml",
+    "sha256": "fa9a12f38b07b69ecce582457450f9d17e226af7e8c1eb3efe5dea2715a61f92"
+  }
+}

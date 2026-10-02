@@ -26,6 +26,7 @@ PROFILE_DEFAULTS = {
     "ai-smoke": SyntheticProfileDefaults(30, 20, 3, 2),
     "ai-temporal-smoke": SyntheticProfileDefaults(102, 8, 3, 2),
     "ai-dev": SyntheticProfileDefaults(365, 100, 5, 3),
+    "ai-intermittent-v1": SyntheticProfileDefaults(365, 100, 5, 3),
     "ai-training": SyntheticProfileDefaults(730, 200, 10, 4),
 }
 SUPPORTED_PROFILES = ("demo", *PROFILE_DEFAULTS, "ai-load")
