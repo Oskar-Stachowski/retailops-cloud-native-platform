@@ -92,8 +92,11 @@ python -m data.dq.full_check --workspace /tmp/ai07-full-dq-fresh \
 ```
 
 The final command requires a fresh workspace and runs both 30-day anomaly cases
-twice in separate processes. It compares source / fixture IDs and every source /
-publication checksum and enforces 300 seconds / 1024 MiB per complete process.
+twice in separate processes. It compares source / fixture IDs, every source
+artifact checksum and all publication checksums, and enforces 300 seconds /
+1024 MiB per complete process. The source manifest is compared semantically,
+excluding only its wall-clock `generated_at`; both actual timestamps and full
+manifest checksums are retained. Every source byte stays fixed within each run.
 Required Data CI runs this acceptance on Python 3.11.15 and tests negative cases.
 This is producer-side offline evidence, not broker durability, ACK, live DLQ,
 an AI03 snapshot publication, an independent AI replay or model readiness.

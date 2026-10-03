@@ -47,10 +47,11 @@ jobs:
           uv pip install --python services/api/.venv/bin/python -r services/api/requirements-dev.txt -r data/requirements-parquet.txt
       - name: Rebuild both full fixtures twice in fresh processes
         run: |
+          mkdir -p ci-cd/reports/data/ai07-full-dq
           services/api/.venv/bin/python -m data.dq.full_check \
             --workspace data/generated/ai07-full-dq-ci \
             --output ci-cd/reports/data/ai07-full-dq/acceptance.json \
-            > ci-cd-ai07-full-dq.log
+            > ci-cd/reports/data/ai07-full-dq/acceptance.log
       - name: Upload full replay acceptance
         if: always()
         uses: ./.github/actions/upload-ci-evidence
@@ -58,7 +59,7 @@ jobs:
           name: ai07-full-dq-evidence
           path: |
             ci-cd/reports/data/ai07-full-dq/acceptance.json
-            ci-cd-ai07-full-dq.log
+            ci-cd/reports/data/ai07-full-dq/acceptance.log
           if-no-files-found: error
 
   ai03-cross-repo:

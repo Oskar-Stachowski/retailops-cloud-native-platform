@@ -19,9 +19,10 @@ from data.dq.full_source import full_events, source_binding
 from data.dq.package import receipt
 from data.dq.source import load_source
 from data.generator.configuration import DatasetGenerationConfig
-from data.generator.identity import ROOT, file_sha256
+from data.generator.identity import ROOT, file_sha256, json_sha256
 from data.inventory.contract import require
 from data.inventory.run_source_dataset import default_inventory_config
+from data.inventory.source_dataset_contract import MANIFEST_FILENAME
 from data.inventory.source_dataset_io import write_source_dataset
 
 
@@ -70,6 +71,11 @@ def worker(case: str, workspace: Path) -> dict:
         "checks": result["checks"],
         "injections": result["injections"],
         "source_hashes": before,
+        "source_artifact_hashes": {k: v for k, v in before.items() if k != MANIFEST_FILENAME},
+        "source_manifest_semantics_sha256": json_sha256(
+            {k: v for k, v in manifest.items() if k != "generated_at"}
+        ),
+        "source_generated_at": manifest["generated_at"],
         "publication_hashes": published,
         "seconds": perf_counter() - started,
         "peak_rss_mib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -123,7 +129,8 @@ def run(workspace: Path) -> dict:
                 for k in (
                     "source_id",
                     "fixture_id",
-                    "source_hashes",
+                    "source_artifact_hashes",
+                    "source_manifest_semantics_sha256",
                     "publication_hashes",
                     "source_binding",
                     "report",
