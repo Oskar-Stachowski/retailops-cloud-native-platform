@@ -119,6 +119,9 @@ AI, zachowaj tabele, raw i pending outbox. Nie usuwaj wspólnego runtime lub
 wolumenów. Ponowne uruchomienie tej samej grupy kontynuuje od ostatniego
 trwale potwierdzonego offsetu. Błąd identity wymaga weryfikacji oryginalnego
 wyniku i jawnego replay przez operatora, bez ręcznego nadpisania projekcji.
+Zgodność starszej aplikacji z nowymi tabelami ma osobny checksum-pinned plan
+i próby w [runbooku rollbacku](application-rollback.md). Plan nie pozwala na
+arbitralną zmianę historii migracji ani destructive downgrade.
 
 Otwarte do całego AI 10: wyniki 07/08 i ich publiczne schematy, sugestia fixture,
 approved latest policy, upstream REST/export/snapshot+replay, shared Compose

@@ -18,6 +18,7 @@ To osobny worktree; głównego checkoutu i runtime innych sesji nie zmieniono.
 | Backend lint/format | passed, 229 plików sformatowanych. |
 | mypy | passed, rozszerzony zakres 11 modułów. |
 | Bandit high/high | passed. |
+| Guard zgodności migracji i rollbacku | 25/25 testów release passed. Dokładne fingerprinty obu historycznych obrazów odpowiadają parent planu. |
 
 Testy trwałości obejmują dokładny payload/lineage, duplicate z jednym efektem,
 rollback między wynikiem a inbox, starszy wynik dostarczony później, zatrzymanie
@@ -28,6 +29,15 @@ commit przed ACK. Rzeczywisty read API sprawdza brak tokenu/obcy scope/DB outage
 JUnit jest w ignorowanym `ci-cd/reports/ai10/`. Fixtures mają jawny namespace
 mechanics; transport fixture nie jest dowodem jakości ML. Pełny Required CI
 dla końcowego commitu pozostaje osobną bramką PR.
+
+Pierwszy przebieg zdalny dla `acf0dc7` zaliczył API (w tym wymagane testy DB
+i brokera) oraz bramki danych/security/frontend. Dwa drille rollbacku
+odrzuciły nową historię migracji zgodnie z dotychczasowym strażnikiem.
+Przyrost dodaje jawny plan dokładnie jednej addytywnej migracji, zamiast
+akceptować dowolny nowy head. Drille migrują własną bazę przed zapisami,
+utrwalają też mechanics wynik/inbox, a następnie porównują cały schemat
+i dane przy działaniu obu wersji aplikacji. Wynik kolejnego zdalnego przebiegu
+musi potwierdzić tę część na dokładnym końcowym commicie.
 
 Nie odebrano jeszcze approved-head latest, wyników AI 07/08, UI,
 typed upstream REST/export/snapshot, korekt faktów, współbieżnego fencing,

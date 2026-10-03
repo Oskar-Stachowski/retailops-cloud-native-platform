@@ -1,0 +1,17 @@
+{
+  "version": "retailops-additive-rollback-1.0",
+  "parent": {
+    "head": "6b0f1c2d3e4a",
+    "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
+  },
+  "expanded": {
+    "head": "a10f0c7e0200",
+    "history_sha256": "cf3b9c1d19e05131c219eee8a245dd282bae927ae8644b0a81f50bfda629d864"
+  },
+  "added_tables": [
+    "ai_forecast_results",
+    "ai_intelligence_inbox"
+  ],
+  "migration_sha256": "93fcd18e752133f344cab9627adf55685260e44f3f670a30916dc997ccb4ce42",
+  "reason": "AI10 adds isolated immutable projection and inbox tables; existing tables and migration files are unchanged. Disposable drills migrate forward once before exercising both image versions and retain the expanded schema and data during rollback."
+}

@@ -1,10 +1,13 @@
 # ruff: noqa: INP001
 """Validate the deployed API through its real Nginx proxy and inspect stored data."""
 
+import hashlib
 import importlib.util
 import json
 import sys
 from urllib.request import Request, urlopen
+
+from psycopg.types.json import Jsonb
 
 spec = importlib.util.spec_from_file_location("recovery_checks", "/recovery/checks.py")
 recovery = importlib.util.module_from_spec(spec)
@@ -68,7 +71,51 @@ def write(expected: dict, stage: str) -> dict:
     return {**expected, "snapshot": after}
 
 
+def seed_expansion(event: dict) -> dict:
+    """Retain a known mechanics result through both image versions in the isolated drill."""
+    payload = event["payload"]
+    fields = (
+        "prediction_id",
+        "prediction_dataset_id",
+        "product_id",
+        "selling_location_id",
+        "channel",
+        "forecast_origin",
+        "target_date",
+        "horizon_days",
+        "release_id",
+        "inference_run_id",
+        "generated_at",
+    )
+
+    def digest(value: dict) -> str:
+        return hashlib.sha256(
+            json.dumps(
+                value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+            ).encode()
+        ).hexdigest()
+
+    with recovery.connect() as connection:
+        connection.execute(
+            """INSERT INTO ai_forecast_results
+               (prediction_id,prediction_dataset_id,product_id,selling_location_id,channel,
+                forecast_origin,target_date,horizon_days,release_id,inference_run_id,generated_at,
+                payload,payload_sha256)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (*[payload[name] for name in fields], Jsonb(payload), digest(payload)),
+        )
+        connection.execute(
+            """INSERT INTO ai_intelligence_inbox
+               (event_id,event_type,prediction_id,document_sha256) VALUES (%s,%s,%s,%s)""",
+            (event["event_id"], event["event_type"], payload["prediction_id"], digest(event)),
+        )
+    return {"forecast_results": 1, "inbox_records": 1, "fixture": "mechanics"}
+
+
 if __name__ == "__main__":
     expected = json.load(sys.stdin)
-    result = validate(expected) if sys.argv[1] == "validate" else write(expected, sys.argv[2])
+    if sys.argv[1] == "seed-expansion":
+        result = seed_expansion(expected)
+    else:
+        result = validate(expected) if sys.argv[1] == "validate" else write(expected, sys.argv[2])
     sys.stdout.write(json.dumps(result) + "\n")

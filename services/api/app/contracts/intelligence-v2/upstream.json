@@ -1,7 +1,7 @@
 {
   "repository": "retailops-ai-intelligence",
   "base_commit": "f4ae14fe6588b91506383a709b5a0185208a4ea6",
-  "commit": "db0246660fb696c0880f76c8044c0b378322f0da",
+  "commit": "8406ff2c6ed416773ccba2283527470f79c5b8d5",
   "branch": "ai/10-intelligence-contract",
   "schema_generator": "scripts/update_intelligence_event_contracts.py",
   "sha256": {
