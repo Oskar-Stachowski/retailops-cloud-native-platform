@@ -48,6 +48,21 @@ class KafkaConsumerClient(Protocol):
     def close(self) -> None: ...
 
 
+class DurableEventConsumer(Protocol):
+    def start(self) -> None: ...
+
+    def stop(self) -> None: ...
+
+    def process_event(
+        self,
+        event: dict[str, Any],
+        *,
+        transport_topic: str | None = None,
+    ) -> dict[str, Any]: ...
+
+    def record_quarantined(self, *, decoded: bool, error: str) -> None: ...
+
+
 @dataclass(frozen=True)
 class RealtimeConsumerRunnerConfig:
     bootstrap_servers: str
@@ -90,7 +105,7 @@ class RealtimeKafkaConsumerRunner:
         self,
         *,
         kafka_consumer: KafkaConsumerClient,
-        event_consumer: RealtimeEventConsumer,
+        event_consumer: DurableEventConsumer,
         config: RealtimeConsumerRunnerConfig,
         quarantine_repository: RealtimeQuarantineRepository | None = None,
     ) -> None:

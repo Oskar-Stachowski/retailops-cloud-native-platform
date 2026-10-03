@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,6 +9,7 @@ from app.api import (
     dashboard,
     forecast_runs,
     forecasts,
+    intelligence,
     inventory,
     me,
     metrics,
@@ -63,3 +66,15 @@ app.include_router(sales.router)
 app.include_router(stock_risks.router)
 app.include_router(me.router)
 app.include_router(notifications.router)
+app.include_router(intelligence.router)
+
+_original_openapi = app.openapi
+
+
+def intelligence_openapi() -> dict[str, Any]:
+    schema = _original_openapi()
+    intelligence.add_payload_openapi(schema)
+    return schema
+
+
+app.openapi = intelligence_openapi

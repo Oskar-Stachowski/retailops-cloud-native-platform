@@ -62,6 +62,12 @@ jobs:
         working-directory: .
         run: docker pull python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff
 
+      - name: Prepare pinned images for broker durability tests
+        working-directory: .
+        run: |
+          docker pull postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+          docker pull redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
+
       - name: Run backend static quality gates
         working-directory: .
         run: |
