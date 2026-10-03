@@ -3,11 +3,14 @@
 """Refusal cases that prevent unsafe rollback before runtime mutation."""
 
 import copy
+import hashlib
+import json
+import shutil
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from release import compatible, migration_contract, verify_image
+from release import additive_expansion, compatible, migration_contract, verify_image
 
 
 class ReleaseGateTests(unittest.TestCase):
@@ -63,6 +66,52 @@ class ReleaseGateTests(unittest.TestCase):
             (root / "branch.py").write_text("revision = 'b'\ndown_revision = None\n")
             with self.assertRaisesRegex(RuntimeError, "incomplete or branched"):
                 migration_contract(root)
+
+
+class AdditiveRollbackTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.plan = json.loads(Path(__file__).with_name("additive-rollback.json").read_text())
+        self.current = {"migration": self.plan["expanded"]}
+        self.previous = {"migration": self.plan["parent"]}
+
+    def test_exact_expansion_allows_only_parent_and_expanded_database_heads(self) -> None:
+        for head in (self.plan["parent"]["head"], self.plan["expanded"]["head"]):
+            compatible(self.current, self.previous, head)
+        with self.assertRaisesRegex(RuntimeError, "outside the verified contract"):
+            compatible(self.current, self.previous, "unverified")
+
+    def test_rewritten_previous_history_is_still_blocked(self) -> None:
+        previous = copy.deepcopy(self.previous)
+        previous["migration"]["history_sha256"] = "0" * 64
+        with self.assertRaisesRegex(RuntimeError, "histories differ"):
+            compatible(self.current, previous, self.plan["expanded"]["head"])
+
+    def test_rewritten_expansion_is_still_blocked(self) -> None:
+        current = copy.deepcopy(self.current)
+        current["migration"]["history_sha256"] = "0" * 64
+        with self.assertRaisesRegex(RuntimeError, "histories differ"):
+            compatible(current, self.previous, self.plan["parent"]["head"])
+
+    def test_other_new_revision_is_not_assumed_compatible(self) -> None:
+        current = copy.deepcopy(self.current)
+        current["migration"]["head"] = "another_new_head"
+        self.assertIsNone(additive_expansion(current, self.previous))
+        with self.assertRaisesRegex(RuntimeError, "histories differ"):
+            compatible(current, self.previous, self.plan["parent"]["head"])
+
+    def test_plan_pins_actual_migration_and_unchanged_parent_files(self) -> None:
+        versions = Path(__file__).resolve().parents[2] / "services/api/alembic/versions"
+        self.assertEqual(migration_contract(versions), self.plan["expanded"])
+        addition = versions / "a10f0c7e0200_add_intelligence_forecasts.py"
+        self.assertEqual(
+            hashlib.sha256(addition.read_bytes()).hexdigest(), self.plan["migration_sha256"]
+        )
+        with TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            for path in versions.glob("*.py"):
+                if path != addition:
+                    shutil.copyfile(path, parent / path.name)
+            self.assertEqual(migration_contract(parent), self.plan["parent"])
 
 
 if __name__ == "__main__":

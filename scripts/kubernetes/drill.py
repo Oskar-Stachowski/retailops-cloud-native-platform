@@ -20,7 +20,7 @@ from uuid import uuid4
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "release"))
 from drill import Drill
-from release import compatible, require
+from release import additive_expansion, compatible, require
 
 ROOT = Path(__file__).resolve().parents[2]
 PREVIOUS = "cb0c79848247612bf71fb9ccf63a8ff3847b5ca1"
@@ -535,8 +535,9 @@ class KubernetesDrill(Drill):
             "--timeout=120s",
         )
         self.until(
-            lambda: self.get("deployment/retailops-api").get("status", {}).get("readyReplicas", 0)
-            == 0,
+            lambda: (
+                self.get("deployment/retailops-api").get("status", {}).get("readyReplicas", 0) == 0
+            ),
             "API readiness stayed true during DB outage",
         )
 
@@ -586,6 +587,7 @@ class KubernetesDrill(Drill):
             ]
         )
         compatible(candidate, previous, previous["migration"]["head"])
+        expansion = additive_expansion(candidate, previous)
         objects = self.render()
         initial = images_for(objects, previous)
         self.apply([o for o in initial if o["kind"] not in {"Deployment", "Job"}])
@@ -599,7 +601,14 @@ class KubernetesDrill(Drill):
         for name in ("postgres", "redpanda"):
             self.wait(name)
         for name in ("retailops-migrate", "retailops-seed-demo-data", "redpanda-topic-init"):
-            self.apply([o for o in initial if o["kind"] == "Job" and o["metadata"]["name"] == name])
+            job_objects = (
+                images_for(objects, candidate)
+                if expansion is not None and name == "retailops-migrate"
+                else initial
+            )
+            self.apply(
+                [o for o in job_objects if o["kind"] == "Job" and o["metadata"]["name"] == name]
+            )
             self.k(
                 "-n",
                 "retailops",
@@ -617,6 +626,17 @@ class KubernetesDrill(Drill):
         self.start_forward()
         self.network_policy()
         self.report["streaming"] = self.check("stream")
+        if expansion is not None:
+            fixture = json.loads(
+                (
+                    ROOT
+                    / "services/api/app/contracts/intelligence-v2/forecast_generated.fixture.json"
+                ).read_text()
+            )
+            self.report["additive_expansion"] = {
+                **expansion,
+                "seeded_projection": self.check("seed-expansion", data=fixture),
+            }
         expected = self.check("prepare")
         self.validate("previous", expected, previous)
         self.database_restart()
@@ -707,7 +727,9 @@ class KubernetesDrill(Drill):
         self.report["final_snapshot"] = expected["snapshot"]
         self.report["database_head"] = self.check("head")
         self.report["migration_action"] = (
-            "one initial migration/seed; same-history rollout; no downgrade/restore/reseed"
+            "one initial fingerprinted additive expansion/seed; both image versions retain full schema/data; no downgrade/restore/reseed"
+            if expansion is not None
+            else "one initial migration/seed; same-history rollout; no downgrade/restore/reseed"
         )
         self.report["status"] = "passed"
 

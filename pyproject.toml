@@ -131,4 +131,10 @@ files = [
   "services/api/app/core/correlation.py",
   "services/api/app/db/instrumentation.py",
   "services/api/app/services/serialization.py",
+  "services/api/app/auth/intelligence.py",
+  "services/api/app/api/intelligence.py",
+  "services/api/app/services/intelligence_contract.py",
+  "services/api/app/services/intelligence_consumer.py",
+  "services/api/app/services/intelligence_reader.py",
+  "services/api/app/repositories/intelligence_repository.py",
 ]
