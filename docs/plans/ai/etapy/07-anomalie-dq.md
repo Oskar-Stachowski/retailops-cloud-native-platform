@@ -3,7 +3,8 @@
 **Status: plan wdrożenia. Repo: RetailOps + AI. Zależności: 04, 05, 06.**
 
 Upstream obejmuje [pięć typów scenariuszy biznesowych](../../../reference/business-anomaly-scenarios.md),
-[raw DQ i ograniczony offline replay](../../../reference/raw-dq-replay.md) oraz
+[raw DQ i ograniczony offline replay](../../../reference/raw-dq-replay.md),
+[pełny strumień sprzedaży i native zwrotów v2](../../../reference/full-raw-dq-replay.md) oraz
 [wersjonowane źródło 2.8 i snapshot 1.2](../../../reference/anomaly-source-handoff.md).
 Odbiór handoff jest osobną częścią etapu; AI07 nadal wymaga anomaly curation,
 cech, obu detektorów, ewaluacji oraz integracji z lifecycle AI05.

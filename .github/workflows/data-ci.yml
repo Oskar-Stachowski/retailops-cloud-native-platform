@@ -27,6 +27,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ai07-full-dq:
+    name: AI 07 full sales and returns offline replay
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout producer
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Set up locked Python toolchain
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.19"
+          python-version: "3.11.15"
+      - name: Install dependencies outside measured flow
+        run: |
+          uv venv services/api/.venv --python 3.11.15
+          uv pip install --python services/api/.venv/bin/python -r services/api/requirements-dev.txt -r data/requirements-parquet.txt
+      - name: Rebuild both full fixtures twice in fresh processes
+        run: |
+          mkdir -p ci-cd/reports/data/ai07-full-dq
+          services/api/.venv/bin/python -m data.dq.full_check \
+            --workspace data/generated/ai07-full-dq-ci \
+            --output ci-cd/reports/data/ai07-full-dq/acceptance.json \
+            > ci-cd/reports/data/ai07-full-dq/acceptance.log
+      - name: Upload full replay acceptance
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: ai07-full-dq-evidence
+          path: |
+            ci-cd/reports/data/ai07-full-dq/acceptance.json
+            ci-cd/reports/data/ai07-full-dq/acceptance.log
+          if-no-files-found: error
+
   ai03-cross-repo:
     name: AI 03 full cross-repo gate
     runs-on: ubuntu-24.04

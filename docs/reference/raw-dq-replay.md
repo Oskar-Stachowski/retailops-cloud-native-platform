@@ -1,5 +1,9 @@
 # Raw DQ fixtures and bounded offline sales replay
 
+[Full canonical sales and native return capture v2](full-raw-dq-replay.md)
+is an explicit additional entry point. The selected-sales v1 scope below remains
+unchanged; the new entry point does not establish business event-day completeness.
+
 AI07.2 generates eight deterministic faults in captured raw events, with a bounded
 AI07.3 reader that demonstrates their handling. Canonical source 2.7 CSVs, commerce
 facts and inventory ledger remain unchanged. Business anomaly injection is a
