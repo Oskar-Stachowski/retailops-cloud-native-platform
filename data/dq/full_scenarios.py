@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 from uuid import NAMESPACE_URL, uuid5
 
 from data.dq.contract import KINDS, TOPIC, seal_record
@@ -27,6 +27,46 @@ def private_id(seed: int, kind: str, target: str) -> str:
     return str(uuid5(NAMESPACE_URL, f"{GENERATOR_VERSION}:{seed}:{kind}:{target}"))
 
 
+def availability_tokens(events: list[dict]) -> list[dict]:
+    """Deliver native facts when available; a future return cannot stall sales.
+
+    A frontier waits for every canonical fact through that business day. Faults
+    are applied afterwards, so an explicitly held late event still tests a
+    correction behind the declared frontier.
+    """
+    scheduled = []
+    days = {}
+    for event in events:
+        available = utc_timestamp(event["ingested_at"])
+        day = utc_timestamp(event["occurred_at"]).date()
+        days[day] = max(days.get(day, available), available)
+        scheduled.append(
+            (
+                available,
+                0,
+                event["event_id"],
+                {"kind": "event", "event": deepcopy(event), "target": event["event_id"]},
+            )
+        )
+    known = datetime.min.replace(tzinfo=UTC)
+    for day in sorted(days):
+        frontier = datetime.combine(day, time.max, tzinfo=UTC)
+        known = max(known, frontier, days[day])
+        scheduled.append(
+            (
+                known,
+                1,
+                day.isoformat(),
+                {
+                    "kind": "progress",
+                    "complete_through": frontier.isoformat(),
+                    "scheduled_at": known.isoformat(),
+                },
+            )
+        )
+    return [token for _, _, _, token in sorted(scheduled)]
+
+
 def example_plan(events: list[dict], source_id: str, *, seed: int = 42) -> FullFaultPlan:
     injections = []
     for event_type in ("sale_completed", "return_completed"):
@@ -41,6 +81,11 @@ def example_plan(events: list[dict], source_id: str, *, seed: int = 42) -> FullF
                 for i in range(1, len(subset) - 2)
                 if dates[i] == dates[i + 1]
                 and subset[i]["occurred_at"] < subset[i + 1]["occurred_at"]
+                and (
+                    len(events) <= 4096
+                    or utc_timestamp(subset[i]["ingested_at"])
+                    <= utc_timestamp(subset[i + 1]["ingested_at"])
+                )
             ),
             None,
         )
@@ -80,7 +125,7 @@ def example_plan(events: list[dict], source_id: str, *, seed: int = 42) -> FullF
     )
 
 
-def capture(  # noqa: PLR0915 - ordered fault and delivery gates
+def capture(  # noqa: PLR0912, PLR0915 - ordered fault and delivery gates
     events: list[dict], plan: FullFaultPlan, source_id: str
 ) -> tuple[list[dict], list[dict]]:
     plan = parse_full_plan(plan.model_dump())
@@ -93,7 +138,8 @@ def capture(  # noqa: PLR0915 - ordered fault and delivery gates
     )
     lookup = {e["event_id"]: e for e in events}
     require(len(lookup) == len(events), "Repeated canonical source event.")
-    tokens = _tokens(events)
+    portfolio = plan.contract_version == "raw-dq-plan-2.1.0"
+    tokens = availability_tokens(events) if portfolio else _tokens(events)
     for injection in plan.injections:
         require(injection.target_event_id in lookup, "Full DQ target absent from source.")
         index = next(
@@ -136,9 +182,13 @@ def capture(  # noqa: PLR0915 - ordered fault and delivery gates
     previous = datetime.min.replace(tzinfo=UTC)
     offset = 0
     by_id = {i.injection_id: i for i in plan.injections}
+    frontier = None
+    max_event_time = None
     for token in tokens:
         lower = (
-            token["event"]["ingested_at"] if token["kind"] == "event" else token["complete_through"]
+            token["event"]["ingested_at"]
+            if token["kind"] == "event"
+            else token.get("scheduled_at", token["complete_through"])
         )
         received = max(utc_timestamp(lower), previous + timedelta(microseconds=1)).isoformat()
         if token["kind"] == "event":
@@ -162,9 +212,28 @@ def capture(  # noqa: PLR0915 - ordered fault and delivery gates
         )
         records.append(record)
         previous = utc_timestamp(received)
+        timing = "on_time"
+        if token["kind"] == "progress":
+            frontier = utc_timestamp(token["complete_through"])
+        else:
+            occurred = utc_timestamp(token["event"]["occurred_at"])
+            timing = (
+                "late"
+                if frontier is not None and occurred <= frontier
+                else (
+                    "out_of_order"
+                    if max_event_time is not None and occurred < max_event_time
+                    else "on_time"
+                )
+            )
+            issue = by_id[token["injection_id"]].issue_type if token.get("injection_id") else None
+            if issue not in QUARANTINED | {"exact_duplicate", "business_duplicate"}:
+                max_event_time = max(max_event_time, occurred) if max_event_time else occurred
         if token.get("injection_id"):
             injection = by_id[token["injection_id"]]
             action, reason = EXPECTED[injection.issue_type]
+            if portfolio and injection.issue_type == "missing_optional_context":
+                reason = timing
             if injection.issue_type == "unexpected_additive_field":
                 reason = "invalid_operational_contract"
             truth.append(
