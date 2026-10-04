@@ -392,3 +392,6 @@ def test_topology_uses_awaited_cluster_identity_without_cached_list_topics():
     admin.list_topics.assert_not_called()
     admin.describe_cluster.assert_called_once_with(request_timeout=5)
     admin.describe_cluster.return_value.result.assert_called_once_with(timeout=6)
+    assert [call[0] for call in admin.mock_calls].index("describe_cluster().result") < [
+        call[0] for call in admin.mock_calls
+    ].index("describe_topics")

@@ -10,7 +10,7 @@ import ssl
 import sys
 import time
 from pathlib import Path
-from typing import Self
+from typing import Any, Self
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPSHandler, ProxyHandler, Request, build_opener
 
@@ -33,6 +33,7 @@ from confluent_kafka.admin import (
     ResourceType,
     ScramCredentialInfo,
     ScramMechanism,
+    UserScramCredentialAlteration,
     UserScramCredentialUpsertion,
 )
 from psycopg import sql
@@ -93,7 +94,7 @@ def require(condition: bool, code: str) -> None:
         raise ProbeError(code)
 
 
-def db(config: dict, role: str) -> psycopg.Connection:
+def db(config: dict, role: str) -> psycopg.Connection[dict[str, Any]]:
     return psycopg.connect(config["database"][role], connect_timeout=3, row_factory=dict_row)
 
 
@@ -125,7 +126,7 @@ def bootstrap(config: dict) -> dict:
             "bootstrap_superuser_authenticated",
         )
     admin = AdminClient(config["broker"]["admin"])
-    credentials = [
+    credentials: list[UserScramCredentialAlteration] = [
         UserScramCredentialUpsertion(
             config["broker"][name]["sasl.username"],
             ScramCredentialInfo(ScramMechanism.SCRAM_SHA_256, 4096),
@@ -148,7 +149,7 @@ def bootstrap(config: dict) -> dict:
     bindings = []
     grants = (
         ("ai-producer", ResourceType.TOPIC, TOPIC, (AclOperation.WRITE, AclOperation.DESCRIBE)),
-        ("ai-producer", ResourceType.CLUSTER, "kafka-cluster", (AclOperation.IDEMPOTENT_WRITE,)),
+        ("ai-producer", ResourceType.BROKER, "kafka-cluster", (AclOperation.IDEMPOTENT_WRITE,)),
         (
             "source-consumer",
             ResourceType.TOPIC,
@@ -156,7 +157,7 @@ def bootstrap(config: dict) -> dict:
             (AclOperation.READ, AclOperation.DESCRIBE, AclOperation.DESCRIBE_CONFIGS),
         ),
         ("source-consumer", ResourceType.GROUP, GROUP, (AclOperation.READ, AclOperation.DESCRIBE)),
-        ("source-consumer", ResourceType.CLUSTER, "kafka-cluster", (AclOperation.DESCRIBE,)),
+        ("source-consumer", ResourceType.BROKER, "kafka-cluster", (AclOperation.DESCRIBE,)),
     )
     for principal, resource, name, operations in grants:
         for operation in operations:
@@ -253,9 +254,9 @@ def negative_auth(config: dict) -> list[str]:
         while True:
             message = client.poll(1)
             if message is not None:
+                error = message.error()
                 require(
-                    message.error() is not None
-                    and message.error().code() == KafkaError.TOPIC_AUTHORIZATION_FAILED,
+                    error is not None and error.code() == KafkaError.TOPIC_AUTHORIZATION_FAILED,
                     "producer_fetch_denied",
                 )
                 break
@@ -297,8 +298,13 @@ def negative_auth(config: dict) -> list[str]:
         ("wrong_password", {"sasl.password": "intentionally-wrong"}, KafkaError._AUTHENTICATION),
         ("untrusted_ca", {"ssl.ca.location": "/private/untrusted.crt"}, KafkaError._SSL),
     ):
-        errors = []
-        invalid = AdminClient({**config["broker"]["source"], **change, "error_cb": errors.append})
+        errors: list[KafkaError] = []
+        invalid_options: dict[str, Any] = {
+            **config["broker"]["source"],
+            **change,
+            "error_cb": errors.append,
+        }
+        invalid = AdminClient(invalid_options)
         try:
             invalid.list_topics(timeout=5)
         except KafkaException:
@@ -359,6 +365,8 @@ def negative_auth(config: dict) -> list[str]:
             info = connection.execute(
                 "SELECT rolsuper,rolcreatedb,rolcreaterole FROM pg_roles WHERE rolname=current_user"
             ).fetchone()
+            if info is None:
+                raise ProbeError("workload_role_metadata_missing")
             require(not any(info.values()), "workload_privileged_database_role")
             try:
                 connection.execute("CREATE ROLE forbidden_role")
@@ -388,7 +396,7 @@ def verify(config: dict, expected: int) -> dict:
             counts = {
                 name: connection.execute(
                     sql.SQL("SELECT count(*) AS n FROM {}").format(sql.Identifier(name))
-                ).fetchone()["n"]
+                ).fetchone()["n"]  # type: ignore[index]
                 for name in (
                     "ai_forecast_results",
                     "ai_intelligence_inbox",
@@ -419,11 +427,15 @@ def verify(config: dict, expected: int) -> dict:
         and all(row["coverage_start"] == 0 for row in positions),
         "exact_contiguous_checkpoint_required",
     )
+    if payload is None:
+        raise ProbeError("projection_row_missing")
     require(payload["payload"] == config["event"]["payload"], "exact_functional_payload_required")
     with db(config, "ai_admin") as connection:
         receipt = connection.execute(
             "SELECT document,delivered_at,delivered_partition,delivered_offset FROM ai.intelligence_outbox"
         ).fetchone()
+    if receipt is None:
+        raise ProbeError("outbox_row_missing")
     require(
         receipt["document"] == config["event"] and receipt["delivered_at"] is not None,
         "exact_outbox_document_and_receipt_required",

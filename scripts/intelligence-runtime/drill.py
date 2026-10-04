@@ -15,6 +15,7 @@ import sys
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 HERE = Path(__file__).resolve().parent
@@ -323,7 +324,7 @@ def main() -> int:  # noqa: PLR0915
     )
     args = parser.parse_args()
     project = "retailops-ai10-runtime-" + uuid4().hex[:12]
-    report = {
+    report: dict[str, Any] = {
         "version": "ai10-runtime-mechanics-1.0",
         "evidence_class": "invented_transport_fixture",
         "project": project,

@@ -125,12 +125,14 @@ class BrokerTopology:
         self.admin = admin
 
     def inspect(self) -> tuple[StreamIdentity, tuple[int, ...]]:
-        description = self.admin.describe_topics(TopicCollection([TOPIC]), request_timeout=5)[
-            TOPIC
-        ].result(timeout=6)
         # list_topics() exposes a cached cluster ID and may return None even
         # after a successful metadata request. DescribeCluster awaits its ID.
         cluster = self.admin.describe_cluster(request_timeout=5).result(timeout=6)
+        # Await cluster discovery before describing topics. A fresh client can
+        # otherwise use initial metadata without topic UUIDs during negotiation.
+        description = self.admin.describe_topics(TopicCollection([TOPIC]), request_timeout=5)[
+            TOPIC
+        ].result(timeout=6)
         resource = ConfigResource(ResourceType.TOPIC, TOPIC)
         configuration = self.admin.describe_configs([resource], request_timeout=5)[resource].result(
             timeout=6
