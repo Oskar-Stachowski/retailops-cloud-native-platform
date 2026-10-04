@@ -14,7 +14,7 @@ from data.day_coverage.package import build, verify
 from data.day_coverage.projection import KEY, days
 from data.dq.source import load_source
 from data.generator.configuration import DatasetGenerationConfig
-from data.generator.identity import file_sha256
+from data.generator.identity import file_sha256, json_sha256
 from data.inventory.contract import utc_timestamp
 from data.inventory.run_source_dataset import default_inventory_config
 from data.inventory.source_dataset_io import write_source_dataset
@@ -40,8 +40,12 @@ def test_schema_registry_is_additive():
 
 
 def test_unchanged_parent_ids_and_native_claim_tail(source):
-    _, directory, tables, _, rows = source
-    assert directory.name in {
+    _, directory, tables, manifest, rows = source
+    assert directory.name == "source-sha256-" + json_sha256(manifest["descriptor"])
+    # General data regressions also cover newer 3.11 patches. The fixture identity
+    # is frozen on 3.11.15; only that declared runtime dimension may differ.
+    frozen_runtime = {**manifest["descriptor"], "python_version": "3.11.15"}
+    assert "source-sha256-" + json_sha256(frozen_runtime) in {
         "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
         "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
     }

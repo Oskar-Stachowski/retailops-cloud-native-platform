@@ -34,6 +34,12 @@ data; CI explicitly supplies `--cov-branch`. The remaining frontend tests, lint 
 build passed separately. The local Docker daemon was left untouched. Full container
 and database acceptance must pass on the isolated required-CI runner.
 
+The first PR run passed 959 / 961 data tests; two new frozen-ID assertions failed
+because the general data job uses Python 3.11.16. The identity includes its declared
+Python version. The regression now checks the actual descriptor identity and
+compares its complete frozen descriptor after normalizing only that runtime field
+to 3.11.15. The dedicated reproducibility job remains pinned to 3.11.15.
+
 The archive exported to the independent consumer contains only these public
 declarations. The declaration policy does not use private truth, cohort flags,
 transport progress or maximum event time. It does not establish global returns,
