@@ -3,13 +3,16 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
+import ssl
 import sys
 import time
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import HTTPSHandler, ProxyHandler, Request, build_opener
 
-import httpx
 import psycopg
 from confluent_kafka import (
     Consumer,
@@ -39,6 +42,47 @@ GROUP = "retailops-intelligence-v2-checkpointed"
 CONFIG = Path("/private/config.json")
 
 
+class HttpResponse:
+    def __init__(self, status: int, body: bytes) -> None:
+        self.status_code = status
+        self.body = body
+
+    def json(self) -> dict:
+        return json.loads(self.body)
+
+
+class HttpClient:
+    """Use only the production image's standard library; never inherit proxies."""
+
+    def __init__(self, *, base_url: str = "", verify: str | None = None, timeout: int = 3) -> None:
+        self.base_url = base_url
+        self.timeout = timeout
+        self.opener = build_opener(
+            ProxyHandler({}), HTTPSHandler(context=ssl.create_default_context(cafile=verify))
+        )
+
+    def __enter__(self) -> HttpClient:
+        return self
+
+    def __exit__(self, *_args: object) -> None:
+        pass
+
+    def get(
+        self, url: str, *, headers: dict | None = None, auth: tuple | None = None
+    ) -> HttpResponse:
+        values = dict(headers or {})
+        if auth is not None:
+            values["Authorization"] = (
+                "Basic " + base64.b64encode((auth[0] + ":" + auth[1]).encode()).decode()
+            )
+        request = Request(self.base_url + url, headers=values)
+        try:
+            with self.opener.open(request, timeout=self.timeout) as response:
+                return HttpResponse(response.status, response.read(65537))
+        except HTTPError as exc:
+            return HttpResponse(exc.code, exc.read(65537))
+
+
 class ProbeError(RuntimeError):
     """Fixed, credential-free acceptance failure."""
 
@@ -53,7 +97,7 @@ def db(config: dict, role: str) -> psycopg.Connection:
 
 
 def bootstrap(config: dict) -> dict:
-    with httpx.Client(verify="/private/ca.crt", timeout=3, trust_env=False) as http:
+    with HttpClient(verify="/private/ca.crt", timeout=3) as http:
         deadline = time.monotonic() + 90
         while True:
             try:
@@ -63,7 +107,7 @@ def bootstrap(config: dict) -> dict:
                 )
                 if response.status_code == 200:
                     break
-            except httpx.HTTPError:
+            except (URLError, OSError):
                 pass
             require(time.monotonic() < deadline, "broker_tls_admin_not_ready")
             time.sleep(1)
@@ -269,7 +313,7 @@ def negative_auth(config: dict) -> list[str]:
         checks.append("anonymous_cannot_obtain_kafka_metadata")
     else:
         raise ProbeError("anonymous_metadata_unexpected_success")
-    with httpx.Client(verify="/private/ca.crt", timeout=3, trust_env=False) as http:
+    with HttpClient(verify="/private/ca.crt", timeout=3) as http:
         require(
             http.get("https://broker:9644/v1/security/users").status_code == 401,
             "anonymous_admin_denied",
@@ -381,13 +425,13 @@ def verify(config: dict, expected: int) -> dict:
         "outbox_transport_position_binding",
     )
     # Source API uses the separate read-only DB account and private access file.
-    with httpx.Client(base_url="http://source:8000", timeout=5, trust_env=False) as http:
+    with HttpClient(base_url="http://source:8000", timeout=5) as http:
         deadline = time.monotonic() + 30
         while True:
             try:
                 if http.get("/ready").status_code == 200:
                     break
-            except httpx.HTTPError:
+            except (URLError, OSError):
                 pass
             require(time.monotonic() < deadline, "source_api_not_ready")
             time.sleep(1)

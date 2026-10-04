@@ -465,6 +465,7 @@ def main() -> int:  # noqa: PLR0915
                                 resource,
                                 "ls",
                                 "-q",
+                                *(["--all"] if resource == "container" else []),
                                 "--filter",
                                 "label=com.docker.compose.project=" + project,
                             ]
