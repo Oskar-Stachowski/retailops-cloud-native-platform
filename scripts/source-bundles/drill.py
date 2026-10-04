@@ -265,6 +265,22 @@ def run(args: argparse.Namespace, report: dict) -> None:  # noqa: PLR0912, PLR09
                 ):
                     msg = "native_import_identity_or_inventory_mismatch"
                     raise ValueError(msg)
+            native_receipt = json.loads(
+                (
+                    imported / "snapshots" / bundle["source_dataset_id"] / "import_manifest.json"
+                ).read_bytes()
+            )
+            expected_native = {
+                Path(relative).name: checksum
+                for relative, checksum in pin["client_files"].items()
+                if relative.startswith("src/retailops_ai/source_snapshot_native/")
+            }
+            if (
+                len(expected_native) != 10
+                or native_receipt["importer"]["code_files"] != expected_native
+            ):
+                msg = "native_importer_execution_receipt_mismatch"
+                raise ValueError(msg)
             stage = "fail_closed_authorization_and_integrity"
             checks = {
                 "anonymous": http_status(url + "/manifest"),
@@ -294,7 +310,7 @@ def run(args: argparse.Namespace, report: dict) -> None:  # noqa: PLR0912, PLR09
             target.write_bytes(b"corrupt")
             try:
                 checks["corrupt_file"] = http_status(url + "/files/" + reference["file_id"], token)
-                rejected = imported.parent / "rejected/generated"
+                rejected = private / "rejected/data/generated"
                 failed = subprocess.run(  # noqa: S603 - same fixed private CLI/config, expected rejection
                     [
                         *cli[:5],
@@ -340,7 +356,9 @@ def run(args: argparse.Namespace, report: dict) -> None:  # noqa: PLR0912, PLR09
                 rows=31623,
                 files=len(bundle["files"]),
                 bytes=bundle["total_bytes"],
-                imports=[{k: v for k, v in r.items() if k != "directory"} for r in imports],
+                imports=[{k: v for k, v in r.items() if k != "destination"} for r in imports],
+                native_importer_code_sha256=native_receipt["importer"]["code_sha256"],
+                native_importer_code_files=10,
                 authorization_and_integrity=checks,
                 model_ready=False,
                 evaluation_truth_included=False,
