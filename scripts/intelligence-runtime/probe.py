@@ -115,7 +115,15 @@ def bootstrap(config: dict) -> dict:
             require(time.monotonic() < deadline, "broker_tls_admin_not_ready_" + last)
             time.sleep(1)
         status = http.get("https://broker:9644/v1/security/users").status_code
-        require(status == 401, "admin_anonymous_denied_" + str(status))
+        require(status == 403, "admin_anonymous_denied_" + str(status))
+        require(
+            http.get(
+                "https://broker:9644/v1/security/users",
+                auth=("bootstrap", config["passwords"]["admin"]),
+            ).status_code
+            == 200,
+            "bootstrap_superuser_authenticated",
+        )
     admin = AdminClient(config["broker"]["admin"])
     credentials = [
         UserScramCredentialUpsertion(
@@ -316,7 +324,7 @@ def negative_auth(config: dict) -> list[str]:
         raise ProbeError("anonymous_metadata_unexpected_success")
     with HttpClient(verify="/private/ca.crt", timeout=3) as http:
         require(
-            http.get("https://broker:9644/v1/security/users").status_code == 401,
+            http.get("https://broker:9644/v1/security/users").status_code == 403,
             "anonymous_admin_denied",
         )
         require(
@@ -327,7 +335,7 @@ def negative_auth(config: dict) -> list[str]:
             == 403,
             "workload_admin_denied",
         )
-    checks.extend(("anonymous_admin_401", "workload_admin_403"))
+    checks.extend(("anonymous_admin_403", "workload_admin_403"))
     for lane, foreign in (("ai", "source"), ("source", "ai")):
         kwargs = {
             "host": "db-" + lane,

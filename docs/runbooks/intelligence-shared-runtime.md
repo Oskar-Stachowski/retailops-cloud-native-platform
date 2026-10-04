@@ -69,7 +69,7 @@ stockout transport, snapshot/replay, source completeness, UI or 102-day three-mo
 8. It checks broker denials for consumer writes, producer reads, foreign group/topic
    and topic creation; wrong password and untrusted CA require explicit client
    authentication/SSL errors. Anonymous Kafka metadata is unavailable and Admin
-   requests return 401/403. Cross-database credentials are rejected, workload roles
+   superuser-only requests return 403 for anonymous/workload identities. Cross-database credentials are rejected, workload roles
    cannot create roles and the API reader cannot delete projections. Separate source
    and intelligence HTTP tokens cannot substitute for each other.
 9. It kills only the owned consumer, resets the fixture outbox delivery receipt
