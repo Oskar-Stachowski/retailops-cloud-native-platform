@@ -16,8 +16,18 @@ HEADERS = {"Authorization": "Bearer " + TOKEN}
 client = TestClient(app)
 PARAMS = {
     "products": {"product_id": PRODUCT},
-    "sales": {"product_id": PRODUCT, "channel": "store", "sold_from": "2026-09-01T00:00:00Z", "sold_to": "2026-10-01T00:00:00Z"},
-    "inventory-snapshots": {"product_id": PRODUCT, "warehouse_code": "WH-01", "recorded_from": "2026-09-01T00:00:00Z", "recorded_to": "2026-10-01T00:00:00Z"},
+    "sales": {
+        "product_id": PRODUCT,
+        "channel": "store",
+        "sold_from": "2026-09-01T00:00:00Z",
+        "sold_to": "2026-10-01T00:00:00Z",
+    },
+    "inventory-snapshots": {
+        "product_id": PRODUCT,
+        "warehouse_code": "WH-01",
+        "recorded_from": "2026-09-01T00:00:00Z",
+        "recorded_to": "2026-10-01T00:00:00Z",
+    },
     "forecasts": {"product_id": PRODUCT, "date_from": "2026-09-01", "date_to": "2026-10-01"},
     "inventory-risks": {"product_id": PRODUCT},
 }
@@ -26,7 +36,23 @@ PARAMS = {
 @pytest.fixture(autouse=True)
 def private_policy(tmp_path, monkeypatch):
     policy = tmp_path / "source-policy.json"
-    policy.write_text(json.dumps({"version": "retailops-source-access-1.0", "principals": [{"principal_id": "source-test", "credential_sha256": hashlib.sha256(TOKEN.encode()).hexdigest(), "resources": list(PARAMS), "product_ids": [PRODUCT], "channels": ["store"], "warehouse_codes": ["WH-01"]}]}))
+    policy.write_text(
+        json.dumps(
+            {
+                "version": "retailops-source-access-1.0",
+                "principals": [
+                    {
+                        "principal_id": "source-test",
+                        "credential_sha256": hashlib.sha256(TOKEN.encode()).hexdigest(),
+                        "resources": list(PARAMS),
+                        "product_ids": [PRODUCT],
+                        "channels": ["store"],
+                        "warehouse_codes": ["WH-01"],
+                    }
+                ],
+            }
+        )
+    )
     policy.chmod(0o600)
     monkeypatch.setenv("RETAILOPS_SOURCE_ACCESS_POLICY", str(policy))
     auth.access_policy.cache_clear()
@@ -37,9 +63,14 @@ def private_policy(tmp_path, monkeypatch):
 @pytest.mark.parametrize("resource", PARAMS)
 def test_each_read_is_authenticated_scoped_and_bounded(resource, monkeypatch):
     received = []
+
     def reader(query):
         received.append(query)
-        return {"items": [], "pagination": {"limit": query.limit, "offset": query.offset, "total": 0}}
+        return {
+            "items": [],
+            "pagination": {"limit": query.limit, "offset": query.offset, "total": 0},
+        }
+
     monkeypatch.setattr("app.api.source_reads.read_page", reader)
     url = "/integration/v2/" + resource
     assert client.get(url, params=PARAMS[resource]).status_code == 401
@@ -57,33 +88,62 @@ def test_each_read_is_authenticated_scoped_and_bounded(resource, monkeypatch):
 
 
 @pytest.mark.parametrize("resource", PARAMS)
-@pytest.mark.parametrize("invalid", [{"store_id": OTHER}, {"user_id": OTHER}, {"limit": 101}, {"offset": 10001}, {"sort_by": "not-a-column"}])
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        {"store_id": OTHER},
+        {"user_id": OTHER},
+        {"limit": 101},
+        {"offset": 10001},
+        {"sort_by": "not-a-column"},
+    ],
+)
 def test_invalid_or_authority_changing_query_never_reads_db(resource, invalid, monkeypatch):
     def no_read(query):
         pytest.fail("invalid query reached database")
+
     monkeypatch.setattr("app.api.source_reads.read_page", no_read)
-    response = client.get("/integration/v2/" + resource, params=dict(PARAMS[resource], **invalid), headers=HEADERS)
+    response = client.get(
+        "/integration/v2/" + resource, params=dict(PARAMS[resource], **invalid), headers=HEADERS
+    )
     assert response.status_code == 422
 
 
-@pytest.mark.parametrize("resource,invalid", [
-    ("sales", {"channel": "online"}),
-    ("inventory-snapshots", {"warehouse_code": "WH-02"}),
-])
+@pytest.mark.parametrize(
+    "resource,invalid",
+    [
+        ("sales", {"channel": "online"}),
+        ("inventory-snapshots", {"warehouse_code": "WH-02"}),
+    ],
+)
 def test_other_channel_and_warehouse_are_denied(resource, invalid, monkeypatch):
     def no_read(query):
         pytest.fail("foreign scope reached database")
+
     monkeypatch.setattr("app.api.source_reads.read_page", no_read)
-    assert client.get("/integration/v2/" + resource, params=dict(PARAMS[resource], **invalid), headers=HEADERS).status_code == 403
+    assert (
+        client.get(
+            "/integration/v2/" + resource, params=dict(PARAMS[resource], **invalid), headers=HEADERS
+        ).status_code
+        == 403
+    )
 
 
-@pytest.mark.parametrize("invalid", [
-    {"sold_from": "2026-01-01T00:00:00Z"},
-    {"sold_from": "2026-10-02T00:00:00Z"},
-    {"sold_from": "2026-09-01T00:00:00"},
-])
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        {"sold_from": "2026-01-01T00:00:00Z"},
+        {"sold_from": "2026-10-02T00:00:00Z"},
+        {"sold_from": "2026-09-01T00:00:00"},
+    ],
+)
 def test_period_requires_timezone_order_and_90_day_bound(invalid):
-    assert client.get("/integration/v2/sales", params=dict(PARAMS["sales"], **invalid), headers=HEADERS).status_code == 422
+    assert (
+        client.get(
+            "/integration/v2/sales", params=dict(PARAMS["sales"], **invalid), headers=HEADERS
+        ).status_code
+        == 422
+    )
 
 
 def test_capabilities_and_snapshot_explicitly_report_unsupported():
@@ -105,6 +165,7 @@ def test_policy_permissions_and_symlinks_fail_closed(private_policy, tmp_path):
     link = tmp_path / "link"
     link.symlink_to(private_policy)
     import os
+
     os.environ["RETAILOPS_SOURCE_ACCESS_POLICY"] = str(link)
     auth.access_policy.cache_clear()
     assert client.get("/integration/v2/capabilities", headers=HEADERS).status_code == 503
@@ -113,6 +174,7 @@ def test_policy_permissions_and_symlinks_fail_closed(private_policy, tmp_path):
 def test_database_outage_returns_safe_503_without_connection_details(monkeypatch):
     def unavailable(query):
         raise psycopg.OperationalError("private-host password=do-not-show")
+
     monkeypatch.setattr("app.api.source_reads.read_page", unavailable)
     response = client.get("/integration/v2/products", params=PARAMS["products"], headers=HEADERS)
     assert response.status_code == 503
@@ -120,7 +182,9 @@ def test_database_outage_returns_safe_503_without_connection_details(monkeypatch
 
 
 def test_executable_contract_matches_query_and_response_schemas():
-    contract = json.loads((Path(__file__).parents[1] / "app/contracts/source-reads-v2/openapi.json").read_text())
+    contract = json.loads(
+        (Path(__file__).parents[1] / "app/contracts/source-reads-v2/openapi.json").read_text()
+    )
     actual = app.openapi()
     for path, operations in contract["paths"].items():
         assert operations == actual["paths"][path]

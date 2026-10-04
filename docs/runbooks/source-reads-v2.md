@@ -77,8 +77,21 @@ PYTHONPATH=services/api services/api/.venv/bin/python \
 
 Required CI sprawdza drift rzeczywistych parametrów i response schemas.
 Testy endpointów sprawdzają auth/scope, limity, daty, unsupported snapshot
-i bezpieczny DB outage. Osobny cross-repo drill powinien przejść klientem
-AI przez rzeczywiste HTTP i PostgreSQL na własnych fixture; nie kwalifikuje ML.
+i bezpieczny DB outage. Required API CI pobiera dokładny klient AI z
+`source-reads-v2/client.json` i wymaga rzeczywistego testu HTTP/PostgreSQL.
+Test wykonuje pięć odczytów, strony 100+25 sales rows, no-data i błędne granty,
+zachowuje jednostki/legacy semantykę; nie kwalifikuje ML. Local invocation:
+
+```sh
+PYTHONPATH=services/api:. REQUIRE_SOURCE_REST_TESTS=1 \
+  RETAILOPS_AI_SOURCE_CLIENT_ROOT=/path/to/pinned-ai \
+  services/api/.venv/bin/python -m pytest \
+  services/api/tests/test_source_read_cross_repo.py
+```
+
+Baza musi być jednorazową usługą GitHub CI albo własną
+`retailops_ai10_rest_*` na loopback. Test tworzy i usuwa tylko rekordy jednego
+własnego UUID produktu. Brak klienta lub DB nie jest zaliczanym skip w CI.
 
 Rollback: zatrzymaj/wyłącz własnego klienta, usuń grant usługi i zrestartuj
 własne API. Nie ma nowej migracji ani cleanup wspólnej bazy/brokera.
