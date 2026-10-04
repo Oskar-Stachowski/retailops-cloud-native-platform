@@ -8,6 +8,7 @@ from pathlib import Path
 
 from data.anomalies.example import example_plan
 from data.anomalies.physical_scenarios import physical_example_plan
+from data.anomalies.portfolio import PROFILE, portfolio_plan
 from data.anomalies.source_process import build_tables
 from data.generator.configuration import DatasetGenerationConfig
 from data.inventory.contract import require
@@ -22,13 +23,16 @@ from data.inventory.source_dataset_io import (
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=("ai-smoke", "ai-temporal-smoke"), default="ai-smoke")
+    parser.add_argument(
+        "--profile", choices=("ai-smoke", "ai-temporal-smoke", PROFILE), default="ai-smoke"
+    )
     for field in ("days", "products", "stores", "warehouses"):
         parser.add_argument("--" + field, type=int)
     parser.add_argument("--seed", type=int, default=42)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--example", action="store_true")
     mode.add_argument("--physical-example", action="store_true")
+    mode.add_argument("--portfolio", choices=("demand", "physical"))
     mode.add_argument("--plan", type=Path)
     mode.add_argument("--verify", type=Path)
     parser.add_argument("--output-root", type=Path)
@@ -54,6 +58,8 @@ def main() -> None:
             plan = (
                 load_json(safe_file(args.plan.parent, args.plan.name, limit=1024 * 1024))
                 if args.plan
+                else portfolio_plan(generation, args.portfolio)
+                if args.portfolio
                 else (physical_example_plan if args.physical_example else example_plan)(generation)
             )
             tables, context = build_tables(generation, plan, config)
