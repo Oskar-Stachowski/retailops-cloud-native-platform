@@ -16,7 +16,7 @@ env:
 
 jobs:
   intelligence-ui:
-    name: Authenticated forecast UI with actual PostgreSQL and API
+    name: Personal forecast and suggestion UI with actual PostgreSQL and API
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:

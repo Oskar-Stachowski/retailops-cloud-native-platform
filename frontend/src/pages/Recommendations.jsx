@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import FeatureBoundary from "../components/FeatureBoundary";
+import IntelligenceSuggestions from "../components/IntelligenceSuggestions.jsx";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
@@ -176,6 +177,7 @@ export default function Recommendations() {
   if (state.loading) {
     return (
       <main className="api-page">
+        <IntelligenceSuggestions />
         <LoadingState title="Loading recommendation context" />
       </main>
     );
@@ -190,6 +192,7 @@ export default function Recommendations() {
           description="Current release exposes recommendation signals through Dashboard and Product 360 while the dedicated recommendation queue remains planned scope."
         />
         <ErrorState message={state.error.message} onRetry={loadRecommendationContext} />
+        <IntelligenceSuggestions />
       </main>
     );
   }
@@ -206,6 +209,8 @@ export default function Recommendations() {
         title="Recommendations"
         description="Decision-support view built from existing backend recommendation and work-item signals. The dedicated approval queue is positioned as planned workflow maturity, not as a visual placeholder."
       />
+
+      <IntelligenceSuggestions />
 
       <section className="metrics-grid" aria-label="Recommendation context metrics">
         <MetricCard

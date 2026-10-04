@@ -122,8 +122,17 @@ def main() -> int:  # noqa: PLR0915 - one owned-resource lifecycle
             [sys.executable, "-m", "alembic", "upgrade", "head"], cwd=ROOT / "services/api", env=env
         )
         result["fixture"] = seed(private)
+        env["RETAILOPS_ENABLE_SUGGESTION_FIXTURE_TRANSPORT"] = "1"
+        os.environ["RETAILOPS_ENABLE_SUGGESTION_FIXTURE_TRANSPORT"] = "1"
+        from suggestion_fixture import seed as seed_suggestions
+
+        result["suggestion_fixture"] = seed_suggestions(private)
         env["RETAILOPS_INTELLIGENCE_ACCESS_POLICY"] = str(private / "access.json")
         env["RETAILOPS_INTELLIGENCE_HEAD_POLICY"] = str(private / "head.json")
+        env["RETAILOPS_INTELLIGENCE_SUGGESTION_ACCESS_POLICY"] = str(
+            private / "suggestion-access.json"
+        )
+        env["INTELLIGENCE_UI_PYTHON"] = sys.executable
         # Own port 8000 only in the isolated CI runner; fail if another process owns it.
         with socket.socket() as owned:
             owned.bind(("127.0.0.1", 8000))
@@ -180,12 +189,22 @@ def main() -> int:  # noqa: PLR0915 - one owned-resource lifecycle
             env=env,
         )
         result["browser"] = json.loads((private / "browser-report.json").read_text())
-        if result["browser"]["status"] != "passed":
+        result["suggestion_browser"] = json.loads(
+            (private / "suggestion-browser-report.json").read_text()
+        )
+        if (
+            result["browser"]["status"] != "passed"
+            or result["suggestion_browser"]["status"] != "passed"
+        ):
             msg = "browser_acceptance_failed"
             raise RuntimeError(msg)
         shutil.copyfile(private / "forecast-lineage.png", REPORT / "forecast-lineage.png")
         result["screenshot_sha256"] = hashlib.sha256(
             (REPORT / "forecast-lineage.png").read_bytes()
+        ).hexdigest()
+        shutil.copyfile(private / "suggestion-evidence.png", REPORT / "suggestion-evidence.png")
+        result["suggestion_screenshot_sha256"] = hashlib.sha256(
+            (REPORT / "suggestion-evidence.png").read_bytes()
         ).hexdigest()
         result["status"] = "passed"
     except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as exc:
