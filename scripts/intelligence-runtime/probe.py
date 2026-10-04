@@ -114,10 +114,8 @@ def bootstrap(config: dict) -> dict:
                 last = type(exc.reason if isinstance(exc, URLError) else exc).__name__
             require(time.monotonic() < deadline, "broker_tls_admin_not_ready_" + last)
             time.sleep(1)
-        require(
-            http.get("https://broker:9644/v1/security/users").status_code == 401,
-            "admin_anonymous_denied",
-        )
+        status = http.get("https://broker:9644/v1/security/users").status_code
+        require(status == 401, "admin_anonymous_denied_" + str(status))
     admin = AdminClient(config["broker"]["admin"])
     credentials = [
         UserScramCredentialUpsertion(

@@ -85,7 +85,8 @@ stockout transport, snapshot/replay, source completeness, UI or 102-day three-mo
     project name. Inspect `ci-cd/reports/intelligence-runtime/report.json`, or the
     `intelligence-runtime-evidence` CI artifact: exact source/AI commits and lock hashes,
     stages, identities, payload digest, offsets, negative checks and cleanup result.
-    Credentials, resolved Compose output, DB URLs and raw application logs are excluded.
+    Credentials, resolved Compose output, DB URLs and raw application logs are excluded;
+    a failed bootstrap may include bounded, redacted broker startup diagnostics.
 
 ## Identity and resource grants
 

@@ -156,7 +156,7 @@ def prepare(private: Path, owner: Path) -> None:
     private_file(private / "broker.env", "RP_BOOTSTRAP_USER=bootstrap:" + passwords["admin"] + "\n")
     private_file(
         private / "broker/.bootstrap.yaml",
-        "enable_sasl: true\nadmin_api_require_auth: true\nsuperusers: [bootstrap]\nauto_create_topics_enabled: false\nsasl_mechanisms: [SCRAM]\n",
+        "enable_sasl: true\nadmin_api_require_auth: true\nhttp_authentication: [BASIC]\nsuperusers: [bootstrap]\nauto_create_topics_enabled: false\nsasl_mechanisms: [SCRAM]\n",
     )
     private_file(
         private / "broker/redpanda.yaml",

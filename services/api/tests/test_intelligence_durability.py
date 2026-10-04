@@ -77,10 +77,11 @@ def intelligence_runtime(runtime):
     # A broker accepting topics/offset reads may still lack its durable cluster
     # identity immediately after startup. Establish the real precondition before
     # exercising fail-stop workers; do not relax or retry their identity guard.
-    topology = BrokerTopology(admin)
     deadline = time.monotonic() + 45
     while True:
         try:
+            # Do not reuse CreateTopics' cached zero UUID during bootstrap.
+            topology = BrokerTopology(AdminClient({"bootstrap.servers": runtime.bootstrap}))
             _, partitions = topology.inspect()
             assert partitions == (0, 1)
             break
