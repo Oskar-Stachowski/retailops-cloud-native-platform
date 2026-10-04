@@ -28,11 +28,12 @@ then performs this sequence:
 1. Migrate and seed only the new disposable source database. Use the older API
    for an identical history; for the fingerprinted AI 10 expansion, migrate
    once with the candidate image before either application version writes.
-   Seed a mechanics forecast/inbox row as well as the legacy demo data.
+   Seed mechanics forecast/inbox, partition checkpoint and transport receipt
+   rows as well as the legacy demo data.
 2. Record an alert acknowledgement/resolution, recommendation acceptance/
    completion and a second recommendation rejection through actual HTTP APIs.
 3. Start the older API/frontend images. Verify HTTP, browser dashboard/Product
-   360/reload, all 15 table fingerprints, schema and five idempotent requests.
+   360/reload, all table fingerprints, schema and five idempotent requests.
 4. Create a pre-update database backup with its checksum.
 5. Check migration compatibility and prove that a rewritten migration history
    or unknown database revision blocks application-only rollback.
@@ -56,7 +57,7 @@ deployment controller or an arbitrary broken-image test.
 | Situation | Action |
 |---|---|
 | Identical Alembic head **and complete migration-file fingerprint**, live DB at that head | Application-only rollback is eligible; still verify the running older version and data. |
-| Exact parent/expanded fingerprints from `scripts/release/additive-rollback.json`, live DB at one of those two verified heads | Exercise the explicit additive plan on a disposable database, retaining the expanded schema and ML row while testing both image versions. |
+| Exact parent/expanded fingerprints from `scripts/release/additive-rollback.json`, live DB at one of those two verified heads | Exercise the explicit additive plan on a disposable database, retaining the expanded schema and all seeded ML/transport rows while testing both image versions. |
 | Same head but changed migration contents | Block automatic rollback and review the inconsistency. |
 | Other new, missing, branched or unknown migration history/revision | Block application-only rollback; prepare an explicit compatibility/forward-fix plan. |
 | Destructive schema change or incompatible new data semantics | Stop writes; prefer a reviewed forward fix, or restore a verified backup into a separate database and reconcile/replay later writes before cutover. |
@@ -66,13 +67,14 @@ successful application rollback with unchanged schema is not proof that a future
 schema change is reversible. The existing [database recovery drill](db-restore.md)
 is the separate foundation for backup-based recovery.
 
-The AI 10 plan permits only `6b0f1c2d3e4a` to `a10f0c7e0200` with their exact
-complete migration-file fingerprints. The new migration adds only
-`ai_forecast_results` and `ai_intelligence_inbox`; existing migrations and tables
-remain unchanged. Unit guards reject a rewritten parent, changed expansion,
+The AI 10 plan permits only `6b0f1c2d3e4a` to `a10f0c7e0300` with their exact
+complete migration-file fingerprints. The two additive migrations add only
+`ai_forecast_results`, `ai_intelligence_inbox`, `ai_intelligence_partitions` and
+`ai_intelligence_transport`; existing migrations and tables remain unchanged.
+The plan also pins both new migration files individually. Unit guards reject a rewritten parent, changed expansion,
 different new head or unknown database revision. Compose and Kubernetes drills
 verify the entire expanded schema and all table fingerprints, including a seeded
-ML payload/inbox, through restart, update and application rollback. No table
+ML payload/inbox and checkpoint/transport receipt, through restart, update and application rollback. No table
 is excluded to make that comparison pass. Kubernetes retains its existing
 exception for operational consumer-state counters.
 

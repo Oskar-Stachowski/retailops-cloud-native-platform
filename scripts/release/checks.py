@@ -109,7 +109,28 @@ def seed_expansion(event: dict) -> dict:
                (event_id,event_type,prediction_id,document_sha256) VALUES (%s,%s,%s,%s)""",
             (event["event_id"], event["event_type"], payload["prediction_id"], digest(event)),
         )
-    return {"forecast_results": 1, "inbox_records": 1, "fixture": "mechanics"}
+        # Explicit mechanics coordinates; this fixture is not a broker handoff.
+        connection.execute(
+            """INSERT INTO ai_intelligence_partitions
+               (consumer_group,topic,partition,cluster_id,topic_id,coverage_start,next_offset,
+                initial_policy,epoch,owner_id,claimed_at,checkpoint_at)
+               VALUES ('rollback-mechanics','retailops.intelligence.v2',0,
+                       'fixture-cluster','fixture-topic',0,1,'log_low',1,%s,now(),now())""",
+            (event["event_id"],),
+        )
+        connection.execute(
+            """INSERT INTO ai_intelligence_transport
+               (consumer_group,topic,partition,offset_number,raw_sha256,outcome,prediction_id)
+               VALUES ('rollback-mechanics','retailops.intelligence.v2',0,0,%s,'projected',%s)""",
+            (digest({"mechanics_fixture": event}), payload["prediction_id"]),
+        )
+    return {
+        "forecast_results": 1,
+        "inbox_records": 1,
+        "partition_checkpoints": 1,
+        "transport_receipts": 1,
+        "fixture": "mechanics",
+    }
 
 
 if __name__ == "__main__":

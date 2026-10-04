@@ -102,14 +102,16 @@ class AdditiveRollbackTests(unittest.TestCase):
     def test_plan_pins_actual_migration_and_unchanged_parent_files(self) -> None:
         versions = Path(__file__).resolve().parents[2] / "services/api/alembic/versions"
         self.assertEqual(migration_contract(versions), self.plan["expanded"])
-        addition = versions / "a10f0c7e0200_add_intelligence_forecasts.py"
-        self.assertEqual(
-            hashlib.sha256(addition.read_bytes()).hexdigest(), self.plan["migration_sha256"]
-        )
+        additions = self.plan["migration_files"]
+        self.assertEqual(len(additions), 2)
+        for name, fingerprint in additions.items():
+            self.assertEqual(
+                hashlib.sha256((versions / name).read_bytes()).hexdigest(), fingerprint
+            )
         with TemporaryDirectory() as temporary:
             parent = Path(temporary)
             for path in versions.glob("*.py"):
-                if path != addition:
+                if path.name not in additions:
                     shutil.copyfile(path, parent / path.name)
             self.assertEqual(migration_contract(parent), self.plan["parent"])
 

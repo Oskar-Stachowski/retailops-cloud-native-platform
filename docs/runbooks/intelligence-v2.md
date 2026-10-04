@@ -26,7 +26,7 @@ grainu; v1 zachowuje dotychczasową walidację i key.
 ## Konfiguracja
 
 1. Na własnej bazie RetailOps wykonaj `alembic upgrade head`. Nowy head to
-   `a10f0c7e0200`; nie ma zmiany schematu tabel legacy.
+   `a10f0c7e0300`; nie ma zmiany schematu tabel legacy.
 2. Utwórz topic `retailops.intelligence.v2`, 3 partycje w lokalnym Compose.
    Zaktualizowany `redpanda-init` robi to poza pętlą legacy. Subskrypcje
    v1 pozostają zamknięte; dedykowana grupa to `retailops-intelligence-v2`.
@@ -128,3 +128,10 @@ approved latest policy, upstream REST/export/snapshot+replay, shared Compose
 overlay i transport auth, rozszerzona telemetry, istniejący frontend oraz
 E2E rzeczywistych trzech modeli na profilu 102 dni. Testy tego przyrostu
 nie zamykają Definition of Done całego etapu.
+
+## Osobny consumer z checkpointami
+
+[Runbook checkpointów](intelligence-checkpoints.md) opisuje dedykowany runner,
+trwały cursor partycji, fencing i atomowy zapis projekcji/kwarantanny z transportem.
+Ten runner ma osobną grupę i jawny bootstrap zatrzymanego logu. Nie zmienia
+semantyki powyższego legacy runnera ani nie ustanawia snapshot+replay handoff.

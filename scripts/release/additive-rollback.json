@@ -5,13 +5,18 @@
     "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
   },
   "expanded": {
-    "head": "a10f0c7e0200",
-    "history_sha256": "cf3b9c1d19e05131c219eee8a245dd282bae927ae8644b0a81f50bfda629d864"
+    "head": "a10f0c7e0300",
+    "history_sha256": "6c3196c00ea64e17e8ea2fd9fb05eda164533d78c2f998766af5e7d8054e8daf"
   },
   "added_tables": [
     "ai_forecast_results",
-    "ai_intelligence_inbox"
+    "ai_intelligence_inbox",
+    "ai_intelligence_partitions",
+    "ai_intelligence_transport"
   ],
-  "migration_sha256": "93fcd18e752133f344cab9627adf55685260e44f3f670a30916dc997ccb4ce42",
-  "reason": "AI10 adds isolated immutable projection and inbox tables; existing tables and migration files are unchanged. Disposable drills migrate forward once before exercising both image versions and retain the expanded schema and data during rollback."
+  "reason": "AI10 adds isolated immutable projection, inbox, partition checkpoint and transport receipt tables. Existing migrations and tables are unchanged. Disposable drills migrate forward once before exercising both image versions and retain every expanded table, including seeded rows, during application rollback.",
+  "migration_files": {
+    "a10f0c7e0200_add_intelligence_forecasts.py": "93fcd18e752133f344cab9627adf55685260e44f3f670a30916dc997ccb4ce42",
+    "a10f0c7e0300_add_intelligence_checkpoints.py": "01dc3a90b1ff595f56bf2ece69853b1988bd2c0097f8acd3312dffa2ec2a7056"
+  }
 }

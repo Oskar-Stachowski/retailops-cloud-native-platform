@@ -3,12 +3,15 @@ from __future__ import annotations
 import base64
 import json
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid5
 
 from psycopg.types.json import Jsonb
 
 from app.db.connection import fetch_all, fetch_one
+
+if TYPE_CHECKING:
+    from psycopg import Connection
 
 QUARANTINE_SOURCE = "retailops.consumer.quarantine"
 QUARANTINE_NAMESPACE = UUID("e69e3c54-5596-45b0-93d5-7e9289916db9")
@@ -29,6 +32,7 @@ class RealtimeQuarantineRepository:
         headers: list[tuple[str, bytes | None]] | None,
         timestamp_ms: int | None,
         error: str,
+        connection: Connection[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         transport = {
             "consumer_group": consumer_group,
@@ -50,27 +54,36 @@ class RealtimeQuarantineRepository:
         )
         # A synthetic ID uses the transport position, never an untrusted event ID.
         # fetch_one returns only after the insert transaction has committed.
-        fetch_one(
-            """
+        insert = """
             INSERT INTO realtime_event_log
                 (event_id, event_type, topic, schema_version, source, correlation_id,
                  occurred_at, ingested_at, status, attempt_count, error_message, payload)
             VALUES (%s, 'transport_rejected', %s, 'transport.v1', %s, %s,
                     %s, %s, 'failed_dead_lettered', 1, %s, %s)
             ON CONFLICT (event_id) DO NOTHING RETURNING event_id;
-            """,
-            (
-                quarantine_id,
-                topic,
-                QUARANTINE_SOURCE,
-                quarantine_id,
-                occurred_at,
-                now,
-                error,
-                Jsonb(payload),
-            ),
+            """
+        arguments = (
+            quarantine_id,
+            topic,
+            QUARANTINE_SOURCE,
+            quarantine_id,
+            occurred_at,
+            now,
+            error,
+            Jsonb(payload),
         )
-        row = self.get(quarantine_id)
+        if connection is None:
+            fetch_one(insert, arguments)
+            row = self.get(quarantine_id)
+        else:
+            connection.execute(insert, arguments)
+            row = connection.execute(
+                "SELECT * FROM realtime_event_log WHERE event_id=%s AND source=%s",
+                (quarantine_id, QUARANTINE_SOURCE),
+            ).fetchone()
+            if row is None:
+                msg = "quarantine_receipt_missing"
+                raise RuntimeError(msg)
         if any(row["payload"].get(name) != content for name, content in payload.items()):
             msg = "Quarantine did not confirm the immutable transport message."
             raise RuntimeError(msg)
