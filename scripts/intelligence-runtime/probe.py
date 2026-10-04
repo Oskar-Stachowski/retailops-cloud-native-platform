@@ -308,6 +308,8 @@ def negative_auth(config: dict) -> list[str]:
         try:
             invalid.list_topics(timeout=5)
         except KafkaException:
+            # Blocking Admin metadata does not serve Python error callbacks.
+            invalid.poll(0)
             require(
                 any(error.code() == expected for error in errors), name + "_explicit_error_required"
             )
