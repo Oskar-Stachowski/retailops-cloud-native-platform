@@ -73,6 +73,8 @@ def write(expected: dict, stage: str) -> dict:
 
 def seed_expansion(event: dict) -> dict:
     """Retain a known mechanics result through both image versions in the isolated drill."""
+    suggestion = event["suggestion"]
+    event = event["forecast"]
     payload = event["payload"]
     fields = (
         "prediction_id",
@@ -124,11 +126,54 @@ def seed_expansion(event: dict) -> dict:
                VALUES ('rollback-mechanics','retailops.intelligence.v2',0,0,%s,'projected',%s)""",
             (digest({"mechanics_fixture": event}), payload["prediction_id"]),
         )
+        item = suggestion["payload"]
+        connection.execute(
+            """INSERT INTO ai_recommendation_results
+            (recommendation_id,trace_id,answer_id,candidate_id,product_id,selling_location_id,
+             channel,policy_sha256,agent_config_version,created_at,expires_at,payload,payload_sha256)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (
+                *[
+                    item[key]
+                    for key in (
+                        "recommendation_id",
+                        "trace_id",
+                        "answer_id",
+                        "candidate_id",
+                        "product_id",
+                        "selling_location_id",
+                        "channel",
+                        "policy_sha256",
+                        "agent_config_version",
+                        "created_at",
+                        "expires_at",
+                    )
+                ],
+                Jsonb(item),
+                digest(item),
+            ),
+        )
+        connection.execute(
+            """INSERT INTO ai_recommendation_inbox
+            (event_id,recommendation_id,document_sha256) VALUES (%s,%s,%s)""",
+            (suggestion["event_id"], item["recommendation_id"], digest(suggestion)),
+        )
+        connection.execute(
+            """INSERT INTO ai_intelligence_transport
+            (consumer_group,topic,partition,offset_number,raw_sha256,outcome,recommendation_id)
+            VALUES ('rollback-mechanics','retailops.intelligence.v2',0,1,%s,'projected',%s)""",
+            (digest({"mechanics_fixture": suggestion}), item["recommendation_id"]),
+        )
+        connection.execute(
+            "UPDATE ai_intelligence_partitions SET next_offset=2 WHERE consumer_group='rollback-mechanics'"
+        )
     return {
         "forecast_results": 1,
         "inbox_records": 1,
         "partition_checkpoints": 1,
-        "transport_receipts": 1,
+        "transport_receipts": 2,
+        "suggestion_results": 1,
+        "suggestion_inbox_records": 1,
         "fixture": "mechanics",
     }
 

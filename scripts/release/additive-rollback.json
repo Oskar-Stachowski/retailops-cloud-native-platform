@@ -5,18 +5,21 @@
     "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
   },
   "expanded": {
-    "head": "a10f0c7e0300",
-    "history_sha256": "6c3196c00ea64e17e8ea2fd9fb05eda164533d78c2f998766af5e7d8054e8daf"
+    "head": "a10f0c7e0400",
+    "history_sha256": "60255905980a3925c687dfe0e1db1ec3c8ea80192c8e23b1c2b51c73e09fa2fd"
   },
   "added_tables": [
     "ai_forecast_results",
     "ai_intelligence_inbox",
     "ai_intelligence_partitions",
-    "ai_intelligence_transport"
+    "ai_intelligence_transport",
+    "ai_recommendation_results",
+    "ai_recommendation_inbox"
   ],
-  "reason": "AI10 adds isolated immutable projection, inbox, partition checkpoint and transport receipt tables. Existing migrations and tables are unchanged. Disposable drills migrate forward once before exercising both image versions and retain every expanded table, including seeded rows, during application rollback.",
+  "reason": "AI10 adds immutable forecast/suggestion projections, inboxes, partition checkpoints and transport receipts. Historical migration bytes remain unchanged. The new nullable recommendation reference and XOR receipt constraint retain the old forecast path. Disposable drills migrate forward once and retain both nonempty projections and all receipts through application rollback. A populated suggestion schema downgrade is refused.",
   "migration_files": {
     "a10f0c7e0200_add_intelligence_forecasts.py": "93fcd18e752133f344cab9627adf55685260e44f3f670a30916dc997ccb4ce42",
-    "a10f0c7e0300_add_intelligence_checkpoints.py": "01dc3a90b1ff595f56bf2ece69853b1988bd2c0097f8acd3312dffa2ec2a7056"
+    "a10f0c7e0300_add_intelligence_checkpoints.py": "01dc3a90b1ff595f56bf2ece69853b1988bd2c0097f8acd3312dffa2ec2a7056",
+    "a10f0c7e0400_add_intelligence_suggestions.py": "c5759cafef509ac33812f8e67f005b1649e090fbabf81ad9145cb01b4658968b"
   }
 }

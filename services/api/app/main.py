@@ -10,6 +10,7 @@ from app.api import (
     forecast_runs,
     forecasts,
     intelligence,
+    intelligence_suggestions,
     inventory,
     me,
     metrics,
@@ -71,6 +72,7 @@ app.include_router(stock_risks.router)
 app.include_router(me.router)
 app.include_router(notifications.router)
 app.include_router(intelligence.router)
+app.include_router(intelligence_suggestions.router)
 app.include_router(source_reads.router)
 app.include_router(source_bundles.router)
 
@@ -80,6 +82,7 @@ _original_openapi = app.openapi
 def intelligence_openapi() -> dict[str, Any]:
     schema = _original_openapi()
     intelligence.add_payload_openapi(schema)
+    intelligence_suggestions.add_payload_openapi(schema)
     return schema
 
 

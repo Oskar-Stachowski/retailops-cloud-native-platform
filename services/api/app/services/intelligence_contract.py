@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import date, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
@@ -45,9 +46,19 @@ def validate_event(event: dict[str, Any], *, transport_topic: str | None = None)
     try:
         if transport_topic != TOPIC or len(canonical_bytes(event)) > MAX_EVENT_BYTES:
             raise ValueError
-        if next(event_validator().iter_errors(event), None) is not None:
-            raise ValueError
-        _forecast_relationships(event)
+        if event.get("event_type") == "recommendation_generated":
+            if os.getenv("RETAILOPS_ENABLE_SUGGESTION_FIXTURE_TRANSPORT") != "1":
+                raise ValueError
+            # Loaded only for this event to keep canonical hashing independent of adapters.
+            from app.services.intelligence_suggestion_contract import (  # noqa: PLC0415
+                validate_suggestion,
+            )
+
+            validate_suggestion(event)
+        else:
+            if next(event_validator().iter_errors(event), None) is not None:
+                raise ValueError
+            _forecast_relationships(event)
     except (ValueError, TypeError, KeyError, OverflowError) as exc:
         msg = "intelligence_v2_contract_invalid"
         raise InvalidRealtimeEventError(msg) from exc

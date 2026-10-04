@@ -240,7 +240,7 @@ class IntelligenceCheckpointStore:
                     "transport_replayed": True,
                     "checkpoint_next_offset": state["next_offset"],
                 }
-            prediction_id = quarantine_id = None
+            prediction_id = recommendation_id = quarantine_id = None
             try:
                 try:
                     event = decode_message_value(record.value)
@@ -254,7 +254,11 @@ class IntelligenceCheckpointStore:
                 if result["status"] not in ("processed", "ignored_duplicate"):
                     msg = "projection_receipt_missing"
                     raise CheckpointError(msg)
-                prediction_id = result["prediction_id"]
+                prediction_id = result.get("prediction_id")
+                recommendation_id = result.get("recommendation_id")
+                if (prediction_id is None) == (recommendation_id is None):
+                    msg = "projection_receipt_missing"
+                    raise CheckpointError(msg)
                 outcome = "projected" if result["status"] == "processed" else "duplicate"
             except InvalidRealtimeEventError as exc:
                 row = self.quarantine.store_message(
@@ -275,13 +279,15 @@ class IntelligenceCheckpointStore:
             connection.execute(
                 """INSERT INTO ai_intelligence_transport
                    (consumer_group,topic,partition,offset_number,raw_sha256,outcome,
-                    prediction_id,quarantine_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    prediction_id,recommendation_id,quarantine_id)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (
                     *lease.coordinates,
                     record.offset,
                     raw_hash,
                     outcome,
                     prediction_id,
+                    recommendation_id,
                     quarantine_id,
                 ),
             )

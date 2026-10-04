@@ -9,7 +9,7 @@ class IntelligenceCacheMiddleware:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         private = scope["type"] == "http" and scope.get("path", "").startswith(
-            "/intelligence/v2/forecasts"
+            ("/intelligence/v2/forecasts", "/intelligence/v2/recommendations")
         )
 
         async def private_send(message: Message) -> None:

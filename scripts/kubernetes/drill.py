@@ -635,7 +635,18 @@ class KubernetesDrill(Drill):
             )
             self.report["additive_expansion"] = {
                 **expansion,
-                "seeded_projection": self.check("seed-expansion", data=fixture),
+                "seeded_projection": self.check(
+                    "seed-expansion",
+                    data={
+                        "forecast": fixture,
+                        "suggestion": json.loads(
+                            (
+                                ROOT
+                                / "services/api/app/contracts/intelligence-suggestions-v1/recommendation_generated.fixture.json"
+                            ).read_text()
+                        ),
+                    },
+                ),
             }
         expected = self.check("prepare")
         self.validate("previous", expected, previous)

@@ -26,6 +26,8 @@ def test_required_database_tables_exist() -> None:
         "realtime_consumer_state",
         "forecast_runs",
         "alembic_version",
+        "ai_recommendation_results",
+        "ai_recommendation_inbox",
     }
 
     with psycopg.connect(DATABASE_URL) as conn, conn.cursor() as cur:

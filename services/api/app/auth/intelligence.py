@@ -38,8 +38,9 @@ class IntelligenceAccessPolicy(PrivateContract):
     principals: tuple[IntelligencePrincipal, ...] = Field(min_length=1, max_length=32)
 
 
-def access_policy() -> IntelligenceAccessPolicy | None:
-    path = os.getenv("RETAILOPS_INTELLIGENCE_ACCESS_POLICY")
+def read_private_policy(environment: str) -> bytes | None:
+    """Read a bounded owner-only regular file anew on every authenticated request."""
+    path = os.getenv(environment)
     if not path:
         return None
     try:
@@ -56,6 +57,16 @@ def access_policy() -> IntelligenceAccessPolicy | None:
             raw = stream.read(65537)
         if len(raw) > 65536:
             raise ValueError
+        return raw
+    except (OSError, ValueError) as exc:
+        raise HTTPException(503, detail="intelligence_access_policy_unavailable") from exc
+
+
+def access_policy() -> IntelligenceAccessPolicy | None:
+    raw = read_private_policy("RETAILOPS_INTELLIGENCE_ACCESS_POLICY")
+    if raw is None:
+        return None
+    try:
         policy = IntelligenceAccessPolicy.model_validate_json(raw)
         identities = [principal.principal_id for principal in policy.principals]
         credentials = [principal.credential_sha256 for principal in policy.principals]

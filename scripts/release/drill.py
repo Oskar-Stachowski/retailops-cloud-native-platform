@@ -318,7 +318,20 @@ class Drill:
             self.report["additive_expansion"] = {
                 **expansion,
                 "seeded_projection": json.loads(
-                    self.app("python", "/release/checks.py", "seed-expansion", data=fixture)
+                    self.app(
+                        "python",
+                        "/release/checks.py",
+                        "seed-expansion",
+                        data={
+                            "forecast": fixture,
+                            "suggestion": json.loads(
+                                (
+                                    ROOT
+                                    / "services/api/app/contracts/intelligence-suggestions-v1/recommendation_generated.fixture.json"
+                                ).read_text()
+                            ),
+                        },
+                    )
                 ),
             }
         expected = json.loads(self.app("python", "/recovery/checks.py", "prepare"))

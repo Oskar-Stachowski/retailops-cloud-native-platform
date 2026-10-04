@@ -1,0 +1,30 @@
+{
+  "repository": "Oskar-Stachowski/retailops-ai-intelligence",
+  "commit": "a14b7899d9366c6ae555c0b6be4a8d027514ca91",
+  "payload_owner": "retailops_ai.assistant.contracts.PersistedSuggestion",
+  "schema_version": "1.0",
+  "upstream_paths": {
+    "suggestion.v1.schema.json": "contracts/assistant/v1/suggestion.v1.schema.json",
+    "suggestion-candidate.v1.schema.json": "contracts/agent/v1/suggestion-candidate.v1.schema.json"
+  },
+  "upstream_sha256": {
+    "src/retailops_ai/assistant/contracts.py": "60b4f95916080c74252c2d76a7911c1d1ca32bc46ac182186730a0bfa7f19a64",
+    "src/retailops_ai/agent/suggestions.py": "d860194545a508de65f3317ca4a637eec8ee892f4724e737cbb72e6e1f1bd732",
+    "src/retailops_ai/assistant/service.py": "751442f408a72cbe3c73a7af964e8fa071efeb08aa42f08ac066870b84510936",
+    "src/retailops_ai/data_contracts/common.py": "9f4cbd1533e8ea7eef0eb0bb84e51920c759d9648ffe4370482cac7ed4cc686a",
+    "src/retailops_ai/data_contracts/identity.py": "af0127e976a9c25b3289b5e96728b781a9afe4d56a273e57170ab97c047f8976",
+    "contracts/assistant/v1/suggestion.v1.schema.json": "5d7ebc50237dc98c28cebb9b93f498f5d9c26d1f46dac189bbd3392376fa2eec",
+    "contracts/agent/v1/suggestion-candidate.v1.schema.json": "401b3bb30cf959fc7b8f3b1cb89d60076825d31563bc4a04a464ba199eac638d"
+  },
+  "local_sha256": {
+    "suggestion.v1.schema.json": "5d7ebc50237dc98c28cebb9b93f498f5d9c26d1f46dac189bbd3392376fa2eec",
+    "suggestion-candidate.v1.schema.json": "401b3bb30cf959fc7b8f3b1cb89d60076825d31563bc4a04a464ba199eac638d",
+    "recommendation_generated.schema.json": "7187f64c637cb77eb3944d28776b1d0517925e676c9e63a2527eada0401d337a",
+    "recommendation_generated.fixture.json": "242504af2ad28150796db3870739529938cfc0921c923fd0719e829428e7bac6",
+    "registry.json": "91663e01261b355452b90b0f406aaceca5dc4e261b032e7488d4dbe60171bc41"
+  },
+  "event_adapter_status": "fixture_only",
+  "real_assistant_outbox_publication": false,
+  "model_quality_qualification": false,
+  "relationships": "candidate canonical UTC identity, 300-second lifetime, UUID5 trace/answer/recommendation binding from pinned assistant service"
+}
