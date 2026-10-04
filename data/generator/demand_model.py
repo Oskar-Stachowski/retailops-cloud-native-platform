@@ -113,6 +113,11 @@ def daily_demand(
         "anomaly_factor": anomaly_factor,
         "noise": str(Decimal(str(rng.uniform(0.78, 1.24)))),
     }
+    if config.profile == "ai-07-portfolio-v2":
+        # Explicit whole-process demand budget for the smaller benchmark. This
+        # applies before anomaly composition and financial/stock facts, with
+        # no dependence on injection labels, windows or detector scores.
+        factors["base_rate"] = str(Decimal(factors["base_rate"]) * Decimal("0.75"))
     rate, draw = expected_demand(factors), Decimal(str(rng.random()))
     return {
         "id": deterministic_uuid("demand_truth", ":".join(key)),
