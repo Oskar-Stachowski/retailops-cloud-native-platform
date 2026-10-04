@@ -67,28 +67,68 @@ def availability_tokens(events: list[dict]) -> list[dict]:
     return [token for _, _, _, token in sorted(scheduled)]
 
 
+def reorder_pair(subset: list[dict], *, portfolio: bool) -> tuple[int, int] | None:
+    return next(
+        (
+            (i, i + 1)
+            for i in range(1, len(subset) - 2)
+            if utc_timestamp(subset[i]["occurred_at"]).date()
+            == utc_timestamp(subset[i + 1]["occurred_at"]).date()
+            and subset[i]["occurred_at"] < subset[i + 1]["occurred_at"]
+            and (
+                not portfolio
+                or (utc_timestamp(subset[i]["ingested_at"]), subset[i]["event_id"])
+                < (utc_timestamp(subset[i + 1]["ingested_at"]), subset[i + 1]["event_id"])
+            )
+        ),
+        None,
+    )
+
+
 def example_plan(events: list[dict], source_id: str, *, seed: int = 42) -> FullFaultPlan:
     injections = []
+    # A deliberately held/quarantined first purchase makes the entire later
+    # return series incomplete. Keep this destructive DQ exercise on a bounded
+    # public product scope; selecting it never reads business injection truth.
+    fault_product = None
+    if len(events) > 4096:
+        products = {e["payload"]["product_id"] for e in events}
+        eligible = [
+            product
+            for product in products
+            if all(
+                len(
+                    subset := [
+                        e
+                        for e in events
+                        if e["payload"]["product_id"] == product and e["event_type"] == kind
+                    ]
+                )
+                >= 12
+                and reorder_pair(subset, portfolio=True) is not None
+                for kind in ("sale_completed", "return_completed")
+            )
+        ]
+        require(bool(eligible), "Portfolio DQ needs a public product with both event types.")
+        fault_product = min(
+            eligible,
+            key=lambda product: (
+                sum(e["payload"]["product_id"] == product for e in events),
+                product,
+            ),
+        )
     for event_type in ("sale_completed", "return_completed"):
-        subset = [e for e in events if e["event_type"] == event_type]
+        subset = [
+            e
+            for e in events
+            if e["event_type"] == event_type
+            and (fault_product is None or e["payload"]["product_id"] == fault_product)
+        ]
         require(len(subset) >= 12, "Full example requires twelve facts of each type.")
         dates = [utc_timestamp(e["occurred_at"]).date() for e in subset]
         require(dates[0] < dates[-1], "Late example needs multiple event days.")
         used = {0, len(subset) - 1}
-        pair = next(
-            (
-                (i, i + 1)
-                for i in range(1, len(subset) - 2)
-                if dates[i] == dates[i + 1]
-                and subset[i]["occurred_at"] < subset[i + 1]["occurred_at"]
-                and (
-                    len(events) <= 4096
-                    or utc_timestamp(subset[i]["ingested_at"])
-                    <= utc_timestamp(subset[i + 1]["ingested_at"])
-                )
-            ),
-            None,
-        )
+        pair = reorder_pair(subset, portfolio=len(events) > 4096)
         require(pair is not None, "Out-of-order example needs two times on the same day.")
         assert pair is not None  # noqa: S101 - explicit require above
         used.update(pair)
