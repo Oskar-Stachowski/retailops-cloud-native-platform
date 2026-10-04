@@ -29,6 +29,7 @@ PROFILE_DEFAULTS = {
     "ai-intermittent-v1": SyntheticProfileDefaults(365, 100, 5, 3),
     "ai-training": SyntheticProfileDefaults(730, 200, 10, 4),
     "ai-07-portfolio-v1": SyntheticProfileDefaults(128, 8, 3, 2),
+    "ai-07-portfolio-v2": SyntheticProfileDefaults(128, 8, 2, 2),
 }
 SUPPORTED_PROFILES = ("demo", *PROFILE_DEFAULTS, "ai-load")
 SIZING_FIELDS = ("days", "products", "stores", "warehouses")

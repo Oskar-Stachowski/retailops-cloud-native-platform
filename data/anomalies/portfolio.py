@@ -13,6 +13,7 @@ from data.inventory.run_source_dataset import default_inventory_config
 from data.inventory.source_bridge import simulate_source_commerce
 
 PROFILE = "ai-07-portfolio-v1"
+SUPPLY_ADEQUATE_PROFILE = "ai-07-portfolio-v2"
 SEEDS = (42, 137, 2026)
 SPLITS = {"training": (28, 59), "validation": (64, 95), "final_test": (100, 127)}
 
@@ -20,9 +21,9 @@ SPLITS = {"training": (28, 59), "validation": (64, 95), "final_test": (100, 127)
 def portfolio_plan(generation: DatasetGenerationConfig, family: str) -> dict:
     effective = resolve_generation_config(generation)
     require(
-        effective.profile == PROFILE
+        effective.profile in (PROFILE, SUPPLY_ADEQUATE_PROFILE)
         and (effective.days, effective.products, effective.stores, effective.warehouses)
-        == (128, 8, 3, 2),
+        == (128, 8, 2 if effective.profile == SUPPLY_ADEQUATE_PROFILE else 3, 2),
         "Portfolio profile dimensions are frozen.",
     )
     require(effective.seed in SEEDS, "Portfolio source seed is not frozen.")

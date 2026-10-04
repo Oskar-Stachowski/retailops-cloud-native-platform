@@ -35,6 +35,7 @@ if TYPE_CHECKING:
 
 def default_inventory_config(generation: DatasetGenerationConfig) -> SourceInventoryConfig:
     effective = resolve_generation_config(generation)
+    supply_adequate = effective.profile == "ai-07-portfolio-v2"
     return SourceInventoryConfig.from_payload(
         {
             "contract_version": "source-inventory-config-1.0.0",
@@ -44,12 +45,12 @@ def default_inventory_config(generation: DatasetGenerationConfig) -> SourceInven
             "return_quality_policy": "refunded_undamaged_returns_only",
             "return_tail_policy": "financial_tail_without_inventory_extension",
             "stock": {
-                "opening_quantity": 12,
-                "reorder_point": 8,
-                "safety_stock": 4,
+                "opening_quantity": 256 if supply_adequate else 12,
+                "reorder_point": 128 if supply_adequate else 8,
+                "safety_stock": 64 if supply_adequate else 4,
                 "history_window_days": min(2, effective.days),
                 "review_cadence_days": 1,
-                "minimum_order_quantity": 4,
+                "minimum_order_quantity": 64 if supply_adequate else 4,
                 "quoted_lead_time_days": 2,
             },
             "sale_ingestion_delay_seconds": 30,

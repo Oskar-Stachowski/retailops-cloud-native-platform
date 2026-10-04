@@ -288,7 +288,7 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
                         table["partition_source_field"] == "business_date"
                         and "business_date" in schema.names
                         and parent["descriptor"]["resolved_parameters"]["profile"]
-                        == "ai-07-portfolio-v1"
+                        in {"ai-07-portfolio-v1", "ai-07-portfolio-v2"}
                     )
                 ),
                 "Inventory schema/grain/class differs.",
@@ -451,7 +451,7 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
         and (
             not partition_by_day
             or source_payload["descriptor"]["resolved_parameters"]["profile"]
-            == "ai-07-portfolio-v1"
+            in {"ai-07-portfolio-v1", "ai-07-portfolio-v2"}
         ),
         "Date partitions require the declared AI07 portfolio profile.",
     )
