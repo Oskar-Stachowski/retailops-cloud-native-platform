@@ -37,7 +37,7 @@ API_PATTERNS = (
     "pytest.ini",
 )
 
-FRONTEND_PATTERNS = ("frontend/**",)
+FRONTEND_PATTERNS = ("frontend/**", "scripts/intelligence-ui/**")
 
 DATA_PATTERNS = (
     "data/**",

@@ -115,8 +115,10 @@ def list_forecasts(
         "offset",
         "view_sha256",
     }
-    if set(request.query_params) - allowed:
-        raise HTTPException(422, detail="intelligence_query_unknown")
+    if set(request.query_params) - allowed or any(
+        len(request.query_params.getlist(key)) != 1 for key in request.query_params
+    ):
+        raise HTTPException(422, detail="intelligence_query_unknown_or_repeated")
     return read_forecasts(
         principal,
         {

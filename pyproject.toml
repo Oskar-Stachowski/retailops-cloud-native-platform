@@ -129,6 +129,7 @@ files = [
   "services/api/app/auth/roles.py",
   "services/api/app/core/config.py",
   "services/api/app/core/correlation.py",
+  "services/api/app/core/intelligence_cache.py",
   "services/api/app/db/instrumentation.py",
   "services/api/app/services/serialization.py",
   "services/api/app/auth/intelligence.py",

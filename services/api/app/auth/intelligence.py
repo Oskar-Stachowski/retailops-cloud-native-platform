@@ -6,7 +6,6 @@ import hashlib
 import hmac
 import os
 import stat
-from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -39,19 +38,19 @@ class IntelligenceAccessPolicy(PrivateContract):
     principals: tuple[IntelligencePrincipal, ...] = Field(min_length=1, max_length=32)
 
 
-@lru_cache
 def access_policy() -> IntelligenceAccessPolicy | None:
     path = os.getenv("RETAILOPS_INTELLIGENCE_ACCESS_POLICY")
     if not path:
         return None
     try:
-        descriptor = os.open(Path(path), os.O_RDONLY | os.O_NOFOLLOW)
+        descriptor = os.open(Path(path), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
         with os.fdopen(descriptor, "rb") as stream:
             info = os.fstat(stream.fileno())
             if (
                 not stat.S_ISREG(info.st_mode)
                 or info.st_uid != os.geteuid()
                 or info.st_mode & 0o077
+                or info.st_nlink != 1
             ):
                 raise ValueError
             raw = stream.read(65537)

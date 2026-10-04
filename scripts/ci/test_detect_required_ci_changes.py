@@ -22,6 +22,9 @@ class RequiredCIPathDetectionTests(unittest.TestCase):
             {"frontend", "docker", "security"},
         )
 
+    def test_intelligence_ui_runtime_is_required(self) -> None:
+        self.assert_gates(["scripts/intelligence-ui/drill.py"], {"frontend", "docker", "security"})
+
     def test_docker_compose_change(self) -> None:
         for path in ("docker-compose.yml", "compose.yaml", "images/api/Dockerfile"):
             with self.subTest(path=path):

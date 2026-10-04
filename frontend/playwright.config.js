@@ -28,7 +28,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      testIgnore: "**/frontend-api-evidence.spec.js",
+      testIgnore: ["**/frontend-api-evidence.spec.js", "**/intelligence-forecasts.spec.js"],
       use: { ...devices["Desktop Chrome"] },
     },
     {
@@ -36,6 +36,12 @@ export default defineConfig({
       testMatch: "**/frontend-api-evidence.spec.js",
       timeout: 180_000,
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "intelligence-chromium",
+      testMatch: "**/intelligence-forecasts.spec.js",
+      timeout: 180_000,
+      use: { ...devices["Desktop Chrome"], trace: "off", screenshot: "off" },
     },
   ],
 });

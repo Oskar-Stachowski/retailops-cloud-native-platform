@@ -20,7 +20,6 @@ from confluent_kafka.admin import AdminClient, NewTopic
 from fastapi.testclient import TestClient
 from test_realtime_durability import docker, runtime as runtime, wait_db
 
-from app.auth.intelligence import access_policy
 from app.main import app
 from app.repositories.intelligence_repository import IntelligenceRepository
 from app.repositories.realtime_quarantine_repository import RealtimeQuarantineRepository
@@ -130,13 +129,8 @@ def context(intelligence_runtime, monkeypatch, tmp_path):
     }))
     policy.chmod(0o600)
     monkeypatch.setenv("RETAILOPS_INTELLIGENCE_ACCESS_POLICY", str(policy))
-    access_policy.cache_clear()
-    try:
-        yield SimpleNamespace(**vars(intelligence_runtime), group=group, initial=initial,
-                              headers={"Authorization": "Bearer " + token}, policy=policy)
-    finally:
-        access_policy.cache_clear()
-
+    yield SimpleNamespace(**vars(intelligence_runtime), group=group, initial=initial,
+                          headers={"Authorization": "Bearer " + token}, policy=policy)
 
 def config(context):
     return RealtimeConsumerRunnerConfig(
@@ -331,7 +325,7 @@ def test_db_and_quarantine_outage_does_not_ack_or_skip_a_later_record(context):
         with pytest.raises(psycopg.Error):
             run(context, count=2, kafka=Outage())
         with TestClient(app) as api:
-            assert api.get(READ_PATH, headers=context.headers).status_code == 503
+        assert api.get(READ_PATH, headers=context.headers).status_code == 503
     finally:
         docker("start", context.pg)
         wait_db(context.db)
@@ -367,5 +361,4 @@ def test_pagination_over_100_is_scoped_bounded_and_detects_a_changed_view(contex
         run(context)
         assert api.get(READ_PATH, params=second_query, headers=context.headers).status_code == 409
         context.policy.chmod(0o644)
-        access_policy.cache_clear()
-        assert api.get(READ_PATH, headers=context.headers).status_code == 503
+            assert api.get(READ_PATH, headers=context.headers).status_code == 503
