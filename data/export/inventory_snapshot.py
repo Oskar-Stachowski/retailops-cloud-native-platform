@@ -282,7 +282,15 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
                 table["schema"] == spec.columns(name)
                 and table["grain"] == grain(name)
                 and table["data_class"] == data_class(name)
-                and table["partition_source_field"] is None,
+                and (
+                    table["partition_source_field"] is None
+                    or (
+                        table["partition_source_field"] == "business_date"
+                        and "business_date" in schema.names
+                        and parent["descriptor"]["resolved_parameters"]["profile"]
+                        == "ai-07-portfolio-v1"
+                    )
+                ),
                 "Inventory schema/grain/class differs.",
             )
             require(
