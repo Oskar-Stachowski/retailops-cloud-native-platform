@@ -129,6 +129,12 @@ są wykonywane przed broad regression; broad ich nie powtarza. Artefakt
 `intelligence-suggestion-evidence` zawiera raport pinów i JUnit rzeczywistych
 testów trwałości. Bramka UI prognoz dalej używa własnego PG/Chromium.
 
+Starszy test restartu brokera może dostać przejściowe `NOT_COORDINATOR` podczas
+samego odczytu zachowanych offsetów. Pomocnik obserwacji ma limit 10 sekund
+i ponawia wyłącznie cztery błędy gotowości koordynatora. Nie wykonuje commit ani
+resetu, błędy autoryzacji przerywają go natychmiast. Worker, ACK i fencing nie
+zmieniają zachowania. Osobne testy potwierdzają deadline i brak ukrywania auth.
+
 Compose i Kubernetes migrują raz do nowego head, zapisują niepuste wyniki
 forecast/suggestion, oba inboxy i dwa transport receipts. Następnie sprawdzają
 ten sam snapshot wszystkich tabel przez upgrade, restart i rollback obrazu.
