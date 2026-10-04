@@ -3,12 +3,10 @@ services:
   broker:
     image: redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
     user: "${AI10_UID:?}:${AI10_GID:?}"
-    command: [redpanda, start, --config, /etc/redpanda/redpanda.yaml, --mode, dev-container, --smp, "1", --memory, 512M, --reserve-memory, 0M, --overprovisioned, --check=false]
+    command: [redpanda, start, --config, /private/redpanda.yaml, --mode, dev-container, --smp, "1", --memory, 512M, --reserve-memory, 0M, --overprovisioned, --check=false]
     env_file: ["${AI10_PRIVATE:?}/broker.env"]
     volumes:
-      - "${AI10_PRIVATE:?}/broker:/private:ro"
-      - "${AI10_PRIVATE:?}/broker/redpanda.yaml:/etc/redpanda/redpanda.yaml:rw"
-      - "${AI10_PRIVATE:?}/broker/bootstrap.yaml:/etc/redpanda/.bootstrap.yaml:ro"
+      - "${AI10_PRIVATE:?}/broker:/private:rw"
       - "${AI10_PRIVATE:?}/broker-data:/var/lib/redpanda/data"
     networks: [bus]
   db-ai:

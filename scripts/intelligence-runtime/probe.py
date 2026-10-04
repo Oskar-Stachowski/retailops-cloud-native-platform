@@ -100,6 +100,7 @@ def db(config: dict, role: str) -> psycopg.Connection:
 def bootstrap(config: dict) -> dict:
     with HttpClient(verify="/private/ca.crt", timeout=3) as http:
         deadline = time.monotonic() + 90
+        last = "unknown"
         while True:
             try:
                 response = http.get(
@@ -108,9 +109,10 @@ def bootstrap(config: dict) -> dict:
                 )
                 if response.status_code == 200:
                     break
-            except (URLError, OSError):
-                pass
-            require(time.monotonic() < deadline, "broker_tls_admin_not_ready")
+                last = "http_" + str(response.status_code)
+            except (URLError, OSError) as exc:
+                last = type(exc.reason if isinstance(exc, URLError) else exc).__name__
+            require(time.monotonic() < deadline, "broker_tls_admin_not_ready_" + last)
             time.sleep(1)
         require(
             http.get("https://broker:9644/v1/security/users").status_code == 401,

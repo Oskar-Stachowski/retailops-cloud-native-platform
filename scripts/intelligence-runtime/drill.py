@@ -40,7 +40,7 @@ def command(
         try:
             value = json.loads(result.stdout.strip().splitlines()[-1])
             if isinstance(value, dict) and re.fullmatch(
-                r"[A-Za-z_]{1,80}", str(value.get("code", ""))
+                r"[A-Za-z][A-Za-z0-9_]{0,79}", str(value.get("code", ""))
             ):
                 code = value["code"]
         except (ValueError, IndexError):
@@ -155,7 +155,7 @@ def prepare(private: Path, owner: Path) -> None:
     certificates(private)
     private_file(private / "broker.env", "RP_BOOTSTRAP_USER=bootstrap:" + passwords["admin"] + "\n")
     private_file(
-        private / "broker/bootstrap.yaml",
+        private / "broker/.bootstrap.yaml",
         "enable_sasl: true\nadmin_api_require_auth: true\nsuperusers: [bootstrap]\nauto_create_topics_enabled: false\nsasl_mechanisms: [SCRAM]\n",
     )
     private_file(
@@ -383,6 +383,28 @@ def main() -> int:  # noqa: PLR0915
                     output = command([*compose, *arguments], env=env, timeout=timeout)
                 except RuntimeCommandError as exc:
                     report.update(failure_stage=name, failure_code=exc.code)
+                    if name == "bootstrap_auth_and_database_roles":
+                        try:
+                            raw = command(
+                                [*compose, "logs", "--no-color", "--tail", "100", "broker"], env=env
+                            )
+                            sensitive = json.loads((private / "probe/config.json").read_text())
+                            for value in [
+                                *sensitive["passwords"].values(),
+                                *sensitive["tokens"].values(),
+                            ]:
+                                raw = raw.replace(value, "[redacted]")
+                            report["broker_diagnostics"] = [
+                                line[:800]
+                                for line in raw.splitlines()
+                                if re.search(
+                                    r"error|failed|permission|read.only|exception|fatal|panic",
+                                    line,
+                                    re.IGNORECASE,
+                                )
+                            ][-12:]
+                        except (OSError, RuntimeError, ValueError):
+                            report["broker_diagnostics"] = ["diagnostics_unavailable"]
                     raise
                 report["stages"].append(name)
                 return output
