@@ -38,6 +38,7 @@ def fingerprint() -> dict:
         str(p.relative_to(ROOT))
         for directory, pattern in (
             (ROOT / "data/dq", "*.py"),
+            (ROOT / "data/dq/contracts", "*.schema.json"),
             (ROOT / "data/inventory", "*.py"),
             (ROOT / "data/contracts", "*.schema.json"),
         )

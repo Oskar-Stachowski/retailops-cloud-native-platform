@@ -8,7 +8,9 @@ only. Later windows of all three seeds are reserved for final evaluation.
 
 This explicitly named bounded profile extends the 30-day transport fixture; it
 does not claim to be the 365-day `ai-dev` or 730-day `ai-training`. The existing
-offline whole-parent replay is bounded to 4,096 canonical events and source
+offline whole-parent replay uses the explicit 2.1 binding with an 8,192 canonical
+event limit for this profile. The unchanged 2.0 binding retains its 4,096 limit
+for earlier profiles. Source
 scenario qualification to 5,000 potential daily grains. Resource and event
 counts must pass measured acceptance before this profile is qualified.
 
