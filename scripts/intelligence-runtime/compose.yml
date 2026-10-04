@@ -48,7 +48,7 @@ services:
     user: "${AI10_UID:?}:${AI10_GID:?}"
     env_file: ["${AI10_PRIVATE:?}/consumer.env"]
     volumes: ["${AI10_PRIVATE:?}/source:/private:ro"]
-    command: [python, scripts/run_checkpointed_intelligence_consumer.py, --broker-config, /private/broker.json, --bootstrap-retained-log]
+    command: [python, -m, scripts.run_checkpointed_intelligence_consumer, --broker-config, /private/broker.json, --bootstrap-retained-log]
     networks: [source-db, bus]
     healthcheck: {disable: true}
   delivery:

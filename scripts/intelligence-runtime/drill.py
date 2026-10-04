@@ -385,6 +385,29 @@ def main() -> int:  # noqa: PLR0915
                 except RuntimeCommandError as exc:
                     report.update(failure_stage=name, failure_code=exc.code)
                     sys.stdout.write(json.dumps({"stage": name, "code": exc.code}) + "\n")
+                    if name.startswith("verify_"):
+                        try:
+                            logs = command(
+                                [*compose, "logs", "--no-color", "--tail", "30", "consumer"],
+                                env=env,
+                            )
+                            for line in logs.splitlines():
+                                payload = line.partition("|")[2].strip()
+                                try:
+                                    value = json.loads(payload)
+                                    code = str(value.get("code", ""))
+                                    if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", code):
+                                        report["consumer_failure_code"] = code
+                                except (ValueError, AttributeError):
+                                    if "ModuleNotFoundError" in line:
+                                        report["consumer_failure_code"] = "ModuleNotFoundError"
+                            if report.get("consumer_failure_code"):
+                                sys.stdout.write(
+                                    json.dumps({"consumer_code": report["consumer_failure_code"]})
+                                    + "\n"
+                                )
+                        except (OSError, RuntimeError, ValueError):
+                            pass
                     if name == "bootstrap_auth_and_database_roles":
                         try:
                             raw = command(
