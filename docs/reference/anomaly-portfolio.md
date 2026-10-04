@@ -39,3 +39,31 @@ CLI generation uses `python -m data.anomalies.run_source --profile
 ai-07-portfolio-v1 --seed 42 --portfolio demand` (or `physical`) with explicit
 output storage and receipt paths. This document freezes preparation only;
 AI07 ready requires downstream quality, lifecycle and serving acceptance.
+
+## Explicit supply-adequate profile v2
+
+`ai-07-portfolio-v2` keeps the same 128-day calendar, eight products, two stock
+locations, seeds and temporal splits. It declares two selling pairs: store and
+online at one physical selling location. Online has a continuous calendar;
+store closures remain real exclusions. The potential sales panel is 2,048 slots.
+
+V2 declares opening inventory 256, reorder point 128, safety stock 64 and minimum
+order quantity 64. Supplier delays and the real inventory process remain active.
+Ordinary base demand is multiplied by 0.75 before sampling, interventions and
+facts. This is a whole-process profile setting, independent of truth labels,
+evaluation windows and model decisions. It keeps the complete event census
+inside the existing 8,192-event capture budget. Nothing is sampled or truncated.
+V1 and legacy defaults remain unchanged.
+
+The source comparison on v1 showed that ordinary supply exhaustion could mask
+the demand interventions. V2 makes ordinary availability explicit so the five
+intervention types can be evaluated against native observations. It remains a
+small synthetic qualification profile, not `ai-training` or production evidence.
+
+Generate each seed/scenario with `--profile ai-07-portfolio-v2`. Prepare parents
+with `python scripts/data/prepare_ai07_portfolio.py --source SOURCE
+--output-root data/generated/ai07-parents/CASE-SEED --bundle BUNDLE.json`.
+Use a separate output root per case when running preparations concurrently:
+the generated-directory guard also examines temporary files in its target.
+The preparation verifies native source facts, typed partitioned snapshot03,
+day coverage and the complete DQ fixture, including expected-action accounting.
