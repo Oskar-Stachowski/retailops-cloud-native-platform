@@ -26,5 +26,7 @@
   "event_adapter_status": "fixture_only",
   "real_assistant_outbox_publication": false,
   "model_quality_qualification": false,
-  "relationships": "candidate canonical UTC identity, 300-second lifetime, UUID5 trace/answer/recommendation binding from pinned assistant service"
+  "relationships": "candidate canonical UTC identity, 300-second lifetime, UUID5 trace/answer/recommendation binding from pinned assistant service",
+  "owner_commit_remote_available": false,
+  "verification_mode": "ci_vendored_schema_sha256_and_envelope_only_owner_code_checked_locally"
 }

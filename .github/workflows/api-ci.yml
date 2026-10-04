@@ -76,14 +76,6 @@ jobs:
           path: .ci-source-rest-client
           persist-credentials: false
 
-      - name: Checkout pinned AI12 suggestion schema owner
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-        with:
-          repository: Oskar-Stachowski/retailops-ai-intelligence
-          ref: a14b7899d9366c6ae555c0b6be4a8d027514ca91
-          path: .ci-suggestion-owner
-          persist-credentials: false
-
       - name: Require actual cross-repo HTTP and PostgreSQL test
         working-directory: .
         run: |
@@ -119,7 +111,7 @@ jobs:
           python -m mypy --config-file pyproject.toml scripts/source-bundles
           PYTHONPATH=services/api python services/api/scripts/export_source_read_contract.py --check
           python services/api/scripts/check_intelligence_head_owner.py --owner-root .ci-source-rest-client
-          RETAILOPS_ENABLE_SUGGESTION_FIXTURE_TRANSPORT=1 PYTHONPATH=services/api python services/api/scripts/check_suggestion_contract.py --owner-root .ci-suggestion-owner | tee ci-cd/reports/api/suggestion-contract.json
+          RETAILOPS_ENABLE_SUGGESTION_FIXTURE_TRANSPORT=1 PYTHONPATH=services/api python services/api/scripts/check_suggestion_contract.py | tee ci-cd/reports/api/suggestion-contract.json
           python -m bandit \
             --severity-level high \
             --confidence-level high \

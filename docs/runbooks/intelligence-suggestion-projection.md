@@ -7,7 +7,13 @@ Ten przyrost dostarcza odbiór fixture `recommendation_generated` na istniejący
 osobisty odczyt HTTP. Schemat `PersistedSuggestion` i schemat kandydata są kopiami
 **identycznych bajtów** z AI12 `a14b7899d9366c6ae555c0b6be4a8d027514ca91`.
 `owner.json` przypina również kod walidatorów, kanonikalizacji i tworzenia UUID.
-CI pobiera ten dokładny commit i sprawdza wszystkie checksumy.
+Commit AI12 jest lokalny i jeszcze nieopublikowany. Schematy porównano lokalnie
+z niezmiennymi plikami przez `git show`; checker opcjonalnie używa `--owner-root`
+do ponownego porównania kodu właściciela na tym komputerze. CI sprawdza checksumy
+zapisanych schematów, zgodność envelope z payloadem i mechanikę adaptera.
+**CI nie sprawdza uruchomienia oryginalnego kodu AI12 ani zdalnej dostępności
+tego commita.** Prywatny kod AI12 nie jest kopiowany do repozytorium RetailOps;
+nie publikujemy ani nie modyfikujemy jego sesji/brancha.
 
 **Status adaptera: `fixture_only`.** AI12 w tym commicie zapisuje sugestie we
 własnej bazie asystenta; nie ma uzgodnionego emitera outbox dla tego eventu.

@@ -12,7 +12,7 @@ from app.services.intelligence_contract import TOPIC, validate_event
 from app.services.intelligence_suggestion_contract import CONTRACT_DIR, suggestion_validator
 
 
-def check(owner_root: Path) -> None:
+def check(owner_root: Path | None = None) -> None:
     pin = json.loads((CONTRACT_DIR / "owner.json").read_bytes())
     if (
         pin["event_adapter_status"] != "fixture_only"
@@ -22,11 +22,17 @@ def check(owner_root: Path) -> None:
         msg = "suggestion_adapter_qualification_changed"
         raise ValueError(msg)
     for relative, expected in pin["upstream_sha256"].items():
-        if hashlib.sha256((owner_root / relative).read_bytes()).hexdigest() != expected:
+        if (
+            owner_root is not None
+            and hashlib.sha256((owner_root / relative).read_bytes()).hexdigest() != expected
+        ):
             msg = "suggestion_owner_pin_changed"
             raise ValueError(msg)
     for name, relative in pin["upstream_paths"].items():
-        if (CONTRACT_DIR / name).read_bytes() != (owner_root / relative).read_bytes():
+        if (
+            hashlib.sha256((CONTRACT_DIR / name).read_bytes()).hexdigest()
+            != pin["upstream_sha256"][relative]
+        ):
             msg = "suggestion_owner_schema_changed"
             raise ValueError(msg)
     for name, expected in pin["local_sha256"].items():
@@ -48,6 +54,9 @@ def check(owner_root: Path) -> None:
                 "status": "passed",
                 "owner_commit": pin["commit"],
                 "event_adapter_status": "fixture_only",
+                "verification_mode": pin["verification_mode"],
+                "owner_code_verified_in_this_run": owner_root is not None,
+                "owner_code_published": False,
             }
         )
         + "\n"
@@ -56,5 +65,5 @@ def check(owner_root: Path) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--owner-root", type=Path, required=True)
+    parser.add_argument("--owner-root", type=Path)
     check(parser.parse_args().owner_root)
