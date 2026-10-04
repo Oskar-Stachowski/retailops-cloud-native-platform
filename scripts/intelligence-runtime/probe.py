@@ -246,6 +246,7 @@ def negative_auth(config: dict) -> list[str]:
             **config["broker"]["ai"],
             "group.id": "forbidden-producer-group",
             "enable.auto.commit": False,
+            "enable.auto.offset.store": False,
         }
     )
     try:
@@ -255,11 +256,17 @@ def negative_auth(config: dict) -> list[str]:
             message = client.poll(1)
             if message is not None:
                 error = message.error()
+                if error is None:
+                    raise ProbeError("producer_fetch_unexpected_record")
+                if error.code() == KafkaError.TOPIC_AUTHORIZATION_FAILED:
+                    break
+                # Manual assignment can also report the independently denied
+                # group coordinator. That is not evidence of denied topic Read;
+                # keep polling until the actual Fetch authorization fails.
                 require(
-                    error is not None and error.code() == KafkaError.TOPIC_AUTHORIZATION_FAILED,
-                    "producer_fetch_denied",
+                    error.code() == KafkaError.GROUP_AUTHORIZATION_FAILED,
+                    "producer_fetch_unexpected_" + error.name(),
                 )
-                break
             require(time.monotonic() < deadline, "producer_fetch_denial_missing")
     finally:
         client.close()
