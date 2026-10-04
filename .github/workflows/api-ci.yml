@@ -102,10 +102,13 @@ jobs:
           set -euo pipefail
           python -m ruff check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
           python -m ruff check scripts/intelligence-runtime scripts/ci/test_intelligence_runtime.py --config pyproject.toml
+          python -m ruff check scripts/source-bundles --config pyproject.toml
           python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
           python -m ruff format --check scripts/intelligence-runtime scripts/ci/test_intelligence_runtime.py --config pyproject.toml
+          python -m ruff format --check scripts/source-bundles --config pyproject.toml
           python -m mypy --config-file pyproject.toml
           python -m mypy --config-file pyproject.toml scripts/intelligence-runtime
+          python -m mypy --config-file pyproject.toml scripts/source-bundles
           PYTHONPATH=services/api python services/api/scripts/export_source_read_contract.py --check
           python services/api/scripts/check_intelligence_head_owner.py --owner-root .ci-source-rest-client
           python -m bandit \

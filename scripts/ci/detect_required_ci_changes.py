@@ -62,6 +62,7 @@ DOCKER_PATTERNS = (
     ".env.example",
     "scripts/db/**",
     "scripts/intelligence-runtime/**",
+    "scripts/source-bundles/**",
 )
 
 TERRAFORM_PATTERNS = (
