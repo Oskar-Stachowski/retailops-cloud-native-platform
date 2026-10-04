@@ -112,6 +112,14 @@ jobs:
             -f txt \
             -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
 
+      - name: Verify atomic checkpoint durability before broad regression
+        env:
+          REQUIRE_BROKER_TESTS: "1"
+        run: |
+          rm -f .coverage .coverage.*
+          python -m pytest -q -x tests/test_intelligence_checkpoint_durability.py \
+            --cov=app --cov-branch --cov-report= --cov-fail-under=0
+
       - name: Verify fixed-origin ML assessment contract
         working-directory: .
         run: |
@@ -149,9 +157,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ../../ci-cd/reports/api
-          rm -f .coverage .coverage.*
           pytest \
+            --ignore=tests/test_intelligence_checkpoint_durability.py \
             --cov=app \
+            --cov-append \
             --cov-report=term-missing \
             --cov-branch \
             --cov-fail-under=80 \

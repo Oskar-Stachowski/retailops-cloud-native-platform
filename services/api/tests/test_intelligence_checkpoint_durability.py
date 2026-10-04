@@ -12,7 +12,7 @@ from uuid import uuid4
 
 import psycopg
 import pytest
-from confluent_kafka import Producer, TopicPartition
+from confluent_kafka import Producer, TopicCollection, TopicPartition
 from fastapi.testclient import TestClient
 from test_intelligence_durability import (
     READ_PATH,
@@ -109,6 +109,26 @@ def claim(context, *, owner=None, committed=None, bootstrap=True, **changes):
     )
     values.update(changes)
     return IntelligenceCheckpointStore().claim(**values)
+
+
+def test_real_broker_exposes_nonzero_cluster_and_topic_identity(context):
+    instance = runner(context)
+    try:
+        admin = instance.topology.admin
+        cluster = admin.describe_cluster(request_timeout=5).result(timeout=6)
+        topic = admin.describe_topics(TopicCollection([TOPIC]), request_timeout=5)[TOPIC].result(
+            timeout=6
+        )
+        assert cluster.cluster_id is not None, "DescribeCluster did not return a cluster ID"
+        assert topic.topic_id is not None, "DescribeTopics did not return a topic UUID"
+        assert str(topic.topic_id) != "AAAAAAAAAAAAAAAAAAAAAA", (
+            "DescribeTopics returned the zero UUID"
+        )
+        stream, partitions = instance.topology.inspect()
+        assert stream == StreamIdentity(str(cluster.cluster_id), str(topic.topic_id))
+        assert partitions == (0, 1)
+    finally:
+        instance.client.close()
 
 
 def test_two_partition_receipts_preserve_original_read_payload_and_deduplicate_business_event(

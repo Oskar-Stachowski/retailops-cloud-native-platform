@@ -264,7 +264,9 @@ def test_topology_rejects_compaction(policy):
             )
         )
     }
-    admin.list_topics.return_value = SimpleNamespace(cluster_id="fixture-cluster")
+    admin.describe_cluster.return_value.result.return_value = SimpleNamespace(
+        cluster_id="fixture-cluster"
+    )
     admin.describe_configs.side_effect = lambda resources, **kwargs: {
         resources[0]: Mock(
             result=Mock(return_value={"cleanup.policy": SimpleNamespace(value=policy)})
@@ -331,3 +333,60 @@ def test_private_fifo_is_rejected_without_waiting_for_a_writer(tmp_path):
     os.mkfifo(path, 0o600)
     with pytest.raises(ValueError, match="private_broker_file_required"):
         CheckpointBrokerConfig.read_private(path)
+
+
+@pytest.mark.parametrize(
+    "cluster_id,topic_id",
+    [
+        (None, "fixture-topic"),
+        ("fixture-cluster", None),
+        ("fixture-cluster", "AAAAAAAAAAAAAAAAAAAAAA"),
+    ],
+)
+def test_topology_refuses_unavailable_cluster_or_topic_identity(cluster_id, topic_id):
+    admin = Mock()
+    admin.describe_topics.return_value = {
+        TOPIC: Mock(
+            result=Mock(
+                return_value=SimpleNamespace(
+                    topic_id=topic_id,
+                    partitions=[SimpleNamespace(id=0)],
+                )
+            )
+        )
+    }
+    admin.describe_cluster.return_value.result.return_value = SimpleNamespace(cluster_id=cluster_id)
+    admin.describe_configs.side_effect = lambda resources, **kwargs: {
+        resources[0]: Mock(
+            result=Mock(return_value={"cleanup.policy": SimpleNamespace(value="delete")})
+        ),
+    }
+    with pytest.raises(CheckpointError, match="broker_stream_identity_unavailable"):
+        BrokerTopology(admin).inspect()
+
+
+def test_topology_uses_awaited_cluster_identity_without_cached_list_topics():
+    admin = Mock()
+    admin.describe_topics.return_value = {
+        TOPIC: Mock(
+            result=Mock(
+                return_value=SimpleNamespace(
+                    topic_id="fixture-topic",
+                    partitions=[SimpleNamespace(id=0), SimpleNamespace(id=1)],
+                )
+            )
+        )
+    }
+    admin.describe_cluster.return_value.result.return_value = SimpleNamespace(
+        cluster_id="fixture-cluster"
+    )
+    admin.list_topics.return_value = SimpleNamespace(cluster_id=None)
+    admin.describe_configs.side_effect = lambda resources, **kwargs: {
+        resources[0]: Mock(
+            result=Mock(return_value={"cleanup.policy": SimpleNamespace(value="delete")})
+        ),
+    }
+    assert BrokerTopology(admin).inspect() == (STREAM, (0, 1))
+    admin.list_topics.assert_not_called()
+    admin.describe_cluster.assert_called_once_with(request_timeout=5)
+    admin.describe_cluster.return_value.result.assert_called_once_with(timeout=6)

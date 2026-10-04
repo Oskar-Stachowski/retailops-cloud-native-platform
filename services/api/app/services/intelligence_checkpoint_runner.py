@@ -128,7 +128,9 @@ class BrokerTopology:
         description = self.admin.describe_topics(TopicCollection([TOPIC]), request_timeout=5)[
             TOPIC
         ].result(timeout=6)
-        metadata = self.admin.list_topics(topic=TOPIC, timeout=5)
+        # list_topics() exposes a cached cluster ID and may return None even
+        # after a successful metadata request. DescribeCluster awaits its ID.
+        cluster = self.admin.describe_cluster(request_timeout=5).result(timeout=6)
         resource = ConfigResource(ResourceType.TOPIC, TOPIC)
         configuration = self.admin.describe_configs([resource], request_timeout=5)[resource].result(
             timeout=6
@@ -145,10 +147,10 @@ class BrokerTopology:
         ):
             msg = "checkpoint_partition_limit"
             raise CheckpointError(msg)
-        if metadata.cluster_id is None or description.topic_id is None:
+        if cluster.cluster_id is None or description.topic_id is None:
             msg = "broker_stream_identity_unavailable"
             raise CheckpointError(msg)
-        return StreamIdentity(str(metadata.cluster_id), str(description.topic_id)), partitions
+        return StreamIdentity(str(cluster.cluster_id), str(description.topic_id)), partitions
 
 
 def broker_commits(client: Consumer, partitions: list[TopicPartition]) -> dict[int, int | None]:
