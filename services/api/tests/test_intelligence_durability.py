@@ -26,6 +26,8 @@ from app.repositories.intelligence_repository import IntelligenceRepository
 from app.repositories.realtime_quarantine_repository import RealtimeQuarantineRepository
 from app.services.intelligence_consumer import IntelligenceEventConsumer
 from app.services.intelligence_contract import CONTRACT_DIR, EVENT_NAMESPACE, TOPIC, content_hash
+from app.services.intelligence_checkpoint import CheckpointError
+from app.services.intelligence_checkpoint_runner import BrokerTopology
 from app.services.realtime_consumer_runner import (
     RealtimeConsumerRunnerConfig,
     RealtimeKafkaConsumerRunner,
@@ -72,6 +74,24 @@ def intelligence_runtime(runtime):
     admin.create_topics([
         NewTopic(TOPIC, num_partitions=2, replication_factor=1)
     ])[TOPIC].result(timeout=15)
+    # A broker accepting topics/offset reads may still lack its durable cluster
+    # identity immediately after startup. Establish the real precondition before
+    # exercising fail-stop workers; do not relax or retry their identity guard.
+    topology = BrokerTopology(admin)
+    deadline = time.monotonic() + 45
+    while True:
+        try:
+            _, partitions = topology.inspect()
+            assert partitions == (0, 1)
+            break
+        except CheckpointError as exc:
+            if str(exc) != "broker_stream_identity_unavailable":
+                raise
+        except KafkaException:
+            pass
+        if time.monotonic() >= deadline:
+            pytest.fail("Intelligence broker durable cluster/topic identity did not become ready")
+        time.sleep(0.2)
     return runtime
 
 
