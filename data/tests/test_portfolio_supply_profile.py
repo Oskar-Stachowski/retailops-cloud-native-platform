@@ -1,7 +1,10 @@
 """The supply-adequate benchmark is explicit and keeps legacy profile policies intact."""
 
+from datetime import timedelta
+
 from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
 from data.inventory.run_source_dataset import default_inventory_config
+from data.generator.main import build_dataset
 
 
 def test_versioned_supply_profile_keeps_the_full_census_within_original_capture_budget():
@@ -19,3 +22,17 @@ def test_versioned_supply_profile_keeps_the_full_census_within_original_capture_
     assert resolved.max_daily_rows == 2048
     assert adequate.fulfillment == legacy.fulfillment
     assert adequate.sale_availability_delay_seconds == legacy.sale_availability_delay_seconds
+
+
+def test_supply_profile_has_native_online_history_for_all_physical_scenario_products():
+    generation = DatasetGenerationConfig(profile="ai-07-portfolio-v2")
+    tables = build_dataset(generation)
+    assert len(tables["selling_locations"]) == 1
+    assert {a["channel"] for a in tables["channel_assignments"]} == {"store", "online"}
+    grouped = {}
+    start = resolve_generation_config(generation).start_date
+    required = {(start + timedelta(days=i)).isoformat() for i in range(28, 128)}
+    for r in tables["daily_demand_truth"]:
+        if r["channel"] == "online":
+            grouped.setdefault(r["product_id"], set()).add(r["business_date"])
+    assert sum(required <= days for days in grouped.values()) >= 4
