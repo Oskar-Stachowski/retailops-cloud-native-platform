@@ -10,6 +10,7 @@ import ssl
 import sys
 import time
 from pathlib import Path
+from typing import Self
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPSHandler, ProxyHandler, Request, build_opener
 
@@ -61,7 +62,7 @@ class HttpClient:
             ProxyHandler({}), HTTPSHandler(context=ssl.create_default_context(cafile=verify))
         )
 
-    def __enter__(self) -> HttpClient:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_args: object) -> None:
@@ -75,7 +76,7 @@ class HttpClient:
             values["Authorization"] = (
                 "Basic " + base64.b64encode((auth[0] + ":" + auth[1]).encode()).decode()
             )
-        request = Request(self.base_url + url, headers=values)
+        request = Request(self.base_url + url, headers=values)  # noqa: S310 - fixed private HTTP(S) endpoints
         try:
             with self.opener.open(request, timeout=self.timeout) as response:
                 return HttpResponse(response.status, response.read(65537))
