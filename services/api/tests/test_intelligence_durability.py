@@ -132,6 +132,7 @@ def context(intelligence_runtime, monkeypatch, tmp_path):
     yield SimpleNamespace(**vars(intelligence_runtime), group=group, initial=initial,
                           headers={"Authorization": "Bearer " + token}, policy=policy)
 
+
 def config(context):
     return RealtimeConsumerRunnerConfig(
         bootstrap_servers=context.bootstrap, group_id=context.group, client_id=context.group,
@@ -325,7 +326,7 @@ def test_db_and_quarantine_outage_does_not_ack_or_skip_a_later_record(context):
         with pytest.raises(psycopg.Error):
             run(context, count=2, kafka=Outage())
         with TestClient(app) as api:
-        assert api.get(READ_PATH, headers=context.headers).status_code == 503
+            assert api.get(READ_PATH, headers=context.headers).status_code == 503
     finally:
         docker("start", context.pg)
         wait_db(context.db)
@@ -361,4 +362,4 @@ def test_pagination_over_100_is_scoped_bounded_and_detects_a_changed_view(contex
         run(context)
         assert api.get(READ_PATH, params=second_query, headers=context.headers).status_code == 409
         context.policy.chmod(0o644)
-            assert api.get(READ_PATH, headers=context.headers).status_code == 503
+        assert api.get(READ_PATH, headers=context.headers).status_code == 503
