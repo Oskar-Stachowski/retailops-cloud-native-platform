@@ -38,9 +38,14 @@ class StreamIdentity:
         if any(
             not value
             or len(value) > 128
-            or not re.fullmatch(r"[A-Za-z0-9._:-]+", value)
+            or not re.fullmatch(pattern, value)
             or value == "AAAAAAAAAAAAAAAAAAAAAA"
-            for value in (self.cluster_id, self.topic_id)
+            for value, pattern in (
+                (self.cluster_id, r"[A-Za-z0-9._:-]+"),
+                # confluent_kafka.Uuid uses standard unpadded Base64, including
+                # '+' and '/'. Preserve its exact bytes; do not rewrite DB pins.
+                (self.topic_id, r"[A-Za-z0-9._:+/-]+"),
+            )
         ):
             msg = "broker_stream_identity_unavailable"
             raise CheckpointError(msg)

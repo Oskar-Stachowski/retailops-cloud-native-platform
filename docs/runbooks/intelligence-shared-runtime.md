@@ -6,6 +6,11 @@ It uses separate PostgreSQL servers, databases, credentials and database network
 and one private Redpanda broker with verified TLS, SCRAM-SHA-256 and literal ACLs.
 It does not join either repository's running Compose project or expose host ports.
 
+The checkpoint identity accepts the actual SDK's unpadded standard Base64 topic
+UUID, including `+` and `/`, and preserves the exact stored representation. Empty
+and zero UUIDs still fail. Discovery awaits the cluster before topic metadata;
+test setup verifies a real cluster/topic identity before starting a worker.
+
 ## Scope of the evidence
 
 The AI input is the owner's explicitly named `retailops-demand-forecast-v12-mechanics`

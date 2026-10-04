@@ -395,3 +395,17 @@ def test_topology_uses_awaited_cluster_identity_without_cached_list_topics():
     assert [call[0] for call in admin.mock_calls].index("describe_cluster().result") < [
         call[0] for call in admin.mock_calls
     ].index("describe_topics")
+
+
+@pytest.mark.parametrize("bits", [b"\xff" * 16, b"\xfb" * 16])
+def test_sdk_uuid_base64_symbols_are_preserved_without_changing_durable_pins(bits):
+    from confluent_kafka import Uuid
+
+    identifier = Uuid(
+        int.from_bytes(bits[:8], "big", signed=True),
+        int.from_bytes(bits[8:], "big", signed=True),
+    )
+    native = str(identifier)
+    assert "+" in native or "/" in native
+    assert native != "AAAAAAAAAAAAAAAAAAAAAA"
+    assert StreamIdentity("fixture-cluster", native).topic_id == native

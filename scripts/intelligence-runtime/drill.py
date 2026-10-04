@@ -384,6 +384,7 @@ def main() -> int:  # noqa: PLR0915
                     output = command([*compose, *arguments], env=env, timeout=timeout)
                 except RuntimeCommandError as exc:
                     report.update(failure_stage=name, failure_code=exc.code)
+                    sys.stdout.write(json.dumps({"stage": name, "code": exc.code}) + "\n")
                     if name == "bootstrap_auth_and_database_roles":
                         try:
                             raw = command(
