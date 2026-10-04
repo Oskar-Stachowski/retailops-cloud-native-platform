@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from data.generator.common import deterministic_uuid
 from data.generator.demand_schema import DEMAND_VERSION
+from data.generator.stockout_stress import anomaly_factor
 
 if TYPE_CHECKING:
     from data.generator.commerce_pricing import CommercePricing
@@ -108,7 +109,7 @@ def daily_demand(
         "lifecycle_factor": str(lifecycle),
         "price_factor": str(price_factor),
         "promotion_factor": str(promotion_factor),
-        "anomaly_factor": "1",
+        "anomaly_factor": str(anomaly_factor(config, product["id"], day)),
         "noise": str(Decimal(str(rng.uniform(0.78, 1.24)))),
     }
     rate, draw = expected_demand(factors), Decimal(str(rng.random()))
