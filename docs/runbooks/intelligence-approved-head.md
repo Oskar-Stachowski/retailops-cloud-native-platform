@@ -55,6 +55,10 @@ ani na współdzielonym stosie. Pliki prywatne pozostają poza Git.
    `scripts/forecast_v12_queue.py`. Ustaw `umask 077`. Użyj własnego pipeline
    policy/credentials i konkretnego run ID. Zwykły wynik obliczeń bez publikacji
    nie jest dopuszczalnym wejściem.
+   Publikacja eventów wymaga jawnego `publish --integration-events`; dostarcz
+   outbox według runbooka v2 na własnym runtime przed rozpoczęciem krótkiego
+   review window. Retry istniejącej publikacji może uzupełnić outbox, ale
+   nie odnawia dopuszczenia.
 3. Z tych trzech plików przygotuj **cały** event export, używając istniejącego
    `forecast_events`. Nie sklejaj kilku runów ani stron z innym view hash.
    Przykład do wykonania w venv AI (ścieżki zastąp własnymi):
@@ -86,7 +90,7 @@ ani na współdzielonym stosie. Pliki prywatne pozostają poza Git.
 
    ```sh
    umask 077
-   AI10_REVIEWED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+   AI10_REVIEWED_AT=$(.venv/bin/python -c 'from datetime import UTC, datetime; print(datetime.now(UTC).isoformat())')
    .venv/bin/python scripts/mlflow_v12_lifecycle.py \
      --env-file /private/ai10/ai.env \
      --policy-file /private/ai10/operator-policy.json \

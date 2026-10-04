@@ -250,6 +250,36 @@ def test_active_openapi_has_the_original_payload_and_requires_credential():
     }
 
 
+def test_active_errors_preserve_existing_api_envelope(monkeypatch):
+    principal = IntelligencePrincipal.model_validate_json(
+        json.dumps(
+            {
+                "principal_id": "reader",
+                "credential_sha256": "a" * 64,
+                "capabilities": ["forecast:read"],
+                "product_ids": ["fixture-product"],
+                "selling_location_ids": ["fixture-store"],
+                "channels": ["store"],
+                "release_ids": ["v12-model-release-sha256-" + "a" * 64],
+            }
+        )
+    )
+    app.dependency_overrides[verified_principal] = lambda: principal
+    monkeypatch.setattr(
+        "app.api.intelligence.read_active_forecasts",
+        Mock(side_effect=HTTPException(503, detail="intelligence_head_incomplete")),
+    )
+    try:
+        with TestClient(app) as client:
+            response = client.get("/intelligence/v2/forecasts/active")
+        assert response.status_code == 503
+        assert response.json() == {
+            "error": {"code": "http_error", "message": "intelligence_head_incomplete"},
+        }
+    finally:
+        app.dependency_overrides.clear()
+
+
 @pytest.mark.parametrize(
     "change", ["success", "old_review", "future_review", "rejected", "wrong_release"]
 )

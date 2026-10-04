@@ -48,7 +48,9 @@ def test_read_budget_counts_real_payload_bytes_before_fetch(context, selected, m
     monkeypatch.setattr("app.services.intelligence_head.MAX_PUBLICATION_BYTES", 1)
     response = get(context)
     assert response.status_code == 429
-    assert response.json() == {"detail": "intelligence_head_read_budget"}
+    assert response.json() == {
+        "error": {"code": "http_error", "message": "intelligence_head_read_budget"}
+    }
 
 
 def project(events):
@@ -93,7 +95,9 @@ def test_partial_delivery_and_uncommitted_tail_cannot_activate(context, selected
     project(events[:-1])
     response = get(context, limit=1)
     assert response.status_code == 503
-    assert response.json() == {"detail": "intelligence_head_incomplete"}
+    assert response.json() == {
+        "error": {"code": "http_error", "message": "intelligence_head_incomplete"}
+    }
     with psycopg.connect(context.db, row_factory=psycopg.rows.dict_row) as connection:
         IntelligenceRepository().project_on_connection(connection, events[-1])
         assert get(context, limit=1).status_code == 503
@@ -199,7 +203,7 @@ def test_owner_review_window_is_enforced_without_renewal_from_received_time(
     store_policy(path, selected_policy(events, reviewed_at=datetime.now(UTC) + delta))
     response = get(context)
     assert response.status_code == 503
-    assert response.json()["detail"] == (
+    assert response.json()["error"]["message"] == (
         "intelligence_head_approval_expired"
         if timing == "expired"
         else "intelligence_head_review_in_future"
