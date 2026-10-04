@@ -75,6 +75,7 @@ jobs:
           python -m ruff check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
           python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
           python -m mypy --config-file pyproject.toml
+          PYTHONPATH=services/api python services/api/scripts/export_source_read_contract.py --check
           python -m bandit \
             --severity-level high \
             --confidence-level high \

@@ -131,7 +131,7 @@ class ForecastRepository:
             FROM forecasts f
             LEFT JOIN products p ON p.id = f.product_id
             {where_clause}
-            ORDER BY {sort_column} {direction}, f.generated_at DESC
+            ORDER BY {sort_column} {direction}, f.generated_at DESC, f.id ASC
             LIMIT %s OFFSET %s;
         """  # noqa: S608 - fixed filters and allowlisted ordering; values use bound parameters
         rows = self._fetch_all(query, (*params, limit, offset))

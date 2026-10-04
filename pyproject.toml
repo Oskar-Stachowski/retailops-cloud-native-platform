@@ -137,4 +137,8 @@ files = [
   "services/api/app/services/intelligence_consumer.py",
   "services/api/app/services/intelligence_reader.py",
   "services/api/app/repositories/intelligence_repository.py",
+  "services/api/app/auth/source_reads.py",
+  "services/api/app/api/source_queries.py",
+  "services/api/app/api/source_reads.py",
+  "services/api/app/services/source_reader.py",
 ]

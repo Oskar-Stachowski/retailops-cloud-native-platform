@@ -18,6 +18,7 @@ from app.api import (
     products,
     recommendations,
     sales,
+    source_reads,
     stock_risks,
 )
 from app.api.errors import register_exception_handlers
@@ -67,6 +68,7 @@ app.include_router(stock_risks.router)
 app.include_router(me.router)
 app.include_router(notifications.router)
 app.include_router(intelligence.router)
+app.include_router(source_reads.router)
 
 _original_openapi = app.openapi
 
