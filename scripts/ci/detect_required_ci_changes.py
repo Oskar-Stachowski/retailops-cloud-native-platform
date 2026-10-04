@@ -61,6 +61,7 @@ DOCKER_PATTERNS = (
     "**/.dockerignore",
     ".env.example",
     "scripts/db/**",
+    "scripts/intelligence-runtime/**",
 )
 
 TERRAFORM_PATTERNS = (
@@ -200,8 +201,7 @@ def read_paths(*, stdin_zero_delimited: bool) -> list[str]:
 
 def append_lines(path: str, lines: Iterable[str]) -> None:
     with Path(path).open("a", encoding="utf-8") as output:
-        for line in lines:
-            output.write(f"{line}\n")
+        output.writelines(f"{line}\n" for line in lines)
 
 
 def write_summary(path: str, decision: Decision, changed_paths: list[str]) -> None:

@@ -12,6 +12,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  intelligence-runtime:
+    name: Authenticated cross-repo intelligence runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Resolve immutable intelligence runtime owner
+        id: runtime-owner
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          pin = json.loads(Path("scripts/intelligence-runtime/owner.json").read_text())
+          assert pin["repository"] == "Oskar-Stachowski/retailops-ai-intelligence"
+          assert re.fullmatch(r"[0-9a-f]{40}", pin["commit"])
+          with open(os.environ["GITHUB_OUTPUT"], "a") as stream:
+              stream.write("commit=" + pin["commit"] + "\n")
+          PY
+      - name: Checkout pinned AI outbox and isolated delivery lock
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: Oskar-Stachowski/retailops-ai-intelligence
+          ref: ${{ steps.runtime-owner.outputs.commit }}
+          path: .ci-intelligence-runtime-owner
+          persist-credentials: false
+      - name: Require actual authenticated transport and durable resume
+        run: python scripts/intelligence-runtime/drill.py --owner-root .ci-intelligence-runtime-owner
+      - name: Upload intelligence runtime acceptance receipt
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: intelligence-runtime-evidence
+          path: ci-cd/reports/intelligence-runtime/report.json
+          if-no-files-found: error
+
   compose-config:
     name: Validate Docker Compose config
     runs-on: ubuntu-latest
