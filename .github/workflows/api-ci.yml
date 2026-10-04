@@ -104,6 +104,7 @@ jobs:
           python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
           python -m mypy --config-file pyproject.toml
           PYTHONPATH=services/api python services/api/scripts/export_source_read_contract.py --check
+          python services/api/scripts/check_intelligence_head_owner.py --owner-root .ci-source-rest-client
           python -m bandit \
             --severity-level high \
             --confidence-level high \
@@ -112,12 +113,13 @@ jobs:
             -f txt \
             -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
 
-      - name: Verify atomic checkpoint durability before broad regression
+      - name: Verify checkpoint and approved head durability before broad regression
         env:
           REQUIRE_BROKER_TESTS: "1"
         run: |
           rm -f .coverage .coverage.*
           python -m pytest -q -x tests/test_intelligence_checkpoint_durability.py \
+            tests/test_intelligence_head_durability.py \
             --cov=app --cov-branch --cov-report= --cov-fail-under=0
 
       - name: Verify fixed-origin ML assessment contract
@@ -159,6 +161,7 @@ jobs:
           mkdir -p ../../ci-cd/reports/api
           pytest \
             --ignore=tests/test_intelligence_checkpoint_durability.py \
+            --ignore=tests/test_intelligence_head_durability.py \
             --cov=app \
             --cov-append \
             --cov-report=term-missing \
