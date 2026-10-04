@@ -61,6 +61,20 @@ jobs:
             ci-cd/reports/data/ai07-full-dq/acceptance.json
             ci-cd/reports/data/ai07-full-dq/acceptance.log
           if-no-files-found: error
+      - name: Rebuild explicit day closures in two fresh processes
+        run: |
+          services/api/.venv/bin/python scripts/data/check_day_coverage.py \
+            --output ci-cd/reports/data/ai07-full-dq/day-coverage.json \
+            > ci-cd/reports/data/ai07-full-dq/day-coverage.log
+      - name: Upload day closure acceptance
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: ai07-day-coverage-evidence
+          path: |
+            ci-cd/reports/data/ai07-full-dq/day-coverage.json
+            ci-cd/reports/data/ai07-full-dq/day-coverage.log
+          if-no-files-found: error
 
   ai03-cross-repo:
     name: AI 03 full cross-repo gate
@@ -157,7 +171,7 @@ jobs:
   data-quality:
     name: Synthetic data quality gate
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
 
     env:
       DATA_PROFILE: ${{ inputs.data_profile || 'small' }}
