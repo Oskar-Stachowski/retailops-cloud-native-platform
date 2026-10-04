@@ -218,7 +218,7 @@ def expect_kafka(action: object, code: int, name: str) -> None:
     try:
         action()  # type: ignore[operator]
     except KafkaException as exc:
-        require(kafka_error(exc) == code, name + "_unexpected_error")
+        require(kafka_error(exc) == code, name + "_unexpected_" + exc.args[0].name())
     else:
         raise ProbeError(name + "_unexpected_success")
 
@@ -271,19 +271,17 @@ def negative_auth(config: dict) -> list[str]:
     finally:
         client.close()
     checks.append("producer_read_topic_authorization_failed")
-    client = Consumer(
-        {**config["broker"]["source"], "group.id": "foreign-group", "enable.auto.commit": False}
-    )
-    try:
-        expect_kafka(
-            lambda: client.committed([TopicPartition(TOPIC, 0)], timeout=5),
-            KafkaError.GROUP_AUTHORIZATION_FAILED,
-            "foreign_group_denied",
-        )
-    finally:
-        client.close()
-    checks.append("foreign_group_authorization_failed")
     admin = AdminClient(config["broker"]["source"])
+    # The high-level Consumer can hide coordinator authorization behind a
+    # committed() timeout. Require the broker's explicit group denial instead.
+    expect_kafka(
+        lambda: admin.describe_consumer_groups(["foreign-group"], request_timeout=5)[
+            "foreign-group"
+        ].result(timeout=6),
+        KafkaError.GROUP_AUTHORIZATION_FAILED,
+        "foreign_group_denied",
+    )
+    checks.append("foreign_group_authorization_failed")
     expect_kafka(
         lambda: admin.describe_topics(TopicCollection(["foreign-topic"]), request_timeout=5)[
             "foreign-topic"
