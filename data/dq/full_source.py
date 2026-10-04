@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from services.api.app.services.realtime_contract import validate_event
 
-from data.dq.full_contract import MAX_CANONICAL_EVENTS, SCOPE, FullBinding
+from data.dq.full_contract import MAX_CANONICAL_EVENTS, SCOPE, FullBinding, PortfolioBinding
 from data.dq.sales import sale_fact
 from data.dq.source import source_binding as selected_binding
 from data.generator.identity import json_sha256
@@ -44,7 +44,13 @@ def full_events(tables: dict, manifest: dict) -> list[dict]:
     products = {r["id"]: r for r in tables["products"]}
     physical = {r["sale_id"]: r for r in tables["inventory_sales"]}
     require(
-        12 <= len(tables["sales"]) + len(tables["return_events"]) <= MAX_CANONICAL_EVENTS,
+        12
+        <= len(tables["sales"]) + len(tables["return_events"])
+        <= (
+            8192
+            if manifest["descriptor"]["resolved_parameters"]["profile"] == "ai-07-portfolio-v1"
+            else MAX_CANONICAL_EVENTS
+        ),
         "Full canonical stream exceeds bounded scope.",
     )
     seed = manifest["descriptor"]["resolved_parameters"]["seed"]
@@ -114,10 +120,12 @@ def business_id(event: dict) -> str:
 
 def source_binding(manifest: dict, events: list[dict]) -> dict:
     base = selected_binding(manifest, events)
-    return FullBinding.from_payload(
+    portfolio = manifest["descriptor"]["resolved_parameters"]["profile"] == "ai-07-portfolio-v1"
+    model = PortfolioBinding if portfolio else FullBinding
+    return model.from_payload(
         {
             **base,
-            "contract_version": "raw-dq-binding-2.0.0",
+            "contract_version": "raw-dq-binding-2.1.0" if portfolio else "raw-dq-binding-2.0.0",
             "selection_policy": "all_canonical_sales_and_native_return_claims_v1",
             "projection": "legacy_operational_sales_and_returns_allowlist_v1",
             "scope": SCOPE,

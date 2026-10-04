@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from data.dq.full_contract import FullFaultPlan
+from data.dq.full_contract import parse_full_plan
 from data.dq.full_package import read_fixture, write_fixture
 from data.dq.full_scenarios import example_plan
 from data.dq.full_source import full_events
@@ -38,7 +38,7 @@ def main() -> None:
         else:
             require(args.output_root is not None, "Full DQ generation requires --output-root.")
             if args.plan:
-                plan = FullFaultPlan.from_payload(
+                plan = parse_full_plan(
                     load_json(safe_file(args.plan.parent, args.plan.name, limit=1024 * 1024))
                 )
             else:

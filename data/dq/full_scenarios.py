@@ -14,6 +14,7 @@ from data.dq.full_contract import (
     PLAN_VERSION,
     SCOPE,
     FullFaultPlan,
+    parse_full_plan,
 )
 from data.dq.full_replay import FullOfflineReplay, totals
 from data.dq.full_source import OPTIONAL_CONTEXT, business_id, parent_facts
@@ -64,9 +65,9 @@ def example_plan(events: list[dict], source_id: str, *, seed: int = 42) -> FullF
                     else None,
                 }
             )
-    return FullFaultPlan.from_payload(
+    return parse_full_plan(
         {
-            "contract_version": PLAN_VERSION,
+            "contract_version": "raw-dq-plan-2.1.0" if len(events) > 4096 else PLAN_VERSION,
             "generator_version": GENERATOR_VERSION,
             "data_class": "simulation_truth",
             "seed": seed,
@@ -82,7 +83,7 @@ def example_plan(events: list[dict], source_id: str, *, seed: int = 42) -> FullF
 def capture(  # noqa: PLR0915 - ordered fault and delivery gates
     events: list[dict], plan: FullFaultPlan, source_id: str
 ) -> tuple[list[dict], list[dict]]:
-    plan = FullFaultPlan.from_payload(plan.model_dump())
+    plan = parse_full_plan(plan.model_dump())
     require(plan.source_dataset_id == source_id, "Full DQ source identity differs.")
     require(plan.source_events_sha256 == json_sha256(events), "Full DQ source events differ.")
     require(len(events) == plan.event_limit, "Full plan must cover every canonical fact.")

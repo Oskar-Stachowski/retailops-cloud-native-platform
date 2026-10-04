@@ -86,6 +86,27 @@ class FullBinding(SupplyRecord):
         return value
 
 
+class PortfolioFaultPlan(FullFaultPlan):
+    contract_version: Literal["raw-dq-plan-2.1.0"]  # type: ignore[assignment]
+    event_limit: Annotated[int, Field(ge=12, le=8192)]
+
+
+class PortfolioBinding(FullBinding):
+    contract_version: Literal["raw-dq-binding-2.1.0"]  # type: ignore[assignment]
+    source_event_count: Annotated[int, Field(ge=12, le=8192)]
+    source_sales_count: Annotated[int, Field(ge=0, le=8192)]
+    source_return_count: Annotated[int, Field(ge=0, le=8192)]
+
+
+def parse_full_plan(payload: dict) -> FullFaultPlan:
+    model = (
+        PortfolioFaultPlan
+        if payload.get("contract_version") == "raw-dq-plan-2.1.0"
+        else FullFaultPlan
+    )
+    return model.from_payload(payload)
+
+
 class FullRecord(SupplyRecord):
     contract_version: Literal["raw-dq-capture-2.0.0"]
     record_id: Annotated[str, Field(pattern=r"^raw-record-sha256-[0-9a-f]{64}$")]

@@ -139,7 +139,7 @@ def portfolio_plan(generation: DatasetGenerationConfig, family: str) -> dict:
         split = "validation" if index < 2 else "final_test"
         base = 68 if split == "validation" else 100
         kind = "return_spike" if index % 2 == 0 else "inventory_censored_episode"
-        controls.append({**window(f"clean-{index}", scope, 35, 41), "control_type": "clean"})
+        controls.append({**window(f"clean-{index}", scope, 35, 44), "control_type": "clean"})
         fields = {
             "seed": effective.seed,
             "generator_version": PHYSICAL_GENERATOR,

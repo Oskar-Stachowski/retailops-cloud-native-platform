@@ -8,10 +8,10 @@ from tempfile import TemporaryDirectory
 from data.dq.full_contract import (
     GENERATOR_VERSION,
     MAX_ARTIFACT_BYTES,
-    PLAN_VERSION,
     REPLAY_VERSION,
     SCOPE,
     FullFaultPlan,
+    parse_full_plan,
 )
 from data.dq.full_scenarios import capture, evaluate
 from data.dq.full_source import full_events, source_binding
@@ -46,7 +46,7 @@ def descriptor(source_id: str, plan: FullFaultPlan, artifacts: dict, provenance:
     return {
         "schema_version": PACKAGE_VERSION,
         "generator_version": GENERATOR_VERSION,
-        "plan_version": PLAN_VERSION,
+        "plan_version": plan.contract_version,
         "replay_version": REPLAY_VERSION,
         "source_dataset_id": source_id,
         "plan_sha256": json_sha256(plan.model_dump()),
@@ -79,7 +79,7 @@ def read_fixture(directory: Path, source_directory: Path) -> dict:
         "Noncanonical full manifest.",
     )
     tables, source = load_source(source_directory)
-    plan = FullFaultPlan.from_payload(
+    plan = parse_full_plan(
         load_json(safe_file(directory, "simulation_truth/fault_plan.json", limit=1024 * 1024))
     )
     expected = contents(tables, source, plan)
@@ -121,7 +121,7 @@ def write_fixture(source_directory: Path, plan: FullFaultPlan, output_root: Path
         not output_root.resolve().is_relative_to(source_directory.resolve()),
         "Full DQ output must be outside source.",
     )
-    plan = FullFaultPlan.from_payload(plan.model_dump())
+    plan = parse_full_plan(plan.model_dump())
     tables, source = load_source(source_directory)
     values = contents(tables, source, plan)
     provenance = code_provenance(fingerprint())
