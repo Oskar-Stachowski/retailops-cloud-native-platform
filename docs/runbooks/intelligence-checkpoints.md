@@ -50,6 +50,8 @@ mogą wspólnie deduplikować wyniki biznesowe, ale mają odrębne checkpointy.
    Konto potrzebuje odczytu topicu, odczytu/zapisu commit swojej grupy oraz
    Describe topic/cluster i DescribeConfigs topicu. Weryfikacja topic UUID jest
    obowiązkowa. Runner korzysta z eager `range` i `read_committed`.
+   Broker musi dopuszczać session timeout 10 s; heartbeat wynosi 3 s.
+   Jawny timeout ogranicza oczekiwanie na zwolnienie przydziału po SIGKILL.
 3. Przygotuj poza Git zwykły plik JSON należący do użytkownika procesu,
    dokładnie `0600`, do 64 KiB. Symlink i FIFO są odrzucane. Przykład:
 

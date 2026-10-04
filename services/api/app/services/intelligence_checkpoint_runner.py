@@ -199,6 +199,8 @@ def build_checkpoint_client(
             "enable.partition.eof": False,
             "partition.assignment.strategy": "range",
             "isolation.level": "read_committed",
+            "session.timeout.ms": 10000,
+            "heartbeat.interval.ms": 3000,
         }
     )
     try:

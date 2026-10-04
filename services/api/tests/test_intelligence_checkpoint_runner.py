@@ -137,6 +137,8 @@ def test_builder_fixes_manual_ack_and_eager_read_committed_assignment(monkeypatc
     assert config["auto.offset.reset"] == "error"
     assert config["partition.assignment.strategy"] == "range"
     assert config["isolation.level"] == "read_committed"
+    assert config["session.timeout.ms"] == 10000
+    assert config["heartbeat.interval.ms"] == 3000
     assert config["group.id"] == GROUP
     assert config["bootstrap.servers"] == "127.0.0.1:9092"
 
