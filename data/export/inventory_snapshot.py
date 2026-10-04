@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -292,8 +293,21 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
             namespace = "evaluation_truth" if data_class(name) == "simulation_truth" else "facts"
             rows = []
             for index, ref in enumerate(table["files"]):
+                field = table["partition_source_field"]
+                match = (
+                    re.fullmatch(
+                        rf"{namespace}/{name}/business_date=(\d{{4}}-\d{{2}}-\d{{2}})/part-{index:06d}\.parquet",
+                        ref["path"],
+                    )
+                    if field is not None
+                    else None
+                )
                 require(
-                    ref["path"] == f"{namespace}/{name}/part-{index:06d}.parquet",
+                    (field == "business_date" and field in schema.names and match is not None)
+                    or (
+                        field is None
+                        and ref["path"] == f"{namespace}/{name}/part-{index:06d}.parquet"
+                    ),
                     "Inventory Parquet placement differs.",
                 )
                 parquet = pq.ParquetFile(root / ref["path"])
@@ -306,7 +320,14 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
                     require(
                         batch.nbytes <= 64 * 1024 * 1024, "Inventory Parquet batch exceeds budget."
                     )
-                    rows.extend(batch.to_pylist())
+                    values = batch.to_pylist()
+                    if field is not None:
+                        require(
+                            match is not None
+                            and all(r[field].isoformat() == match[1] for r in values),
+                            "Inventory partition day differs from row.",
+                        )
+                    rows.extend(values)
             computed = logical(name, rows, schema, grain(name), data_class(name), work)
             require(
                 computed == {k: table[k] for k in computed},
@@ -414,8 +435,18 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
     include_truth: bool = False,
     chunk_rows: int = CHUNK_ROWS,
     required_use_cases: tuple[str, ...] = ("forecast_source", "inventory_source"),
+    partition_by_day: bool = False,
 ) -> dict:
     source_payload = load_json(safe_file(source, MANIFEST_FILENAME))
+    require(
+        type(partition_by_day) is bool
+        and (
+            not partition_by_day
+            or source_payload["descriptor"]["resolved_parameters"]["profile"]
+            == "ai-07-portfolio-v1"
+        ),
+        "Date partitions require the declared AI07 portfolio profile.",
+    )
     spec = snapshot_format("1.2.0" if source_payload.get("schema_version") == "2.8.0" else "1.1.0")
     root = generated_target(output_root)
     require(
@@ -476,19 +507,32 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
             directory = bundle / namespace / name
             directory.mkdir(parents=True, mode=0o700)
             files = []
-            for index, offset in enumerate(range(0, max(len(rows), 1), chunk_rows)):
-                chunk = rows[offset : offset + chunk_rows]
-                path = directory / f"part-{index:06d}.parquet"
-                pq.write_table(
-                    pa.Table.from_pylist(chunk, schema=schema),
-                    path,
-                    compression="zstd",
-                    row_group_size=chunk_rows,
-                    write_page_checksum=True,
-                )
-                path.chmod(0o600)
-                files.append({**reference(bundle, path), "row_count": len(chunk)})
-            artifacts.append({**table, "partition_source_field": None, "files": files})
+            field = (
+                "business_date"
+                if partition_by_day and rows and "business_date" in schema.names
+                else None
+            )
+            groups = {}
+            for row in rows:
+                key = row[field].isoformat() if field else ""
+                groups.setdefault(key, []).append(row)
+            groups = groups or {"": []}
+            for day, values in sorted(groups.items()):
+                for offset in range(0, max(len(values), 1), chunk_rows):
+                    chunk = values[offset : offset + chunk_rows]
+                    partition = directory / f"business_date={day}" if field else directory
+                    partition.mkdir(parents=True, exist_ok=True, mode=0o700)
+                    path = partition / f"part-{len(files):06d}.parquet"
+                    pq.write_table(
+                        pa.Table.from_pylist(chunk, schema=schema),
+                        path,
+                        compression="zstd",
+                        row_group_size=chunk_rows,
+                        write_page_checksum=True,
+                    )
+                    path.chmod(0o600)
+                    files.append({**reference(bundle, path), "row_count": len(chunk)})
+            artifacts.append({**table, "partition_source_field": field, "files": files})
             (bundle / "schemas" / (name + ".arrow.json")).write_bytes(
                 canonical_json({"table": name, "schema": spec.columns(name)}) + b"\n"
             )
