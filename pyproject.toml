@@ -148,4 +148,8 @@ files = [
   "services/api/app/api/source_queries.py",
   "services/api/app/api/source_reads.py",
   "services/api/app/services/source_reader.py",
+  "services/api/app/services/source_bundle_wire.py",
+  "services/api/app/services/source_bundles.py",
+  "services/api/app/auth/source_bundles.py",
+  "services/api/app/api/source_bundles.py",
 ]

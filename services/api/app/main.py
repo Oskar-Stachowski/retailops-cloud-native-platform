@@ -18,6 +18,7 @@ from app.api import (
     products,
     recommendations,
     sales,
+    source_bundles,
     source_reads,
     stock_risks,
 )
@@ -69,6 +70,7 @@ app.include_router(me.router)
 app.include_router(notifications.router)
 app.include_router(intelligence.router)
 app.include_router(source_reads.router)
+app.include_router(source_bundles.router)
 
 _original_openapi = app.openapi
 
