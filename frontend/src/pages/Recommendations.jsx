@@ -177,7 +177,7 @@ export default function Recommendations() {
   if (state.loading) {
     return (
       <main className="api-page">
-        <IntelligenceSuggestions />
+        <IntelligenceSuggestions key="personal-ai-suggestions" />
         <LoadingState title="Loading recommendation context" />
       </main>
     );
@@ -192,7 +192,7 @@ export default function Recommendations() {
           description="Current release exposes recommendation signals through Dashboard and Product 360 while the dedicated recommendation queue remains planned scope."
         />
         <ErrorState message={state.error.message} onRetry={loadRecommendationContext} />
-        <IntelligenceSuggestions />
+        <IntelligenceSuggestions key="personal-ai-suggestions" />
       </main>
     );
   }
@@ -210,7 +210,7 @@ export default function Recommendations() {
         description="Decision-support view built from existing backend recommendation and work-item signals. The dedicated approval queue is positioned as planned workflow maturity, not as a visual placeholder."
       />
 
-      <IntelligenceSuggestions />
+      <IntelligenceSuggestions key="personal-ai-suggestions" />
 
       <section className="metrics-grid" aria-label="Recommendation context metrics">
         <MetricCard

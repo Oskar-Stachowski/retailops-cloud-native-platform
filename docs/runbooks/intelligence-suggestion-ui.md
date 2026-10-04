@@ -70,7 +70,8 @@ history results with expired/future payloads; two foreign product/model results
 excluded before counts; exact immutable payload and rendered evidence; escaped
 HTML-shaped references; 401 anonymous/forecast credential, 403 foreign scope,
 422 demo override and 409 changed view; no execution controls or stored secrets;
-demo/hidden-event clearing, completed in-flight disconnect cancellation and live
+preserving the connected panel across completion of an independent actual
+dashboard response; demo/hidden-event clearing, in-flight disconnect cancellation and live
 policy revocation. A fixture projected during the test expires after eight
 seconds: despite an eight-year workstation clock skew the browser clears both
 page and evidence, while actual API history preserves its payload with stale

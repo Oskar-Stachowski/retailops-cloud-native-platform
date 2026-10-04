@@ -13,6 +13,18 @@ test("personal read-only suggestions, evidence, history, expiry and cancellation
   const panel = page.getByRole("region", { name: "AI suggestions", exact: true });
   const headers = { Authorization: `Bearer ${secret}` };
   const assertions = [];
+  // Hold an actual legacy response until after AI connects. Completing that
+  // independent dashboard load must preserve the AI panel's component identity.
+  let releaseContext;
+  let contextEntered;
+  const contextBlocked = new Promise((resolve) => { releaseContext = resolve; });
+  const contextIntercepted = new Promise((resolve) => { contextEntered = resolve; });
+  await page.route("**/api/dashboard/operational-visibility?**", async (route) => {
+    const response = await route.fetch();
+    contextEntered();
+    await contextBlocked;
+    await route.fulfill({ response });
+  });
   // A workstation eight years behind must not extend the server's validity.
   await page.addInitScript(() => { Date.now = () => Date.parse("2018-01-01T00:00:00Z"); });
   async function connect() {
@@ -40,6 +52,14 @@ test("personal read-only suggestions, evidence, history, expiry and cancellation
   expect(first.execution_authorized).toBe(false);
 
   await connect();
+  await contextIntercepted;
+  await expect(page.getByText("Loading recommendation context", { exact: true })).toBeVisible();
+  releaseContext();
+  await page.unrouteAll({ behavior: "wait" });
+  await expect(page.getByText("Loading recommendation context", { exact: true })).toHaveCount(0);
+  await expect(panel.getByRole("heading", { name: "AI suggestion results" })).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Disconnect AI suggestions" })).toBeVisible();
+  assertions.push("completed actual legacy dashboard response preserves connected AI panel and data");
   await expect(panel.getByText("Showing 50 of 70 scoped suggestions.")).toBeVisible();
   const rows = await panel.getByRole("row").allTextContents();
   expect(rows.length).toBe(51);
