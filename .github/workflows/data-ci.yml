@@ -171,7 +171,9 @@ jobs:
   data-quality:
     name: Synthetic data quality gate
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # The full 972-test regression suite reached 88% at the former 35-minute
+    # limit. Keep every test and the four unchanged 300s/1024MiB flow budgets.
+    timeout-minutes: 90
 
     env:
       DATA_PROFILE: ${{ inputs.data_profile || 'small' }}

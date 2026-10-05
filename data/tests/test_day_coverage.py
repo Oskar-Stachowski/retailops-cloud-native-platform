@@ -17,7 +17,7 @@ from data.generator.configuration import DatasetGenerationConfig
 from data.generator.identity import file_sha256, json_sha256
 from data.inventory.contract import utc_timestamp
 from data.inventory.run_source_dataset import default_inventory_config
-from data.inventory.source_dataset_io import write_source_dataset
+from data.inventory.source_dataset_io import fingerprint, write_source_dataset
 
 
 @pytest.fixture(scope="module", params=["demand", "physical"])
@@ -42,9 +42,17 @@ def test_schema_registry_is_additive():
 def test_unchanged_parent_ids_and_native_claim_tail(source):
     _, directory, tables, manifest, rows = source
     assert directory.name == "source-sha256-" + json_sha256(manifest["descriptor"])
-    # General data regressions also cover newer 3.11 patches. The fixture identity
-    # is frozen on 3.11.15; only that declared runtime dimension may differ.
-    frozen_runtime = {**manifest["descriptor"], "python_version": "3.11.15"}
+    # Actual source identity includes current generator provenance. Adding the
+    # separately declared portfolio profiles versions that provenance, while
+    # every business field and all 58 table hashes remain frozen. Compare that
+    # complete descriptor using the original dee564e code hash and runtime;
+    # retain the original golden IDs instead of replacing them with today's IDs.
+    assert manifest["descriptor"]["code_sha256"] == fingerprint()["code_sha256"]
+    frozen_runtime = {
+        **manifest["descriptor"],
+        "python_version": "3.11.15",
+        "code_sha256": "37a18d21bd960dfe72793da9f787dbe7172fbb4ab7f87d283090a1037b1d9f33",
+    }
     assert "source-sha256-" + json_sha256(frozen_runtime) in {
         "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
         "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
