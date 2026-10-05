@@ -461,21 +461,3 @@ def publisher_runtime(tmp_path_factory):
                 "Mandatory broker acceptance did not complete every runtime check"
             )
 
-
-def fetch(runner, partition=0):
-    runner.assigned(runner.client, [runner._partition(partition)])
-    deadline = time.monotonic() + 15
-    while time.monotonic() < deadline:
-        message = runner.client.poll(0.25)
-        if message is not None:
-            assert message.error() is None
-            return message
-    pytest.fail("actual broker message unavailable")
-
-
-def close(runner):
-    try:
-        for lease in runner.leases.values():
-            runner.store.release(lease)
-    finally:
-        runner.client.close()

@@ -210,3 +210,33 @@ def test_run_bounds_do_not_touch_sql_or_broker(messages, seconds):
         ObservationPublisher(None, None, None).run(
             max_messages=messages, max_seconds=seconds
         )
+
+
+def private_broker_document(config):
+    document = json.loads(config.model_dump_json())
+    document.update(
+        username=config.username.get_secret_value(),
+        password=config.password.get_secret_value(),
+    )
+    return document
+
+
+def test_private_child_configuration_preserves_authentication_values():
+    config = BrokerConfig.model_validate_json(
+        json.dumps(
+            {
+                "source_authority_id": str(uuid4()),
+                "bootstrap_servers": "host:9092",
+                "username": "explicit-fixture-user",
+                "password": "explicit-fixture-password",
+                "ca_file": "/private/ca.crt",
+            }
+        )
+    )
+    clone = BrokerConfig.model_validate_json(
+        json.dumps(private_broker_document(config))
+    )
+    assert clone.username.get_secret_value() == config.username.get_secret_value()
+    assert clone.password.get_secret_value() == config.password.get_secret_value()
+    assert "explicit-fixture-user" not in repr(clone)
+    assert "explicit-fixture-password" not in repr(clone)

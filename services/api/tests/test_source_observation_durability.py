@@ -15,7 +15,7 @@ import psycopg
 import pytest
 from confluent_kafka import Consumer, TopicPartition
 from source_observation_runtime import publisher_runtime as publisher_runtime
-from test_source_observation_outbox import fact
+from test_source_observation_outbox import fact, private_broker_document
 
 from app.services.source_observation_broker import BrokerConfig, TOPIC, build_producer
 from app.services.source_observation_outbox import (
@@ -245,7 +245,7 @@ def test_actual_sigkill_after_delivery_before_sql_commit(context):
     ctx = context
     row = fact()
     ctx.outbox.append(ctx.stream, ctx.partitions, row)
-    config = json.loads(ctx.config.model_dump_json())
+    config = private_broker_document(ctx.config)
     config["password"] = ctx.rt.passwords["producer"]
     child = subprocess.Popen(
         [sys.executable, str(Path(__file__).with_name("source_observation_child.py"))],
@@ -320,7 +320,7 @@ def test_broker_stream_binding_change_stops_before_delivery(context):
 def test_wrong_scram_credentials_keep_pending(context):
     ctx = context
     ctx.outbox.append(ctx.stream, ctx.partitions, fact())
-    document = json.loads(ctx.config.model_dump_json())
+    document = private_broker_document(ctx.config)
     document["password"] = "wrong-private-fixture"
     producer, topology = build_producer(
         BrokerConfig.model_validate_json(json.dumps(document))
@@ -363,7 +363,7 @@ def test_compaction_change_stops_before_delivery(context):
 def test_untrusted_ca_keeps_pending(context):
     ctx = context
     ctx.outbox.append(ctx.stream, ctx.partitions, fact())
-    document = json.loads(ctx.config.model_dump_json())
+    document = private_broker_document(ctx.config)
     document.update(
         password=ctx.rt.passwords["producer"],
         ca_file=str(ctx.rt.private / "untrusted.crt"),
