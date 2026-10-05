@@ -1,5 +1,10 @@
 # Plan rozbudowy RetailOps AI
 
+**Status: AI 05 i AI 06 mają odbiór. AI 07 ma kompletną kwalifikację v4, oba detektory i lifecycle/batch/API; formalne `ready` na main wymaga obu scalonych PR-ów i zielonego Required CI HEAD/merge. Aktualizacja: 05.10.2026.**
+[Końcowy stan AI 07](etapy/07-anomalie-dq.md) oraz
+[bieżący status obu publikacji](../../STATUS.md) wskazują exact SHA/runy w PR #97/#24.
+Dalsza integracja transportu i UI wyników należy do AI 10.
+
 **Status: AI 08 jest READY; AI 04/v12, AI 05 i AI 06 mają przyjęte odbiory. Aktualizacja: 05.10.2026.**
 [Końcowy odbiór AI 08](../../evidence/ai/08/final/README.md) i jego receipt wskazują
 kwalifikowany model, wyniki niezależnej jakości oraz zielone CI obu przyjętych main.
@@ -46,7 +51,12 @@ dostawy, realizację sprzedaży/zwrotów, znane snapshoty, osobną kwalifikację
 labeli i pełną ścieżkę do curated 1.1. Domyślne CLI AI generuje 2.7.
 [Runbook](../../reference/inventory-snapshots.md) i [karta danych](../../evidence/ai/06/final/dataset-card.md)
 podają komendy i IDs. Ukończenie 06 nie zależy od 04/05; zgodne prognozy
-oraz lifecycle są osobnym warunkiem rozpoczęcia 07/08.
+oraz lifecycle są osobnym warunkiem części modelowej 07/08.
+[Lokalne scenariusze biznesowe 07.1a/b](../../reference/business-anomaly-scenarios.md)
+stanowią niezależne przygotowanie źródła z osobną truth i niezmiennym kandydatem.
+Obejmują popyt, zwroty i ograniczenie zapasu. Późniejsze raw DQ, offline
+curation, handoff i część modelowa mają końcowy odbiór AI 07 wskazany powyżej. [Odbiór 07.1b](../../evidence/ai/07/07.1b/README.md)
+potwierdza realne zmiany procesu i 190 różnych testów.
 
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)

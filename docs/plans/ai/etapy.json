@@ -1,6 +1,6 @@
 {
-  "version": "1.18",
-  "date": "2026-09-29",
+  "version": "1.20",
+  "date": "2026-10-05",
   "stages": [
     {
       "id": "00",
@@ -190,7 +190,25 @@
         "06"
       ],
       "path": "etapy/07-anomalie-dq.md",
-      "status": "planned"
+      "status": "completed",
+      "acceptance_date": "2026-10-05",
+      "acceptance_scope": "synthetic_ai_07_portfolio_v4; native producer/DQ, qualified inputs, seasonal residual and Isolation Forest, leakage-safe final quality, lifecycle, atomic batch, scoped HTTP and OCI recovery",
+      "qualification_source_commit": "48439ebd9515dc1c7adc633609bbe33d1657c3df",
+      "actual_fit_commit": "fcd09f68187b8d21e9dff756a24688b790221023",
+      "quality_gates_per_model": {
+        "passed": 56,
+        "total": 56,
+        "waivers": 0
+      },
+      "publication_acceptance": {
+        "producer_pr": 97,
+        "consumer_pr": 24,
+        "ready_when": "both protected PRs merged to main and Required CI succeeds for exact integrated HEAD and both merge commits",
+        "exact_sha_and_run_receipts": "PR97 and PR24 bodies"
+      },
+      "consumer_completion_evidence": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md",
+      "consumer_capsules": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-ready/capsules.json",
+      "remaining_transport_and_ui_stage": "10"
     },
     {
       "id": "08",
@@ -346,7 +364,7 @@
     }
   ],
   "status": "in_progress",
-  "next_stage": "07",
+  "next_stage": "09",
   "execution_map": "kolejnosc-i-repozytoria.md",
   "updated_at": "2026-10-05"
 }

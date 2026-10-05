@@ -9,6 +9,7 @@ import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 from time import perf_counter
+from typing import TYPE_CHECKING
 
 from data.generator.configuration import (
     SUPPORTED_PROFILES,
@@ -27,9 +28,18 @@ from data.inventory.source_dataset_io import load_json, read_source_dataset, wri
 from data.inventory.source_observations import known_commerce_view
 from data.inventory.source_tables import TableContext, tables_from_source
 
+if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
+    from data.anomalies.physical_contract import PhysicalAnomalyPlan
+
 
 def default_inventory_config(generation: DatasetGenerationConfig) -> SourceInventoryConfig:
     effective = resolve_generation_config(generation)
+    supply_adequate = effective.profile in {
+        "ai-07-portfolio-v2",
+        "ai-07-portfolio-v3",
+        "ai-07-portfolio-v4",
+    }
     return SourceInventoryConfig.from_payload(
         {
             "contract_version": "source-inventory-config-1.0.0",
@@ -39,12 +49,12 @@ def default_inventory_config(generation: DatasetGenerationConfig) -> SourceInven
             "return_quality_policy": "refunded_undamaged_returns_only",
             "return_tail_policy": "financial_tail_without_inventory_extension",
             "stock": {
-                "opening_quantity": 12,
-                "reorder_point": 8,
-                "safety_stock": 4,
+                "opening_quantity": 256 if supply_adequate else 12,
+                "reorder_point": 128 if supply_adequate else 8,
+                "safety_stock": 64 if supply_adequate else 4,
                 "history_window_days": min(2, effective.days),
                 "review_cadence_days": 1,
-                "minimum_order_quantity": 4,
+                "minimum_order_quantity": 64 if supply_adequate else 4,
                 "quoted_lead_time_days": 2,
             },
             "sale_ingestion_delay_seconds": 30,
@@ -80,14 +90,18 @@ def build_source_dataset(
     config: SourceInventoryConfig,
     *,
     evaluated_at: str | None = None,
+    anomaly_plan: AnomalyPlan | None = None,
+    physical_plan: PhysicalAnomalyPlan | None = None,
 ) -> tuple[dict, TableContext]:
     effective = resolve_generation_config(generation)
     require(
         effective.profile.startswith("ai-"),
         "Inventory source 2.7 requires an AI profile; demo remains unchanged.",
     )
-    candidate = build_dataset(generation)
-    source = simulate_source_commerce(candidate, effective, config)
+    candidate = build_dataset(generation, anomaly_plan=anomaly_plan)
+    source = simulate_source_commerce(
+        candidate, effective, config, anomaly_plan=anomaly_plan, physical_plan=physical_plan
+    )
     settings = source["effective_configuration"]["scenario"]["settings"]
     projection_config = ProjectionConfig.from_payload(
         {

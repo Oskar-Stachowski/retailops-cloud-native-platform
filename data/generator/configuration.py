@@ -30,6 +30,10 @@ PROFILE_DEFAULTS = {
     "ai-intermittent-v1": SyntheticProfileDefaults(365, 100, 5, 3),
     "ai-stockout-stress-v1": SyntheticProfileDefaults(102, 30, 3, 2),
     "ai-training": SyntheticProfileDefaults(730, 200, 10, 4),
+    "ai-07-portfolio-v1": SyntheticProfileDefaults(128, 8, 3, 2),
+    "ai-07-portfolio-v2": SyntheticProfileDefaults(128, 8, 2, 2),
+    "ai-07-portfolio-v3": SyntheticProfileDefaults(128, 12, 2, 2),
+    "ai-07-portfolio-v4": SyntheticProfileDefaults(128, 12, 2, 2),
 }
 SUPPORTED_PROFILES = ("demo", *PROFILE_DEFAULTS, "ai-load")
 SIZING_FIELDS = ("days", "products", "stores", "warehouses")
@@ -152,7 +156,15 @@ def resolve_generation_config(config: DatasetGenerationConfig) -> ResolvedGenera
             msg = "days must equal the inclusive start_date/end_date interval."
             raise ValueError(msg)
         values["days"] = days
-    end = config.end_date or (AI_END_DATE if config.profile.startswith("ai-") else BASE_DATE)
+    end = config.end_date or (
+        date(2025, 5, 8)
+        if config.profile == "ai-07-portfolio-v4"
+        else date(2026, 5, 8)
+        if config.profile == "ai-07-portfolio-v3"
+        else AI_END_DATE
+        if config.profile.startswith("ai-")
+        else BASE_DATE
+    )
     if config.start_date:
         end = config.end_date or config.start_date + timedelta(days=values["days"] - 1)
     start = end - timedelta(days=values["days"] - 1)

@@ -1,0 +1,93 @@
+{
+  "acceptance": {
+    "limits": {
+      "peak_rss_mib": 1024,
+      "seconds_per_process": 300
+    },
+    "runs": [
+      {
+        "cases": [
+          {
+            "case": "demand",
+            "coverage_id": "day-coverage-sha256-2a1102d5068df76ee276eadea3e9afdf772703b915c16f4e00373ba2af0d5aef",
+            "files": {
+              "coverage_manifest.json": "fda3c01dc4ff882ba92770f79878c24d66f6b9dc932cafb54554d7d07bfd89a8",
+              "days.jsonl": "81940c7e5e72871bee3c0d902ea249205af0ee8ef1196672de5f3285b49599ec",
+              "manifest.sha256": "49dc2e5975d6f4a97d9eda65092b2d3e5b85dcd4656fb93d5b5de083d1796732"
+            },
+            "row_count": 1713,
+            "rows_sha256": "81940c7e5e72871bee3c0d902ea249205af0ee8ef1196672de5f3285b49599ec",
+            "source_dataset_id": "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd"
+          },
+          {
+            "case": "physical",
+            "coverage_id": "day-coverage-sha256-cd82a5392012a8ec57a7b73301f6c579034f95f40b29f484834d5888e17444d5",
+            "files": {
+              "coverage_manifest.json": "430fddc9e0612c6ba7150271062a74ec83ed7a4ca25c07d93d42623122cef9fd",
+              "days.jsonl": "bed710209320e74e17fc2cbc015df4c9c832b00abcd6554ff64f2e27ade122e4",
+              "manifest.sha256": "2d44c46655d704d83ca5aafa7f21b63b38c9229a4fa960669d0259a7e2335075"
+            },
+            "row_count": 1717,
+            "rows_sha256": "bed710209320e74e17fc2cbc015df4c9c832b00abcd6554ff64f2e27ade122e4",
+            "source_dataset_id": "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09"
+          }
+        ],
+        "elapsed_seconds": 131.795,
+        "peak_rss_mib": 210.453
+      },
+      {
+        "cases": [
+          {
+            "case": "demand",
+            "coverage_id": "day-coverage-sha256-2a1102d5068df76ee276eadea3e9afdf772703b915c16f4e00373ba2af0d5aef",
+            "files": {
+              "coverage_manifest.json": "fda3c01dc4ff882ba92770f79878c24d66f6b9dc932cafb54554d7d07bfd89a8",
+              "days.jsonl": "81940c7e5e72871bee3c0d902ea249205af0ee8ef1196672de5f3285b49599ec",
+              "manifest.sha256": "49dc2e5975d6f4a97d9eda65092b2d3e5b85dcd4656fb93d5b5de083d1796732"
+            },
+            "row_count": 1713,
+            "rows_sha256": "81940c7e5e72871bee3c0d902ea249205af0ee8ef1196672de5f3285b49599ec",
+            "source_dataset_id": "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd"
+          },
+          {
+            "case": "physical",
+            "coverage_id": "day-coverage-sha256-cd82a5392012a8ec57a7b73301f6c579034f95f40b29f484834d5888e17444d5",
+            "files": {
+              "coverage_manifest.json": "430fddc9e0612c6ba7150271062a74ec83ed7a4ca25c07d93d42623122cef9fd",
+              "days.jsonl": "bed710209320e74e17fc2cbc015df4c9c832b00abcd6554ff64f2e27ade122e4",
+              "manifest.sha256": "2d44c46655d704d83ca5aafa7f21b63b38c9229a4fa960669d0259a7e2335075"
+            },
+            "row_count": 1717,
+            "rows_sha256": "bed710209320e74e17fc2cbc015df4c9c832b00abcd6554ff64f2e27ade122e4",
+            "source_dataset_id": "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09"
+          }
+        ],
+        "elapsed_seconds": 151.108,
+        "peak_rss_mib": 213.062
+      }
+    ],
+    "status": "passed"
+  },
+  "acceptance_sha256": "99e2ef9b997375a4415d1248ffa1ef9ed0b44f3b608d6b475f64d892584cb4fc",
+  "ai07_ready": false,
+  "component": "business-day-coverage-1.0.0",
+  "local_preflight": {
+    "api_tests": {
+      "failed": 4,
+      "passed": 682,
+      "skipped": 57
+    },
+    "command": "make ci-local PYTHON=/opt/homebrew/opt/python@3.11/bin/python3.11 DATABASE_URL=postgresql://retailops:retailops@127.0.0.1:65531/retailops_ai07_preflight",
+    "docker_daemon_started": false,
+    "log_sha256": "5d03882111fcaa555c880dbd7a7057520a997d1be422f83fd3538193f10446f9",
+    "remaining_frontend_targets": "passed",
+    "status": "blocked_by_unavailable_local_docker_and_mixed_coverage_modes"
+  },
+  "producer_base_sha": "1fc2787d21a49911fcf663cfd67b4407f3a85986",
+  "python_version": "3.11.15",
+  "schema_version": "1.0.0",
+  "tests": {
+    "junit_sha256": "1093dd592713d0ea5cf4f87d90a07b59420972c04ae549d38fdd9dd489d6e623",
+    "passed": 17
+  }
+}

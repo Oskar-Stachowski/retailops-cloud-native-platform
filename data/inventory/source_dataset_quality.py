@@ -41,6 +41,7 @@ from data.inventory.supplier_truth import SupplierTruth
 from ml.features.worker import transform
 
 if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
     from data.generator.configuration import ResolvedGenerationConfig
     from data.inventory.source_contract import SourceInventoryConfig
     from data.inventory.source_tables import TableContext
@@ -66,15 +67,25 @@ def commerce_view(tables: dict) -> dict:
     return known_commerce_view(legacy, tables["inventory_sales"])
 
 
-def demand_budget(tables: dict, generation: ResolvedGenerationConfig) -> int:
+def demand_budget(
+    tables: dict, generation: ResolvedGenerationConfig, anomaly_plan: AnomalyPlan | None = None
+) -> int:
     grid, _ = demand_grid(tables, generation)
     products, stores = (
         {r["id"]: r for r in simulation_entities(tables, "products")},
         {r["id"]: r for r in simulation_entities(tables, "stores")},
     )
     pricing = CommercePricing(tables, DimensionIndex(tables))
+    factors = anomaly_plan.factors(tables, generation) if anomaly_plan else {}
     expected = [
-        daily_demand(products[k[1]], stores[f["legacy_store_id"]], k, pricing, generation)
+        daily_demand(
+            products[k[1]],
+            stores[f["legacy_store_id"]],
+            k,
+            pricing,
+            generation,
+            anomaly_factor=factors.get(k, "1"),
+        )
         for k, f in sorted(grid.items())
         if f["location_open"] == "true"
     ]
@@ -394,6 +405,8 @@ def build_source_report(
     context: TableContext,
     generation: ResolvedGenerationConfig,
     inventory_config: SourceInventoryConfig,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict:
     view = commerce_view(tables)
     checks = []
@@ -403,7 +416,12 @@ def build_source_report(
         build_demand_report,
         build_return_report,
     ):
-        for check in builder(view, generation)["checks"]:
+        report = (
+            builder(view, generation, anomaly_plan=anomaly_plan)
+            if builder is build_demand_report
+            else builder(view, generation)
+        )
+        for check in report["checks"]:
             # Uncapped demand and legacy full-cohort assumptions are replaced by explicit
             # inventory conservation and causal finance gates below; all other gates remain.
             if check["check_id"] not in {"daily_demand_budget", "return_snapshot_reconciliation"}:
@@ -417,7 +435,9 @@ def build_source_report(
         "historical_fulfillment_adapter": lambda: historical_routes(tables),
         "private_supplier_realization": lambda: supplier_replay(tables, inventory_config),
         "known_fact_reorder_policy": lambda: reorder_replay(tables, context, inventory_config),
-        "inventory_daily_demand_conservation": lambda: demand_budget(tables, generation),
+        "inventory_daily_demand_conservation": lambda: demand_budget(
+            tables, generation, anomaly_plan
+        ),
         "causal_observation_and_finance_history": lambda: observations(tables, generation),
         "private_simulation_parameters": lambda: validate_simulation(tables),
         "forecast_feature_projection": lambda: len(transform(project_facts(view))),

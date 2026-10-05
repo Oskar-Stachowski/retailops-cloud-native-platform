@@ -1,5 +1,16 @@
 # Aktualny status RetailOps
 
+**AI 07 — odbiór kwalifikacji zaliczony; zamknięcie na `main` ma jawny warunek.**
+Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),
+a konsument w [PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24).
+Po scaleniu obu PR-ów i zaliczeniu Required CI ich HEAD oraz obu merge commitów
+AI 07 jest `ready` w zakresie `synthetic_ai_07_portfolio_v4`.
+[Końcowy odbiór konsumenta](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md)
+wiąże dwa rzeczywiste modele, 56/56 bramek, lifecycle, batch/API i restart OCI.
+Frozen qualification source pozostaje `48439ebd9515dc1c7adc633609bbe33d1657c3df`;
+scalenie z main zachowuje AI 05, prospektywny profil AI 08 i historyczne dane.
+Niższe wpisy AI 07 dokumentują wcześniejsze zakresy odbioru.
+
 **2026-10-05: AI 08 jest READY.** [Końcowy odbiór](evidence/ai/08/final/README.md)
 i [receipt obu repo](evidence/ai/08/final/main-publication.json) potwierdzają
 9296 punktów, 90 passed / 3 accepted warnings / 0 blockers, kwalifikowany model,
@@ -50,9 +61,10 @@ opisuje [plan AI](plans/ai/README.md).
 ## Punkt wznowienia
 
 [AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md) jest zamknięty.
-Kolejna sesja korzysta z [końcowego odbioru](evidence/ai/08/final/README.md).
-AI 07 ma osobny odbiór i pozostaje najbliższym otwartym etapem w indeksie;
-AI 09/10 zachowują własne zależności. Nie otwieraj ponownie AI 08 na podstawie historii.
+AI 07 ma końcowy odbiór i publikację #97/#24 wskazaną powyżej; formalne
+ready wymaga zielonego CI obu mainów. Po spełnieniu tego warunku można
+przejść do AI 09/10, z zachowaniem ich pozostałych zależności.
+Nie otwieraj ponownie AI 08 na podstawie historycznych wpisów.
 Poniższe wcześniejsze odbiory zachowują swoje wersje danych i zakresy.
 
 [AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md).
@@ -82,6 +94,21 @@ warstw zapisują curated i końcowy receipt. [Nowa karta danych](evidence/ai/06/
 wiąże source/qualification/snapshot/curated IDs. Demo/API zachowują zgodność.
 AI 04/05 mają [odbiór finalnego v12 i świeżego przepływu](evidence/ai/05/final/README.md).
 Nowe wejścia 07/08 nadal wymagają własnych identyfikatorów, kwalifikacji i lineage.
+
+AI 04/05 są odebrane na main obu repozytoriów; nowe wejścia 07/08 wymagają
+własnej kwalifikacji i lineage.
+
+**AI 07 ma kandydatów scenariuszy, handoff 2.8/1.2 i pełnego offline DQ.**
+[Scenariusze](reference/business-anomaly-scenarios.md) zmieniają proces przed
+finalnymi faktami i oddzielają prywatną truth od wejść operacyjnych.
+[Pełny replay v2](reference/full-raw-dq-replay.md) obejmuje wszystkie sprzedaże
+i native zgłoszenia zwrotów, również ogon po historii sprzedaży. Rozlicza błędy,
+oryginalne lokalizacje, refundowane / odrzucone sztuki i brakujące fakty źródłowe.
+[Odbiór 07.5](evidence/ai/07/07.5-full-dq/README.md) potwierdza oba przypadki
+dwukrotnie w budżecie. Pełne pokrycie faktów nie oznacza kompletności dnia;
+brakujące obserwacje pozostają nieznane. Odbiór nowego strumienia w AI,
+kwalifikacja dni, baseline / IF, ewaluacja i anomaly lifecycle pozostają otwarte.
+Cały AI 07 nie jest jeszcze ready.
 
 [Karta danych](evidence/ai/03/03.6/dataset-card.md) podaje IDs i ograniczenia;
 [runbook](reference/ai03-cross-repo.md) pozwala odtworzyć bramkę.

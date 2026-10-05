@@ -1,0 +1,36 @@
+{
+  "status": "local_regressions_passed_pending_final_head_required_ci",
+  "previous_publication_commit": "b55d0ef384030e0bd5fcc71aa6b09652fab6f96e",
+  "failed_run_id": 37270456764,
+  "failed_data_job_id": 111636173659,
+  "causes": [
+    {
+      "kind": "full_job_timeout",
+      "previous_minutes": 35,
+      "observed_test_completion": "88 percent of 972 tests",
+      "new_minutes": 90,
+      "individual_measured_flow_gates": "unchanged: four full smoke runs, each max 300 seconds and 1024 MiB"
+    },
+    {
+      "kind": "provenance_versioned_by_declared_portfolio_extension",
+      "tests": "test_unchanged_parent_ids_and_native_claim_tail demand/physical",
+      "fix": "Actual source identity still uses current complete code fingerprint. Compare original full business descriptor including all 58 table hashes with original dee564e provenance and 3.11.15 runtime. Original two golden IDs unchanged."
+    }
+  ],
+  "original_code_sha256": "37a18d21bd960dfe72793da9f787dbe7172fbb4ab7f87d283090a1037b1d9f33",
+  "current_code_sha256": "f00f8183443abd79ad58f0af0d845e03d6e8466c8bf8d4f71fb05a34aae17a39",
+  "original_golden_ids": [
+    "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+    "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09"
+  ],
+  "validation": {
+    "day_coverage_tests_passed": 17,
+    "elapsed_seconds": 216.48,
+    "junit_sha256": "39829193a933f3cd80207c9697ad76d487750855edf3cf126a6c8138fe87cb09",
+    "path_detection_tests_passed": 16,
+    "immutable_input_tests_passed": 11,
+    "actionlint": "passed"
+  },
+  "frozen_qualification_source": "48439ebd9515dc1c7adc633609bbe33d1657c3df",
+  "source_runtime_and_model_artifacts": "unchanged_by_this_ci_remediation"
+}
