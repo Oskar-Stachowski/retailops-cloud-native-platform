@@ -1,5 +1,9 @@
 # Prospective stockout stress profile
 
+**AI 08 is READY (2026-10-05).** [Final acceptance](../evidence/ai/08/final/README.md)
+records the completed six-world quality and actual serving acceptance. The design
+and preregistered source interval below describe decisions made before final scoring.
+
 `ai-stockout-stress-v1` is a separate, smaller qualified source proposal for AI 08
 robustness. It defaults to 102 days, 30 products, three selling locations and two
 physical stock locations. It requires an explicit end date and at least 84 days
@@ -10,7 +14,7 @@ The proposed final-source interval is **2026-06-09 through 2026-09-18**, on the
 already preregistered seeds 42/137/2026. With this interval the existing planned
 promotions begin around 13 July, after the current downstream selection cutoff.
 This makes them observable in a later assessment, rather than only in training.
-No final model outcome has been scored to choose these dates.
+These dates were frozen before any final model outcome was scored.
 
 `stockout-prospective-demand-shock-1.0.0` defines a seven-day latent-demand
 increase beginning at zero-based day 49: **28 July through 3 August inclusive**
@@ -52,6 +56,6 @@ The producer's full
 is successful, including data quality, AI03/AI06 cross-repo, API/Compose image/smoke
 and security gates. This documentation update leaves the accepted producer code
 and archived source contents intact; the final campaign retains its original
-producer SHA. Source review/merge/main CI and the separately authorized independent
-model evaluation remain open. AI 08 is not ready and this profile does not
-authorize model promotion.
+producer SHA. Source review/merge/main CI and the separately authorized independent model
+evaluation are complete in the final acceptance. The original producer SHA remains
+recorded in the frozen campaign. Profile design alone does not authorize a new promotion.

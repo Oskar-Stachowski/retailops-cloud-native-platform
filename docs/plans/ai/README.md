@@ -1,6 +1,9 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: AI 06 ma końcowy odbiór pełnego pipeline’u source 2.7 → curated 1.1. AI 04/05 wymagają zgodnej oceny na nowych IDs przed 07/08. Aktualizacja: 29.09.2026.**
+**Status: AI 08 jest READY; AI 04/v12, AI 05 i AI 06 mają przyjęte odbiory. Aktualizacja: 05.10.2026.**
+[Końcowy odbiór AI 08](../../evidence/ai/08/final/README.md) i jego receipt wskazują
+kwalifikowany model, wyniki niezależnej jakości oraz zielone CI obu przyjętych main.
+AI 07 zachowuje osobny odbiór; zależności AI 09/10 pozostają w indeksie etapów.
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne

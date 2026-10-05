@@ -119,7 +119,10 @@
         "03"
       ],
       "path": "etapy/04-forecasting.md",
-      "status": "planned"
+      "status": "completed",
+      "evidence": "../../evidence/ai/05/final/README.md",
+      "final_version": "v12",
+      "quality_acceptance": "owner_accepted_three_MSE_exceptions_original_results_preserved"
     },
     {
       "id": "05",
@@ -130,7 +133,13 @@
         "04"
       ],
       "path": "etapy/05-mlflow-serving.md",
-      "status": "planned"
+      "status": "completed",
+      "evidence": "../../evidence/ai/05/final/README.md",
+      "serving_ready": true,
+      "remote_required_ci": {
+        "status": "success",
+        "evidence": "../../evidence/ai/05/final/main-publication.json"
+      }
     },
     {
       "id": "06",
@@ -194,7 +203,30 @@
         "06"
       ],
       "path": "etapy/08-stockout-risk.md",
-      "status": "planned"
+      "status": "completed",
+      "ready": true,
+      "model_ready": true,
+      "evidence": "../../evidence/ai/08/final/README.md",
+      "verification": "../../evidence/ai/08/final/main-publication.json",
+      "implementation_repository": "retailops-ai-intelligence",
+      "implementation_commit": "68a3ede16da4bd8b93609c2489514c08e95a7384",
+      "accepted_main_commits": {
+        "retailops-ai-intelligence": "2565a216fa7807a756387dcbaa408d6ccc07840d",
+        "retailops-cloud-native-platform": "684f18f999ce6bddc5aa83bf6d7fa7aaef9fc832"
+      },
+      "remote_required_ci": {
+        "status": "success",
+        "consumer_pr_run": 37282434148,
+        "consumer_main_push_run": 37288700026,
+        "producer_main_push_run": 37262096351
+      },
+      "quality": {
+        "points": 9296,
+        "passed": 90,
+        "approved_warnings": 3,
+        "blockers": 0
+      },
+      "remaining": []
     },
     {
       "id": "09",
@@ -314,6 +346,7 @@
     }
   ],
   "status": "in_progress",
-  "next_stage": "04",
-  "execution_map": "kolejnosc-i-repozytoria.md"
+  "next_stage": "07",
+  "execution_map": "kolejnosc-i-repozytoria.md",
+  "updated_at": "2026-10-05"
 }

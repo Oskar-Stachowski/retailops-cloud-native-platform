@@ -1,5 +1,10 @@
 # 08 — Zbuduj model ryzyka stockout
 
+**Status: READY, 2026-10-05.** [Końcowy odbiór](../../../evidence/ai/08/final/README.md)
+i [receipt obu repo](../../../evidence/ai/08/final/main-publication.json) potwierdzają
+spełnienie DoD. Pozostałe wymagane prace tego etapu: **0**. Poniżej pozostaje
+uzgodniona specyfikacja i historyczny prompt, a nie lista otwartych zadań.
+
 **Repo:** AI. **Zależności:** 04, 05, 06. **Wynik:** skalibrowane ryzyko nowego stockout w kolejnych siedmiu dniach, z kolejką priorytetów i pełną lineage. Nie jest to automatyczne zamówienie towaru.
 
 ## Wejście i decyzje domenowe
