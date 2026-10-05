@@ -1,13 +1,24 @@
 # 07. Dodaj anomalie, błędy danych i detekcję
 
-**Status: plan wdrożenia. Repo: RetailOps + AI. Zależności: 04, 05, 06.**
+**Status: odbiór AI 07 zaliczony w zakresie `synthetic_ai_07_portfolio_v4`.**
+Repo: RetailOps + AI. Zależności: 04, 05, 06 są spełnione.
+Pełne `ready` na main wymaga scalenia
+[source PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97)
+i [AI PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24)
+oraz zielonego Required CI obu HEAD i merge commitów.
+[Końcowy odbiór](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md)
+i [manifest kapsuł](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-ready/capsules.json)
+wiążą scenariusze/DQ, kwalifikowane dane, oba rzeczywiste detektory,
+56/56 bramek dla każdego, MLflow, atomowy batch, scoped API i restart OCI.
+Modele i progi są zamrożone; nieudane finalne v2/v3 pozostają zachowane.
+Poniżej jest przyjęta specyfikacja etapu, a nie lista bieżących zaległości.
 
 Upstream obejmuje [pięć typów scenariuszy biznesowych](../../../reference/business-anomaly-scenarios.md),
 [raw DQ i ograniczony offline replay](../../../reference/raw-dq-replay.md),
 [pełny strumień sprzedaży i native zwrotów v2](../../../reference/full-raw-dq-replay.md) oraz
 [wersjonowane źródło 2.8 i snapshot 1.2](../../../reference/anomaly-source-handoff.md).
-Odbiór handoff jest osobną częścią etapu; AI07 nadal wymaga anomaly curation,
-cech, obu detektorów, ewaluacji oraz integracji z lifecycle AI05.
+Handoff, anomaly curation, cechy, oba detektory, ewaluacja i integracja z
+lifecycle AI05 mają końcowy odbiór podlinkowany powyżej.
 
 Cel: uzyskać oddzielne, deterministyczne scenariusze business anomalies i raw data faults, a następnie porównać seasonal-residual baseline z Isolation Forest w istniejącym lifecycle MLflow. Offline replay/curation jest częścią07. Produkcyjna trwałość brokera, ACK/DLQ i projekcje są etapem10; nie deklarować ich zaliczenia na podstawie fixture offline.
 

@@ -1,6 +1,9 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: AI 06 ma końcowy odbiór source 2.7 → curated 1.1. AI 07 ma lokalne przygotowanie pięciu typów scenariuszy biznesowych; część modelowa 07/08 wymaga zgodnych AI 04/05. Aktualizacja: 02.10.2026.**
+**Status: AI 05 i AI 06 mają odbiór. AI 07 ma kompletną kwalifikację v4, oba detektory i lifecycle/batch/API; formalne `ready` na main wymaga obu scalonych PR-ów i zielonego Required CI HEAD/merge. Aktualizacja: 05.10.2026.**
+[Końcowy stan AI 07](etapy/07-anomalie-dq.md) oraz
+[bieżący status obu publikacji](../../STATUS.md) wskazują exact SHA/runy w PR #97/#24.
+Dalsza integracja transportu i UI wyników należy do AI 10.
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -46,8 +49,8 @@ podają komendy i IDs. Ukończenie 06 nie zależy od 04/05; zgodne prognozy
 oraz lifecycle są osobnym warunkiem części modelowej 07/08.
 [Lokalne scenariusze biznesowe 07.1a/b](../../reference/business-anomaly-scenarios.md)
 stanowią niezależne przygotowanie źródła z osobną truth i niezmiennym kandydatem.
-Obejmują popyt, zwroty i ograniczenie zapasu; raw DQ, offline curation i nowy
-handoff pozostają dalszym zakresem. [Odbiór 07.1b](../../evidence/ai/07/07.1b/README.md)
+Obejmują popyt, zwroty i ograniczenie zapasu. Późniejsze raw DQ, offline
+curation, handoff i część modelowa mają końcowy odbiór AI 07 wskazany powyżej. [Odbiór 07.1b](../../evidence/ai/07/07.1b/README.md)
 potwierdza realne zmiany procesu i 190 różnych testów.
 
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
