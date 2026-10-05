@@ -236,7 +236,9 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
         "Schema identity differs.",
     )
     checked_schemas = {name: (root / "schemas" / name).read_bytes() for name in spec.SCHEMAS}
-    allowed_schemas = [{name: (ROOT / "data/contracts" / name).read_bytes() for name in spec.SCHEMAS}]
+    allowed_schemas = [
+        {name: (ROOT / "data/contracts" / name).read_bytes() for name in spec.SCHEMAS}
+    ]
     if parent["descriptor"]["generator_version"] == "0.9.0":
         allowed_schemas.append(
             {name: export_schema_file(name, parent).read_bytes() for name in spec.SCHEMAS}

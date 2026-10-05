@@ -111,7 +111,9 @@ def daily_demand(
         "lifecycle_factor": str(lifecycle),
         "price_factor": str(price_factor),
         "promotion_factor": str(promotion_factor),
-        "anomaly_factor": str(Decimal(anomaly_factor) * stockout_anomaly_factor(config, product["id"], day)),
+        "anomaly_factor": str(
+            Decimal(anomaly_factor) * stockout_anomaly_factor(config, product["id"], day)
+        ),
         "noise": str(Decimal(str(rng.uniform(0.78, 1.24)))),
     }
     if config.profile in {"ai-07-portfolio-v2", "ai-07-portfolio-v3", "ai-07-portfolio-v4"}:
