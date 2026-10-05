@@ -27,6 +27,7 @@ from data.inventory.source_tables_contract import TABLE_CONTRACT_VERSION, TABLES
 SOURCE_VERSION = "2.7.0"
 SOURCE_POLICY = "inventory-source-acceptance-1.0.0"
 GENERATOR_VERSION = "0.9.0"
+FORECAST_GENERATOR_VERSION = "0.9.1"
 MANIFEST_FILENAME = MANIFEST_V2_FILENAME
 PRIVATE_TABLES = (
     "product_simulation_parameters",
@@ -89,17 +90,38 @@ class Artifact(SupplyRecord):
     size_bytes: Count
 
 
+class ForecastRequestedParameters(RequestedParameters):
+    forecast_plan_days: Annotated[int, Field(ge=1, le=14)]
+    forecast_plan_version: Literal["known-forecast-plans-1.0.0"]
+
+
+class ForecastResolvedParameters(ResolvedParameters):
+    forecast_plan_days: Annotated[int, Field(ge=1, le=14)]
+    forecast_plan_version: Literal["known-forecast-plans-1.0.0"]
+
+
+class ForecastWatermark(SupplyRecord):
+    as_of_time: str
+    complete_through: str | None
+    completeness_status: Literal["complete", "not_ready"]
+    meaning: Literal["synthetic_sales_day_close_without_return_guarantee"]
+    policy_version: Literal["daily-demand-1.0.0"]
+
+
 class SourceDescriptor(SupplyRecord):
     identity_version: Literal["inventory-source-identity-1.0.0"]
     role: Literal["source"]
     owner: Literal["retailops-cloud-native-platform"]
     schema_version: Literal["2.7.0"]
-    generator_version: Literal["0.9.0"]
+    generator_version: Literal["0.9.0", "0.9.1"]
     table_contract_version: Literal["inventory-source-tables-1.0.0"]
     source_policy_version: Literal["inventory-source-acceptance-1.0.0"]
     canonicalization_version: Literal["inventory-source-typed-csv-1.0.0"]
     table_schema_sha256: SHA256
-    resolved_parameters: ResolvedParameters
+    resolved_parameters: ResolvedParameters | ForecastResolvedParameters
+    forecast_watermarks: dict[Literal["daily_demand_observations"], ForecastWatermark] | None = (
+        Field(default=None, exclude_if=lambda value: value is None)
+    )
     inventory_configuration_sha256: SHA256
     context: TableContext
     code_sha256: SHA256
@@ -113,7 +135,7 @@ class SourceManifest(SupplyRecord):
     dataset_name: Literal["retailops-synthetic"]
     dataset_id: Annotated[str, Field(pattern=r"^source-sha256-[0-9a-f]{64}$")]
     descriptor: SourceDescriptor
-    requested_parameters: RequestedParameters
+    requested_parameters: RequestedParameters | ForecastRequestedParameters
     provenance: Provenance
     generated_at: str
     artifacts: dict[str, Artifact]

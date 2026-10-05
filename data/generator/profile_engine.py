@@ -148,6 +148,8 @@ def _rng(seed: int, profile: str) -> random.Random:
     # Paired scenario: keep catalog/location/price draws identical to ai-dev.
     if profile == "ai-intermittent-v1":
         profile = "ai-dev"
+    elif profile == "ai-stockout-stress-v1":
+        profile = "ai-load"
     return random.Random(f"retailops-{profile}-{seed}")  # noqa: S311 - deterministic demo data
 
 
@@ -936,6 +938,7 @@ def build_profile_dataset(
     warehouse_count: int,
     seed: int = 42,
     clock: GenerationClock = DEFAULT_CLOCK,
+    forecast_plan_days: int = 0,
     *,
     anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, list[dict[str, str]]]:
@@ -958,6 +961,7 @@ def build_profile_dataset(
                 seed=seed,
                 end_date=clock.end_date,
                 max_daily_rows=days * product_count * store_count,
+                forecast_plan_days=forecast_plan_days,
             )
         )
         dimension_tables, products, stores, warehouses = build_dimensions(

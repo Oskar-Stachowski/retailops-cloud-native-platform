@@ -1,6 +1,23 @@
 # Aktualny status RetailOps
 
-Aktualizacja: **2026-09-30**. [Audyt AI 00](evidence/ai/00/README.md) na
+**AI 07 — odbiór kwalifikacji zaliczony; zamknięcie na `main` ma jawny warunek.**
+Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),
+a konsument w [PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24).
+Po scaleniu obu PR-ów i zaliczeniu Required CI ich HEAD oraz obu merge commitów
+AI 07 jest `ready` w zakresie `synthetic_ai_07_portfolio_v4`.
+[Końcowy odbiór konsumenta](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md)
+wiąże dwa rzeczywiste modele, 56/56 bramek, lifecycle, batch/API i restart OCI.
+Frozen qualification source pozostaje `48439ebd9515dc1c7adc633609bbe33d1657c3df`;
+scalenie z main zachowuje AI 05, prospektywny profil AI 08 i historyczne dane.
+Niższe wpisy AI 07 dokumentują wcześniejsze zakresy odbioru.
+
+**AI 05 jest `ready`: [końcowy odbiór i publikacja](evidence/ai/05/final/README.md)**
+obejmują rzeczywisty przepływ v12, oba scalone PR-y i zielony Required CI
+na `main` obu repozytoriów. AI 04 jest zamknięty na v12 z trzema przyjętymi
+odstępstwami MSE, a AI 06 ma odbiór danych inventory. Można rozpocząć AI 08
+po kontroli jego wejść i lineage; AI 07 pozostaje osobnym etapem.
+
+Aktualizacja: **2026-10-02**. [Audyt AI 00](evidence/ai/00/README.md) na
 `cbf28b2` obejmuje dwukrotną generację `small`, kontrast 100/20 produktów,
 pomiary danych i kontraktów, **138 testów bez pominięć** oraz ponowny odczyt
 ocenionych artefaktów RF. Required CI tego SHA ma `success`.
@@ -37,6 +54,12 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
+Po [odbiorze AI 05](evidence/ai/05/final/README.md) można rozpocząć
+[AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md), zaczynając od
+weryfikacji danych inventory, dojrzałych etykiet i historycznej lineage prognoz.
+AI 07 ma końcowy odbiór i warunek zamknięcia na main opisany powyżej.
+Poniższe wcześniejsze odbiory zachowują swoje wersje danych i zakresy.
+
 [AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md).
 Źródło 2.6 przechodzi 46 hard gates; cechy AI 3.1 powstają w izolowanym workerze
 z czterech projekcji faktów. Fingerprint obejmuje cały wykonywany kod, a wersje
@@ -62,6 +85,9 @@ Pełny pipeline obu profili dwukrotnie spełnia budżet 300 s / 1024 MiB.
 Frozen manifest źródła nadal ma pierwotne flagi false; readiness kolejnych
 warstw zapisują curated i końcowy receipt. [Nowa karta danych](evidence/ai/06/final/dataset-card.md)
 wiąże source/qualification/snapshot/curated IDs. Demo/API zachowują zgodność.
+AI 04/05 mają [odbiór finalnego v12 i świeżego przepływu](evidence/ai/05/final/README.md).
+Nowe wejścia 07/08 nadal wymagają własnych identyfikatorów, kwalifikacji i lineage.
+
 AI 04/05 są odebrane na main obu repozytoriów; nowe wejścia 07/08 wymagają
 własnej kwalifikacji i lineage.
 

@@ -26,6 +26,7 @@ from data.generator.source_realism import realism_markdown
 from data.inventory.contract import require
 from data.inventory.source_contract import SourceInventoryConfig
 from data.inventory.source_dataset_contract import (
+    FORECAST_GENERATOR_VERSION,
     GENERATOR_VERSION,
     MANIFEST_FILENAME,
     SOURCE_POLICY,
@@ -117,12 +118,15 @@ def descriptor(
     context: TableContext,
     provenance: dict,
 ) -> dict:
-    return {
+    effective = resolve_generation_config(generation)
+    result = {
         "identity_version": "inventory-source-identity-1.0.0",
         "role": "source",
         "owner": "retailops-cloud-native-platform",
         "schema_version": SOURCE_VERSION,
-        "generator_version": GENERATOR_VERSION,
+        "generator_version": FORECAST_GENERATOR_VERSION
+        if effective.forecast_plan_days
+        else GENERATOR_VERSION,
         "table_contract_version": TABLE_CONTRACT_VERSION,
         "source_policy_version": SOURCE_POLICY,
         "canonicalization_version": "inventory-source-typed-csv-1.0.0",
@@ -132,6 +136,32 @@ def descriptor(
         "context": context.model_dump(),
         **{k: provenance[k] for k in ("code_sha256", "dependency_sha256", "python_version")},
         "tables": {n: table_identity(n, tables[n]) for n in SOURCE_TABLES},
+    }
+    if effective.forecast_plan_days:
+        result["forecast_watermarks"] = forecast_watermarks(tables, context, effective)
+    return result
+
+
+def forecast_watermarks(
+    tables: dict, context: TableContext, generation: ResolvedGenerationConfig
+) -> dict:
+    """Declare observed completeness at the real source cutoff; plans never extend it."""
+    rows = tables["daily_demand_observations"]
+    cutoff = datetime.fromisoformat(context.evaluated_at)
+    complete = bool(rows) and all(
+        r["source_data_complete"] == "true"
+        and datetime.fromisoformat(r["available_at"]) <= cutoff
+        and r["business_date"] <= generation.end_date.isoformat()
+        for r in rows
+    )
+    return {
+        "daily_demand_observations": {
+            "as_of_time": context.evaluated_at,
+            "complete_through": generation.end_date.isoformat() if complete else None,
+            "completeness_status": "complete" if complete else "not_ready",
+            "meaning": "synthetic_sales_day_close_without_return_guarantee",
+            "policy_version": "daily-demand-1.0.0",
+        }
     }
 
 
@@ -191,6 +221,18 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         generation.profile.startswith("ai-")
         and effective.parameters() == desc["resolved_parameters"],
         "Source requested/resolved generation differs.",
+    )
+    require(
+        desc["generator_version"]
+        == (
+            "1.0.0"
+            if is_anomaly
+            else FORECAST_GENERATOR_VERSION
+            if effective.forecast_plan_days
+            else GENERATOR_VERSION
+        )
+        and not (is_anomaly and effective.forecast_plan_days),
+        "Source generator version disagrees with declared forecast planning mode.",
     )
     context = manifest.descriptor.context
     require(
@@ -308,6 +350,15 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
         )
     reports = build_reports(
         tables, context, effective, config, scenario_plan=scenario["plan"] if scenario else None
+    )
+    require(
+        desc.get("forecast_watermarks")
+        == (
+            forecast_watermarks(tables, context, effective)
+            if effective.forecast_plan_days
+            else None
+        ),
+        "Forecast watermark differs from independently recomputed observed source completeness.",
     )
     require(set(normalized["reports"]) == set(REPORT_NAMES), "Source report allowlist differs.")
     for name, expected in reports.items():

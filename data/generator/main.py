@@ -156,6 +156,7 @@ def build_dataset(
         seed=effective.seed,
         clock=GenerationClock(effective.end_date),
         anomaly_plan=anomaly_plan,
+        forecast_plan_days=effective.forecast_plan_days,
     )
 
 

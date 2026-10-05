@@ -92,6 +92,32 @@ def test_checked_schema_and_43_fact_allowlist(snapshot):
     assert all(p.stat().st_mode & 0o777 == 0o600 for p in root.rglob("*") if p.is_file())
 
 
+def test_default_export_preserves_pinned_independent_consumer_schema_bytes(snapshot):
+    _, _, _, result, _ = snapshot
+    root = Path(result["path"])
+    assert result["manifest"]["source"]["descriptor"]["generator_version"] == "0.9.0"
+    assert file_sha256(root / "schemas/inventory_snapshot.v1_1.schema.json") == (
+        "ec040a294eff7a898eba59572dc7cf2deec01b29a48ed555b493154ce0694447"
+    )
+    assert file_sha256(root / "schemas/inventory_source_dataset.v2_7.schema.json") == (
+        "22938590dcf0183e8c5a7f83a648a7e037dad794e71a0e26158bb6aef43f75a9"
+    )
+
+
+@pytest.mark.parametrize(
+    "filename", ["inventory_snapshot.v1_1.schema.json", "inventory_source_dataset.v2_7.schema.json"]
+)
+def test_resealed_mixed_legacy_and_forecast_contracts_are_refused(snapshot, tmp_path, filename):
+    _, _, _, result, _ = snapshot
+    root = tmp_path / "mixed-contracts"
+    shutil.copytree(result["path"], root)
+    (root / "schemas" / filename).write_bytes((Path("data/contracts") / filename).read_bytes())
+    document = json.loads((root / "snapshot_manifest.json").read_text())
+    reseal(root, document)
+    with pytest.raises(ValueError, match="Unreviewed snapshot schema"):
+        exporter.verify_inventory_snapshot(root)
+
+
 def test_partition_metadata_and_chunking_do_not_change_identity(snapshot):
     base, source, qualification, result, _ = snapshot
     original = hashes(Path(result["path"]))

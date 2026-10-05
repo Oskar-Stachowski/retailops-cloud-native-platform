@@ -76,6 +76,16 @@ def copy_file(source: Path, target: Path) -> None:
     target.chmod(0o600)
 
 
+def export_schema_file(name: str, parent: dict) -> Path:
+    """Keep ordinary exports compatible with the pinned pre-planning consumer."""
+    filename = (
+        inventory_contract.LEGACY_SCHEMAS.get(name, name)
+        if parent["descriptor"]["generator_version"] == "0.9.0"
+        else name
+    )
+    return ROOT / "data/contracts" / filename
+
+
 def seal_source(source: Path, target: Path, dataset_id: str) -> tuple[dict, dict]:
     require(
         not source.is_symlink() and not any(p.is_symlink() for p in source.rglob("*")),
@@ -225,11 +235,13 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
         },
         "Schema identity differs.",
     )
-    for name in spec.SCHEMAS:
-        require(
-            (root / "schemas" / name).read_bytes() == (ROOT / "data/contracts" / name).read_bytes(),
-            "Unreviewed snapshot schema.",
+    checked_schemas = {name: (root / "schemas" / name).read_bytes() for name in spec.SCHEMAS}
+    allowed_schemas = [{name: (ROOT / "data/contracts" / name).read_bytes() for name in spec.SCHEMAS}]
+    if parent["descriptor"]["generator_version"] == "0.9.0":
+        allowed_schemas.append(
+            {name: export_schema_file(name, parent).read_bytes() for name in spec.SCHEMAS}
         )
+    require(checked_schemas in allowed_schemas, "Unreviewed snapshot schema.")
     require(
         load_json(root / "schemas" / spec.HANDOFF) == spec.handoff_contract(),
         "Unreviewed inventory handoff.",
@@ -497,7 +509,7 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
             copy_file(work / "source" / name, bundle / "reports" / name)
         copy_file(work / "source" / MANIFEST_FILENAME, bundle / "manifests" / MANIFEST_FILENAME)
         for name in spec.SCHEMAS:
-            copy_file(ROOT / "data/contracts" / name, bundle / "schemas" / name)
+            copy_file(export_schema_file(name, parent), bundle / "schemas" / name)
         (bundle / "schemas" / spec.HANDOFF).write_bytes(
             canonical_json(spec.handoff_contract()) + b"\n"
         )

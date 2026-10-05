@@ -88,6 +88,10 @@ SCHEMAS = (
     "inventory_source_tables.v1.schema.json",
     "inventory_label_qualification.v1.schema.json",
 )
+LEGACY_SCHEMAS = {
+    "inventory_snapshot.v1_1.schema.json": "inventory_snapshot.legacy.v1_1.schema.json",
+    "inventory_source_dataset.v2_7.schema.json": "inventory_source_dataset.legacy.v2_7.schema.json",
+}
 
 
 class Descriptor(SupplyRecord):
