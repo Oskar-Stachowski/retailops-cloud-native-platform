@@ -22,11 +22,14 @@ const { chromium, expect } = frontendRequire("@playwright/test");
     await expect(products.locator("strong")).toHaveText(String(expected.snapshot.tables.products.rows));
     for (const entity of expected.entities) {
       await page.goto(`${baseURL}/products/${entity.product_id}`);
-      await expect(page.getByLabel("Product 360 summary")).toBeVisible();
+      await expect(page.getByLabel("Product 360 summary")).toBeVisible({ timeout: 15000 });
       const heading = entity.resource === "alerts" ? "Alerts" : "Recommendations";
       const section = page.locator("section.table-card").filter({ has: page.getByRole("heading", { name: heading, exact: true }) });
       await expect(section.getByRole("cell", { name: entity.status, exact: true }).first()).toBeVisible();
       await page.reload();
+      // Reload completes the document before its live Product 360 data is ready.
+      // Bound that readiness wait separately; retain the exact status assertion.
+      await expect(page.getByLabel("Product 360 summary")).toBeVisible({ timeout: 15000 });
       await expect(section.getByRole("cell", { name: entity.status, exact: true }).first()).toBeVisible();
     }
     await context.tracing.stop();
