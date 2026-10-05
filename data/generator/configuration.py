@@ -28,6 +28,7 @@ PROFILE_DEFAULTS = {
     "ai-temporal-smoke": SyntheticProfileDefaults(102, 8, 3, 2),
     "ai-dev": SyntheticProfileDefaults(365, 100, 5, 3),
     "ai-intermittent-v1": SyntheticProfileDefaults(365, 100, 5, 3),
+    "ai-stockout-stress-v1": SyntheticProfileDefaults(102, 30, 3, 2),
     "ai-training": SyntheticProfileDefaults(730, 200, 10, 4),
 }
 SUPPORTED_PROFILES = ("demo", *PROFILE_DEFAULTS, "ai-load")
@@ -120,6 +121,9 @@ def validate_generation_config(config: DatasetGenerationConfig) -> None:
     if config.start_date and config.end_date and config.start_date > config.end_date:
         msg = "start_date must not be after end_date."
         raise ValueError(msg)
+    if config.profile == "ai-stockout-stress-v1" and config.end_date is None:
+        msg = "Stockout stress requires an explicit prospective end date."
+        raise ValueError(msg)
 
 
 def resolve_generation_config(config: DatasetGenerationConfig) -> ResolvedGenerationConfig:
@@ -152,6 +156,9 @@ def resolve_generation_config(config: DatasetGenerationConfig) -> ResolvedGenera
     if config.start_date:
         end = config.end_date or config.start_date + timedelta(days=values["days"] - 1)
     start = end - timedelta(days=values["days"] - 1)
+    if config.profile == "ai-stockout-stress-v1" and values["days"] < 84:
+        msg = "Stockout stress requires at least 84 days including controls and tail."
+        raise ValueError(msg)
     daily_rows = values["days"] * values["products"] * values["stores"]
     limit = config.max_daily_rows or daily_rows
     if daily_rows > limit:

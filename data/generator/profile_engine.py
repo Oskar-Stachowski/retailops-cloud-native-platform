@@ -144,6 +144,8 @@ def _rng(seed: int, profile: str) -> random.Random:
     # Paired scenario: keep catalog/location/price draws identical to ai-dev.
     if profile == "ai-intermittent-v1":
         profile = "ai-dev"
+    elif profile == "ai-stockout-stress-v1":
+        profile = "ai-load"
     return random.Random(f"retailops-{profile}-{seed}")  # noqa: S311 - deterministic demo data
 
 
