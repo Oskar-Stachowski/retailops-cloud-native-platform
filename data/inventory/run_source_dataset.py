@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 def default_inventory_config(generation: DatasetGenerationConfig) -> SourceInventoryConfig:
     effective = resolve_generation_config(generation)
-    supply_adequate = effective.profile == "ai-07-portfolio-v2"
+    supply_adequate = effective.profile in {"ai-07-portfolio-v2", "ai-07-portfolio-v3"}
     return SourceInventoryConfig.from_payload(
         {
             "contract_version": "source-inventory-config-1.0.0",

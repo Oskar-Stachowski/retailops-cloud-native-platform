@@ -8,7 +8,12 @@ from pathlib import Path
 
 from data.anomalies.example import example_plan
 from data.anomalies.physical_scenarios import physical_example_plan
-from data.anomalies.portfolio import PROFILE, SUPPLY_ADEQUATE_PROFILE, portfolio_plan
+from data.anomalies.portfolio import (
+    CONFIRMATORY_PROFILE,
+    PROFILE,
+    SUPPLY_ADEQUATE_PROFILE,
+    portfolio_plan,
+)
 from data.anomalies.source_process import build_tables
 from data.generator.configuration import DatasetGenerationConfig
 from data.inventory.contract import require
@@ -25,7 +30,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--profile",
-        choices=("ai-smoke", "ai-temporal-smoke", PROFILE, SUPPLY_ADEQUATE_PROFILE),
+        choices=(
+            "ai-smoke",
+            "ai-temporal-smoke",
+            PROFILE,
+            SUPPLY_ADEQUATE_PROFILE,
+            CONFIRMATORY_PROFILE,
+        ),
         default="ai-smoke",
     )
     for field in ("days", "products", "stores", "warehouses"):

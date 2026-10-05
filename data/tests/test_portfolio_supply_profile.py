@@ -1,6 +1,6 @@
 """The supply-adequate benchmark is explicit and keeps legacy profile policies intact."""
 
-from datetime import timedelta
+from datetime import date, timedelta
 
 from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
 from data.inventory.run_source_dataset import default_inventory_config
@@ -36,3 +36,20 @@ def test_supply_profile_has_native_online_history_for_all_physical_scenario_prod
         if r["channel"] == "online":
             grouped.setdefault(r["product_id"], set()).add(r["business_date"])
     assert sum(required <= days for days in grouped.values()) >= 4
+
+
+def test_confirmatory_profile_declares_distinct_calendar_and_larger_control_cohort():
+    generation = DatasetGenerationConfig(profile="ai-07-portfolio-v3")
+    resolved = resolve_generation_config(generation)
+    assert (resolved.start_date, resolved.end_date) == (date(2026, 1, 1), date(2026, 5, 8))
+    assert (resolved.days, resolved.products, resolved.stores, resolved.warehouses) == (128, 12, 2, 2)
+    assert resolved.max_daily_rows == 3072
+    tables = build_dataset(generation)
+    assert len(tables["selling_locations"]) == 1
+    assert len(tables["product_catalog"]) == 12
+    assert {a["channel"] for a in tables["channel_assignments"]} == {"store", "online"}
+    assert default_inventory_config(generation).stock.opening_quantity == 256
+    # The new recipe acts on every native demand row before sampling, never on
+    # selected outcomes or final labels.
+    for row in tables["daily_demand_truth"]:
+        assert float(row["base_rate"]) <= 4

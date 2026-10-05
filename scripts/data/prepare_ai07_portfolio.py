@@ -34,7 +34,7 @@ def main() -> int:
     tables, manifest = load_source(source)
     parameters = manifest["descriptor"]["resolved_parameters"]
     require(
-        parameters["profile"] in {"ai-07-portfolio-v1", "ai-07-portfolio-v2"}
+        parameters["profile"] in {"ai-07-portfolio-v1", "ai-07-portfolio-v2", "ai-07-portfolio-v3"}
         and parameters["seed"] in (42, 137, 2026),
         "AI 07 requires the frozen portfolio profile and seed inventory.",
     )

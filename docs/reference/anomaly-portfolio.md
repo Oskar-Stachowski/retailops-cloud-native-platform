@@ -67,3 +67,27 @@ Use a separate output root per case when running preparations concurrently:
 the generated-directory guard also examines temporary files in its target.
 The preparation verifies native source facts, typed partitioned snapshot03,
 day coverage and the complete DQ fixture, including expected-action accounting.
+
+## Confirmatory portfolio v3 (declared before new final scoring)
+
+The v2 model experiment failed its unchanged numerical final quality gates.
+Its final records remain `not_ready`. V3 is a separate synthetic qualification
+scope, not a rerun or reinterpretation of the opened v2 holdout.
+
+`ai-07-portfolio-v3` declares 128 days, **2026-01-01 through 2026-05-08**,
+12 products, one selling location with store and online channels, and two stock
+locations. Native stochastic rounding is unchanged. A uniform 0.50 factor on
+base demand applies before sampling, intervention composition and commerce.
+Opening stock 256, reorder point 128, safety stock 64 and minimum order 64
+are unchanged from v2. The original 8192-event capture budget is unchanged;
+no rows are sampled, trimmed or silently dropped.
+
+The extra independent products increase the clean control cohort under the
+unchanged conservative truth policy: all non-primary slots of intervened
+products remain unknown after interventions. Windows, five intervention types,
+magnitudes, neutral controls and required seeds 42/137/2026 are unchanged.
+The new calendar produces different native random draws and facts. Results
+qualify only this declared synthetic scope, not the prior v2 cohort or production.
+Training and validation use seed 42, offsets 28–59 and 64–95. Final offsets
+100–127 for all six seed/scenario cases remain unopened until model selection,
+thresholds, metrics and complete public lineage are frozen.
