@@ -138,6 +138,11 @@ class ObservationOutbox:
         fact: ObservationVersion,
     ) -> str:
         """Join the caller's transaction; never commit a partial business fact."""
+        if conn.autocommit and conn.info.transaction_status != psycopg.pq.TransactionStatus.INTRANS:
+            msg = "observation_caller_transaction_required"
+            raise ObservationError(msg)
+        conn.execute("SET LOCAL lock_timeout='2s'")
+        conn.execute("SET LOCAL statement_timeout='3s'")
         self.locked(conn, stream, partitions)
         fact = ObservationVersion.model_validate_json(canonical(fact))
         raw = canonical(fact)

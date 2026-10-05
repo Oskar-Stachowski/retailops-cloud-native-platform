@@ -460,4 +460,3 @@ def publisher_runtime(tmp_path_factory):
             pytest.fail(
                 "Mandatory broker acceptance did not complete every runtime check"
             )
-

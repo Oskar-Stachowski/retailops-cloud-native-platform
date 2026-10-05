@@ -54,6 +54,8 @@ Nie zmienia to legacy v1, snapshotów, istniejących bundle ani modeli.
    identyczną już zapisaną wersję, bez drugiego zdarzenia. To nie potwierdzenie
    dostarczenia. Istniejący zapis domenowy może użyć `append_on_connection`
    w swojej transakcji; nie wolno commitować faktu osobno od outboxu.
+   Połączenie `autocommit` bez aktywnego explicit transaction jest odrzucane
+   przed zapisem. Lock/statement timeout jest ustawiany także dla caller.
 8. Publikować ograniczoną partię:
 
    ```sh

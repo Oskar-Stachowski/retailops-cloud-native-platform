@@ -161,6 +161,10 @@ def test_actual_sql_outbox_publish_correction_and_duplicate(context):
 
 def test_failure_in_caller_transaction_rolls_back_fact_and_outbox(context):
     ctx = context
+    with psycopg.connect(ctx.database, autocommit=True) as conn:
+        with pytest.raises(ObservationError, match="observation_caller_transaction_required"):
+            ctx.outbox.append_on_connection(conn, ctx.stream, ctx.partitions, fact())
+    assert counts(ctx) == (0, 0, 0)
     with pytest.raises(ObservationError), ctx.outbox.transaction() as conn:
         ctx.outbox.append_on_connection(conn, ctx.stream, ctx.partitions, fact())
         raise ObservationError("injected_after_fact_and_outbox")
