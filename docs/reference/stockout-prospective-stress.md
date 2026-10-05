@@ -38,6 +38,20 @@ This miniature proves source physics, **not model quality or portfolio readiness
 Ruff/format pass for changed production files. Repository policy excludes data
 tests from its broad ALL-mode lint; their format was separately checked.
 
-Actual 30-product generation, qualification/export/import, resource acceptance,
-independent model evaluation, complete required CI and review/merge remain open.
-AI 08 is not ready and this profile does not authorize model promotion.
+The actual 30-product sources on seeds 42/137/2026 are prepared in
+[run 37245910420](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/37245910420),
+using frozen producer `61eb215193106cc3f41e6b79e0470585cc9e791b` and consumer
+`4faaf4b6c1997fda3a609645595165643bf302a9`. Generation, qualification/export/import,
+sealed feature/label/upstream/temporal parents and resource receipts are complete.
+The later test memberships are respectively 2627, 2609 and 2628; membership counts
+are not model quality measurements. Exact source identities and ZIP SHA are
+frozen in AI PR #14's six-world final campaign before outcome scoring.
+
+The producer's full
+[Required CI 37244283406](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37244283406)
+is successful, including data quality, AI03/AI06 cross-repo, API/Compose image/smoke
+and security gates. This documentation update leaves the accepted producer code
+and archived source contents intact; the final campaign retains its original
+producer SHA. Source review/merge/main CI and the separately authorized independent
+model evaluation remain open. AI 08 is not ready and this profile does not
+authorize model promotion.
