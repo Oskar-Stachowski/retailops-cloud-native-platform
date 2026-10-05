@@ -103,7 +103,7 @@ class AdditiveRollbackTests(unittest.TestCase):
         versions = Path(__file__).resolve().parents[2] / "services/api/alembic/versions"
         self.assertEqual(migration_contract(versions), self.plan["expanded"])
         additions = self.plan["migration_files"]
-        self.assertEqual(len(additions), 3)
+        self.assertEqual(len(additions), 4)
         for name, fingerprint in additions.items():
             self.assertEqual(
                 hashlib.sha256((versions / name).read_bytes()).hexdigest(), fingerprint

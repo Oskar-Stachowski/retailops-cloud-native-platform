@@ -50,3 +50,7 @@ w [indeksie dowodów](evidence/README.md).
 `STATUS.md` opisuje możliwości, audyt zawiera tylko otwarte problemy, a `plans/`
 opisuje pracę do wykonania. Usunięte i zakończone zadania nie mają tu osobnego
 archiwum; historię śledzonych dokumentów przechowuje Git.
+
+
+AI10: [operacyjny outbox obserwacji Source](runbooks/source-observation-outbox.md) —
+wersje faktów i outbox w jednej transakcji, publikacja TLS/SCRAM oraz wznowienie po awarii.

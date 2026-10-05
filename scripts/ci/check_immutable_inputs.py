@@ -148,6 +148,7 @@ def inventory(root: Path) -> dict:
             "scripts/release/registry.py",
             "scripts/kubernetes/drill.py",
             "services/api/tests/test_realtime_durability.py",
+            "services/api/tests/source_observation_runtime.py",
         )
     )
     references = []

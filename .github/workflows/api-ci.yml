@@ -123,11 +123,13 @@ jobs:
       - name: Verify checkpoint, approved head and suggestion durability before broad regression
         env:
           REQUIRE_BROKER_TESTS: "1"
+          SOURCE_OBSERVATION_OUTBOX_REPORT: "../../ci-cd/reports/api/source-observation-outbox.json"
         run: |
           rm -f .coverage .coverage.*
           python -m pytest -q -x tests/test_intelligence_checkpoint_durability.py \
             tests/test_intelligence_head_durability.py \
             tests/test_intelligence_suggestion_durability.py \
+            tests/test_source_observation_durability.py \
             --junitxml=../../ci-cd/reports/api/intelligence-durability.xml \
             --cov=app --cov-branch --cov-report= --cov-fail-under=0
 
@@ -172,6 +174,7 @@ jobs:
             --ignore=tests/test_intelligence_checkpoint_durability.py \
             --ignore=tests/test_intelligence_head_durability.py \
             --ignore=tests/test_intelligence_suggestion_durability.py \
+            --ignore=tests/test_source_observation_durability.py \
             --cov=app \
             --cov-append \
             --cov-report=term-missing \
@@ -211,6 +214,7 @@ jobs:
           path: |
             ci-cd/reports/api/suggestion-contract.json
             ci-cd/reports/api/intelligence-durability.xml
+            ci-cd/reports/api/source-observation-outbox.json
           if-no-files-found: error
 
       - name: Upload API security evidence

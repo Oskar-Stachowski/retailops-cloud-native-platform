@@ -5,8 +5,8 @@
     "history_sha256": "6035f243880f33eeba1ccc872c8901d1686c1c6766a518f64b9f712ba8151c80"
   },
   "expanded": {
-    "head": "a10f0c7e0400",
-    "history_sha256": "60255905980a3925c687dfe0e1db1ec3c8ea80192c8e23b1c2b51c73e09fa2fd"
+    "head": "a10f0c7e0500",
+    "history_sha256": "40cc6abd2e70ccf903635c3b3a03d5fbd636ef10d854c489de5a1fba2151280f"
   },
   "added_tables": [
     "ai_forecast_results",
@@ -14,12 +14,17 @@
     "ai_intelligence_partitions",
     "ai_intelligence_transport",
     "ai_recommendation_results",
-    "ai_recommendation_inbox"
+    "ai_recommendation_inbox",
+    "source_observation_streams",
+    "source_observation_keys",
+    "source_observation_versions",
+    "source_observation_outbox"
   ],
-  "reason": "AI10 adds immutable forecast/suggestion projections, inboxes, partition checkpoints and transport receipts. Historical migration bytes remain unchanged. The new nullable recommendation reference and XOR receipt constraint retain the old forecast path. Disposable drills migrate forward once and retain both nonempty projections and all receipts through application rollback. A populated suggestion schema downgrade is refused.",
+  "reason": "AI10 adds immutable forecast/suggestion projections, inboxes, partition checkpoints and transport receipts. Historical migration bytes remain unchanged. The new nullable recommendation reference and XOR receipt constraint retain the old forecast path. Disposable drills migrate forward once and retain both nonempty projections and all receipts through application rollback. A populated suggestion schema downgrade is refused. Source observation versions and outbox are additive and atomic; populated stream downgrade is refused. Publisher delivery is at least once and does not establish a full snapshot handoff.",
   "migration_files": {
     "a10f0c7e0200_add_intelligence_forecasts.py": "93fcd18e752133f344cab9627adf55685260e44f3f670a30916dc997ccb4ce42",
     "a10f0c7e0300_add_intelligence_checkpoints.py": "01dc3a90b1ff595f56bf2ece69853b1988bd2c0097f8acd3312dffa2ec2a7056",
-    "a10f0c7e0400_add_intelligence_suggestions.py": "c5759cafef509ac33812f8e67f005b1649e090fbabf81ad9145cb01b4658968b"
+    "a10f0c7e0400_add_intelligence_suggestions.py": "c5759cafef509ac33812f8e67f005b1649e090fbabf81ad9145cb01b4658968b",
+    "a10f0c7e0500_add_source_observation_outbox.py": "34f30a2f010575a6ab1b0b72ae87cdee1175b659e3edbe735c011f9e971ce530"
   }
 }
