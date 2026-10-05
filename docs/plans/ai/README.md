@@ -4,6 +4,11 @@
 [Końcowy stan AI 07](etapy/07-anomalie-dq.md) oraz
 [bieżący status obu publikacji](../../STATUS.md) wskazują exact SHA/runy w PR #97/#24.
 Dalsza integracja transportu i UI wyników należy do AI 10.
+
+**Status: AI 08 jest READY; AI 04/v12, AI 05 i AI 06 mają przyjęte odbiory. Aktualizacja: 05.10.2026.**
+[Końcowy odbiór AI 08](../../evidence/ai/08/final/README.md) i jego receipt wskazują
+kwalifikowany model, wyniki niezależnej jakości oraz zielone CI obu przyjętych main.
+AI 07 zachowuje osobny odbiór; zależności AI 09/10 pozostają w indeksie etapów.
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne

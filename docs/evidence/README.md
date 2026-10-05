@@ -1,12 +1,14 @@
 # Dowody weryfikacji
 
-Indeks przeglądany 2026-10-02. Poniżej znajdują się ostatnie zachowane wyniki
+Indeks przeglądany 2026-10-05. Poniżej znajdują się ostatnie zachowane wyniki
 potrzebne do opisania obecnych możliwości projektu. Każdy raport dotyczy
 konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
 | AI 07.5 — pełny strumień sprzedaży i zwrotów | 2026-10-03 | [Odbiór producenta](ai/07/07.5-full-dq/README.md): wszystkie 1633 / 1636 faktów obu przypadków, 16 rozliczonych błędów na przypadek, native zwroty i ich ogon, pokrycie faktów per grain, cztery odtwarzalne przebiegi w budżecie. Kwalifikacja dni biznesowych, odbiór AI i modele pozostają otwarte. |
+
+| AI 08 — końcowe READY | 2026-10-05 | [Końcowy odbiór](ai/08/final/README.md): 9296 punktów, 90 passed / 3 accepted warnings / 0 blockers, rzeczywisty lifecycle/batch/API i zielone CI obu przyjętych main. |
 | AI 05 — finalne v12 i publikacja | 2026-10-02 | [Końcowy odbiór](ai/05/final/README.md): świeży snapshot, trwały batch/API, lifecycle i restart; oba PR-y scalone, Required CI main zaliczony. |
 | OPS-06 — wejścia builda i workflow | 2026-09-30 | [Odbiór lokalny](ops/06/README.md): pełne SHA Actions, digesty zewnętrznych obrazów, kontrola 171 referencji, receipts BuildKit i rzeczywisty upgrade/awaria/rollback. Aktualizacje przez kontrolowany PR. |
 | OPS-03 — trwałe ACK i odtwarzanie | 2026-09-30 | [Odbiór lokalny](ops/03/README.md): 1424 passed, 40 istniejących DB tests skipped; wszystkie 17 real-broker cases passed. Raw quarantine, DB/handler failures, atomic rollback, SIGKILL przed ACK i reviewed replay. |

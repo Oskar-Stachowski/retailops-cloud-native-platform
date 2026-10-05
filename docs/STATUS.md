@@ -11,11 +11,17 @@ Frozen qualification source pozostaje `48439ebd9515dc1c7adc633609bbe33d1657c3df`
 scalenie z main zachowuje AI 05, prospektywny profil AI 08 i historyczne dane.
 Niższe wpisy AI 07 dokumentują wcześniejsze zakresy odbioru.
 
+**2026-10-05: AI 08 jest READY.** [Końcowy odbiór](evidence/ai/08/final/README.md)
+i [receipt obu repo](evidence/ai/08/final/main-publication.json) potwierdzają
+9296 punktów, 90 passed / 3 accepted warnings / 0 blockers, kwalifikowany model,
+rzeczywisty MLflow/lifecycle/batch/API i zielone Required CI obu przyjętych main.
+Wymagane prace AI 08: **0**. Odbiór był izolowany, bez wdrożenia produkcyjnego.
+
 **AI 05 jest `ready`: [końcowy odbiór i publikacja](evidence/ai/05/final/README.md)**
 obejmują rzeczywisty przepływ v12, oba scalone PR-y i zielony Required CI
 na `main` obu repozytoriów. AI 04 jest zamknięty na v12 z trzema przyjętymi
-odstępstwami MSE, a AI 06 ma odbiór danych inventory. Można rozpocząć AI 08
-po kontroli jego wejść i lineage; AI 07 pozostaje osobnym etapem.
+odstępstwami MSE, a AI 06 ma odbiór danych inventory. Wejścia i lineage AI 08
+są przyjęte w końcowym odbiorze; AI 07 pozostaje osobnym etapem.
 
 Aktualizacja: **2026-10-02**. [Audyt AI 00](evidence/ai/00/README.md) na
 `cbf28b2` obejmuje dwukrotną generację `small`, kontrast 100/20 produktów,
@@ -54,10 +60,11 @@ opisuje [plan AI](plans/ai/README.md).
 
 ## Punkt wznowienia
 
-Po [odbiorze AI 05](evidence/ai/05/final/README.md) można rozpocząć
-[AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md), zaczynając od
-weryfikacji danych inventory, dojrzałych etykiet i historycznej lineage prognoz.
-AI 07 ma końcowy odbiór i warunek zamknięcia na main opisany powyżej.
+[AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md) jest zamknięty.
+AI 07 ma końcowy odbiór i publikację #97/#24 wskazaną powyżej; formalne
+ready wymaga zielonego CI obu mainów. Po spełnieniu tego warunku można
+przejść do AI 09/10, z zachowaniem ich pozostałych zależności.
+Nie otwieraj ponownie AI 08 na podstawie historycznych wpisów.
 Poniższe wcześniejsze odbiory zachowują swoje wersje danych i zakresy.
 
 [AI 03 — snapshot, importer i curated](plans/ai/etapy/03-snapshot-curated.md).
