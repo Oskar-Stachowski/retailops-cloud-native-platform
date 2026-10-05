@@ -286,7 +286,7 @@ def build_dimensions(
     categories = _categories()
     catalog = _catalog(products, brands, config)
     selling_count = min(config.stores, max(2, (config.stores + len(CHANNELS) - 1) // len(CHANNELS)))
-    if config.profile in {"ai-07-portfolio-v2", "ai-07-portfolio-v3"}:
+    if config.profile in {"ai-07-portfolio-v2", "ai-07-portfolio-v3", "ai-07-portfolio-v4"}:
         # The declared two-pair benchmark has one physical location, with
         # store and online intake, rather than two Sunday-closed store pairs.
         selling_count = 1

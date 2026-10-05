@@ -49,7 +49,12 @@ def full_events(tables: dict, manifest: dict) -> list[dict]:
         <= (
             8192
             if manifest["descriptor"]["resolved_parameters"]["profile"]
-            in {"ai-07-portfolio-v1", "ai-07-portfolio-v2", "ai-07-portfolio-v3"}
+            in {
+                "ai-07-portfolio-v1",
+                "ai-07-portfolio-v2",
+                "ai-07-portfolio-v3",
+                "ai-07-portfolio-v4",
+            }
             else MAX_CANONICAL_EVENTS
         ),
         "Full canonical stream exceeds bounded scope.",
@@ -125,6 +130,7 @@ def source_binding(manifest: dict, events: list[dict]) -> dict:
         "ai-07-portfolio-v1",
         "ai-07-portfolio-v2",
         "ai-07-portfolio-v3",
+        "ai-07-portfolio-v4",
     }
     model = PortfolioBinding if portfolio else FullBinding
     return model.from_payload(

@@ -2,6 +2,8 @@
 
 from datetime import date, timedelta
 
+import pytest
+
 from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
 from data.inventory.run_source_dataset import default_inventory_config
 from data.generator.main import build_dataset
@@ -38,10 +40,11 @@ def test_supply_profile_has_native_online_history_for_all_physical_scenario_prod
     assert sum(required <= days for days in grouped.values()) >= 4
 
 
-def test_confirmatory_profile_declares_distinct_calendar_and_larger_control_cohort():
-    generation = DatasetGenerationConfig(profile="ai-07-portfolio-v3")
+@pytest.mark.parametrize("profile,year", [("ai-07-portfolio-v3", 2026), ("ai-07-portfolio-v4", 2025)])
+def test_confirmatory_profile_declares_distinct_calendar_and_larger_control_cohort(profile, year):
+    generation = DatasetGenerationConfig(profile=profile)
     resolved = resolve_generation_config(generation)
-    assert (resolved.start_date, resolved.end_date) == (date(2026, 1, 1), date(2026, 5, 8))
+    assert (resolved.start_date, resolved.end_date) == (date(year, 1, 1), date(year, 5, 8))
     assert (resolved.days, resolved.products, resolved.stores, resolved.warehouses) == (128, 12, 2, 2)
     assert resolved.max_daily_rows == 3072
     tables = build_dataset(generation)

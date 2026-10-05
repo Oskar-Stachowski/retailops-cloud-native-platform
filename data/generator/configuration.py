@@ -31,6 +31,7 @@ PROFILE_DEFAULTS = {
     "ai-07-portfolio-v1": SyntheticProfileDefaults(128, 8, 3, 2),
     "ai-07-portfolio-v2": SyntheticProfileDefaults(128, 8, 2, 2),
     "ai-07-portfolio-v3": SyntheticProfileDefaults(128, 12, 2, 2),
+    "ai-07-portfolio-v4": SyntheticProfileDefaults(128, 12, 2, 2),
 }
 SUPPORTED_PROFILES = ("demo", *PROFILE_DEFAULTS, "ai-load")
 SIZING_FIELDS = ("days", "products", "stores", "warehouses")
@@ -126,7 +127,9 @@ def resolve_generation_config(config: DatasetGenerationConfig) -> ResolvedGenera
             raise ValueError(msg)
         values["days"] = days
     end = config.end_date or (
-        date(2026, 5, 8)
+        date(2025, 5, 8)
+        if config.profile == "ai-07-portfolio-v4"
+        else date(2026, 5, 8)
         if config.profile == "ai-07-portfolio-v3"
         else AI_END_DATE
         if config.profile.startswith("ai-")

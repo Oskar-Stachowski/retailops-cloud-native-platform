@@ -82,7 +82,12 @@ def build_pricing_plans(
         discount, minimum, _ = PROMOTION_POLICIES[promotion_type]
         scope, location, channel, _ = scopes[-1]
         offset = config.days // 3 + index % 4
-        if config.profile in {"ai-07-portfolio-v1", "ai-07-portfolio-v2", "ai-07-portfolio-v3"}:
+        if config.profile in {
+            "ai-07-portfolio-v1",
+            "ai-07-portfolio-v2",
+            "ai-07-portfolio-v3",
+            "ai-07-portfolio-v4",
+        }:
             offset = (42, 72, 104)[index % 3]
         start = config.start_date + timedelta(days=min(config.days - 1, offset))
         end = min(

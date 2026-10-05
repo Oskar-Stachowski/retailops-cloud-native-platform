@@ -91,3 +91,19 @@ qualify only this declared synthetic scope, not the prior v2 cohort or productio
 Training and validation use seed 42, offsets 28–59 and 64–95. Final offsets
 100–127 for all six seed/scenario cases remain unopened until model selection,
 thresholds, metrics and complete public lineage are frozen.
+
+## Separately reserved calibration cohort v4
+
+The v3 final test failed precision and return-segment false-alert gates. Its
+original models, frozen selections and failed results are retained.
+`ai-07-portfolio-v4` declares the distinct 2025-01-01 through 2025-05-08 calendar
+before any new final scoring. Dimensions, native demand factor, supply policy,
+full-census 8192-event bound, five intervention types and magnitudes, conservative
+truth mask, seeds and temporal offsets are identical to v3. No observations
+are removed to improve measured quality.
+
+This new synthetic cohort supports a separately declared event-capacity
+calibration experiment. Development uses seed 42 only. Final windows of all
+six cases are reserved until model versions and complete public lineages are
+frozen. Repeated synthetic experiments are correlated; success would qualify
+only this declared synthetic scope and would not validate v2, v3 or production.

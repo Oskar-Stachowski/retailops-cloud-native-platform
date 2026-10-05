@@ -9,6 +9,7 @@ from pathlib import Path
 from data.anomalies.example import example_plan
 from data.anomalies.physical_scenarios import physical_example_plan
 from data.anomalies.portfolio import (
+    CALIBRATED_PROFILE,
     CONFIRMATORY_PROFILE,
     PROFILE,
     SUPPLY_ADEQUATE_PROFILE,
@@ -36,6 +37,7 @@ def main() -> None:
             PROFILE,
             SUPPLY_ADEQUATE_PROFILE,
             CONFIRMATORY_PROFILE,
+            CALIBRATED_PROFILE,
         ),
         default="ai-smoke",
     )

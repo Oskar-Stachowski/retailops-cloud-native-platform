@@ -15,6 +15,7 @@ from data.inventory.source_bridge import simulate_source_commerce
 PROFILE = "ai-07-portfolio-v1"
 SUPPLY_ADEQUATE_PROFILE = "ai-07-portfolio-v2"
 CONFIRMATORY_PROFILE = "ai-07-portfolio-v3"
+CALIBRATED_PROFILE = "ai-07-portfolio-v4"
 SEEDS = (42, 137, 2026)
 SPLITS = {"training": (28, 59), "validation": (64, 95), "final_test": (100, 127)}
 
@@ -22,11 +23,12 @@ SPLITS = {"training": (28, 59), "validation": (64, 95), "final_test": (100, 127)
 def portfolio_plan(generation: DatasetGenerationConfig, family: str) -> dict:
     effective = resolve_generation_config(generation)
     require(
-        effective.profile in (PROFILE, SUPPLY_ADEQUATE_PROFILE, CONFIRMATORY_PROFILE)
+        effective.profile
+        in (PROFILE, SUPPLY_ADEQUATE_PROFILE, CONFIRMATORY_PROFILE, CALIBRATED_PROFILE)
         and (effective.days, effective.products, effective.stores, effective.warehouses)
         == (
             128,
-            12 if effective.profile == CONFIRMATORY_PROFILE else 8,
+            12 if effective.profile in (CONFIRMATORY_PROFILE, CALIBRATED_PROFILE) else 8,
             3 if effective.profile == PROFILE else 2,
             2,
         ),
