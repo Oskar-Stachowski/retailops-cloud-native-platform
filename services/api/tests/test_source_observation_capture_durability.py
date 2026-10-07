@@ -15,17 +15,17 @@ from app.services.source_observation_outbox import (
     ObservationPublisher,
 )
 from pydantic import SecretStr
-from source_observation_runtime import publisher_runtime  # noqa: F401 - pytest fixture
+from source_observation_runtime import capture_runtime  # noqa: F401 - pytest fixture
 from test_source_observation_outbox import fact
 
 pytestmark = pytest.mark.integration_broker
 
 
 def test_actual_source_capture_binds_complete_prefix_retry_correction_and_later_replay(
-    publisher_runtime,  # noqa: F811 - pytest resolves imported module fixture
+    capture_runtime,  # noqa: F811 - pytest resolves imported module fixture
     tmp_path,
 ):
-    rt = publisher_runtime
+    rt = capture_runtime
     producer, topology = build_producer(rt.config)
     stream, partitions = topology.inspect()
     database = rt.engine.url.render_as_string(hide_password=False).replace(
@@ -131,5 +131,8 @@ def test_actual_source_capture_binds_complete_prefix_retry_correction_and_later_
                 )
                 + "\n"
             )
+        rt.passed(
+            "complete_source_capture_crash_retry_correction_and_immutable_later_replay"
+        )
     finally:
         reader.close()

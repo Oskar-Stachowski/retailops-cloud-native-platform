@@ -17,14 +17,9 @@ from uuid import uuid4
 import pytest
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
-from sqlalchemy import create_engine, text
-
-from app.services.source_observation_broker import BrokerConfig, TOPIC, build_producer
-from app.services.source_observation_outbox import (
-    ObservationOutbox,
-    ObservationPublisher,
-)
+from app.services.source_observation_broker import TOPIC, BrokerConfig
 from app.services.source_observation_wire import Stream
+from sqlalchemy import create_engine, text
 
 ROOT = Path(__file__).resolve().parents[3]
 POSTGRES = "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea"
@@ -76,8 +71,7 @@ class Runtime:
         self.checks.append(name)
 
 
-@pytest.fixture(scope="module")
-def publisher_runtime(tmp_path_factory):
+def observation_runtime(tmp_path_factory, *, required_checks):
     if os.getenv("REQUIRE_BROKER_TESTS") != "1":
         pytest.skip("Mandatory remote gate owns PostgreSQL and TLS/SCRAM Redpanda")
     docker = shutil.which("docker")
@@ -456,7 +450,19 @@ def publisher_runtime(tmp_path_factory):
         for name in names:
             subprocess.run([docker, "rm", "-fv", name], capture_output=True, timeout=45)
         shutil.rmtree(private)
-        if rt is not None and len(rt.checks) != 12:
+        if rt is not None and len(rt.checks) != required_checks:
             pytest.fail(
                 "Mandatory broker acceptance did not complete every runtime check"
             )
+
+
+@pytest.fixture(scope="module")
+def publisher_runtime(tmp_path_factory):
+    # Preserve all twelve existing mandatory publisher checks.
+    yield from observation_runtime(tmp_path_factory, required_checks=12)
+
+
+@pytest.fixture(scope="module")
+def capture_runtime(tmp_path_factory):
+    # This independent SQL/broker instance must finish its complete capture/replay check.
+    yield from observation_runtime(tmp_path_factory, required_checks=1)
