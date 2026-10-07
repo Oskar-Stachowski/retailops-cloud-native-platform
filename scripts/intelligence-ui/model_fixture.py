@@ -34,7 +34,7 @@ def seed(control: Path) -> dict[str, Any]:
             )
             bind(events[0])
         foreign = fixture_event(kind)
-        foreign["payload"]["product_id"] = "foreign-model-product"
+        foreign["payload"]["product_id"] = "ffffffff-ffff-4fff-8fff-ffffffffffff"
         bind(foreign)
         for event in [*events, foreign]:
             repository.project(event)

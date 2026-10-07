@@ -27,7 +27,7 @@ test("native model SQL/API/UI reads preserve grains, lineage, pagination and pri
     await panel.getByLabel("Personal model read credential").fill(secret);
     await panel.getByRole("button", { name: `Connect ${title}` }).click();
     await expect(panel.getByText("Showing 50 of 70 scoped results.")).toBeVisible();
-    await expect(panel).not.toContainText("foreign-model-product");
+    await expect(panel).not.toContainText("ffffffff-ffff-4fff-8fff-ffffffffffff");
     const response = await request.get(`/api/intelligence/v2/${resource}?limit=50&offset=0`, { headers });
     expect(response.status()).toBe(200);
     expect(response.headers()["cache-control"]).toBe("no-store");

@@ -118,7 +118,7 @@ def test_native_model_broker_projection_deduplicates_and_literal_id_api_preserve
         assert response.json()["source"] == "retailops-ai"
         assert response.headers["cache-control"] == "no-store"
         foreign = fixture_event(kind)
-        foreign["payload"]["product_id"] = "foreign-product"
+        foreign["payload"]["product_id"] = "ffffffff-ffff-4fff-8fff-ffffffffffff"
         bind(foreign); produce_model(context, foreign); run(context, bootstrap=False)
         assert api.get(path + "/" + identity(foreign), headers=model_headers).status_code == 404
         assert api.get(path + "?product_id=foreign-product", headers=model_headers).status_code == 403
