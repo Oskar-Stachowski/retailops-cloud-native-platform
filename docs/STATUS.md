@@ -1,10 +1,15 @@
 # Aktualny status RetailOps
 
-**AI 07 — odbiór kwalifikacji zaliczony; zamknięcie na `main` ma jawny warunek.**
-Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),
-a konsument w [PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24).
-Po scaleniu obu PR-ów i zaliczeniu Required CI ich HEAD oraz obu merge commitów
-AI 07 jest `ready` w zakresie `synthetic_ai_07_portfolio_v4`.
+**2026-10-07: AI 09 pozostaje in_progress.**
+[Odbiór komponentów producenta](evidence/ai/09/source-preparation/README.md)
+opisuje ograniczenie kopii wejść oraz dziennego replayu inventory:
+456 testów regresji i zgodne dane kontrolne. Pomiar pełnego profilu,
+rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamknięte.
+
+**AI 07 — READY na `main`, zakres `synthetic_ai_07_portfolio_v4`.**
+Kompletny producent [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97)
+i konsument [PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24)
+są scalone i mają zaliczony Required CI implementacji oraz obu main.
 [Końcowy odbiór konsumenta](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md)
 wiąże dwa rzeczywiste modele, 56/56 bramek, lifecycle, batch/API i restart OCI.
 Frozen qualification source pozostaje `48439ebd9515dc1c7adc633609bbe33d1657c3df`;
@@ -62,8 +67,7 @@ opisuje [plan AI](plans/ai/README.md).
 
 [AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md) jest zamknięty.
 AI 07 ma końcowy odbiór i publikację #97/#24 wskazaną powyżej; formalne
-ready wymaga zielonego CI obu mainów. Po spełnieniu tego warunku można
-przejść do AI 09/10, z zachowaniem ich pozostałych zależności.
+ready obu mainów jest zamknięte. AI 09/10 zachowują własne wymagania.
 Nie otwieraj ponownie AI 08 na podstawie historycznych wpisów.
 Poniższe wcześniejsze odbiory zachowują swoje wersje danych i zakresy.
 

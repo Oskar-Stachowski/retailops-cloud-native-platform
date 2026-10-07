@@ -1,0 +1,232 @@
+{
+  "scope": "controlled native components on ai-load; not whole pipeline or canonical qualification",
+  "producer_base": "1de462729012a1bad458a8da4ad317ec22dbc5b8",
+  "changed_code_sha256": {
+    "data/inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
+    "data/inventory/snapshots.py": "513015f4a69d72d199e880d9a7b435f7aa5caf8f69f59f8fa0bda5360ba27f93"
+  },
+  "python": "3.11.15",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "generation": {
+    "profile": "ai-load",
+    "days": 90,
+    "products": 8,
+    "stores": 2,
+    "warehouses": 2,
+    "seed": 42,
+    "start_date": "2026-05-03",
+    "end_date": "2026-07-31",
+    "max_daily_rows": 1440,
+    "business_timezone": "UTC",
+    "output_format": "csv",
+    "warmup_days": 0,
+    "origin_days": 0,
+    "label_tail_days": 0,
+    "forecast_plan_days": 14,
+    "forecast_plan_version": "known-forecast-plans-1.0.0"
+  },
+  "native_ledger_movements": 3834,
+  "inventory_scope": 16,
+  "snapshot_rows": 1440,
+  "snapshot_sha256": "a53463ff17fffb8d97f24b8d68355fc161645a2fe6e2fce43d32f8d093689e2d",
+  "candidate_unchanged": true,
+  "snapshot_complete_byte_parity": true,
+  "copy_table_names": [
+    "assortment",
+    "business_calendar",
+    "catalog_categories",
+    "category_calendar",
+    "channel_assignments",
+    "daily_demand_exclusions",
+    "daily_demand_observations",
+    "daily_demand_versions",
+    "daily_price_observations",
+    "daily_return_cohorts",
+    "fulfillment_routes",
+    "order_items",
+    "orders",
+    "price_history",
+    "price_plans",
+    "product_catalog",
+    "product_simulation_parameters",
+    "products",
+    "promotion_effect_truth",
+    "promotion_plans",
+    "promotions",
+    "return_events",
+    "return_policies",
+    "returns",
+    "sale_price_references",
+    "sales",
+    "selling_locations",
+    "stock_locations",
+    "store_simulation_parameters",
+    "stores",
+    "warehouses"
+  ],
+  "pairs": 5,
+  "copy_pairs": [
+    {
+      "old": {
+        "wall_seconds": 0.7281911669997498,
+        "process_cpu_seconds": 0.5276259999999997,
+        "python_traced_peak_bytes": 16709064
+      },
+      "new": {
+        "wall_seconds": 0.4739835829968797,
+        "process_cpu_seconds": 0.39852699999999963,
+        "python_traced_peak_bytes": 14234096
+      }
+    },
+    {
+      "new": {
+        "wall_seconds": 0.4287733329983894,
+        "process_cpu_seconds": 0.3932450000000003,
+        "python_traced_peak_bytes": 14234096
+      },
+      "old": {
+        "wall_seconds": 0.5319312499923399,
+        "process_cpu_seconds": 0.47779999999999845,
+        "python_traced_peak_bytes": 16709064
+      }
+    },
+    {
+      "old": {
+        "wall_seconds": 0.4633907499955967,
+        "process_cpu_seconds": 0.4493369999999999,
+        "python_traced_peak_bytes": 16709064
+      },
+      "new": {
+        "wall_seconds": 0.44718424999155104,
+        "process_cpu_seconds": 0.4055769999999974,
+        "python_traced_peak_bytes": 14234096
+      }
+    },
+    {
+      "new": {
+        "wall_seconds": 0.36921287499717437,
+        "process_cpu_seconds": 0.36338399999999993,
+        "python_traced_peak_bytes": 14234096
+      },
+      "old": {
+        "wall_seconds": 0.43454537499928847,
+        "process_cpu_seconds": 0.42763800000000174,
+        "python_traced_peak_bytes": 16709064
+      }
+    },
+    {
+      "old": {
+        "wall_seconds": 0.48453737499949057,
+        "process_cpu_seconds": 0.459226000000001,
+        "python_traced_peak_bytes": 16709064
+      },
+      "new": {
+        "wall_seconds": 0.4564945829915814,
+        "process_cpu_seconds": 0.408574999999999,
+        "python_traced_peak_bytes": 14234096
+      }
+    }
+  ],
+  "snapshot_pairs": [
+    {
+      "old": {
+        "wall_seconds": 0.22680462499556597,
+        "process_cpu_seconds": 0.18626500000000057,
+        "python_traced_peak_bytes": null
+      },
+      "new": {
+        "wall_seconds": 0.02628670900594443,
+        "process_cpu_seconds": 0.020518000000000924,
+        "python_traced_peak_bytes": null
+      }
+    },
+    {
+      "new": {
+        "wall_seconds": 0.016882625001017004,
+        "process_cpu_seconds": 0.01590699999999856,
+        "python_traced_peak_bytes": null
+      },
+      "old": {
+        "wall_seconds": 0.1607914580090437,
+        "process_cpu_seconds": 0.15327500000000072,
+        "python_traced_peak_bytes": null
+      }
+    },
+    {
+      "old": {
+        "wall_seconds": 0.1449965830106521,
+        "process_cpu_seconds": 0.1431740000000019,
+        "python_traced_peak_bytes": null
+      },
+      "new": {
+        "wall_seconds": 0.014595665998058394,
+        "process_cpu_seconds": 0.014401999999996917,
+        "python_traced_peak_bytes": null
+      }
+    },
+    {
+      "new": {
+        "wall_seconds": 0.01657287499983795,
+        "process_cpu_seconds": 0.014958999999997502,
+        "python_traced_peak_bytes": null
+      },
+      "old": {
+        "wall_seconds": 0.14449208301084582,
+        "process_cpu_seconds": 0.14368200000000186,
+        "python_traced_peak_bytes": null
+      }
+    },
+    {
+      "old": {
+        "wall_seconds": 0.16628099999797996,
+        "process_cpu_seconds": 0.16068800000000039,
+        "python_traced_peak_bytes": null
+      },
+      "new": {
+        "wall_seconds": 0.017848917006631382,
+        "process_cpu_seconds": 0.01612400000000136,
+        "python_traced_peak_bytes": null
+      }
+    }
+  ],
+  "copy_allocation_summary": {
+    "old_median": 16709064,
+    "new_median": 14234096,
+    "reduction_percent": 14.812128315505884,
+    "old_over_new": 1.173876022755502
+  },
+  "snapshot_cpu_summary": {
+    "old_median": 0.15327500000000072,
+    "new_median": 0.01590699999999856,
+    "reduction_percent": 89.62192138313587,
+    "old_over_new": 9.635694977055044
+  },
+  "snapshot_wall_summary": {
+    "old_median": 0.1607914580090437,
+    "new_median": 0.016882625001017004,
+    "reduction_percent": 89.50029733540482,
+    "old_over_new": 9.524079223423945
+  },
+  "tree_rss_measured": false,
+  "whole_pipeline_speed_measured": false,
+  "canonical_ai_dev_qualified": false,
+  "canonical_ai_training_qualified": false,
+  "new_project_fits": 0,
+  "final_test_opened": false,
+  "validation": {
+    "combined_native_tests_passed": 456,
+    "combined_native_seconds": 122.85,
+    "snapshot_differential_and_projection_tests_passed": 69,
+    "snapshot_differential_and_projection_seconds": 1.17,
+    "complete_copy_differential_tests_passed": 6,
+    "complete_copy_differential_seconds": 7.39,
+    "ruff_source_all": "passed",
+    "ruff_source_format": "passed",
+    "diagnostic_preparation_failures_retained": [
+      "max_daily_rows missing",
+      "scenario.settings lookup"
+    ],
+    "project_campaign_initialized": false,
+    "stage_ready": false
+  }
+}
