@@ -28,7 +28,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      testIgnore: ["**/frontend-api-evidence.spec.js", "**/intelligence-forecasts.spec.js", "**/intelligence-suggestions.spec.js", "**/intelligence-models.spec.js", "**/intelligence-native-models.spec.js"],
+      testIgnore: ["**/frontend-api-evidence.spec.js", "**/intelligence-forecasts.spec.js", "**/intelligence-suggestions.spec.js", "**/intelligence-models.spec.js", "**/intelligence-native-models.spec.js", "**/intelligence-native-forecast.spec.js"],
       use: { ...devices["Desktop Chrome"] },
     },
     {
@@ -40,6 +40,12 @@ export default defineConfig({
     {
       name: "native-intelligence-chromium",
       testMatch: "**/intelligence-native-models.spec.js",
+      timeout: 180_000,
+      use: { ...devices["Desktop Chrome"], trace: "off", screenshot: "off" },
+    },
+    {
+      name: "native-forecast-chromium",
+      testMatch: "**/intelligence-native-forecast.spec.js",
       timeout: 180_000,
       use: { ...devices["Desktop Chrome"], trace: "off", screenshot: "off" },
     },

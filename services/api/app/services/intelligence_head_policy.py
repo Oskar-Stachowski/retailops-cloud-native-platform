@@ -21,6 +21,10 @@ RunID = Annotated[str, Field(pattern=r"^run-[0-9a-f]{32}$")]
 MAX_HEAD_ROWS = 2800
 MAX_POLICY_BYTES = 1024 * 1024
 MAX_REVIEW_AGE = timedelta(minutes=15)
+ForecastModel = Literal[
+    "retailops-demand-forecast-v12", "retailops-demand-forecast-v12-development"
+]
+DEVELOPMENT_ACCEPTANCE_SHA256 = "11cd0e1fdd10629543bcb66aaedb3bd9b7b7fc5b31473575b998d951c93f00d2"
 
 
 class HeadRow(PrivateContract):
@@ -31,7 +35,7 @@ class HeadRow(PrivateContract):
 class OwnerReviewReceipt(PrivateContract):
     """Exact pinned AI lifecycle review response, delivered by the trusted operator."""
 
-    model_name: Literal["retailops-demand-forecast-v12"]
+    model_name: ForecastModel
     model_version: Annotated[str, Field(pattern=r"^[1-9][0-9]*$")]
     approval_id: Annotated[str, Field(pattern=r"^v12-inference-release-sha256-[0-9a-f]{64}$")]
     approval_sha256: Sha256
@@ -42,6 +46,21 @@ class OwnerReviewReceipt(PrivateContract):
     )
     pending_decisions: tuple[str, ...] = Field(max_length=0)
     runtime_status: Literal["not_integrated"]
+    development_acceptance_sha256: Sha256 | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+
+    @model_validator(mode="after")
+    def separate_development_authority(self) -> Self:
+        expected = (
+            DEVELOPMENT_ACCEPTANCE_SHA256
+            if self.model_name == "retailops-demand-forecast-v12-development"
+            else None
+        )
+        if self.development_acceptance_sha256 != expected:
+            msg = "head_original_development_acceptance_required"
+            raise ValueError(msg)
+        return self
 
     @field_validator("rejected", mode="before")
     @classmethod
@@ -74,7 +93,7 @@ class ApprovedForecastHead(PrivateContract):
     prediction_dataset_id: OutputID
     forecast_origin: datetime
     generated_at: datetime
-    model_name: Literal["retailops-demand-forecast-v12"]
+    model_name: ForecastModel
     model_version: Annotated[str, Field(pattern=r"^[1-9][0-9]*$")]
     approval_sha256: Sha256
     approval_valid_until: datetime

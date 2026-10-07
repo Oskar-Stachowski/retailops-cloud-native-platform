@@ -157,6 +157,7 @@ export default function IntelligenceForecasts() {
       {state.page && (
         <>
           <p>{selection === "active" ? "Selected by a private operator review with a limited validity window." : "Historical publications. These rows do not imply current approval."} Source: retailops-ai. Freshness is evaluated separately for every result.</p>
+          {state.page.items.some((item) => item.forecast.model_name === "retailops-demand-forecast-v12-development") && <p role="status">Development acceptance only. The original model quality remains not_ready.</p>}
           <DataTable title="Daily AI forecast results" columns={tableColumns} rows={state.page.items}
             getRowKey={(item) => item.forecast.prediction_id}
             emptyMessage="No AI forecasts are available in your assigned scope for this selection." />

@@ -11,8 +11,17 @@ import urllib.request
 
 
 def run_native_browser(
-    *, api_url, control, policy_path, token, cases, frontend, report
+    *,
+    api_url,
+    control,
+    policy_path,
+    token,
+    cases,
+    frontend,
+    report,
+    project="native-intelligence-chromium",
 ):
+    assert project in {"native-intelligence-chromium", "native-forecast-chromium"}
     assert frontend.joinpath("dist/index.html").is_file(), (
         "Build the real frontend first"
     )
@@ -73,7 +82,7 @@ def run_native_browser(
                     node,
                     "node_modules/@playwright/test/cli.js",
                     "test",
-                    "--project=native-intelligence-chromium",
+                    "--project=" + project,
                 ],
                 cwd=frontend,
                 env=env,

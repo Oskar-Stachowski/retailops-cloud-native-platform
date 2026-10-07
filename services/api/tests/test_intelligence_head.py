@@ -10,6 +10,16 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+from app.auth.intelligence import IntelligencePrincipal, verified_principal
+from app.main import app
+from app.services.intelligence_contract import content_hash
+from app.services.intelligence_head import verify_head_rows
+from app.services.intelligence_head_policy import (
+    DEVELOPMENT_ACCEPTANCE_SHA256,
+    ForecastHeadPolicy,
+    head_policy,
+    private_document,
+)
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from intelligence_head_fixture import (
@@ -19,12 +29,6 @@ from intelligence_head_fixture import (
     store_policy,
 )
 from pydantic import ValidationError
-
-from app.auth.intelligence import IntelligencePrincipal, verified_principal
-from app.main import app
-from app.services.intelligence_contract import content_hash
-from app.services.intelligence_head import verify_head_rows
-from app.services.intelligence_head_policy import ForecastHeadPolicy, head_policy, private_document
 from scripts.prepare_intelligence_head import write_new_policy
 
 
@@ -36,6 +40,56 @@ def events():
 @pytest.fixture
 def policy(events):
     return selected_policy(events)
+
+
+def test_exact_development_owner_receipt_allows_separate_namespace(policy, events):
+    """Invented policy mechanics only; this test never qualifies the original model."""
+    raw = policy.model_dump(mode="json")
+    head = raw["heads"][0]
+    head["model_name"] = "retailops-demand-forecast-v12-development"
+    review = head["owner_review_receipt"]
+    review["model_name"] = head["model_name"]
+    review["development_acceptance_sha256"] = DEVELOPMENT_ACCEPTANCE_SHA256
+    head["owner_review_receipt_sha256"] = content_hash(review)
+    selected = ForecastHeadPolicy.model_validate_json(rehash_policy(raw))
+    for event in events:
+        event["payload"]["model_name"] = head["model_name"]
+    records = {
+        event["payload"]["prediction_id"]: {
+            "payload": event["payload"],
+            "payload_sha256": content_hash(event["payload"]),
+        }
+        for event in events
+    }
+    changed = selected.model_dump(mode="json")
+    for row in changed["heads"][0]["rows"]:
+        row["payload_sha256"] = records[row["prediction_id"]]["payload_sha256"]
+    selected = ForecastHeadPolicy.model_validate_json(rehash_policy(changed))
+    verify_head_rows(selected.heads[0], records)
+
+
+@pytest.mark.parametrize("acceptance", [None, "f" * 64])
+def test_development_name_alone_or_substituted_owner_decision_is_refused(
+    policy, acceptance
+):
+    raw = policy.model_dump(mode="json")
+    head = raw["heads"][0]
+    head["model_name"] = "retailops-demand-forecast-v12-development"
+    review = head["owner_review_receipt"]
+    review["model_name"] = head["model_name"]
+    if acceptance is not None:
+        review["development_acceptance_sha256"] = acceptance
+    head["owner_review_receipt_sha256"] = content_hash(review)
+    with pytest.raises(ValidationError, match="development_acceptance_required"):
+        ForecastHeadPolicy.model_validate_json(rehash_policy(raw))
+
+
+def test_standard_owner_review_preserves_original_field_inventory(policy):
+    raw = policy.model_dump(mode="json")
+    assert (
+        "development_acceptance_sha256" not in raw["heads"][0]["owner_review_receipt"]
+    )
+    assert ForecastHeadPolicy.model_validate_json(json.dumps(raw)) == policy
 
 
 @pytest.mark.parametrize(
@@ -97,7 +151,9 @@ def test_policy_refuses_invalid_or_ambiguous_selections(policy, mutation):
     elif mutation == "wrong_owner_approval":
         head["owner_review_receipt"]["approval_sha256"] = "f" * 64
     elif mutation == "wrong_owner_release":
-        head["owner_review_receipt"]["release_id"] = "v12-model-release-sha256-" + "f" * 64
+        head["owner_review_receipt"]["release_id"] = (
+            "v12-model-release-sha256-" + "f" * 64
+        )
     elif mutation == "review_hash":
         head["owner_review_receipt_sha256"] = "0" * 64
     else:
@@ -109,7 +165,9 @@ def test_policy_refuses_invalid_or_ambiguous_selections(policy, mutation):
         ForecastHeadPolicy.model_validate_json(text)
 
 
-@pytest.mark.parametrize("mutation", ["partial", "duplicate_grain", "mixed_binding", "mechanics"])
+@pytest.mark.parametrize(
+    "mutation", ["partial", "duplicate_grain", "mixed_binding", "mechanics"]
+)
 def test_preparation_requires_complete_production_publication(events, mutation):
     changed = copy.deepcopy(events)
     if mutation == "partial":
@@ -134,9 +192,9 @@ def test_full_payload_hash_and_scope_coverage_are_checked_outside_page(events, p
         for event in events
     }
     verify_head_rows(policy.heads[0], records)
-    records[events[-1]["payload"]["prediction_id"]]["payload"]["prediction"]["candidate"][
-        "mean"
-    ] += 1
+    records[events[-1]["payload"]["prediction_id"]]["payload"]["prediction"][
+        "candidate"
+    ]["mean"] += 1
     with pytest.raises(HTTPException) as caught:
         verify_head_rows(policy.heads[0], records)
     assert caught.value.detail == "intelligence_head_binding_invalid"
@@ -178,7 +236,9 @@ def test_missing_policy_cannot_be_replaced_by_a_reader_grant(monkeypatch):
         head_policy()
 
 
-def test_policy_is_reloaded_and_empty_policy_revokes_all_heads(tmp_path, monkeypatch, policy):
+def test_policy_is_reloaded_and_empty_policy_revokes_all_heads(
+    tmp_path, monkeypatch, policy
+):
     path = tmp_path / "policy.json"
     store_policy(path, policy)
     monkeypatch.setenv("RETAILOPS_INTELLIGENCE_HEAD_POLICY", str(path))
@@ -196,7 +256,9 @@ def test_preparation_is_atomic_private_and_never_replaces_policy(tmp_path, polic
     write_new_policy(path, policy.model_dump_json().encode())
     assert path.stat().st_mode & 0o777 == 0o600
     assert (
-        ForecastHeadPolicy.model_validate_json(private_document(path, max_bytes=1024 * 1024))
+        ForecastHeadPolicy.model_validate_json(
+            private_document(path, max_bytes=1024 * 1024)
+        )
         == policy
     )
     original = path.read_bytes()
@@ -216,7 +278,9 @@ def test_preparation_is_atomic_private_and_never_replaces_policy(tmp_path, polic
         "?as_of=2026-10-04T23:59:59%2B02:00",
     ],
 )
-def test_active_route_rejects_unknown_repeated_unbounded_or_non_utc_query(query, monkeypatch):
+def test_active_route_rejects_unknown_repeated_unbounded_or_non_utc_query(
+    query, monkeypatch
+):
     principal = IntelligencePrincipal.model_validate_json(
         json.dumps(
             {
@@ -235,7 +299,10 @@ def test_active_route_rejects_unknown_repeated_unbounded_or_non_utc_query(query,
     monkeypatch.setattr("app.api.intelligence.read_active_forecasts", call)
     try:
         with TestClient(app) as client:
-            assert client.get("/intelligence/v2/forecasts/active" + query).status_code == 422
+            assert (
+                client.get("/intelligence/v2/forecasts/active" + query).status_code
+                == 422
+            )
         call.assert_not_called()
     finally:
         app.dependency_overrides.clear()
@@ -245,7 +312,9 @@ def test_active_openapi_has_the_original_payload_and_requires_credential():
     schema = app.openapi()
     operation = schema["paths"]["/intelligence/v2/forecasts/active"]["get"]
     assert operation["security"] == [{"IntelligenceCredential": []}]
-    assert schema["components"]["schemas"]["ForecastProjection"]["properties"]["forecast"] == {
+    assert schema["components"]["schemas"]["ForecastProjection"]["properties"][
+        "forecast"
+    ] == {
         "$ref": "#/components/schemas/AI10_V12ForecastItem",
     }
 
@@ -283,7 +352,9 @@ def test_active_errors_preserve_existing_api_envelope(monkeypatch):
 @pytest.mark.parametrize(
     "change", ["success", "old_review", "future_review", "rejected", "wrong_release"]
 )
-def test_private_cli_requires_fresh_matching_owner_review(tmp_path, policy, events, change):
+def test_private_cli_requires_fresh_matching_owner_review(
+    tmp_path, policy, events, change
+):
     events_file = tmp_path / "events.json"
     events_file.write_text(json.dumps(events))
     events_file.chmod(0o600)
@@ -304,7 +375,10 @@ def test_private_cli_requires_fresh_matching_owner_review(tmp_path, policy, even
     result = subprocess.run(
         [
             sys.executable,
-            str(Path(__file__).resolve().parents[1] / "scripts/prepare_intelligence_head.py"),
+            str(
+                Path(__file__).resolve().parents[1]
+                / "scripts/prepare_intelligence_head.py"
+            ),
             "--events-file",
             str(events_file),
             "--owner-review-receipt-file",
