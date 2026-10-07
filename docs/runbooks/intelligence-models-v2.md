@@ -147,8 +147,10 @@ zainstalować i zbudować przypięty Source, Chromium i testowe obrazy usług.
    commit/run ID, pełny pending census i oryginalne native payloady.
 2. Istniejący `deliver_model_one` wysyła każdy event, czeka na ACK brokera,
    następnie utrwala partition/offset w tej samej oryginalnej bazie AI.
-3. Source wiąże wszystkie SQL ACK z oryginalnym census i SHA rzeczywistych
-   bytes na danych pozycjach; konsumuje je własnym checkpoint runnerem.
+3. Source wiąże wszystkie SQL ACK z oryginalnym census; konsumuje je własnym
+   checkpoint runnerem. Osobny kontrolowany odczyt tych samych pozycji bez
+   commitów porównuje SHA samej wartości z publisherem oraz pełny odcisk
+   transportu (value/key/headers/timestamp) z receipt w SQL Source.
 4. Jednorazowy replay całego oryginalnego eksportu wymaga dokładnie N projekcji
    i N duplikatów, bez zmiany native payloadu. Oryginalny publisher i eksport
    mogą mieć różną kolejność kluczy JSON; raport osobno zapisuje oba SHA.
@@ -158,7 +160,8 @@ zainstalować i zbudować przypięty Source, Chromium i testowe obrazy usług.
 
 `original-ai-publisher.json` utrwala pełny wektor oryginalnych SQL ACK;
 `source-native-read.json` ustawia `original_AI_database_publisher_attested=true`
-wyłącznie po porównaniu consumed wire SHA. Bez prywatnego control test zachowuje
+wyłącznie po porównaniu consumed wire SHA i całego SQL transport fingerprint.
+Bez prywatnego control test zachowuje
 wcześniejszy file-handoff i jawne `false`. Implementacja i testy negatywnych
 bindings są gotowe; nowy pełny przebieg CI musi jeszcze potwierdzić tę ścieżkę.
 Fixture w testach parsera nie kwalifikują modeli.

@@ -88,7 +88,12 @@ w tymczasowym pliku `0600`, poza uploadem.
    Source usuwa prywatny control po powrocie procesu. Publiczny
    `independent-ai-sql-handoff.json` zawiera tylko bindings, counts i offsety.
 
-Ten opt-in ma implementację i lokalny setup-plan; wymagane wykonanie CI jest
-jeszcze pending. Nie rozszerza zakresu na pełny 43-table SQL snapshot ani nie
+Ten opt-in ma zaliczony rzeczywisty
+[CI run 37607732767](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/37607732767):
+Source `f4535a3`, AI `0d75f59`, 9 testów bez pominięć, sumy 4 → 7 i
+rzeczywisty final ACK `[0, 0, 4]`. Niezależnie sprawdzono ZIP SHA
+`a145565bf85a8bc2fc27eaa3492473b856f01471f067cd0ae189e7e05a5a5401`;
+receipt jest zachowany w AI `docs/evidence/ai10-source-sql-handoff-accepted.json`.
+Nie rozszerza zakresu na pełny 43-table SQL snapshot ani nie
 kwalifikuje modeli. Zwykły capture pozostaje odczytem bez zapisu offsetów;
 ACK w tej ścieżce należy wyłącznie do osobnej grupy odbiorcy AI.

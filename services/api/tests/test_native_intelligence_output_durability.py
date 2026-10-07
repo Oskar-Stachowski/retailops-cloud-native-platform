@@ -19,7 +19,10 @@ from app.services.intelligence_model_contract import model_partition_key
 from confluent_kafka import Producer
 from native_intelligence_browser import run_native_browser
 from native_intelligence_bundle import load_anomaly_export, load_stockout_export
-from native_model_delivery import validate_original_receipts
+from native_model_delivery import (
+    validate_original_receipts,
+    verify_original_consumed_records,
+)
 from test_intelligence_checkpoint_durability import receipts, run
 from test_intelligence_durability import (
     context,  # noqa: F401 - pytest fixture registration
@@ -87,6 +90,13 @@ def test_complete_original_qualified_model_output_survives_transport_duplicate_a
         original_positions = validate_original_receipts(
             original, acceptance, events, kind
         )
+        # This public component receipt has no private control or database URL.
+        # Preserve actual original SQL ACKs even if a later read/UI check fails.
+        original_path = Path(os.environ["AI10_NATIVE_READ_REPORT"]).with_name(
+            "original-ai-publisher.json"
+        )
+        original_path.write_text(json.dumps(original, indent=2) + "\n")
+        original_path.chmod(0o600)
     producer = Producer(
         {
             "bootstrap.servers": context.bootstrap,
@@ -117,11 +127,10 @@ def test_complete_original_qualified_model_output_survives_transport_duplicate_a
     assert len(transport) == total
     assert sum(row[2] == "projected" for row in transport) == len(events)
     assert sum(row[2] == "duplicate" for row in transport) == len(events)
-    consumed_hashes = {(row[0], row[1]): row[3] for row in transport}
-    assert all(
-        consumed_hashes.get(position) == digest
-        for position, digest in original_positions.items()
-    )
+    if original is not None:
+        verify_original_consumed_records(
+            context.bootstrap, original_positions, transport
+        )
     committed = positions(context)
     for partition in (0, 1):
         consumed = [
@@ -270,10 +279,6 @@ def test_complete_original_qualified_model_output_survives_transport_duplicate_a
                 process.wait(timeout=5)
     report_path = Path(os.environ["AI10_NATIVE_READ_REPORT"])
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    if original is not None:
-        original_path = report_path.with_name("original-ai-publisher.json")
-        original_path.write_text(json.dumps(original, indent=2) + "\n")
-        original_path.chmod(0o600)
     report_path.write_text(
         json.dumps(
             {
