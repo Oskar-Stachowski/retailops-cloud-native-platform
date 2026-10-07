@@ -58,9 +58,9 @@ from data.inventory.source_tables import TableContext, tables_from_source
 
 FAST_PATH_VERSION = "inventory-source-cached-ledger-2.0.0"
 UPSTREAM_SHA256 = {
-    "source_cohort_batch.py": "444a481dd550fc9e266a49764083c97113a80fa2b21b064cc0d2f942862a12be",
+    "source_cohort_batch.py": "3e3ecafba7298d343a8c9624617bdc6461e0925d5a446aeab9d011acc3909e00",
     "ledger.py": "3e50ac30d3732789680461d96d5855f01619d0978de56e774d11565df884565f",
-    "source_bridge.py": "b3cd35d1269a09b7b44c5eaab6ff22c17c00dcc085e7c60bed90d7f2c4ba74ff",
+    "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
     "source_commerce.py": "9322d5240b1762db498929febed872bd207bd683ec3b1785cc0a0674f43e09c7",
