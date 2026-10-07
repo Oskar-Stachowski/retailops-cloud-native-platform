@@ -74,6 +74,7 @@ def write(expected: dict, stage: str) -> dict:
 def seed_expansion(event: dict) -> dict:
     """Retain a known mechanics result through both image versions in the isolated drill."""
     suggestion = event["suggestion"]
+    models = event["models"]
     event = event["forecast"]
     payload = event["payload"]
     fields = (
@@ -164,16 +165,59 @@ def seed_expansion(event: dict) -> dict:
             VALUES ('rollback-mechanics','retailops.intelligence.v2',0,1,%s,'projected',%s)""",
             (digest({"mechanics_fixture": suggestion}), item["recommendation_id"]),
         )
+        for offset, model in enumerate(models, start=2):
+            item = model["payload"]
+            anomaly = model["event_type"] == "anomaly_detected"
+            result_id = item["anomaly_id"] if anomaly else item["risk_id"]
+            connection.execute(
+                """INSERT INTO ai_model_results
+                (result_id,event_type,product_id,selling_location_id,stock_location_id,channel,currency,
+                 as_of,generated_at,model_name,model_version,release_id,inference_run_id,source_dataset_id,
+                 payload,payload_sha256)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (
+                    result_id,
+                    model["event_type"],
+                    item["product_id"],
+                    item["selling_location_id"] if anomaly else None,
+                    None if anomaly else item["stock_location_id"],
+                    item["channel"] if anomaly else None,
+                    item["currency"] if anomaly else None,
+                    item["as_of"],
+                    item["generated_at"],
+                    item["detector_name"] if anomaly else item["model_name"],
+                    item["detector_version"] if anomaly else item["model_version"],
+                    item["release_id"],
+                    item["inference_run_id"],
+                    item["source_dataset_id"] if anomaly else item["lineage"]["source_dataset_id"],
+                    Jsonb(item),
+                    digest(item),
+                ),
+            )
+            connection.execute(
+                """INSERT INTO ai_model_intelligence_inbox
+                (event_id,result_id,document_sha256) VALUES (%s,%s,%s)""",
+                (model["event_id"], result_id, digest(model)),
+            )
+            connection.execute(
+                """INSERT INTO ai_intelligence_transport
+                (consumer_group,topic,partition,offset_number,raw_sha256,outcome,model_result_id)
+                VALUES ('rollback-mechanics','retailops.intelligence.v2',0,%s,%s,'projected',%s)""",
+                (offset, digest({"mechanics_fixture": model}), result_id),
+            )
         connection.execute(
-            "UPDATE ai_intelligence_partitions SET next_offset=2 WHERE consumer_group='rollback-mechanics'"
+            "UPDATE ai_intelligence_partitions SET next_offset=%s WHERE consumer_group='rollback-mechanics'",
+            (2 + len(models),),
         )
     return {
         "forecast_results": 1,
         "inbox_records": 1,
         "partition_checkpoints": 1,
-        "transport_receipts": 2,
+        "transport_receipts": 2 + len(models),
         "suggestion_results": 1,
         "suggestion_inbox_records": 1,
+        "model_results": len(models),
+        "model_inbox_records": len(models),
         "fixture": "mechanics",
     }
 

@@ -127,8 +127,12 @@ def main() -> int:  # noqa: PLR0915 - one owned-resource lifecycle
         from suggestion_fixture import seed as seed_suggestions
 
         result["suggestion_fixture"] = seed_suggestions(private)
+        from model_fixture import seed as seed_models
+
+        result["model_fixture"] = seed_models(private)
         env["RETAILOPS_INTELLIGENCE_ACCESS_POLICY"] = str(private / "access.json")
         env["RETAILOPS_INTELLIGENCE_HEAD_POLICY"] = str(private / "head.json")
+        env["RETAILOPS_INTELLIGENCE_MODEL_ACCESS_POLICY"] = str(private / "model-access.json")
         env["RETAILOPS_INTELLIGENCE_SUGGESTION_ACCESS_POLICY"] = str(
             private / "suggestion-access.json"
         )
@@ -192,9 +196,11 @@ def main() -> int:  # noqa: PLR0915 - one owned-resource lifecycle
         result["suggestion_browser"] = json.loads(
             (private / "suggestion-browser-report.json").read_text()
         )
+        result["model_browser"] = json.loads((private / "model-browser-report.json").read_text())
         if (
             result["browser"]["status"] != "passed"
             or result["suggestion_browser"]["status"] != "passed"
+            or result["model_browser"]["status"] != "passed"
         ):
             msg = "browser_acceptance_failed"
             raise RuntimeError(msg)
@@ -205,6 +211,10 @@ def main() -> int:  # noqa: PLR0915 - one owned-resource lifecycle
         shutil.copyfile(private / "suggestion-evidence.png", REPORT / "suggestion-evidence.png")
         result["suggestion_screenshot_sha256"] = hashlib.sha256(
             (REPORT / "suggestion-evidence.png").read_bytes()
+        ).hexdigest()
+        shutil.copyfile(private / "model-lineage.png", REPORT / "model-lineage.png")
+        result["model_screenshot_sha256"] = hashlib.sha256(
+            (REPORT / "model-lineage.png").read_bytes()
         ).hexdigest()
         result["status"] = "passed"
     except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as exc:

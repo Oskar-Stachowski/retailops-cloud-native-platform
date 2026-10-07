@@ -67,16 +67,22 @@ successful application rollback with unchanged schema is not proof that a future
 schema change is reversible. The existing [database recovery drill](db-restore.md)
 is the separate foundation for backup-based recovery.
 
-The AI 10 plan permits only `6b0f1c2d3e4a` to `a10f0c7e0300` with their exact
-complete migration-file fingerprints. The two additive migrations add only
-`ai_forecast_results`, `ai_intelligence_inbox`, `ai_intelligence_partitions` and
-`ai_intelligence_transport`; existing migrations and tables remain unchanged.
-The plan also pins both new migration files individually. Unit guards reject a rewritten parent, changed expansion,
-different new head or unknown database revision. Compose and Kubernetes drills
-verify the entire expanded schema and all table fingerprints, including a seeded
-ML payload/inbox and checkpoint/transport receipt, through restart, update and application rollback. No table
-is excluded to make that comparison pass. Kubernetes retains its existing
-exception for operational consumer-state counters.
+The AI 10 plan permits only `6b0f1c2d3e4a` to `a10f0c7e0600` with their exact
+complete migration-file fingerprints. Additive migrations retain forecast,
+checkpoint/transport, recommendation, source-observation and native model
+history/inbox state. Existing parent migrations remain unchanged. The plan pins
+every new migration file individually; guards reject rewritten history,
+changed expansion, different new head or an unknown database revision.
+
+Compose and Kubernetes drills compare the entire expanded schema and all table
+fingerprints through restart, update and application rollback. Their explicit
+mechanics fixtures populate forecast and suggestion payloads, both anomaly and
+physical stockout payloads, their inboxes, one checkpoint and four transport
+receipts. No table is excluded to make the comparison pass. Kubernetes retains
+its existing exception for operational consumer-state counters. These synthetic
+fixtures verify data conservation; they do not qualify a model or a broker handoff.
+The model migration refuses schema downgrade while model rows/receipts exist.
+[Native model read/recovery instructions](intelligence-models-v2.md).
 
 ## Evidence and timings
 

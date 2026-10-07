@@ -292,7 +292,7 @@ def test_transport_xor_constraint_and_populated_schema_downgrade_guard(context):
     )
     assert process.returncode != 0
     assert b"suggestion_schema_downgrade_requires_empty_projection" in process.stderr
-    assert rows(context, "SELECT version_num FROM alembic_version") == [("a10f0c7e0500",)]
+    assert rows(context, "SELECT version_num FROM alembic_version") == [("a10f0c7e0600",)]
     assert count(context, event) == 1
 
 

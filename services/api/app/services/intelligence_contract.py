@@ -36,8 +36,11 @@ def content_hash(value: object) -> str:
 
 
 @lru_cache
-def event_validator() -> Draft202012Validator:
-    schema = json.loads((CONTRACT_DIR / "forecast_generated.schema.json").read_bytes())
+def event_validator(event_type: str = "forecast_generated") -> Draft202012Validator:
+    if event_type not in {"forecast_generated", "anomaly_detected", "stockout_risk_scored"}:
+        msg = "intelligence_event_type_unsupported"
+        raise ValueError(msg)
+    schema = json.loads((CONTRACT_DIR / (event_type + ".schema.json")).read_bytes())
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, format_checker=FormatChecker())
 
@@ -56,9 +59,15 @@ def validate_event(event: dict[str, Any], *, transport_topic: str | None = None)
 
             validate_suggestion(event)
         else:
-            if next(event_validator().iter_errors(event), None) is not None:
+            event_type = event.get("event_type", "")
+            if next(event_validator(event_type).iter_errors(event), None) is not None:
                 raise ValueError
-            _forecast_relationships(event)
+            if event_type == "forecast_generated":
+                _forecast_relationships(event)
+            else:
+                from app.services import intelligence_model_contract  # noqa: PLC0415
+
+                intelligence_model_contract.model_relationships(event)
     except (ValueError, TypeError, KeyError, OverflowError) as exc:
         msg = "intelligence_v2_contract_invalid"
         raise InvalidRealtimeEventError(msg) from exc

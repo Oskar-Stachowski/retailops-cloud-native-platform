@@ -6,7 +6,7 @@ import os
 import signal
 import threading
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from app.core.config import Settings
 from app.core.config import settings as default_settings
@@ -38,12 +38,18 @@ class KafkaMessage(Protocol):
     def timestamp(self) -> tuple[int, int]: ...
 
 
+class KafkaCommitPartition(Protocol):
+    error: object | None
+
+
 class KafkaConsumerClient(Protocol):
     def subscribe(self, topics: list[str]) -> None: ...
 
     def poll(self, timeout: float) -> KafkaMessage | None: ...
 
-    def commit(self, message: KafkaMessage, *, asynchronous: bool = False) -> object: ...
+    def commit(
+        self, *, message: KafkaMessage, asynchronous: bool = False
+    ) -> list[KafkaCommitPartition] | None: ...
 
     def close(self) -> None: ...
 
@@ -236,16 +242,19 @@ def build_confluent_kafka_consumer(
         )
         raise RuntimeError(msg) from exc
 
-    return Consumer(
-        {
-            "bootstrap.servers": config.bootstrap_servers,
-            "group.id": config.group_id,
-            "client.id": config.client_id,
-            "enable.auto.commit": False,
-            "enable.auto.offset.store": False,
-            "auto.offset.reset": config.auto_offset_reset,
-            "enable.partition.eof": False,
-        },
+    return cast(
+        "KafkaConsumerClient",
+        Consumer(
+            {
+                "bootstrap.servers": config.bootstrap_servers,
+                "group.id": config.group_id,
+                "client.id": config.client_id,
+                "enable.auto.commit": False,
+                "enable.auto.offset.store": False,
+                "auto.offset.reset": config.auto_offset_reset,
+                "enable.partition.eof": False,
+            },
+        ),
     )
 
 
@@ -289,7 +298,7 @@ def build_signal_stop_event() -> threading.Event:
 
 def _float_env(name: str, default: float) -> float:
     raw_value = os.getenv(name)
-    if raw_value in (None, ""):
+    if raw_value is None or raw_value == "":
         return default
 
     return float(raw_value)

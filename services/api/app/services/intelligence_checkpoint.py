@@ -240,7 +240,7 @@ class IntelligenceCheckpointStore:
                     "transport_replayed": True,
                     "checkpoint_next_offset": state["next_offset"],
                 }
-            prediction_id = recommendation_id = quarantine_id = None
+            prediction_id = recommendation_id = model_result_id = quarantine_id = None
             try:
                 try:
                     event = decode_message_value(record.value)
@@ -256,7 +256,14 @@ class IntelligenceCheckpointStore:
                     raise CheckpointError(msg)
                 prediction_id = result.get("prediction_id")
                 recommendation_id = result.get("recommendation_id")
-                if (prediction_id is None) == (recommendation_id is None):
+                model_result_id = result.get("model_result_id")
+                if (
+                    sum(
+                        value is not None
+                        for value in (prediction_id, recommendation_id, model_result_id)
+                    )
+                    != 1
+                ):
                     msg = "projection_receipt_missing"
                     raise CheckpointError(msg)
                 outcome = "projected" if result["status"] == "processed" else "duplicate"
@@ -279,8 +286,8 @@ class IntelligenceCheckpointStore:
             connection.execute(
                 """INSERT INTO ai_intelligence_transport
                    (consumer_group,topic,partition,offset_number,raw_sha256,outcome,
-                    prediction_id,recommendation_id,quarantine_id)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    prediction_id,recommendation_id,model_result_id,quarantine_id)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (
                     *lease.coordinates,
                     record.offset,
@@ -288,6 +295,7 @@ class IntelligenceCheckpointStore:
                     outcome,
                     prediction_id,
                     recommendation_id,
+                    model_result_id,
                     quarantine_id,
                 ),
             )

@@ -1,11 +1,17 @@
 {
   "repository": "retailops-ai-intelligence",
-  "base_commit": "f4ae14fe6588b91506383a709b5a0185208a4ea6",
-  "commit": "8406ff2c6ed416773ccba2283527470f79c5b8d5",
-  "branch": "ai/10-intelligence-contract",
+  "base_commit": "18e771f9c2e89e91bf7afeb1744e0cd9112f50b5",
+  "commit": "81c40eed41c4f061b889422b2aa8b13a1245770a",
+  "branch": "ai/10-ready",
   "schema_generator": "scripts/update_intelligence_event_contracts.py",
   "sha256": {
-    "registry.json": "124a6589f6264e595709b240b7f7dd2d2321119b196538296deb2be44cf8526b",
-    "forecast_generated.schema.json": "17e9a9c05f6f39101e6a00dbfed89203800dd388818ee7b0b9cf7a87c05af511"
+    "registry.json": "ffd174e697c4db58f45b67ed778c5270c1cc1ecc35b5434ef49b7a8560901886",
+    "forecast_generated.schema.json": "17e9a9c05f6f39101e6a00dbfed89203800dd388818ee7b0b9cf7a87c05af511",
+    "anomaly_detected.schema.json": "e92d612354b7439959409cef2a529012d8def85439ee5d5a854f528fee94a30e",
+    "stockout_risk_scored.schema.json": "a41c0fac6f12be363fe787a151459030e8588fb9cacd7806c134bb18e1064a83",
+    "forecast_generated.fixture.json": "5801e52ff621df1762872b39ba8362ff5e58381839a4ece2915eac899d1dcbe3",
+    "anomaly_detected.fixture.json": "47707260a56381e68704352fdcbeaf06179f4996286ac77cff21c4f2da07a727",
+    "stockout_risk_scored.fixture.json": "8854c8066be42b0ff4163eb9751b830d70421facfba8d86d292bf52ba52ee717",
+    "model-fixtures.json": "a73eb729d11d7a9b792c4f5b7c5af70cea9984746cf587e78c390e9480ce2b70"
   }
 }

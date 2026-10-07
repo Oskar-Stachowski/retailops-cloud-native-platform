@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 from psycopg.types.json import Jsonb
 
 from app.db.connection import get_connection
+from app.repositories.intelligence_model_repository import project_model
 from app.repositories.intelligence_suggestion_repository import project_suggestion
 from app.services.intelligence_contract import content_hash
 from app.services.realtime_consumer import InvalidRealtimeEventError
@@ -27,6 +28,8 @@ class IntelligenceRepository:
         """Join the caller's transaction without committing a partial projection."""
         if event["event_type"] == "recommendation_generated":
             return project_suggestion(connection, event)
+        if event["event_type"] in {"anomaly_detected", "stockout_risk_scored"}:
+            return project_model(connection, event)
         payload = event["payload"]
         event_hash, payload_hash = content_hash(event), content_hash(payload)
         connection.execute(

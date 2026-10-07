@@ -28,6 +28,8 @@ def test_required_database_tables_exist() -> None:
         "alembic_version",
         "ai_recommendation_results",
         "ai_recommendation_inbox",
+        "ai_model_results",
+        "ai_model_intelligence_inbox",
     }
 
     with psycopg.connect(DATABASE_URL) as conn, conn.cursor() as cur:

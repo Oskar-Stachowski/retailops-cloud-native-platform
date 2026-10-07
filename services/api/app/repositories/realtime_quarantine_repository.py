@@ -77,13 +77,14 @@ class RealtimeQuarantineRepository:
             row = self.get(quarantine_id)
         else:
             connection.execute(insert, arguments)
-            row = connection.execute(
+            stored = connection.execute(
                 "SELECT * FROM realtime_event_log WHERE event_id=%s AND source=%s",
                 (quarantine_id, QUARANTINE_SOURCE),
             ).fetchone()
-            if row is None:
+            if stored is None:
                 msg = "quarantine_receipt_missing"
                 raise RuntimeError(msg)
+            row = stored
         if any(row["payload"].get(name) != content for name, content in payload.items()):
             msg = "Quarantine did not confirm the immutable transport message."
             raise RuntimeError(msg)

@@ -129,6 +129,7 @@ jobs:
           python -m pytest -q -x tests/test_intelligence_checkpoint_durability.py \
             tests/test_intelligence_head_durability.py \
             tests/test_intelligence_suggestion_durability.py \
+            tests/test_intelligence_model_durability.py \
             tests/test_source_observation_durability.py \
             --junitxml=../../ci-cd/reports/api/intelligence-durability.xml \
             --cov=app --cov-branch --cov-report= --cov-fail-under=0

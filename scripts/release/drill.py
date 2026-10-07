@@ -324,6 +324,17 @@ class Drill:
                         "seed-expansion",
                         data={
                             "forecast": fixture,
+                            "models": [
+                                json.loads(
+                                    (
+                                        ROOT / "services/api/app/contracts/intelligence-v2" / name
+                                    ).read_text()
+                                )
+                                for name in (
+                                    "anomaly_detected.fixture.json",
+                                    "stockout_risk_scored.fixture.json",
+                                )
+                            ],
                             "suggestion": json.loads(
                                 (
                                     ROOT
