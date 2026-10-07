@@ -23,6 +23,10 @@ rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sum
 4 → 7. Stockout i anomaly mają odebrane oryginalne AI SQL publishery,
 pełne read API i built UI, również po wspólnych optymalizacjach CI.
 Kod jest na main po protected merge #28/#100 i pełnym CI AI 17/17, Source 30/30.
+Nowszy [Source main `b723489`](evidence/ai/10/source-b723489-main-ci.json)
+zaliczył 21 jobs; 4 unaffected obszary są celowo skipped. Zachowany pełny
+odbiór `467f990` ma 30/30. Pierwsza awaria agregatora i udane ponowienie
+pozostają osobnymi dowodami.
 V12 na 102 dniach ma 56 oryginalnych wyników i atomowy rollback, ale końcowy
 odbiór Source w oryginalnej bazie pozostał failed. Odtworzony Source diagnostic
 passed nie zastępuje pełnego odbioru. Nowy pełny run jest w toku.

@@ -5,7 +5,11 @@ Aktualizacja: 2026-10-07. **Status: in_progress.** Kod jest na main po
 i [AI #28](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/28).
 [Source main `467f990`](source-code-main-ci.json) zaliczył 30/30 Required CI jobs,
 a AI main `2dc0a5b` 17/17. [Source head `9382681`](source-9382681-ci.json)
-również ma 30/30 success. [Zgodność runtime z main](native-runtime-main-compatibility.json)
+również ma 30/30 success. Nowszy [Source main `b723489`](source-b723489-main-ci.json)
+ma 21 success i 4 celowe skipped zgodnie z niezmienionym wykrywaniem obszarów.
+[Pierwsza awaria agregatora](source-b723489-main-result-failure.json) jest
+zachowana; ponowienie wykonało brakujący API Docker image build i required-result.
+[Zgodność runtime z main](native-runtime-main-compatibility.json)
 potwierdza identyczne Git objects API, migracji, istniejącego UI i native
 consumerów względem rzeczywiście odebranych commitów. AI 07–08 są zamknięte;
 AI10 zachowuje ich modele i kwalifikacje. Końcowy pełny V12 i publikacja
