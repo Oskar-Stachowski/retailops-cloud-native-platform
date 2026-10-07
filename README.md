@@ -3,11 +3,11 @@
 Platforma demonstracyjna do analizy sprzedaży, zapasów i decyzji operacyjnych:
 React, FastAPI, PostgreSQL, Redpanda, Docker Compose oraz lokalny Kubernetes.
 
-**AI 10: integracja w toku.** [Bieżący odbiór](docs/evidence/ai/10/README.md)
-opisuje trzy ścieżki snapshot/REST/stream, rzeczywisty Source → AI SQL/ACK
-oraz native wyniki w istniejących panelach RetailOps. Kod jest na obu main
-z zielonym pełnym CI (AI 17/17, Source 30/30). Pełny oryginalny V12
-oraz końcowa publikacja dokumentacji ready pozostają wymagane.
+**AI 10: ready — pełny odbiór integracji.** [Raport i instrukcja](docs/evidence/ai/10/README.md)
+wiążą snapshot/REST/stream oraz oryginalne publishery SQL: 40 stockout,
+1232 anomaly i 56 forecast, z pełnym odczytem istniejącego API/UI.
+V12 zachowuje oryginalne quality `not_ready` i zaakceptowany zakres development.
+Publikacja końcowych rekordów odbywa się przez chronione PR-y i Required CI.
 
 **[Zacznij od dokumentacji →](docs/README.md)**
 

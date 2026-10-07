@@ -17,24 +17,21 @@ opisuje ograniczenie kopii wejść oraz dziennego replayu inventory:
 456 testów regresji i zgodne dane kontrolne. Pomiar pełnego profilu,
 rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamknięte.
 
-**2026-10-07 — AI 10: końcowa integracja w toku.**
-[Bieżący odbiór i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
-rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sumy
-4 → 7. Stockout i anomaly mają odebrane oryginalne AI SQL publishery,
-pełne read API i built UI, również po wspólnych optymalizacjach CI.
-Kod jest na main po protected merge #28/#100 i pełnym CI AI 17/17, Source 30/30.
-Nowszy [Source main `b723489`](evidence/ai/10/source-b723489-main-ci.json)
-zaliczył 21 jobs; 4 unaffected obszary są celowo skipped. Zachowany pełny
-odbiór `467f990` ma 30/30. Pierwsza awaria agregatora i udane ponowienie
-pozostają osobnymi dowodami.
-V12 na 102 dniach ma 56 oryginalnych wyników i atomowy rollback, ale końcowy
-odbiór Source w oryginalnej bazie pozostał failed. Odtworzony Source diagnostic
-passed nie zastępuje pełnego odbioru. Kolejna pełna próba ujawniła błąd
-wyboru interpretera Source: rozwiązywanie symlinku omijało venv.
-[Poprawka i 55 testów](evidence/ai/10/source-python-launcher-fix.json) wymagają
-nowego pełnego V12; [dowód awarii](evidence/ai/10/v12-source-startup-failure.json)
-zachowuje 270 boundary tests i pięć zaliczonych etapów AI bez odbioru Source.
-Do zamknięcia pozostają V12 i końcowe dokumenty ready z protected merge/main CI.
+**2026-10-07 — AI 10: READY, pełny odbiór integracji.**
+[Raport i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
+Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK oraz korektę 4 → 7.
+Oryginalne publishery SQL dostarczyły 40 stockout, 1232 anomaly i 56 forecast;
+Source sprawdził pełne projekcje, duplikaty, authenticated TCP API i built UI.
+[Pełny V12](evidence/ai/10/v12-22de575.json), run `37665627162`, zaliczył
+273 testy granic i rzeczywisty test Source bez failures/errors/skips.
+Własne zasoby kontenerowe, sześć handoff objects i unikalny secret usunięto;
+oryginalne S3 i inne sesje zachowano. [Source baseline CI](evidence/ai/10/source-code-main-ci.json)
+ma 30/30; [nowszy scoped main CI](evidence/ai/10/source-b723489-main-ci.json)
+21 success / 4 przewidziane skipped, a [AI main CI](evidence/ai/10/ai-b0-main-ci.json) 17/17.
+Końcowe dokumenty podlegają normalnym protected merges i Required CI dokładnych main.
+V12 pozostaje wyłącznie development z oryginalnym quality `not_ready`.
+Sugestie są jawnym fixture AI10; rzeczywisty producent należy do AI12.
+AI09 pozostaje odrębnym, otwartym etapem.
 
 **AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**
 Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),
