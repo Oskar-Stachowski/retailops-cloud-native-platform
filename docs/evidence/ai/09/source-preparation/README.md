@@ -43,6 +43,19 @@ każdy review, pending transfer, duplicate IDs, ujemne bilanse, zastąpione bł�
 rekordy i zmieniony master. Indeks identyfikatorów oraz cached ledger pochodzą
 z istniejącej pracy AI 08; kolejny pomiar może wykorzystać tę odebraną ścieżkę.
 
+Dodatkowe **3 passed w 24.02 s** porównują ordinary i cached źródło z 14 dniami
+znanych planów forecast, na seedach 42, 137 i 2026. Każdy przypadek zachowuje
+całe 58 tabel, identyczne CSV/source ID i kontekst, zwykły writer/reader oraz
+zaliczone bramki source. To kontrolne `ai-load` 45 × 2 × 1 × 1, bez model fits
+lub final testu.
+
+Required CI początkowego HEAD wskazał także jedną podatność high w przechodniej
+zależności frontendu `source-map-js`. Lock zmienia wyłącznie jej wersję
+1.2.1 → 1.2.2, URL i integrity. [Advisory](https://github.com/advisories/GHSA-68fv-2mgg-jv7q)
+wskazuje 1.2.2 jako wersję z poprawką. Po `npm ci` audyt wszystkich zależności
+ma 0 podatności; lint, 36 testów Node oraz produkcyjny build przechodzą.
+Nie zmieniono reguł security CI.
+
 [Pomiar](components.json) obejmuje pięć par na native `ai-load`:
 90 dni, 8 produktów, 2 pary sprzedaży, 2 stock locations, seed 42 i 14 dni
 znanych planów. Powstały 3834 ruchy ledgeru oraz 1440 snapshotów. Kolejność

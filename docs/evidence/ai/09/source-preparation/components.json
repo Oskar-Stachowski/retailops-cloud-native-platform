@@ -232,6 +232,26 @@
     "cohort_current_pin_parity_tests_passed": 16,
     "cohort_current_pin_parity_seconds": 12.73,
     "cohort_guards": "Exact current upstream hashes rebound after complete-copy review; drift and all ledger validations retained",
-    "mypy_configured_backend_gate": "5 files passed"
+    "mypy_configured_backend_gate": "5 files passed",
+    "cached_planned_forecast_parity_seeds": [
+      42,
+      137,
+      2026
+    ],
+    "cached_planned_forecast_parity_tests_passed": 3,
+    "cached_planned_forecast_parity_seconds": 24.02,
+    "cached_planned_forecast_scope": "ai-load 45 days, 2 products, 1 selling pair, 1 stock location, 14 known plan days; complete 58 tables, CSV bytes, context, source ID and ordinary qualification",
+    "frontend_patch": {
+      "package": "source-map-js",
+      "from": "1.2.1",
+      "to": "1.2.2",
+      "advisory": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+      "manifest_changed": false,
+      "npm_audit_vulnerabilities": 0,
+      "node_tests_passed": 36,
+      "lint": "passed",
+      "production_build": "passed",
+      "security_gate_changed": false
+    }
   }
 }
