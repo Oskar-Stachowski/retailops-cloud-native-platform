@@ -6,10 +6,21 @@ opisuje ograniczenie kopii wejść oraz dziennego replayu inventory:
 456 testów regresji i zgodne dane kontrolne. Pomiar pełnego profilu,
 rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamknięte.
 
-**AI 07 — READY na `main`, zakres `synthetic_ai_07_portfolio_v4`.**
-Kompletny producent [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97)
-i konsument [PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24)
-są scalone i mają zaliczony Required CI implementacji oraz obu main.
+**2026-10-07 — AI 10: końcowa integracja w toku.**
+[Bieżący odbiór i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
+rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sumy
+4 → 7. Stockout i anomaly mają odebrane oryginalne AI SQL publishery,
+pełne read API i built UI, również po wspólnych optymalizacjach CI.
+Pełny v12 na 102 dniach nadal przechodzi odbiór.
+Protected merge i Required CI obu main pozostają warunkiem zamknięcia.
+
+**AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**
+Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),
+a konsument w [PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24).
+Oba PR-y są scalone. AI `18e771f9c2e89e91bf7afeb1744e0cd9112f50b5` i Source
+`1de462729012a1bad458a8da4ad317ec22dbc5b8` mają odpowiednio zielony
+[Required CI 37304852763](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/37304852763)
+i [Required CI 37305855911](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37305855911).
 [Końcowy odbiór konsumenta](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md)
 wiąże dwa rzeczywiste modele, 56/56 bramek, lifecycle, batch/API i restart OCI.
 Frozen qualification source pozostaje `48439ebd9515dc1c7adc633609bbe33d1657c3df`;
@@ -66,8 +77,9 @@ opisuje [plan AI](plans/ai/README.md).
 ## Punkt wznowienia
 
 [AI 08 — ryzyko stockout](plans/ai/etapy/08-stockout-risk.md) jest zamknięty.
-AI 07 ma końcowy odbiór i publikację #97/#24 wskazaną powyżej; formalne
-ready obu mainów jest zamknięte. AI 09/10 zachowują własne wymagania.
+AI 07 ma końcowy odbiór, publikację #97/#24 i zielone CI obu przyjętych mainów
+wskazane powyżej. Jest ready. AI 10 jest w końcowym odbiorze opisanym na początku
+tego dokumentu; AI 09 zachowuje własny zakres i zależności.
 Nie otwieraj ponownie AI 08 na podstawie historycznych wpisów.
 Poniższe wcześniejsze odbiory zachowują swoje wersje danych i zakresy.
 

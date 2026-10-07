@@ -18,6 +18,10 @@ IMAGE_TOKEN = re.compile(
     r"(?:@sha256:[a-f0-9]+)?)(?![a-z0-9/_.-])"
 )
 LOCAL_IMAGES = {
+    "scripts/intelligence-runtime/compose.yml": {
+        "${COMPOSE_PROJECT_NAME}-source",
+        "${COMPOSE_PROJECT_NAME}-delivery",
+    },
     "docker-compose.yml": {
         "${API_IMAGE:-retailops-api:0.1.0}",
         "${FRONTEND_IMAGE:-retailops-frontend:0.1.0}",
@@ -135,6 +139,7 @@ def inventory(root: Path) -> dict:
         paths.update((root / directory).rglob("*.yaml"))
     paths.update(root.glob("docker-compose*.yml"))
     paths.update((root / "scripts").rglob("*compose*.yml"))
+    paths.update((root / "scripts/intelligence-runtime").glob("Dockerfile"))
     paths.update(
         root / name
         for name in (
@@ -143,6 +148,7 @@ def inventory(root: Path) -> dict:
             "scripts/release/registry.py",
             "scripts/kubernetes/drill.py",
             "services/api/tests/test_realtime_durability.py",
+            "services/api/tests/source_observation_runtime.py",
         )
     )
     references = []

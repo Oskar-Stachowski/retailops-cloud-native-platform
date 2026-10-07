@@ -1,0 +1,8 @@
+{
+  "repository": "Oskar-Stachowski/retailops-ai-intelligence",
+  "commit": "b887b90e12036499870d0de455511f2cca4ba441",
+  "path": "contracts/source_replay/v1/event.schema.json",
+  "sha256": "ce9962db5cf89bbf23c10e5848d1a37b2b012d59c0ed1220e56ab3604a1c2aaf",
+  "topic": "retailops.source-observations.v1",
+  "full_source_snapshot_handoff": false
+}

@@ -25,11 +25,15 @@ normal `.env`/Compose settings and exposes only an ephemeral frontend port on
 `127.0.0.1`. It builds immutable API/frontend identities from each Git revision,
 then performs this sequence:
 
-1. Migrate and seed only the new disposable source database using the older API.
+1. Migrate and seed only the new disposable source database. Use the older API
+   for an identical history; for the fingerprinted AI 10 expansion, migrate
+   once with the candidate image before either application version writes.
+   Seed mechanics forecast/inbox, partition checkpoint and transport receipt
+   rows as well as the legacy demo data.
 2. Record an alert acknowledgement/resolution, recommendation acceptance/
    completion and a second recommendation rejection through actual HTTP APIs.
 3. Start the older API/frontend images. Verify HTTP, browser dashboard/Product
-   360/reload, all 15 table fingerprints, schema and five idempotent requests.
+   360/reload, all table fingerprints, schema and five idempotent requests.
 4. Create a pre-update database backup with its checksum.
 5. Check migration compatibility and prove that a rewritten migration history
    or unknown database revision blocks application-only rollback.
@@ -53,14 +57,32 @@ deployment controller or an arbitrary broken-image test.
 | Situation | Action |
 |---|---|
 | Identical Alembic head **and complete migration-file fingerprint**, live DB at that head | Application-only rollback is eligible; still verify the running older version and data. |
+| Exact parent/expanded fingerprints from `scripts/release/additive-rollback.json`, live DB at one of those two verified heads | Exercise the explicit additive plan on a disposable database, retaining the expanded schema and all seeded ML/transport rows while testing both image versions. |
 | Same head but changed migration contents | Block automatic rollback and review the inconsistency. |
-| New, missing, branched or unknown migration history/revision | Block application-only rollback; prepare an explicit compatibility/forward-fix plan. |
+| Other new, missing, branched or unknown migration history/revision | Block application-only rollback; prepare an explicit compatibility/forward-fix plan. |
 | Destructive schema change or incompatible new data semantics | Stop writes; prefer a reviewed forward fix, or restore a verified backup into a separate database and reconcile/replay later writes before cutover. |
 
 Never run `alembic downgrade` blindly to make the version number match. A
 successful application rollback with unchanged schema is not proof that a future
 schema change is reversible. The existing [database recovery drill](db-restore.md)
 is the separate foundation for backup-based recovery.
+
+The AI 10 plan permits only `6b0f1c2d3e4a` to `a10f0c7e0600` with their exact
+complete migration-file fingerprints. Additive migrations retain forecast,
+checkpoint/transport, recommendation, source-observation and native model
+history/inbox state. Existing parent migrations remain unchanged. The plan pins
+every new migration file individually; guards reject rewritten history,
+changed expansion, different new head or an unknown database revision.
+
+Compose and Kubernetes drills compare the entire expanded schema and all table
+fingerprints through restart, update and application rollback. Their explicit
+mechanics fixtures populate forecast and suggestion payloads, both anomaly and
+physical stockout payloads, their inboxes, one checkpoint and four transport
+receipts. No table is excluded to make the comparison pass. Kubernetes retains
+its existing exception for operational consumer-state counters. These synthetic
+fixtures verify data conservation; they do not qualify a model or a broker handoff.
+The model migration refuses schema downgrade while model rows/receipts exist.
+[Native model read/recovery instructions](intelligence-models-v2.md).
 
 ## Evidence and timings
 
