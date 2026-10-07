@@ -104,3 +104,29 @@ oryginalny `risk_id`, payload oraz brak eskalacji przez query/demo user.
 Ten test obejmuje przekazanie plikowe committed outbox do Source; nie
 poświadcza wysyłki z oryginalnej bazy AI ani UI dla tych wyników. Oddzielny
 istniejący UI drill pozostaje dowodem mechaniki ekranów na oznaczonych fixture.
+# Odbiór oryginalnych wyników przez broker/API/UI
+
+Dedykowany workflow AI10 przypina dokładny commit odbiorcy Source i SHA jego
+plików. `REQUIRE_AI10_NATIVE_MODEL_READ=1` wymaga artefaktu bieżącego producer
+commitu i GitHub run ID; brak pakietu przerywa test. Stockout używa pełnego
+oryginalnego outputu/census po cold worker. Anomaly wymaga pełnego OCI,
+registry, scoped HTTP oraz restartu po SIGKILL, a ponadto dokładnych bajtów
+zamrożonego primary modelu z zaakceptowanego AI07. Schematowy anomaly fixture
+ma literalne `passed_at_publication`, lecz nie zawiera tych dowodów wykonania.
+
+Każdy event jest wysłany dwukrotnie przez rzeczywisty broker. Consumer
+przetwarza bounded partie po najwyżej 100 receipts, z kolejnymi claims;
+raport wymaga pełnego census projekcji, duplikatów i wektora ACK obu partycji.
+Wszystkie oryginalne ID są odczytywane przez owned TCP API z prywatnym grantem.
+`REQUIRE_AI10_NATIVE_BROWSER=1` dodatkowo wymaga zbudowanego frontendu oraz
+Chromium. Dedicated Playwright project `native-intelligence-chromium` porównuje
+cały zestaw niezmienionych payloadów, wszystkie strony istniejącego panelu,
+native grain, status, literalny ID, lineage oraz policy revocation bez restartu.
+Private credentials nie trafiają do storage, report ani uploadów.
+
+Do wyboru anomaly służy `AI10_NATIVE_MODEL_KIND=anomaly_detected` oraz
+`AI10_NATIVE_ANOMALY_OUTPUT`; domyślny stockout używa
+`AI10_NATIVE_STOCKOUT_OUTPUT`. `AI10_NATIVE_PRODUCER_COMMIT` i
+`AI10_NATIVE_READ_REPORT` ustala przypięty caller CI. Ogólne CI bez artefaktu
+nie uruchamia tego dedykowanego odbioru. To file handoff prawdziwego committed
+outboxu; raport nie poświadcza jeszcze wysyłki z oryginalnej bazy AI.

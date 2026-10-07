@@ -17,7 +17,8 @@ from app.auth.intelligence_models import ModelAccessPolicy
 from app.services.intelligence_contract import TOPIC
 from app.services.intelligence_model_contract import model_partition_key
 from confluent_kafka import Producer
-from native_intelligence_bundle import load_stockout_export
+from native_intelligence_browser import run_native_browser
+from native_intelligence_bundle import load_anomaly_export, load_stockout_export
 from test_intelligence_checkpoint_durability import receipts, run
 from test_intelligence_durability import (
     context,  # noqa: F401 - pytest fixture registration
@@ -37,18 +38,26 @@ pytestmark = [
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_complete_original_qualified_stockout_output_survives_transport_duplicate_and_tcp_api(
+def test_complete_original_qualified_model_output_survives_transport_duplicate_and_tcp_api(
     context,  # noqa: F811 - pytest resolves the imported fixture
     monkeypatch,
     tmp_path,
 ):
     # This test deliberately has no fixture fallback. Its dedicated CI caller must
     # provide output from the native frozen model acceptance on the same runner.
-    exported = os.environ.get("AI10_NATIVE_STOCKOUT_OUTPUT")
-    assert exported, (
-        "AI10_NATIVE_STOCKOUT_OUTPUT is required; invented outputs cannot qualify this test"
+    kind = os.environ.get("AI10_NATIVE_MODEL_KIND", "stockout_risk_scored")
+    assert kind in {"stockout_risk_scored", "anomaly_detected"}
+    anomaly = kind == "anomaly_detected"
+    output_variable = (
+        "AI10_NATIVE_ANOMALY_OUTPUT" if anomaly else "AI10_NATIVE_STOCKOUT_OUTPUT"
     )
-    acceptance, events = load_stockout_export(Path(exported))
+    exported = os.environ.get(output_variable)
+    assert exported, (
+        "The original model output is required; invented outputs cannot qualify this test"
+    )
+    acceptance, events = (load_anomaly_export if anomaly else load_stockout_export)(
+        Path(exported)
+    )
     assert os.environ.get("AI10_NATIVE_PRODUCER_COMMIT") == acceptance["commit"]
     assert acceptance["workflow_run_id"] == int(os.environ["GITHUB_RUN_ID"])
     producer = Producer(
@@ -71,7 +80,11 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
     assert len(delivered) == 2 * len(events) and all(
         error is None for error, _ in delivered
     )
-    run(context, count=len(delivered))
+    remaining = len(delivered)
+    while remaining:
+        count = min(100, remaining)
+        run(context, count=count, bootstrap=remaining == len(delivered))
+        remaining -= count
     transport = receipts(context)
     assert len(transport) == len(delivered)
     assert sum(row[2] == "projected" for row in transport) == len(events)
@@ -86,7 +99,8 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
         assert committed[partition] == (
             max(consumed) + 1 if consumed else context.initial[partition].offset
         )
-    ids = [event["payload"]["risk_id"] for event, _ in events]
+    result_id = "anomaly_id" if anomaly else "risk_id"
+    ids = [event["payload"][result_id] for event, _ in events]
     assert rows(
         context, "SELECT count(*) FROM ai_model_results WHERE result_id=ANY(%s)", (ids,)
     ) == [(len(ids),)]
@@ -98,11 +112,23 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
             {
                 "principal_id": "ai10-native-personal-reader",
                 "credential_sha256": hashlib.sha256(token.encode()).hexdigest(),
-                "capabilities": ["stockout:read"],
-                "stockout_scope": {
+                "capabilities": ["anomaly:read" if anomaly else "stockout:read"],
+                "anomaly_scope" if anomaly else "stockout_scope": {
                     "product_ids": sorted({item["product_id"] for item in items}),
-                    "stock_location_ids": sorted(
-                        {item["stock_location_id"] for item in items}
+                    **(
+                        {
+                            "selling_location_ids": sorted(
+                                {item["selling_location_id"] for item in items}
+                            ),
+                            "channels": sorted({item["channel"] for item in items}),
+                            "currencies": sorted({item["currency"] for item in items}),
+                        }
+                        if anomaly
+                        else {
+                            "stock_location_ids": sorted(
+                                {item["stock_location_id"] for item in items}
+                            )
+                        }
                     ),
                     "release_ids": sorted({item["release_id"] for item in items}),
                 },
@@ -150,16 +176,17 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
                         "owned native read API was not ready"
                     )
                     time.sleep(0.1)
-            resource = "/intelligence/v2/stockout-risks"
+            resource_name = "anomalies" if anomaly else "stockout-risks"
+            resource = "/intelligence/v2/" + resource_name
             for item in items:
                 request = urllib.request.Request(
-                    base + resource + "/" + item["risk_id"],
+                    base + resource + "/" + item[result_id],
                     headers={"Authorization": "Bearer " + token},
                 )
                 with opener.open(request, timeout=10) as response:
                     result = json.load(response)
                     assert response.headers["Cache-Control"] == "no-store"
-                assert result["result_id"] == item["risk_id"]
+                assert result["result_id"] == item[result_id]
                 assert result["source"] == "retailops-ai"
                 assert result["result"] == item
             for query, authorization, expected_status in (
@@ -177,6 +204,27 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
                     opener.open(request, timeout=10)
                 assert error.value.code == expected_status
                 error.value.close()
+            browser = None
+            if os.environ.get("REQUIRE_AI10_NATIVE_BROWSER") == "1":
+                browser = run_native_browser(
+                    api_url=base,
+                    control=tmp_path / "native-browser",
+                    policy_path=policy_path,
+                    token=token,
+                    cases=[
+                        {
+                            "kind": kind,
+                            "resource": resource_name,
+                            "title": "AI anomalies" if anomaly else "AI stockout risks",
+                            "id": result_id,
+                            "items": items,
+                        }
+                    ],
+                    frontend=ROOT.parents[1] / "frontend",
+                    report=Path(os.environ["AI10_NATIVE_READ_REPORT"]).with_name(
+                        "source-native-browser.json"
+                    ),
+                )
         finally:
             process.terminate()
             try:
@@ -190,7 +238,8 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
         json.dumps(
             {
                 "status": "passed",
-                "scope": "qualified_native_stockout_output_to_broker_sql_and_authenticated_TCP_API",
+                "scope": "qualified_native_model_output_to_broker_sql_and_authenticated_TCP_API",
+                "model_kind": kind,
                 "producer_commit": acceptance["commit"],
                 "source_commit": subprocess.check_output(
                     ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
@@ -204,7 +253,8 @@ def test_complete_original_qualified_stockout_output_survives_transport_duplicat
                 "committed_next_offsets": committed,
                 "native_payloads_unchanged": True,
                 "model_refits": 0,
-                "evidence_boundary": "file-handoff replay of committed outbox; original AI database publisher and UI are not attested",
+                "browser": browser,
+                "evidence_boundary": "file-handoff replay of committed outbox; original AI database publisher is not attested",
             },
             indent=2,
         )

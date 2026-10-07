@@ -6,7 +6,11 @@ import json
 import pytest
 from app.services.intelligence_contract import CONTRACT_DIR, content_hash
 from app.services.intelligence_model_contract import model_partition_key
-from native_intelligence_bundle import load_stockout_export
+from native_intelligence_bundle import (
+    ANOMALY_MODEL_SHA256,
+    load_anomaly_export,
+    load_stockout_export,
+)
 
 
 @pytest.fixture
@@ -122,3 +126,101 @@ def test_rehashed_or_replaced_receipts_are_rejected(mechanics_export, file):
 def test_missing_artifact_never_selects_a_fixture(tmp_path):
     with pytest.raises(FileNotFoundError):
         load_stockout_export(tmp_path)
+
+
+@pytest.fixture
+def mechanics_anomaly_export(mechanics_export):
+    root, _, directory = mechanics_export
+    event = json.loads((CONTRACT_DIR / "anomaly_detected.fixture.json").read_bytes())
+    item = event["payload"]
+    raw = json.dumps(event, sort_keys=True, separators=(",", ":")).encode()
+    receipt = json.loads((directory / "receipt.json").read_text())
+    receipt.pop("census_id")
+    receipt["events"].update(
+        sha256=hashlib.sha256(raw + b"\n").hexdigest(), size_bytes=len(raw) + 1
+    )
+    receipt["members"] = [
+        {
+            "event_id": event["event_id"],
+            "event_type": event["event_type"],
+            "result_id": item["anomaly_id"],
+            "correlation_id": event["correlation_id"],
+            "partition_key": model_partition_key(event),
+            "event_sha256": hashlib.sha256(raw).hexdigest(),
+            "payload_sha256": content_hash(item),
+        }
+    ]
+    census_id = "native-model-outbox-sha256-" + content_hash(receipt)
+    receipt["census_id"] = census_id
+    directory = root / "native-outbox" / census_id
+    directory.mkdir()
+    (directory / "receipt.json").write_text(json.dumps(receipt))
+    (directory / "events.jsonl").write_bytes(raw + b"\n")
+    output = {"batch_id": item["batch_id"], "items": [item]}
+    output_raw = json.dumps(output).encode()
+    (root / "native-batch-output.json").write_bytes(output_raw)
+    report = {
+        "status": "passed",
+        "restart": {"status": "passed"},
+        "qualification_scope": "synthetic_ai_07_portfolio_v4",
+        "deployment_attestation": "not_attested",
+        "consumer_commit": "a" * 40,
+        "oci_image_digest": "sha256:" + "a" * 64,
+        "workflow_run_id": 1,
+        "source_dataset_id": item["source_dataset_id"],
+        "qualified_anomaly_input_id": item["qualified_anomaly_input_id"],
+        "stages": [
+            "saved_models_frozen_evaluation_and_current_compatibility",
+            "native_complete_public_source_snapshot_dq_coverage_features",
+            "actual_built_oci_pinned_pg16_mlflow_and_all_migrations",
+            "real_qualified_versions_lifecycle_recovery_atomic_batch_scoped_http",
+            "sigkill_restart_preserves_exact_complete_state",
+        ],
+        "acceptance": {
+            "status": "passed",
+            "batch_id": item["batch_id"],
+            "release_id": item["release_id"],
+            "native_outbox_census_id": census_id,
+            "native_outbox_rows": 1,
+            "native_batch_output_sha256": hashlib.sha256(output_raw).hexdigest(),
+            "checks": [
+                "qualified_primary_promoted_with_actual_image_pin",
+                "actual_saved_model_scores_native_verified_public_features",
+                "complete_census_atomic_postgresql_publication",
+                "native_outbox_insert_failure_rolls_back_complete_batch_request_and_events",
+                "scoped_read_api_counts_403_404_and_read_only_routes",
+            ],
+        },
+    }
+    (root / "acceptance.json").write_text(json.dumps(report))
+    return root, report
+
+
+def test_anomaly_runtime_claims_require_original_frozen_model_binding(
+    mechanics_anomaly_export,
+):
+    root, _ = mechanics_anomaly_export
+    with pytest.raises(ValueError, match="genuine_completed_model_required"):
+        load_anomaly_export(root)
+
+
+@pytest.mark.parametrize("stage", ["stages", "restart", "qualification_scope"])
+def test_anomaly_incomplete_acceptance_cannot_supply_output(
+    mechanics_anomaly_export, stage
+):
+    root, report = mechanics_anomaly_export
+    report[stage] = [] if stage == "stages" else {} if stage == "restart" else "fixture"
+    (root / "acceptance.json").write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="genuine_completed_model_required"):
+        load_anomaly_export(root)
+
+
+def test_anomaly_claimed_frozen_hash_requires_exact_original_bytes(
+    mechanics_anomaly_export,
+):
+    root, report = mechanics_anomaly_export
+    report["acceptance"]["model_sha256"] = ANOMALY_MODEL_SHA256
+    (root / "acceptance.json").write_text(json.dumps(report))
+    (root / "native-frozen-model.json").write_text("{}")
+    with pytest.raises(ValueError, match="original_model_binding"):
+        load_anomaly_export(root)
