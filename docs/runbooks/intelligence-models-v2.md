@@ -103,9 +103,9 @@ Odbiór porównuje pełny oryginalny output, census SHA-256 i każdy native
 payload/ID. Dwukrotna wysyłka oryginalnych bytes daje jeden wynik SQL i
 odpowiednie checkpoints/ACK. Uwierzytelniony odczyt TCP sprawdza każdy
 oryginalny `risk_id`, payload oraz brak eskalacji przez query/demo user.
-Ten test obejmuje przekazanie plikowe committed outbox do Source; nie
-poświadcza wysyłki z oryginalnej bazy AI ani UI dla tych wyników. Oddzielny
-istniejący UI drill pozostaje dowodem mechaniki ekranów na oznaczonych fixture.
+Pierwszy wariant testu obejmował przekazanie plikowe committed outbox do Source.
+Późniejszy odbiór z rzeczywistym UI opisano poniżej; sam eksport nadal nie
+poświadcza wysyłki z oryginalnej bazy AI.
 
 ## Odbiór oryginalnych wyników przez broker/API/UI
 
@@ -133,3 +133,32 @@ Do wyboru anomaly służy `AI10_NATIVE_MODEL_KIND=anomaly_detected` oraz
 `AI10_NATIVE_READ_REPORT` ustala przypięty caller CI. Ogólne CI bez artefaktu
 nie uruchamia tego dedykowanego odbioru. To file handoff prawdziwego committed
 outboxu; raport nie poświadcza jeszcze wysyłki z oryginalnej bazy AI.
+
+## Publikacja z zachowanej oryginalnej bazy AI
+
+Nowy opt-in caller zachowuje bazę AI do końca niezależnego odbioru. Własny
+acceptor przekazuje `AI10_MODEL_ORIGINAL_DATABASE_CONTROL` jako prywatny plik
+600 poza katalogiem artefaktu. Source tworzy osobny prywatny adres brokera;
+`AI10_NATIVE_DELIVERY_PYTHON` i `AI10_NATIVE_DELIVERY_SCRIPT` wskazują
+zamknięty runtime oraz rzeczywisty publisher AI. Caller musi wcześniej
+zainstalować i zbudować przypięty Source, Chromium i testowe obrazy usług.
+
+1. Publisher sprawdza hosted runner, właściciela oryginalnej bazy, dokładny
+   commit/run ID, pełny pending census i oryginalne native payloady.
+2. Istniejący `deliver_model_one` wysyła każdy event, czeka na ACK brokera,
+   następnie utrwala partition/offset w tej samej oryginalnej bazie AI.
+3. Source wiąże wszystkie SQL ACK z oryginalnym census i SHA rzeczywistych
+   bytes na danych pozycjach; konsumuje je własnym checkpoint runnerem.
+4. Jednorazowy replay całego oryginalnego eksportu wymaga dokładnie N projekcji
+   i N duplikatów, bez zmiany native payloadu. Oryginalny publisher i eksport
+   mogą mieć różną kolejność kluczy JSON; raport osobno zapisuje oba SHA.
+5. Odbiór TCP API i istniejącego built UI wymaga każdego native ID, payloadu,
+   lineage, paginacji i odwołania grantu. Dopiero wtedy baza AI jest usuwana
+   razem z własnymi usługami acceptora.
+
+`original-ai-publisher.json` utrwala pełny wektor oryginalnych SQL ACK;
+`source-native-read.json` ustawia `original_AI_database_publisher_attested=true`
+wyłącznie po porównaniu consumed wire SHA. Bez prywatnego control test zachowuje
+wcześniejszy file-handoff i jawne `false`. Implementacja i testy negatywnych
+bindings są gotowe; nowy pełny przebieg CI musi jeszcze potwierdzić tę ścieżkę.
+Fixture w testach parsera nie kwalifikują modeli.
