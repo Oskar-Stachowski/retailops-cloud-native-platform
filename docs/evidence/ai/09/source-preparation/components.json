@@ -227,6 +227,11 @@
       "scenario.settings lookup"
     ],
     "project_campaign_initialized": false,
-    "stage_ready": false
+    "stage_ready": false,
+    "cohort_initial_guard_result": "1 failed and 15 errors; exact upstream drift correctly blocked execution",
+    "cohort_current_pin_parity_tests_passed": 16,
+    "cohort_current_pin_parity_seconds": 12.73,
+    "cohort_guards": "Exact current upstream hashes rebound after complete-copy review; drift and all ledger validations retained",
+    "mypy_configured_backend_gate": "5 files passed"
   }
 }

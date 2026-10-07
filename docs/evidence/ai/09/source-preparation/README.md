@@ -33,6 +33,16 @@ Ruff broad ALL oraz format dwóch zmienionych modułów są zaliczone.
 Konfiguracja Mypy producenta nadal obejmuje pięć istniejących modułów backendu;
 nie jest odbiorem typów całego generatora.
 
+Pierwsza regresja istniejących ścieżek AI 08 celowo zatrzymała się na strażniku
+zmienionego pliku commerce: 1 failed i 15 errors, przed użyciem fast path.
+Po przeglądzie wcześniejszych porównań z kompletną kopią zaktualizowano dokładne
+przypięcia `source_bridge.py` i wynikowego `source_cohort_batch.py`.
+Strażniki nie zostały wyłączone. Osobny odbiór ma **16 passed w 12.73 s**:
+kompletne 58 tabel, identyczne CSV i kontekst, ordinary writer/reader i 36 bramek,
+każdy review, pending transfer, duplicate IDs, ujemne bilanse, zastąpione błędne
+rekordy i zmieniony master. Indeks identyfikatorów oraz cached ledger pochodzą
+z istniejącej pracy AI 08; kolejny pomiar może wykorzystać tę odebraną ścieżkę.
+
 [Pomiar](components.json) obejmuje pięć par na native `ai-load`:
 90 dni, 8 produktów, 2 pary sprzedaży, 2 stock locations, seed 42 i 14 dni
 znanych planów. Powstały 3834 ruchy ledgeru oraz 1440 snapshotów. Kolejność
