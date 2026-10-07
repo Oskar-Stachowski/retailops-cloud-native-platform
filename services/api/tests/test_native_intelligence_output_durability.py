@@ -20,8 +20,11 @@ from confluent_kafka import Producer
 from native_intelligence_bundle import load_stockout_export
 from test_intelligence_checkpoint_durability import receipts, run
 from test_intelligence_durability import (
+    context,  # noqa: F401 - pytest fixture registration
+    intelligence_runtime,  # noqa: F401 - pytest fixture registration
     positions,
     rows,
+    runtime,  # noqa: F401 - pytest fixture registration
 )
 
 pytestmark = [
@@ -35,7 +38,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_complete_original_qualified_stockout_output_survives_transport_duplicate_and_tcp_api(
-    context, monkeypatch, tmp_path
+    context,  # noqa: F811 - pytest resolves the imported fixture
+    monkeypatch,
+    tmp_path,
 ):
     # This test deliberately has no fixture fallback. Its dedicated CI caller must
     # provide output from the native frozen model acceptance on the same runner.
