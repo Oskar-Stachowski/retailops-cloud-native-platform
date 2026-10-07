@@ -1,0 +1,119 @@
+{
+  "$defs": {
+    "Injection": {
+      "additionalProperties": false,
+      "properties": {
+        "deliver_after_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deliver After Event Id"
+        },
+        "injection_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Injection Id",
+          "type": "string"
+        },
+        "issue_type": {
+          "enum": [
+            "exact_duplicate",
+            "business_duplicate",
+            "late_event",
+            "out_of_order",
+            "missing_optional_context",
+            "unsupported_major",
+            "unsupported_minor",
+            "unexpected_additive_field"
+          ],
+          "title": "Issue Type",
+          "type": "string"
+        },
+        "target_event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Target Event Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "injection_id",
+        "target_event_id",
+        "issue_type"
+      ],
+      "title": "Injection",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "raw-dq-plan-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "data_class": {
+      "const": "simulation_truth",
+      "title": "Data Class",
+      "type": "string"
+    },
+    "event_limit": {
+      "maximum": 512,
+      "minimum": 12,
+      "title": "Event Limit",
+      "type": "integer"
+    },
+    "generator_version": {
+      "const": "raw-dq-generator-1.0.0",
+      "title": "Generator Version",
+      "type": "string"
+    },
+    "injections": {
+      "items": {
+        "$ref": "#/$defs/Injection"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Injections",
+      "type": "array"
+    },
+    "overlap_policy": {
+      "const": "reject_target_or_anchor_overlap",
+      "title": "Overlap Policy",
+      "type": "string"
+    },
+    "seed": {
+      "title": "Seed",
+      "type": "integer"
+    },
+    "source_dataset_id": {
+      "pattern": "^source-sha256-[0-9a-f]{64}$",
+      "title": "Source Dataset Id",
+      "type": "string"
+    },
+    "source_events_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Events Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "generator_version",
+    "data_class",
+    "seed",
+    "source_dataset_id",
+    "source_events_sha256",
+    "event_limit",
+    "overlap_policy",
+    "injections"
+  ],
+  "title": "FaultPlan",
+  "type": "object"
+}

@@ -81,9 +81,15 @@ def build_pricing_plans(
         promotion_type = list(PROMOTION_POLICIES)[index % 4]
         discount, minimum, _ = PROMOTION_POLICIES[promotion_type]
         scope, location, channel, _ = scopes[-1]
-        start = config.start_date + timedelta(
-            days=min(config.days - 1, config.days // 3 + index % 4)
-        )
+        offset = config.days // 3 + index % 4
+        if config.profile in {
+            "ai-07-portfolio-v1",
+            "ai-07-portfolio-v2",
+            "ai-07-portfolio-v3",
+            "ai-07-portfolio-v4",
+        }:
+            offset = (42, 72, 104)[index % 3]
+        start = config.start_date + timedelta(days=min(config.days - 1, offset))
         end = min(
             config.end_date + timedelta(days=1),
             start + timedelta(days=max(1, min(7, config.days // 4))),

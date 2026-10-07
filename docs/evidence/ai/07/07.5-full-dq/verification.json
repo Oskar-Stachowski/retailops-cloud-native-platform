@@ -1,0 +1,1920 @@
+{
+  "evidence_version": "ai07-full-dq-producer-1.0.0",
+  "date_utc": "2026-10-03",
+  "runtime_revision": "ae1178ccfc7f3019645a364acb4ca210f8a05c95",
+  "parent_revision": "a4231f170838414c5b33bdaf9e9aef70c864e9d8",
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.11.15"
+  },
+  "command": "python -m data.dq.full_check --workspace /private/tmp/ai07-full-dq-final-acceptance --output /private/tmp/ai07-full-dq-final-acceptance.json",
+  "acceptance_artifact": "/private/tmp/ai07-full-dq-final-acceptance.json",
+  "acceptance_sha256": "b383b1dad55cfd4b602d91e77b6da41ee50de1244a6b131f3562527f7780aa86",
+  "acceptance": {
+    "status": "passed",
+    "fresh_processes": 4,
+    "max_seconds": 300,
+    "max_rss_mib": 1024,
+    "cases": [
+      {
+        "case": "demand",
+        "runs": [
+          {
+            "status": "passed",
+            "case": "demand",
+            "source_id": "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+            "fixture_id": "raw-dq-sha256-49c3b360e381325b6174d7eb7382685a0636457d03da790d57c2bd4677709f5b",
+            "source_binding": {
+              "contract_version": "raw-dq-binding-2.0.0",
+              "source_dataset_id": "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+              "source_descriptor_sha256": "3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+              "source_events_sha256": "be2878aadc0df6f18343fef88639db231bd3dfe2b7d7f0ba31a2bd995b85217c",
+              "source_event_count": 1633,
+              "source_sales_count": 1401,
+              "source_return_count": 232,
+              "source_facts_ready": true,
+              "selection_policy": "all_canonical_sales_and_native_return_claims_v1",
+              "projection": "legacy_operational_sales_and_returns_allowlist_v1",
+              "scope": "all_parent_sales_and_return_claims",
+              "projection_tables": {
+                "sales": {
+                  "row_count": 1401,
+                  "columns": [
+                    "id",
+                    "product_id",
+                    "quantity",
+                    "unit_price",
+                    "total_amount",
+                    "currency",
+                    "channel",
+                    "region",
+                    "sold_at",
+                    "order_reference",
+                    "observed_sales",
+                    "promotion_applied",
+                    "data_quality_status",
+                    "ingested_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "09cdd4be1e7b4b87a234b2b266f0c9d8875d92920f84e5d0bd2a5f08c3e2b671"
+                },
+                "orders": {
+                  "row_count": 896,
+                  "columns": [
+                    "id",
+                    "order_reference",
+                    "store_id",
+                    "channel",
+                    "region",
+                    "status",
+                    "order_total",
+                    "currency",
+                    "ordered_at",
+                    "created_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "9345568165e5669890d2d3053a4db946e48eeb2ee18542cfbe98e962083f0fae"
+                },
+                "sale_price_references": {
+                  "row_count": 1401,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "business_date",
+                    "as_of_time",
+                    "price_plan_id",
+                    "promotion_plan_id",
+                    "pricing_policy_version"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "84258f5b24265a7acf77cfe33a02fe5c6cd088a652e38dcfa83bda4feea6792c"
+                },
+                "products": {
+                  "row_count": 8,
+                  "columns": [
+                    "id",
+                    "sku",
+                    "name",
+                    "category",
+                    "brand",
+                    "status"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "ef2b5247897109f96b79ac4318beac89acc9bdcb1ec0a2e9e5ebe31b908d2488"
+                },
+                "inventory_sales": {
+                  "row_count": 1401,
+                  "columns": [
+                    "sale_id",
+                    "order_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "stock_location_id",
+                    "fulfillment_route_id",
+                    "quantity",
+                    "unit_of_measure",
+                    "unit_price",
+                    "currency",
+                    "gross_revenue",
+                    "ordered_at",
+                    "sold_at",
+                    "ingested_at",
+                    "available_at",
+                    "sequence",
+                    "source_reference"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "fbb181a51aca03a57c5551d3c1acbb51533a4b0c3e42dbb7e18bebca37d5360c"
+                },
+                "return_events": {
+                  "row_count": 232,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "policy_id",
+                    "quantity",
+                    "refund_amount",
+                    "currency",
+                    "reason",
+                    "status",
+                    "returned_at",
+                    "ingested_at",
+                    "available_at",
+                    "returns_policy_version"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "98e7a31e49fec706a481c82ffa04111d9b70773a9bc1d0e70d25af463986a8a1"
+                }
+              },
+              "return_scope": "purchases_in_parent_source_only",
+              "return_status_source": "verified_native_parent_not_refund_amount_inference",
+              "business_event_day_completeness": "not_qualified",
+              "missing_grain_policy": "unknown_not_zero"
+            },
+            "report": {
+              "accepted": 1627,
+              "accepted_return_claims": 229,
+              "accepted_sales": 1398,
+              "aggregate_revisions": 1627,
+              "curated_completeness": "not_qualified",
+              "declared_source_watermark": "2026-08-31T23:59:59.999999+00:00",
+              "duplicate_business": 2,
+              "duplicate_event": 2,
+              "input_records": 1690,
+              "late": 2,
+              "max_accepted_event_time": "2026-08-31T09:01:04+00:00",
+              "missing_grain_policy": "unknown_not_zero",
+              "missing_parent_facts": 6,
+              "out_of_order": 2,
+              "policy_version": "operational-offline-replay-2.0.0",
+              "progress_declarations": 53,
+              "quarantined": 6,
+              "raw_events": 1637,
+              "scope": "all_parent_sales_and_return_claims",
+              "status": "completed",
+              "transport_durability_proven": false,
+              "watermark_meaning": "explicit_parent_stream_progress_not_business_event_day_completeness"
+            },
+            "checks": {
+              "accepted_business_facts_match": true,
+              "aggregate_reconciliation": true,
+              "all_injections_reconciled": true,
+              "missing_parent_facts_reconciled": true,
+              "replay_idempotent": true,
+              "source_event_accounting": true
+            },
+            "injections": [
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              }
+            ],
+            "source_hashes": {
+              "dataset_manifest.v2.json": "d140771156ae4e7f7a44b486c43b8ff4b35a2db0d50e8f12cb9c6fbe316b8e56",
+              "source_report.json": "0756f1940f48fefbe7279fd0a4de5091d3d95863a621d8aceb94aa24f09b9e25",
+              "realism_report.json": "0117cead9c4b8ca5cbc3e3ff7269d8a14568286ca8d45fe441426d67174dd341",
+              "realism_report.md": "2384f0be9838b310ba3ab49c6287c00458242f9c3a0c4e590b7acfea08597fc4",
+              "source_report.md": "7c1958faa420bb9d371eb5598861e11b3ed6e12d123c0398da67460456f0f384",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "5c9bf2148ac5aed119f330ab1ee704f27c5df3f0e66835cf50ed12f5b9af631c",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "e1d2ebc2b78efd2062d0a1a18d60042ab6311d0578dd64904c82c2b70bcb4307",
+              "simulation_truth/stockout_episodes.csv": "67d16abb741b6d4fd2dd15fe43e56f82084c10a1a24a2381ef95d53733c7e20b",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "f66ff0683c4f9372f8918b4591038dab1721b5e2dbe53b9e67941ace864d6df8",
+              "simulation_truth/anomaly_scenario.json": "7a82eb68dffc6bf74ac0524dd06b58c646c6df6ecec086bea1b754ad99b4f827",
+              "simulation_truth/inventory_window_diagnostics.csv": "43abada586e63c024a258adf38638f3bc535c7e24760a15ad0371607e5146269",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "e4bc06e4f48608751ecd74bb1fa77627b296c6f2ebc833cd369a5c9841566c05",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "c2e901a9a1a52cd1538593bf63f2ae5861c5cac19ca9b9020255d94685455c83",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "e7862a114e6b364b626f620d3c8618db5ef55acac4b449b279b1f9e81ed79459",
+              "simulation_truth/inventory_physical_daily_balances.csv": "d351acfc616498ac4c28e37a4f3089bc2874329d0fdcaa6bb7b6d3704abf22e0",
+              "facts/inventory_ledger.csv": "e3f2e4fcf306583d69c0ed3f8d726dbb0f61d2f979906cc8de21e3e46cd2b0ed",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "7d17b9a034dea6967c6a2b30954ceeb4dfc4c523cff53b090acae22c896e4910",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "4ac8d52aace2b4b5846b16b0763b24b879b36ebc42f52d5847d59ed7c71ead3c",
+              "facts/replenishment_receipts.csv": "bda5490cb3b1e064d3d2ee0742e50ac1ccbf9ff31623aafdb6f504ed5043a549",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "f63461c77907775b4b25a563ed9e0448c54a4aafadaa15ed2a1898cbbf32155c",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "181fc89f1c9c194e303b3d106c626005f8e08c25949a9bc08b04ecb61ec1c0b1",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "4f447928ea3ed04d86d9d57909638da662fc188f2be998c4dde1343c6715f1b8",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "df54e45265bf13e3ef4b2581bbf23b094d35ff0a843104a7992bfc4d6be96040",
+              "facts/return_events.csv": "2ad5176056b869bb0ff8fe839150b4649480326ec67072cccae2adb1d14aeec2",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "aa9f44e2279c4b87d7d0aaae852a1c943bf2ef92ab8e97a150cbf2865ad15f27",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "e2df2029fe100a4767d1650cfbba4bad5abc42c435aa4940b3b6c1ab05d2ec02",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "3c99b71f74c7786112f36363ae12c9b3932bb81b7c7b8061fe48f0ac51c3648f",
+              "facts/daily_price_observations.csv": "c91cdc13aacf78512940e83e5127e7811444e35dad78c7041d0eb3245dc6d7ec",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "ffec2f4259000c1619b82f78f1b1d542b8866886a1675c14fef91e008406c040",
+              "facts/delivery_plan_versions.csv": "577b9189769c690fc7c942a8f37545d48592b26bf7886a54bf238d1c111f1d35",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "cc6863d7bf17d0a8cff187943c5bc9e798de29e231ce1c329161ca539bb76863",
+              "facts/inventory_returns.csv": "4cedb31ce6eee50f62e1b46c90b215032f0b2fbb70f2c106c8fdbd7e3c4c18ef",
+              "facts/sales.csv": "05c84fe59ee0bb2a8867edc169dd1bcf14f7cdc5bd6c7ccf93df5049e7a906a9"
+            },
+            "source_artifact_hashes": {
+              "source_report.json": "0756f1940f48fefbe7279fd0a4de5091d3d95863a621d8aceb94aa24f09b9e25",
+              "realism_report.json": "0117cead9c4b8ca5cbc3e3ff7269d8a14568286ca8d45fe441426d67174dd341",
+              "realism_report.md": "2384f0be9838b310ba3ab49c6287c00458242f9c3a0c4e590b7acfea08597fc4",
+              "source_report.md": "7c1958faa420bb9d371eb5598861e11b3ed6e12d123c0398da67460456f0f384",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "5c9bf2148ac5aed119f330ab1ee704f27c5df3f0e66835cf50ed12f5b9af631c",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "e1d2ebc2b78efd2062d0a1a18d60042ab6311d0578dd64904c82c2b70bcb4307",
+              "simulation_truth/stockout_episodes.csv": "67d16abb741b6d4fd2dd15fe43e56f82084c10a1a24a2381ef95d53733c7e20b",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "f66ff0683c4f9372f8918b4591038dab1721b5e2dbe53b9e67941ace864d6df8",
+              "simulation_truth/anomaly_scenario.json": "7a82eb68dffc6bf74ac0524dd06b58c646c6df6ecec086bea1b754ad99b4f827",
+              "simulation_truth/inventory_window_diagnostics.csv": "43abada586e63c024a258adf38638f3bc535c7e24760a15ad0371607e5146269",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "e4bc06e4f48608751ecd74bb1fa77627b296c6f2ebc833cd369a5c9841566c05",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "c2e901a9a1a52cd1538593bf63f2ae5861c5cac19ca9b9020255d94685455c83",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "e7862a114e6b364b626f620d3c8618db5ef55acac4b449b279b1f9e81ed79459",
+              "simulation_truth/inventory_physical_daily_balances.csv": "d351acfc616498ac4c28e37a4f3089bc2874329d0fdcaa6bb7b6d3704abf22e0",
+              "facts/inventory_ledger.csv": "e3f2e4fcf306583d69c0ed3f8d726dbb0f61d2f979906cc8de21e3e46cd2b0ed",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "7d17b9a034dea6967c6a2b30954ceeb4dfc4c523cff53b090acae22c896e4910",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "4ac8d52aace2b4b5846b16b0763b24b879b36ebc42f52d5847d59ed7c71ead3c",
+              "facts/replenishment_receipts.csv": "bda5490cb3b1e064d3d2ee0742e50ac1ccbf9ff31623aafdb6f504ed5043a549",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "f63461c77907775b4b25a563ed9e0448c54a4aafadaa15ed2a1898cbbf32155c",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "181fc89f1c9c194e303b3d106c626005f8e08c25949a9bc08b04ecb61ec1c0b1",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "4f447928ea3ed04d86d9d57909638da662fc188f2be998c4dde1343c6715f1b8",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "df54e45265bf13e3ef4b2581bbf23b094d35ff0a843104a7992bfc4d6be96040",
+              "facts/return_events.csv": "2ad5176056b869bb0ff8fe839150b4649480326ec67072cccae2adb1d14aeec2",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "aa9f44e2279c4b87d7d0aaae852a1c943bf2ef92ab8e97a150cbf2865ad15f27",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "e2df2029fe100a4767d1650cfbba4bad5abc42c435aa4940b3b6c1ab05d2ec02",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "3c99b71f74c7786112f36363ae12c9b3932bb81b7c7b8061fe48f0ac51c3648f",
+              "facts/daily_price_observations.csv": "c91cdc13aacf78512940e83e5127e7811444e35dad78c7041d0eb3245dc6d7ec",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "ffec2f4259000c1619b82f78f1b1d542b8866886a1675c14fef91e008406c040",
+              "facts/delivery_plan_versions.csv": "577b9189769c690fc7c942a8f37545d48592b26bf7886a54bf238d1c111f1d35",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "cc6863d7bf17d0a8cff187943c5bc9e798de29e231ce1c329161ca539bb76863",
+              "facts/inventory_returns.csv": "4cedb31ce6eee50f62e1b46c90b215032f0b2fbb70f2c106c8fdbd7e3c4c18ef",
+              "facts/sales.csv": "05c84fe59ee0bb2a8867edc169dd1bcf14f7cdc5bd6c7ccf93df5049e7a906a9"
+            },
+            "source_manifest_semantics_sha256": "d1db64728dacbeb91739a4f81989a5c90ee193a8e8193d0a374d7fbc01587ce2",
+            "source_generated_at": "2026-10-03T06:51:10.178985+00:00",
+            "publication_hashes": {
+              "dq_manifest.json": "6ddbb0ff260c9475f55cccb902c15ab7be451769a3f62c3bcd3b1798a8425256",
+              "source_binding.json": "bcebbc4de120866fda2e56600e69aa80eb0323b193c7dcf593f8c069265d79c0",
+              "simulation_truth/fault_plan.json": "b2893f2597d1371edcf9840bcd42976fcd60bafbb432348b678f51b6fae5a74a",
+              "simulation_truth/data_quality_injections.json": "c6542ce807f71affb1beee5237e7bb125a57b76e3f90321eacf09bf0ae67cdcd",
+              "simulation_truth/evaluation.json": "40e60a87cccd3a69d64e596907f3c1a87e7a3314effbbffadfc05ae611c05a3f",
+              "raw/events.jsonl": "890028d632e1d7c7ea4551ddcca3bd06eee4fcc750cb71f3079ed05692031464",
+              "curated/replay.json": "dbea584541d569e26caeda011e831a7ce4ad46990c8006ae8e64379278371f18"
+            },
+            "seconds": 123.25507212500088,
+            "peak_rss_mib": 237.609375,
+            "process_seconds": 123.59021266596392
+          },
+          {
+            "status": "passed",
+            "case": "demand",
+            "source_id": "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+            "fixture_id": "raw-dq-sha256-49c3b360e381325b6174d7eb7382685a0636457d03da790d57c2bd4677709f5b",
+            "source_binding": {
+              "contract_version": "raw-dq-binding-2.0.0",
+              "source_dataset_id": "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+              "source_descriptor_sha256": "3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+              "source_events_sha256": "be2878aadc0df6f18343fef88639db231bd3dfe2b7d7f0ba31a2bd995b85217c",
+              "source_event_count": 1633,
+              "source_sales_count": 1401,
+              "source_return_count": 232,
+              "source_facts_ready": true,
+              "selection_policy": "all_canonical_sales_and_native_return_claims_v1",
+              "projection": "legacy_operational_sales_and_returns_allowlist_v1",
+              "scope": "all_parent_sales_and_return_claims",
+              "projection_tables": {
+                "sales": {
+                  "row_count": 1401,
+                  "columns": [
+                    "id",
+                    "product_id",
+                    "quantity",
+                    "unit_price",
+                    "total_amount",
+                    "currency",
+                    "channel",
+                    "region",
+                    "sold_at",
+                    "order_reference",
+                    "observed_sales",
+                    "promotion_applied",
+                    "data_quality_status",
+                    "ingested_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "09cdd4be1e7b4b87a234b2b266f0c9d8875d92920f84e5d0bd2a5f08c3e2b671"
+                },
+                "orders": {
+                  "row_count": 896,
+                  "columns": [
+                    "id",
+                    "order_reference",
+                    "store_id",
+                    "channel",
+                    "region",
+                    "status",
+                    "order_total",
+                    "currency",
+                    "ordered_at",
+                    "created_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "9345568165e5669890d2d3053a4db946e48eeb2ee18542cfbe98e962083f0fae"
+                },
+                "sale_price_references": {
+                  "row_count": 1401,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "business_date",
+                    "as_of_time",
+                    "price_plan_id",
+                    "promotion_plan_id",
+                    "pricing_policy_version"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "84258f5b24265a7acf77cfe33a02fe5c6cd088a652e38dcfa83bda4feea6792c"
+                },
+                "products": {
+                  "row_count": 8,
+                  "columns": [
+                    "id",
+                    "sku",
+                    "name",
+                    "category",
+                    "brand",
+                    "status"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "ef2b5247897109f96b79ac4318beac89acc9bdcb1ec0a2e9e5ebe31b908d2488"
+                },
+                "inventory_sales": {
+                  "row_count": 1401,
+                  "columns": [
+                    "sale_id",
+                    "order_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "stock_location_id",
+                    "fulfillment_route_id",
+                    "quantity",
+                    "unit_of_measure",
+                    "unit_price",
+                    "currency",
+                    "gross_revenue",
+                    "ordered_at",
+                    "sold_at",
+                    "ingested_at",
+                    "available_at",
+                    "sequence",
+                    "source_reference"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "fbb181a51aca03a57c5551d3c1acbb51533a4b0c3e42dbb7e18bebca37d5360c"
+                },
+                "return_events": {
+                  "row_count": 232,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "policy_id",
+                    "quantity",
+                    "refund_amount",
+                    "currency",
+                    "reason",
+                    "status",
+                    "returned_at",
+                    "ingested_at",
+                    "available_at",
+                    "returns_policy_version"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "98e7a31e49fec706a481c82ffa04111d9b70773a9bc1d0e70d25af463986a8a1"
+                }
+              },
+              "return_scope": "purchases_in_parent_source_only",
+              "return_status_source": "verified_native_parent_not_refund_amount_inference",
+              "business_event_day_completeness": "not_qualified",
+              "missing_grain_policy": "unknown_not_zero"
+            },
+            "report": {
+              "accepted": 1627,
+              "accepted_return_claims": 229,
+              "accepted_sales": 1398,
+              "aggregate_revisions": 1627,
+              "curated_completeness": "not_qualified",
+              "declared_source_watermark": "2026-08-31T23:59:59.999999+00:00",
+              "duplicate_business": 2,
+              "duplicate_event": 2,
+              "input_records": 1690,
+              "late": 2,
+              "max_accepted_event_time": "2026-08-31T09:01:04+00:00",
+              "missing_grain_policy": "unknown_not_zero",
+              "missing_parent_facts": 6,
+              "out_of_order": 2,
+              "policy_version": "operational-offline-replay-2.0.0",
+              "progress_declarations": 53,
+              "quarantined": 6,
+              "raw_events": 1637,
+              "scope": "all_parent_sales_and_return_claims",
+              "status": "completed",
+              "transport_durability_proven": false,
+              "watermark_meaning": "explicit_parent_stream_progress_not_business_event_day_completeness"
+            },
+            "checks": {
+              "accepted_business_facts_match": true,
+              "aggregate_reconciliation": true,
+              "all_injections_reconciled": true,
+              "missing_parent_facts_reconciled": true,
+              "replay_idempotent": true,
+              "source_event_accounting": true
+            },
+            "injections": [
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              }
+            ],
+            "source_hashes": {
+              "dataset_manifest.v2.json": "f986614c90de02cf2ca697c7031fea98be690c4c46ba1294f6aa24170a1f1860",
+              "source_report.json": "0756f1940f48fefbe7279fd0a4de5091d3d95863a621d8aceb94aa24f09b9e25",
+              "realism_report.json": "0117cead9c4b8ca5cbc3e3ff7269d8a14568286ca8d45fe441426d67174dd341",
+              "realism_report.md": "2384f0be9838b310ba3ab49c6287c00458242f9c3a0c4e590b7acfea08597fc4",
+              "source_report.md": "7c1958faa420bb9d371eb5598861e11b3ed6e12d123c0398da67460456f0f384",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "5c9bf2148ac5aed119f330ab1ee704f27c5df3f0e66835cf50ed12f5b9af631c",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "e1d2ebc2b78efd2062d0a1a18d60042ab6311d0578dd64904c82c2b70bcb4307",
+              "simulation_truth/stockout_episodes.csv": "67d16abb741b6d4fd2dd15fe43e56f82084c10a1a24a2381ef95d53733c7e20b",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "f66ff0683c4f9372f8918b4591038dab1721b5e2dbe53b9e67941ace864d6df8",
+              "simulation_truth/anomaly_scenario.json": "7a82eb68dffc6bf74ac0524dd06b58c646c6df6ecec086bea1b754ad99b4f827",
+              "simulation_truth/inventory_window_diagnostics.csv": "43abada586e63c024a258adf38638f3bc535c7e24760a15ad0371607e5146269",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "e4bc06e4f48608751ecd74bb1fa77627b296c6f2ebc833cd369a5c9841566c05",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "c2e901a9a1a52cd1538593bf63f2ae5861c5cac19ca9b9020255d94685455c83",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "e7862a114e6b364b626f620d3c8618db5ef55acac4b449b279b1f9e81ed79459",
+              "simulation_truth/inventory_physical_daily_balances.csv": "d351acfc616498ac4c28e37a4f3089bc2874329d0fdcaa6bb7b6d3704abf22e0",
+              "facts/inventory_ledger.csv": "e3f2e4fcf306583d69c0ed3f8d726dbb0f61d2f979906cc8de21e3e46cd2b0ed",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "7d17b9a034dea6967c6a2b30954ceeb4dfc4c523cff53b090acae22c896e4910",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "4ac8d52aace2b4b5846b16b0763b24b879b36ebc42f52d5847d59ed7c71ead3c",
+              "facts/replenishment_receipts.csv": "bda5490cb3b1e064d3d2ee0742e50ac1ccbf9ff31623aafdb6f504ed5043a549",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "f63461c77907775b4b25a563ed9e0448c54a4aafadaa15ed2a1898cbbf32155c",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "181fc89f1c9c194e303b3d106c626005f8e08c25949a9bc08b04ecb61ec1c0b1",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "4f447928ea3ed04d86d9d57909638da662fc188f2be998c4dde1343c6715f1b8",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "df54e45265bf13e3ef4b2581bbf23b094d35ff0a843104a7992bfc4d6be96040",
+              "facts/return_events.csv": "2ad5176056b869bb0ff8fe839150b4649480326ec67072cccae2adb1d14aeec2",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "aa9f44e2279c4b87d7d0aaae852a1c943bf2ef92ab8e97a150cbf2865ad15f27",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "e2df2029fe100a4767d1650cfbba4bad5abc42c435aa4940b3b6c1ab05d2ec02",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "3c99b71f74c7786112f36363ae12c9b3932bb81b7c7b8061fe48f0ac51c3648f",
+              "facts/daily_price_observations.csv": "c91cdc13aacf78512940e83e5127e7811444e35dad78c7041d0eb3245dc6d7ec",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "ffec2f4259000c1619b82f78f1b1d542b8866886a1675c14fef91e008406c040",
+              "facts/delivery_plan_versions.csv": "577b9189769c690fc7c942a8f37545d48592b26bf7886a54bf238d1c111f1d35",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "cc6863d7bf17d0a8cff187943c5bc9e798de29e231ce1c329161ca539bb76863",
+              "facts/inventory_returns.csv": "4cedb31ce6eee50f62e1b46c90b215032f0b2fbb70f2c106c8fdbd7e3c4c18ef",
+              "facts/sales.csv": "05c84fe59ee0bb2a8867edc169dd1bcf14f7cdc5bd6c7ccf93df5049e7a906a9"
+            },
+            "source_artifact_hashes": {
+              "source_report.json": "0756f1940f48fefbe7279fd0a4de5091d3d95863a621d8aceb94aa24f09b9e25",
+              "realism_report.json": "0117cead9c4b8ca5cbc3e3ff7269d8a14568286ca8d45fe441426d67174dd341",
+              "realism_report.md": "2384f0be9838b310ba3ab49c6287c00458242f9c3a0c4e590b7acfea08597fc4",
+              "source_report.md": "7c1958faa420bb9d371eb5598861e11b3ed6e12d123c0398da67460456f0f384",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "5c9bf2148ac5aed119f330ab1ee704f27c5df3f0e66835cf50ed12f5b9af631c",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "e1d2ebc2b78efd2062d0a1a18d60042ab6311d0578dd64904c82c2b70bcb4307",
+              "simulation_truth/stockout_episodes.csv": "67d16abb741b6d4fd2dd15fe43e56f82084c10a1a24a2381ef95d53733c7e20b",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "f66ff0683c4f9372f8918b4591038dab1721b5e2dbe53b9e67941ace864d6df8",
+              "simulation_truth/anomaly_scenario.json": "7a82eb68dffc6bf74ac0524dd06b58c646c6df6ecec086bea1b754ad99b4f827",
+              "simulation_truth/inventory_window_diagnostics.csv": "43abada586e63c024a258adf38638f3bc535c7e24760a15ad0371607e5146269",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "e4bc06e4f48608751ecd74bb1fa77627b296c6f2ebc833cd369a5c9841566c05",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "c2e901a9a1a52cd1538593bf63f2ae5861c5cac19ca9b9020255d94685455c83",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "e7862a114e6b364b626f620d3c8618db5ef55acac4b449b279b1f9e81ed79459",
+              "simulation_truth/inventory_physical_daily_balances.csv": "d351acfc616498ac4c28e37a4f3089bc2874329d0fdcaa6bb7b6d3704abf22e0",
+              "facts/inventory_ledger.csv": "e3f2e4fcf306583d69c0ed3f8d726dbb0f61d2f979906cc8de21e3e46cd2b0ed",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "7d17b9a034dea6967c6a2b30954ceeb4dfc4c523cff53b090acae22c896e4910",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "4ac8d52aace2b4b5846b16b0763b24b879b36ebc42f52d5847d59ed7c71ead3c",
+              "facts/replenishment_receipts.csv": "bda5490cb3b1e064d3d2ee0742e50ac1ccbf9ff31623aafdb6f504ed5043a549",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "f63461c77907775b4b25a563ed9e0448c54a4aafadaa15ed2a1898cbbf32155c",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "181fc89f1c9c194e303b3d106c626005f8e08c25949a9bc08b04ecb61ec1c0b1",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "4f447928ea3ed04d86d9d57909638da662fc188f2be998c4dde1343c6715f1b8",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "df54e45265bf13e3ef4b2581bbf23b094d35ff0a843104a7992bfc4d6be96040",
+              "facts/return_events.csv": "2ad5176056b869bb0ff8fe839150b4649480326ec67072cccae2adb1d14aeec2",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "aa9f44e2279c4b87d7d0aaae852a1c943bf2ef92ab8e97a150cbf2865ad15f27",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "e2df2029fe100a4767d1650cfbba4bad5abc42c435aa4940b3b6c1ab05d2ec02",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "3c99b71f74c7786112f36363ae12c9b3932bb81b7c7b8061fe48f0ac51c3648f",
+              "facts/daily_price_observations.csv": "c91cdc13aacf78512940e83e5127e7811444e35dad78c7041d0eb3245dc6d7ec",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "ffec2f4259000c1619b82f78f1b1d542b8866886a1675c14fef91e008406c040",
+              "facts/delivery_plan_versions.csv": "577b9189769c690fc7c942a8f37545d48592b26bf7886a54bf238d1c111f1d35",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "cc6863d7bf17d0a8cff187943c5bc9e798de29e231ce1c329161ca539bb76863",
+              "facts/inventory_returns.csv": "4cedb31ce6eee50f62e1b46c90b215032f0b2fbb70f2c106c8fdbd7e3c4c18ef",
+              "facts/sales.csv": "05c84fe59ee0bb2a8867edc169dd1bcf14f7cdc5bd6c7ccf93df5049e7a906a9"
+            },
+            "source_manifest_semantics_sha256": "d1db64728dacbeb91739a4f81989a5c90ee193a8e8193d0a374d7fbc01587ce2",
+            "source_generated_at": "2026-10-03T06:53:14.105669+00:00",
+            "publication_hashes": {
+              "dq_manifest.json": "6ddbb0ff260c9475f55cccb902c15ab7be451769a3f62c3bcd3b1798a8425256",
+              "source_binding.json": "bcebbc4de120866fda2e56600e69aa80eb0323b193c7dcf593f8c069265d79c0",
+              "simulation_truth/fault_plan.json": "b2893f2597d1371edcf9840bcd42976fcd60bafbb432348b678f51b6fae5a74a",
+              "simulation_truth/data_quality_injections.json": "c6542ce807f71affb1beee5237e7bb125a57b76e3f90321eacf09bf0ae67cdcd",
+              "simulation_truth/evaluation.json": "40e60a87cccd3a69d64e596907f3c1a87e7a3314effbbffadfc05ae611c05a3f",
+              "raw/events.jsonl": "890028d632e1d7c7ea4551ddcca3bd06eee4fcc750cb71f3079ed05692031464",
+              "curated/replay.json": "dbea584541d569e26caeda011e831a7ce4ad46990c8006ae8e64379278371f18"
+            },
+            "seconds": 139.17121941701043,
+            "peak_rss_mib": 210.5625,
+            "process_seconds": 139.57866683299653
+          }
+        ]
+      },
+      {
+        "case": "physical",
+        "runs": [
+          {
+            "status": "passed",
+            "case": "physical",
+            "source_id": "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
+            "fixture_id": "raw-dq-sha256-0bcc03f0cfa0adf8d431a17bea57919dc72e59ebeccc5c76513d913d15c08aab",
+            "source_binding": {
+              "contract_version": "raw-dq-binding-2.0.0",
+              "source_dataset_id": "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
+              "source_descriptor_sha256": "be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
+              "source_events_sha256": "7804bbbc50e90e2592061462a669ccea5f749ae9afb58fe8fd9759000ed6230d",
+              "source_event_count": 1636,
+              "source_sales_count": 1390,
+              "source_return_count": 246,
+              "source_facts_ready": true,
+              "selection_policy": "all_canonical_sales_and_native_return_claims_v1",
+              "projection": "legacy_operational_sales_and_returns_allowlist_v1",
+              "scope": "all_parent_sales_and_return_claims",
+              "projection_tables": {
+                "sales": {
+                  "row_count": 1390,
+                  "columns": [
+                    "id",
+                    "product_id",
+                    "quantity",
+                    "unit_price",
+                    "total_amount",
+                    "currency",
+                    "channel",
+                    "region",
+                    "sold_at",
+                    "order_reference",
+                    "observed_sales",
+                    "promotion_applied",
+                    "data_quality_status",
+                    "ingested_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "d72e956d8b6ada45918ab28193fb7c75083abf7d69e49ccaf201016e8f9545f1"
+                },
+                "orders": {
+                  "row_count": 900,
+                  "columns": [
+                    "id",
+                    "order_reference",
+                    "store_id",
+                    "channel",
+                    "region",
+                    "status",
+                    "order_total",
+                    "currency",
+                    "ordered_at",
+                    "created_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "a37de92baf31bf2fe1bda2b619bc47f60927bb116d19526577fb632abc2bc28c"
+                },
+                "sale_price_references": {
+                  "row_count": 1390,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "business_date",
+                    "as_of_time",
+                    "price_plan_id",
+                    "promotion_plan_id",
+                    "pricing_policy_version"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "93639eedfd1f3ff02dd9fc0f4c1a964722666a3555f45bf9724f8f58b5da51c4"
+                },
+                "products": {
+                  "row_count": 8,
+                  "columns": [
+                    "id",
+                    "sku",
+                    "name",
+                    "category",
+                    "brand",
+                    "status"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "ef2b5247897109f96b79ac4318beac89acc9bdcb1ec0a2e9e5ebe31b908d2488"
+                },
+                "inventory_sales": {
+                  "row_count": 1390,
+                  "columns": [
+                    "sale_id",
+                    "order_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "stock_location_id",
+                    "fulfillment_route_id",
+                    "quantity",
+                    "unit_of_measure",
+                    "unit_price",
+                    "currency",
+                    "gross_revenue",
+                    "ordered_at",
+                    "sold_at",
+                    "ingested_at",
+                    "available_at",
+                    "sequence",
+                    "source_reference"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "3dcd1171e529d7ff1e2cdd893d37beac9840c891326bbffca349b781d2433737"
+                },
+                "return_events": {
+                  "row_count": 246,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "policy_id",
+                    "quantity",
+                    "refund_amount",
+                    "currency",
+                    "reason",
+                    "status",
+                    "returned_at",
+                    "ingested_at",
+                    "available_at",
+                    "returns_policy_version"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "9ae4bed32f745b838554d78482c0e75665576eaf544e6aec05f2bf793f4a24b7"
+                }
+              },
+              "return_scope": "purchases_in_parent_source_only",
+              "return_status_source": "verified_native_parent_not_refund_amount_inference",
+              "business_event_day_completeness": "not_qualified",
+              "missing_grain_policy": "unknown_not_zero"
+            },
+            "report": {
+              "accepted": 1630,
+              "accepted_return_claims": 243,
+              "accepted_sales": 1387,
+              "aggregate_revisions": 1630,
+              "curated_completeness": "not_qualified",
+              "declared_source_watermark": "2026-08-31T23:59:59.999999+00:00",
+              "duplicate_business": 2,
+              "duplicate_event": 2,
+              "input_records": 1693,
+              "late": 2,
+              "max_accepted_event_time": "2026-08-31T09:01:04+00:00",
+              "missing_grain_policy": "unknown_not_zero",
+              "missing_parent_facts": 6,
+              "out_of_order": 2,
+              "policy_version": "operational-offline-replay-2.0.0",
+              "progress_declarations": 53,
+              "quarantined": 6,
+              "raw_events": 1640,
+              "scope": "all_parent_sales_and_return_claims",
+              "status": "completed",
+              "transport_durability_proven": false,
+              "watermark_meaning": "explicit_parent_stream_progress_not_business_event_day_completeness"
+            },
+            "checks": {
+              "accepted_business_facts_match": true,
+              "aggregate_reconciliation": true,
+              "all_injections_reconciled": true,
+              "missing_parent_facts_reconciled": true,
+              "replay_idempotent": true,
+              "source_event_accounting": true
+            },
+            "injections": [
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              }
+            ],
+            "source_hashes": {
+              "dataset_manifest.v2.json": "8d6538e1528b2ea60f2b5d3786990c905f47c84a3ad1deeb2bdda7eb22e3dc85",
+              "source_report.json": "7814051236de165e8636825852e517a628e09df58a27f066e18007285cbcaeda",
+              "realism_report.json": "8fef6c5f9d4f23c426d3b017e4e1e6dfd153f108375a8210f1dc52cd95ba0f0c",
+              "realism_report.md": "ffe082cc66c342b3adbf9a4291a2cc0f9855af10ec05956560b6732b0a9c170d",
+              "source_report.md": "2f6a2f25f6bbfa291e7825ad71d4b7a2fd3a613ee79bd8aae4400918eb07d7e7",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "643a5b1bdca460c743032a4d550a54409ba275ce021d6d36defc54404cfbe047",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "9cf1d3ced944a7080c159cd34e04e2c2da37e9b6f06d965040172eea00f80f41",
+              "simulation_truth/stockout_episodes.csv": "dc8fab5f734ed9f632284e493a7b36389e42e1808f1c15e83029cfa296e4c4e0",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "754cba6aad3537f9db2cdf991b3899b99715ab7c7c3e6f08833c44449c510c4e",
+              "simulation_truth/anomaly_scenario.json": "69b3635b4a3483a41a7d3f3d3f9013a3c9ecff53e5fb5edce5ff6636a9752a0d",
+              "simulation_truth/inventory_window_diagnostics.csv": "4b38b95503c2271d2b785ae3f5c546332e63f659ee4c9a7414b79b6f45700efe",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "6b0ec913d16cb8da49b84b912e3fbbec795a30e1109d895386e994cb07d2f0a4",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "46fe01ef439639ebb75d72627b2b8848f244a2ab7fbd3760f59186bb05a461ee",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "9f36dd3d032a424817397b9c74519c03ba3e56abd23a47f1d6aec35bc5122772",
+              "simulation_truth/inventory_physical_daily_balances.csv": "59473a73224cd2777eef5101625442594e41ace76400fd810cf86e958db2c21b",
+              "facts/inventory_ledger.csv": "09398f4a2077adfbc9aca7cc3ca13e19f055b5ed4f49112941d7ddc6bfb18740",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "68bd212d8775bb5f95b8b91814e65a44c7ab4f493678dd833b5795444880d618",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "98bffc5542be33fa90982743ecb9b9a0878cf0a7208ce05755dad5282b1ce71f",
+              "facts/replenishment_receipts.csv": "6c907a16b8b2bc66c75df8efb095894d7745a79da08e1e4d09ee03593608ad2a",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "8aedfcfeaab1188832acc84b7760050a9bbcb6b3831524262265a61fe723b086",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "560803636e19e986908aefb2f7759ca420857b42476fca6392b2a93eaf9a2f60",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "23c3d55ed12bafb8aa32d9d93e6e2fb74eeb87092ac38ea20b1aa9f6b3e4b880",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "9d6efd804c81e8dc2eb7b91ca1452b70f07e5b847d53ce06d8743f9da54b6d15",
+              "facts/return_events.csv": "358f07906f17cdc890a8c95cba9eff02e93cbbafae8e238f7c374cc41bef33a1",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "0d735a4e3f8921437eddb069115ffb0321b08a8673d0fa5610458fb991ee3389",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "1942ff1c6cdead3aed9de2a418a97ec9bd8d682dce92750bf8a52cb5af83cab0",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "1cc26a135277984c7ca4ccbf4db9bce19c58bb6e245e5925008aff36e04de5e4",
+              "facts/daily_price_observations.csv": "78da2299de76bc3a636b71afec9a82ae8d1d36d6fff85410a5effbd0c199b412",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "cfa8542349e29a8d93fd27cdd2126bfdbfb04a7b978cab23b89682755c3742f8",
+              "facts/delivery_plan_versions.csv": "1e229f60406ad4ebf1b0c18dc1e36cb9440a4ee24f53885502df485401834fc4",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "3e87f257156e5ff4db8ea3669b8c08ab6b2e3247dc5a98542786b3bc607ad806",
+              "facts/inventory_returns.csv": "af1986d58fa306ef05e1670ef930a21633ecbea200deffdeb1d83c11dede85a3",
+              "facts/sales.csv": "9a60ff3a770e9d676af13a7c7811494f9638d63e623a839ecf5dcc947c4fb92e"
+            },
+            "source_artifact_hashes": {
+              "source_report.json": "7814051236de165e8636825852e517a628e09df58a27f066e18007285cbcaeda",
+              "realism_report.json": "8fef6c5f9d4f23c426d3b017e4e1e6dfd153f108375a8210f1dc52cd95ba0f0c",
+              "realism_report.md": "ffe082cc66c342b3adbf9a4291a2cc0f9855af10ec05956560b6732b0a9c170d",
+              "source_report.md": "2f6a2f25f6bbfa291e7825ad71d4b7a2fd3a613ee79bd8aae4400918eb07d7e7",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "643a5b1bdca460c743032a4d550a54409ba275ce021d6d36defc54404cfbe047",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "9cf1d3ced944a7080c159cd34e04e2c2da37e9b6f06d965040172eea00f80f41",
+              "simulation_truth/stockout_episodes.csv": "dc8fab5f734ed9f632284e493a7b36389e42e1808f1c15e83029cfa296e4c4e0",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "754cba6aad3537f9db2cdf991b3899b99715ab7c7c3e6f08833c44449c510c4e",
+              "simulation_truth/anomaly_scenario.json": "69b3635b4a3483a41a7d3f3d3f9013a3c9ecff53e5fb5edce5ff6636a9752a0d",
+              "simulation_truth/inventory_window_diagnostics.csv": "4b38b95503c2271d2b785ae3f5c546332e63f659ee4c9a7414b79b6f45700efe",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "6b0ec913d16cb8da49b84b912e3fbbec795a30e1109d895386e994cb07d2f0a4",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "46fe01ef439639ebb75d72627b2b8848f244a2ab7fbd3760f59186bb05a461ee",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "9f36dd3d032a424817397b9c74519c03ba3e56abd23a47f1d6aec35bc5122772",
+              "simulation_truth/inventory_physical_daily_balances.csv": "59473a73224cd2777eef5101625442594e41ace76400fd810cf86e958db2c21b",
+              "facts/inventory_ledger.csv": "09398f4a2077adfbc9aca7cc3ca13e19f055b5ed4f49112941d7ddc6bfb18740",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "68bd212d8775bb5f95b8b91814e65a44c7ab4f493678dd833b5795444880d618",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "98bffc5542be33fa90982743ecb9b9a0878cf0a7208ce05755dad5282b1ce71f",
+              "facts/replenishment_receipts.csv": "6c907a16b8b2bc66c75df8efb095894d7745a79da08e1e4d09ee03593608ad2a",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "8aedfcfeaab1188832acc84b7760050a9bbcb6b3831524262265a61fe723b086",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "560803636e19e986908aefb2f7759ca420857b42476fca6392b2a93eaf9a2f60",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "23c3d55ed12bafb8aa32d9d93e6e2fb74eeb87092ac38ea20b1aa9f6b3e4b880",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "9d6efd804c81e8dc2eb7b91ca1452b70f07e5b847d53ce06d8743f9da54b6d15",
+              "facts/return_events.csv": "358f07906f17cdc890a8c95cba9eff02e93cbbafae8e238f7c374cc41bef33a1",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "0d735a4e3f8921437eddb069115ffb0321b08a8673d0fa5610458fb991ee3389",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "1942ff1c6cdead3aed9de2a418a97ec9bd8d682dce92750bf8a52cb5af83cab0",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "1cc26a135277984c7ca4ccbf4db9bce19c58bb6e245e5925008aff36e04de5e4",
+              "facts/daily_price_observations.csv": "78da2299de76bc3a636b71afec9a82ae8d1d36d6fff85410a5effbd0c199b412",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "cfa8542349e29a8d93fd27cdd2126bfdbfb04a7b978cab23b89682755c3742f8",
+              "facts/delivery_plan_versions.csv": "1e229f60406ad4ebf1b0c18dc1e36cb9440a4ee24f53885502df485401834fc4",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "3e87f257156e5ff4db8ea3669b8c08ab6b2e3247dc5a98542786b3bc607ad806",
+              "facts/inventory_returns.csv": "af1986d58fa306ef05e1670ef930a21633ecbea200deffdeb1d83c11dede85a3",
+              "facts/sales.csv": "9a60ff3a770e9d676af13a7c7811494f9638d63e623a839ecf5dcc947c4fb92e"
+            },
+            "source_manifest_semantics_sha256": "54b63f117940b1d1a131911f5add91d146779316a980e19dabd18587c695ba95",
+            "source_generated_at": "2026-10-03T06:55:36.873498+00:00",
+            "publication_hashes": {
+              "dq_manifest.json": "9e131cbd00522483d9dc85fd3bbb40134fa6f43b5a43692ec7dc777a7c0b852a",
+              "source_binding.json": "f2614c5eaa81550bd54dcd2de27d7d7707054348047e1400f9eb015b1595a5dd",
+              "simulation_truth/fault_plan.json": "40457c272f44785ba0411a2180f8a95db7ea0622b432e82ba2be11457ad1db62",
+              "simulation_truth/data_quality_injections.json": "6179460dc98c7c9e3931c031565dafe22146d3103e4a5bc6401c3db6d280bdae",
+              "simulation_truth/evaluation.json": "9e9d5694ec5c9e77131cc88d9dff0c27376087f2187cf4f3c96e60c9f75255f7",
+              "raw/events.jsonl": "1d895c3ae8860416ad88e7dde196ab3804d50ac1053392cfe66fad54725b3e53",
+              "curated/replay.json": "352ec0d9bdfc91cd05a7cd9c7123f6fa6970358853f0d78751db826d2b3e0195"
+            },
+            "seconds": 157.0139055000036,
+            "peak_rss_mib": 186.671875,
+            "process_seconds": 157.4757463329588
+          },
+          {
+            "status": "passed",
+            "case": "physical",
+            "source_id": "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
+            "fixture_id": "raw-dq-sha256-0bcc03f0cfa0adf8d431a17bea57919dc72e59ebeccc5c76513d913d15c08aab",
+            "source_binding": {
+              "contract_version": "raw-dq-binding-2.0.0",
+              "source_dataset_id": "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
+              "source_descriptor_sha256": "be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09",
+              "source_events_sha256": "7804bbbc50e90e2592061462a669ccea5f749ae9afb58fe8fd9759000ed6230d",
+              "source_event_count": 1636,
+              "source_sales_count": 1390,
+              "source_return_count": 246,
+              "source_facts_ready": true,
+              "selection_policy": "all_canonical_sales_and_native_return_claims_v1",
+              "projection": "legacy_operational_sales_and_returns_allowlist_v1",
+              "scope": "all_parent_sales_and_return_claims",
+              "projection_tables": {
+                "sales": {
+                  "row_count": 1390,
+                  "columns": [
+                    "id",
+                    "product_id",
+                    "quantity",
+                    "unit_price",
+                    "total_amount",
+                    "currency",
+                    "channel",
+                    "region",
+                    "sold_at",
+                    "order_reference",
+                    "observed_sales",
+                    "promotion_applied",
+                    "data_quality_status",
+                    "ingested_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "d72e956d8b6ada45918ab28193fb7c75083abf7d69e49ccaf201016e8f9545f1"
+                },
+                "orders": {
+                  "row_count": 900,
+                  "columns": [
+                    "id",
+                    "order_reference",
+                    "store_id",
+                    "channel",
+                    "region",
+                    "status",
+                    "order_total",
+                    "currency",
+                    "ordered_at",
+                    "created_at"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "a37de92baf31bf2fe1bda2b619bc47f60927bb116d19526577fb632abc2bc28c"
+                },
+                "sale_price_references": {
+                  "row_count": 1390,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "business_date",
+                    "as_of_time",
+                    "price_plan_id",
+                    "promotion_plan_id",
+                    "pricing_policy_version"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "93639eedfd1f3ff02dd9fc0f4c1a964722666a3555f45bf9724f8f58b5da51c4"
+                },
+                "products": {
+                  "row_count": 8,
+                  "columns": [
+                    "id",
+                    "sku",
+                    "name",
+                    "category",
+                    "brand",
+                    "status"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "ef2b5247897109f96b79ac4318beac89acc9bdcb1ec0a2e9e5ebe31b908d2488"
+                },
+                "inventory_sales": {
+                  "row_count": 1390,
+                  "columns": [
+                    "sale_id",
+                    "order_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "stock_location_id",
+                    "fulfillment_route_id",
+                    "quantity",
+                    "unit_of_measure",
+                    "unit_price",
+                    "currency",
+                    "gross_revenue",
+                    "ordered_at",
+                    "sold_at",
+                    "ingested_at",
+                    "available_at",
+                    "sequence",
+                    "source_reference"
+                  ],
+                  "grain": [
+                    "sale_id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "3dcd1171e529d7ff1e2cdd893d37beac9840c891326bbffca349b781d2433737"
+                },
+                "return_events": {
+                  "row_count": 246,
+                  "columns": [
+                    "id",
+                    "sale_id",
+                    "order_id",
+                    "order_item_id",
+                    "product_id",
+                    "selling_location_id",
+                    "channel",
+                    "policy_id",
+                    "quantity",
+                    "refund_amount",
+                    "currency",
+                    "reason",
+                    "status",
+                    "returned_at",
+                    "ingested_at",
+                    "available_at",
+                    "returns_policy_version"
+                  ],
+                  "grain": [
+                    "id"
+                  ],
+                  "data_class": "source_observation",
+                  "content_sha256": "9ae4bed32f745b838554d78482c0e75665576eaf544e6aec05f2bf793f4a24b7"
+                }
+              },
+              "return_scope": "purchases_in_parent_source_only",
+              "return_status_source": "verified_native_parent_not_refund_amount_inference",
+              "business_event_day_completeness": "not_qualified",
+              "missing_grain_policy": "unknown_not_zero"
+            },
+            "report": {
+              "accepted": 1630,
+              "accepted_return_claims": 243,
+              "accepted_sales": 1387,
+              "aggregate_revisions": 1630,
+              "curated_completeness": "not_qualified",
+              "declared_source_watermark": "2026-08-31T23:59:59.999999+00:00",
+              "duplicate_business": 2,
+              "duplicate_event": 2,
+              "input_records": 1693,
+              "late": 2,
+              "max_accepted_event_time": "2026-08-31T09:01:04+00:00",
+              "missing_grain_policy": "unknown_not_zero",
+              "missing_parent_facts": 6,
+              "out_of_order": 2,
+              "policy_version": "operational-offline-replay-2.0.0",
+              "progress_declarations": 53,
+              "quarantined": 6,
+              "raw_events": 1640,
+              "scope": "all_parent_sales_and_return_claims",
+              "status": "completed",
+              "transport_durability_proven": false,
+              "watermark_meaning": "explicit_parent_stream_progress_not_business_event_day_completeness"
+            },
+            "checks": {
+              "accepted_business_facts_match": true,
+              "aggregate_reconciliation": true,
+              "all_injections_reconciled": true,
+              "missing_parent_facts_reconciled": true,
+              "replay_idempotent": true,
+              "source_event_accounting": true
+            },
+            "injections": [
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "exact_duplicate",
+                "expected_action": "duplicate_event",
+                "observed_action": "duplicate_event",
+                "observed_reason": "same_event_id_and_content",
+                "passed": true
+              },
+              {
+                "issue_type": "late_event",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "late",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_major",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "out_of_order",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "out_of_order",
+                "passed": true
+              },
+              {
+                "issue_type": "missing_optional_context",
+                "expected_action": "accepted",
+                "observed_action": "accepted",
+                "observed_reason": "on_time",
+                "passed": true
+              },
+              {
+                "issue_type": "unsupported_minor",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "unsupported_schema_version",
+                "passed": true
+              },
+              {
+                "issue_type": "unexpected_additive_field",
+                "expected_action": "quarantined",
+                "observed_action": "quarantined",
+                "observed_reason": "invalid_operational_contract",
+                "passed": true
+              },
+              {
+                "issue_type": "business_duplicate",
+                "expected_action": "duplicate_business",
+                "observed_action": "duplicate_business",
+                "observed_reason": "same_business_fact",
+                "passed": true
+              }
+            ],
+            "source_hashes": {
+              "dataset_manifest.v2.json": "3aa3d42e48d087cb6b7db1cc072d35d56719b93cdd76e21c8137c6c4422f7c28",
+              "source_report.json": "7814051236de165e8636825852e517a628e09df58a27f066e18007285cbcaeda",
+              "realism_report.json": "8fef6c5f9d4f23c426d3b017e4e1e6dfd153f108375a8210f1dc52cd95ba0f0c",
+              "realism_report.md": "ffe082cc66c342b3adbf9a4291a2cc0f9855af10ec05956560b6732b0a9c170d",
+              "source_report.md": "2f6a2f25f6bbfa291e7825ad71d4b7a2fd3a613ee79bd8aae4400918eb07d7e7",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "643a5b1bdca460c743032a4d550a54409ba275ce021d6d36defc54404cfbe047",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "9cf1d3ced944a7080c159cd34e04e2c2da37e9b6f06d965040172eea00f80f41",
+              "simulation_truth/stockout_episodes.csv": "dc8fab5f734ed9f632284e493a7b36389e42e1808f1c15e83029cfa296e4c4e0",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "754cba6aad3537f9db2cdf991b3899b99715ab7c7c3e6f08833c44449c510c4e",
+              "simulation_truth/anomaly_scenario.json": "69b3635b4a3483a41a7d3f3d3f9013a3c9ecff53e5fb5edce5ff6636a9752a0d",
+              "simulation_truth/inventory_window_diagnostics.csv": "4b38b95503c2271d2b785ae3f5c546332e63f659ee4c9a7414b79b6f45700efe",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "6b0ec913d16cb8da49b84b912e3fbbec795a30e1109d895386e994cb07d2f0a4",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "46fe01ef439639ebb75d72627b2b8848f244a2ab7fbd3760f59186bb05a461ee",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "9f36dd3d032a424817397b9c74519c03ba3e56abd23a47f1d6aec35bc5122772",
+              "simulation_truth/inventory_physical_daily_balances.csv": "59473a73224cd2777eef5101625442594e41ace76400fd810cf86e958db2c21b",
+              "facts/inventory_ledger.csv": "09398f4a2077adfbc9aca7cc3ca13e19f055b5ed4f49112941d7ddc6bfb18740",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "68bd212d8775bb5f95b8b91814e65a44c7ab4f493678dd833b5795444880d618",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "98bffc5542be33fa90982743ecb9b9a0878cf0a7208ce05755dad5282b1ce71f",
+              "facts/replenishment_receipts.csv": "6c907a16b8b2bc66c75df8efb095894d7745a79da08e1e4d09ee03593608ad2a",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "8aedfcfeaab1188832acc84b7760050a9bbcb6b3831524262265a61fe723b086",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "560803636e19e986908aefb2f7759ca420857b42476fca6392b2a93eaf9a2f60",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "23c3d55ed12bafb8aa32d9d93e6e2fb74eeb87092ac38ea20b1aa9f6b3e4b880",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "9d6efd804c81e8dc2eb7b91ca1452b70f07e5b847d53ce06d8743f9da54b6d15",
+              "facts/return_events.csv": "358f07906f17cdc890a8c95cba9eff02e93cbbafae8e238f7c374cc41bef33a1",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "0d735a4e3f8921437eddb069115ffb0321b08a8673d0fa5610458fb991ee3389",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "1942ff1c6cdead3aed9de2a418a97ec9bd8d682dce92750bf8a52cb5af83cab0",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "1cc26a135277984c7ca4ccbf4db9bce19c58bb6e245e5925008aff36e04de5e4",
+              "facts/daily_price_observations.csv": "78da2299de76bc3a636b71afec9a82ae8d1d36d6fff85410a5effbd0c199b412",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "cfa8542349e29a8d93fd27cdd2126bfdbfb04a7b978cab23b89682755c3742f8",
+              "facts/delivery_plan_versions.csv": "1e229f60406ad4ebf1b0c18dc1e36cb9440a4ee24f53885502df485401834fc4",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "3e87f257156e5ff4db8ea3669b8c08ab6b2e3247dc5a98542786b3bc607ad806",
+              "facts/inventory_returns.csv": "af1986d58fa306ef05e1670ef930a21633ecbea200deffdeb1d83c11dede85a3",
+              "facts/sales.csv": "9a60ff3a770e9d676af13a7c7811494f9638d63e623a839ecf5dcc947c4fb92e"
+            },
+            "source_artifact_hashes": {
+              "source_report.json": "7814051236de165e8636825852e517a628e09df58a27f066e18007285cbcaeda",
+              "realism_report.json": "8fef6c5f9d4f23c426d3b017e4e1e6dfd153f108375a8210f1dc52cd95ba0f0c",
+              "realism_report.md": "ffe082cc66c342b3adbf9a4291a2cc0f9855af10ec05956560b6732b0a9c170d",
+              "source_report.md": "2f6a2f25f6bbfa291e7825ad71d4b7a2fd3a613ee79bd8aae4400918eb07d7e7",
+              "simulation_truth/promotion_effect_truth.csv": "17305d04de4a915dc84f64947261da92b4e157d9e211d30aa55dda544e56fec6",
+              "simulation_truth/inventory_demand_outcomes.csv": "643a5b1bdca460c743032a4d550a54409ba275ce021d6d36defc54404cfbe047",
+              "simulation_truth/store_simulation_parameters.csv": "8375e0e4ba593e758986ee8d9d55003cf95aa6e3e517de7e6fb447fd07006ed0",
+              "simulation_truth/inventory_demand_arrivals.csv": "9cf1d3ced944a7080c159cd34e04e2c2da37e9b6f06d965040172eea00f80f41",
+              "simulation_truth/stockout_episodes.csv": "dc8fab5f734ed9f632284e493a7b36389e42e1808f1c15e83029cfa296e4c4e0",
+              "simulation_truth/inventory_scheduled_receipt_tail.csv": "754cba6aad3537f9db2cdf991b3899b99715ab7c7c3e6f08833c44449c510c4e",
+              "simulation_truth/anomaly_scenario.json": "69b3635b4a3483a41a7d3f3d3f9013a3c9ecff53e5fb5edce5ff6636a9752a0d",
+              "simulation_truth/inventory_window_diagnostics.csv": "4b38b95503c2271d2b785ae3f5c546332e63f659ee4c9a7414b79b6f45700efe",
+              "simulation_truth/inventory_lost_sales_impacts.csv": "6b0ec913d16cb8da49b84b912e3fbbec795a30e1109d895386e994cb07d2f0a4",
+              "simulation_truth/product_simulation_parameters.csv": "cedf13e0b5c4480bd159687e496ec3c533f1df9374bddf9470be596e405e67cc",
+              "simulation_truth/daily_demand_truth.csv": "46fe01ef439639ebb75d72627b2b8848f244a2ab7fbd3760f59186bb05a461ee",
+              "simulation_truth/inventory_configuration.json": "e115712c64402e8c95803629756466423d656e285ff1271ae09251eef092fb4b",
+              "simulation_truth/inventory_supplier_samples.csv": "9f36dd3d032a424817397b9c74519c03ba3e56abd23a47f1d6aec35bc5122772",
+              "simulation_truth/inventory_physical_daily_balances.csv": "59473a73224cd2777eef5101625442594e41ace76400fd810cf86e958db2c21b",
+              "facts/inventory_ledger.csv": "09398f4a2077adfbc9aca7cc3ca13e19f055b5ed4f49112941d7ddc6bfb18740",
+              "facts/catalog_categories.csv": "214ef19e3afe2207dea724aaad33d24b16c238f29b2444220e37c9d7a62b97c6",
+              "facts/product_catalog.csv": "cdf9eb2c1ff2efc6e2cb363f5250cc7c54a78f3bc539669bb82bec9cab1e9e29",
+              "facts/business_calendar.csv": "98e0357d80a083b4b19fb962c65b9f341b51c171574e48ea74b6052c8c507a63",
+              "facts/fulfillment_routes.csv": "f2bac5bde81e09cf5b5e2a7301c1c674de156f67ae31091eeea0a0ade9d3c8fb",
+              "facts/inventory_sales.csv": "68bd212d8775bb5f95b8b91814e65a44c7ab4f493678dd833b5795444880d618",
+              "facts/selling_locations.csv": "7236d082d758186508952f3c8fa0e3afa66553026b3c5c6e36e9a60ed2ac02d2",
+              "facts/products.csv": "c2ac4e7413d5362dd23793ee5d951d83d1db9f0b969344fb36a3f2721bdb9126",
+              "facts/orders.csv": "98bffc5542be33fa90982743ecb9b9a0878cf0a7208ce05755dad5282b1ce71f",
+              "facts/replenishment_receipts.csv": "6c907a16b8b2bc66c75df8efb095894d7745a79da08e1e4d09ee03593608ad2a",
+              "facts/inventory_route_versions.csv": "0ea5ebbd97fd854f5d7f424476c435b7f498411d24b7a2b042acb1deb7f4beec",
+              "facts/daily_return_cohorts.csv": "8aedfcfeaab1188832acc84b7760050a9bbcb6b3831524262265a61fe723b086",
+              "facts/category_calendar.csv": "4cb90291ff51b73fd57abc75bf87f6ccd2e9b479d7f06a6780cc021fe17776a1",
+              "facts/price_plans.csv": "068b232eaef28f24abebd3de00f32fd00398917d52b80f3b8e365fe1a76d0f10",
+              "facts/sale_price_references.csv": "560803636e19e986908aefb2f7759ca420857b42476fca6392b2a93eaf9a2f60",
+              "facts/return_policies.csv": "66d2b936eecd215325380349b1d200a8f27af0cb7c766824380899b6526cbaf4",
+              "facts/inventory_daily_snapshots.csv": "23c3d55ed12bafb8aa32d9d93e6e2fb74eeb87092ac38ea20b1aa9f6b3e4b880",
+              "facts/inventory_fulfillment_routes.csv": "2e289df8f7b8bb4311524ed7ea9f6c85f4f713e180f6b5fe156dbd448ddc1144",
+              "facts/daily_demand_observations.csv": "9d6efd804c81e8dc2eb7b91ca1452b70f07e5b847d53ce06d8743f9da54b6d15",
+              "facts/return_events.csv": "358f07906f17cdc890a8c95cba9eff02e93cbbafae8e238f7c374cc41bef33a1",
+              "facts/price_history.csv": "0b19baf5f118642ffeb863df0aac6d79ed99a45e372ae1ff46ea501a7482f327",
+              "facts/inventory_scope.csv": "33709d9d0325266904e738b3100e4c33a2be622be108732afbec636931d5316e",
+              "facts/inventory_products.csv": "57fbc9d851c451a3b4c3cf5d574cae826bc662902dd2d231097d605cb139ba77",
+              "facts/stock_locations.csv": "a93353bd8f0d473c5261b26aa837554ad6cca023f754ee0c4ecd186209e213f4",
+              "facts/inventory_reorder_rules.csv": "4b94097673692e93190cf6453f9a71ac66f77a6c2636b7f8c28c3acfe3764440",
+              "facts/daily_demand_versions.csv": "0d735a4e3f8921437eddb069115ffb0321b08a8673d0fa5610458fb991ee3389",
+              "facts/promotions.csv": "418d513b148f75cb2f72b32536f26ff52eb09c09740e0a17dfb904c1d5fc832a",
+              "facts/suppliers.csv": "ae6594211397d72c4d25908291817a3a9a128cb7ea427f9489a61963c9c669d7",
+              "facts/channel_assignments.csv": "bf126a9e52e370f144a19906f1f4db6c5c2c128f0e2f8e4264158cdeb5f4cea7",
+              "facts/return_inventory_decisions.csv": "1942ff1c6cdead3aed9de2a418a97ec9bd8d682dce92750bf8a52cb5af83cab0",
+              "facts/inventory_history_coverage.csv": "92dde0e1030465db65e753112a735adb563b877637d3eabda960ae4680489d9b",
+              "facts/replenishment_orders.csv": "1cc26a135277984c7ca4ccbf4db9bce19c58bb6e245e5925008aff36e04de5e4",
+              "facts/daily_price_observations.csv": "78da2299de76bc3a636b71afec9a82ae8d1d36d6fff85410a5effbd0c199b412",
+              "facts/product_suppliers.csv": "86af456afdc01d52c79c3ffa116eb8630be049f65abd0007c7e230d10e895a25",
+              "facts/inventory_stock_locations.csv": "ce9f82b74f1f90331e803395f23abacd99e59aab9c245a0ca1e7b663e74b592a",
+              "facts/assortment.csv": "3c45e701fb729d9d6fd39145511dde19592f1550ae79ba9f7c15d60b79fd514d",
+              "facts/warehouses.csv": "ee0147a5903955d9d18ebea72d83b4268c49c32da156a62bea23a6e8c89e493e",
+              "facts/order_items.csv": "cfa8542349e29a8d93fd27cdd2126bfdbfb04a7b978cab23b89682755c3742f8",
+              "facts/delivery_plan_versions.csv": "1e229f60406ad4ebf1b0c18dc1e36cb9440a4ee24f53885502df485401834fc4",
+              "facts/promotion_plans.csv": "9c5366b685cb956b2f7eb59fec0eebea1d7d5c574f3359a05756a7f76b64cd0e",
+              "facts/inventory_selling_locations.csv": "2f01fb247469bff01e206b52c77817e1badd552e5cecd34a36ea549efc304bda",
+              "facts/daily_demand_exclusions.csv": "cf9c42abddc23fdb505a89a5829c693157ed778d1c9603bba9d506c699b55201",
+              "facts/stores.csv": "b381b98a73de0949b597888249932129dee29b0b179a1e54efd87ca5ba918d50",
+              "facts/returns.csv": "3e87f257156e5ff4db8ea3669b8c08ab6b2e3247dc5a98542786b3bc607ad806",
+              "facts/inventory_returns.csv": "af1986d58fa306ef05e1670ef930a21633ecbea200deffdeb1d83c11dede85a3",
+              "facts/sales.csv": "9a60ff3a770e9d676af13a7c7811494f9638d63e623a839ecf5dcc947c4fb92e"
+            },
+            "source_manifest_semantics_sha256": "54b63f117940b1d1a131911f5add91d146779316a980e19dabd18587c695ba95",
+            "source_generated_at": "2026-10-03T06:58:17.380508+00:00",
+            "publication_hashes": {
+              "dq_manifest.json": "9e131cbd00522483d9dc85fd3bbb40134fa6f43b5a43692ec7dc777a7c0b852a",
+              "source_binding.json": "f2614c5eaa81550bd54dcd2de27d7d7707054348047e1400f9eb015b1595a5dd",
+              "simulation_truth/fault_plan.json": "40457c272f44785ba0411a2180f8a95db7ea0622b432e82ba2be11457ad1db62",
+              "simulation_truth/data_quality_injections.json": "6179460dc98c7c9e3931c031565dafe22146d3103e4a5bc6401c3db6d280bdae",
+              "simulation_truth/evaluation.json": "9e9d5694ec5c9e77131cc88d9dff0c27376087f2187cf4f3c96e60c9f75255f7",
+              "raw/events.jsonl": "1d895c3ae8860416ad88e7dde196ab3804d50ac1053392cfe66fad54725b3e53",
+              "curated/replay.json": "352ec0d9bdfc91cd05a7cd9c7123f6fa6970358853f0d78751db826d2b3e0195"
+            },
+            "seconds": 131.78096258296864,
+            "peak_rss_mib": 234.453125,
+            "process_seconds": 132.27180145902093
+          }
+        ]
+      }
+    ],
+    "business_event_day_completeness": "not_qualified",
+    "model_ready": false,
+    "transport_durability_proven": false
+  },
+  "test_receipts": {
+    "data": {
+      "collected": 942,
+      "failed": [
+        "test_immutable_fixture_reuse_and_resealed_false_aggregate_rejected[demand]"
+      ],
+      "skipped": 0,
+      "junit_sha256": "c8ab3ad6e54592c6dc9fe9de835bf54efe01c7351fdbb1f501d9082b4dbb01eb",
+      "artifact": "/private/tmp/ai07-full-dq-data-tests.xml"
+    },
+    "full_dq": {
+      "collected": 48,
+      "failed": [],
+      "skipped": 0,
+      "junit_sha256": "5e86a12f94a3eebdf41645e7ebfa99cc94fd67b6cfacca3cd64420f79f8b0be9",
+      "artifact": "/private/tmp/ai07-full-dq-final-tests.xml"
+    },
+    "legacy": {
+      "collected": 72,
+      "failed": [],
+      "skipped": 0,
+      "junit_sha256": "8bb472b12430969eabfd590dfd01aa1a6d3c66c3dd234444a33c8a669fc35fcd",
+      "artifact": "/private/tmp/ai07-full-dq-legacy-tests.xml"
+    }
+  },
+  "test_interpretation": {
+    "unique_data_cases_verified": 944,
+    "unresolved_failures": 0,
+    "development_run_failure": "Full data run started before a checker edit; its immutable fixture fingerprint check correctly rejected the changed implementation. All 48 full-DQ cases, including that case, subsequently passed on frozen ae1178c. The other 896 data regressions passed in the full run."
+  },
+  "static_checks": {
+    "ruff": "passed",
+    "ruff_format_production_files": 251,
+    "mypy_configured_files": 5,
+    "mypy": "passed",
+    "actionlint": "passed",
+    "bandit_high_high_data_dq": "passed",
+    "ci_detection_contract_tests": 16,
+    "immutable_input_contract_tests": 11,
+    "gitleaks_directory": "passed",
+    "gitleaks_all_refs_commits": 417,
+    "gitleaks_all_refs": "passed"
+  },
+  "limits": {
+    "independent_ai_consumer": "pending",
+    "business_event_day_completeness": "not_qualified",
+    "missing_grain_policy": "unknown_not_zero",
+    "model_ready": false,
+    "transport_durability_proven": false,
+    "source_changes": "Additive schema files change source implementation identity; this acceptance regenerates source 2.8 and does not rewrite prior frozen datasets."
+  },
+  "remote_ci": "Final head results are recorded on the draft PR after completion.",
+  "cli_verification": [
+    {
+      "case": "demand",
+      "status": "passed",
+      "fixture_id": "raw-dq-sha256-49c3b360e381325b6174d7eb7382685a0636457d03da790d57c2bd4677709f5b",
+      "accepted": 1627,
+      "receipt_sha256": "d24098101bace39f37d9d33db1214c4c4a08463def5ae73b980c7f2cfae6b5c3",
+      "artifact": "/private/tmp/ai07-full-dq-demand-cli.json"
+    },
+    {
+      "case": "physical",
+      "status": "passed",
+      "fixture_id": "raw-dq-sha256-0bcc03f0cfa0adf8d431a17bea57919dc72e59ebeccc5c76513d913d15c08aab",
+      "accepted": 1630,
+      "receipt_sha256": "8df8b20ebdd7ad7c403e04b7ce4b27a5d702323e962c3e84ec01659af928cf7a",
+      "artifact": "/private/tmp/ai07-full-dq-physical-cli.json"
+    }
+  ]
+}

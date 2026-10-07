@@ -35,7 +35,12 @@ def build_return_policies(tables: dict, config: ResolvedGenerationConfig) -> lis
     ]
 
 
-def generate_return_events(tables: dict, config: ResolvedGenerationConfig) -> list[dict[str, str]]:
+def generate_return_events(
+    tables: dict,
+    config: ResolvedGenerationConfig,
+    *,
+    return_factors: dict[tuple[str, ...], str] | None = None,
+) -> list[dict[str, str]]:
     products = {r["id"]: r for r in tables["products"]}
     catalog = {r["id"]: r for r in tables["product_catalog"]}
     items = {r["id"]: r for r in tables["order_items"]}
@@ -48,7 +53,8 @@ def generate_return_events(tables: dict, config: ResolvedGenerationConfig) -> li
         item, sale = items[ref["order_item_id"]], sales[ref["sale_id"]]
         rng = random.Random(f"returns:{RETURNS_VERSION}:{config.seed}:{sale['id']}")  # noqa: S311 - synthetic data
         rate = float(products[item["product_id"]]["return_rate"]) * multipliers[ref["channel"]]
-        if rng.random() >= min(rate, 0.75):
+        selection_draw = rng.random()
+        if not return_factors and selection_draw >= min(rate, 0.75):
             continue
         policy = policies[catalog[item["product_id"]]["category_id"], ref["channel"]]
         quantity = rng.randint(1, int(item["quantity"]))
@@ -62,27 +68,37 @@ def generate_return_events(tables: dict, config: ResolvedGenerationConfig) -> li
             )
             ingested = returned + timedelta(hours=rng.randint(0, MAX_INGESTION_DELAY_DAYS * 24))
             status = "rejected" if rng.random() < 0.08 else "refunded"
-            events.append(
-                {
-                    "id": deterministic_uuid("return_event", sale["id"] + ":" + str(sequence)),
-                    "sale_id": sale["id"],
-                    "order_id": item["order_id"],
-                    "order_item_id": item["id"],
-                    "product_id": item["product_id"],
-                    "selling_location_id": ref["selling_location_id"],
-                    "channel": ref["channel"],
-                    "policy_id": policy["id"],
-                    "quantity": str(units),
-                    "refund_amount": money(Decimal(item["unit_price"]) * units)
-                    if status == "refunded"
-                    else "0.00",
-                    "currency": item["currency"],
-                    "reason": rng.choice(reasons),
-                    "status": status,
-                    "returned_at": returned.isoformat(),
-                    "ingested_at": ingested.isoformat(),
-                    "available_at": ingested.isoformat(),
-                    "returns_policy_version": RETURNS_VERSION,
-                }
+            event = {
+                "id": deterministic_uuid("return_event", sale["id"] + ":" + str(sequence)),
+                "sale_id": sale["id"],
+                "order_id": item["order_id"],
+                "order_item_id": item["id"],
+                "product_id": item["product_id"],
+                "selling_location_id": ref["selling_location_id"],
+                "channel": ref["channel"],
+                "policy_id": policy["id"],
+                "quantity": str(units),
+                "refund_amount": money(Decimal(item["unit_price"]) * units)
+                if status == "refunded"
+                else "0.00",
+                "currency": item["currency"],
+                "reason": rng.choice(reasons),
+                "status": status,
+                "returned_at": returned.isoformat(),
+                "ingested_at": ingested.isoformat(),
+                "available_at": ingested.isoformat(),
+                "returns_policy_version": RETURNS_VERSION,
+            }
+            # Generate the same potential pieces/random draws for an original sale.
+            # The private scenario changes selection only for the return-date grain.
+            # Pieces partition the purchased quantity; they never add a second refund.
+            key = (
+                returned.date().isoformat(),
+                event["product_id"],
+                event["selling_location_id"],
+                event["channel"],
             )
+            factor = float((return_factors or {}).get(key, "1"))
+            if selection_draw < min(rate * factor, 0.75):
+                events.append(event)
     return sorted(events, key=lambda r: r["id"])

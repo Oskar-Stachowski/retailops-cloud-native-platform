@@ -1,0 +1,41 @@
+{
+  "status": "harness_regression_passed_pending_actual_kubernetes_ci",
+  "failed_run_id": 37274528113,
+  "failed_job_id": 111651336499,
+  "publication_commit": "7dfca2e262e11e6b0901522f64c94e43f4e83c94",
+  "artifact_id": 11330730727,
+  "artifact_sha256": "4b08a8bfcea93f3fbd0407dc8885c17211aacde84c5f5505f3df8b297288feb9",
+  "observed_failure": {
+    "stage": "rolled_back_product360_after_reload",
+    "api_status": 200,
+    "api_duration_ms": 5235.36,
+    "browser_status_wait_ms": 5000,
+    "ui_state": "Loading Product 360"
+  },
+  "fix": "Await actual Product 360 summary with a bounded 15-second readiness wait on navigation and reload, then retain the unchanged exact status assertion",
+  "validation": {
+    "scope": "black_box_test_harness_only_not_kubernetes_acceptance",
+    "cases": [
+      {
+        "case": "original_delayed_reload",
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "status": "passed"
+      },
+      {
+        "case": "patched_delayed_reload",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "status": "passed"
+      },
+      {
+        "case": "patched_wrong_status",
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "status": "passed"
+      }
+    ]
+  },
+  "source_runtime_and_frozen_models": "unchanged",
+  "scope": "functional browser harness, not a statistical quality or per-flow resource gate"
+}

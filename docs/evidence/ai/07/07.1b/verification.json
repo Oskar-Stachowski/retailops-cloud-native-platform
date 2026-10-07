@@ -1,0 +1,299 @@
+{
+  "verified_at": "2026-10-02T08:48:55.940632+00:00",
+  "scope": "AI 07.1b physical business scenario preparation only",
+  "branch": "ai/07-business-anomalies",
+  "runtime_commit": "ffbf9e9dce4081cb4097df48c595e8a0920853a9",
+  "base_origin_main": "6ccbe3de0aefc97cc221a279d5fe83aa338b3601",
+  "generation": {
+    "business_timezone": "UTC",
+    "days": 30,
+    "end_date": "2026-07-31",
+    "label_tail_days": 0,
+    "max_daily_rows": 720,
+    "origin_days": 0,
+    "output_format": "csv",
+    "products": 8,
+    "profile": "ai-smoke",
+    "seed": 42,
+    "start_date": "2026-07-02",
+    "stores": 3,
+    "warehouses": 2,
+    "warmup_days": 0
+  },
+  "provenance": {
+    "code_sha256": "bf26ca9637cb094b68c55470340547c603bd8f3d9d2fa1f85a0d54e9eedc14d2",
+    "code_state": "clean",
+    "dependency_sha256": "f55452e6f30020829f87d8c040440e7b589fd0f431e84c082aff87a9fe8b35f4",
+    "git_commit": "ffbf9e9dce4081cb4097df48c595e8a0920853a9",
+    "python_version": "3.11.15"
+  },
+  "candidate_schema": "anomaly-scenario-candidate-1.0.0",
+  "plan_schema": "business-physical-anomaly-plan-1.0.0",
+  "runs": [
+    {
+      "status": "passed",
+      "scope": "AI 07.1b physical business scenario preparation only",
+      "candidate_id": "anomaly-candidate-sha256-5fcec0281468fcda78ca0126b1cc91a5cd7fc042b1c53857b1c5b1804d609ba3",
+      "directory": "data/generated/ai07-physical-acceptance/first/anomaly-candidate-sha256-5fcec0281468fcda78ca0126b1cc91a5cd7fc042b1c53857b1c5b1804d609ba3",
+      "episode_count": 2,
+      "control_count": 2,
+      "facts_status": "passed",
+      "source_ready": false,
+      "anomaly_ready": false,
+      "model_ready": false,
+      "publication_status": "candidate_only_awaiting_versioned_ai03_handoff",
+      "seconds": 13.286466042045504,
+      "peak_rss_mib": 157.90625
+    },
+    {
+      "status": "passed",
+      "scope": "AI 07.1b physical business scenario preparation only",
+      "candidate_id": "anomaly-candidate-sha256-5fcec0281468fcda78ca0126b1cc91a5cd7fc042b1c53857b1c5b1804d609ba3",
+      "directory": "data/generated/ai07-physical-acceptance/repeat/anomaly-candidate-sha256-5fcec0281468fcda78ca0126b1cc91a5cd7fc042b1c53857b1c5b1804d609ba3",
+      "episode_count": 2,
+      "control_count": 2,
+      "facts_status": "passed",
+      "source_ready": false,
+      "anomaly_ready": false,
+      "model_ready": false,
+      "publication_status": "candidate_only_awaiting_versioned_ai03_handoff",
+      "seconds": 10.905360750039108,
+      "peak_rss_mib": 183.1875
+    }
+  ],
+  "repeat_identical_candidate_id": true,
+  "repeat_identical_files": [
+    "facts/commerce.json",
+    "facts/inventory.json",
+    "scenario_manifest.json",
+    "simulation_truth/anomaly_injections.json",
+    "simulation_truth/process.json"
+  ],
+  "artifacts": {
+    "facts/commerce.json": {
+      "path": "facts/commerce.json",
+      "sha256": "1e8a8f7c40fe7ab8d226d81b746febef168dd5d85dea5d1055c650607a8c85a7",
+      "size_bytes": 4015073
+    },
+    "facts/inventory.json": {
+      "path": "facts/inventory.json",
+      "sha256": "6648a9b4590808494b12a112c87844da827a0721fadc0f0c6010111bd50eab86",
+      "size_bytes": 2515369
+    },
+    "simulation_truth/anomaly_injections.json": {
+      "path": "simulation_truth/anomaly_injections.json",
+      "sha256": "d2c7bdc4f07f243e89c5d2f8386b9fc8d8fcecd6087e0b74f0b448e4d35c0584",
+      "size_bytes": 5704
+    },
+    "simulation_truth/process.json": {
+      "path": "simulation_truth/process.json",
+      "sha256": "32c3c19d3ba56b3abfb5f50e8e2c5089dee8da3b91554c6badebfdc736305c51",
+      "size_bytes": 1545714
+    }
+  },
+  "manifest_sha256": "fb6a38b99ce2ed511306e18109f99f9359ee84a05672a75b6ea926b6d6dad0b1",
+  "episode_outcomes": [
+    {
+      "injection_type": "inventory_censored_episode",
+      "start_date": "2026-07-10",
+      "end_date": "2026-07-10",
+      "magnitude": 0,
+      "affected_daily_grains": 1,
+      "normal_inventory_outcome": {
+        "latent_quantity": 17,
+        "lost_sales_quantity": 14,
+        "observed_quantity": 3
+      },
+      "injected_inventory_outcome": {
+        "latent_quantity": 17,
+        "lost_sales_quantity": 17,
+        "observed_quantity": 0
+      },
+      "removed_quantity": 3,
+      "write_off_event_ids": [
+        "ad4d3900-5f35-5a4a-b41d-5f0e76a587c2"
+      ]
+    },
+    {
+      "injection_type": "return_spike",
+      "start_date": "2026-07-14",
+      "end_date": "2026-07-20",
+      "magnitude": "20",
+      "affected_daily_grains": 7,
+      "normal_inventory_outcome": {
+        "latent_quantity": 208,
+        "lost_sales_quantity": 144,
+        "observed_quantity": 64
+      },
+      "injected_inventory_outcome": {
+        "latent_quantity": 208,
+        "lost_sales_quantity": 139,
+        "observed_quantity": 69
+      },
+      "normal_returns": {
+        "events": 9,
+        "refunded_units": 11,
+        "returned_units": 12
+      },
+      "injected_returns": {
+        "events": 21,
+        "refunded_units": 24,
+        "returned_units": 26
+      }
+    }
+  ],
+  "control_count": 2,
+  "controls_unchanged": true,
+  "observed_sales_changes": [
+    {
+      "business_date": "2026-07-10",
+      "channel": "online",
+      "injected_observed_units": 0,
+      "normal_observed_units": 3,
+      "product_id": "576f0781-3104-5d50-92f3-befe834a6fa6",
+      "selling_location_id": "dccdb512-8eb9-5025-a0f8-e41d3d2e3f34"
+    },
+    {
+      "business_date": "2026-07-14",
+      "channel": "online",
+      "injected_observed_units": 2,
+      "normal_observed_units": 0,
+      "product_id": "38d5dc41-891b-50f6-a02f-fda88ad8ccde",
+      "selling_location_id": "dccdb512-8eb9-5025-a0f8-e41d3d2e3f34"
+    },
+    {
+      "business_date": "2026-07-19",
+      "channel": "online",
+      "injected_observed_units": 2,
+      "normal_observed_units": 0,
+      "product_id": "38d5dc41-891b-50f6-a02f-fda88ad8ccde",
+      "selling_location_id": "dccdb512-8eb9-5025-a0f8-e41d3d2e3f34"
+    },
+    {
+      "business_date": "2026-07-20",
+      "channel": "online",
+      "injected_observed_units": 3,
+      "normal_observed_units": 2,
+      "product_id": "38d5dc41-891b-50f6-a02f-fda88ad8ccde",
+      "selling_location_id": "dccdb512-8eb9-5025-a0f8-e41d3d2e3f34"
+    }
+  ],
+  "reconciliation": {
+    "accepted_restocks": 37,
+    "arrivals": 2638,
+    "daily_grains": 678,
+    "financial_returns": 246,
+    "inventory_snapshots": 480,
+    "latent_daily_grains": 618,
+    "latent_quantity": 4796,
+    "lost_sales_quantity": 2394,
+    "observation_versions": 678,
+    "observed_quantity": 2402,
+    "orders": 110,
+    "pricing_checks": 6,
+    "receipt_movements": 101,
+    "receipts": 101,
+    "received_quantity": 2318,
+    "return_checks": 7,
+    "returns": 116,
+    "sale_issues": 1390,
+    "sales": 1390,
+    "sold_quantity": 2402
+  },
+  "compatibility": {
+    "status": "passed",
+    "base_origin_main": "6ccbe3de0aefc97cc221a279d5fe83aa338b3601",
+    "default_returns_exact_main_parity": true,
+    "events": 461,
+    "return_events_sha256": "478d84b14302b3039d77d05d69cbd2730d575ba32ec3f47d54d14577fc89556c",
+    "preserved_base_files": 73,
+    "preserved_paths": [
+      "data/demo",
+      "data/tests/fixtures",
+      "k8s/overlays/dev/demo-data",
+      "existing data/contracts"
+    ]
+  },
+  "demand_v1_cli_revalidation": {
+    "status": "passed",
+    "scope": "AI 07.1a demand scenarios only",
+    "candidate_id": "anomaly-candidate-sha256-3dd0c00ff53b7f9fe11d252f53ec7fc17c3044328755b7999c32f9f9935772c8",
+    "directory": "data/generated/ai07-physical-acceptance/demand-compatibility/anomaly-candidate-sha256-3dd0c00ff53b7f9fe11d252f53ec7fc17c3044328755b7999c32f9f9935772c8",
+    "episode_count": 3,
+    "control_count": 4,
+    "facts_status": "passed",
+    "source_ready": false,
+    "anomaly_ready": false,
+    "model_ready": false,
+    "publication_status": "candidate_only_awaiting_versioned_ai03_handoff",
+    "seconds": 9.313850957958493,
+    "peak_rss_mib": 197.671875
+  },
+  "tests": [
+    {
+      "report": "ci-cd/reports/data/ai07-physical-regression.xml",
+      "sha256": "d16911ac4a39016e0a831e3bc8f0da2089a7fea7204a637439515dcadc960062",
+      "cases": 190,
+      "failed_or_error": 16,
+      "skipped": 0,
+      "failed_nodes": [
+        "test_source_cohort_batch::test_exact_all_source_tables_and_context",
+        "test_source_cohort_batch::test_ordinary_source_writer_reader_and_bytes_are_identical",
+        "test_source_cohort_batch::test_same_duplicate_and_negative_balance_rejections_without_state_change",
+        "test_source_cohort_batch::test_new_movement_is_indexed_and_second_application_is_rejected",
+        "test_source_cohort_batch::test_upstream_code_pin_detects_drift",
+        "test_source_cohort_batch::test_entrypoint_refuses_existing_output_root_before_generation",
+        "test_source_cohort_batch_v2::test_all_58_tables_and_csv_bytes_equal_ordinary_path",
+        "test_source_cohort_batch_v2::test_published_runner_releases_build_state_and_fully_revalidates",
+        "test_source_cohort_batch_v2::test_ledger_state_matches_after_every_review_and_final_execution",
+        "test_source_cohort_batch_v2::test_pending_transfer_uses_destination_and_outbound_availability",
+        "test_source_cohort_batch_v2::test_untracked_malformed_record_replacements_are_revalidated[duplicate_id]",
+        "test_source_cohort_batch_v2::test_untracked_malformed_record_replacements_are_revalidated[duplicate_order]",
+        "test_source_cohort_batch_v2::test_untracked_malformed_record_replacements_are_revalidated[negative_opening]",
+        "test_source_cohort_batch_v2::test_untracked_malformed_record_replacements_are_revalidated[bad_identifier]",
+        "test_source_cohort_batch_v2::test_untracked_malformed_record_replacements_are_revalidated[empty_reference]",
+        "test_source_cohort_batch_v2::test_cached_master_change_is_rejected"
+      ]
+    },
+    {
+      "report": "ci-cd/reports/data/ai07-physical-parity.xml",
+      "sha256": "dfac1d2bb67b9f7044bd3a9005bca3c8673d90d16b38020bfd3c30781a792c3a",
+      "cases": 16,
+      "failed_or_error": 0,
+      "skipped": 0,
+      "failed_nodes": []
+    }
+  ],
+  "unique_passed_tests": 190,
+  "unresolved_failed_tests": 0,
+  "regression_fix": "Upstream hash guards correctly rejected additive source_bridge/source_commerce changes; reviewed optional default path and exact return parity, then refreshed guards and passed 16 indexed/cached parity and negative tests, including all 58 tables and CSV bytes.",
+  "lint": "passed",
+  "format": "passed",
+  "mypy": {
+    "scope": "data/anomalies --follow-imports=skip",
+    "modules": 9,
+    "status": "passed"
+  },
+  "remote_ci": "pending_publication",
+  "source_ready": false,
+  "anomaly_ready": false,
+  "model_ready": false,
+  "remaining": [
+    "raw_dq_faults",
+    "offline_replay_curation",
+    "versioned_ai03_handoff",
+    "pit_safe_anomaly_features_and_baseline_if_after_04_05_acceptance",
+    "full_profile_multi_seed_evaluation_and_model_lifecycle"
+  ],
+  "test_commands": [
+    "python -m pytest -q data/tests/test_physical_anomalies.py data/tests/test_business_anomalies.py data/tests/test_source_inventory_commerce.py data/tests/test_inventory_source_dataset.py data/tests/test_source_cohort_batch.py data/tests/test_source_cohort_batch_v2.py services/api/tests/test_data_returns.py --junitxml=ci-cd/reports/data/ai07-physical-regression.xml",
+    "python -m pytest -q data/tests/test_source_cohort_batch.py data/tests/test_source_cohort_batch_v2.py --junitxml=ci-cd/reports/data/ai07-physical-parity.xml"
+  ],
+  "run_commands": [
+    "python -m data.anomalies.run --physical-example --products 8 --output-root data/generated/ai07-physical-acceptance/first --output ci-cd/reports/data/ai07-physical-final-first.json",
+    "python -m data.anomalies.run --physical-example --products 8 --output-root data/generated/ai07-physical-acceptance/repeat --output ci-cd/reports/data/ai07-physical-final-repeat.json",
+    "python -m data.anomalies.run --example --products 8 --output-root data/generated/ai07-physical-acceptance/demand-compatibility --output ci-cd/reports/data/ai07-physical-demand-compatibility.json"
+  ],
+  "python_executable": "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+  "ai05_interference": "No changes to AI05 worktree, serving services, data, processes or MLflow state."
+}
