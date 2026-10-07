@@ -278,10 +278,10 @@
         "08"
       ],
       "path": "etapy/10-integracja-retailops.md",
-      "status": "in_progress",
-      "ready": false,
+      "status": "completed",
+      "ready": true,
       "evidence": "../../evidence/ai/10/README.md",
-      "acceptance_scope": "immutable Source bundle; bounded authenticated REST; daily_demand_versions Source SQL TLS SCRAM capture to same broker AI SQL ACK; native three-model Source API UI acceptance pending; no production deployment or 43-table SQL snapshot claim"
+      "acceptance_scope": "immutable Source bundle; bounded authenticated REST; daily_demand_versions actual Source SQL TLS SCRAM capture to same broker AI SQL ACK and 4-to-7 correction; original SQL publishers and complete Source SQL TCP API built UI for 40 stockout, 1232 anomaly, 56 forecast; forecast original quality not_ready retained in owner-approved development namespace; explicit human-approved suggestion fixture; no production deployment or general 43-table SQL snapshot claim"
     },
     {
       "id": "11",
