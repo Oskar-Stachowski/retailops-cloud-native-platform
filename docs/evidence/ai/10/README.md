@@ -1,13 +1,31 @@
 # AI 10 — integracja wyników w RetailOps
 
-Aktualizacja: 2026-10-07. **Status: in_progress.** Implementacja jest w
-[Source #100](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/100)
-i [AI #28](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/28).
-AI 07 i AI 08 są odebrane; AI10 zachowuje ich modele i kwalifikacje.
-Pełne Required CI Source `cbbf711` ma 30/30 zaliczonych jobów:
-[receipt komponentów](source-component-ci.json). Nowszy `4b03664` także zaliczył
-30/30 jobów w runie `37617019955`. Nowy head po dołączeniu main AI09
-i oba opublikowane main wymagają własnego potwierdzenia.
+Aktualizacja: 2026-10-07. **Status: ready — odbiór integracji AI 10.**
+Pełny oryginalny [V12](v12-22de575.json), run `37665627162` na AI `22de575`,
+zaliczył 273 testy granic i rzeczywisty Source E2E: 56 wyników, 56 ACK oryginalnego
+publishera AI SQL, 56 projekcji i 56 duplikatów, pełny TCP API oraz dwie strony
+istniejącego built UI z live revocation. Frozen Source `1a7f558` zachowuje
+102 dni historii, 43 tabele i osobne 14 dni planów bez truth.
+[Stockout](stockout-64a4c71.json) ma 40 wyników/ACK/projekcji/duplikatów,
+a [anomaly](anomaly-64a4c71.json) 1232 oraz 25 stron UI. Niezależne parsery
+Source sprawdziły komplet payloadów i lineage wszystkich trzech ścieżek.
+
+V12 działa wyłącznie w `retailops-demand-forecast-v12-development`.
+Oryginalne quality `not_ready`, trzy niezaliczone MSE gates i decyzja właściciela
+pozostają zachowane. UI pokazuje ostrzeżenie development; nie ma refitów,
+przekwalifikowania jakości ani deploymentu produkcyjnego.
+
+Kod wcześniejszych jedenastu przyrostów Source jest już zawarty w main.
+[Pełny Source main `467f990`](source-code-main-ci.json) ma 30/30 success,
+[nowszy `b723489`](source-b723489-main-ci.json) 21 success i 4 celowe skipped
+zgodnie z niezmienionym wykrywaniem obszarów. [AI main `b0e2de`](ai-b0-main-ci.json)
+ma 17/17 success. [Zgodność native runtime](native-runtime-main-compatibility.json)
+wiąże odebrane commity z aktualną integracją; całego katalogu AI src nie uznaje
+za identyczny. Poprawkę launchera i końcowe dowody publikuje
+[AI #38](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/38).
+Publikacja tego rekordu wymaga normalnego protected merge i zielonego Required CI
+jego dokładnych headów oraz wynikowych main; dowodem tej bramki są checks PR-ów
+oraz merge commitów w GitHub, niezależnie od historycznych receipts.
 
 ## Zakres
 
@@ -25,7 +43,7 @@ przechowywany tylko w pamięci, a odwołanie grantu usuwa dane widoku.
 | Stream | [Source observation capture](../../../runbooks/source-observation-capture.md): operational SQL outbox, TLS/SCRAM, pełny prefix, osobny AI SQL/ACK, overlap i korekta 4 → 7; [receipt](source-sql-handoff.json) |
 | Stockout | **Passed**: frozen model, oryginalny AI SQL publisher i 40 ACK, Source SQL/API/built UI, 40 duplikatów i ACK `[34,46]`; [receipt](stockout-original-sql.json) |
 | Anomaly | **Passed**: oryginalny AI07, OCI/registry/SIGKILL, oryginalny publisher AI SQL i 1232 ACK, 1232 wyników/1232 duplikatów, API oraz 25 stron built UI; [receipt](anomaly-original-sql.json) |
-| V12 | [Własny development namespace](../../../runbooks/native-v12-development-acceptance.md), dokładna decyzja właściciela i oryginalna jakość `not_ready`; pełny native runtime na 102 dniach pending |
+| V12 | **Passed**: [pełny oryginalny receipt](v12-22de575.json), 56 wyników/ACK/projekcji/duplikatów, ACK `[70,42]`, pełny TCP API i 2 strony UI; oryginalna jakość `not_ready`, wyłącznie zaakceptowany development |
 | Sugestie | [Jawny fixture i human approval](../../../runbooks/intelligence-suggestion-ui.md) w zakresie AI10; rzeczywisty producent należy do AI12 |
 
 Ścieżka streamu obejmuje `daily_demand_versions`, a jej obserwacje do testu
@@ -37,10 +55,22 @@ Pełne native grain, record versions i availability dostarcza osobny
 wersjonowany immutable bundle. Ograniczone strony REST nie rozszerzają
 deklarowanych capabilities źródła.
 
+## Overlay istniejących projektów
+
+[Instrukcja krok po kroku](../../../runbooks/intelligence-existing-projects.md)
+i [konfiguracje wraz z 11 guard tests](existing-project-overlays.json) wiążą
+`docker-compose.intelligence.yml` Source oraz `infra/compose-intelligence.yaml` AI.
+Source `api`/`redpanda` dołączają do jednej Source-owned external network;
+Source DB oraz AI DB/MLflow pozostają poza nią. API mają jawne aliasy,
+listener Source `redpanda:9092` jest rozwiązywany, a AI nie tworzy drugiego brokera.
+Overlay zachowuje skonfigurowane auth; bazowy demo Compose nie zyskuje TLS
+przez dołączenie sieci. Configuration acceptance nie zastępuje native ML/API/UI.
+Required CI sprawdza rzeczywisty Compose config oraz locked delivery image/SDK.
+
 ## Odtwarzanie i awarie
 
 Własność danych i diagram obu niezależnych baz opisuje
-[AI10 acceptance](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/ai/10-ready/docs/ai10-acceptance.md).
+[AI10 acceptance](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/ai10-acceptance.md).
 Source odpowiada za fakty operacyjne, eksporty, read models i istniejący UI;
 AI za własne importy, registry, obliczenia i outbox. Broker przenosi zdarzenia,
 a osobne transakcje SQL i grants wyznaczają granice trwałości.
@@ -79,28 +109,42 @@ modele/API/UI wykonują dedykowane workflowy AI10 na własnych runnerach.
 quarantine i naprawę. [Modele v2](../../../runbooks/intelligence-models-v2.md)
 opisują fizyczne i sprzedażowe scope bez eskalacji praw.
 
-## Publikacja
+## Historia wykonania i publikacja
 
-Pełny v12 ponowiono na AI `64a4c71` w runie `37636569401`. Poprzednią
-próbę zatrzymał hook awarii ignorujący nową linię na początku rzeczywistego SQL,
-po full qualification/review/MLflow/registry i actual intake/cold worker.
-[Receipt failed](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/ai/10-ready/docs/evidence/ai10-v12-native-outbox-hook-failure.json)
-nie poświadcza finalnego publishera ani Source API/UI. Nowy runner testuje
-hook na SQL kompilowanym przez rzeczywisty emitter przed archiwum.
+Pełny odbiór kończy run `37665627162`; wcześniejsze failed próby i diagnostyka
+pozostają poniżej jako historia, bez przepisywania ich wyników.
 
-[Powtórzony stockout](stockout-final-head.json) i
-[powtórzony anomaly](anomaly-final-head.json) na AI `433f5ed` przeszły pełne
-oryginalne SQL publishery, read API i istniejący built UI. Zachowują oryginalne
-kwalifikacje i piny Source, bez refitów.
+
+Pełny V12 na AI `64a4c71`, run `37636569401`, zaliczył 262 boundary tests,
+pełną oryginalną kwalifikację/cold probes, review/MLflow/registry, actual
+intake/cold worker, atomowy rollback i SQL publikację 56 prognoz.
+[Końcowy odbiór Source failed](v12-source-consumer-failure.json); failing child
+JUnit/log nie zostały zachowane, więc szczegółowa przyczyna jest nieustalona.
+[Source diagnostic](v12-reconstructed-source-diagnostic.json), run `37651238268`,
+przeszedł pełny rzeczywisty test odbioru tych samych bytes na odtworzonej
+bazie fixture. Nie poświadcza oryginalnej bazy ani zamknięcia V12.
+Pełny run `37653954039` zaliczył 270 boundary tests i pięć etapów AI,
+ale [Source startup failed](v12-source-startup-failure.json) nie wytworzył JUnit.
+Kontroler rozwiązywał symlink venv do bazowego interpretera; rzeczywisty
+lokalny subprocess reprodukuje utratę środowiska. Dokładny stderr failed child
+pozostaje nieznany. [AI #38](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/38)
+zachowuje venv entry point i kontroluje prefix/pytest przed długą kwalifikacją.
+Wszystkie oryginalne modele, Source test i science/runtime gates pozostają wymagane.
+
+[Stockout](stockout-64a4c71.json) i [anomaly](anomaly-64a4c71.json) w runie
+`37636434765` na AI `64a4c71` ponownie przeszły pełne oryginalne SQL
+publishery, 40/1232 ACK, wszystkie native payloads w TCP API i built UI.
+Zachowują oryginalne kwalifikacje i piny Source, bez refitów.
 
 - [x] Oryginalny Source capture do tego samego brokera i rzeczywistego AI SQL/ACK.
 - [x] Native stockout/anomaly w prawdziwym Source API i istniejącym built UI.
 - [x] Oryginalny publisher AI SQL stockout w pełnym nowym runtime.
 - [x] Oryginalny publisher AI SQL anomaly w pełnym nowym runtime.
-- [ ] Oryginalny v12 registry/SQL/publisher/Source API/UI na 102 dniach.
-- [ ] Końcowy bounded raport i zielone Required CI obu dokładnych HEAD.
-- [ ] Normalny protected merge obu PR-ów i zielone Required CI obu `origin/main`.
+- [x] Oryginalny v12 registry/SQL/publisher/Source API/UI na 102 dniach: 56 pełnych wyników.
+- [x] Końcowy bounded raport, pełne receipts i powiązanie zakresów CI.
+- [x] Kod #28/#100: normalny protected merge i zielone pełne Required CI obu main.
+- [x] Końcowe dokumenty i registry ready; ich dostarczenie podlega chronionym PR-om i Required CI dokładnych main.
 
 Pełna bieżąca instrukcja i receipts po stronie AI:
-[AI10 acceptance](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/ai/10-ready/docs/ai10-acceptance.md).
+[AI10 acceptance](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/ai10-acceptance.md).
 Oryginalnych historycznych receipts nie przepisujemy na wynik późniejszych prób.
