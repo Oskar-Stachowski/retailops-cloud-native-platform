@@ -29,7 +29,11 @@ odbiór `467f990` ma 30/30. Pierwsza awaria agregatora i udane ponowienie
 pozostają osobnymi dowodami.
 V12 na 102 dniach ma 56 oryginalnych wyników i atomowy rollback, ale końcowy
 odbiór Source w oryginalnej bazie pozostał failed. Odtworzony Source diagnostic
-passed nie zastępuje pełnego odbioru. Nowy pełny run jest w toku.
+passed nie zastępuje pełnego odbioru. Kolejna pełna próba ujawniła błąd
+wyboru interpretera Source: rozwiązywanie symlinku omijało venv.
+[Poprawka i 55 testów](evidence/ai/10/source-python-launcher-fix.json) wymagają
+nowego pełnego V12; [dowód awarii](evidence/ai/10/v12-source-startup-failure.json)
+zachowuje 270 boundary tests i pięć zaliczonych etapów AI bez odbioru Source.
 Do zamknięcia pozostają V12 i końcowe dokumenty ready z protected merge/main CI.
 
 **AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**

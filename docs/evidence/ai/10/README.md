@@ -95,8 +95,13 @@ JUnit/log nie zostały zachowane, więc szczegółowa przyczyna jest nieustalona
 [Source diagnostic](v12-reconstructed-source-diagnostic.json), run `37651238268`,
 przeszedł pełny rzeczywisty test odbioru tych samych bytes na odtworzonej
 bazie fixture. Nie poświadcza oryginalnej bazy ani zamknięcia V12.
-Nowy pełny run `37653954039` zachowuje wszystkie naukowe i runtime gates,
-z poprawionym bounded raportowaniem błędów w [AI #38](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/38).
+Pełny run `37653954039` zaliczył 270 boundary tests i pięć etapów AI,
+ale [Source startup failed](v12-source-startup-failure.json) nie wytworzył JUnit.
+Kontroler rozwiązywał symlink venv do bazowego interpretera; rzeczywisty
+lokalny subprocess reprodukuje utratę środowiska. Dokładny stderr failed child
+pozostaje nieznany. [AI #38](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/38)
+zachowuje venv entry point i kontroluje prefix/pytest przed długą kwalifikacją.
+Wszystkie oryginalne modele, Source test i science/runtime gates pozostają wymagane.
 
 [Stockout](stockout-64a4c71.json) i [anomaly](anomaly-64a4c71.json) w runie
 `37636434765` na AI `64a4c71` ponownie przeszły pełne oryginalne SQL
