@@ -63,3 +63,32 @@ Kontrakt jest skopiowany bez zmian z dokładnego commitu AI wskazanego przez
 `services/api/app/contracts/source-observations-v1/capture-upstream.json`.
 Pełne requirements etapu pozostają w
 [planie AI 10](../plans/ai/etapy/10-integracja-retailops.md).
+
+## Niezależny odbiór SQL i ACK po stronie AI
+
+Dedykowany workflow AI10 może ustawić równocześnie
+`AI10_SOURCE_CAPTURE_RECEIVER_PYTHON` oraz
+`AI10_SOURCE_CAPTURE_RECEIVER_SCRIPT`. Source utrzymuje oryginalny broker
+i własną bazę do końca tego odbioru; poświadczenia readera przekazuje tylko
+w tymczasowym pliku `0600`, poza uploadem.
+
+1. Zamknięty runtime AI porównuje Source commit, oryginalny capture, replay
+   i prawdziwe cluster/topic IDs. Własny jednorazowy PostgreSQL jest osobną
+   bazą AI; odbiorca nie zapisuje projekcji w SQL Source.
+2. Istniejący `ObservationRunner` odczytuje oryginalne trzy rekordy przez
+   TLS/SCRAM, zapisuje facts/receipts/checkpoints atomowo w AI i potwierdza
+   odczytane offsety. SQL capture AI musi być identyczny z capture Source.
+3. Kontrolowane cofnięcie wyłącznie własnej grupy odbiorcy odtwarza trzy
+   stare rekordy i późną korektę. SQL zachowuje trzy wersje i cztery receipts,
+   a ilość zmienia się z 4 na 7; żaden duplikat nie dolicza wkładu.
+4. Druga własna grupa wykonuje cały prefix od zera. Pełny SQL replay,
+   capture + overlap oraz niezależny receiver in-memory mają identyczny seal.
+   Raport zawiera rzeczywisty prefix/final ACK wszystkich trzech partycji.
+5. Odbiorca usuwa wyłącznie własny kontener AI po sprawdzeniu UUID label.
+   Source usuwa prywatny control po powrocie procesu. Publiczny
+   `independent-ai-sql-handoff.json` zawiera tylko bindings, counts i offsety.
+
+Ten opt-in ma implementację i lokalny setup-plan; wymagane wykonanie CI jest
+jeszcze pending. Nie rozszerza zakresu na pełny 43-table SQL snapshot ani nie
+kwalifikuje modeli. Zwykły capture pozostaje odczytem bez zapisu offsetów;
+ACK w tej ścieżce należy wyłącznie do osobnej grupy odbiorcy AI.

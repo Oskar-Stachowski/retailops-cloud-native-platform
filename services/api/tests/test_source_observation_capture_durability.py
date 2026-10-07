@@ -2,6 +2,7 @@
 
 import json
 import os
+import subprocess
 from datetime import timedelta
 from pathlib import Path
 from uuid import uuid4
@@ -131,6 +132,63 @@ def test_actual_source_capture_binds_complete_prefix_retry_correction_and_later_
                 )
                 + "\n"
             )
+            # Dedicated AI10 handoff keeps this original broker and Source SQL
+            # alive while the independently installed AI receiver persists/ACKs it.
+            receiver = os.getenv("AI10_SOURCE_CAPTURE_RECEIVER_PYTHON")
+            receiver_script = os.getenv("AI10_SOURCE_CAPTURE_RECEIVER_SCRIPT")
+            if receiver or receiver_script:
+                assert receiver and receiver_script
+                control = tmp_path / "ai-receiver-broker.json"
+                control.write_text(
+                    json.dumps(
+                        {
+                            "source_authority_id": reader_config.source_authority_id,
+                            "bootstrap_servers": reader_config.bootstrap_servers,
+                            "security_protocol": reader_config.security_protocol,
+                            "sasl_mechanism": reader_config.sasl_mechanism,
+                            "username": reader_config.username.get_secret_value(),
+                            "password": reader_config.password.get_secret_value(),
+                            "ca_file": reader_config.ca_file,
+                        }
+                    )
+                )
+                control.chmod(0o600)
+                sql_report = target.with_name("independent-ai-sql-handoff.json")
+                try:
+                    subprocess.run(
+                        [
+                            receiver,
+                            receiver_script,
+                            "--broker-config",
+                            str(control),
+                            "--capture",
+                            str(target.with_name("source-observation-capture.json")),
+                            "--replay",
+                            str(
+                                target.with_name(
+                                    "source-observation-capture-replay.json"
+                                )
+                            ),
+                            "--source-root",
+                            str(Path(__file__).resolve().parents[3]),
+                            "--report",
+                            str(sql_report),
+                        ],
+                        check=True,
+                        timeout=300,
+                    )
+                    received = json.loads(sql_report.read_text())
+                    assert received["status"] == "passed"
+                    assert received["actual_AI_SQL_or_ACK"] is True
+                    assert received["capture_id"] == report["capture_id"]
+                    assert received["full_equals_capture_overlap"] is True
+                    assert received["quantity_before_correction"] == 4
+                    assert received["quantity_after_correction"] == 7
+                    assert received["final_facts"] == 3
+                    assert received["final_receipts"] == 4
+                    assert received["actual_original_broker_overlap_records"] == 3
+                finally:
+                    control.unlink()
         rt.passed(
             "complete_source_capture_crash_retry_correction_and_immutable_later_replay"
         )
