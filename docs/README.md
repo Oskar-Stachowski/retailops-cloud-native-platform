@@ -17,6 +17,7 @@ w [indeksie dowodów](evidence/README.md).
 | Temat | Dokument |
 |---|---|
 | Stan projektu | [STATUS.md](STATUS.md) |
+| Integracja AI 10 | [Bieżący odbiór, dowody i odtwarzanie](evidence/ai/10/README.md) |
 | Problemy wymagające poprawy | [Audyt: otwarte ustalenia](audits/open-findings.md) |
 | Najbliższa praca i rozwój AI | [AI 04](plans/ai/etapy/04-forecasting.md) i [AI 06](plans/ai/etapy/06-inventory-ledger.md), [kolejność i repozytoria](plans/ai/kolejnosc-i-repozytoria.md), [backlog](plans/ai/backlog.md), [status RAG 11](evidence/ai/11/README.md) |
 | Uruchomienie i rozwój aplikacji | [Lokalnie](guides/local-development.md), [frontend](guides/frontend.md), [backend](guides/backend.md) |
@@ -50,3 +51,7 @@ w [indeksie dowodów](evidence/README.md).
 `STATUS.md` opisuje możliwości, audyt zawiera tylko otwarte problemy, a `plans/`
 opisuje pracę do wykonania. Usunięte i zakończone zadania nie mają tu osobnego
 archiwum; historię śledzonych dokumentów przechowuje Git.
+
+
+AI10: [operacyjny outbox obserwacji Source](runbooks/source-observation-outbox.md) —
+wersje faktów i outbox w jednej transakcji, publikacja TLS/SCRAM oraz wznowienie po awarii.

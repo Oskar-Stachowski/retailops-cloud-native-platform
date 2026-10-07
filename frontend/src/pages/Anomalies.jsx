@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import FeatureBoundary from "../components/FeatureBoundary";
+import IntelligenceModels from "../components/IntelligenceModels.jsx";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
@@ -178,10 +179,16 @@ export default function Anomalies() {
     [state.data?.alerts, state.data?.stockRisks],
   );
 
+  const modelPanels = <div key="ai-model-panels">
+    <IntelligenceModels kind="anomaly_detected" />
+    <IntelligenceModels kind="stockout_risk_scored" />
+  </div>;
+
   if (state.loading) {
     return (
       <main className="api-page">
         <LoadingState title="Loading anomaly context" />
+        {modelPanels}
       </main>
     );
   }
@@ -195,6 +202,7 @@ export default function Anomalies() {
           description="Current release exposes anomaly-adjacent signals through the dashboard endpoints while the dedicated anomaly queue remains planned scope."
         />
         <ErrorState message={state.error.message} onRetry={loadAnomalyContext} />
+        {modelPanels}
       </main>
     );
   }
@@ -211,6 +219,7 @@ export default function Anomalies() {
         description="Operational anomaly context built from real dashboard alerts and stock-risk signals. The dedicated anomaly queue is shown as a planned boundary, not as missing functionality."
       />
 
+      {modelPanels}
       <section className="metrics-grid" aria-label="Anomaly context metrics">
         <MetricCard
           label="Alert signals"

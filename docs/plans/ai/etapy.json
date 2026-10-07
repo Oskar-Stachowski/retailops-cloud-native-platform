@@ -1,6 +1,6 @@
 {
   "version": "1.20",
-  "date": "2026-10-05",
+  "date": "2026-10-07",
   "stages": [
     {
       "id": "00",
@@ -204,11 +204,21 @@
         "producer_pr": 97,
         "consumer_pr": 24,
         "ready_when": "both protected PRs merged to main and Required CI succeeds for exact integrated HEAD and both merge commits",
-        "exact_sha_and_run_receipts": "PR97 and PR24 bodies"
+        "exact_sha_and_run_receipts": "PR97 and PR24 bodies",
+        "status": "success",
+        "accepted_main_commits": {
+          "retailops-ai-intelligence": "18e771f9c2e89e91bf7afeb1744e0cd9112f50b5",
+          "retailops-cloud-native-platform": "1de462729012a1bad458a8da4ad317ec22dbc5b8"
+        },
+        "required_main_ci_runs": {
+          "retailops-ai-intelligence": 37304852763,
+          "retailops-cloud-native-platform": 37305855911
+        }
       },
       "consumer_completion_evidence": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md",
       "consumer_capsules": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-ready/capsules.json",
-      "remaining_transport_and_ui_stage": "10"
+      "remaining_transport_and_ui_stage": "10",
+      "ready": true
     },
     {
       "id": "08",
@@ -268,7 +278,10 @@
         "08"
       ],
       "path": "etapy/10-integracja-retailops.md",
-      "status": "planned"
+      "status": "in_progress",
+      "ready": false,
+      "evidence": "../../evidence/ai/10/README.md",
+      "acceptance_scope": "immutable Source bundle; bounded authenticated REST; daily_demand_versions Source SQL TLS SCRAM capture to same broker AI SQL ACK; native three-model Source API UI acceptance pending; no production deployment or 43-table SQL snapshot claim"
     },
     {
       "id": "11",
@@ -366,5 +379,5 @@
   "status": "in_progress",
   "next_stage": "09",
   "execution_map": "kolejnosc-i-repozytoria.md",
-  "updated_at": "2026-10-05"
+  "updated_at": "2026-10-07"
 }

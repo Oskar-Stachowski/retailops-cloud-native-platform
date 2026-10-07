@@ -26,7 +26,11 @@ Osobna regresja cohort/forecast plans ma 31 passed.
 Exact source main `cbcac6eb`, CI37629010997, wykrył pojedynczy błąd Kafka
 NOT_COORDINATOR przy odczycie committed offsets po restarcie własnego brokera;
 742 testy API zaliczono. Porazka pozostaje zachowana. Testowy helper ponawia
-wyłącznie odczyt NOT_COORDINATOR/COORDINATOR_NOT_AVAILABLE przez maksymalnie45s.
+wyłącznie odczyt NOT_COORDINATOR/COORDINATOR_NOT_AVAILABLE przez maksymalnie45s
+w pierwotnym przyroście. Integracja source main `467f9903` zachowuje jego wspólny
+helper `committed_offsets`, limit 10 s oraz dodatkowe przejściowe stany
+COORDINATOR_LOAD_IN_PROGRESS/_WAIT_COORD. Sprawdza także błąd każdej zwróconej
+partycji przed użyciem offsetu; błąd uprawnień pozostaje natychmiastową porażką.
 Nie ponawia zapisów ani przetwarzania zdarzeń i nie tworzy domyślnych offsetów.
 Wszystkie asercje trwałych bajtów, dokładnego offsetu i restartu pozostają.
 Kontrole jednostkowe dowodzą realnej odpowiedzi, braku retry błędu permanentnego

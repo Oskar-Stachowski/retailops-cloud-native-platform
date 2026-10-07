@@ -7,6 +7,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 from app.repositories.realtime_quarantine_repository import RealtimeQuarantineRepository
+from app.services.intelligence_contract import TOPIC, content_hash
+from app.services.intelligence_contract import validate_event as validate_intelligence_event
+from app.services.intelligence_model_contract import MODEL_TYPES, model_partition_key
 from app.services.realtime_contract import validate_event
 
 
@@ -44,7 +47,26 @@ def replay_quarantined_message(
         raise ValueError(msg)
     repository = repository or RealtimeQuarantineRepository()
     original = repository.get(quarantine_id)
-    validate_event(event, transport_topic=original["topic"])
+    if original["topic"] == TOPIC:
+        validate_intelligence_event(event, transport_topic=original["topic"])
+        payload = event["payload"]
+        partition_key = (
+            model_partition_key(event)
+            if event["event_type"] in MODEL_TYPES
+            else content_hash(
+                {
+                    name: payload[name]
+                    for name in (
+                        "product_id",
+                        "selling_location_id",
+                        "channel",
+                    )
+                }
+            )
+        )
+    else:
+        validate_event(event, transport_topic=original["topic"])
+        partition_key = event["event_id"]
     intent = repository.prepare_replay(quarantine_id, event, operator)
     if intent["payload"]["replay"].get("delivered_at"):
         return {"status": "already_replayed", "quarantine_id": quarantine_id}
@@ -68,7 +90,7 @@ def replay_quarantined_message(
 
     producer.produce(
         original["topic"],
-        key=event["event_id"].encode("utf-8"),
+        key=partition_key.encode("utf-8"),
         value=json.dumps(event, sort_keys=True, allow_nan=False).encode("utf-8"),
         on_delivery=on_delivery,
     )

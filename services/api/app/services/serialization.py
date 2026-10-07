@@ -3,7 +3,18 @@
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
+from typing import Any, TypeVar, overload
 from uuid import UUID
+
+K = TypeVar("K")
+
+
+@overload
+def make_json_safe(value: dict[K, Any]) -> dict[K, Any]: ...
+
+
+@overload
+def make_json_safe(value: object) -> object: ...
 
 
 def make_json_safe(value: object) -> object:

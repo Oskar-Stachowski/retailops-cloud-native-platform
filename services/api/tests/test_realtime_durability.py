@@ -268,30 +268,40 @@ def run(context, *, count=1, handlers=None, kafka=None, quarantine=None):
 
 def positions(context):
     client = build_confluent_kafka_consumer(config(context))
-    deadline = time.monotonic() + 45
     try:
-        while time.monotonic() < deadline:
-            try:
-                committed = client.committed(
-                    [TopicPartition(TOPIC, 0), TopicPartition(TOPIC, 1)],
-                    timeout=min(10, max(0.1, deadline - time.monotonic())),
-                )
-                for partition in committed:
-                    if partition.error is not None:
-                        raise KafkaException(partition.error)
-                return {p.partition: p.offset for p in committed}
-            except KafkaException as error:
-                # Broker readiness does not imply group-coordinator readiness
-                # after restart. Retry only these transient reads, never writes
-                # or missing/wrong durable offsets.
-                if not error.args or not isinstance(error.args[0], KafkaError) or error.args[0].code() not in {
-                    KafkaError.NOT_COORDINATOR, KafkaError.COORDINATOR_NOT_AVAILABLE,
-                }:
-                    raise
-                time.sleep(0.2)
-        pytest.fail("Isolated Kafka group coordinator did not provide committed offsets")
+        return {p.partition: p.offset for p in committed_offsets(client)}
     finally:
         client.close()
+
+
+def committed_offsets(client, *, timeout=10):
+    """Observe offsets after restart; do not commit or relax worker fences."""
+    deadline = time.monotonic() + timeout
+    last_error = "coordinator unavailable"
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        try:
+            committed = client.committed(
+                [TopicPartition(TOPIC, 0), TopicPartition(TOPIC, 1)],
+                timeout=min(2, remaining),
+            )
+            for partition in committed:
+                if partition.error is not None:
+                    raise KafkaException(partition.error)
+            return committed
+        except KafkaException as error:
+            if error.args[0].code() not in (
+                KafkaError.NOT_COORDINATOR,
+                KafkaError.COORDINATOR_NOT_AVAILABLE,
+                KafkaError.COORDINATOR_LOAD_IN_PROGRESS,
+                KafkaError._WAIT_COORD,
+            ):
+                raise
+            last_error = str(error)
+        time.sleep(min(0.2, max(0, deadline - time.monotonic())))
+    pytest.fail(f"Isolated Redpanda coordinator did not become ready: {last_error}")
 
 
 def rows(context, query, params=()):

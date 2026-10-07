@@ -33,7 +33,9 @@ E2E_REPORTS_DIR ?= $(REPORTS_DIR)/e2e
 DOCKER_REPORTS_DIR ?= $(REPORTS_DIR)/docker
 SBOM_REPORTS_DIR ?= $(REPORTS_DIR)/sbom
 API_REQUIREMENTS ?= $(API_DIR)/requirements.txt
+INTELLIGENCE_TEST_PATH := $(API_DIR)/tests/test_intelligence_durability.py
 API_DEV_REQUIREMENTS ?= $(API_DIR)/requirements-dev.txt
+
 DATA_PARQUET_REQUIREMENTS ?= data/requirements-parquet.txt
 API_COVERAGE_XML ?= $(API_REPORTS_DIR)/coverage.xml
 API_BANDIT_REPORT ?= $(SECURITY_REPORTS_DIR)/bandit-api.txt
@@ -907,3 +909,10 @@ docs-repo-structure:
 .PHONY: k8s-runtime-drill
 k8s-runtime-drill:
 	python3 scripts/kubernetes/drill.py
+
+.PHONY: integration-replay-test integration-failure-test
+integration-replay-test:
+	PYTHONPATH=.:$(API_DIR) REQUIRE_BROKER_TESTS=1 $(API_VENV_PYTHON) -m pytest -q $(INTELLIGENCE_TEST_PATH) -k 'duplicate_forecast or history_keeps or pagination' --junitxml=$(REPORTS_DIR)/ai10/replay-tests.xml
+
+integration-failure-test:
+	PYTHONPATH=.:$(API_DIR) REQUIRE_BROKER_TESTS=1 $(API_VENV_PYTHON) -m pytest -q $(INTELLIGENCE_TEST_PATH) -k 'not duplicate_forecast and not history_keeps and not pagination' --junitxml=$(REPORTS_DIR)/ai10/failure-tests.xml

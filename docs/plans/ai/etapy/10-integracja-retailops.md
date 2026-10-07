@@ -40,7 +40,16 @@ Profil `ai-smoke` (30 dni) jest tylko fixture dla schema/import/replay. Temporal
 - Runbook odtwarzania i diagram własności danych; dotychczasowy seed/API test suite nadal przechodzi.
 - DoD: istnieje trwały odczytywalny wynik w RetailOps i brak utraty/podwojenia efektu przy testowanych awariach. Samo przyjęcie eventu, log lub licznik nie zamykają etapu.
 
-Proponowany docelowy interfejs weryfikacyjny (do zaimplementowania i opisania w README, nie istniejąca obecnie komenda): `make integration-replay-test` oraz `make integration-failure-test`. Raportuj dokładnie, co wykonano i na których commitach obu repozytoriów.
+Interfejs weryfikacyjny jest zaimplementowany w obu repozytoriach:
+`make integration-replay-test` oraz `make integration-failure-test`.
+Po stronie AI pierwszy target sprawdza kontrakty i mechanikę replay, a drugi
+rzeczywisty PostgreSQL/outbox. Osobne `make observation-persistence-test`
+i `make observation-broker-test` sprawdzają SQL/checkpoints oraz TLS/SCRAM/ACK.
+Po stronie Source oba targety wykonują rzeczywiste testy SQL/brokera na jawnych
+fixtures mechaniki. Pełny odbiór oryginalnych modeli, publisherów SQL, API i UI
+oraz przekazania Source capture do rzeczywistego AI SQL/ACK ma dedykowane
+workflowy. [Bieżący raport odbioru](../../../evidence/ai/10/README.md) podaje
+dokładne commity, run IDs, sumy, offsety i pozostałe warunki zamknięcia.
 
 ## Prompt do Codex
 
