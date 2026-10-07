@@ -11,8 +11,11 @@ rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamkni
 rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sumy
 4 → 7. Stockout i anomaly mają odebrane oryginalne AI SQL publishery,
 pełne read API i built UI, również po wspólnych optymalizacjach CI.
-Pełny v12 na 102 dniach nadal przechodzi odbiór.
-Protected merge i Required CI obu main pozostają warunkiem zamknięcia.
+Kod jest na main po protected merge #28/#100 i pełnym CI AI 17/17, Source 30/30.
+V12 na 102 dniach ma 56 oryginalnych wyników i atomowy rollback, ale końcowy
+odbiór Source w oryginalnej bazie pozostał failed. Odtworzony Source diagnostic
+passed nie zastępuje pełnego odbioru. Nowy pełny run jest w toku.
+Do zamknięcia pozostają V12 i końcowe dokumenty ready z protected merge/main CI.
 
 **AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**
 Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),

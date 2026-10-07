@@ -5,8 +5,9 @@ React, FastAPI, PostgreSQL, Redpanda, Docker Compose oraz lokalny Kubernetes.
 
 **AI 10: integracja w toku.** [Bieżący odbiór](docs/evidence/ai/10/README.md)
 opisuje trzy ścieżki snapshot/REST/stream, rzeczywisty Source → AI SQL/ACK
-oraz native wyniki w istniejących panelach RetailOps. Końcowe native runtime
-i publikacja na obu main pozostają wymagane.
+oraz native wyniki w istniejących panelach RetailOps. Kod jest na obu main
+z zielonym pełnym CI (AI 17/17, Source 30/30). Pełny oryginalny V12
+oraz końcowa publikacja dokumentacji ready pozostają wymagane.
 
 **[Zacznij od dokumentacji →](docs/README.md)**
 
