@@ -24,7 +24,13 @@ from test_intelligence_durability import (
     rows,
 )
 
-pytestmark = pytest.mark.integration_broker
+pytestmark = [
+    pytest.mark.integration_broker,
+    pytest.mark.skipif(
+        os.getenv("REQUIRE_AI10_NATIVE_MODEL_READ") != "1",
+        reason="Dedicated qualified native output acceptance requires its producer artifact",
+    ),
+]
 ROOT = Path(__file__).resolve().parents[1]
 
 

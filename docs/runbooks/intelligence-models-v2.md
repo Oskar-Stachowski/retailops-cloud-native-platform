@@ -92,8 +92,9 @@ osobnego odbioru zgodnego z [planem AI 10](../plans/ai/etapy/10-integracja-retai
 rzeczywistego acceptora AI08 uruchomionego na tym samym runnerze AI10.
 `AI10_NATIVE_STOCKOUT_OUTPUT` wskazuje `accepted-model`,
 `AI10_NATIVE_PRODUCER_COMMIT` wiąże oryginalny commit producenta, a
-`AI10_NATIVE_READ_REPORT` wskazuje plik raportu. `REQUIRE_BROKER_TESTS=1`
-wymaga rzeczywistego brokera i osobnej testowej bazy; lokalnie Docker
+`AI10_NATIVE_READ_REPORT` wskazuje plik raportu. Dedykowany workflow ustawia
+`REQUIRE_AI10_NATIVE_MODEL_READ=1` oraz `REQUIRE_BROKER_TESTS=1`, wymagając
+rzeczywistego brokera i osobnej testowej bazy; lokalnie Docker
 pozostaje wyłączony. Brak pakietu nigdy nie wybiera fixture.
 
 Odbiór porównuje pełny oryginalny output, census SHA-256 i każdy native
