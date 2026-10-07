@@ -104,7 +104,8 @@ oryginalny `risk_id`, payload oraz brak eskalacji przez query/demo user.
 Ten test obejmuje przekazanie plikowe committed outbox do Source; nie
 poświadcza wysyłki z oryginalnej bazy AI ani UI dla tych wyników. Oddzielny
 istniejący UI drill pozostaje dowodem mechaniki ekranów na oznaczonych fixture.
-# Odbiór oryginalnych wyników przez broker/API/UI
+
+## Odbiór oryginalnych wyników przez broker/API/UI
 
 Dedykowany workflow AI10 przypina dokładny commit odbiorcy Source i SHA jego
 plików. `REQUIRE_AI10_NATIVE_MODEL_READ=1` wymaga artefaktu bieżącego producer

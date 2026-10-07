@@ -44,9 +44,14 @@ test("original model publications reach the built RetailOps panels without chang
         expect(returned.result).toEqual(item);
         expect(seen.has(returned.result_id)).toBe(false);
         seen.add(returned.result_id);
-        expect(rows[index + 1]).toContain(item.product_id);
+        const row = panel.getByRole("row").nth(index + 1);
+        await expect(row.getByRole("cell").nth(0).locator(".identifier-text")).toHaveAttribute("aria-label", item.product_id);
         expect(rows[index + 1]).toContain(item.status);
-        expect(rows[index + 1]).toContain(kind === "anomaly_detected" ? item.selling_location_id : item.stock_location_id);
+        if (kind === "anomaly_detected") {
+          expect(rows[index + 1]).toContain(item.selling_location_id);
+        } else {
+          await expect(row.getByRole("cell").nth(1).locator(".identifier-text")).toHaveAttribute("aria-label", item.stock_location_id);
+        }
         expect(rows[index + 1]).toContain(item.quality_status);
         if (kind === "stockout_risk_scored") {
           expect(rows[index + 1]).toContain(item.probability === null ? "Unavailable" : `${(item.probability * 100).toFixed(2)}%`);
