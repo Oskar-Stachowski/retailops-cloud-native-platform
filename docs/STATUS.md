@@ -1,3 +1,14 @@
+AI09 follow-up: source2.8+knownplans jest przygotowany z osobnymi wariantami
+schematów, pełnym process replay oraz testami native; nie jest odbiorem etapu.
+[Evidence](evidence/ai/09/planned-anomaly-preparation.md) zachowuje też pojedynczy
+Kafka coordinator read failure exact maincbcac6eb/CI37629010997 i ograniczoną
+poprawkę helpera. PR #103 na `16d34887` zaliczył pełny Required CI
+[37637743439](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37637743439):
+19 success, 4 celowe skipped, z zielonym required-result. Integracja nowszego
+main `467f9903` zachowuje wspólny helper Kafka i wszystkie przyrosty AI 10.
+18 testów offsetów, configured Ruff/format oraz mypy 43 źródeł są zaliczone;
+pełne CI nowego head i chronionego main pozostaje wymagane.
+
 # Aktualny status RetailOps
 
 **2026-10-07: AI 09 pozostaje in_progress.**

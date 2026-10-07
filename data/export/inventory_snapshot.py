@@ -78,6 +78,15 @@ def copy_file(source: Path, target: Path) -> None:
 
 def export_schema_file(name: str, parent: dict) -> Path:
     """Keep ordinary exports compatible with the pinned pre-planning consumer."""
+    if (
+        parent["schema_version"] == "2.8.0"
+        and "forecast_plan_days" in parent["descriptor"]["resolved_parameters"]
+    ):
+        planned = {
+            "anomaly_snapshot.v1_2.schema.json": "anomaly_snapshot.v1_2.forecast.schema.json",
+            "anomaly_source_dataset.v2_8.schema.json": "anomaly_source_dataset.v2_8.forecast.schema.json",
+        }
+        return ROOT / "data/contracts" / planned.get(name, name)
     filename = (
         inventory_contract.LEGACY_SCHEMAS.get(name, name)
         if parent["descriptor"]["generator_version"] == "0.9.0"
@@ -236,8 +245,19 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
         "Schema identity differs.",
     )
     checked_schemas = {name: (root / "schemas" / name).read_bytes() for name in spec.SCHEMAS}
+    planned_anomaly = (
+        parent["schema_version"] == "2.8.0"
+        and "forecast_plan_days" in parent["descriptor"]["resolved_parameters"]
+    )
     allowed_schemas = [
-        {name: (ROOT / "data/contracts" / name).read_bytes() for name in spec.SCHEMAS}
+        {
+            name: (
+                export_schema_file(name, parent)
+                if planned_anomaly
+                else ROOT / "data/contracts" / name
+            ).read_bytes()
+            for name in spec.SCHEMAS
+        }
     ]
     if parent["descriptor"]["generator_version"] == "0.9.0":
         allowed_schemas.append(
