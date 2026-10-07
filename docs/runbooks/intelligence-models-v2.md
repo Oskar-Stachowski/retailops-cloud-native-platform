@@ -85,3 +85,21 @@ Przykłady z `model-fixtures.json` oraz browser/rollback fixtures sprawdzają
 mechanikę. Nie kwalifikują modeli i nie zamykają pełnego temporalnego E2E.
 Pełny Source capture/snapshot/replay oraz trzy rzeczywiste model runs wymagają
 osobnego odbioru zgodnego z [planem AI 10](../plans/ai/etapy/10-integracja-retailops.md).
+
+## Odbiór oryginalnych wyników na runnerze AI10
+
+`tests/test_native_intelligence_output_durability.py` wymaga pakietu z
+rzeczywistego acceptora AI08 uruchomionego na tym samym runnerze AI10.
+`AI10_NATIVE_STOCKOUT_OUTPUT` wskazuje `accepted-model`,
+`AI10_NATIVE_PRODUCER_COMMIT` wiąże oryginalny commit producenta, a
+`AI10_NATIVE_READ_REPORT` wskazuje plik raportu. `REQUIRE_BROKER_TESTS=1`
+wymaga rzeczywistego brokera i osobnej testowej bazy; lokalnie Docker
+pozostaje wyłączony. Brak pakietu nigdy nie wybiera fixture.
+
+Odbiór porównuje pełny oryginalny output, census SHA-256 i każdy native
+payload/ID. Dwukrotna wysyłka oryginalnych bytes daje jeden wynik SQL i
+odpowiednie checkpoints/ACK. Uwierzytelniony odczyt TCP sprawdza każdy
+oryginalny `risk_id`, payload oraz brak eskalacji przez query/demo user.
+Ten test obejmuje przekazanie plikowe committed outbox do Source; nie
+poświadcza wysyłki z oryginalnej bazy AI ani UI dla tych wyników. Oddzielny
+istniejący UI drill pozostaje dowodem mechaniki ekranów na oznaczonych fixture.
