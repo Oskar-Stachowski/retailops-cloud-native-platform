@@ -1,0 +1,16 @@
+# Attach only the existing API and broker to a Source-owned external network.
+# The Source database stays on its original project network.
+services:
+  api:
+    networks:
+      default: {}
+      intelligence_bus:
+        aliases: [retailops-api]
+  redpanda:
+    networks:
+      default: {}
+      intelligence_bus: {}
+networks:
+  intelligence_bus:
+    external: true
+    name: ${RETAILOPS_INTELLIGENCE_NETWORK:?source_owned_network_required}

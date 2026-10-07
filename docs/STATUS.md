@@ -31,6 +31,8 @@ ma 30/30; [nowszy scoped main CI](evidence/ai/10/source-b723489-main-ci.json)
 Końcowe dokumenty podlegają normalnym protected merges i Required CI dokładnych main.
 V12 pozostaje wyłącznie development z oryginalnym quality `not_ready`.
 Sugestie są jawnym fixture AI10; rzeczywisty producent należy do AI12.
+[Overlay istniejących projektów](runbooks/intelligence-existing-projects.md) zachowuje
+oddzielne bazy, Source-owned external network, jeden broker i prywatne granty.
 AI09 pozostaje odrębnym, otwartym etapem.
 
 **AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**

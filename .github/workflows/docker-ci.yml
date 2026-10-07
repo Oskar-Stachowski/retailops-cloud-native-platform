@@ -132,6 +132,11 @@ jobs:
       - name: Validate Compose profiles
         run: make compose-profile-config
 
+      - name: Validate existing-service intelligence overlay without joining a runtime
+        env:
+          RETAILOPS_INTELLIGENCE_NETWORK: ai10-source-owned-config-validation
+        run: docker compose -p ai10-source-overlay-config --profile dev -f docker-compose.yml -f docker-compose.intelligence.yml config --quiet
+
       - name: Verify security scanner container
         run: |
           set -euo pipefail

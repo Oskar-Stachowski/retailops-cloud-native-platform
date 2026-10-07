@@ -3,7 +3,8 @@
 **Repozytoria:** RetailOps i RetailOps AI. **Wymagane etapy:** 07 i 08. Przygotowanie kontraktów może rozpocząć się wcześniej; odbiór obejmuje działający forecast, anomalie i ryzyko. Zasady obowiązujące: [kontrakt integracji i agenta](../kontrakty/integracja-agent.md), [czas i dane](../kontrakty/dane-i-czas.md), [API ML](../kontrakty/ml-api-lifecycle.md).
 
 **Odbiór 2026-10-07: ready.** [Końcowy raport](../../../evidence/ai/10/README.md)
-wiąże wszystkie siedem punktów planu: trzy tryby wejścia, trwałość/ACK/recovery,
+oraz [overlay istniejących projektów](../../../runbooks/intelligence-existing-projects.md)
+wiążą wszystkie siedem punktów planu: trzy tryby wejścia, trwałość/ACK/recovery,
 40 stockout, 1232 anomaly i 56 oryginalnych forecast przez SQL publisher,
 Source API i istniejący UI, uprawnienia oraz jawny fixture sugestii.
 V12 zachowuje oryginalne quality `not_ready` i własny development namespace.

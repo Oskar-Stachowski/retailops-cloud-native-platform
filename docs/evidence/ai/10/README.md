@@ -55,6 +55,18 @@ Pełne native grain, record versions i availability dostarcza osobny
 wersjonowany immutable bundle. Ograniczone strony REST nie rozszerzają
 deklarowanych capabilities źródła.
 
+## Overlay istniejących projektów
+
+[Instrukcja krok po kroku](../../../runbooks/intelligence-existing-projects.md)
+i [konfiguracje wraz z 11 guard tests](existing-project-overlays.json) wiążą
+`docker-compose.intelligence.yml` Source oraz `infra/compose-intelligence.yaml` AI.
+Source `api`/`redpanda` dołączają do jednej Source-owned external network;
+Source DB oraz AI DB/MLflow pozostają poza nią. API mają jawne aliasy,
+listener Source `redpanda:9092` jest rozwiązywany, a AI nie tworzy drugiego brokera.
+Overlay zachowuje skonfigurowane auth; bazowy demo Compose nie zyskuje TLS
+przez dołączenie sieci. Configuration acceptance nie zastępuje native ML/API/UI.
+Required CI sprawdza rzeczywisty Compose config oraz locked delivery image/SDK.
+
 ## Odtwarzanie i awarie
 
 Własność danych i diagram obu niezależnych baz opisuje
