@@ -3,9 +3,9 @@
 **2026-10-07 — AI 10: końcowa integracja w toku.**
 [Bieżący odbiór i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
 rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sumy
-4 → 7. Qualified anomaly/stockout mają pełny read API i built UI; stockout ma
-także odebrany oryginalny AI SQL publisher. Publisher anomaly i v12 na 102
-dniach nadal przechodzą odbiór.
+4 → 7. Stockout i anomaly mają odebrane oryginalne AI SQL publishery,
+pełne read API i built UI, również po wspólnych optymalizacjach CI.
+Pełny v12 na 102 dniach nadal przechodzi odbiór.
 Protected merge i Required CI obu main pozostają warunkiem zamknięcia.
 
 **AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**
