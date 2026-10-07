@@ -268,13 +268,28 @@ def run(context, *, count=1, handlers=None, kafka=None, quarantine=None):
 
 def positions(context):
     client = build_confluent_kafka_consumer(config(context))
+    deadline = time.monotonic() + 45
     try:
-        return {
-            p.partition: p.offset
-            for p in client.committed(
-                [TopicPartition(TOPIC, 0), TopicPartition(TOPIC, 1)], timeout=10
-            )
-        }
+        while time.monotonic() < deadline:
+            try:
+                committed = client.committed(
+                    [TopicPartition(TOPIC, 0), TopicPartition(TOPIC, 1)],
+                    timeout=min(10, max(0.1, deadline - time.monotonic())),
+                )
+                for partition in committed:
+                    if partition.error is not None:
+                        raise KafkaException(partition.error)
+                return {p.partition: p.offset for p in committed}
+            except KafkaException as error:
+                # Broker readiness does not imply group-coordinator readiness
+                # after restart. Retry only these transient reads, never writes
+                # or missing/wrong durable offsets.
+                if not error.args or not isinstance(error.args[0], KafkaError) or error.args[0].code() not in {
+                    KafkaError.NOT_COORDINATOR, KafkaError.COORDINATOR_NOT_AVAILABLE,
+                }:
+                    raise
+                time.sleep(0.2)
+        pytest.fail("Isolated Kafka group coordinator did not provide committed offsets")
     finally:
         client.close()
 

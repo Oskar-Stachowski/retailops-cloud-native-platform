@@ -230,8 +230,7 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
             else FORECAST_GENERATOR_VERSION
             if effective.forecast_plan_days
             else GENERATOR_VERSION
-        )
-        and not (is_anomaly and effective.forecast_plan_days),
+        ),
         "Source generator version disagrees with declared forecast planning mode.",
     )
     context = manifest.descriptor.context

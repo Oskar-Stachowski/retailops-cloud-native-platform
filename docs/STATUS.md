@@ -1,3 +1,9 @@
+AI09 follow-up: source2.8+knownplans jest przygotowany z osobnymi wariantami
+schematów, pełnym process replay oraz testami native; nie jest odbiorem etapu.
+[Evidence](evidence/ai/09/planned-anomaly-preparation.md) zachowuje też pojedynczy
+Kafka coordinator read failure exact maincbcac6eb/CI37629010997 i ograniczoną
+poprawkę helpera. Pełne CI nowego head/main pozostaje wymagane.
+
 # Aktualny status RetailOps
 
 **2026-10-07: AI 09 pozostaje in_progress.**
