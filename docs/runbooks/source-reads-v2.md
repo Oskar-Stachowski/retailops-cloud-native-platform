@@ -1,6 +1,7 @@
 # AI 10 — chroniony, ograniczony odczyt źródła v2
 
-Status: przyrost integracji REST; cały AI 10 pozostaje `in_progress`.
+Implementacja bounded live reads ma odbiór cross-repo. Bieżący stan całego
+etapu i dokładne receipts podaje [raport AI10](../evidence/ai/10/README.md).
 Endpointy `/integration/v2/products`, `/sales`, `/inventory-snapshots`,
 `/forecasts`, `/inventory-risks` (każdy pod prefiksem `/integration/v2`)
 zachowują istniejące modele odpowiedzi i nazwy filtrów. Wymagają jednego
