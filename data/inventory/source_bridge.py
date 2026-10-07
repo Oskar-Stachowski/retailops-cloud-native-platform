@@ -48,6 +48,22 @@ COMMERCE_TABLES = (
 )
 
 
+def _copy_commerce_inputs(candidate: dict) -> dict:
+    """Detach every consumed row without copying unrelated candidate outputs.
+
+    Requested baskets and all returned operational tables still have independent
+    containers. The small private pricing/product parameters are needed by the
+    simulator but are never emitted as operational commerce tables.
+    """
+    private = (
+        "promotion_effect_truth",
+        "product_simulation_parameters",
+        "store_simulation_parameters",
+    )
+    names = set(COMMERCE_TABLES) | set(private)
+    return deepcopy({name: rows for name, rows in candidate.items() if name in names})
+
+
 def simulate_source_commerce(
     candidate: dict,
     generation: ResolvedGenerationConfig,
@@ -60,7 +76,7 @@ def simulate_source_commerce(
     # Never write these candidate rows into an existing source/snapshot directory.
     validate_demand(candidate, generation, anomaly_plan=anomaly_plan)
     inputs = source_foundation(candidate, generation, config)
-    tables = deepcopy(candidate)
+    tables = _copy_commerce_inputs(candidate)
     if physical_plan is None:
         simulator = SourceCommerceSimulator(inputs, tables, generation, config)
     else:

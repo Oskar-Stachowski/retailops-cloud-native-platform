@@ -1,5 +1,11 @@
 # Aktualny status RetailOps
 
+**2026-10-07: AI 09 pozostaje in_progress.**
+[Odbiór komponentów producenta](evidence/ai/09/source-preparation/README.md)
+opisuje ograniczenie kopii wejść oraz dziennego replayu inventory:
+456 testów regresji i zgodne dane kontrolne. Pomiar pełnego profilu,
+rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamknięte.
+
 **2026-10-07 — AI 10: końcowa integracja w toku.**
 [Bieżący odbiór i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
 rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sumy
