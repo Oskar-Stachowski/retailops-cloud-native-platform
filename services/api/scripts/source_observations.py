@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import signal
 import sys
 import threading
@@ -11,6 +12,7 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from app.services.source_observation_broker import BrokerConfig, build_producer
+from app.services.source_observation_capture import CaptureReader, capture_source
 from app.services.source_observation_outbox import (
     ObservationOutbox,
     ObservationPublisher,
@@ -26,10 +28,11 @@ class DatabaseConfig(BaseModel):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("append", "publish"))
+    parser.add_argument("command", choices=("append", "publish", "capture"))
     parser.add_argument("--database-config", type=Path, required=True)
     parser.add_argument("--broker-config", type=Path, required=True)
     parser.add_argument("--fact", type=Path)
+    parser.add_argument("--output", type=Path)
     parser.add_argument("--max-messages", type=int, default=100)
     parser.add_argument("--max-seconds", type=int, default=60)
     args = parser.parse_args()
@@ -39,6 +42,18 @@ def main() -> int:
         if not db.database_url.get_secret_value().startswith("postgresql://"):
             raise ValueError
         outbox = ObservationOutbox(db.database_url.get_secret_value())
+        if args.command == "capture":
+            if args.fact is not None or args.output is None:
+                raise ValueError
+            reader = CaptureReader(broker)
+            try:
+                result = capture_source(outbox, reader, args.output)
+            finally:
+                reader.close()
+            sys.stdout.write(json.dumps(result, sort_keys=True) + "\n")
+            return 0
+        if args.output is not None:
+            raise ValueError
         producer, topology = build_producer(broker)
         stream, partitions = topology.inspect()
         if args.command == "append":

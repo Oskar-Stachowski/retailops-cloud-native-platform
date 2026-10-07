@@ -85,6 +85,8 @@ Przykłady z `model-fixtures.json` oraz browser/rollback fixtures sprawdzają
 mechanikę. Nie kwalifikują modeli i nie zamykają pełnego temporalnego E2E.
 Pełny Source capture/snapshot/replay oraz trzy rzeczywiste model runs wymagają
 osobnego odbioru zgodnego z [planem AI 10](../plans/ai/etapy/10-integracja-retailops.md).
+Capture opt-in obserwacji i jego pełny broker prefix opisuje osobny
+[runbook](source-observation-capture.md).
 
 ## Odbiór oryginalnych wyników na runnerze AI10
 

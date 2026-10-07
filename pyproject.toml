@@ -164,6 +164,7 @@ files = [
   "services/api/app/services/source_observation_wire.py",
   "services/api/app/services/source_observation_outbox.py",
   "services/api/app/services/source_observation_broker.py",
+  "services/api/app/services/source_observation_capture.py",
   "services/api/scripts/source_observations.py",
   "services/api/app/services/source_bundles.py",
   "services/api/app/auth/source_bundles.py",
