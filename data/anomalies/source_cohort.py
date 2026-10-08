@@ -27,9 +27,10 @@ from data.inventory.legacy import legacy_stock_movements
 from data.inventory.projection import project_inventory
 from data.inventory.projection_contract import ProjectionConfig
 from data.inventory.snapshots import daily_snapshots
-from data.inventory.source_bridge import COMMERCE_TABLES, _copy_commerce_inputs
+from data.inventory.source_bridge import COMMERCE_TABLES
 from data.inventory.source_cohort_batch_v2 import (
     CachedLedgerSourceCommerceSimulator,
+    _copy_commerce_inputs,
 )
 from data.inventory.source_cohort_batch_v2 import (
     verify_upstream_pins as verify_cached_pins,
@@ -46,9 +47,9 @@ if TYPE_CHECKING:
     from data.inventory.source_contract import SourceInventoryConfig
     from data.inventory.source_tables import TableContext
 
-VERSION = "planned-source-cached-execution-1.0.0"
+VERSION = "planned-source-cached-execution-1.1.0"
 UPSTREAM_SHA256 = {
-    "inventory/source_cohort_batch_v2.py": "b5716935d97b722fcd704d2dd3bb1984a3e1d2cddca595ad3ec124cb13bd5394",
+    "inventory/source_cohort_batch_v2.py": "958d93170487c030c6eb1579ce256ed03331f6a2bcdae5272754069559122c05",
     "inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",
@@ -103,9 +104,7 @@ class CachedPlannedSimulator(CachedLedgerSourceCommerceSimulator):
         self._master_bytes = self._master_document()
         self._master_units = dict(self.units)
         self._master_scope = set(self.scope)
-        self._validated_objects: dict[int, tuple[InventoryMovement, InventoryMovement]] = {
-            id(m): (m, m) for m in self.movements
-        }
+        self._validated_objects: dict[int, InventoryMovement] = {id(m): m for m in self.movements}
 
     def execute(self) -> dict:
         # The bridge first captures the complete, validated physical scenario.
@@ -138,7 +137,8 @@ def simulate_planned_source(
         # Includes all demand rows with the original physical sequence transform.
         inputs["scenario"] = simulator.scenario.model_dump()
     result = simulator.execute()
-    if physical_plan is not None:
+    start, end = simulator.start, simulator.end
+    if isinstance(simulator, CachedPhysicalSimulator):
         result["simulation_truth"]["physical_interventions"] = simulator.applied_caps
     tables["sales"] = [
         {field: row[field] for field in fact_columns("sales", TABLE_COLUMNS["sales"])}
@@ -158,14 +158,15 @@ def simulate_planned_source(
         ),
         "simulation_truth": result["simulation_truth"],
     }
+    del simulator, result
     ledger = InventoryLedger.from_payload(output["inventory"]["ledger"])
     projection = ProjectionConfig.from_payload(
         {
             "contract_version": "inventory-projection-config-1.0.0",
             "process_version": "inventory-projection-1.0.0",
             "business_timezone": "UTC",
-            "start_at": simulator.start.isoformat(),
-            "end_at": simulator.end.isoformat(),
+            "start_at": start.isoformat(),
+            "end_at": end.isoformat(),
             "snapshot_policy": "utc_day_last_microsecond",
             "reservation_policy": "none",
             "stock_measure": "available_qty",
@@ -176,6 +177,7 @@ def simulate_planned_source(
     )
     output["inventory_snapshots"] = daily_snapshots(ledger, projection)
     output["legacy_stock_movements"] = legacy_stock_movements(ledger)
+    del ledger
     output["reconciliation"] = reconcile_source_commerce(
         candidate, output, generation, inputs["scenario"]
     )
@@ -187,8 +189,7 @@ def simulate_planned_source(
         )
         and all(r["status"] == "known" for r in output["inventory_snapshots"])
         and all(
-            utc_timestamp(r["available_at"]) <= simulator.end
-            for r in tables["daily_demand_observations"]
+            utc_timestamp(r["available_at"]) <= end for r in tables["daily_demand_observations"]
         )
     )
     output["status"] = "passed" if ready else "not_ready"
@@ -209,7 +210,11 @@ def build_tables(
     require(effective.profile.startswith("ai-"), "Planned source requires an AI profile.")
     demand = plan if isinstance(plan, AnomalyPlan) else None
     physical = plan if isinstance(plan, PhysicalAnomalyPlan) else None
-    candidate = build_dataset(generation, anomaly_plan=demand)
+    candidate = {
+        name: rows
+        for name, rows in build_dataset(generation, anomaly_plan=demand).items()
+        if name in set(COMMERCE_TABLES) | set(PRIVATE_TABLES)
+    }
     source = simulate_planned_source(
         candidate, effective, config, anomaly_plan=demand, physical_plan=physical
     )
@@ -236,6 +241,7 @@ def build_tables(
         evaluated_at=evaluated_at or projection_config.end_at,
     )
     native, context = tables_from_source(source, projection)
+    del source["effective_configuration"]
     commerce = source["commerce"]
     view = known_commerce_view(commerce, native["inventory_sales"])
     commerce["daily_price_observations"] = daily_price_observations(

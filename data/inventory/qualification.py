@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import Counter, OrderedDict, defaultdict
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from typing import TYPE_CHECKING
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from data.inventory.source_tables import TableContext
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class PhysicalDay:
     reason: str | None
     routes: tuple[str, ...] = ()
@@ -38,12 +38,15 @@ class Eligibility:
         self.assignments = defaultdict(list)
         for row in tables["channel_assignments"]:
             self.assignments[row["selling_location_id"], row["channel"]].append(row)
-        self.cache: dict[tuple[str, str, str, str], PhysicalDay] = {}
+        self.cache: OrderedDict[tuple[str, str, str, str], PhysicalDay] = OrderedDict()
 
     def day(self, product: str, stock: str, day: str, cutoff: str) -> PhysicalDay:
         key = product, stock, day, cutoff
         if key not in self.cache:
             self.cache[key] = self._day(product, stock, day, cutoff)
+            if len(self.cache) > 4096:
+                self.cache.popitem(last=False)
+        self.cache.move_to_end(key)
         return self.cache[key]
 
     def _day(self, product: str, stock: str, day: str, cutoff: str) -> PhysicalDay:
@@ -190,11 +193,12 @@ def qualify_windows(tables: dict, context: TableContext) -> list[dict]:
     coverage = defaultdict(list)
     for row in tables["inventory_history_coverage"]:
         coverage[row["product_id"], row["stock_location_id"]].append(row)
-    result = [
-        _qualify(r, eligibility, observations, coverage, context)
+    normalized = [
+        QualifiedWindow.model_validate(
+            _qualify(r, eligibility, observations, coverage, context)
+        ).model_dump()
         for r in tables["inventory_window_diagnostics"]
     ]
-    normalized = [QualifiedWindow.model_validate(r).model_dump() for r in result]
     keys = [tuple(r[k] for k in GRAIN) for r in normalized]
     require(len(keys) == len(set(keys)), "Duplicate qualified inventory grain.")
     return sorted(normalized, key=lambda r: tuple(r[k] for k in GRAIN))

@@ -46,7 +46,8 @@ from data.inventory.projection_contract import ProjectionConfig
 from data.inventory.run_source_dataset import default_inventory_config
 from data.inventory.simulation_contract import ChronologicalScenario
 from data.inventory.snapshots import daily_snapshots
-from data.inventory.source_bridge import COMMERCE_TABLES, _copy_commerce_inputs
+from data.inventory.source_bridge import COMMERCE_TABLES
+from data.inventory.source_bridge import _copy_commerce_inputs as _copy_all_commerce_inputs
 from data.inventory.source_cohort_batch import IndexedSourceCommerceSimulator
 from data.inventory.source_contract import SourceInventoryConfig
 from data.inventory.source_dataset_contract import PRIVATE_TABLES
@@ -56,14 +57,14 @@ from data.inventory.source_observations import known_commerce_view, rebuild_obse
 from data.inventory.source_reconciliation import reconcile_source_commerce
 from data.inventory.source_tables import TableContext, tables_from_source
 
-FAST_PATH_VERSION = "inventory-source-cached-ledger-2.1.0"
+FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.0"
 UPSTREAM_SHA256 = {
-    "source_cohort_batch.py": "3e3ecafba7298d343a8c9624617bdc6461e0925d5a446aeab9d011acc3909e00",
-    "ledger.py": "3e50ac30d3732789680461d96d5855f01619d0978de56e774d11565df884565f",
+    "source_cohort_batch.py": "7459292242696e6e1ea35ab2ea8171b31acab044d879f67168d379941c8dee84",
+    "ledger.py": "4effb9cdd18b4eb18f5f1a0b60cb0fab7f467262a961d9a4baf6fa6c2d1e8e09",
     "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
-    "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
-    "source_commerce.py": "9322d5240b1762db498929febed872bd207bd683ec3b1785cc0a0674f43e09c7",
+    "simulator.py": "7b10a76f7a4ea93b40557d402a3f6cd5a6400e939e78c3ffa64dadc4b531dcd7",
+    "source_commerce.py": "c53fefae30abfdf5c48d744cc0c903db449edbc970be3523e8a008dbd0ad7991",
 }
 
 
@@ -82,10 +83,35 @@ def implementation() -> dict[str, Any]:
         "version": FAST_PATH_VERSION,
         "code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "upstream_sha256": verify_upstream_pins(),
-        "optimization": "cached_immutable_records_and_queue_owned_scenario_events",
+        "optimization": "cached_immutable_records_queue_events_borrowed_requests_and_early_release",
         "rng_and_chronological_process": "unchanged",
         "source_validation": "ordinary_source_2_7_writer_and_reader_all_gates",
     }
+
+
+def _copy_commerce_inputs(candidate: dict) -> dict:
+    """Borrow read-only inputs that successful execution replaces completely.
+
+    The pinned commerce process reads requested baskets through its indexes,
+    creates new fulfilled rows, and replaces every borrowed output container.
+    All published master/plan rows still have independent deep copies.
+    """
+    borrowed = {
+        "sales",
+        "orders",
+        "order_items",
+        "sale_price_references",
+        "return_events",
+        "daily_price_observations",
+        "daily_demand_observations",
+        "daily_demand_versions",
+        "daily_return_cohorts",
+        "returns",
+    }
+    detached = _copy_all_commerce_inputs(
+        {name: rows for name, rows in candidate.items() if name not in borrowed}
+    )
+    return {**detached, **{name: candidate[name] for name in borrowed}}
 
 
 class CachedLedgerSourceCommerceSimulator(IndexedSourceCommerceSimulator):
@@ -104,9 +130,7 @@ class CachedLedgerSourceCommerceSimulator(IndexedSourceCommerceSimulator):
         self._master_bytes = self._master_document()
         self._master_units = dict(self.units)
         self._master_scope = set(self.scope)
-        self._validated_objects: dict[int, tuple[InventoryMovement, InventoryMovement]] = {
-            id(m): (m, m) for m in self.movements
-        }
+        self._validated_objects: dict[int, InventoryMovement] = {id(m): m for m in self.movements}
         self._release_queued_scenario_events()
 
     def _release_queued_scenario_events(self) -> None:
@@ -131,21 +155,22 @@ class CachedLedgerSourceCommerceSimulator(IndexedSourceCommerceSimulator):
 
     def _checked(self, movement: InventoryMovement) -> InventoryMovement:
         cached = self._validated_objects.get(id(movement))
-        if cached is not None and cached[0] is movement:
-            return cached[1]
+        if cached is movement:
+            return movement
         # An untracked replacement must pass the same strict single-row schema,
         # normalization and semantic checks that ordinary from_payload performs.
         record = movement.record()
         MovementRecord.model_validate(record)
         normalized = InventoryMovement.from_record(record)
         validate_movement(normalized, self.units, self.scope)
-        self._validated_objects[id(movement)] = (movement, normalized)
+        # Replacement objects are never trusted on a subsequent view. Only
+        # immutable records created and validated by this executor are cached.
         return normalized
 
     def _apply(self, record: dict) -> InventoryMovement:
         MovementRecord.model_validate(record)
         movement = super()._apply(record)
-        self._validated_objects[id(movement)] = (movement, movement)
+        self._validated_objects[id(movement)] = movement
         return movement
 
     def _ledger(self) -> InventoryLedger:
@@ -211,6 +236,7 @@ def simulate_source_commerce_fast(
     tables = _copy_commerce_inputs(candidate)
     simulator = CachedLedgerSourceCommerceSimulator(inputs, tables, generation, config)
     result = simulator.execute()
+    start, end = simulator.start, simulator.end
     tables["sales"] = [
         {field: row[field] for field in fact_columns("sales", TABLE_COLUMNS["sales"])}
         for row in simulator.actual_sales
@@ -229,14 +255,17 @@ def simulate_source_commerce_fast(
         ),
         "simulation_truth": result["simulation_truth"],
     }
+    # Output owns every surviving list; immutable movements, requested indexes
+    # and pricing caches no longer participate in projection or reconciliation.
+    del simulator, result
     ledger = InventoryLedger.from_payload(output["inventory"]["ledger"])
     projection = ProjectionConfig.from_payload(
         {
             "contract_version": "inventory-projection-config-1.0.0",
             "process_version": "inventory-projection-1.0.0",
             "business_timezone": "UTC",
-            "start_at": simulator.start.isoformat(),
-            "end_at": simulator.end.isoformat(),
+            "start_at": start.isoformat(),
+            "end_at": end.isoformat(),
             "snapshot_policy": "utc_day_last_microsecond",
             "reservation_policy": "none",
             "stock_measure": "available_qty",
@@ -247,6 +276,7 @@ def simulate_source_commerce_fast(
     )
     output["inventory_snapshots"] = daily_snapshots(ledger, projection)
     output["legacy_stock_movements"] = legacy_stock_movements(ledger)
+    del ledger
     output["reconciliation"] = reconcile_source_commerce(
         candidate, output, generation, inputs["scenario"]
     )
@@ -258,8 +288,7 @@ def simulate_source_commerce_fast(
         )
         and all(r["status"] == "known" for r in output["inventory_snapshots"])
         and all(
-            utc_timestamp(r["available_at"]) <= simulator.end
-            for r in tables["daily_demand_observations"]
+            utc_timestamp(r["available_at"]) <= end for r in tables["daily_demand_observations"]
         )
     )
     output["status"] = "passed" if ready else "not_ready"
@@ -279,7 +308,14 @@ def build_source_dataset_fast(
         effective.profile.startswith("ai-"),
         "Inventory source 2.7 requires an AI profile; demo remains unchanged.",
     )
-    candidate = build_dataset(generation)
+    # This freshly generated candidate has one private owner. Retain every
+    # source/reconciliation input and private published table; release legacy
+    # stock/forecast/workflow outputs that the chronological Source replaces.
+    candidate = {
+        name: rows
+        for name, rows in build_dataset(generation).items()
+        if name in set(COMMERCE_TABLES) | set(PRIVATE_TABLES)
+    }
     source = simulate_source_commerce_fast(candidate, effective, config)
     settings = source["effective_configuration"]["scenario"]["settings"]
     projection_config = ProjectionConfig.from_payload(
@@ -304,6 +340,7 @@ def build_source_dataset_fast(
         evaluated_at=evaluated_at or projection_config.end_at,
     )
     native, context = tables_from_source(source, projection)
+    del source["effective_configuration"]
     commerce = source["commerce"]
     view = known_commerce_view(commerce, native["inventory_sales"])
     commerce["daily_price_observations"] = daily_price_observations(
@@ -337,7 +374,9 @@ def run(
     tables, context = build_source_dataset_fast(generation, config, evaluated_at=evaluated_at)
     built_seconds = perf_counter() - started
     record_stage("source_built")
-    directory = write_source_dataset(tables, context, generation, config, output_root)
+    directory = write_source_dataset(
+        tables, context, generation, config, output_root, consume_input=True
+    )
     del tables, context
     written_seconds = perf_counter() - started
     record_stage("source_written_and_staging_verified")

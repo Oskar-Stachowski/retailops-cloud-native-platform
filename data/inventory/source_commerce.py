@@ -58,6 +58,7 @@ class SourceCommerceSimulator(ChronologicalSimulator):
         self.actual_items: list[dict[str, str]] = []
         self.financial_returns: list[dict[str, str]] = []
         self.return_decisions: list[dict] = []
+        self._return_decisions_by_id: dict[str, dict] = {}
         self.return_base = {
             "products": simulation_entities(tables, "products"),
             "product_catalog": tables["product_catalog"],
@@ -152,6 +153,9 @@ class SourceCommerceSimulator(ChronologicalSimulator):
                 "inventory_available_at": None,
             }
         )
+        # Match the original first matching decision, including malformed
+        # duplicate IDs that the ordinary complete source validator rejects.
+        self._return_decisions_by_id.setdefault(event["id"], self.return_decisions[-1])
         if disposition in {"not_refunded", "outside_inventory_window"}:
             return
         sequence = self.reserved_sequences.get(stamp, -1) + 1
@@ -181,7 +185,7 @@ class SourceCommerceSimulator(ChronologicalSimulator):
     def _return(self, event: ReturnEvent) -> None:
         super()._return(event)
         processed = self.returns[-1]
-        decision = next(r for r in self.return_decisions if r["return_id"] == event.return_id)
+        decision = self._return_decisions_by_id[event.return_id]
         decision["inventory_available_at"] = processed["available_at"]
 
     def actual_orders(self) -> list[dict[str, str]]:

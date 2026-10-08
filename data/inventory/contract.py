@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import UTC, datetime
+from functools import lru_cache
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -29,6 +30,19 @@ def require(condition: bool, message: str) -> None:  # noqa: FBT001 - validation
 
 
 def utc_timestamp(value: str) -> datetime:
+    # Only ordinary immutable strings enter the bounded cache. Preserve the
+    # original validation for wrong types and user-defined string subclasses.
+    if type(value) is str:
+        return _cached_utc_timestamp(value)
+    return _parse_utc_timestamp(value)
+
+
+@lru_cache(maxsize=4096)
+def _cached_utc_timestamp(value: str) -> datetime:
+    return _parse_utc_timestamp(value)
+
+
+def _parse_utc_timestamp(value: str) -> datetime:
     require(
         isinstance(value, str) and re.fullmatch(UTC_TIMESTAMP_PATTERN, value) is not None,
         "Inventory timestamps require explicit UTC and at most microsecond precision.",
