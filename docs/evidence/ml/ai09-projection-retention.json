@@ -1,0 +1,164 @@
+{
+  "recorded_at_utc": "2026-10-08T14:40:42.488089+00:00",
+  "scope": "AI09 pre-canonical audit follow-up; no full-profile generation or model qualification",
+  "source_base_main": "649d34ec5808aa61f5ce942086527e240f66de3b",
+  "source_base_main_required_ci": 37787824952,
+  "source_base_main_ci_inventory": {
+    "total": 25,
+    "success": 21,
+    "scoped_skips": [
+      "frontend-gate",
+      "terraform-validation-gate",
+      "kubernetes-gate",
+      "iac-security-gate"
+    ]
+  },
+  "code_commit": "5ed6592d66049467e519973a2492e2a3578c3826",
+  "implementations": {
+    "ordinary": "inventory-source-cached-ledger-2.2.1",
+    "planned": "planned-source-cached-execution-1.1.1"
+  },
+  "change": "Release original candidate after completed independent reconciliation, before projection; retain all four private output tables. Public simulation API, validation and complete native output remain unchanged.",
+  "controls": {
+    "native": {
+      "passed": 67,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 462.462,
+      "junit_sha256": "d029ceeba236161dd0256c715522a2882f2c7041f70f6939fa2c8956b08b908b"
+    },
+    "lifetime": {
+      "passed": 3,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 6.564,
+      "junit_sha256": "e98370732ddb3a0fc731ff3f0ea248b13a51dae0bfcb0e8b24a89faa8e903f45"
+    }
+  },
+  "static_controls": {
+    "configured_mypy_files": 43,
+    "ruff": "passed",
+    "format_files": 158
+  },
+  "paired_resource_control": {
+    "scope": "Three fresh paired processes of checked-in tiny native build; not canonical or full profile",
+    "baseline_commit": "a164cc6a03b43213b2b1adb3b63d81f4ad54f3b6",
+    "candidate_code_commit": "5ed6592d66049467e519973a2492e2a3578c3826",
+    "harness_sha256": "da4a4353a4f578c7efcc3c0a392044dfb4138de78012fc7b79d428df049a627d",
+    "source_58_tables_and_context_identical": true,
+    "raw": {
+      "baseline": [
+        {
+          "fixture": "existing_710001_10d_8p_2pairs_2stock_2026-09-30",
+          "measurement": "whole tiny native Source build; not full canonical capacity",
+          "wall_seconds": 1.5904050000244752,
+          "cpu_seconds": 1.5246169999999999,
+          "peak_python_bytes": 7825877,
+          "retained_python_bytes": 4535726,
+          "process_peak_rss_bytes": 83247104,
+          "tables_sha256": "7c78cca97da9c7c10ebf20e026ebf1d9e1976847d6cba01eb2e25b1df4f51f54",
+          "context_sha256": "2f15a3575dfce6ae85c237cfde261352eaa51a29060b4236b8a2b4a549f5819b"
+        },
+        {
+          "fixture": "existing_710001_10d_8p_2pairs_2stock_2026-09-30",
+          "measurement": "whole tiny native Source build; not full canonical capacity",
+          "wall_seconds": 1.5064772499899846,
+          "cpu_seconds": 1.5002440000000001,
+          "peak_python_bytes": 7821948,
+          "retained_python_bytes": 4531840,
+          "process_peak_rss_bytes": 83755008,
+          "tables_sha256": "7c78cca97da9c7c10ebf20e026ebf1d9e1976847d6cba01eb2e25b1df4f51f54",
+          "context_sha256": "2f15a3575dfce6ae85c237cfde261352eaa51a29060b4236b8a2b4a549f5819b"
+        },
+        {
+          "fixture": "existing_710001_10d_8p_2pairs_2stock_2026-09-30",
+          "measurement": "whole tiny native Source build; not full canonical capacity",
+          "wall_seconds": 1.5242109159880783,
+          "cpu_seconds": 1.516278,
+          "peak_python_bytes": 7825958,
+          "retained_python_bytes": 4535854,
+          "process_peak_rss_bytes": 81526784,
+          "tables_sha256": "7c78cca97da9c7c10ebf20e026ebf1d9e1976847d6cba01eb2e25b1df4f51f54",
+          "context_sha256": "2f15a3575dfce6ae85c237cfde261352eaa51a29060b4236b8a2b4a549f5819b"
+        }
+      ],
+      "candidate": [
+        {
+          "fixture": "existing_710001_10d_8p_2pairs_2stock_2026-09-30",
+          "measurement": "whole tiny native Source build; not full canonical capacity",
+          "wall_seconds": 1.4960758330125827,
+          "cpu_seconds": 1.491242,
+          "peak_python_bytes": 6534457,
+          "retained_python_bytes": 4535942,
+          "process_peak_rss_bytes": 80936960,
+          "tables_sha256": "7c78cca97da9c7c10ebf20e026ebf1d9e1976847d6cba01eb2e25b1df4f51f54",
+          "context_sha256": "2f15a3575dfce6ae85c237cfde261352eaa51a29060b4236b8a2b4a549f5819b"
+        },
+        {
+          "fixture": "existing_710001_10d_8p_2pairs_2stock_2026-09-30",
+          "measurement": "whole tiny native Source build; not full canonical capacity",
+          "wall_seconds": 1.5254041250154842,
+          "cpu_seconds": 1.518396,
+          "peak_python_bytes": 6534975,
+          "retained_python_bytes": 4533955,
+          "process_peak_rss_bytes": 71811072,
+          "tables_sha256": "7c78cca97da9c7c10ebf20e026ebf1d9e1976847d6cba01eb2e25b1df4f51f54",
+          "context_sha256": "2f15a3575dfce6ae85c237cfde261352eaa51a29060b4236b8a2b4a549f5819b"
+        },
+        {
+          "fixture": "existing_710001_10d_8p_2pairs_2stock_2026-09-30",
+          "measurement": "whole tiny native Source build; not full canonical capacity",
+          "wall_seconds": 1.4881239579990506,
+          "cpu_seconds": 1.485313,
+          "peak_python_bytes": 6534916,
+          "retained_python_bytes": 4531389,
+          "process_peak_rss_bytes": 76513280,
+          "tables_sha256": "7c78cca97da9c7c10ebf20e026ebf1d9e1976847d6cba01eb2e25b1df4f51f54",
+          "context_sha256": "2f15a3575dfce6ae85c237cfde261352eaa51a29060b4236b8a2b4a549f5819b"
+        }
+      ]
+    },
+    "medians": {
+      "wall_seconds": {
+        "baseline": 1.5242109159880783,
+        "candidate": 1.4960758330125827,
+        "change_percent": -1.845878590710448
+      },
+      "cpu_seconds": {
+        "baseline": 1.516278,
+        "candidate": 1.491242,
+        "change_percent": -1.651148404184466
+      },
+      "peak_python_bytes": {
+        "baseline": 7825877,
+        "candidate": 6534916,
+        "change_percent": -16.49605533028439
+      },
+      "retained_python_bytes": {
+        "baseline": 4535726,
+        "candidate": 4533955,
+        "change_percent": -0.039045568449236345
+      },
+      "process_peak_rss_bytes": {
+        "baseline": 83247104,
+        "candidate": 76513280,
+        "change_percent": -8.088958866364893
+      }
+    }
+  },
+  "previous_override_experiment": "Superseded for implementation evidence by the checked-in paired control above; it is not a canonical result.",
+  "retained_scope": [
+    "58 native tables and complete context",
+    "ordinary Source2.7 and planned Source2.8 validation",
+    "demand and physical independent plan replay",
+    "full dimensions, seeds, dates, limits and failed canonical history"
+  ],
+  "canonical_1_6_dispatched": false,
+  "next_recipe": "1.7, only after exact accepted head and resulting main CI in both repositories",
+  "new_project_fits": 0,
+  "fresh_final_reads": 0,
+  "project_journal_initialized": false,
+  "quality_qualified": false,
+  "stage_ready": false,
+  "published_head_and_main_CI_pending": true
+}
