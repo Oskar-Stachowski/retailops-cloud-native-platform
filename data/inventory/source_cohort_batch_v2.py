@@ -57,7 +57,7 @@ from data.inventory.source_observations import known_commerce_view, rebuild_obse
 from data.inventory.source_reconciliation import reconcile_source_commerce
 from data.inventory.source_tables import TableContext, tables_from_source
 
-FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.0"
+FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.1"
 UPSTREAM_SHA256 = {
     "source_cohort_batch.py": "7459292242696e6e1ea35ab2ea8171b31acab044d879f67168d379941c8dee84",
     "ledger.py": "4effb9cdd18b4eb18f5f1a0b60cb0fab7f467262a961d9a4baf6fa6c2d1e8e09",
@@ -317,6 +317,10 @@ def build_source_dataset_fast(
         if name in set(COMMERCE_TABLES) | set(PRIVATE_TABLES)
     }
     source = simulate_source_commerce_fast(candidate, effective, config)
+    # Reconciliation has finished; projection needs the fulfilled Source only.
+    # Keep the four private published tables and release original commerce rows.
+    private_tables = {name: candidate[name] for name in PRIVATE_TABLES}
+    del candidate
     settings = source["effective_configuration"]["scenario"]["settings"]
     projection_config = ProjectionConfig.from_payload(
         {
@@ -346,7 +350,7 @@ def build_source_dataset_fast(
     commerce["daily_price_observations"] = daily_price_observations(
         view["sales"], view["sale_price_references"]
     )
-    return {**commerce, **{n: candidate[n] for n in PRIVATE_TABLES}, **native}, context
+    return {**commerce, **private_tables, **native}, context
 
 
 def run(
