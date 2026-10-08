@@ -42,7 +42,7 @@ def snapshot_at(
     for movement in visible:
         by_position[movement.position].append(movement)
     result = []
-    units = {m.product_id: m.unit_of_measure for m in ledger.movements}
+    units = ledger.units_by_product()
     for position in balances:
         rows = by_position[position["product_id"], position["stock_location_id"]]
         result.append(

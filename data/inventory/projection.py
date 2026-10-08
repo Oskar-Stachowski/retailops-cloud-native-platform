@@ -12,6 +12,7 @@ from data.inventory.projection_contract import (
     ProjectionConfig,
     ProjectionOutput,
 )
+from data.inventory.projection_daily_index import DailyVerificationIndex
 from data.inventory.simulation_reconciliation import reconcile_simulation, verify_demand_outcomes
 from data.inventory.snapshots import daily_snapshots, day_periods
 from data.inventory.stockout import diagnose_windows, elapsed_microseconds, stockout_episodes
@@ -49,16 +50,23 @@ def physical_daily_balances(
     ledger: InventoryLedger, config: ProjectionConfig
 ) -> list[dict[str, Any]]:
     rows = []
-    by_position = defaultdict(list)
-    for movement in ledger.movements:
-        by_position[movement.position].append(movement)
+    by_position = ledger.movements_by_position()
     for midnight, start, end in day_periods(config):
         for product, location in ledger.scope:
-            movements = by_position[product, location]
-            preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
-            included = [m for m in movements if start <= m.occurred_time < end]
-            opening = sum(m.quantity_delta for m in included if m.movement_type == "opening_stock")
-            delta = sum(m.quantity_delta for m in included if m.movement_type != "opening_stock")
+            indexed = ledger.indexed_physical_period((product, location), start, end)
+            if indexed is None:
+                movements = by_position.get((product, location), ())
+                preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
+                included = [m for m in movements if start <= m.occurred_time < end]
+                opening = sum(
+                    m.quantity_delta for m in included if m.movement_type == "opening_stock"
+                )
+                delta = sum(
+                    m.quantity_delta for m in included if m.movement_type != "opening_stock"
+                )
+            else:
+                preceding, opening, closing = indexed
+                delta = closing - preceding - opening
             rows.append(
                 {
                     "product_id": product,
@@ -140,6 +148,18 @@ def _reconcile_daily(
     for movement in ledger.movements:
         by_position[movement.position].append(movement)
         first_unit_by_product.setdefault(movement.product_id, movement.unit_of_measure)
+    day_indexes = {day: index for index, day in enumerate(periods)}
+    ends = tuple(period[2] for period in periods.values())
+    cutoffs = tuple(end - timedelta(microseconds=1) for end in ends)
+    daily_indexes: dict[Position, DailyVerificationIndex] = {}
+
+    def index_for(position: Position) -> DailyVerificationIndex:
+        if position not in daily_indexes:
+            daily_indexes[position] = DailyVerificationIndex.build(
+                by_position[position], ends, cutoffs
+            )
+        return daily_indexes[position]
+
     for rows in (snapshots, physical):
         keys = [(r["business_date"], r["product_id"], r["stock_location_id"]) for r in rows]
         require(
@@ -157,24 +177,19 @@ def _reconcile_daily(
             == (start == midnight and end == midnight + timedelta(days=1)),
             "Wrong snapshot period or cutoff.",
         )
-        visible = [
-            m
-            for m in by_position[row["product_id"], row["stock_location_id"]]
-            if m.occurred_time <= cutoff and m.available_time <= cutoff
-        ]
-        known = any(m.movement_type == "opening_stock" for m in visible)
-        quantity = sum(m.quantity_delta for m in visible) if known else None
+        quantity, count, last_event, latest = index_for(
+            (row["product_id"], row["stock_location_id"])
+        ).visible[day_indexes[row["business_date"]]]
+        known = quantity is not None
         require(
             (row["on_hand"], row["reserved_qty"], row["available_qty"], row["status"])
             == (quantity, 0 if known else None, quantity, "known" if known else "not_available"),
             "Snapshot differs from known ledger balance.",
         )
         require(
-            row["movement_count"] == len(visible)
-            and row["last_inventory_event_id"]
-            == (visible[-1].inventory_event_id if visible else None)
-            and row["source_available_at"]
-            == (max(m.available_time for m in visible).isoformat() if visible else None),
+            row["movement_count"] == count
+            and row["last_inventory_event_id"] == last_event
+            and row["source_available_at"] == (latest.isoformat() if latest is not None else None),
             "Snapshot source lineage is inconsistent.",
         )
         require(
@@ -191,14 +206,9 @@ def _reconcile_daily(
         )
     for row in physical:
         _day, start, end = periods[row["business_date"]]
-        movements = by_position[row["product_id"], row["stock_location_id"]]
-        closing = sum(m.quantity_delta for m in movements if m.occurred_time < end)
-        preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
-        opening = sum(
-            m.quantity_delta
-            for m in movements
-            if m.movement_type == "opening_stock" and start <= m.occurred_time < end
-        )
+        preceding, opening, closing = index_for(
+            (row["product_id"], row["stock_location_id"])
+        ).physical[day_indexes[row["business_date"]]]
         require(
             utc_timestamp(row["snapshot_at"]) == end - timedelta(microseconds=1)
             and (

@@ -57,10 +57,15 @@ from data.inventory.source_observations import known_commerce_view, rebuild_obse
 from data.inventory.source_reconciliation import reconcile_source_commerce
 from data.inventory.source_tables import TableContext, tables_from_source
 
-FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.1"
+FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.2"
 UPSTREAM_SHA256 = {
+    "snapshots.py": "e705092e4ce5c97a80b2b9760faa1298388a497093eea17a4e4dd162bd48dd65",
     "source_cohort_batch.py": "7459292242696e6e1ea35ab2ea8171b31acab044d879f67168d379941c8dee84",
-    "ledger.py": "4effb9cdd18b4eb18f5f1a0b60cb0fab7f467262a961d9a4baf6fa6c2d1e8e09",
+    "ledger.py": "e4d4974cbfe4c12bab6cbda68cc54190b553d2a3f036ed70ee7c24644b1e0244",
+    "ledger_index.py": "03fc7f949f65556f962b6165453bce1525d82df609127da7320cae9bd575d6a4",
+    "projection.py": "377b66cf4e5db634982edcfb5d68d05e89c84f493d799fba9e4ef2e735c08989",
+    "projection_daily_index.py": "dde38576cc37ecf7c13cce8a958baa8a0d05d64510991a16acf9979978d4d52a",
+    "stockout.py": "438f04ab76b2881fe983936de5a8b95440d4bba30664275f471794c47ae69f4a",
     "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "simulator.py": "7b10a76f7a4ea93b40557d402a3f6cd5a6400e939e78c3ffa64dadc4b531dcd7",
@@ -83,7 +88,7 @@ def implementation() -> dict[str, Any]:
         "version": FAST_PATH_VERSION,
         "code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "upstream_sha256": verify_upstream_pins(),
-        "optimization": "cached_immutable_records_queue_events_borrowed_requests_and_early_release",
+        "optimization": "cached_immutable_records_queue_events_borrowed_requests_early_release_and_daily_query_indexes",
         "rng_and_chronological_process": "unchanged",
         "source_validation": "ordinary_source_2_7_writer_and_reader_all_gates",
     }

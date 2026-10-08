@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import asdict, dataclass, fields
 from functools import cached_property
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
 from data.generator.common import deterministic_uuid
@@ -15,6 +16,7 @@ from data.inventory.contract import (
     utc_timestamp,
     validate_structure,
 )
+from data.inventory.ledger_index import PositionIndex
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -194,6 +196,50 @@ class InventoryLedger:
     stock_location_codes: tuple[tuple[str, str], ...]
     transfers: tuple[tuple[InventoryMovement, InventoryMovement], ...]
 
+    @cached_property
+    def _movement_groups(self) -> Mapping[Position, tuple[InventoryMovement, ...]]:
+        grouped: dict[Position, list[InventoryMovement]] = defaultdict(list)
+        for movement in self.movements:
+            grouped[movement.position].append(movement)
+        return MappingProxyType({position: tuple(rows) for position, rows in grouped.items()})
+
+    def movements_by_position(self) -> Mapping[Position, tuple[InventoryMovement, ...]]:
+        """Group movements once for validated immutable ledgers."""
+        if getattr(self, "_payload_validated", False):
+            return self._movement_groups
+        grouped: dict[Position, list[InventoryMovement]] = defaultdict(list)
+        for movement in self.movements:
+            grouped[movement.position].append(movement)
+        return {position: tuple(rows) for position, rows in grouped.items()}
+
+    @cached_property
+    def _product_units(self) -> Mapping[str, str]:
+        return MappingProxyType({m.product_id: m.unit_of_measure for m in self.movements})
+
+    def units_by_product(self) -> Mapping[str, str]:
+        """Read units once for validated immutable ledgers."""
+        if getattr(self, "_payload_validated", False):
+            return self._product_units
+        return {m.product_id: m.unit_of_measure for m in self.movements}
+
+    def indexed_physical_period(
+        self, position: Position, start: datetime, end: datetime
+    ) -> tuple[int, int, int] | None:
+        """Return indexed physical sums or request native replay for unvalidated ledgers."""
+        if not getattr(self, "_payload_validated", False):
+            return None
+        index = self._position_index.get(position)
+        return index.physical_period(start, end) if index is not None else (0, 0, 0)
+
+    @cached_property
+    def _position_index(self) -> Mapping[Position, PositionIndex]:
+        return MappingProxyType(
+            {
+                position: PositionIndex.build(rows)
+                for position, rows in self._movement_groups.items()
+            }
+        )
+
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> InventoryLedger:
         validate_structure(payload)
@@ -236,6 +282,10 @@ class InventoryLedger:
             ordered, tuple(sorted(scope)), tuple(sorted(codes.items())), transfer_pairs(ordered)
         )
         result._balances(ordered)
+        # The fast query index is only used after this complete independent
+        # validation. A manually constructed or dataclass-replaced ledger keeps
+        # the original lazy filtering/replay and its exception semantics.
+        object.__setattr__(result, "_payload_validated", True)
         return result
 
     def _balances(self, movements: tuple[InventoryMovement, ...]) -> dict[Position, int]:
@@ -266,7 +316,23 @@ class InventoryLedger:
         self, occurred_through: str, *, known_at: str | None = None
     ) -> list[dict[str, Any]]:
         """Return physical balances or only the facts available at a knowledge cutoff."""
-        balances = self._balances(self.known_movements(occurred_through, known_at=known_at))
+        happened = utc_timestamp(occurred_through)
+        known = utc_timestamp(known_at) if known_at is not None else None
+        balances: dict[Position, int] = {}
+        if getattr(self, "_payload_validated", False):
+            for position, index in self._position_index.items():
+                supported, quantity = index.balance(happened, known)
+                if not supported:
+                    # Preserve exact native filtering, ordering and errors
+                    # whenever late availability breaks a physical prefix.
+                    balances = self._balances(
+                        self.known_movements(occurred_through, known_at=known_at)
+                    )
+                    break
+                if quantity is not None:
+                    balances[position] = quantity
+        else:
+            balances = self._balances(self.known_movements(occurred_through, known_at=known_at))
         return [
             {
                 "product_id": product,
