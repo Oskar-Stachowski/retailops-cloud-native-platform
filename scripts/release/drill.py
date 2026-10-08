@@ -18,7 +18,7 @@ from tempfile import TemporaryDirectory
 from uuid import uuid4
 
 from inputs import build_inputs, harness_inputs, verify_source_inputs
-from release import compatible, migration_contract, require, verify_image
+from release import additive_expansion, compatible, migration_contract, require, verify_image
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "scripts/release/compose.yml"
@@ -284,7 +284,7 @@ class Drill:
             "snapshot": expected["snapshot"],
         }
 
-    def exercise(self, previous: dict, candidate: dict, old_dir: Path, new_dir: Path) -> None:
+    def exercise(self, previous: dict, candidate: dict, old_dir: Path, new_dir: Path) -> None:  # noqa: PLR0915 -- ordered isolated upgrade/rollback drill
         require(
             previous["source_commit"] != candidate["source_commit"],
             "Two distinct commits are required",
@@ -299,10 +299,52 @@ class Drill:
             ]
         )
         compatible(candidate, previous, previous["migration"]["head"])
+        expansion = additive_expansion(candidate, previous)
         self.select(previous, old_dir)
         self.run([*self.compose, "up", "-d", "--wait", "--wait-timeout", "90", "db"], stream=True)
+        if expansion is not None:
+            # Forward migration occurs once, before either application version owns writes.
+            self.select(candidate, new_dir)
         self.app("alembic", "upgrade", "head")
+        self.select(previous, old_dir)
         self.app("python", "scripts/seed_demo_data.py")
+        if expansion is not None:
+            fixture = json.loads(
+                (
+                    ROOT
+                    / "services/api/app/contracts/intelligence-v2/forecast_generated.fixture.json"
+                ).read_text()
+            )
+            self.report["additive_expansion"] = {
+                **expansion,
+                "seeded_projection": json.loads(
+                    self.app(
+                        "python",
+                        "/release/checks.py",
+                        "seed-expansion",
+                        data={
+                            "forecast": fixture,
+                            "models": [
+                                json.loads(
+                                    (
+                                        ROOT / "services/api/app/contracts/intelligence-v2" / name
+                                    ).read_text()
+                                )
+                                for name in (
+                                    "anomaly_detected.fixture.json",
+                                    "stockout_risk_scored.fixture.json",
+                                )
+                            ],
+                            "suggestion": json.loads(
+                                (
+                                    ROOT
+                                    / "services/api/app/contracts/intelligence-suggestions-v1/recommendation_generated.fixture.json"
+                                ).read_text()
+                            ),
+                        },
+                    )
+                ),
+            }
         expected = json.loads(self.app("python", "/recovery/checks.py", "prepare"))
         self.report["before"] = expected["snapshot"]
         self.deploy(previous, old_dir)
@@ -373,7 +415,11 @@ class Drill:
         )
         self.report["after_rollback_write"] = expected["snapshot"]
         self.report["database_head"] = self.db_head()
-        self.report["migration_action"] = "same-head upgrade check; no downgrade, restore or reseed"
+        self.report["migration_action"] = (
+            "one initial fingerprinted additive expansion; both image versions retain full schema/data; no downgrade, restore or reseed"
+            if expansion is not None
+            else "same-head upgrade check; no downgrade, restore or reseed"
+        )
         previous["validation"] = candidate["validation"] = "local_drill_passed"
         self.report["status"] = "passed"
 

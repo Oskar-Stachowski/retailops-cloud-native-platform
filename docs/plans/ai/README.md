@@ -1,9 +1,12 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: AI 05 i AI 06 mają odbiór. AI 07 ma kompletną kwalifikację v4, oba detektory i lifecycle/batch/API; formalne `ready` na main wymaga obu scalonych PR-ów i zielonego Required CI HEAD/merge. Aktualizacja: 05.10.2026.**
+**Status: AI 07 i AI 08 są READY na zaakceptowanych main; AI 05/06 mają odbiór.
+AI 10 jest w końcowej integracji. Aktualizacja: 07.10.2026.**
 [Końcowy stan AI 07](etapy/07-anomalie-dq.md) oraz
 [bieżący status obu publikacji](../../STATUS.md) wskazują exact SHA/runy w PR #97/#24.
 Dalsza integracja transportu i UI wyników należy do AI 10.
+[Bieżący odbiór AI10](../../evidence/ai/10/README.md) podaje przyjęty Source → AI
+SQL/ACK oraz pozostałe native runtime i protected publikację na obu main.
 
 **Status: AI 08 jest READY; AI 04/v12, AI 05 i AI 06 mają przyjęte odbiory. Aktualizacja: 05.10.2026.**
 [Końcowy odbiór AI 08](../../evidence/ai/08/final/README.md) i jego receipt wskazują

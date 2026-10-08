@@ -77,6 +77,50 @@ def test_published_runner_releases_build_state_and_fully_revalidates(parity_samp
     ]
 
 
+@pytest.mark.parametrize("seed", [42, 137, 2026])
+def test_cached_native_source_matches_complete_copy_and_detaches_consumed_inputs(seed, monkeypatch):
+    from data.generator.configuration import DatasetGenerationConfig
+    from data.inventory import source_cohort_batch_v2 as cached
+    from data.inventory.run_source_dataset import default_inventory_config
+
+    generation = DatasetGenerationConfig(
+        profile="ai-load", days=45, products=2, stores=1, warehouses=1,
+        seed=seed, forecast_plan_days=14, max_daily_rows=90,
+    )
+    candidate = build_dataset(generation)
+    original = deepcopy(candidate)
+    effective = resolve_generation_config(generation)
+    config = default_inventory_config(generation)
+    actual = cached.simulate_source_commerce_fast(candidate, effective, config)
+    assert candidate == original
+    monkeypatch.setattr(cached, "_copy_commerce_inputs", deepcopy)
+    expected = cached.simulate_source_commerce_fast(candidate, effective, config)
+    assert actual == expected and candidate == original
+    actual["commerce"]["product_catalog"][0]["name"] = "changed output only"
+    assert candidate == original
+
+
+def test_cached_native_orchestration_does_not_copy_unconsumed_candidate_outputs():
+    from data.generator.configuration import DatasetGenerationConfig
+    from data.inventory import source_cohort_batch_v2 as cached
+    from data.inventory.run_source_dataset import default_inventory_config
+
+    class Unused:
+        def __deepcopy__(self, memo):
+            raise AssertionError("Cached source copied an unused candidate table")
+
+    generation = DatasetGenerationConfig(
+        profile="ai-load", days=45, products=2, stores=1, warehouses=1, seed=42,
+        max_daily_rows=90,
+    )
+    candidate = build_dataset(generation)
+    candidate["unrelated_private_output"] = Unused()
+    result = cached.simulate_source_commerce_fast(
+        candidate, resolve_generation_config(generation), default_inventory_config(generation)
+    )
+    assert "unrelated_private_output" not in result["commerce"]
+
+
 @pytest.fixture
 def simulators(parity_sample):
     generation = parity_sample["generation"]

@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,6 +9,9 @@ from app.api import (
     dashboard,
     forecast_runs,
     forecasts,
+    intelligence,
+    intelligence_models,
+    intelligence_suggestions,
     inventory,
     me,
     metrics,
@@ -15,12 +20,15 @@ from app.api import (
     products,
     recommendations,
     sales,
+    source_bundles,
+    source_reads,
     stock_risks,
 )
 from app.api.errors import register_exception_handlers
 from app.api.health import router as health_router
 from app.core.config import settings
 from app.core.correlation import CorrelationIdMiddleware
+from app.core.intelligence_cache import IntelligenceCacheMiddleware
 from app.core.logging import configure_logging
 from app.core.tracing import configure_tracing
 from app.services.realtime_consumer import build_realtime_event_consumer
@@ -43,6 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(CorrelationIdMiddleware)
+app.add_middleware(IntelligenceCacheMiddleware)
 configure_tracing(app)
 
 register_exception_handlers(app)
@@ -63,3 +72,21 @@ app.include_router(sales.router)
 app.include_router(stock_risks.router)
 app.include_router(me.router)
 app.include_router(notifications.router)
+app.include_router(intelligence.router)
+app.include_router(intelligence_models.router)
+app.include_router(intelligence_suggestions.router)
+app.include_router(source_reads.router)
+app.include_router(source_bundles.router)
+
+_original_openapi = app.openapi
+
+
+def intelligence_openapi() -> dict[str, Any]:
+    schema = _original_openapi()
+    intelligence.add_payload_openapi(schema)
+    intelligence_models.add_payload_openapi(schema)
+    intelligence_suggestions.add_payload_openapi(schema)
+    return schema
+
+
+app.openapi = intelligence_openapi

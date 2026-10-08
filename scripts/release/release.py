@@ -3,6 +3,7 @@
 
 import ast
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -54,13 +55,30 @@ def migration_contract(directory: Path) -> dict:
     return {"head": head, "history_sha256": digest.hexdigest()}
 
 
+def additive_expansion(current: dict, target: dict) -> dict | None:
+    """Recognize only the explicitly fingerprinted AI10 expansion, never arbitrary new heads."""
+    plan = json.loads(Path(__file__).with_name("additive-rollback.json").read_text())
+    if (
+        plan["version"] == "retailops-additive-rollback-1.0"
+        and current["migration"] == plan["expanded"]
+        and target["migration"] == plan["parent"]
+    ):
+        return plan
+    return None
+
+
 def compatible(current: dict, target: dict, database_head: str) -> None:
+    expansion = None
+    if current["migration"] != target["migration"]:
+        expansion = additive_expansion(current, target)
     require(
-        current["migration"] == target["migration"],
+        current["migration"] == target["migration"] or expansion is not None,
         "Application-only rollback blocked: migration histories differ; review recovery/forward-fix plan",
     )
     require(
-        database_head == target["migration"]["head"],
+        database_head in {target["migration"]["head"], current["migration"]["head"]}
+        if expansion is not None
+        else database_head == target["migration"]["head"],
         "Application-only rollback blocked: database revision is outside the verified contract",
     )
 
