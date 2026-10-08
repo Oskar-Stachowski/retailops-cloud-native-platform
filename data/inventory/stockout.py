@@ -19,11 +19,8 @@ def elapsed_microseconds(delta: timedelta) -> int:
     return (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
 
 
-def _position_movements(ledger: InventoryLedger) -> dict[Position, list[InventoryMovement]]:
-    result: dict[Position, list[InventoryMovement]] = defaultdict(list)
-    for movement in ledger.movements:
-        result[movement.position].append(movement)
-    return result
+def _position_movements(ledger: InventoryLedger) -> dict[Position, tuple[InventoryMovement, ...]]:
+    return dict(ledger.movements_by_position())
 
 
 def stockout_episodes(
