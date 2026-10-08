@@ -1,3 +1,14 @@
+AI09 follow-up: source2.8+knownplans jest przygotowany z osobnymi wariantami
+schematów, pełnym process replay oraz testami native; nie jest odbiorem etapu.
+[Evidence](evidence/ai/09/planned-anomaly-preparation.md) zachowuje też pojedynczy
+Kafka coordinator read failure exact maincbcac6eb/CI37629010997 i ograniczoną
+poprawkę helpera. PR #103 na `16d34887` zaliczył pełny Required CI
+[37637743439](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37637743439):
+19 success, 4 celowe skipped, z zielonym required-result. Integracja nowszego
+main `467f9903` zachowuje wspólny helper Kafka i wszystkie przyrosty AI 10.
+18 testów offsetów, configured Ruff/format oraz mypy 43 źródeł są zaliczone;
+pełne CI nowego head i chronionego main pozostaje wymagane.
+
 # Aktualny status RetailOps
 
 **2026-10-07: AI 09 pozostaje in_progress.**
@@ -6,13 +17,23 @@ opisuje ograniczenie kopii wejść oraz dziennego replayu inventory:
 456 testów regresji i zgodne dane kontrolne. Pomiar pełnego profilu,
 rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamknięte.
 
-**2026-10-07 — AI 10: końcowa integracja w toku.**
-[Bieżący odbiór i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
-rzeczywisty Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK i sumy
-4 → 7. Stockout i anomaly mają odebrane oryginalne AI SQL publishery,
-pełne read API i built UI, również po wspólnych optymalizacjach CI.
-Pełny v12 na 102 dniach nadal przechodzi odbiór.
-Protected merge i Required CI obu main pozostają warunkiem zamknięcia.
+**2026-10-07 — AI 10: READY, pełny odbiór integracji.**
+[Raport i checklist](evidence/ai/10/README.md) wiążą snapshot/REST/stream,
+Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK oraz korektę 4 → 7.
+Oryginalne publishery SQL dostarczyły 40 stockout, 1232 anomaly i 56 forecast;
+Source sprawdził pełne projekcje, duplikaty, authenticated TCP API i built UI.
+[Pełny V12](evidence/ai/10/v12-22de575.json), run `37665627162`, zaliczył
+273 testy granic i rzeczywisty test Source bez failures/errors/skips.
+Własne zasoby kontenerowe, sześć handoff objects i unikalny secret usunięto;
+oryginalne S3 i inne sesje zachowano. [Source baseline CI](evidence/ai/10/source-code-main-ci.json)
+ma 30/30; [nowszy scoped main CI](evidence/ai/10/source-b723489-main-ci.json)
+21 success / 4 przewidziane skipped, a [AI main CI](evidence/ai/10/ai-b0-main-ci.json) 17/17.
+Końcowe dokumenty podlegają normalnym protected merges i Required CI dokładnych main.
+V12 pozostaje wyłącznie development z oryginalnym quality `not_ready`.
+Sugestie są jawnym fixture AI10; rzeczywisty producent należy do AI12.
+[Overlay istniejących projektów](runbooks/intelligence-existing-projects.md) zachowuje
+oddzielne bazy, Source-owned external network, jeden broker i prywatne granty.
+AI09 pozostaje odrębnym, otwartym etapem.
 
 **AI 07 — READY na zaakceptowanych main, kwalifikacja `synthetic_ai_07_portfolio_v4`.**
 Kompletny producent jest w [PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97),

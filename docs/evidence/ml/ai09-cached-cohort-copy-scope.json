@@ -1,0 +1,71 @@
+{
+  "scope": "Python allocation component control, not process RSS or completed canonical source",
+  "generation": {
+    "days": 45,
+    "products": 2,
+    "stores": 1,
+    "warehouses": 1,
+    "max_daily_rows": 90,
+    "seed": 42,
+    "forecast_plan_days": 14
+  },
+  "measurements": {
+    "complete": {
+      "retained_python_allocations_bytes": 759416,
+      "peak_python_allocations_bytes": 916576,
+      "copied_tables": 40
+    },
+    "consumed": {
+      "retained_python_allocations_bytes": 661984,
+      "peak_python_allocations_bytes": 807816,
+      "copied_tables": 31
+    }
+  },
+  "peak_reduction_fraction": 0.11865900918199912,
+  "upstream_pins_verified": {
+    "source_cohort_batch.py": "3e3ecafba7298d343a8c9624617bdc6461e0925d5a446aeab9d011acc3909e00",
+    "ledger.py": "3e50ac30d3732789680461d96d5855f01619d0978de56e774d11565df884565f",
+    "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
+    "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
+    "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
+    "source_commerce.py": "9322d5240b1762db498929febed872bd207bd683ec3b1785cc0a0674f43e09c7"
+  },
+  "full_profile_resource_qualified": false,
+  "closed_ai07_ai08_reopened": false,
+  "native_regression": {
+    "passed": 23,
+    "seconds": 37.03,
+    "command": "pytest data/tests/test_source_cohort_batch_v2.py data/tests/test_source_cohort_forecast_plans.py data/tests/test_source_commerce_copy_scope.py",
+    "models_fitted": 0,
+    "all58_tables_csv_context_and_quality_parity": true,
+    "forecast_plan_seeds": [
+      42,
+      137,
+      2026
+    ],
+    "alias_mutation_guard_passed": true,
+    "unused_output_no_copy_guard_passed": true
+  },
+  "retained_failed_controls": [
+    {
+      "failed": 4,
+      "passed": 19,
+      "seconds": 35.29,
+      "cause": "new ai-load fixtures lacked required max_daily_rows; fixed explicit90, production gates unchanged"
+    }
+  ],
+  "base_main": "b7234899769119c67f27a62867c1d2153dbd6a00",
+  "full_canonical_run_failed": {
+    "repo": "retailops-ai-intelligence",
+    "run": 37676033214,
+    "reason": "tree_rss_limit",
+    "rss_bytes": 8592396288,
+    "wall_seconds": 1751.742747054,
+    "already_included_AI08_indexed_IDs_cached_ledger_and_build_state_release": true
+  },
+  "change": "Reuse existing pinned source_bridge._copy_commerce_inputs in cached orchestration, detach all consumed rows while excluding unused private outputs",
+  "pending": [
+    "Full exact-head Required CI,protected merge and exact-main CI",
+    "A separately frozen canonical capacity recipe retaining all3 failures; no automatic dispatch or reduced profile"
+  ]
+}

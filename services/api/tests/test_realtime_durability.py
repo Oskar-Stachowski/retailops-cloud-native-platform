@@ -283,10 +283,14 @@ def committed_offsets(client, *, timeout=10):
         if remaining <= 0:
             break
         try:
-            return client.committed(
+            committed = client.committed(
                 [TopicPartition(TOPIC, 0), TopicPartition(TOPIC, 1)],
                 timeout=min(2, remaining),
             )
+            for partition in committed:
+                if partition.error is not None:
+                    raise KafkaException(partition.error)
+            return committed
         except KafkaException as error:
             if error.args[0].code() not in (
                 KafkaError.NOT_COORDINATOR,

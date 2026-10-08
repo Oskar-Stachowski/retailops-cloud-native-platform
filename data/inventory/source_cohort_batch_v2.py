@@ -13,7 +13,6 @@ import hashlib
 import json
 import resource
 import sys
-from copy import deepcopy
 from datetime import UTC, date, datetime
 from pathlib import Path
 from time import perf_counter
@@ -46,7 +45,7 @@ from data.inventory.projection import project_inventory
 from data.inventory.projection_contract import ProjectionConfig
 from data.inventory.run_source_dataset import default_inventory_config
 from data.inventory.snapshots import daily_snapshots
-from data.inventory.source_bridge import COMMERCE_TABLES
+from data.inventory.source_bridge import COMMERCE_TABLES, _copy_commerce_inputs
 from data.inventory.source_cohort_batch import IndexedSourceCommerceSimulator
 from data.inventory.source_contract import SourceInventoryConfig
 from data.inventory.source_dataset_contract import PRIVATE_TABLES
@@ -190,7 +189,7 @@ def simulate_source_commerce_fast(
     verify_upstream_pins()
     validate_demand(candidate, generation)
     inputs = source_foundation(candidate, generation, config)
-    tables = deepcopy(candidate)
+    tables = _copy_commerce_inputs(candidate)
     simulator = CachedLedgerSourceCommerceSimulator(inputs, tables, generation, config)
     result = simulator.execute()
     tables["sales"] = [
