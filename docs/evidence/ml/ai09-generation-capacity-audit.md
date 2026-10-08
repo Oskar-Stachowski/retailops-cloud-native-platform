@@ -70,3 +70,21 @@ pomiary i koszty, zamiast wybierać wyłącznie korzystne wyniki.
 Nie wykonano nowych projektowych fitów ani odczytów świeżego final testu.
 Poprawki i testy są wykonywane w osobnych worktree; otwarte sesje i usługi
 użytkownika pozostają nienaruszone.
+
+Dalszy audyt przed uruchomieniem canonical wykrył pełny pierwotny kandydat
+pozostający w pamięci podczas drugiej projekcji. Implementacje `2.2.1` oraz
+`1.1.1` zwalniają go dopiero po zakończeniu niezależnej rekonsyliacji i zachowują
+cztery prywatne tabele publikowane w wyniku. Publiczny symulator nadal ma
+dostęp do wszystkich pierwotnych danych podczas walidacji.
+
+[Dowód retencji](ai09-projection-retention.json) zawiera trzy rzeczywiste
+kontrole czasu życia dla ordinary, demand i physical oraz 67 zaliczonych
+regresji natywnych. Trzy świeże pary procesów z zapisanym kodem zachowują hash
+wszystkich 58 tabel i context. Mediany małego pełnego build: alokacje Python
+−16.50%, RSS procesu −8.09%, CPU −1.65%, retained Python −0.04%. Nie jest to
+pomiar canonical ani prognoza identycznej poprawy na pełnych danych.
+
+Pierwszy audyt został scalony przez PR108; CI wynikowego main `649d34ec`
+(run `37787824952`) ma komplet 25 zadań: 21 success i cztery deklarowane skips.
+Receptura 1.6 pozostaje zachowana i nieuruchomiona. Nowa receptura 1.7 obejmie
+poprawkę retencji dopiero po pełnym odbiorze head i main obu repozytoriów.

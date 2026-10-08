@@ -47,9 +47,9 @@ if TYPE_CHECKING:
     from data.inventory.source_contract import SourceInventoryConfig
     from data.inventory.source_tables import TableContext
 
-VERSION = "planned-source-cached-execution-1.1.0"
+VERSION = "planned-source-cached-execution-1.1.1"
 UPSTREAM_SHA256 = {
-    "inventory/source_cohort_batch_v2.py": "958d93170487c030c6eb1579ce256ed03331f6a2bcdae5272754069559122c05",
+    "inventory/source_cohort_batch_v2.py": "187f3ca7d3e06b8e682cf190380ff4d11917033518709a4a0273a4e6d2b0cbb8",
     "inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",
@@ -218,6 +218,9 @@ def build_tables(
     source = simulate_planned_source(
         candidate, effective, config, anomaly_plan=demand, physical_plan=physical
     )
+    # Full independent reconciliation has consumed the original request rows.
+    private_tables = {name: candidate[name] for name in PRIVATE_TABLES}
+    del candidate
     settings = source["effective_configuration"]["scenario"]["settings"]
     projection_config = ProjectionConfig.from_payload(
         {
@@ -247,4 +250,4 @@ def build_tables(
     commerce["daily_price_observations"] = daily_price_observations(
         view["sales"], view["sale_price_references"]
     )
-    return {**commerce, **{n: candidate[n] for n in PRIVATE_TABLES}, **native}, context
+    return {**commerce, **private_tables, **native}, context
