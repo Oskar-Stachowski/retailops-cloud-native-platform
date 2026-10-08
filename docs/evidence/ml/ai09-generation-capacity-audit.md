@@ -41,7 +41,7 @@ Wprowadzone poprawki:
   rekonsyliacja i niezależny replay planów pozostają wymagane.
 
 Source 2.7/2.8 i snapshot 1.1/1.2 zachowują swoje kontrakty. Nowe wersje
-implementacji to `inventory-source-cached-ledger-2.2.0` oraz
+implementacji pierwszej części audytu to `inventory-source-cached-ledger-2.2.0` oraz
 `planned-source-cached-execution-1.1.0`. Przypięcia upstream są aktualizowane
 jawnie; stare zamrożone commity i receptury pozostają niezmienne.
 
@@ -86,5 +86,14 @@ pomiar canonical ani prognoza identycznej poprawy na pełnych danych.
 
 Pierwszy audyt został scalony przez PR108; CI wynikowego main `649d34ec`
 (run `37787824952`) ma komplet 25 zadań: 21 success i cztery deklarowane skips.
-Receptura 1.6 pozostaje zachowana i nieuruchomiona. Nowa receptura 1.7 obejmie
-poprawkę retencji dopiero po pełnym odbiorze head i main obu repozytoriów.
+Receptura 1.6 pozostaje zachowana i nieuruchomiona. Poprawkę retencji scalił
+PR109; wynikowy main `c04ca954` (run `37798616664`) zaliczył komplet 25 zadań:
+21 success i cztery deklarowane skips. Rzeczywista próba 1.7 przekroczyła 8 GiB
+RSS po 1702.79 s, przed ukończeniem generacji.
+
+Po podniesieniu limitu do 12 GiB rzeczywista próba 1.8 (`37824794411`) osiągnęła
+limit 3600 s przy próbkowanym RSS 9066307584 B i 0/5 ukończonych faz. Następna
+część audytu obejmuje [indeksy zapytań i niezależną weryfikację dzienną](ai09-ledger-query-index.md),
+w tym prefiksy okresów fizycznych i jednokrotny odczyt jednostek produktów.
+Wersje `2.2.2` i `1.1.2` wymagają pełnego odbioru head i wynikowego main przed
+nową diagnostyką. Pomiary małych kontroli są oddzielone od kwalifikacji canonical.

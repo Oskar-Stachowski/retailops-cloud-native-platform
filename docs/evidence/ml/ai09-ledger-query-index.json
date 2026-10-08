@@ -1,0 +1,814 @@
+{
+  "recorded_at_utc": "2026-10-08T20:21:35.918458+00:00",
+  "scope": "AI09 CPU audit after actual1.8 wall_limit; native controls, not full-profile or scientific qualification",
+  "baseline_accepted_main": "c04ca9545e1698de5f9201f5067bafb6769df226",
+  "baseline_producer_code_commit": "4dacf0403add494f74e4b4f22497f6206de753d9",
+  "baseline_main_required_ci": 37798616664,
+  "baseline_ci": {
+    "total": 25,
+    "success": 21,
+    "scoped_skips": [
+      "frontend-gate",
+      "terraform-validation-gate",
+      "kubernetes-gate",
+      "iac-security-gate"
+    ]
+  },
+  "code_commit": "dbb8d0c4f16e029cd3d080d1c62d654f66f5032b",
+  "code_files_sha256": {
+    "data/inventory/ledger.py": "e4d4974cbfe4c12bab6cbda68cc54190b553d2a3f036ed70ee7c24644b1e0244",
+    "data/inventory/ledger_index.py": "03fc7f949f65556f962b6165453bce1525d82df609127da7320cae9bd575d6a4",
+    "data/inventory/stockout.py": "438f04ab76b2881fe983936de5a8b95440d4bba30664275f471794c47ae69f4a",
+    "data/inventory/projection.py": "377b66cf4e5db634982edcfb5d68d05e89c84f493d799fba9e4ef2e735c08989",
+    "data/inventory/projection_daily_index.py": "dde38576cc37ecf7c13cce8a958baa8a0d05d64510991a16acf9979978d4d52a",
+    "data/inventory/snapshots.py": "e705092e4ce5c97a80b2b9760faa1298388a497093eea17a4e4dd162bd48dd65",
+    "data/inventory/source_cohort_batch_v2.py": "ecbe27a7fd0186237dc44dba0d3a1a63c7ac81b2d1d8c972421f4af434beb3b1",
+    "data/anomalies/source_cohort.py": "7be2a5ced798fe83dd4d8897ee766bb252d1e3a1a7d2288bd796329bfaf3ee45",
+    "data/tests/test_ledger_query_index.py": "8da1fcd676edfbfa3ed53a6cc35c2c4d25d1de266b751f9f8acd6e45158d0271"
+  },
+  "implementations": {
+    "ordinary": "inventory-source-cached-ledger-2.2.2",
+    "planned": "planned-source-cached-execution-1.1.2"
+  },
+  "trigger": {
+    "actual_ai_run": 37824794411,
+    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/37824794411",
+    "reason": "wall_limit",
+    "wall_seconds": 3600.57873507,
+    "sampled_tree_peak_rss_bytes": 9066307584,
+    "tree_rss_budget_bytes": 12884901888,
+    "completed_phases": 0,
+    "stack_evidence_limit": "Sampled locations show repeated execution, not allocation ownership or the exact kill stack."
+  },
+  "native_controls": {
+    "tests": 274,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 460.15,
+    "junit_sha256": "530a9dd7645caa0d077d8db9ebd839e5c255bf7b3ecbc2cee78cdb9ea08966b7"
+  },
+  "static_controls": {
+    "configured_mypy_files": 43,
+    "new_index_module_mypy_files": 2,
+    "ruff": "passed",
+    "format_files": 160,
+    "diff_hygiene": "passed"
+  },
+  "final_paired_whole_small_build": {
+    "harness_sha256": "61788ef641d46fff71e4c034748e57e620fd948e08505da1ec3069ada18d7d98",
+    "all_58_tables_and_context_identical": true,
+    "raw": {
+      "baseline": [
+        {
+          "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+          "scope": "local paired native control; not canonical or scientific qualification",
+          "wall_seconds": 7.516680125001585,
+          "cpu_seconds": 7.455789,
+          "peak_python_bytes": 28470142,
+          "retained_python_bytes": 16839010,
+          "process_peak_rss_bytes": 112558080,
+          "table_count": 58,
+          "movement_count": 1537,
+          "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+          "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+        },
+        {
+          "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+          "scope": "local paired native control; not canonical or scientific qualification",
+          "wall_seconds": 7.48212991701439,
+          "cpu_seconds": 7.468125000000001,
+          "peak_python_bytes": 28471703,
+          "retained_python_bytes": 16839705,
+          "process_peak_rss_bytes": 113868800,
+          "table_count": 58,
+          "movement_count": 1537,
+          "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+          "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+        },
+        {
+          "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+          "scope": "local paired native control; not canonical or scientific qualification",
+          "wall_seconds": 7.5867849590140395,
+          "cpu_seconds": 7.515193,
+          "peak_python_bytes": 28474734,
+          "retained_python_bytes": 16839952,
+          "process_peak_rss_bytes": 112951296,
+          "table_count": 58,
+          "movement_count": 1537,
+          "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+          "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+        }
+      ],
+      "candidate": [
+        {
+          "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+          "scope": "local paired native control; not canonical or scientific qualification",
+          "wall_seconds": 7.447718542010989,
+          "cpu_seconds": 7.428323000000001,
+          "peak_python_bytes": 28472879,
+          "retained_python_bytes": 16847769,
+          "process_peak_rss_bytes": 110641152,
+          "table_count": 58,
+          "movement_count": 1537,
+          "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+          "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+        },
+        {
+          "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+          "scope": "local paired native control; not canonical or scientific qualification",
+          "wall_seconds": 7.36102758400375,
+          "cpu_seconds": 7.352766,
+          "peak_python_bytes": 28473579,
+          "retained_python_bytes": 16846227,
+          "process_peak_rss_bytes": 112836608,
+          "table_count": 58,
+          "movement_count": 1537,
+          "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+          "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+        },
+        {
+          "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+          "scope": "local paired native control; not canonical or scientific qualification",
+          "wall_seconds": 7.412138792016776,
+          "cpu_seconds": 7.387509,
+          "peak_python_bytes": 28473641,
+          "retained_python_bytes": 16848161,
+          "process_peak_rss_bytes": 112295936,
+          "table_count": 58,
+          "movement_count": 1537,
+          "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+          "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+        }
+      ]
+    },
+    "medians": {
+      "wall_seconds": {
+        "baseline": 7.516680125001585,
+        "candidate": 7.412138792016776,
+        "change_percent": -1.390791296773275
+      },
+      "cpu_seconds": {
+        "baseline": 7.468125000000001,
+        "candidate": 7.387509,
+        "change_percent": -1.0794677378860307
+      },
+      "peak_python_bytes": {
+        "baseline": 28471703,
+        "candidate": 28473579,
+        "change_percent": 0.006588998206402685
+      },
+      "retained_python_bytes": {
+        "baseline": 16839705,
+        "candidate": 16847769,
+        "change_percent": 0.047886824620735347
+      },
+      "process_peak_rss_bytes": {
+        "baseline": 112951296,
+        "candidate": 112295936,
+        "change_percent": -0.58021467943139
+      }
+    },
+    "canonical_qualification": false,
+    "new_project_fits": 0,
+    "fresh_final_reads": 0,
+    "local_import_provenance_verified": true
+  },
+  "final_paired_native_kernels": {
+    "harness_sha256": "f7b9ed544de4dcffab8eea7577ef068bc8bdb587f64626419516d6d105eea480",
+    "raw": {
+      "baseline": [
+        {
+          "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+          "origins": 365,
+          "positions": 2,
+          "movements": 726,
+          "queries": {
+            "wall_seconds": 0.0582953339908272,
+            "cpu_seconds": 0.057554000000000105,
+            "peak_python_bytes": 242744,
+            "retained_python_bytes": 236056
+          },
+          "daily_reconciliation": {
+            "wall_seconds": 0.1571267500112299,
+            "cpu_seconds": 0.156987,
+            "peak_python_bytes": 303463,
+            "retained_python_bytes": 129750
+          },
+          "physical_projection": {
+            "wall_seconds": 0.03751308302162215,
+            "cpu_seconds": 0.037504000000000204,
+            "peak_python_bytes": 338146,
+            "retained_python_bytes": 331150
+          },
+          "snapshots": {
+            "wall_seconds": 0.15323483300744556,
+            "cpu_seconds": 0.15322900000000006,
+            "peak_python_bytes": 665606,
+            "retained_python_bytes": 652106
+          },
+          "physical_sha256": "832b69e071a54ecbae7561e686587637ee79a6e83b0d78e501f42d9da0237290",
+          "snapshots_sha256": "f7cd9531d20490f41006d61b43cecb7084737f78bf74a854ce295046c1cf8879",
+          "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+          "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+          "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+        },
+        {
+          "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+          "origins": 365,
+          "positions": 2,
+          "movements": 726,
+          "queries": {
+            "wall_seconds": 0.05433308400097303,
+            "cpu_seconds": 0.05432499999999996,
+            "peak_python_bytes": 242744,
+            "retained_python_bytes": 236056
+          },
+          "daily_reconciliation": {
+            "wall_seconds": 0.15527608297998086,
+            "cpu_seconds": 0.15495600000000032,
+            "peak_python_bytes": 303463,
+            "retained_python_bytes": 129750
+          },
+          "physical_projection": {
+            "wall_seconds": 0.038804582989541814,
+            "cpu_seconds": 0.03876400000000002,
+            "peak_python_bytes": 337102,
+            "retained_python_bytes": 330164
+          },
+          "snapshots": {
+            "wall_seconds": 0.1576536660140846,
+            "cpu_seconds": 0.15725199999999973,
+            "peak_python_bytes": 665084,
+            "retained_python_bytes": 651584
+          },
+          "physical_sha256": "832b69e071a54ecbae7561e686587637ee79a6e83b0d78e501f42d9da0237290",
+          "snapshots_sha256": "f7cd9531d20490f41006d61b43cecb7084737f78bf74a854ce295046c1cf8879",
+          "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+          "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+          "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+        },
+        {
+          "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+          "origins": 365,
+          "positions": 2,
+          "movements": 726,
+          "queries": {
+            "wall_seconds": 0.05382366600679234,
+            "cpu_seconds": 0.053822999999999954,
+            "peak_python_bytes": 242744,
+            "retained_python_bytes": 236056
+          },
+          "daily_reconciliation": {
+            "wall_seconds": 0.15134124999167398,
+            "cpu_seconds": 0.15129199999999976,
+            "peak_python_bytes": 303463,
+            "retained_python_bytes": 129750
+          },
+          "physical_projection": {
+            "wall_seconds": 0.038207000005058944,
+            "cpu_seconds": 0.038195999999999675,
+            "peak_python_bytes": 338204,
+            "retained_python_bytes": 331266
+          },
+          "snapshots": {
+            "wall_seconds": 0.2447089580236934,
+            "cpu_seconds": 0.18093000000000004,
+            "peak_python_bytes": 665374,
+            "retained_python_bytes": 651874
+          },
+          "physical_sha256": "832b69e071a54ecbae7561e686587637ee79a6e83b0d78e501f42d9da0237290",
+          "snapshots_sha256": "f7cd9531d20490f41006d61b43cecb7084737f78bf74a854ce295046c1cf8879",
+          "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+          "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+          "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+        }
+      ],
+      "candidate": [
+        {
+          "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+          "origins": 365,
+          "positions": 2,
+          "movements": 726,
+          "queries": {
+            "wall_seconds": 0.005204749992117286,
+            "cpu_seconds": 0.005198000000000036,
+            "peak_python_bytes": 260256,
+            "retained_python_bytes": 259728
+          },
+          "daily_reconciliation": {
+            "wall_seconds": 0.08307625001179986,
+            "cpu_seconds": 0.08302100000000001,
+            "peak_python_bytes": 406185,
+            "retained_python_bytes": 182908
+          },
+          "physical_projection": {
+            "wall_seconds": 0.014037374989129603,
+            "cpu_seconds": 0.014029999999999987,
+            "peak_python_bytes": 356632,
+            "retained_python_bytes": 356224
+          },
+          "snapshots": {
+            "wall_seconds": 0.0938179999939166,
+            "cpu_seconds": 0.09380200000000016,
+            "peak_python_bytes": 689350,
+            "retained_python_bytes": 675966
+          },
+          "physical_sha256": "832b69e071a54ecbae7561e686587637ee79a6e83b0d78e501f42d9da0237290",
+          "snapshots_sha256": "f7cd9531d20490f41006d61b43cecb7084737f78bf74a854ce295046c1cf8879",
+          "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+          "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+          "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+        },
+        {
+          "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+          "origins": 365,
+          "positions": 2,
+          "movements": 726,
+          "queries": {
+            "wall_seconds": 0.004817124980036169,
+            "cpu_seconds": 0.004815000000000236,
+            "peak_python_bytes": 260256,
+            "retained_python_bytes": 259728
+          },
+          "daily_reconciliation": {
+            "wall_seconds": 0.0826232919935137,
+            "cpu_seconds": 0.08260500000000004,
+            "peak_python_bytes": 406185,
+            "retained_python_bytes": 182966
+          },
+          "physical_projection": {
+            "wall_seconds": 0.013531624979805201,
+            "cpu_seconds": 0.0135320000000001,
+            "peak_python_bytes": 356980,
+            "retained_python_bytes": 356572
+          },
+          "snapshots": {
+            "wall_seconds": 0.0959899160079658,
+            "cpu_seconds": 0.09535099999999996,
+            "peak_python_bytes": 685000,
+            "retained_python_bytes": 671616
+          },
+          "physical_sha256": "832b69e071a54ecbae7561e686587637ee79a6e83b0d78e501f42d9da0237290",
+          "snapshots_sha256": "f7cd9531d20490f41006d61b43cecb7084737f78bf74a854ce295046c1cf8879",
+          "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+          "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+          "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+        },
+        {
+          "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+          "origins": 365,
+          "positions": 2,
+          "movements": 726,
+          "queries": {
+            "wall_seconds": 0.0048407919821329415,
+            "cpu_seconds": 0.004833999999999783,
+            "peak_python_bytes": 260256,
+            "retained_python_bytes": 259728
+          },
+          "daily_reconciliation": {
+            "wall_seconds": 0.08370262500829995,
+            "cpu_seconds": 0.08352699999999968,
+            "peak_python_bytes": 406243,
+            "retained_python_bytes": 182966
+          },
+          "physical_projection": {
+            "wall_seconds": 0.01507566700456664,
+            "cpu_seconds": 0.014988999999999919,
+            "peak_python_bytes": 355182,
+            "retained_python_bytes": 354774
+          },
+          "snapshots": {
+            "wall_seconds": 0.10124087502481416,
+            "cpu_seconds": 0.10038500000000017,
+            "peak_python_bytes": 687320,
+            "retained_python_bytes": 673936
+          },
+          "physical_sha256": "832b69e071a54ecbae7561e686587637ee79a6e83b0d78e501f42d9da0237290",
+          "snapshots_sha256": "f7cd9531d20490f41006d61b43cecb7084737f78bf74a854ce295046c1cf8879",
+          "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+          "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+          "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+        }
+      ]
+    },
+    "medians": {
+      "queries": {
+        "wall_seconds": {
+          "baseline": 0.05433308400097303,
+          "candidate": 0.0048407919821329415,
+          "change_percent": -91.09052601901587
+        },
+        "cpu_seconds": {
+          "baseline": 0.05432499999999996,
+          "candidate": 0.004833999999999783,
+          "change_percent": -91.10170271514076
+        },
+        "peak_python_bytes": {
+          "baseline": 242744,
+          "candidate": 260256,
+          "change_percent": 7.2141844906568275
+        },
+        "retained_python_bytes": {
+          "baseline": 236056,
+          "candidate": 259728,
+          "change_percent": 10.028128918561707
+        }
+      },
+      "daily_reconciliation": {
+        "wall_seconds": {
+          "baseline": 0.15527608297998086,
+          "candidate": 0.08307625001179986,
+          "change_percent": -46.4977165720296
+        },
+        "cpu_seconds": {
+          "baseline": 0.15495600000000032,
+          "candidate": 0.08302100000000001,
+          "change_percent": -46.422855520276826
+        },
+        "peak_python_bytes": {
+          "baseline": 303463,
+          "candidate": 406185,
+          "change_percent": 33.849925691105675
+        },
+        "retained_python_bytes": {
+          "baseline": 129750,
+          "candidate": 182966,
+          "change_percent": 41.01425818882467
+        }
+      },
+      "physical_projection": {
+        "wall_seconds": {
+          "baseline": 0.038207000005058944,
+          "candidate": 0.014037374989129603,
+          "change_percent": -63.2596775793155
+        },
+        "cpu_seconds": {
+          "baseline": 0.038195999999999675,
+          "candidate": 0.014029999999999987,
+          "change_percent": -63.26840506859329
+        },
+        "peak_python_bytes": {
+          "baseline": 338146,
+          "candidate": 356632,
+          "change_percent": 5.46686934046241
+        },
+        "retained_python_bytes": {
+          "baseline": 331150,
+          "candidate": 356224,
+          "change_percent": 7.57179525894609
+        }
+      },
+      "snapshots": {
+        "wall_seconds": {
+          "baseline": 0.1576536660140846,
+          "candidate": 0.0959899160079658,
+          "change_percent": -39.11342600850768
+        },
+        "cpu_seconds": {
+          "baseline": 0.15725199999999973,
+          "candidate": 0.09535099999999996,
+          "change_percent": -39.36420522473474
+        },
+        "peak_python_bytes": {
+          "baseline": 665374,
+          "candidate": 687320,
+          "change_percent": 3.2982953947704674
+        },
+        "retained_python_bytes": {
+          "baseline": 651874,
+          "candidate": 673936,
+          "change_percent": 3.3843963710778358
+        }
+      }
+    },
+    "all_native_balances_tables_context_identical": true,
+    "full_profile_qualified": false,
+    "scientific_qualification": false,
+    "new_project_fits": 0,
+    "fresh_final_reads": 0
+  },
+  "intermediate_control_retained": {
+    "code_commit": "238b956e7721307de06d324e25f7f18aa0ed0d64",
+    "whole_small_build": {
+      "harness_sha256": "c2599be645b0a9f27379b0db112db80509be24b974c22bd45450319fa7009532",
+      "all_58_tables_and_context_identical": true,
+      "raw": {
+        "baseline": [
+          {
+            "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+            "scope": "local paired native control; not canonical or scientific qualification",
+            "wall_seconds": 7.746515375009039,
+            "cpu_seconds": 7.6821779999999995,
+            "peak_python_bytes": 28471538,
+            "retained_python_bytes": 16839997,
+            "process_peak_rss_bytes": 109903872,
+            "table_count": 58,
+            "movement_count": 1537,
+            "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+            "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+          },
+          {
+            "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+            "scope": "local paired native control; not canonical or scientific qualification",
+            "wall_seconds": 7.528825999994297,
+            "cpu_seconds": 7.493723999999999,
+            "peak_python_bytes": 28473390,
+            "retained_python_bytes": 16838464,
+            "process_peak_rss_bytes": 110723072,
+            "table_count": 58,
+            "movement_count": 1537,
+            "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+            "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+          },
+          {
+            "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+            "scope": "local paired native control; not canonical or scientific qualification",
+            "wall_seconds": 7.600683458003914,
+            "cpu_seconds": 7.512356,
+            "peak_python_bytes": 28472238,
+            "retained_python_bytes": 16837682,
+            "process_peak_rss_bytes": 112164864,
+            "table_count": 58,
+            "movement_count": 1537,
+            "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+            "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+          }
+        ],
+        "candidate": [
+          {
+            "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+            "scope": "local paired native control; not canonical or scientific qualification",
+            "wall_seconds": 7.702566791005665,
+            "cpu_seconds": 7.578339,
+            "peak_python_bytes": 28473637,
+            "retained_python_bytes": 16844857,
+            "process_peak_rss_bytes": 110149632,
+            "table_count": 58,
+            "movement_count": 1537,
+            "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+            "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+          },
+          {
+            "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+            "scope": "local paired native control; not canonical or scientific qualification",
+            "wall_seconds": 7.438897040992742,
+            "cpu_seconds": 7.416161,
+            "peak_python_bytes": 28473532,
+            "retained_python_bytes": 16847662,
+            "process_peak_rss_bytes": 112525312,
+            "table_count": 58,
+            "movement_count": 1537,
+            "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+            "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+          },
+          {
+            "fixture": "710001_45d_8p_2stores_2warehouses_2026-09-30",
+            "scope": "local paired native control; not canonical or scientific qualification",
+            "wall_seconds": 7.45650004100753,
+            "cpu_seconds": 7.411831,
+            "peak_python_bytes": 28473565,
+            "retained_python_bytes": 16845369,
+            "process_peak_rss_bytes": 113524736,
+            "table_count": 58,
+            "movement_count": 1537,
+            "tables_sha256": "ef8d126980055d0c0cf43b5a5d9f1edbf110c4293987f9e237aea7b0490cffc9",
+            "context_sha256": "fd6350aa1fda4e3f6fbde05532f858c07af5f8744a8434f3dd2e217989862647"
+          }
+        ]
+      },
+      "medians": {
+        "wall_seconds": {
+          "baseline": 7.600683458003914,
+          "candidate": 7.45650004100753,
+          "change_percent": -1.8969796307534925
+        },
+        "cpu_seconds": {
+          "baseline": 7.512356,
+          "candidate": 7.416161,
+          "change_percent": -1.280490434691861
+        },
+        "peak_python_bytes": {
+          "baseline": 28472238,
+          "candidate": 28473565,
+          "change_percent": 0.004660680344126256
+        },
+        "retained_python_bytes": {
+          "baseline": 16838464,
+          "candidate": 16845369,
+          "change_percent": 0.041007303278961516
+        },
+        "process_peak_rss_bytes": {
+          "baseline": 110723072,
+          "candidate": 112525312,
+          "change_percent": 1.627700503107432
+        }
+      },
+      "canonical_qualification": false,
+      "new_project_fits": 0,
+      "fresh_final_reads": 0,
+      "local_import_provenance_verified": true
+    },
+    "kernels": {
+      "harness_sha256": "36c87a68f5c502e303922e0b6e65a359b2940a7a818d5d41fddbf20fd89bcca8",
+      "raw": {
+        "baseline": [
+          {
+            "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+            "origins": 365,
+            "positions": 2,
+            "movements": 726,
+            "queries": {
+              "wall_seconds": 0.053684707992943004,
+              "cpu_seconds": 0.053666000000000214,
+              "peak_python_bytes": 242744,
+              "retained_python_bytes": 236056
+            },
+            "daily_reconciliation": {
+              "wall_seconds": 0.15219287501531653,
+              "cpu_seconds": 0.15217800000000015,
+              "peak_python_bytes": 303463,
+              "retained_python_bytes": 129750
+            },
+            "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+            "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+            "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+          },
+          {
+            "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+            "origins": 365,
+            "positions": 2,
+            "movements": 726,
+            "queries": {
+              "wall_seconds": 0.05328608298441395,
+              "cpu_seconds": 0.053264999999999674,
+              "peak_python_bytes": 242744,
+              "retained_python_bytes": 236056
+            },
+            "daily_reconciliation": {
+              "wall_seconds": 0.15249850001418963,
+              "cpu_seconds": 0.15247400000000022,
+              "peak_python_bytes": 303463,
+              "retained_python_bytes": 129750
+            },
+            "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+            "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+            "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+          },
+          {
+            "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+            "origins": 365,
+            "positions": 2,
+            "movements": 726,
+            "queries": {
+              "wall_seconds": 0.05683179199695587,
+              "cpu_seconds": 0.056750999999999774,
+              "peak_python_bytes": 242744,
+              "retained_python_bytes": 236056
+            },
+            "daily_reconciliation": {
+              "wall_seconds": 0.15667641701293178,
+              "cpu_seconds": 0.1565500000000002,
+              "peak_python_bytes": 303463,
+              "retained_python_bytes": 129692
+            },
+            "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+            "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+            "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+          }
+        ],
+        "candidate": [
+          {
+            "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+            "origins": 365,
+            "positions": 2,
+            "movements": 726,
+            "queries": {
+              "wall_seconds": 0.004778959002578631,
+              "cpu_seconds": 0.004778000000000393,
+              "peak_python_bytes": 260256,
+              "retained_python_bytes": 259728
+            },
+            "daily_reconciliation": {
+              "wall_seconds": 0.08303545799572021,
+              "cpu_seconds": 0.08302100000000001,
+              "peak_python_bytes": 406185,
+              "retained_python_bytes": 182908
+            },
+            "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+            "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+            "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+          },
+          {
+            "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+            "origins": 365,
+            "positions": 2,
+            "movements": 726,
+            "queries": {
+              "wall_seconds": 0.005412124999566004,
+              "cpu_seconds": 0.005405000000000104,
+              "peak_python_bytes": 260256,
+              "retained_python_bytes": 259728
+            },
+            "daily_reconciliation": {
+              "wall_seconds": 0.08433191600488499,
+              "cpu_seconds": 0.08431200000000016,
+              "peak_python_bytes": 406243,
+              "retained_python_bytes": 182966
+            },
+            "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+            "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+            "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+          },
+          {
+            "scope": "365-day small native control; not the frozen full profile or scientific qualification",
+            "origins": 365,
+            "positions": 2,
+            "movements": 726,
+            "queries": {
+              "wall_seconds": 0.004934791009873152,
+              "cpu_seconds": 0.004922999999999789,
+              "peak_python_bytes": 260256,
+              "retained_python_bytes": 259728
+            },
+            "daily_reconciliation": {
+              "wall_seconds": 0.08461933300714009,
+              "cpu_seconds": 0.08445400000000003,
+              "peak_python_bytes": 406185,
+              "retained_python_bytes": 182966
+            },
+            "balances_sha256": "4765b1a434c2c333b8978e4035480c9640a0d15f98ad2f3a33b2663efab2102b",
+            "all_tables_sha256": "16ba73159c776abd05a85d099df7f48f02f5677fa876e1d7e955df2b280e5aac",
+            "context_sha256": "0c07adb09b8af27cf85a43b01a914ad8d6190235c7283c2937202cb9e4b08ac6"
+          }
+        ]
+      },
+      "medians": {
+        "queries": {
+          "wall_seconds": {
+            "baseline": 0.053684707992943004,
+            "candidate": 0.004934791009873152,
+            "change_percent": -90.80782741610173
+          },
+          "cpu_seconds": {
+            "baseline": 0.053666000000000214,
+            "candidate": 0.004922999999999789,
+            "change_percent": -90.82659411918203
+          },
+          "peak_python_bytes": {
+            "baseline": 242744,
+            "candidate": 260256,
+            "change_percent": 7.2141844906568275
+          },
+          "retained_python_bytes": {
+            "baseline": 236056,
+            "candidate": 259728,
+            "change_percent": 10.028128918561707
+          }
+        },
+        "daily_reconciliation": {
+          "wall_seconds": {
+            "baseline": 0.15249850001418963,
+            "candidate": 0.08433191600488499,
+            "change_percent": -44.69983901675223
+          },
+          "cpu_seconds": {
+            "baseline": 0.15247400000000022,
+            "candidate": 0.08431200000000016,
+            "change_percent": -44.70401511077296
+          },
+          "peak_python_bytes": {
+            "baseline": 303463,
+            "candidate": 406185,
+            "change_percent": 33.849925691105675
+          },
+          "retained_python_bytes": {
+            "baseline": 129750,
+            "candidate": 182966,
+            "change_percent": 41.01425818882467
+          }
+        }
+      },
+      "all_native_balances_tables_context_identical": true,
+      "full_profile_qualified": false,
+      "scientific_qualification": false,
+      "new_project_fits": 0,
+      "fresh_final_reads": 0
+    }
+  },
+  "retained_contracts": [
+    "All58 tables and complete context/CSV/publication validation",
+    "Original physical and knowledge cutoffs, event ordering and errors",
+    "Unvalidated/replaced ledgers use native filtering and sums",
+    "Irregular availability keeps native balance replay",
+    "Independent daily verifier uses its own daily buckets, not production position prefixes",
+    "Full native dimensions, seeds, scenarios and frozen historical recipes"
+  ],
+  "measurement_limits": "Three fresh local pairs are small controls. Incremental Python allocations of kernels do not bound whole-worker RSS. Local process RSS/wall include scheduling variation. No full canonical performance or twelve-source capacity claim.",
+  "new_project_fits": 0,
+  "fresh_final_reads": 0,
+  "project_journal_initialized": false,
+  "quality_qualified": false,
+  "stage_ready": false,
+  "new_capacity_attempt_dispatched": false,
+  "publication_head_and_main_CI_pending": true
+}
