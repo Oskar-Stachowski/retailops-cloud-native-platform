@@ -90,7 +90,7 @@ services:
 
   grafana:
     profiles: ["observability"]
-    image: grafana/grafana:12.4.3@sha256:2e986801428cd689c2358605289c90ab37d2b39e24808874971f54c99bcdc412
+    image: grafana/grafana:12.4.11@sha256:3ea272e5cab64a4a62240c682e2c62433b25614d956d44c299a10cb6994f6f2e
     ports:
       - "127.0.0.1:${GRAFANA_PORT:-3001}:3000"
     environment:
@@ -120,7 +120,7 @@ services:
 
   redpanda:
     profiles: ["dev", "observability", "test"]
-    image: redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
+    image: redpandadata/redpanda:v25.3.17@sha256:c96a71811ec85eee436b7471e4d2777b70ceb4d6a0bc5447094854b3150511c1
     command:
       - redpanda
       - start
@@ -157,7 +157,7 @@ services:
 
   redpanda-init:
     profiles: ["dev", "observability", "test"]
-    image: redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
+    image: redpandadata/redpanda:v25.3.17@sha256:c96a71811ec85eee436b7471e4d2777b70ceb4d6a0bc5447094854b3150511c1
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
