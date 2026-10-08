@@ -5,6 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from data.generator.commerce_pricing import CommercePricing
 from data.generator.common import DEFAULT_CLOCK, GenerationClock, deterministic_uuid, money
@@ -33,6 +34,9 @@ from data.generator.return_reconciliation import (
 )
 from data.generator.simulation import separate_simulation
 from data.generator.users import generate_users
+
+if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
 
 
 @dataclass(frozen=True)
@@ -935,6 +939,8 @@ def build_profile_dataset(
     seed: int = 42,
     clock: GenerationClock = DEFAULT_CLOCK,
     forecast_plan_days: int = 0,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     rng = _rng(seed, profile)
     products = generate_profile_products(product_count, rng)
@@ -966,7 +972,7 @@ def build_profile_dataset(
     demand_tables = {}
     if pricing_tables is not None:
         sales, orders, order_items, truth, exclusions = generate_demand_commerce(
-            products, stores, dimension_tables, pricing_tables, effective
+            products, stores, dimension_tables, pricing_tables, effective, anomaly_plan=anomaly_plan
         )
         demand_tables = {
             "daily_demand_truth": truth,

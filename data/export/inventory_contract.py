@@ -37,6 +37,8 @@ if TYPE_CHECKING:
 VERSION = "1.1.0"
 POLICY = "retailops-inventory-snapshot-1.0.0"
 FORMAT = "retailops-parquet-1.1.0"
+HANDOFF = "source_snapshot_handoff.v1_1.json"
+USE_CASES = {"forecast_source", "inventory_source"}
 METADATA = {b"retailops.format": FORMAT.encode(), b"retailops.source_schema": b"2.7.0"}
 FACT_TABLES = tuple(
     sorted({*COMMERCE_FACTS, *(n for n in TABLES if data_class(n) != "simulation_truth")})
@@ -121,6 +123,9 @@ class InventorySnapshot(SupplyRecord):
     exporter: ExporterProvenance
     tables: list[TableArtifact]
     metadata_files: list[FileReference]
+
+
+SnapshotManifest = InventorySnapshot
 
 
 def table_schema(name: str) -> pa.Schema:

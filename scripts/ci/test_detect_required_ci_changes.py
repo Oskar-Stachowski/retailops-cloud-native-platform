@@ -22,10 +22,17 @@ class RequiredCIPathDetectionTests(unittest.TestCase):
             {"frontend", "docker", "security"},
         )
 
+    def test_intelligence_ui_runtime_is_required(self) -> None:
+        self.assert_gates(["scripts/intelligence-ui/drill.py"], {"frontend", "docker", "security"})
+
     def test_docker_compose_change(self) -> None:
         for path in ("docker-compose.yml", "compose.yaml", "images/api/Dockerfile"):
             with self.subTest(path=path):
                 self.assert_gates([path], {"docker", "security"})
+
+    def test_native_bundle_gate_changes_require_runtime_and_security(self) -> None:
+        self.assert_gates(["scripts/source-bundles/drill.py"], {"docker", "security"})
+        self.assert_gates(["scripts/source-bundles/owner.json"], {"docker", "security"})
 
     def test_terraform_change(self) -> None:
         self.assert_gates(["infra/modules/vpc/main.tf"], {"terraform"})

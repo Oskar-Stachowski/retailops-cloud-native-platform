@@ -1,0 +1,41 @@
+{
+  "version": "ai07-source-fast-path-compatibility-1.0.0",
+  "checked_at": "2026-10-05T04:55:17.540002+00:00",
+  "frozen_qualification_source_commit": "48439ebd9515dc1c7adc633609bbe33d1657c3df",
+  "cause": "explicit_portfolio_supply_defaults_changed_run_source_dataset_file_hash",
+  "parity_preflight": {
+    "tests_passed": 16,
+    "elapsed_seconds": 8.17,
+    "all_source_tables": 58,
+    "ordinary_indexed_cached_tables_csv_reports_context_and_ledger_equal": true,
+    "log_sha256": "70548b698c20f3d93cdec3f59adb5b42c23453cbe2783c31cbcda54f106980c5"
+  },
+  "changes": [
+    {
+      "file": "data/inventory/source_cohort_batch.py",
+      "upstream": "run_source_dataset.py",
+      "before": "6c6d3c01315a5edc8ba465db3b743a631f7700d5124fa29c50c96738981bcdb4",
+      "after": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf"
+    },
+    {
+      "file": "data/inventory/source_cohort_batch_v2.py",
+      "upstream": "source_cohort_batch.py",
+      "before": "49b709bc190289d8a4d2d5ad925f882b78dedfc15fe33b56abc888272a1c3490",
+      "after": "444a481dd550fc9e266a49764083c97113a80fa2b21b064cc0d2f942862a12be"
+    },
+    {
+      "file": "data/inventory/source_cohort_batch_v2.py",
+      "upstream": "run_source_dataset.py",
+      "before": "6c6d3c01315a5edc8ba465db3b743a631f7700d5124fa29c50c96738981bcdb4",
+      "after": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf"
+    }
+  ],
+  "frozen_models_inputs_final_reports_changed": false,
+  "ci_pin_drift_rejection_retained": true,
+  "actual_pins_regression": {
+    "tests_passed": 16,
+    "elapsed_seconds": 8.11,
+    "log_sha256": "8b620de288273f64f0f3c81e1d25124fe6612a37a302745b2306eefa171d0097",
+    "pin_drift_negative_case": "passed"
+  }
+}

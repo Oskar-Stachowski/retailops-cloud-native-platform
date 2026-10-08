@@ -1,0 +1,88 @@
+# Independent, disposable output-lane acceptance stack. No host listeners.
+services:
+  broker:
+    image: redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    command: [redpanda, start, --config, /private/redpanda.yaml, --mode, dev-container, --smp, "1", --memory, 512M, --reserve-memory, 0M, --overprovisioned, --check=false]
+    env_file: ["${AI10_PRIVATE:?}/broker.env"]
+    volumes:
+      - "${AI10_PRIVATE:?}/broker:/private:rw"
+      - "${AI10_PRIVATE:?}/broker-data:/var/lib/redpanda/data"
+    networks: [bus]
+  db-ai:
+    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    env_file: ["${AI10_PRIVATE:?}/db-ai.env"]
+    volumes: [ai-db:/var/lib/postgresql/data]
+    networks: [ai-db]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  db-source:
+    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    env_file: ["${AI10_PRIVATE:?}/db-source.env"]
+    volumes: [source-db:/var/lib/postgresql/data]
+    networks: [source-db]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  source:
+    image: "${COMPOSE_PROJECT_NAME}-source"
+    build: {context: ../../services/api}
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    env_file: ["${AI10_PRIVATE:?}/source.env"]
+    volumes: ["${AI10_PRIVATE:?}/source:/private:ro"]
+    networks: [source-db, bus]
+  migrate:
+    image: "${COMPOSE_PROJECT_NAME}-source"
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    env_file: ["${AI10_PRIVATE:?}/source-migrate.env"]
+    command: [alembic, upgrade, head]
+    networks: [source-db]
+    profiles: [tools]
+  consumer:
+    image: "${COMPOSE_PROJECT_NAME}-source"
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    env_file: ["${AI10_PRIVATE:?}/consumer.env"]
+    volumes: ["${AI10_PRIVATE:?}/source:/private:ro"]
+    command: [python, -m, scripts.run_checkpointed_intelligence_consumer, --broker-config, /private/broker.json, --bootstrap-retained-log]
+    networks: [source-db, bus]
+    healthcheck: {disable: true}
+  delivery:
+    image: "${COMPOSE_PROJECT_NAME}-delivery"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      additional_contexts: {ai-owner: "${AI10_OWNER_ROOT:?}"}
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    env_file: ["${AI10_PRIVATE:?}/ai.env"]
+    volumes: ["${AI10_PRIVATE:?}/ai:/private:ro"]
+    networks: [ai-db, bus]
+    profiles: [tools]
+  ai-fixture:
+    image: "${COMPOSE_PROJECT_NAME}-delivery"
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    env_file: ["${AI10_PRIVATE:?}/ai-migrate.env"]
+    command: [python, /ai/ai_fixture.py]
+    networks: [ai-db]
+    profiles: [tools]
+  probe:
+    image: "${COMPOSE_PROJECT_NAME}-source"
+    user: "${AI10_UID:?}:${AI10_GID:?}"
+    volumes:
+      - "${AI10_PRIVATE:?}/probe:/private:ro"
+      - "./probe.py:/probe.py:ro"
+    command: [python, /probe.py]
+    networks: [ai-db, source-db, bus]
+    healthcheck: {disable: true}
+    profiles: [tools]
+networks:
+  ai-db: {internal: true}
+  source-db: {internal: true}
+  bus: {internal: true}
+volumes:
+  ai-db: {}
+  source-db: {}

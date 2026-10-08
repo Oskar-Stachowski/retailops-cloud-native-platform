@@ -1,0 +1,8 @@
+{
+  "version": "source-observation-capture-upstream-1.0",
+  "repository": "Oskar-Stachowski/retailops-ai-intelligence",
+  "commit": "e49969c27416ea7c56f1ecacb7b2f67a19b2755f",
+  "path": "contracts/source_replay/v1/capture.schema.json",
+  "sha256": "732c5d20e03b4fe9f95910947e89d621e222f5a6cfa6d4a7003e14f2b854b4a1",
+  "scope": "daily_demand_versions_only_not_full_43_table_snapshot"
+}

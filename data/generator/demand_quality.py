@@ -21,6 +21,7 @@ from data.generator.simulation import simulation_entities
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from data.anomalies.contract import AnomalyPlan
     from data.generator.configuration import ResolvedGenerationConfig
 
 
@@ -102,15 +103,25 @@ def _baskets(tables: dict, _config: ResolvedGenerationConfig) -> int:
     return len(order_ids)
 
 
-def _demand(tables: dict, config: ResolvedGenerationConfig) -> int:
+def _demand(
+    tables: dict, config: ResolvedGenerationConfig, anomaly_plan: AnomalyPlan | None = None
+) -> int:
     grid, _ = demand_grid(tables, config)
     products, stores = (
         {r["id"]: r for r in simulation_entities(tables, "products")},
         {r["id"]: r for r in simulation_entities(tables, "stores")},
     )
     pricing = CommercePricing(tables, DimensionIndex(tables))
+    factors = anomaly_plan.factors(tables, config) if anomaly_plan is not None else {}
     expected = [
-        daily_demand(products[key[1]], stores[flags["legacy_store_id"]], key, pricing, config)
+        daily_demand(
+            products[key[1]],
+            stores[flags["legacy_store_id"]],
+            key,
+            pricing,
+            config,
+            anomaly_factor=factors.get(key, "1"),
+        )
         for key, flags in sorted(grid.items())
         if flags["location_open"] == "true"
     ]
@@ -181,7 +192,10 @@ def _complete(tables: dict, config: ResolvedGenerationConfig) -> int:
 
 
 def build_demand_report(
-    tables: dict[str, list[dict[str, Any]]], config: ResolvedGenerationConfig
+    tables: dict[str, list[dict[str, Any]]],
+    config: ResolvedGenerationConfig,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, Any]:
     checks = []
     for check_id, function in (
@@ -189,7 +203,7 @@ def build_demand_report(
         ("daily_panel_coverage", _coverage),
         ("daily_transaction_aggregation", _aggregates),
         ("basket_sku_totals", _baskets),
-        ("daily_demand_budget", _demand),
+        ("daily_demand_budget", lambda t, c: _demand(t, c, anomaly_plan)),
         ("daily_source_completeness", _complete),
     ):
         try:
@@ -232,8 +246,10 @@ def build_demand_report(
     }
 
 
-def validate_demand(tables: dict, config: ResolvedGenerationConfig) -> dict:
-    report = build_demand_report(tables, config)
+def validate_demand(
+    tables: dict, config: ResolvedGenerationConfig, *, anomaly_plan: AnomalyPlan | None = None
+) -> dict:
+    report = build_demand_report(tables, config, anomaly_plan=anomaly_plan)
     if report["status"] != "passed":
         msg = "Demand hard gate failed: " + "; ".join(
             c["check_id"] + ": " + c["description"]

@@ -1,0 +1,11 @@
+{
+  "repository": "Oskar-Stachowski/retailops-ai-intelligence",
+  "commit": "3a64b03ac707a7bc041bef4ad80e451c9ff8e49a",
+  "sha256": {
+    "uv.lock": "33c53d1a1f08d5c90b3b61c79e6aeb732f0eebc6e8be36e735c93ca277492587",
+    "tools/intelligence-delivery/uv.lock": "d018fd51b6b176e707307179f5d8c953522b676349b053a98470e834261d3f58",
+    "tools/intelligence-delivery/pyproject.toml": "5e987ed95a72173684643104da194b58c58b9313bcb4075b495c0b401534f0cb",
+    "scripts/intelligence_outbox.py": "23a57559b3c15a9cf73b111afee41df9e616418fe82cc9bc21a7cf7f371e5212",
+    "contracts/events/v2/forecast_generated.fixture.json": "5801e52ff621df1762872b39ba8362ff5e58381839a4ece2915eac899d1dcbe3"
+  }
+}

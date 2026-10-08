@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
+from data.anomalies.physical_process import PhysicalAnomalySimulator
 from data.generator.csv_writer import TABLE_COLUMNS
 from data.generator.demand_quality import validate_demand
 from data.generator.dimension_schema import DIMENSION_COLUMNS
@@ -23,6 +24,8 @@ from data.inventory.source_observations import rebuild_observations
 from data.inventory.source_reconciliation import reconcile_source_commerce
 
 if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
+    from data.anomalies.physical_contract import PhysicalAnomalyPlan
     from data.generator.configuration import ResolvedGenerationConfig
     from data.inventory.source_contract import SourceInventoryConfig
 
@@ -45,16 +48,43 @@ COMMERCE_TABLES = (
 )
 
 
+def _copy_commerce_inputs(candidate: dict) -> dict:
+    """Detach every consumed row without copying unrelated candidate outputs.
+
+    Requested baskets and all returned operational tables still have independent
+    containers. The small private pricing/product parameters are needed by the
+    simulator but are never emitted as operational commerce tables.
+    """
+    private = (
+        "promotion_effect_truth",
+        "product_simulation_parameters",
+        "store_simulation_parameters",
+    )
+    names = set(COMMERCE_TABLES) | set(private)
+    return deepcopy({name: rows for name, rows in candidate.items() if name in names})
+
+
 def simulate_source_commerce(
-    candidate: dict, generation: ResolvedGenerationConfig, config: SourceInventoryConfig
+    candidate: dict,
+    generation: ResolvedGenerationConfig,
+    config: SourceInventoryConfig,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
+    physical_plan: PhysicalAnomalyPlan | None = None,
 ) -> dict[str, Any]:
     # Only this unpublished path consumes uncapped baskets as private demand input.
     # Never write these candidate rows into an existing source/snapshot directory.
-    validate_demand(candidate, generation)
+    validate_demand(candidate, generation, anomaly_plan=anomaly_plan)
     inputs = source_foundation(candidate, generation, config)
-    tables = deepcopy(candidate)
-    simulator = SourceCommerceSimulator(inputs, tables, generation, config)
+    tables = _copy_commerce_inputs(candidate)
+    if physical_plan is None:
+        simulator = SourceCommerceSimulator(inputs, tables, generation, config)
+    else:
+        simulator = PhysicalAnomalySimulator(inputs, tables, generation, config, physical_plan)
+        inputs["scenario"] = simulator.scenario.model_dump()
     result = simulator.execute()
+    if physical_plan is not None:
+        result["simulation_truth"]["physical_interventions"] = simulator.applied_caps
     tables["sales"] = [
         {field: row[field] for field in fact_columns("sales", TABLE_COLUMNS["sales"])}
         for row in simulator.actual_sales

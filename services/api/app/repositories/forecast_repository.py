@@ -1,11 +1,17 @@
-from datetime import date
-from typing import Any, ClassVar
-from uuid import UUID
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from psycopg.rows import dict_row
 
 from app.db.connection import fetch_all, fetch_one
 from app.domain.models import Forecast
+
+if TYPE_CHECKING:
+    from datetime import date
+    from uuid import UUID
+
+    from psycopg import Connection
 
 
 class ForecastRepository:
@@ -19,7 +25,7 @@ class ForecastRepository:
         "confidence_level": "f.confidence_level",
     }
 
-    def __init__(self, connection: object | None = None) -> None:
+    def __init__(self, connection: Connection[dict[str, Any]] | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -131,7 +137,7 @@ class ForecastRepository:
             FROM forecasts f
             LEFT JOIN products p ON p.id = f.product_id
             {where_clause}
-            ORDER BY {sort_column} {direction}, f.generated_at DESC
+            ORDER BY {sort_column} {direction}, f.generated_at DESC, f.id ASC
             LIMIT %s OFFSET %s;
         """  # noqa: S608 - fixed filters and allowlisted ordering; values use bound parameters
         rows = self._fetch_all(query, (*params, limit, offset))

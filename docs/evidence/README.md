@@ -1,15 +1,21 @@
 # Dowody weryfikacji
 
-Indeks przeglądany 2026-10-02. Poniżej znajdują się ostatnie zachowane wyniki
+Indeks przeglądany 2026-10-07. Poniżej znajdują się ostatnie zachowane wyniki
 potrzebne do opisania obecnych możliwości projektu. Każdy raport dotyczy
 konkretnej daty, rewizji i środowiska; nie oznacza nowego uruchomienia na HEAD.
 
 | Obszar | Data wykonania | Raport i zakres |
 |---|---|---|
+| AI 10 — końcowy odbiór w toku | 2026-10-07 | [Bieżący raport](ai/10/README.md): Source SQL/capture → ten sam TLS/SCRAM broker → AI SQL/ACK, overlap i korekta 4 → 7; oryginalny stockout SQL publisher/API/UI passed; anomaly publisher i pełny v12 pending. [Required CI komponentów Source](ai/10/source-component-ci.json): 30/30 jobów passed na dokładnym `cbbf711`. |
+| AI 07 — końcowe READY | 2026-10-05 | [Końcowy odbiór konsumenta](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md), scalone PR #97/#24 i zielone Required CI obu przyjętych main. Historyczne zakresy 07.1/07.5 nie otwierają ponownie AI07. |
+| AI 07.5 — pełny strumień sprzedaży i zwrotów | 2026-10-03 | [Odbiór producenta](ai/07/07.5-full-dq/README.md): wszystkie 1633 / 1636 faktów obu przypadków, 16 rozliczonych błędów na przypadek, native zwroty i ich ogon, pokrycie faktów per grain, cztery odtwarzalne przebiegi w budżecie. Kwalifikacja dni biznesowych, odbiór AI i modele pozostają otwarte. |
+| AI 08 — końcowe READY | 2026-10-05 | [Końcowy odbiór](ai/08/final/README.md): 9296 punktów, 90 passed / 3 accepted warnings / 0 blockers, rzeczywisty lifecycle/batch/API i zielone CI obu przyjętych main. |
 | AI 05 — finalne v12 i publikacja | 2026-10-02 | [Końcowy odbiór](ai/05/final/README.md): świeży snapshot, trwały batch/API, lifecycle i restart; oba PR-y scalone, Required CI main zaliczony. |
 | OPS-06 — wejścia builda i workflow | 2026-09-30 | [Odbiór lokalny](ops/06/README.md): pełne SHA Actions, digesty zewnętrznych obrazów, kontrola 171 referencji, receipts BuildKit i rzeczywisty upgrade/awaria/rollback. Aktualizacje przez kontrolowany PR. |
 | OPS-03 — trwałe ACK i odtwarzanie | 2026-09-30 | [Odbiór lokalny](ops/03/README.md): 1424 passed, 40 istniejących DB tests skipped; wszystkie 17 real-broker cases passed. Raw quarantine, DB/handler failures, atomic rollback, SIGKILL przed ACK i reviewed replay. |
 | OPS-07 — kontrakt zdarzeń v1 | 2026-09-29 | [Odbiór lokalny](ops/07/README.md): 13 typów, pięć topiców, wykonywalny JSON Schema, zgodność generatora, brokera i konsumenta oraz IDs rozróżniające rewizje. Trwałe ACK/kwarantannę opisuje oddzielny odbiór OPS-03. |
+| AI 07.1a — scenariusze popytu | 2026-09-30 | [Odbiór lokalnego przygotowania](ai/07/07.1a/README.md): trzy realne injekcje popytu, cztery rodzaje kontroli, osobna truth, niezmienny kandydat z powtórzeniem procesu i 1085 różnych testów. Pozostałe scenariusze, DQ, snapshot i detekcja mają dalsze bramki. |
+| AI 07.1b — zwroty i ograniczenie zapasu | 2026-10-02 | [Odbiór lokalnego przygotowania](ai/07/07.1b/README.md): rzeczywiste zwroty, write-off i censoring wspólnego zapasu, dwa clean controls, identyczne ID/bajty powtórzenia oraz 190 różnych testów. DQ, handoff i detekcja pozostają otwarte. |
 | AI 06 — pełny odbiór i audyt | 2026-09-29 | [Końcowy odbiór](ai/06/final/README.md), [karta danych](ai/06/final/dataset-card.md): source 2.7 → qualification → snapshot/import/curated 1.1, historyczny as-of, truth isolation, oba profile dwukrotnie i domyślna ścieżka AI. |
 | AI 03.6 — pełny cross-repo | 2026-09-29 | [Odbiór obu repo](ai/03/03.6/README.md): oba standardowe smoke dwukrotnie na Darwin/Linux, osobny późny fakt, parity/IDs/as-of, budżet oraz [publikacja na main obu repo z Required CI](ai/03/03.6/main-publication.json). Otwiera 04 i 06. |
 | AI 03.5 — curated w repo AI | 2026-09-29 | [Odbiór lokalny](ai/03/03.5/README.md): 743 testy, typed normalization/mapping/quarantine, immutable IDs, as-of, oba smoke i truth dwukrotnie oraz odłączony wheel. |

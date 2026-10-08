@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import DataTable from "../components/DataTable";
+import IntelligenceForecasts from "../components/IntelligenceForecasts.jsx";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import MetricCard from "../components/MetricCard";
@@ -329,6 +330,7 @@ export default function Forecasts() {
     return (
       <main className="api-page">
         <LoadingState title="Loading forecasts" />
+        <IntelligenceForecasts />
       </main>
     );
   }
@@ -337,6 +339,7 @@ export default function Forecasts() {
     return (
       <main className="api-page">
         <ErrorState message={state.error.message} onRetry={handleRetry} />
+        <IntelligenceForecasts />
       </main>
     );
   }
@@ -348,6 +351,8 @@ export default function Forecasts() {
         title="Demand forecast foundation"
         description="Forecast records are loaded from the backend `/forecasts` endpoint and explain how baseline demand signals support inventory planning, replenishment and workflow recommendations."
       />
+
+      <IntelligenceForecasts />
 
       <section className="metrics-grid">
         <MetricCard

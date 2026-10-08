@@ -24,6 +24,7 @@ def harness_inputs(root: Path) -> dict:
             )
             actions.append({"path": path.relative_to(root).as_posix(), "reference": reference})
     paths.extend((root / "scripts/release").glob("*.py"))
+    paths.extend((root / "scripts/release").glob("*.json"))
     paths.append(root / "scripts/release/compose.yml")
     return {
         "actions": actions,
