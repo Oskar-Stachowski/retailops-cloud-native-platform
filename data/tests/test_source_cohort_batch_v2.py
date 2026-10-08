@@ -3,8 +3,10 @@
 from copy import deepcopy
 from dataclasses import replace
 from datetime import timedelta
+import gc
 import json
 from pathlib import Path
+import weakref
 
 import pytest
 
@@ -159,6 +161,68 @@ def test_ledger_state_matches_after_every_review_and_final_execution(simulators)
         reviews.append(capture)
     assert outputs[0] == outputs[1]
     assert reviews[0] and reviews[0] == reviews[1]
+
+
+def test_complete_event_heap_releases_consumed_typed_rows_without_changing_outputs(simulators):
+    ordinary, cached = simulators
+    physical_kinds = {"demand", "return", "action"}
+
+    def events(simulator):
+        return sorted(
+            (stamp, phase, sequence, kind, row.model_dump())
+            for stamp, phase, sequence, kind, row in simulator.queue
+            if kind in physical_kinds
+        )
+
+    # Every validated physical row, timestamp and sequence is still in the heap.
+    assert events(cached) == events(ordinary)
+    assert cached.scenario.settings == ordinary.scenario.settings
+    assert cached.scenario.selling_locations == ordinary.scenario.selling_locations
+    assert cached.scenario.fulfillment_routes == ordinary.scenario.fulfillment_routes
+    assert not cached.scenario.demand_arrivals
+    assert not cached.scenario.return_events
+    assert not cached.scenario.inventory_actions
+    refs = [
+        [weakref.ref(row) for _, _, _, kind, row in simulator.queue if kind in physical_kinds]
+        for simulator in simulators
+    ]
+    assert refs[0] and len(refs[0]) == len(refs[1])
+    assert all(ref() is not None for ref in refs[1])
+
+    released_during_reviews = []
+    original_review = cached._review
+
+    def review(stamp):
+        original_review(stamp)
+        gc.collect()
+        released_during_reviews.append(sum(ref() is None for ref in refs[1]))
+
+    cached._review = review
+    expected = ordinary.execute()
+    actual = cached.execute()
+    gc.collect()
+    assert actual == expected
+    assert released_during_reviews and max(released_during_reviews) > 0
+    assert all(ref() is None for ref in refs[1])
+    assert all(ref() is not None for ref in refs[0])
+
+
+@pytest.mark.parametrize("change", ["unknown_product", "duplicate_time_sequence", "outside_window"])
+def test_scenario_events_are_fully_validated_before_releasing_lists(parity_sample, change):
+    generation = resolve_generation_config(parity_sample["generation"])
+    config = parity_sample["config"]
+    candidate = build_dataset(parity_sample["generation"])
+    inputs = source_foundation(candidate, generation, config)
+    demand = inputs["scenario"]["demand_arrivals"]
+    if change == "unknown_product":
+        demand[0]["product_id"] = deterministic_uuid("invalid-demand", "unknown-product")
+    elif change == "duplicate_time_sequence":
+        demand[1]["occurred_at"] = demand[0]["occurred_at"]
+        demand[1]["sequence"] = demand[0]["sequence"]
+    else:
+        demand[0]["occurred_at"] = inputs["scenario"]["settings"]["end_at"]
+    with pytest.raises(ValueError):
+        CachedLedgerSourceCommerceSimulator(inputs, deepcopy(candidate), generation, config)
 
 
 def test_pending_transfer_uses_destination_and_outbound_availability(simulators):

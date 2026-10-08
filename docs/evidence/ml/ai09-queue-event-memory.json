@@ -1,0 +1,204 @@
+{
+  "observed_at_utc": "2026-10-08T06:29:36.345848+00:00",
+  "base_source_main": "5c05445e8105c378107099785bae7355388ed7e7",
+  "scope": "Native allocation component control on the already exposed test_source_cohort_batch.parity_sample; not full-profile resource qualification",
+  "generation": {
+    "profile": "ai-intermittent-v1",
+    "seed": 710001,
+    "days": 10,
+    "products": 8,
+    "stores": 2,
+    "warehouses": 2,
+    "end_date": "2026-09-30"
+  },
+  "change": "Release typed event-list references after every original validation and heap initialization; keep all heap events, caller-owned inputs and outputs",
+  "implementation": {
+    "version": "inventory-source-cached-ledger-2.1.0",
+    "code_sha256": "b5716935d97b722fcd704d2dd3bb1984a3e1d2cddca595ad3ec124cb13bd5394",
+    "upstream_sha256": {
+      "source_cohort_batch.py": "3e3ecafba7298d343a8c9624617bdc6461e0925d5a446aeab9d011acc3909e00",
+      "ledger.py": "3e50ac30d3732789680461d96d5855f01619d0978de56e774d11565df884565f",
+      "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
+      "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
+      "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
+      "source_commerce.py": "9322d5240b1762db498929febed872bd207bd683ec3b1785cc0a0674f43e09c7"
+    },
+    "optimization": "cached_immutable_records_and_queue_owned_scenario_events",
+    "rng_and_chronological_process": "unchanged",
+    "source_validation": "ordinary_source_2_7_writer_and_reader_all_gates"
+  },
+  "reuse_of_closed_ai08": "Existing movement ID index, immutable validation cache, consumed-input copy and post-write build-state release retained; no FactIndex or closed AI07/AI08 changes",
+  "native_regression": {
+    "passed": 33,
+    "seconds": 72.31,
+    "command": "PYTHONPATH=. python -m pytest -q data/tests/test_source_cohort_batch_v2.py data/tests/test_source_cohort_forecast_plans.py data/tests/test_source_commerce_copy_scope.py data/tests/test_source_cohort_batch.py",
+    "all58_tables_csv_context_quality_parity": true,
+    "original_ledger_invariants_retained": true,
+    "event_heap_identity_and_order_parity": true,
+    "processed_events_released_during_reviews": true,
+    "invalid_events_rejected_before_release": [
+      "unknown_product",
+      "duplicate_time_sequence",
+      "outside_window"
+    ],
+    "consumed_input_native_seed_controls": [
+      42,
+      137,
+      2026
+    ]
+  },
+  "measurements": [
+    {
+      "mode": "retained",
+      "repetition": 1,
+      "scope": "constructor and complete chronological execution of existing tiny parity fixture",
+      "tracemalloc_current_bytes": 2700251,
+      "tracemalloc_peak_bytes": 2889975,
+      "process_peak_rss_bytes": 82968576,
+      "wall_seconds": 0.6262285840057302,
+      "initial_typed_events": 416,
+      "retained_typed_events_after_execution": 416,
+      "outcome_sha256": "0fa3cde16d8fb24d3ff4175ab0ef933f15ee2c45ceabf8763530c7582be3d5e0",
+      "original_source_inputs_unchanged": true,
+      "original_demand_rows_retained": 416,
+      "source_input_sha256": "f951529016417ecbafb8622fb3aade97501c9678bcaf35a2c9f7ad21f3cea17d",
+      "full_profile_qualified": false,
+      "project_fits": 0,
+      "fresh_final_reads": 0
+    },
+    {
+      "mode": "queue",
+      "repetition": 1,
+      "scope": "constructor and complete chronological execution of existing tiny parity fixture",
+      "tracemalloc_current_bytes": 2252021,
+      "tracemalloc_peak_bytes": 2441825,
+      "process_peak_rss_bytes": 78659584,
+      "wall_seconds": 0.6388974580040667,
+      "initial_typed_events": 416,
+      "retained_typed_events_after_execution": 0,
+      "outcome_sha256": "0fa3cde16d8fb24d3ff4175ab0ef933f15ee2c45ceabf8763530c7582be3d5e0",
+      "original_source_inputs_unchanged": true,
+      "original_demand_rows_retained": 416,
+      "source_input_sha256": "f951529016417ecbafb8622fb3aade97501c9678bcaf35a2c9f7ad21f3cea17d",
+      "full_profile_qualified": false,
+      "project_fits": 0,
+      "fresh_final_reads": 0
+    },
+    {
+      "mode": "retained",
+      "repetition": 2,
+      "scope": "constructor and complete chronological execution of existing tiny parity fixture",
+      "tracemalloc_current_bytes": 2700193,
+      "tracemalloc_peak_bytes": 2889917,
+      "process_peak_rss_bytes": 77971456,
+      "wall_seconds": 0.5998772500024643,
+      "initial_typed_events": 416,
+      "retained_typed_events_after_execution": 416,
+      "outcome_sha256": "0fa3cde16d8fb24d3ff4175ab0ef933f15ee2c45ceabf8763530c7582be3d5e0",
+      "original_source_inputs_unchanged": true,
+      "original_demand_rows_retained": 416,
+      "source_input_sha256": "f951529016417ecbafb8622fb3aade97501c9678bcaf35a2c9f7ad21f3cea17d",
+      "full_profile_qualified": false,
+      "project_fits": 0,
+      "fresh_final_reads": 0
+    },
+    {
+      "mode": "queue",
+      "repetition": 2,
+      "scope": "constructor and complete chronological execution of existing tiny parity fixture",
+      "tracemalloc_current_bytes": 2252543,
+      "tracemalloc_peak_bytes": 2442347,
+      "process_peak_rss_bytes": 76644352,
+      "wall_seconds": 0.9242780829954427,
+      "initial_typed_events": 416,
+      "retained_typed_events_after_execution": 0,
+      "outcome_sha256": "0fa3cde16d8fb24d3ff4175ab0ef933f15ee2c45ceabf8763530c7582be3d5e0",
+      "original_source_inputs_unchanged": true,
+      "original_demand_rows_retained": 416,
+      "source_input_sha256": "f951529016417ecbafb8622fb3aade97501c9678bcaf35a2c9f7ad21f3cea17d",
+      "full_profile_qualified": false,
+      "project_fits": 0,
+      "fresh_final_reads": 0
+    },
+    {
+      "mode": "retained",
+      "repetition": 3,
+      "scope": "constructor and complete chronological execution of existing tiny parity fixture",
+      "tracemalloc_current_bytes": 2700309,
+      "tracemalloc_peak_bytes": 2890033,
+      "process_peak_rss_bytes": 75333632,
+      "wall_seconds": 0.7902068340044934,
+      "initial_typed_events": 416,
+      "retained_typed_events_after_execution": 416,
+      "outcome_sha256": "0fa3cde16d8fb24d3ff4175ab0ef933f15ee2c45ceabf8763530c7582be3d5e0",
+      "original_source_inputs_unchanged": true,
+      "original_demand_rows_retained": 416,
+      "source_input_sha256": "f951529016417ecbafb8622fb3aade97501c9678bcaf35a2c9f7ad21f3cea17d",
+      "full_profile_qualified": false,
+      "project_fits": 0,
+      "fresh_final_reads": 0
+    },
+    {
+      "mode": "queue",
+      "repetition": 3,
+      "scope": "constructor and complete chronological execution of existing tiny parity fixture",
+      "tracemalloc_current_bytes": 2252311,
+      "tracemalloc_peak_bytes": 2442115,
+      "process_peak_rss_bytes": 77168640,
+      "wall_seconds": 0.9219579169875942,
+      "initial_typed_events": 416,
+      "retained_typed_events_after_execution": 0,
+      "outcome_sha256": "0fa3cde16d8fb24d3ff4175ab0ef933f15ee2c45ceabf8763530c7582be3d5e0",
+      "original_source_inputs_unchanged": true,
+      "original_demand_rows_retained": 416,
+      "source_input_sha256": "f951529016417ecbafb8622fb3aade97501c9678bcaf35a2c9f7ad21f3cea17d",
+      "full_profile_qualified": false,
+      "project_fits": 0,
+      "fresh_final_reads": 0
+    }
+  ],
+  "measurement_medians": {
+    "retained": {
+      "tracemalloc_current_bytes": 2700251,
+      "tracemalloc_peak_bytes": 2889975,
+      "process_peak_rss_bytes": 77971456,
+      "wall_seconds": 0.6262285840057302
+    },
+    "queue": {
+      "tracemalloc_current_bytes": 2252311,
+      "tracemalloc_peak_bytes": 2442115,
+      "process_peak_rss_bytes": 77168640,
+      "wall_seconds": 0.9219579169875942
+    }
+  },
+  "component_python_peak_reduction_fraction": 0.15497019870414108,
+  "component_python_retained_reduction_fraction": 0.1658882822374661,
+  "whole_generator_rss_or_cpu_improvement_proved": false,
+  "component_wall_improvement_proved": false,
+  "measurement_script_sha256": "aacd2e2a25f8fae9bf2781f4caeb53c626af4fc3f9cea8074ba48ddc8827972d",
+  "runtime": "CPython 3.11.15/macOS; RSS is process-lifetime ru_maxrss and includes premeasurement inputs/imports; timings include tracemalloc and GC; no isolated whole-source CPU conclusion",
+  "last_full_capacity_failure": {
+    "repo": "retailops-ai-intelligence",
+    "run": 37731200719,
+    "reason": "tree_rss_limit",
+    "wall_seconds": 1836.0621024959999,
+    "sampled_tree_peak_rss_bytes": 8590368768,
+    "completed_phases": 0,
+    "all_five_failed_costs_retained": true
+  },
+  "full_profile_qualified": false,
+  "project_fits": 0,
+  "fresh_final_reads": 0,
+  "stage_ready": false,
+  "quality_checks": {
+    "ruff": "passed",
+    "production_file_format": "passed",
+    "git_diff_check": "passed"
+  },
+  "pending": [
+    "Exact Source head Required CI and protected publication",
+    "Whole exact merged-main CI",
+    "A distinct frozen full canonical capacity recipe after accepted producer; preserve original dimensions, limits, reserves and all five failures",
+    "Full canonical campaign for all three uses, final seeds, scenarios, reports and lifecycle"
+  ]
+}

@@ -7,6 +7,7 @@ workflows.
 
 | Path | Purpose |
 | --- | --- |
+| [ai09-queue-event-memory.md](ai09-queue-event-memory.md) | Native full-output parity and measured release of consumed typed events; full canonical capacity remains unqualified. |
 | [fixed-origin-rf-2026-09-27](fixed-origin-rf-2026-09-27/README.md) | Current controlled 20/80-tree comparison, independent repeat and `rejected` admission decision. |
 | [random-forest-v1](random-forest-v1/README.md) | Historical artifact with an older, non-comparable evaluation protocol. |
 | [experiment-identity-2026-09-27.md](experiment-identity-2026-09-27.md) | Bounded 20/80-tree and repeat-run identity verification; no model qualification. |
