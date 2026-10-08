@@ -49,7 +49,9 @@ jawnie; stare zamrożone commity i receptury pozostają niezmienne.
 retencji; kolejne 64 potwierdziły uproszczenie cache ruchów. Ostateczny odbiór
 tych samych natywnych tabel/CSV, scenariuszy demand/physical na trzech już
 odsłoniętych seedach, kontraktów i całego Required CI jest wymagany dla końcowego
-head. Nie kwalifikuje to modeli ani pełnego profilu canonical.
+head. Końcowy kod z uproszczonym cache i zwalnianiem ośmiu tabel zaliczył
+64 kontrole w 423.42 s; Mypy 43 plików, Ruff i format 158 plików są poprawne.
+Nie kwalifikuje to modeli ani pełnego profilu canonical.
 
 Jedna mała para przeszła 5/5 faz w obu implementacjach: 58 tabel Source oraz
 43 tabele eksportu, importu i curated mają identyczną treść logiczną, zakresy
@@ -58,6 +60,12 @@ retencji, dały medianę CPU −13.11%, RSS procesu −4.92% i peak alokacji Pyt
 −2.11%; retained Python wzrósł o 0.80%. To pomiary małych kontroli, a ich wall
 time może zależeć od równoległych lokalnych testów. Pełny RSS, scratch i czas
 canonical nadal wymagają oddzielnego pomiaru. Nie zmieniono limitów ani profilu.
+
+Końcowe trzy świeże pary dały medianę CPU −16.78% i peak alokacji Python
+−5.18%, przy retained Python +0.69% oraz RSS procesu +2.51%. Pojedyncza końcowa
+para pięciu faz nadal zachowała wszystkie treści i zakresy; CPU curation wzrósł
+o około 4.85%. Zysku pełnego RSS nie potwierdzamy. Zachowujemy także wcześniejsze
+pomiary i koszty, zamiast wybierać wyłącznie korzystne wyniki.
 
 Nie wykonano nowych projektowych fitów ani odczytów świeżego final testu.
 Poprawki i testy są wykonywane w osobnych worktree; otwarte sesje i usługi
