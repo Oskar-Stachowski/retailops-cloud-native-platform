@@ -10,6 +10,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from data.generator.configuration import (
+    FORECAST_PLAN_VERSION,
     SUPPORTED_PROFILES,
     DatasetGenerationConfig,
     requested_parameters,
@@ -548,12 +549,26 @@ def build_source_manifest_v2(
 
 def config_from_parameters(parameters: dict[str, Any]) -> DatasetGenerationConfig:
     values = dict(parameters)
+    has_forecast_plans = "forecast_plan_days" in values or "forecast_plan_version" in values
+    plan_version = values.pop("forecast_plan_version", None)
+    if has_forecast_plans and (
+        plan_version != FORECAST_PLAN_VERSION or not values.get("forecast_plan_days")
+    ):
+        msg = "Forecast plan parameters require their explicit version and positive horizon."
+        raise ValueError(msg)
     for name in ("start_date", "end_date"):
         values[name] = date.fromisoformat(values[name]) if values[name] is not None else None
     return DatasetGenerationConfig(**values)
 
 
 def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> str:
+    if payload.get("schema_version") == "2.7.0":
+        from data.inventory.source_dataset_io import (  # noqa: PLC0415 - versioned reader dispatch
+            read_source_dataset,
+        )
+
+        _, verified = read_source_dataset(output_dir, payload)
+        return verified["dataset_id"]
     manifest = SourceManifestV2.model_validate(payload)
     descriptor = manifest.descriptor.model_dump(exclude_unset=True)
     if manifest.schema_version != descriptor["schema_version"]:
@@ -587,7 +602,7 @@ def validate_source_manifest_v2(payload: dict[str, Any], output_dir: Path) -> st
             raise ValueError(msg)
 
     generated = datetime.fromisoformat(manifest.generated_at)
-    if generated.tzinfo is None or generated.utcoffset().total_seconds() != 0:
+    if generated.utcoffset() != timedelta(0):
         msg = "Manifest generation time requires UTC."
         raise ValueError(msg)
     if [a.table for a in manifest.artifacts] != source_table_order(
@@ -729,11 +744,11 @@ def verify_final_source_reports(manifest: SourceManifestV2, tables: dict, output
         if json.loads((output_dir / name).read_text(encoding="utf-8")) != value:
             msg = "Final source report disagrees with verified records: " + name
             raise ValueError(msg)
-    for name, value in {
+    for name, markdown_value in {
         "source_report.md": source_report_markdown(report),
         "realism_report.md": realism_markdown(realism),
     }.items():
-        if (output_dir / name).read_text(encoding="utf-8") != value:
+        if (output_dir / name).read_text(encoding="utf-8") != markdown_value:
             msg = "Final source Markdown disagrees with verified records: " + name
             raise ValueError(msg)
 

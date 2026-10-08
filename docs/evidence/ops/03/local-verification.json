@@ -1,0 +1,156 @@
+{
+  "measured_at": "2026-09-30T06:45:29.483294+00:00",
+  "base_commit": "d4ee7a4e4217a59871c654f204f16de74017d13b",
+  "environment": {
+    "os": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11",
+    "postgres_image": "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+    "redpanda_image": "redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408"
+  },
+  "command": "PYTHONPATH=services/api:. REQUIRE_BROKER_TESTS=1 services/api/.venv/bin/python -m pytest -q services/api/tests data/tests",
+  "results": {
+    "passed": 1424,
+    "skipped": 40,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 553.721,
+    "broker_cases_passed": 17
+  },
+  "skip_scope": "40 existing integration_db tests without configured seeded DATABASE_URL at collection; isolated migrated DB/broker drill is required and not skipped",
+  "junit_sha256": "267e702cf56129f464f396e84e0ffd4aa5ab1ef7c65e9339be8f7b81dac197d5",
+  "broker_cases": [
+    {
+      "name": "test_poison_is_durable_before_ack_with_exact_bytes[not-json]",
+      "seconds": 6.712,
+      "status": "passed"
+    },
+    {
+      "name": "test_poison_is_durable_before_ack_with_exact_bytes[\\xff]",
+      "seconds": 1.996,
+      "status": "passed"
+    },
+    {
+      "name": "test_poison_is_durable_before_ack_with_exact_bytes[[]]",
+      "seconds": 1.713,
+      "status": "passed"
+    },
+    {
+      "name": "test_poison_is_durable_before_ack_with_exact_bytes[None]",
+      "seconds": 1.938,
+      "status": "passed"
+    },
+    {
+      "name": "test_poison_is_durable_before_ack_with_exact_bytes[raw4]",
+      "seconds": 2.1,
+      "status": "passed"
+    },
+    {
+      "name": "test_handler_failure_stops_before_later_offset_and_retries",
+      "seconds": 1.968,
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_envelope_is_quarantined_before_ack[event_id-not-a-uuid]",
+      "seconds": 0.67,
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_envelope_is_quarantined_before_ack[payload-value1]",
+      "seconds": 0.641,
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_envelope_is_quarantined_before_ack[schema_version-2.0]",
+      "seconds": 0.662,
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_envelope_is_quarantined_before_ack[schema_version-1.1]",
+      "seconds": 0.647,
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_envelope_is_quarantined_before_ack[source-retailops.consumer.quarantine]",
+      "seconds": 0.638,
+      "status": "passed"
+    },
+    {
+      "name": "test_partial_projection_rolls_back_before_retry",
+      "seconds": 0.751,
+      "status": "passed"
+    },
+    {
+      "name": "test_db_or_quarantine_outage_leaves_broker_message_for_restart[False]",
+      "seconds": 1.442,
+      "status": "passed"
+    },
+    {
+      "name": "test_db_or_quarantine_outage_leaves_broker_message_for_restart[True]",
+      "seconds": 1.682,
+      "status": "passed"
+    },
+    {
+      "name": "test_sigkill_after_durable_write_before_ack_is_replayed_once[False]",
+      "seconds": 46.288,
+      "status": "passed"
+    },
+    {
+      "name": "test_sigkill_after_durable_write_before_ack_is_replayed_once[True]",
+      "seconds": 46.068,
+      "status": "passed"
+    },
+    {
+      "name": "test_reviewed_replay_retries_delivery_without_duplicate_metrics",
+      "seconds": 5.908,
+      "status": "passed"
+    }
+  ],
+  "runtime_and_drill_sha256": {
+    "services/api/app/services/realtime_consumer.py": "704140ac1e7a39ae513801f7d73bf6ea1ca4d31614a158220a93f1befe69a75b",
+    "services/api/app/services/realtime_consumer_runner.py": "63d4fd92ac58de107a2cbeff0bc3cb1d733c69f2455885c5a014fb2ff23a7821",
+    "services/api/app/services/realtime_quarantine.py": "38efc4659af4049ed4d77d078cc6a821a92736840451ef335ac78e18cda179fc",
+    "services/api/app/repositories/realtime_metrics_repository.py": "eaf1343656f2b705726750fd4eddd04962ef71ba5b38d6ef6a04feda8015a78d",
+    "services/api/app/repositories/realtime_quarantine_repository.py": "d000f90d6c51c04f7109f2c753504f48c851503b63063660fc96c45ff3992844",
+    "services/api/app/contracts/realtime-events.v1.schema.json": "e8bdf016a3f8362a81c5ee2b6cde21bce07991c5692d8aebd3e3f40b700b078e",
+    "services/api/scripts/realtime_quarantine.py": "c0afb5457071599a75efeab9dfd9ce4d3b8c7871ae0ee6fb57f5258756e688e2",
+    "services/api/tests/test_realtime_durability.py": "4351cb7a7f672c57e4ae0b649375886cae1be9b087786509e0f89768eb03deea",
+    ".github/workflows/api-ci.yml": "88b2b15221c99aea3dae9092895f432dd52c551a48b7531b94ae725076f6849d",
+    "services/api/app/services/realtime_contract.py": "0b6d7cb39c11c448d46b1d77c47b1ab3c7c31378236577030b8ab4b991312320"
+  },
+  "checks": {
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "mypy": "passed",
+    "bandit_high_high": "passed",
+    "data_contracts": "passed",
+    "api_docker_build": "passed",
+    "api_container_module_cli": "passed",
+    "gitleaks_branch_history": "passed with one exact path+public digest allowlist"
+  },
+  "transport_semantics": "at-least-once with atomic idempotent metrics projection; PostgreSQL raw quarantine; no automatic publication to broker DLQ topic",
+  "schema_migrations": "unchanged",
+  "scope_excludes": [
+    "AI v2 business projections and inbox/outbox",
+    "external side effects of custom handlers",
+    "retroactive raw recovery from legacy failure records"
+  ],
+  "full_regression_commit": "da868d10a1c6dcb14074284a10eb4d7b515b699b",
+  "followup_verification": {
+    "safe_diagnostics_and_replay": {
+      "passed": 61,
+      "seconds": 0.3,
+      "junit_sha256": "93a3a12ba29800c84fe190e7ea0c2d8462c3f327a3b35fce3c2da25fa0931b8c"
+    },
+    "broker": {
+      "passed": 17,
+      "seconds": 116.65,
+      "junit_sha256": "96598f1236905d152c50fa36ab487a0edda93ae5326cdef34dbbe9fd9b6dcf69"
+    },
+    "scope": "Safe validation reasons omit untrusted values/payload; exact public workflow SHA-256 false positive exception; runtime behavior remains unchanged",
+    "file_sha256": {
+      "services/api/tests/test_realtime_consumer.py": "a9eee92a414a23fd65eb7e286bc6f1a5db4bece09392cfdf347dff4d666fe439",
+      ".gitleaks.toml": "a26de7ba406725e6de42f87930562f909229f824c879f9724feab72307f4e810"
+    }
+  }
+}

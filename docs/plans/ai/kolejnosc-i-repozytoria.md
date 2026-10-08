@@ -36,7 +36,7 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
 
 1. **Teraz AI 04 w AI-intelligence oraz równolegle AI 06 w cloud-native.**
    [Odbiór 03](../../evidence/ai/03/03.6/README.md) potwierdza snapshoty,
-   import/curated, pełną bramkę i Required CI na opublikowanych PR-ach.
+   import/curated, pełną bramkę i publikację na main obu repo z Required CI.
    Pierwszy forecasting opisuje obserwowaną sprzedaż i pomija inventory.
 2. **Po 04:** rozpocząć 05, nawet jeśli 06 jeszcze trwa.
    AI 11 jest odebrany i opublikowany; interfejsy i test doubles 12 można

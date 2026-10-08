@@ -9,53 +9,17 @@ from typing import Any, Protocol
 from app.core.config import Settings
 from app.core.config import settings as default_settings
 from app.repositories.realtime_metrics_repository import RealtimeMetricsRepository
+from app.repositories.realtime_quarantine_repository import QUARANTINE_SOURCE
+from app.services.realtime_contract import (
+    SUPPORTED_EVENT_TYPES,
+    validate_event,
+)
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_EVENT_TYPES = frozenset(
-    {
-        "order_created",
-        "sale_completed",
-        "return_completed",
-        "stock_changed",
-        "inventory_snapshot_recorded",
-        "replenishment_completed",
-        "price_changed",
-        "promotion_started",
-        "promotion_ended",
-        "forecast_generated",
-        "anomaly_detected",
-        "alert_created",
-        "workflow_action_performed",
-    },
-)
 
-REQUIRED_EVENT_FIELDS = (
-    "event_id",
-    "event_type",
-    "schema_version",
-    "source",
-    "correlation_id",
-    "occurred_at",
-    "ingested_at",
-    "payload",
-)
-
-EVENT_TOPICS = {
-    "order_created": "retailops.sales.v1",
-    "sale_completed": "retailops.sales.v1",
-    "return_completed": "retailops.sales.v1",
-    "stock_changed": "retailops.inventory.v1",
-    "inventory_snapshot_recorded": "retailops.inventory.v1",
-    "replenishment_completed": "retailops.inventory.v1",
-    "price_changed": "retailops.pricing.v1",
-    "promotion_started": "retailops.pricing.v1",
-    "promotion_ended": "retailops.pricing.v1",
-    "forecast_generated": "retailops.intelligence.v1",
-    "anomaly_detected": "retailops.intelligence.v1",
-    "alert_created": "retailops.operations.v1",
-    "workflow_action_performed": "retailops.operations.v1",
-}
+class InvalidRealtimeEventError(ValueError):
+    """An envelope rejected before any handler or projection runs."""
 
 
 class EventHandler(Protocol):
@@ -66,6 +30,7 @@ class EventHandler(Protocol):
 class RealtimeEventEnvelope:
     event_id: str
     event_type: str
+    topic: str
     schema_version: str
     source: str
     correlation_id: str
@@ -74,36 +39,21 @@ class RealtimeEventEnvelope:
     payload: dict[str, Any]
 
     @classmethod
-    def from_dict(cls, event: dict[str, Any]) -> RealtimeEventEnvelope:
-        missing = [
-            field_name
-            for field_name in REQUIRED_EVENT_FIELDS
-            if field_name not in event or event[field_name] in (None, "")
-        ]
-
-        if missing:
-            msg = f"Missing required event fields: {', '.join(missing)}"
-            raise ValueError(msg)
-
-        event_type = str(event["event_type"])
-        if event_type not in SUPPORTED_EVENT_TYPES:
-            msg = f"Unsupported event type: {event_type}"
-            raise ValueError(msg)
-
-        payload = event["payload"]
-        if not isinstance(payload, dict):
-            msg = "payload must be a JSON object"
-            raise TypeError(msg)
+    def from_dict(
+        cls, event: dict[str, Any], *, transport_topic: str | None = None
+    ) -> RealtimeEventEnvelope:
+        validate_event(event, transport_topic=transport_topic)
 
         return cls(
             event_id=str(event["event_id"]),
-            event_type=event_type,
+            event_type=event["event_type"],
+            topic=event["topic"],
             schema_version=str(event["schema_version"]),
             source=str(event["source"]),
             correlation_id=str(event["correlation_id"]),
             occurred_at=str(event["occurred_at"]),
             ingested_at=str(event["ingested_at"]),
-            payload=payload,
+            payload=event["payload"],
         )
 
 
@@ -151,12 +101,7 @@ def _noop_handler(event: dict[str, Any]) -> None:
 
 
 class RealtimeEventConsumer:
-    """Minimal consumer skeleton for Sprint 9.
-
-    The class is intentionally broker-agnostic for now. It validates event
-    envelopes, dispatches to registered handlers and records processing state.
-    The broker adapter will be added in a later commit.
-    """
+    """Validate and atomically project events; the runner owns transport ACK."""
 
     def __init__(
         self,
@@ -189,139 +134,92 @@ class RealtimeEventConsumer:
     def supported_event_types(self) -> tuple[str, ...]:
         return tuple(sorted(self.handlers))
 
-    def process_event(self, event: dict[str, Any]) -> dict[str, Any]:
+    def process_event(
+        self, event: dict[str, Any], *, transport_topic: str | None = None
+    ) -> dict[str, Any]:
         self.state.received_events += 1
-        raw_event_id = self._safe_event_id(event)
+        try:
+            envelope = RealtimeEventEnvelope.from_dict(event, transport_topic=transport_topic)
+        except (TypeError, ValueError) as exc:
+            self._note_failure(exc)
+            raise InvalidRealtimeEventError(str(exc)) from exc
 
         try:
-            envelope = RealtimeEventEnvelope.from_dict(event)
-
-            if self.repository.is_event_processed(envelope.event_id):
-                self.state.ignored_events += 1
-                self.state.last_event_id = envelope.event_id
-                self.state.last_event_type = envelope.event_type
-                self.state.last_error = None
-                self._persist_state()
-
-                return {
-                    "status": "ignored_duplicate",
-                    "event_id": envelope.event_id,
-                    "event_type": envelope.event_type,
-                }
-
-            self.repository.record_event_log(
-                event_id=envelope.event_id,
-                event_type=envelope.event_type,
-                topic=self._resolve_topic(envelope.event_type),
-                schema_version=envelope.schema_version,
-                source=envelope.source,
-                correlation_id=envelope.correlation_id,
-                occurred_at=self._parse_datetime(envelope.occurred_at),
-                ingested_at=self._parse_datetime(envelope.ingested_at),
-                payload=envelope.payload,
-                status="received",
-            )
-
-            handler = self.handlers.get(envelope.event_type)
-
-            if handler is None:
-                msg = f"No handler registered for {envelope.event_type}"
-                raise ValueError(msg)
-
-            handler(event)
-            observations = self._build_metric_observations(envelope)
-            self.repository.replace_metric_observations(
-                event_id=envelope.event_id,
-                observations=observations,
-            )
-            processed_at = datetime.now(UTC)
-            self.repository.record_event_log(
-                event_id=envelope.event_id,
-                event_type=envelope.event_type,
-                topic=self._resolve_topic(envelope.event_type),
-                schema_version=envelope.schema_version,
-                source=envelope.source,
-                correlation_id=envelope.correlation_id,
-                occurred_at=self._parse_datetime(envelope.occurred_at),
-                ingested_at=self._parse_datetime(envelope.ingested_at),
-                payload=envelope.payload,
-                status="processed",
-                processed_at=processed_at,
-            )
-            self.state.processed_events += 1
-            self.state.last_event_id = envelope.event_id
-            self.state.last_event_type = envelope.event_type
-            self.state.last_processed_at = processed_at
-            self.state.last_error = None
-            self._persist_state()
-
-            return {
-                "status": "processed",
-                "event_id": envelope.event_id,
-                "event_type": envelope.event_type,
-            }
-
+            with self.repository.event_transaction(envelope.event_id) as repository:
+                record = repository.get_event_record(envelope.event_id)
+                if record and record.get("source") == QUARANTINE_SOURCE:
+                    msg = "Event ID is reserved by an immutable quarantine record."
+                    raise InvalidRealtimeEventError(msg)
+                if record and record.get("status") == "processed":
+                    duplicate = True
+                else:
+                    duplicate = False
+                    handler = self.handlers.get(envelope.event_type)
+                    if handler is None:
+                        msg = f"No handler registered for {envelope.event_type}"
+                        raise RuntimeError(msg)
+                    repository.record_event_log(**self._event_record(envelope), status="received")
+                    handler(event)
+                    repository.replace_metric_observations(
+                        event_id=envelope.event_id,
+                        observations=self._build_metric_observations(envelope),
+                    )
+                    processed_at = datetime.now(UTC)
+                    repository.record_event_log(
+                        **self._event_record(envelope),
+                        status="processed",
+                        processed_at=processed_at,
+                    )
         except Exception as exc:
+            self._note_failure(exc)
+            raise
+
+        self.state.last_event_id = envelope.event_id
+        self.state.last_event_type = envelope.event_type
+        self.state.last_error = None
+        if duplicate:
+            self.state.ignored_events += 1
+        else:
+            self.state.processed_events += 1
+            self.state.last_processed_at = processed_at
+        # An error here also stops the runner without ACK. The durable marker
+        # makes the subsequent delivery a duplicate with no repeated projection.
+        self._persist_state()
+        return {
+            "status": "ignored_duplicate" if duplicate else "processed",
+            "event_id": envelope.event_id,
+            "event_type": envelope.event_type,
+        }
+
+    def record_quarantined(self, *, decoded: bool, error: str) -> None:
+        """Count only messages whose raw transport record was committed to DB."""
+        if not decoded:
+            self.state.received_events += 1
             self.state.failed_events += 1
-            self.state.dead_lettered_events += 1
-            self.state.last_error = str(exc)
-            if raw_event_id is not None:
-                try:
-                    raw_event_type = (
-                        str(event.get("event_type"))
-                        if isinstance(event, dict) and event.get("event_type")
-                        else "unknown"
-                    )
-                    raw_schema_version = (
-                        str(event.get("schema_version"))
-                        if isinstance(event, dict) and event.get("schema_version")
-                        else "unknown"
-                    )
-                    raw_source = (
-                        str(event.get("source"))
-                        if isinstance(event, dict) and event.get("source")
-                        else "unknown"
-                    )
-                    raw_correlation_id = (
-                        str(event.get("correlation_id"))
-                        if isinstance(event, dict) and event.get("correlation_id")
-                        else raw_event_id
-                    )
-                    topic = self._resolve_topic(raw_event_type)
-                    occurred_at = self._parse_datetime(
-                        event.get("occurred_at") if isinstance(event, dict) else None,
-                    )
-                    ingested_at = self._parse_datetime(
-                        event.get("ingested_at") if isinstance(event, dict) else None,
-                    )
-                    payload = (
-                        event.get("payload")
-                        if isinstance(event, dict) and isinstance(event.get("payload"), dict)
-                        else {}
-                    )
-                    self.repository.record_event_log(
-                        event_id=raw_event_id,
-                        event_type=raw_event_type,
-                        topic=topic,
-                        schema_version=raw_schema_version,
-                        source=raw_source,
-                        correlation_id=raw_correlation_id,
-                        occurred_at=occurred_at,
-                        ingested_at=ingested_at,
-                        payload=payload,
-                        status="failed_dead_lettered",
-                        error_message=str(exc),
-                    )
-                except Exception:
-                    logger.exception("Failed to persist dead-lettered event")
+        self.state.last_error = error
+        self.state.dead_lettered_events += 1
+        self._persist_state()
 
-            logger.exception("Realtime event processing failed")
+    def _note_failure(self, error: Exception) -> None:
+        self.state.failed_events += 1
+        self.state.last_error = str(error)
+        try:
             self._persist_state()
+        except Exception:
+            logger.exception("Could not persist consumer failure state")
 
-            return {
-                "status": "failed_dead_lettered",
-                "error": str(exc),
-            }
+    def _event_record(self, envelope: RealtimeEventEnvelope) -> dict[str, Any]:
+        return {
+            "event_id": envelope.event_id,
+            "event_type": envelope.event_type,
+            "topic": envelope.topic,
+            "schema_version": envelope.schema_version,
+            "source": envelope.source,
+            "correlation_id": envelope.correlation_id,
+            "occurred_at": self._parse_datetime(envelope.occurred_at),
+            "ingested_at": self._parse_datetime(envelope.ingested_at),
+            "payload": envelope.payload,
+        }
 
     def process_events(self, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         return [self.process_event(event) for event in events]
@@ -557,22 +455,6 @@ class RealtimeEventConsumer:
             return Decimal(0)
 
         return Decimal(str(value))
-
-    def _resolve_topic(self, event_type: str) -> str:
-        if event_type not in EVENT_TOPICS:
-            return "retailops.unknown.v1"
-
-        return EVENT_TOPICS[event_type]
-
-    def _safe_event_id(self, event: dict[str, Any]) -> str | None:
-        if not isinstance(event, dict):
-            return None
-
-        event_id = event.get("event_id")
-        if event_id in (None, ""):
-            return None
-
-        return str(event_id)
 
 
 def build_realtime_event_consumer(

@@ -19,7 +19,9 @@ COMPONENTS = ("api", "frontend")
 REPOSITORY = "Oskar-Stachowski/retailops-cloud-native-platform"
 NAMESPACE = "ghcr.io/" + REPOSITORY.lower()
 WORKFLOW = REPOSITORY + "/.github/workflows/release.yml"
-TRIVY = "aquasec/trivy:0.74.0"
+TRIVY = (
+    "aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969"
+)
 
 
 def sbom_predicate(document: dict) -> str:
@@ -55,16 +57,29 @@ def ready_report(report: dict) -> None:
     require(report["status"] == "passed" and report["cleanup"] == "passed", "Drill did not pass")
     require(not report["working_tree_dirty"], "Release requires a clean committed harness")
     require(set(report["stages"]) == {"previous", "upgraded", "rolled_back"}, "Missing drill stage")
-    for _, component, release, image in images(report):
+    require(bool(report.get("harness_inputs")), "Missing release harness identities")
+    for role, component, release, image in images(report):
         require(
             release["validation"] == "local_drill_passed", "Unverified image cannot be published"
         )
+        require(bool(image.get("build_inputs")), "Missing verified build inputs")
+        if role == "candidate":
+            require(
+                all(
+                    re.fullmatch(r".+@sha256:[a-f0-9]{64}", ref)
+                    for ref in image["build_inputs"]["declared_bases"]
+                ),
+                "Candidate base images must be pinned by digest",
+            )
         inspected = json.loads(run(["docker", "image", "inspect", image["image_id"]]))[0]
         verify_image(inspected, release, component, image["image_id"])
 
 
 def publication_contract(manifest: dict, report: dict) -> None:
     require(manifest["harness_commit"] == report["harness_commit"], "Harness identity changed")
+    require(
+        manifest.get("harness_inputs") == report.get("harness_inputs"), "Harness inputs changed"
+    )
     for role, component, release, image in images(manifest):
         tested = report["releases"][role]
         for key in ("source_commit", "version", "migration", "validation"):
@@ -73,6 +88,10 @@ def publication_contract(manifest: dict, report: dict) -> None:
             require(
                 image[key] == tested["images"][component][key], "Image differs from tested artifact"
             )
+        require(
+            image.get("build_inputs") == tested["images"][component].get("build_inputs"),
+            "Build inputs differ from tested artifact",
+        )
 
 
 def prepare(report_path: Path, output: Path) -> None:
@@ -82,6 +101,11 @@ def prepare(report_path: Path, output: Path) -> None:
     output.mkdir(parents=True)
     shutil.copyfile(report_path, output / "build-drill.json")
     for role, component, _, image in images(report):
+        metadata = image["build_inputs"]["metadata"]
+        require(Path(metadata["file"]).name == metadata["file"], "Invalid build metadata filename")
+        metadata_path = report_path.parent / metadata["file"]
+        require(digest(metadata_path) == metadata["sha256"], "Build metadata changed")
+        shutil.copyfile(metadata_path, output / metadata["file"])
         stem = role + "-" + component
         scanner = [
             "docker",
@@ -122,10 +146,11 @@ def prepare(report_path: Path, output: Path) -> None:
         require(bool(document.get("packages")), "Empty image SBOM")
         image["sbom"] = {"file": sbom, "sha256": digest(output / sbom)}
     manifest = {
-        "manifest_version": 2,
+        "manifest_version": 3,
         "status": "tested_not_published",
         "repository": REPOSITORY,
         "harness_commit": report["harness_commit"],
+        "harness_inputs": report["harness_inputs"],
         "ci_run_url": report["ci_run_url"],
         "releases": report["releases"],
         "scanner": {"image": TRIVY, "blocking": "fixed CRITICAL vulnerabilities"},
@@ -163,6 +188,8 @@ def publish(output: Path) -> None:
     run_identity = os.environ["GITHUB_RUN_ID"] + "-" + os.environ["GITHUB_RUN_ATTEMPT"]
     require(re.fullmatch(r"\d+-\d+", run_identity), "Invalid workflow identity")
     for role, component, release, image in images(manifest):
+        metadata = image["build_inputs"]["metadata"]
+        require(digest(output / metadata["file"]) == metadata["sha256"], "Build metadata changed")
         require(digest(output / image["sbom"]["file"]) == image["sbom"]["sha256"], "SBOM changed")
         repository = NAMESPACE + "-" + component
         tag = repository + ":sha-" + release["source_commit"] + "-run-" + run_identity
@@ -227,6 +254,14 @@ def pull(output: Path) -> None:
         "https://slsa.dev/provenance/v1",
     )
     for role, component, release, image in images(manifest):
+        metadata = image.get("build_inputs", {}).get("metadata")
+        if metadata:
+            require(
+                Path(metadata["file"]).name == metadata["file"], "Invalid build metadata filename"
+            )
+            require(
+                digest(output / metadata["file"]) == metadata["sha256"], "Build metadata changed"
+            )
         reference = registry_reference(image["registry_repository"], image["registry_digest"])
         require(reference == image["registry_ref"], "Registry reference was changed")
         require(digest(output / image["sbom"]["file"]) == image["sbom"]["sha256"], "SBOM changed")

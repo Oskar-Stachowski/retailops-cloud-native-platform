@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -80,7 +80,7 @@ jobs:
             --entrypoint=/bin/promtool \
             -v "${PWD}/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
-            prom/prometheus:v3.7.3 \
+            prom/prometheus:v3.7.3@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038 \
             check config /etc/prometheus/prometheus.yml 2>&1 | tee ci-cd/reports/observability/prometheus-config-check.txt
 
       - name: Validate Prometheus alert rules
@@ -89,14 +89,14 @@ jobs:
           docker run --rm \
             --entrypoint=/bin/sh \
             -v "${PWD}/observability/prometheus/rules:/etc/prometheus/rules:ro" \
-            prom/prometheus:v3.7.3 \
+            prom/prometheus:v3.7.3@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038 \
             -c '/bin/promtool check rules /etc/prometheus/rules/*.yml' 2>&1 | tee ci-cd/reports/observability/prometheus-rules-check.txt
 
       - name: Test alert transitions and SLI semantics
         run: |
           docker run --rm --entrypoint=/bin/promtool \
             -v "${PWD}/observability/prometheus:/work:ro" \
-            prom/prometheus:v3.7.3 test rules /work/tests/outage.yml
+            prom/prometheus:v3.7.3@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038 test rules /work/tests/outage.yml
 
       - name: Set up Python CI toolchain
         uses: ./.github/actions/setup-python-ci

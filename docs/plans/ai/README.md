@@ -1,6 +1,17 @@
 # Plan rozbudowy RetailOps AI
 
-**Status: etap 03 odebrany lokalnie i w Required CI na opublikowanych branchach obu repo. Następne zakresy: 04 w AI i równolegle 06 w RetailOps. Aktualizacja: 29.09.2026.**
+**Status: AI 07 i AI 08 są READY na zaakceptowanych main; AI 05/06 mają odbiór.
+AI 10 jest w końcowej integracji. Aktualizacja: 07.10.2026.**
+[Końcowy stan AI 07](etapy/07-anomalie-dq.md) oraz
+[bieżący status obu publikacji](../../STATUS.md) wskazują exact SHA/runy w PR #97/#24.
+Dalsza integracja transportu i UI wyników należy do AI 10.
+[Bieżący odbiór AI10](../../evidence/ai/10/README.md) podaje przyjęty Source → AI
+SQL/ACK oraz pozostałe native runtime i protected publikację na obu main.
+
+**Status: AI 08 jest READY; AI 04/v12, AI 05 i AI 06 mają przyjęte odbiory. Aktualizacja: 05.10.2026.**
+[Końcowy odbiór AI 08](../../evidence/ai/08/final/README.md) i jego receipt wskazują
+kwalifikowany model, wyniki niezależnej jakości oraz zielone CI obu przyjętych main.
+AI 07 zachowuje osobny odbiór; zależności AI 09/10 pozostają w indeksie etapów.
 [Audyt na `cbf28b2`](../../evidence/ai/00/README.md) ustala zmierzony stan wyjściowy.
 [Fundament AI](../../evidence/ai/01/README.md) obejmuje osobne lokalne repo,
 pakiet, HTTP, PostgreSQL/pgvector, oddzielny MLflow, Compose i wykonywalne
@@ -32,12 +43,24 @@ niezmienny reimport i atomową publikację w osobnym branchu repo AI.
 jawne mappings, quarantine i historyczny odczyt as-of.
 [AI 03.6](../../evidence/ai/03/03.6/README.md) potwierdza pełną bramkę cross-repo
 na obu smoke dwukrotnie, późną korektę i Required CI obu repo.
-Można rozpocząć **04 forecasting** oraz równolegle **06 ledger**.
-Publikacja dotyczy osobnych PR-ów; nie wykonano ich merge na main.
+Odbiór 03 otworzył **04 forecasting** i **06 ledger**; AI 06 jest już odebrany.
+[Publikacja na main obu repo](../../evidence/ai/03/03.6/main-publication.json)
+zachowuje commity merge i Required CI dla push na main.
 [RAG 11](../../evidence/ai/11/README.md) ma odbiór semantyczny i użytkowy
 oraz publikację w repo AI na `abf3f69`. Równolegle można przygotować interfejsy
 i test doubles agenta 12; pełny agent czeka na 10.
-Modele i inventory nadal nie są gotowe.
+[Końcowy odbiór AI 06](../../evidence/ai/06/final/README.md) obejmuje ledger,
+dostawy, realizację sprzedaży/zwrotów, znane snapshoty, osobną kwalifikację
+labeli i pełną ścieżkę do curated 1.1. Domyślne CLI AI generuje 2.7.
+[Runbook](../../reference/inventory-snapshots.md) i [karta danych](../../evidence/ai/06/final/dataset-card.md)
+podają komendy i IDs. Ukończenie 06 nie zależy od 04/05; zgodne prognozy
+oraz lifecycle są osobnym warunkiem części modelowej 07/08.
+[Lokalne scenariusze biznesowe 07.1a/b](../../reference/business-anomaly-scenarios.md)
+stanowią niezależne przygotowanie źródła z osobną truth i niezmiennym kandydatem.
+Obejmują popyt, zwroty i ograniczenie zapasu. Późniejsze raw DQ, offline
+curation, handoff i część modelowa mają końcowy odbiór AI 07 wskazany powyżej. [Odbiór 07.1b](../../evidence/ai/07/07.1b/README.md)
+potwierdza realne zmiany procesu i 190 różnych testów.
+
 [Backlog](backlog.md) podaje zakres 04/06 i granice równoległych strumieni.
 Szczegółowa [pisemna mapa repozytoriów i kolejności](kolejnosc-i-repozytoria.md)
 rozróżnia przygotowanie interfejsów od pełnego odbioru etapów.

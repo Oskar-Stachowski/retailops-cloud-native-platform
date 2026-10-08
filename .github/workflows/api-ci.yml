@@ -27,7 +27,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
         env:
           POSTGRES_USER: retailops
           POSTGRES_PASSWORD: retailops
@@ -47,12 +47,40 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Set up Python CI toolchain
         uses: ./.github/actions/setup-python-ci
+
+      - name: Resolve pinned AI10 source client
+        id: source-client
+        working-directory: .
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          pin = json.loads(Path("services/api/app/contracts/source-reads-v2/client.json").read_text())
+          assert pin["repository"] == "Oskar-Stachowski/retailops-ai-intelligence"
+          assert re.fullmatch(r"[0-9a-f]{40}", pin["commit"])
+          with open(os.environ["GITHUB_OUTPUT"], "a") as stream:
+              stream.write("commit=" + pin["commit"] + "\n")
+          PY
+
+      - name: Checkout pinned AI10 source client for actual HTTP drill
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: Oskar-Stachowski/retailops-ai-intelligence
+          ref: ${{ steps.source-client.outputs.commit }}
+          path: .ci-source-rest-client
+          persist-credentials: false
+
+      - name: Require actual cross-repo HTTP and PostgreSQL test
+        working-directory: .
+        run: |
+          echo "RETAILOPS_AI_SOURCE_CLIENT_ROOT=${GITHUB_WORKSPACE}/.ci-source-rest-client" >> "${GITHUB_ENV}"
+          echo "REQUIRE_SOURCE_REST_TESTS=1" >> "${GITHUB_ENV}"
 
       - name: Prepare evidence directories
         working-directory: .
@@ -62,13 +90,28 @@ jobs:
         working-directory: .
         run: docker pull python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff
 
+      - name: Prepare pinned images for broker durability tests
+        working-directory: .
+        run: |
+          docker pull postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+          docker pull redpandadata/redpanda:v25.3.6@sha256:ac152ec27adccf9482af2649d293f398eb03c860d7469fc49f86e30d870ea408
+
       - name: Run backend static quality gates
         working-directory: .
         run: |
           set -euo pipefail
           python -m ruff check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
+          python -m ruff check scripts/intelligence-runtime scripts/ci/test_intelligence_runtime.py --config pyproject.toml
+          python -m ruff check scripts/source-bundles --config pyproject.toml
           python -m ruff format --check services/api/app services/api/scripts services/api/tests data ml scripts/ci/ml_experiment_report.py --config pyproject.toml
+          python -m ruff format --check scripts/intelligence-runtime scripts/ci/test_intelligence_runtime.py --config pyproject.toml
+          python -m ruff format --check scripts/source-bundles --config pyproject.toml
           python -m mypy --config-file pyproject.toml
+          python -m mypy --config-file pyproject.toml scripts/intelligence-runtime
+          python -m mypy --config-file pyproject.toml scripts/source-bundles
+          PYTHONPATH=services/api python services/api/scripts/export_source_read_contract.py --check
+          python services/api/scripts/check_intelligence_head_owner.py --owner-root .ci-source-rest-client
+          RETAILOPS_ENABLE_SUGGESTION_FIXTURE_TRANSPORT=1 PYTHONPATH=services/api python services/api/scripts/check_suggestion_contract.py | tee ci-cd/reports/api/suggestion-contract.json
           python -m bandit \
             --severity-level high \
             --confidence-level high \
@@ -76,6 +119,30 @@ jobs:
             -r services/api/app services/api/scripts \
             -f txt \
             -o "${SECURITY_REPORT_DIR}/bandit-api.txt"
+
+      - name: Verify checkpoint, approved head and suggestion durability before broad regression
+        env:
+          REQUIRE_BROKER_TESTS: "1"
+          SOURCE_OBSERVATION_OUTBOX_REPORT: "../../ci-cd/reports/api/source-observation-outbox.json"
+        run: |
+          rm -f .coverage .coverage.*
+          python -m pytest -q -x tests/test_intelligence_checkpoint_durability.py \
+            tests/test_intelligence_head_durability.py \
+            tests/test_intelligence_suggestion_durability.py \
+            tests/test_intelligence_model_durability.py \
+            tests/test_source_observation_durability.py \
+            --junitxml=../../ci-cd/reports/api/intelligence-durability.xml \
+            --cov=app --cov-branch --cov-report= --cov-fail-under=0
+
+      - name: Verify Source SQL capture and complete broker prefix
+        env:
+          REQUIRE_BROKER_TESTS: "1"
+          SOURCE_OBSERVATION_CAPTURE_REPORT: "../../ci-cd/reports/api/source-observation-capture-report.json"
+        run: |
+          python -m pytest -q -x tests/test_source_observation_capture.py \
+            tests/test_source_observation_capture_durability.py \
+            --junitxml=../../ci-cd/reports/api/source-observation-capture.xml \
+            --cov=app --cov-branch --cov-append --cov-report= --cov-fail-under=0
 
       - name: Verify fixed-origin ML assessment contract
         working-directory: .
@@ -109,12 +176,19 @@ jobs:
         run: python scripts/seed_demo_data.py
 
       - name: Run API tests with coverage
+        env:
+          REQUIRE_BROKER_TESTS: "1"
         run: |
           set -euo pipefail
           mkdir -p ../../ci-cd/reports/api
-          rm -f .coverage .coverage.*
           pytest \
+            --ignore=tests/test_intelligence_checkpoint_durability.py \
+            --ignore=tests/test_intelligence_head_durability.py \
+            --ignore=tests/test_intelligence_suggestion_durability.py \
+            --ignore=tests/test_source_observation_durability.py \
+            --ignore=tests/test_source_observation_capture_durability.py \
             --cov=app \
+            --cov-append \
             --cov-report=term-missing \
             --cov-branch \
             --cov-fail-under=80 \
@@ -143,6 +217,29 @@ jobs:
           name: api-coverage-evidence
           path: ci-cd/reports/api/coverage.xml
           if-no-files-found: warn
+
+      - name: Upload pinned suggestion contract and real durability evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: intelligence-suggestion-evidence
+          path: |
+            ci-cd/reports/api/suggestion-contract.json
+            ci-cd/reports/api/intelligence-durability.xml
+            ci-cd/reports/api/source-observation-outbox.json
+          if-no-files-found: error
+
+      - name: Upload Source capture and original replay evidence
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: source-observation-capture-evidence
+          path: |
+            ci-cd/reports/api/source-observation-capture-report.json
+            ci-cd/reports/api/source-observation-capture.json
+            ci-cd/reports/api/source-observation-capture-replay.json
+            ci-cd/reports/api/source-observation-capture.xml
+          if-no-files-found: error
 
       - name: Upload API security evidence
         if: always()
@@ -179,7 +276,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 

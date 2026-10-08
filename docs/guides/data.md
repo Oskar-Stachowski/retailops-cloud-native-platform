@@ -38,13 +38,23 @@ i bezpieczny cleanup opisuje [runbook AI 03.1](../reference/parquet-artifacts.md
 Kwalifikowaną atomową publikację, allowlistę faktów, opcjonalną evaluation truth
 i niezmienny re-export opisuje [runbook AI 03.2](../reference/ai-snapshots.md).
 
-Przykład profilu AI z kontrolą integralności źródła i cech:
+Osobna [ścieżka integracji inventory 06.6a](../reference/source-inventory-commerce.md)
+realizuje źródłowe koszyki przez chronologiczny ledger i tworzy prywatny raport
+uzgodnienia. Nie jest domyślnym source, eksportem AI ani wejściem loadera seeda.
+[Typowane tabele 06.6b.1](../reference/inventory-source-tables.md) można osobno
+materializować i odczytać z uzgodnieniem CSV/Parquet.
+[Source 2.7](../reference/inventory-source-dataset.md) i [pełny pipeline AI 06](../reference/inventory-snapshots.md)
+są domyślną ścieżką CLI AI: source → qualification → snapshot/import/curated 1.1.
+[Końcowy odbiór](../evidence/ai/06/final/README.md) potwierdza historyczny as-of,
+truth isolation, oba profile i budżet. Demo/API/seeder zachowują zgodność.
+
+Przykład jawnej ścieżki zgodności 2.6 i historycznego feature buildera:
 
 ```bash
 docker pull python@sha256:90744cff8f32887f075c47d747a173ff333e9e98801667af93c357fa9f5e28ff
 data_ai_dir=$(mktemp -d /tmp/retailops-ai-smoke.XXXXXX)
 services/api/.venv/bin/python -m data.generator.main \
-  --profile ai-smoke --end-date 2026-07-31 --output-dir "$data_ai_dir"
+  --source-version 2.6 --profile ai-smoke --end-date 2026-07-31 --output-dir "$data_ai_dir"
 services/api/.venv/bin/python -m data.generator.manifest_v2 --data-dir "$data_ai_dir"
 services/api/.venv/bin/python -m ml.features.demand_forecast \
   --profile ai-smoke --end-date 2026-07-31 --source-dir "$data_ai_dir" \

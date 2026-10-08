@@ -9,6 +9,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import SchemaError
+
 
 REQUIRED_EVENT_CONTRACT_FIELDS = {
     "contract_name",
@@ -47,7 +50,9 @@ def csv_row_count(path: Path) -> int:
         return sum(1 for _ in csv.DictReader(file))
 
 
-def validate_dataset_contract(contract_path: Path, data_dir: Path) -> tuple[list[dict[str, Any]], dict[str, int]]:
+def validate_dataset_contract(
+    contract_path: Path, data_dir: Path
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
     contract = load_json(contract_path)
     checks: list[dict[str, Any]] = []
     row_counts: dict[str, int] = {}
@@ -147,17 +152,56 @@ def validate_event_contract(event_contract_path: Path) -> list[dict[str, Any]]:
         )
         - set(required_envelope_fields),
     )
+    routing = event_contract.get("event_type_topics", {})
+    route_valid = (
+        isinstance(routing, dict)
+        and bool(routing)
+        and sorted(routing) == sorted(event_contract.get("supported_event_types", []))
+        and sorted(set(routing.values())) == sorted(event_contract.get("supported_topics", []))
+        and event_contract.get("supported_schema_versions") == ["1.0"]
+    )
+    schema_path = event_contract_path.resolve().parent / str(event_contract.get("schema_file", ""))
+    schema_valid = False
+    if schema_path.is_file():
+        schema = load_json(schema_path)
+        try:
+            Draft202012Validator.check_schema(schema)
+            schema_valid = (
+                set(schema.get("$defs", {})) == set(routing)
+                and set(schema.get("required", [])) == set(required_envelope_fields)
+                and schema.get("properties", {}).get("schema_version", {}).get("const") == "1.0"
+                and {
+                    (
+                        clause["properties"]["event_type"]["const"],
+                        clause["properties"]["topic"]["const"],
+                    )
+                    for clause in schema.get("oneOf", [])
+                }
+                == set(routing.items())
+            )
+        except (KeyError, SchemaError, TypeError, ValueError):
+            schema_valid = False
 
     checks.append(
         {
             "name": "event_contract_shape_is_valid",
-            "status": "passed" if not missing_top_level and not missing_envelope_basics else "failed",
+            "status": (
+                "passed"
+                if not missing_top_level
+                and not missing_envelope_basics
+                and route_valid
+                and schema_valid
+                else "failed"
+            ),
             "details": {
                 "file": str(event_contract_path),
                 "missing_top_level_fields": missing_top_level,
                 "missing_envelope_fields": missing_envelope_basics,
                 "supported_event_type_count": len(event_contract.get("supported_event_types", [])),
                 "supported_topic_count": len(event_contract.get("supported_topics", [])),
+                "routing_valid": route_valid,
+                "schema_file": str(schema_path),
+                "schema_valid": schema_valid,
             },
         },
     )
@@ -165,7 +209,9 @@ def validate_event_contract(event_contract_path: Path) -> list[dict[str, Any]]:
     return checks
 
 
-def write_report(report_path: Path, checks: list[dict[str, Any]], row_counts: dict[str, int]) -> dict[str, Any]:
+def write_report(
+    report_path: Path, checks: list[dict[str, Any]], row_counts: dict[str, int]
+) -> dict[str, Any]:
     report_path.parent.mkdir(parents=True, exist_ok=True)
     failed = [check for check in checks if check["status"] != "passed"]
     report = {

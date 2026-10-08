@@ -4,6 +4,7 @@
 
 import argparse
 import copy
+import hashlib
 import json
 import os
 import re
@@ -16,7 +17,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
-from release import compatible, migration_contract, require, verify_image
+from inputs import build_inputs, harness_inputs, verify_source_inputs
+from release import additive_expansion, compatible, migration_contract, require, verify_image
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "scripts/release/compose.yml"
@@ -32,6 +34,7 @@ class Drill:
         self.env = {k: v for k, v in os.environ.items() if not k.startswith("COMPOSE_")}
         self.env.update(
             {
+                "BUILDX_METADATA_PROVENANCE": "max",
                 "COMPOSE_PROJECT_NAME": self.project,
                 "COMPOSE_FILE": str(CONFIG),
                 "COMPOSE": "docker compose --env-file /dev/null",
@@ -58,6 +61,7 @@ class Drill:
             "stages": {},
             "timings_seconds": {},
             "negative_checks": {},
+            "harness_inputs": harness_inputs(ROOT),
             "ci_run_url": os.getenv("GITHUB_SERVER_URL", "https://github.com")
             + "/"
             + os.getenv("GITHUB_REPOSITORY", "")
@@ -136,6 +140,10 @@ class Drill:
         source = self.source(release["source_commit"], directory)
         for key in ("source_commit", "version", "migration"):
             require(release[key] == source[key], f"Imported manifest differs from source: {key}")
+        for component, context in (("api", "services/api"), ("frontend", "frontend")):
+            recorded = release["images"][component].get("build_inputs")
+            if recorded is not None:
+                verify_source_inputs(directory / context, recorded)
         self.select(release, directory)
         return release
 
@@ -145,11 +153,16 @@ class Drill:
         for component, context in (("api", "services/api"), ("frontend", "frontend")):
             tag = f"{self.project}-{component}:sha-{sha}"
             self.tags.append(tag)
+            metadata_file = self.report_dir / f"{sha}-{component}-build.json"
             self.progress(f"Build {component} from {sha[:12]}")
             self.run(
                 [
                     "docker",
+                    "buildx",
                     "build",
+                    "--load",
+                    "--metadata-file",
+                    str(metadata_file),
                     "--label",
                     "org.opencontainers.image.revision=" + sha,
                     "--label",
@@ -166,10 +179,18 @@ class Drill:
             )
             image = json.loads(self.run(["docker", "image", "inspect", tag]))[0]
             verify_image(image, release, component, image["Id"])
+            recorded = build_inputs(
+                directory / context, json.loads(metadata_file.read_text()), image
+            )
+            recorded["metadata"] = {
+                "file": metadata_file.name,
+                "sha256": hashlib.sha256(metadata_file.read_bytes()).hexdigest(),
+            }
             release["images"][component] = {
                 "tag": tag,
                 "image_id": image["Id"],
                 "platform": image["Os"] + "/" + image["Architecture"],
+                "build_inputs": recorded,
             }
         return release
 
@@ -263,7 +284,7 @@ class Drill:
             "snapshot": expected["snapshot"],
         }
 
-    def exercise(self, previous: dict, candidate: dict, old_dir: Path, new_dir: Path) -> None:
+    def exercise(self, previous: dict, candidate: dict, old_dir: Path, new_dir: Path) -> None:  # noqa: PLR0915 -- ordered isolated upgrade/rollback drill
         require(
             previous["source_commit"] != candidate["source_commit"],
             "Two distinct commits are required",
@@ -278,10 +299,52 @@ class Drill:
             ]
         )
         compatible(candidate, previous, previous["migration"]["head"])
+        expansion = additive_expansion(candidate, previous)
         self.select(previous, old_dir)
         self.run([*self.compose, "up", "-d", "--wait", "--wait-timeout", "90", "db"], stream=True)
+        if expansion is not None:
+            # Forward migration occurs once, before either application version owns writes.
+            self.select(candidate, new_dir)
         self.app("alembic", "upgrade", "head")
+        self.select(previous, old_dir)
         self.app("python", "scripts/seed_demo_data.py")
+        if expansion is not None:
+            fixture = json.loads(
+                (
+                    ROOT
+                    / "services/api/app/contracts/intelligence-v2/forecast_generated.fixture.json"
+                ).read_text()
+            )
+            self.report["additive_expansion"] = {
+                **expansion,
+                "seeded_projection": json.loads(
+                    self.app(
+                        "python",
+                        "/release/checks.py",
+                        "seed-expansion",
+                        data={
+                            "forecast": fixture,
+                            "models": [
+                                json.loads(
+                                    (
+                                        ROOT / "services/api/app/contracts/intelligence-v2" / name
+                                    ).read_text()
+                                )
+                                for name in (
+                                    "anomaly_detected.fixture.json",
+                                    "stockout_risk_scored.fixture.json",
+                                )
+                            ],
+                            "suggestion": json.loads(
+                                (
+                                    ROOT
+                                    / "services/api/app/contracts/intelligence-suggestions-v1/recommendation_generated.fixture.json"
+                                ).read_text()
+                            ),
+                        },
+                    )
+                ),
+            }
         expected = json.loads(self.app("python", "/recovery/checks.py", "prepare"))
         self.report["before"] = expected["snapshot"]
         self.deploy(previous, old_dir)
@@ -352,7 +415,11 @@ class Drill:
         )
         self.report["after_rollback_write"] = expected["snapshot"]
         self.report["database_head"] = self.db_head()
-        self.report["migration_action"] = "same-head upgrade check; no downgrade, restore or reseed"
+        self.report["migration_action"] = (
+            "one initial fingerprinted additive expansion; both image versions retain full schema/data; no downgrade, restore or reseed"
+            if expansion is not None
+            else "same-head upgrade check; no downgrade, restore or reseed"
+        )
         previous["validation"] = candidate["validation"] = "local_drill_passed"
         self.report["status"] = "passed"
 

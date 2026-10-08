@@ -1,0 +1,9 @@
+{
+  "repository": "Oskar-Stachowski/retailops-ai-intelligence",
+  "commit": "3a64b03ac707a7bc041bef4ad80e451c9ff8e49a",
+  "path": "scripts/mlflow_v12_lifecycle.py",
+  "sha256": "167dc435ac1be4a2ae2b676724aedab42f88b9e4f2df86dfdfa866e858d74cfb",
+  "command": "review",
+  "authority": "trusted_private_operator_handoff",
+  "live_registry_validation_in_retailops": false
+}

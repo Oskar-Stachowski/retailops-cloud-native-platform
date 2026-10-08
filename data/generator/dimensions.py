@@ -158,6 +158,12 @@ def _assignments(
         for version, first, last in dated_versions(
             config.start_date, config.end_date + timedelta(days=1)
         ):
+            # Extend only the final known plan; history/version boundaries stay unchanged.
+            effective_end = (
+                (config.planning_end_date + timedelta(days=1)).isoformat()
+                if last == (config.end_date + timedelta(days=1)).isoformat()
+                else last
+            )
             result.append(
                 {
                     "id": deterministic_uuid("channel_assignment", f"{key}:v{version}"),
@@ -167,7 +173,7 @@ def _assignments(
                     "selling_location_id": location["id"],
                     "channel": channel,
                     "effective_from": first,
-                    "effective_to": last,
+                    "effective_to": effective_end,
                     "available_at": known,
                 }
             )
@@ -286,11 +292,15 @@ def build_dimensions(
     categories = _categories()
     catalog = _catalog(products, brands, config)
     selling_count = min(config.stores, max(2, (config.stores + len(CHANNELS) - 1) // len(CHANNELS)))
+    if config.profile in {"ai-07-portfolio-v2", "ai-07-portfolio-v3", "ai-07-portfolio-v4"}:
+        # The declared two-pair benchmark has one physical location, with
+        # store and online intake, rather than two Sunday-closed store pairs.
+        selling_count = 1
     selling = _locations(selling_count, "selling")
     stock = _locations(config.warehouses, "stock")
     assignments = _assignments(selling, config)
     category_calendar = []
-    for offset in range(config.days):
+    for offset in range(config.planning_days):
         day = config.start_date + timedelta(days=offset)
         for category in categories:
             months = {int(value) for value in category["seasonal_months"].split(",") if value}

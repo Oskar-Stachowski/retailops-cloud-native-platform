@@ -1,0 +1,372 @@
+{
+  "verified_at": "2026-09-30T15:54:31.769820+00:00",
+  "scope": "AI 07.1a upstream demand scenario preparation only",
+  "runtime_commit": "23a6a601093e5b3df7e61afaa42a0c77edc0949f",
+  "base_origin_main": "1bc051bd1fe48c7201d6c1544e4dfc8669ff5e27",
+  "branch": "ai/07-business-anomalies",
+  "code_sha256": "2fb93e0cfe591f7c2f16142f11258c8e77f9abf4a8ce638ab159aec4ebd55455",
+  "generation": {
+    "business_timezone": "UTC",
+    "days": 30,
+    "end_date": "2026-07-31",
+    "label_tail_days": 0,
+    "max_daily_rows": 720,
+    "origin_days": 0,
+    "output_format": "csv",
+    "products": 8,
+    "profile": "ai-smoke",
+    "seed": 42,
+    "start_date": "2026-07-02",
+    "stores": 3,
+    "warehouses": 2,
+    "warmup_days": 0
+  },
+  "candidate_schema": "anomaly-scenario-candidate-1.0.0",
+  "runs": [
+    {
+      "status": "passed",
+      "scope": "AI 07.1a demand scenarios only",
+      "candidate_id": "anomaly-candidate-sha256-b436788169b5a6d1f9c46d74e25f4c8d488969f95ddbfe97cbacd78006958749",
+      "directory": "data/generated/ai07-acceptance/first/anomaly-candidate-sha256-b436788169b5a6d1f9c46d74e25f4c8d488969f95ddbfe97cbacd78006958749",
+      "episode_count": 3,
+      "control_count": 4,
+      "facts_status": "passed",
+      "source_ready": false,
+      "anomaly_ready": false,
+      "model_ready": false,
+      "publication_status": "candidate_only_awaiting_versioned_ai03_handoff",
+      "seconds": 15.613376332999906,
+      "peak_rss_mib": 167.5625
+    },
+    {
+      "status": "passed",
+      "scope": "AI 07.1a demand scenarios only",
+      "candidate_id": "anomaly-candidate-sha256-b436788169b5a6d1f9c46d74e25f4c8d488969f95ddbfe97cbacd78006958749",
+      "directory": "data/generated/ai07-acceptance/repeat/anomaly-candidate-sha256-b436788169b5a6d1f9c46d74e25f4c8d488969f95ddbfe97cbacd78006958749",
+      "episode_count": 3,
+      "control_count": 4,
+      "facts_status": "passed",
+      "source_ready": false,
+      "anomaly_ready": false,
+      "model_ready": false,
+      "publication_status": "candidate_only_awaiting_versioned_ai03_handoff",
+      "seconds": 10.707687874994008,
+      "peak_rss_mib": 203.015625
+    },
+    {
+      "status": "passed",
+      "scope": "AI 07.1a demand scenarios only",
+      "candidate_id": "anomaly-candidate-sha256-54809dfad77a5cfbf6d8d1d374014d16d8483b99fd0b2406366af10becc04bad",
+      "directory": "data/generated/ai07-acceptance/unconstrained/anomaly-candidate-sha256-54809dfad77a5cfbf6d8d1d374014d16d8483b99fd0b2406366af10becc04bad",
+      "episode_count": 3,
+      "control_count": 4,
+      "facts_status": "passed",
+      "source_ready": false,
+      "anomaly_ready": false,
+      "model_ready": false,
+      "publication_status": "candidate_only_awaiting_versioned_ai03_handoff",
+      "seconds": 14.400550666003255,
+      "peak_rss_mib": 227.46875
+    }
+  ],
+  "repeat_identical_candidate_id": true,
+  "repeat_identical_files": 5,
+  "artifacts": {
+    "facts/commerce.json": {
+      "path": "facts/commerce.json",
+      "sha256": "d85c9e484bc8dbcd779bc03e22434d10736ae33c0bd4ecd92483e4dea2693d5d",
+      "size_bytes": 4017653
+    },
+    "facts/inventory.json": {
+      "path": "facts/inventory.json",
+      "sha256": "a7adc39aa3cf033d14b53488e494765663b5c2846ecf86c620473b5e251e67d1",
+      "size_bytes": 2526330
+    },
+    "simulation_truth/anomaly_injections.json": {
+      "path": "simulation_truth/anomaly_injections.json",
+      "sha256": "c5e96b6356b24ed319e4446fb2edbf106bdf93f24cb33897951e343975743018",
+      "size_bytes": 6965
+    },
+    "simulation_truth/process.json": {
+      "path": "simulation_truth/process.json",
+      "sha256": "edba34d25c8954edd94b8ba16fddd1d36476e0bdd8cd30abd88bf75870b0bf67",
+      "size_bytes": 1560674
+    }
+  },
+  "episode_outcomes": {
+    "default_stock": [
+      {
+        "type": "one_day_spike",
+        "window": [
+          "2026-07-10",
+          "2026-07-10"
+        ],
+        "magnitude": "3",
+        "normal": {
+          "latent_quantity": 24,
+          "lost_sales_quantity": 24,
+          "observed_quantity": 0
+        },
+        "injected": {
+          "latent_quantity": 72,
+          "lost_sales_quantity": 72,
+          "observed_quantity": 0
+        }
+      },
+      {
+        "type": "multi_day_spike",
+        "window": [
+          "2026-07-17",
+          "2026-07-19"
+        ],
+        "magnitude": "2",
+        "normal": {
+          "latent_quantity": 103,
+          "lost_sales_quantity": 66,
+          "observed_quantity": 37
+        },
+        "injected": {
+          "latent_quantity": 205,
+          "lost_sales_quantity": 161,
+          "observed_quantity": 44
+        }
+      },
+      {
+        "type": "sustained_drop",
+        "window": [
+          "2026-07-24",
+          "2026-07-27"
+        ],
+        "magnitude": "0.2",
+        "normal": {
+          "latent_quantity": 102,
+          "lost_sales_quantity": 51,
+          "observed_quantity": 51
+        },
+        "injected": {
+          "latent_quantity": 20,
+          "lost_sales_quantity": 8,
+          "observed_quantity": 12
+        }
+      }
+    ],
+    "unconstrained_stock": [
+      {
+        "type": "one_day_spike",
+        "window": [
+          "2026-07-10",
+          "2026-07-10"
+        ],
+        "magnitude": "3",
+        "normal": {
+          "latent_quantity": 24,
+          "lost_sales_quantity": 0,
+          "observed_quantity": 24
+        },
+        "injected": {
+          "latent_quantity": 72,
+          "lost_sales_quantity": 0,
+          "observed_quantity": 72
+        }
+      },
+      {
+        "type": "multi_day_spike",
+        "window": [
+          "2026-07-17",
+          "2026-07-19"
+        ],
+        "magnitude": "2",
+        "normal": {
+          "latent_quantity": 103,
+          "lost_sales_quantity": 0,
+          "observed_quantity": 103
+        },
+        "injected": {
+          "latent_quantity": 205,
+          "lost_sales_quantity": 0,
+          "observed_quantity": 205
+        }
+      },
+      {
+        "type": "sustained_drop",
+        "window": [
+          "2026-07-24",
+          "2026-07-27"
+        ],
+        "magnitude": "0.2",
+        "normal": {
+          "latent_quantity": 102,
+          "lost_sales_quantity": 0,
+          "observed_quantity": 102
+        },
+        "injected": {
+          "latent_quantity": 20,
+          "lost_sales_quantity": 0,
+          "observed_quantity": 20
+        }
+      }
+    ]
+  },
+  "tests": [
+    {
+      "report": "ci-cd/reports/data/ai07-demand-tests.xml",
+      "sha256": "8a263c98133b0ef3040c7269ef2894152dfacdf6bf3994ff2dbfc2187c89da9c",
+      "cases": 43,
+      "failed": 0,
+      "skipped": 0,
+      "failed_nodes": []
+    },
+    {
+      "report": "ci-cd/reports/data/ai07-regression.xml",
+      "sha256": "8808be27ae5920ab6d4897c284f97fa1f581f1e37f9a0906fe4ac18eabefb3d1",
+      "cases": 1042,
+      "failed": 3,
+      "skipped": 0,
+      "failed_nodes": [
+        "services.api.tests.test_data_demand::test_ai_feature_export_is_verified_and_not_silently_legacy",
+        "services.api.tests.test_data_identity_v2::test_repeated_exports_keep_logical_identity_and_table_bytes[config1]",
+        "services.api.tests.test_data_identity_v2::test_repeated_exports_keep_logical_identity_and_table_bytes[config2]"
+      ]
+    },
+    {
+      "report": "ci-cd/reports/data/ai07-docker-retry.xml",
+      "sha256": "ccda518ffc271157f6fabb7db9b60600940667b4fd63cd20c301cdefb2e61b6d",
+      "cases": 3,
+      "failed": 0,
+      "skipped": 0,
+      "failed_nodes": []
+    }
+  ],
+  "unique_passed_tests": 1085,
+  "unresolved_failed_tests": 0,
+  "junit_node_normalization": "Module basename plus parametrized name; retry pytest root produces shorter classnames.",
+  "docker_retry_reason": "Sandbox denied access to Docker socket. The three failed cases passed outside the sandbox with the pinned isolated worker.",
+  "lint": "passed",
+  "format": "passed",
+  "mypy": {
+    "scope": "data/anomalies, follow-imports=skip",
+    "modules": 6,
+    "status": "passed"
+  },
+  "preserved_base_files": {
+    "status": "passed",
+    "tracked_files": 73,
+    "paths": [
+      "data/demo",
+      "data/tests/fixtures",
+      "k8s/overlays/dev/demo-data",
+      "existing data/contracts"
+    ]
+  },
+  "remote_ci": "not_run",
+  "source_ready": false,
+  "anomaly_ready": false,
+  "model_ready": false,
+  "remaining": [
+    "return_spike",
+    "inventory_censored_episode",
+    "raw_dq_faults",
+    "versioned_ai03_handoff",
+    "ai_curation_detection_lifecycle_after_04_05_acceptance"
+  ],
+  "test_commands": [
+    {
+      "argv": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "data/tests/test_business_anomalies.py",
+        "--junitxml=ci-cd/reports/data/ai07-demand-tests.xml"
+      ],
+      "env": {
+        "PYTHONPATH": "services/api:."
+      }
+    },
+    {
+      "argv": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "data/tests",
+        "--ignore=data/tests/test_business_anomalies.py",
+        "services/api/tests/test_data_contracts.py",
+        "services/api/tests/test_data_generator_cli.py",
+        "services/api/tests/test_data_demand.py",
+        "services/api/tests/test_data_dimensions.py",
+        "services/api/tests/test_data_pricing.py",
+        "services/api/tests/test_data_returns.py",
+        "services/api/tests/test_data_identity_v2.py",
+        "services/api/tests/test_observation_history.py",
+        "services/api/tests/test_demand_feature_generation.py",
+        "services/api/tests/test_realtime_contract.py",
+        "--junitxml=ci-cd/reports/data/ai07-regression.xml"
+      ],
+      "env": {
+        "PYTHONPATH": "services/api:."
+      }
+    },
+    {
+      "argv": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "services/api/tests/test_data_demand.py::test_ai_feature_export_is_verified_and_not_silently_legacy",
+        "services/api/tests/test_data_identity_v2.py::test_repeated_exports_keep_logical_identity_and_table_bytes[config1]",
+        "services/api/tests/test_data_identity_v2.py::test_repeated_exports_keep_logical_identity_and_table_bytes[config2]",
+        "--junitxml=ci-cd/reports/data/ai07-docker-retry.xml"
+      ],
+      "env": {
+        "PYTHONPATH": "services/api:."
+      }
+    }
+  ],
+  "run_commands": [
+    {
+      "argv": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "data.anomalies.run",
+        "--example",
+        "--products",
+        "8",
+        "--output-root",
+        "data/generated/ai07-acceptance/first",
+        "--output",
+        "ci-cd/reports/data/ai07-first.json"
+      ]
+    },
+    {
+      "argv": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "data.anomalies.run",
+        "--example",
+        "--products",
+        "8",
+        "--output-root",
+        "data/generated/ai07-acceptance/repeat",
+        "--output",
+        "ci-cd/reports/data/ai07-repeat.json"
+      ]
+    },
+    {
+      "argv": [
+        "/Users/oskarstachowski/retailops-cloud-native-platform/services/api/.venv/bin/python",
+        "-m",
+        "data.anomalies.run",
+        "--example",
+        "--products",
+        "8",
+        "--output-root",
+        "data/generated/ai07-acceptance/unconstrained",
+        "--output",
+        "ci-cd/reports/data/ai07-unconstrained.json",
+        "--inventory-config",
+        "ci-cd/reports/data/ai07-inventory-unconstrained.json"
+      ]
+    }
+  ]
+}

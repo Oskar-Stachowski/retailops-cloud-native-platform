@@ -6,11 +6,13 @@ import os
 import signal
 import threading
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from app.core.config import Settings
 from app.core.config import settings as default_settings
+from app.repositories.realtime_quarantine_repository import RealtimeQuarantineRepository
 from app.services.realtime_consumer import (
+    InvalidRealtimeEventError,
     RealtimeEventConsumer,
     build_realtime_event_consumer,
 )
@@ -29,15 +31,42 @@ class KafkaMessage(Protocol):
 
     def offset(self) -> int: ...
 
+    def key(self) -> bytes | None: ...
+
+    def headers(self) -> list[tuple[str, bytes | None]] | None: ...
+
+    def timestamp(self) -> tuple[int, int]: ...
+
+
+class KafkaCommitPartition(Protocol):
+    error: object | None
+
 
 class KafkaConsumerClient(Protocol):
     def subscribe(self, topics: list[str]) -> None: ...
 
     def poll(self, timeout: float) -> KafkaMessage | None: ...
 
-    def commit(self, message: KafkaMessage, *, asynchronous: bool = False) -> object: ...
+    def commit(
+        self, *, message: KafkaMessage, asynchronous: bool = False
+    ) -> list[KafkaCommitPartition] | None: ...
 
     def close(self) -> None: ...
+
+
+class DurableEventConsumer(Protocol):
+    def start(self) -> None: ...
+
+    def stop(self) -> None: ...
+
+    def process_event(
+        self,
+        event: dict[str, Any],
+        *,
+        transport_topic: str | None = None,
+    ) -> dict[str, Any]: ...
+
+    def record_quarantined(self, *, decoded: bool, error: str) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -82,12 +111,14 @@ class RealtimeKafkaConsumerRunner:
         self,
         *,
         kafka_consumer: KafkaConsumerClient,
-        event_consumer: RealtimeEventConsumer,
+        event_consumer: DurableEventConsumer,
         config: RealtimeConsumerRunnerConfig,
+        quarantine_repository: RealtimeQuarantineRepository | None = None,
     ) -> None:
         self.kafka_consumer = kafka_consumer
         self.event_consumer = event_consumer
         self.config = config
+        self.quarantine_repository = quarantine_repository or RealtimeQuarantineRepository()
 
     def run(
         self,
@@ -107,16 +138,16 @@ class RealtimeKafkaConsumerRunner:
             self.config.group_id,
         )
 
-        self.event_consumer.start()
         try:
+            self.event_consumer.start()
             while not stop_event.is_set():
                 message = self.kafka_consumer.poll(self.config.poll_timeout_seconds)
                 if message is None:
                     continue
 
                 if message.error():
-                    logger.warning("Kafka consumer message error: %s", message.error())
-                    continue
+                    msg = f"Kafka consumer message error: {message.error()}"
+                    raise RuntimeError(msg)
 
                 handled_messages += 1
                 self._handle_message(message)
@@ -124,15 +155,25 @@ class RealtimeKafkaConsumerRunner:
                 if max_messages is not None and handled_messages >= max_messages:
                     break
         finally:
-            self.event_consumer.stop()
-            self.kafka_consumer.close()
+            try:
+                self.event_consumer.stop()
+            finally:
+                self.kafka_consumer.close()
 
         return handled_messages
 
     def _handle_message(self, message: KafkaMessage) -> None:
+        decoded = False
         try:
-            event = decode_message_value(message.value())
-            result = self.event_consumer.process_event(event)
+            try:
+                event = decode_message_value(message.value())
+            except (ValueError, TypeError) as exc:
+                raise InvalidRealtimeEventError(str(exc)) from exc
+            decoded = True
+            result = self.event_consumer.process_event(event, transport_topic=message.topic())
+            if result.get("status") not in {"processed", "ignored_duplicate"}:
+                msg = f"Event has no durable success receipt: {result.get('status')}"
+                raise RuntimeError(msg)
             logger.info(
                 "Processed realtime event status=%s topic=%s partition=%s offset=%s",
                 result.get("status"),
@@ -140,16 +181,33 @@ class RealtimeKafkaConsumerRunner:
                 message.partition(),
                 message.offset(),
             )
-        except Exception:
-            logger.exception(
-                "Failed to process Kafka message topic=%s partition=%s offset=%s",
+        except InvalidRealtimeEventError as exc:
+            self.quarantine_repository.store_message(
+                consumer_group=self.config.group_id,
+                topic=message.topic(),
+                partition=message.partition(),
+                offset=message.offset(),
+                value=message.value(),
+                key=message.key(),
+                headers=message.headers(),
+                timestamp_ms=message.timestamp()[1],
+                error=str(exc),
+            )
+            self.event_consumer.record_quarantined(decoded=decoded, error=str(exc))
+            logger.warning(
+                "Durably quarantined message topic=%s partition=%s offset=%s",
                 message.topic(),
                 message.partition(),
                 message.offset(),
             )
-        finally:
-            if self.config.commit_offsets:
-                self.kafka_consumer.commit(message=message, asynchronous=False)
+
+        # Any handler/DB/quarantine/commit failure must escape to run(). Polling
+        # another message could otherwise commit past this offset in its partition.
+        if self.config.commit_offsets:
+            offsets = self.kafka_consumer.commit(message=message, asynchronous=False)
+            if offsets and any(partition.error for partition in offsets):
+                msg = "Kafka offset commit failed for at least one partition."
+                raise RuntimeError(msg)
 
 
 def decode_message_value(value: bytes | str | None) -> dict[str, Any]:
@@ -158,12 +216,17 @@ def decode_message_value(value: bytes | str | None) -> dict[str, Any]:
         raise ValueError(msg)
 
     raw_value = value.decode("utf-8") if isinstance(value, bytes) else value
-    decoded = json.loads(raw_value)
+    decoded = json.loads(raw_value, parse_constant=_reject_json_constant)
     if not isinstance(decoded, dict):
         msg = "Kafka message value must decode to a JSON object."
         raise TypeError(msg)
 
     return decoded
+
+
+def _reject_json_constant(value: str) -> None:
+    msg = f"Non-standard JSON numeric constant: {value}"
+    raise ValueError(msg)
 
 
 def build_confluent_kafka_consumer(
@@ -179,15 +242,19 @@ def build_confluent_kafka_consumer(
         )
         raise RuntimeError(msg) from exc
 
-    return Consumer(
-        {
-            "bootstrap.servers": config.bootstrap_servers,
-            "group.id": config.group_id,
-            "client.id": config.client_id,
-            "enable.auto.commit": False,
-            "auto.offset.reset": config.auto_offset_reset,
-            "enable.partition.eof": False,
-        },
+    return cast(
+        "KafkaConsumerClient",
+        Consumer(
+            {
+                "bootstrap.servers": config.bootstrap_servers,
+                "group.id": config.group_id,
+                "client.id": config.client_id,
+                "enable.auto.commit": False,
+                "enable.auto.offset.store": False,
+                "auto.offset.reset": config.auto_offset_reset,
+                "enable.partition.eof": False,
+            },
+        ),
     )
 
 
@@ -231,7 +298,7 @@ def build_signal_stop_event() -> threading.Event:
 
 def _float_env(name: str, default: float) -> float:
     raw_value = os.getenv(name)
-    if raw_value in (None, ""):
+    if raw_value is None or raw_value == "":
         return default
 
     return float(raw_value)

@@ -1,0 +1,24 @@
+{
+  "contract_version": "inventory-history-coverage-1.0.0",
+  "coverage_basis": "observed_ledger_stream",
+  "coverage": [
+    {
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "514ff762-6bf9-536a-a7e2-538e01731fea",
+      "coverage_id": "3d14f60d-761e-569c-a0c4-9c76048d4cdf",
+      "covered_from_at": "2026-07-01T00:00:00Z",
+      "covered_through_at": "2026-07-03T00:00:00Z",
+      "available_at": "2026-07-03T00:00:00Z",
+      "source_reference": "ledger-extract:reorder-fixture"
+    },
+    {
+      "product_id": "e275c721-4f0d-597b-b0f1-93ec6e2e3f41",
+      "stock_location_id": "7db7acb8-6e46-5a3e-b39a-faaa449238a3",
+      "coverage_id": "30eb6e83-b773-5901-bd6a-5e82141ffa35",
+      "covered_from_at": "2026-07-01T00:00:00Z",
+      "covered_through_at": "2026-07-03T00:00:00Z",
+      "available_at": "2026-07-03T00:00:00Z",
+      "source_reference": "ledger-extract:reorder-fixture"
+    }
+  ]
+}

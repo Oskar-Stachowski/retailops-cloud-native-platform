@@ -1,0 +1,14 @@
+{
+  "added_module": "data/inventory/source_cohort_batch_v2.py",
+  "added_module_sha256": "37b35764712d36c8d7b74e7ff892fbbb01e3b5a419c49ded2403786e09a286b4",
+  "final_campaign_requirement": "Commit/freeze the entire producer inventory before any final cohort generation and do not edit those files until all final cohorts have completed.",
+  "pilot_plan": "data/generated/ai04-v12-development/sourcepilot/development-plan.json",
+  "reason": "An additive v2 module was developed and tested while v1 pilot was executing. The ordinary source writer fingerprints all data/inventory/*.py at publication, including files not executed by v1.",
+  "recorded_at": "2026-09-30T17:07:56.337771+00:00",
+  "running_algorithm": "inventory-source-indexed-movement-1.0.0",
+  "running_algorithm_and_its_upstream_pins_changed": false,
+  "running_algorithm_sha256": "5e48b799eeecf25bde59cbae2a3e192682a11ed62baed4fc6777c61a117b91bb",
+  "scope": "development_only_seed_710001_excluded_from_final_qualification",
+  "snapshot_parent_provenance": "Use the actual published source manifest code_files, not a claim that all inventory files were frozen at pilot start.",
+  "whole_producer_inventory_frozen_at_pilot_start": false
+}

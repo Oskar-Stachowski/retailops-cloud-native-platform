@@ -5,25 +5,21 @@ DATABASE_URL environment variable and returns dictionary-like rows so repository
 code can expose stable API payloads without adding a heavy abstraction layer.
 """
 
+from __future__ import annotations
+
 import os
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
-from typing import Any, Protocol
+from typing import Any
 
 import psycopg
+from psycopg import sql
 from psycopg.rows import dict_row
 
 from app.db.instrumentation import instrument_database_call
 
+Query = str | bytes | sql.SQL | sql.Composed
 QueryParams = Mapping[str, Any] | Sequence[Any] | None
-
-
-class CursorLike(Protocol):
-    def execute(self, query: object, params: QueryParams = None) -> object: ...
-
-    def fetchone(self) -> object: ...
-
-    def fetchall(self) -> Sequence[Mapping[str, Any]]: ...
 
 
 def get_database_url() -> str:
@@ -63,13 +59,13 @@ def check_database_connection() -> bool:
 
 
 @contextmanager
-def get_connection() -> Iterator[psycopg.Connection]:
+def get_connection() -> Iterator[psycopg.Connection[dict[str, Any]]]:
     """Open a PostgreSQL connection with rows returned as dictionaries."""
     with psycopg.connect(get_database_url(), row_factory=dict_row) as connection:
         yield connection
 
 
-def fetch_all(query: object, params: QueryParams = None) -> list[dict[str, Any]]:
+def fetch_all(query: Query, params: QueryParams = None) -> list[dict[str, Any]]:
     """Execute a SELECT query and return all rows as plain dictionaries."""
     with get_connection() as connection, connection.cursor() as cursor:
         return instrument_database_call(
@@ -80,7 +76,7 @@ def fetch_all(query: object, params: QueryParams = None) -> list[dict[str, Any]]
         )
 
 
-def fetch_one(query: object, params: QueryParams = None) -> dict[str, Any] | None:
+def fetch_one(query: Query, params: QueryParams = None) -> dict[str, Any] | None:
     """Execute a SELECT query and return one row as a plain dictionary."""
     with get_connection() as connection, connection.cursor() as cursor:
         return instrument_database_call(
@@ -91,14 +87,16 @@ def fetch_one(query: object, params: QueryParams = None) -> dict[str, Any] | Non
         )
 
 
-def _fetch_health_check(cursor: CursorLike, query: object) -> object:
+def _fetch_health_check(
+    cursor: psycopg.Cursor[tuple[Any, ...]], query: Query
+) -> tuple[Any, ...] | None:
     cursor.execute(query)
     return cursor.fetchone()
 
 
 def _fetch_all(
-    cursor: CursorLike,
-    query: object,
+    cursor: psycopg.Cursor[dict[str, Any]],
+    query: Query,
     params: QueryParams,
 ) -> list[dict[str, Any]]:
     cursor.execute(query, params)
@@ -106,8 +104,8 @@ def _fetch_all(
 
 
 def _fetch_one(
-    cursor: CursorLike,
-    query: object,
+    cursor: psycopg.Cursor[dict[str, Any]],
+    query: Query,
     params: QueryParams,
 ) -> dict[str, Any] | None:
     cursor.execute(query, params)

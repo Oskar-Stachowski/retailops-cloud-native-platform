@@ -8,6 +8,7 @@ from psycopg.rows import dict_row
 
 from app.db.connection import get_connection
 from app.services.realtime_consumer import RealtimeEventConsumer
+from app.services.realtime_contract import EVENT_TOPICS
 
 
 def utc_now() -> datetime:
@@ -51,6 +52,7 @@ def event(
     return {
         "event_id": stable_event_id(readable_id),
         "event_type": event_type,
+        "topic": EVENT_TOPICS[event_type],
         "schema_version": "1.0",
         "source": "observability-demo",
         "correlation_id": f"obs-demo-{run_id}",

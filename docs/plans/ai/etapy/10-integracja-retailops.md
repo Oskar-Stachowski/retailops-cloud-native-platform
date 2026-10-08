@@ -2,6 +2,14 @@
 
 **Repozytoria:** RetailOps i RetailOps AI. **Wymagane etapy:** 07 i 08. Przygotowanie kontraktów może rozpocząć się wcześniej; odbiór obejmuje działający forecast, anomalie i ryzyko. Zasady obowiązujące: [kontrakt integracji i agenta](../kontrakty/integracja-agent.md), [czas i dane](../kontrakty/dane-i-czas.md), [API ML](../kontrakty/ml-api-lifecycle.md).
 
+**Odbiór 2026-10-07: ready.** [Końcowy raport](../../../evidence/ai/10/README.md)
+oraz [overlay istniejących projektów](../../../runbooks/intelligence-existing-projects.md)
+wiążą wszystkie siedem punktów planu: trzy tryby wejścia, trwałość/ACK/recovery,
+40 stockout, 1232 anomaly i 56 oryginalnych forecast przez SQL publisher,
+Source API i istniejący UI, uprawnienia oraz jawny fixture sugestii.
+V12 zachowuje oryginalne quality `not_ready` i własny development namespace.
+Publikacja statusu jest objęta chronionymi PR-ami i Required CI wynikowych main.
+
 ## Cel i stan wejściowy
 
 Udostępnić wyniki AI w istniejącym interfejsie RetailOps, z pełnym pochodzeniem i bez podwójnego liczenia faktów. Zrealizować trzy tryby: niezmienny snapshot z etapu 03, ograniczone odczyty REST oraz strumień zdarzeń. Pierwszego działającego forecastingu nie uzależniamy od ukończenia strumienia.
@@ -12,10 +20,10 @@ Przed kodowaniem sprawdź aktualne OpenAPI, obsługiwane typy zdarzeń, granicę
 
 ## Kolejność małych PR-ów
 
-1. **Przypnij i uzgodnij kontrakty źródła.** W RetailOps porównaj `events/contracts/retailops-realtime-events.v1.contract.json`, `data/generator/realtime.py`, `services/api/app/services/realtime_consumer.py`, runner, topic-init i przykłady. Ustal jedną mapę event type → topic, obowiązkowe `topic` oraz kompletne JSON Schemas envelope i payloadów. Registry nie zastępuje JSON Schema. Jawnie odrzucaj nieobsługiwane major versions i nieznane typy; rozszerzenie listy jest zmianą wymagającą testu konsumenta. Zgodnie z nową decyzją planu ADR-09 zachowaj legacy v1 i wprowadź oddzielny `retailops.intelligence.v2` dla bogatych wyników AI, zgodnie z kontraktem. Nie zmieniaj znaczenia starych pól.
+1. **Przypnij kontrakt źródła i dodaj v2.** OPS-07 uzgodnił legacy v1 w `services/api/app/contracts/retailops-realtime-events.v1.contract.json`, `data/generator/realtime.py`, consumerze i topic-init, z wykonywalnym JSON Schema. Zweryfikuj zgodność na nowych commitach obu repo. Zgodnie z ADR-09 zachowaj legacy v1 i wprowadź oddzielny `retailops.intelligence.v2` dla bogatych wyników AI. Nie zmieniaj znaczenia starych pól ani nie traktuj legacy v1 jako odbioru projektora v2.
 2. **Dodaj rzeczywisty, typowany klient REST i niezbędne rozszerzenia upstream.** Użyj faktycznych nazw filtrów z kontraktu, domyślnego limitu 50 i maksymalnego 100. Obsłuż puste i ostatnie strony, walidację, sortowanie, timeout, ograniczone retry bezpiecznych GET, circuit breaker i trace headers. W źródłowym `/sales` brakuje `store_id`, `order_id`, `ingested_at`; sama zmiana filtrów nie odtwarza pełnego ziarna. Zaprojektuj kompatybilną projekcję eksportową v2 lub dedykowany wersjonowany eksport, który dostarcza identyfikatory sklepu, zamówienia, wersji i dostępności. Pierwszy import plikowy pozostaje działającą ścieżką. Odróżnij świeżość biznesową od chwili pobrania HTTP.
 3. **Zdefiniuj spójny snapshot REST i przekazanie do replay.** Ustal niezmienny `snapshot_id` i wersje rekordów oraz dokładny wektor granicznych offsetów partycji. Eksport nie może zależeć od zmieniającego się `total` przy offset pagination. Jeśli źródło nie zapewnia snapshot isolation/historycznych wersji, zwróć jawny brak wsparcia; nie reklamuj zwykłego odczytu stron jako snapshotu. Wsparcie wymaga utrwalonego eksportu lub protokołu z wysokim watermarkiem i wersjami. Skopiuj do manifestu offsety, included event IDs/natural keys i zakres danych. Uruchom replay od pierwszego nieobjętego offsetu, zachowując deduplikację faktów i obsługę spóźnionych korekt.
-4. **Napraw runner i trwałe przetwarzanie po obu stronach.** Wyłącz automatyczne ACK. W jednej transakcji utrwal inbox/idempotency, zmianę agregatu lub projekcji, wynik przetwarzania i outbox. Zatwierdź offset dopiero po sukcesie trwałej transakcji. Przy uszkodzonym JSON zachowaj surowe bajty, partycję, offset i bezpieczny powód błędu; trwała kwarantanna/DLQ outbox musi istnieć przed ACK. Przy niedostępnej bazie/kwarantannie zatrzymaj tę partycję i zastosuj ograniczone retry. Nie zatwierdzaj wyższych offsetów ponad nieobsłużoną luką. Publisher outbox może powtórzyć wysyłkę, dlatego odbiorca również deduplikuje.
+4. **Rozszerz trwałe przetwarzanie na domenowe projekcje obu repo.** Obecny runner legacy v1 ma atomowe live metrics, fail-stop bez ACK i trwałą raw kwarantannę PostgreSQL z [runbookiem odtwarzania](../../../runbooks/realtime-recovery.md). Wykorzystaj tę granicę dla v2 i rozszerz ją o domenowe inbox/idempotency, zmianę agregatu/projekcji i outbox w jednej transakcji. Automatyczne ACK pozostaje wyłączone. Przy uszkodzonym JSON zachowaj raw i pozycję przed ACK; przy niedostępnej bazie/kwarantannie nie pomijaj luki partycji. Publisher outbox może powtórzyć wysyłkę, dlatego odbiorca również deduplikuje. Odbiór obecnych metryk nie zastępuje cross-repo E2E wyników AI.
 5. **Dodaj projekcje wyników AI i adaptery semantyczne.** W RetailOps osobny projektor utrwala forecast, anomaly, modelowy stockout risk i sugestię wymagającą człowieka. Zachowaj `origin`, wersję modelu, run/dataset IDs, moment prognozy, ziarno, jednostkę, świeżość i identyfikator oryginalnego wyniku. Legacy heurystyka oraz AI probability są różnymi polami/zasobami. Rozszerz read API lub dodaj wersjonowaną projekcję AI. Agregacja do starszego `/forecasts` wymaga jawnego okresu, sumy i jednostki; nie wolno upychać dziennej prognozy sklepu w pole oznaczające całą firmę. Starszy replay pozostaje historią i nie nadpisuje nowszej aktywnej prognozy.
 6. **Podłącz istniejący frontend i połączenie usług.** Uzupełnij obecne widoki RetailOps o prognozę, anomalie, ryzyko, sugestie, link do lineage i status świeżości. Oddziel dane demo, heurystykę i modele AI. UI wyświetla źródło i ograniczenia, a akcję operacyjną wykonuje człowiek w istniejącym workflow. Nie twórz drugiego dashboardu. Przygotuj overlay Compose: istniejące usługi to `api`, `db`, `redpanda`; aliasy `retailops-api` i external network są nową konfiguracją. AI ma osobną bazę, korzysta z tego samego brokera i poprawnego advertised listener. Cleanup usuwa tylko zasoby AI. Polityki cross-namespace zostaną sprawdzone w etapie 14.
 7. **Zamknij kompatybilność, auth i runbook.** Wprowadź tokeny usługowe poza Git, ograniczone origins, prywatną komunikację oraz principal ustalany na serwerze. Lokalny demo user RetailOps nie jest zweryfikowaną tożsamością użytkownika AI. Dostęp do danych, runów i trace’ów sprawdzaj po stronie API. Zapisz procedurę backfill/replay, zatrzymania partycji, naprawy i ponownego odczytu DLQ oraz pełnego resync z nowego snapshotu.
@@ -40,7 +48,16 @@ Profil `ai-smoke` (30 dni) jest tylko fixture dla schema/import/replay. Temporal
 - Runbook odtwarzania i diagram własności danych; dotychczasowy seed/API test suite nadal przechodzi.
 - DoD: istnieje trwały odczytywalny wynik w RetailOps i brak utraty/podwojenia efektu przy testowanych awariach. Samo przyjęcie eventu, log lub licznik nie zamykają etapu.
 
-Proponowany docelowy interfejs weryfikacyjny (do zaimplementowania i opisania w README, nie istniejąca obecnie komenda): `make integration-replay-test` oraz `make integration-failure-test`. Raportuj dokładnie, co wykonano i na których commitach obu repozytoriów.
+Interfejs weryfikacyjny jest zaimplementowany w obu repozytoriach:
+`make integration-replay-test` oraz `make integration-failure-test`.
+Po stronie AI pierwszy target sprawdza kontrakty i mechanikę replay, a drugi
+rzeczywisty PostgreSQL/outbox. Osobne `make observation-persistence-test`
+i `make observation-broker-test` sprawdzają SQL/checkpoints oraz TLS/SCRAM/ACK.
+Po stronie Source oba targety wykonują rzeczywiste testy SQL/brokera na jawnych
+fixtures mechaniki. Pełny odbiór oryginalnych modeli, publisherów SQL, API i UI
+oraz przekazania Source capture do rzeczywistego AI SQL/ACK ma dedykowane
+workflowy. [Bieżący raport odbioru](../../../evidence/ai/10/README.md) podaje
+dokładne commity, run IDs, sumy, offsety i pozostałe warunki zamknięcia.
 
 ## Prompt do Codex
 

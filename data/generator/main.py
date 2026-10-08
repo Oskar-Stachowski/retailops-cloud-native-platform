@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from data.generator.common import GenerationClock
 from data.generator.configuration import (
@@ -46,6 +48,9 @@ from data.generator.source_quality import validate_source_report, write_source_r
 from data.generator.source_realism import build_source_realism, write_source_realism
 from data.generator.stock import generate_returns, generate_stock_movements
 from data.generator.users import generate_users
+
+if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
 
 
 def build_demo_dataset() -> dict[str, list[dict[str, str]]]:
@@ -131,9 +136,14 @@ def warn_if_demo_ignores_sizing_options(config: DatasetGenerationConfig) -> None
 
 def build_dataset(
     config: DatasetGenerationConfig | None = None,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     config = config or DatasetGenerationConfig()
     effective = resolve_generation_config(config)
+    if anomaly_plan is not None and not config.profile.startswith("ai-"):
+        msg = "Anomaly scenarios require an AI profile."
+        raise ValueError(msg)
     if config.profile == "demo":
         return build_demo_dataset()
 
@@ -145,6 +155,8 @@ def build_dataset(
         warehouse_count=effective.warehouses,
         seed=effective.seed,
         clock=GenerationClock(effective.end_date),
+        anomaly_plan=anomaly_plan,
+        forecast_plan_days=effective.forecast_plan_days,
     )
 
 
@@ -255,6 +267,12 @@ def parse_args() -> argparse.Namespace:
         help="Directory where CSV files should be written.",
     )
 
+    parser.add_argument(
+        "--source-version",
+        choices=("2.6", "2.7"),
+        default=None,
+        help="AI profiles default to inventory source 2.7; 2.6 is frozen compatibility.",
+    )
     return parser.parse_args()
 
 
@@ -277,6 +295,22 @@ def main() -> None:
     config = config_from_args(args)
     warn_if_demo_ignores_sizing_options(config)
 
+    if config.profile.startswith("ai-") and args.source_version != "2.6":
+        from data.inventory.run_source_dataset import (  # noqa: PLC0415 - versioned dispatch avoids dependency cycle
+            run,
+        )
+
+        result = run(
+            config,
+            args.output_dir or Path(__file__).resolve().parents[2] / "data/generated/sources",
+        )
+        print(json.dumps(result, indent=2))  # noqa: T201 - CLI receipt
+        if result["status"] != "passed":
+            raise SystemExit(1)
+        return
+    if args.source_version == "2.7":
+        message = "Source 2.7 requires an AI profile."
+        raise ValueError(message)
     counts = generate_demo_dataset(args.output_dir, config)
     output_dir = args.output_dir or default_output_dir_for_profile(
         config.profile,

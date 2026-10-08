@@ -112,7 +112,10 @@ updates:
   # Docker Compose images.
   # Keep this conservative because Compose touches local runtime and CI smoke tests.
   - package-ecosystem: "docker-compose"
-    directory: "/"
+    directories:
+      - "/"
+      - "/scripts/db"
+      - "/scripts/release"
     schedule:
       interval: "monthly"
       day: "monday"

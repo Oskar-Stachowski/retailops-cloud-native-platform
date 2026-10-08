@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -67,13 +67,13 @@ jobs:
           } > "${PROVENANCE_REPORT_DIR}/provenance-summary.md"
 
       - name: Attest API image provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-name: retailops-api
           subject-digest: ${{ steps.image-digests.outputs.api_digest }}
 
       - name: Attest frontend image provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-name: retailops-frontend
           subject-digest: ${{ steps.image-digests.outputs.frontend_digest }}

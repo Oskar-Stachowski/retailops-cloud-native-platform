@@ -12,6 +12,109 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  source-bundles:
+    name: Authenticated immutable native source bundle import
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Resolve immutable native producer and typed client
+        id: bundle-owners
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          pin = json.loads(Path("scripts/source-bundles/owner.json").read_text())
+          assert pin["producer_repository"] == "Oskar-Stachowski/retailops-cloud-native-platform"
+          assert pin["client_repository"] == "Oskar-Stachowski/retailops-ai-intelligence"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as stream:
+              for name in ("producer_commit", "client_commit"):
+                  assert re.fullmatch(r"[0-9a-f]{40}", pin[name])
+                  stream.write(name + "=" + pin[name] + "\n")
+          PY
+      - name: Checkout approved native source exporter
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: Oskar-Stachowski/retailops-cloud-native-platform
+          ref: ${{ steps.bundle-owners.outputs.producer_commit }}
+          path: .ci-source-bundle-producer
+          persist-credentials: false
+      - name: Checkout pinned typed AI receiver and isolated lock
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: Oskar-Stachowski/retailops-ai-intelligence
+          ref: ${{ steps.bundle-owners.outputs.client_commit }}
+          path: .ci-source-bundle-client
+          persist-credentials: false
+      - name: Set up isolated CI source runtime
+        uses: ./.github/actions/setup-python-ci
+        with:
+          python-version: "3.11.15"
+          install-command: python -m pip install -r services/api/requirements.txt -r .ci-source-bundle-producer/data/requirements-parquet.txt
+      - name: Install immutable transfer toolchain
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.12.19"
+          enable-cache: false
+      - name: Install separate minimal typed receiver
+        run: uv sync --locked --project .ci-source-bundle-client/tools/source-bundle-verification --python 3.11.15
+      - name: Require native export, HTTP authorization and actual typed import
+        run: |
+          python scripts/source-bundles/drill.py \
+            --producer-root .ci-source-bundle-producer \
+            --client-root .ci-source-bundle-client \
+            --producer-python "$(command -v python)" \
+            --api-python "$(command -v python)" \
+            --client-python "$GITHUB_WORKSPACE/.ci-source-bundle-client/tools/source-bundle-verification/.venv/bin/python"
+      - name: Upload immutable native transfer receipt
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: source-bundle-evidence
+          path: ci-cd/reports/source-bundles/report.json
+          if-no-files-found: error
+
+  intelligence-runtime:
+    name: Authenticated cross-repo intelligence runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Resolve immutable intelligence runtime owner
+        id: runtime-owner
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          pin = json.loads(Path("scripts/intelligence-runtime/owner.json").read_text())
+          assert pin["repository"] == "Oskar-Stachowski/retailops-ai-intelligence"
+          assert re.fullmatch(r"[0-9a-f]{40}", pin["commit"])
+          with open(os.environ["GITHUB_OUTPUT"], "a") as stream:
+              stream.write("commit=" + pin["commit"] + "\n")
+          PY
+      - name: Checkout pinned AI outbox and isolated delivery lock
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: Oskar-Stachowski/retailops-ai-intelligence
+          ref: ${{ steps.runtime-owner.outputs.commit }}
+          path: .ci-intelligence-runtime-owner
+          persist-credentials: false
+      - name: Require actual authenticated transport and durable resume
+        run: python scripts/intelligence-runtime/drill.py --owner-root .ci-intelligence-runtime-owner
+      - name: Upload intelligence runtime acceptance receipt
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: intelligence-runtime-evidence
+          path: ci-cd/reports/intelligence-runtime/report.json
+          if-no-files-found: error
+
   compose-config:
     name: Validate Docker Compose config
     runs-on: ubuntu-latest
@@ -19,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -28,6 +131,11 @@ jobs:
 
       - name: Validate Compose profiles
         run: make compose-profile-config
+
+      - name: Validate existing-service intelligence overlay without joining a runtime
+        env:
+          RETAILOPS_INTELLIGENCE_NETWORK: ai10-source-owned-config-validation
+        run: docker compose -p ai10-source-overlay-config --profile dev -f docker-compose.yml -f docker-compose.intelligence.yml config --quiet
 
       - name: Verify security scanner container
         run: |
@@ -58,7 +166,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -122,6 +230,7 @@ jobs:
             ci-cd/reports/db/recovery/*/commands.log
             ci-cd/reports/releases/*/report.json
             ci-cd/reports/releases/*/*-manifest.json
+            ci-cd/reports/releases/*/*-build.json
             ci-cd/reports/releases/*/commands.log
             ci-cd/reports/releases/*/*/failure.png
             ci-cd/reports/releases/*/*/trace.zip

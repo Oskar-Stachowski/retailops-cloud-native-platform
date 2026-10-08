@@ -1,6 +1,24 @@
 # 07. Dodaj anomalie, błędy danych i detekcję
 
-**Status: plan wdrożenia. Repo: RetailOps + AI. Zależności: 04, 05, 06.**
+**Status: odbiór AI 07 zaliczony w zakresie `synthetic_ai_07_portfolio_v4`.**
+Repo: RetailOps + AI. Zależności: 04, 05, 06 są spełnione.
+Pełne `ready` na main wymaga scalenia
+[source PR #97](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/97)
+i [AI PR #24](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/24)
+oraz zielonego Required CI obu HEAD i merge commitów.
+[Końcowy odbiór](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md)
+i [manifest kapsuł](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-ready/capsules.json)
+wiążą scenariusze/DQ, kwalifikowane dane, oba rzeczywiste detektory,
+56/56 bramek dla każdego, MLflow, atomowy batch, scoped API i restart OCI.
+Modele i progi są zamrożone; nieudane finalne v2/v3 pozostają zachowane.
+Poniżej jest przyjęta specyfikacja etapu, a nie lista bieżących zaległości.
+
+Upstream obejmuje [pięć typów scenariuszy biznesowych](../../../reference/business-anomaly-scenarios.md),
+[raw DQ i ograniczony offline replay](../../../reference/raw-dq-replay.md),
+[pełny strumień sprzedaży i native zwrotów v2](../../../reference/full-raw-dq-replay.md) oraz
+[wersjonowane źródło 2.8 i snapshot 1.2](../../../reference/anomaly-source-handoff.md).
+Handoff, anomaly curation, cechy, oba detektory, ewaluacja i integracja z
+lifecycle AI05 mają końcowy odbiór podlinkowany powyżej.
 
 Cel: uzyskać oddzielne, deterministyczne scenariusze business anomalies i raw data faults, a następnie porównać seasonal-residual baseline z Isolation Forest w istniejącym lifecycle MLflow. Offline replay/curation jest częścią07. Produkcyjna trwałość brokera, ACK/DLQ i projekcje są etapem10; nie deklarować ich zaliczenia na podstawie fixture offline.
 
@@ -10,7 +28,7 @@ Normatywne źródła: [dane i czas](../kontrakty/dane-i-czas.md), [profile i bra
 
 1. **RetailOps — scenariusze business anomalies.** Wersjonowany injection contract i osobny `anomaly_injections` artifact: ID, typ, product/location/channel scope, start/end, magnitude/shape, affected fields, seed, generator version. Wymagane one-day spike, multi-day spike, sustained drop, return spike i inventory-censored episode. Modyfikować proces przed finalnym wygenerowaniem faktów (demand, returns lub rzeczywiste ograniczenie dostaw/zapasu), nie sam label. Dopisać clean control windows, neutralne promotion/seasonality controls i insufficient-history cases. Overlapping injections mają jawny deterministic composition albo są odrzucane. Legacy anomalies/alerts pozostają precomputed outputs.
 2. **RetailOps — realne DQ faults.** Osobno generować exact duplicate event ID, business duplicate z innym envelope ID, late event, out-of-order, missing optional context, unsupported major i nieobsługiwany minor/additive field według polityki kontraktu. Faults dotykają raw replay, nie poprawnych kanonicznych CSV/Parquet do seedowania. `data_quality_injections` ma event/raw reference, issue type, expected action, seed i timing. Etykiety injekcji nie są polem normalnego event payloadu.
-3. **Granica offline replay/curation.** Uzgodnić z rejestrem kontraktów01/10 executable envelope/payload schemas i compatibility policy. Stary opisowy rejestr nie jest wystarczającym walidatorem. Bounded fixture reader testuje dedup po event ID i business key, late-arrival handling, quarantine/DLQ fixture, immutable revisions, aggregate reconciliation i watermark. Zapisuje raw/accepted/duplicate/late/quarantine/DLQ counts oraz rozliczenie każdej injekcji. Nie dodawać nowych topiców lub event types do starego konsumenta bez osobnej kompatybilnej zmiany10.
+3. **Granica offline replay/curation.** Wykorzystać odebrany w OPS-07 wykonywalny envelope/payload schema legacy v1 i uzgodnić rozszerzenia z kontraktami01/10. Bounded fixture reader testuje dedup po event ID i business key, late-arrival handling, quarantine/DLQ fixture, immutable revisions, aggregate reconciliation i watermark. Zapisuje raw/accepted/duplicate/late/quarantine/DLQ counts oraz rozliczenie każdej injekcji. Nie dodawać nowych topiców lub event types do starego konsumenta bez osobnej kompatybilnej zmiany10.
 4. **Nowy snapshot i anomaly dataset.** Ponowić03 dla zmienionych scenariuszy. AI tworzy observed value, historical expected value, residual, robust scale, contextual price/promo/inventory/DQ fields i insufficient-history flag. Użyć jawnej allowlist. Label dla ocenianego okna dołącza wyłącznie evaluator z truth; model nigdy go nie dostaje. OOF/rolling-origin expected i scale są dopasowane przed ocenianym outcome. Jeśli zmienił się source/forecast schema lub scenariusze, ponowić właściwe04/05 przed generacją downstream features.
 5. **Reguły i seasonal residual baseline.** Warstwa DQ najpierw oznacza niekompletne/niewiarygodne wejście. Baseline porównuje observed z seasonal naive lub historycznym forecastem, normalizuje resztę robust scale i stosuje progi wybrane na validation. MAD/scale=0 ma jawną bezpieczną politykę, nie dzielenie przez zero. Status insufficient_data oznacza brak score/uzasadnienie. Spodziewana promocja nie jest automatycznie anomaly; błędy danych nie są automatycznie biznesowym spadkiem sprzedaży.
 6. **Isolation Forest candidate.** Dopasować pipeline preprocessingu+IF na dozwolonych historycznych obserwacjach training. Domyślny detector nie dostaje oracle clean labels ani parametrów injekcji. Ewentualny wariant trenowany na label-assisted clean subset oznaczyć jako dodatkową ablation, nie jako uczciwy bezetykietowy baseline. Contamination, features i score threshold wybierać wyłącznie train/validation; końcowy test pozostaje nietknięty.

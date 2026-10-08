@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from datetime import datetime
+
+    from psycopg import Connection
 
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
@@ -16,8 +20,24 @@ from app.db.introspection import table_exists
 class RealtimeMetricsRepository:
     """Persistence layer for real-time event processing state and metrics."""
 
-    def __init__(self, connection: object | None = None) -> None:
+    def __init__(self, connection: Connection[dict[str, Any]] | None = None) -> None:
         self.connection = connection
+
+    @contextmanager
+    def event_transaction(self, event_id: str) -> Iterator[RealtimeMetricsRepository]:
+        """Commit the projection and processed marker together, serializing replays."""
+        if self.connection is not None:
+            with self.connection.transaction():
+                self._execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0));", (event_id,))
+                yield self
+            return
+
+        with get_connection() as connection:
+            repository = RealtimeMetricsRepository(connection=connection)
+            repository._execute(
+                "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0));", (event_id,)
+            )
+            yield repository
 
     def _fetch_one(
         self,
@@ -31,6 +51,13 @@ class RealtimeMetricsRepository:
             cursor.execute(query, params)
             row = cursor.fetchone()
             return dict(row) if row is not None else None
+
+    def _fetch_required(self, query: str, params: tuple[Any, ...]) -> dict[str, Any]:
+        row = self._fetch_one(query, params)
+        if row is None:
+            msg = "realtime_write_receipt_missing"
+            raise RuntimeError(msg)
+        return row
 
     def _execute(
         self,
@@ -282,7 +309,7 @@ class RealtimeMetricsRepository:
         processed_at: datetime | None = None,
         error_message: str | None = None,
     ) -> dict[str, Any]:
-        return self._fetch_one(
+        return self._fetch_required(
             """
             INSERT INTO realtime_event_log (
                 event_id,
@@ -425,7 +452,7 @@ class RealtimeMetricsRepository:
         started_at: datetime | None,
         stopped_at: datetime | None,
     ) -> dict[str, Any]:
-        return self._fetch_one(
+        return self._fetch_required(
             """
             INSERT INTO realtime_consumer_state (
                 consumer_name,

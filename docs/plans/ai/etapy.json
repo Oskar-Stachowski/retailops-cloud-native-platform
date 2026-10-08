@@ -1,6 +1,6 @@
 {
-  "version": "1.6",
-  "date": "2026-09-29",
+  "version": "1.20",
+  "date": "2026-10-07",
   "stages": [
     {
       "id": "00",
@@ -71,7 +71,7 @@
       "status": "completed",
       "evidence": "../../evidence/ai/03/03.6/README.md",
       "implementation_scope": "03.1–03.5 typed Parquet, immutable qualified exporter, versioned independent handoff/importer, normalized immutable curated with mapping/quarantine and as-of; 03.6 full pinned cross-repo acceptance and required CI gate",
-      "acceptance_scope": "Published independent PR branches; both full smoke profiles twice plus separate controlled late-fact fixture twice, on Darwin ARM64 and Linux AMD64; no main merge or model qualification",
+      "acceptance_scope": "Published on main in both repositories; both full smoke profiles twice plus separate controlled late-fact fixture twice, on Darwin ARM64 and Linux AMD64; no model qualification",
       "next_scope": "04 / 06 in parallel",
       "implementation_commits": {
         "retailops-cloud-native-platform": "25fb0b887503c119055af86b63991299465096b9",
@@ -81,7 +81,11 @@
         "status": "success",
         "producer_pr_run": 36540743369,
         "consumer_pr_run": 36541696909,
-        "evidence": "../../evidence/ai/03/03.6/verification.json"
+        "evidence": "../../evidence/ai/03/03.6/verification.json",
+        "producer_final_pr_run": 36543846350,
+        "producer_main_push_run": 36546235649,
+        "consumer_main_push_run": 36546199968,
+        "main_push_evidence": "../../evidence/ai/03/03.6/main-publication.json"
       },
       "consumer_branch": "ai/03-04-importer",
       "consumer_implementation_commits": [
@@ -94,12 +98,17 @@
       "publication": {
         "producer_pr": 65,
         "consumer_pr": 5,
-        "scope": "published independent PR branches; no main merge"
+        "scope": "merged independent PRs to main; Required CI for each main push",
+        "evidence": "../../evidence/ai/03/03.6/main-publication.json"
       },
       "next_unblocked_stages": [
         "04",
         "06"
-      ]
+      ],
+      "accepted_main_commits": {
+        "retailops-cloud-native-platform": "44e916567b5b82ba0e00b4ffa1d824589fd30676",
+        "retailops-ai-intelligence": "9eb873a0ae6ec75e444d20aad3bebb7f8820beba"
+      }
     },
     {
       "id": "04",
@@ -110,7 +119,10 @@
         "03"
       ],
       "path": "etapy/04-forecasting.md",
-      "status": "planned"
+      "status": "completed",
+      "evidence": "../../evidence/ai/05/final/README.md",
+      "final_version": "v12",
+      "quality_acceptance": "owner_accepted_three_MSE_exceptions_original_results_preserved"
     },
     {
       "id": "05",
@@ -121,18 +133,51 @@
         "04"
       ],
       "path": "etapy/05-mlflow-serving.md",
-      "status": "planned"
+      "status": "completed",
+      "evidence": "../../evidence/ai/05/final/README.md",
+      "serving_ready": true,
+      "remote_required_ci": {
+        "status": "success",
+        "evidence": "../../evidence/ai/05/final/main-publication.json"
+      }
     },
     {
       "id": "06",
       "slug": "inventory-ledger",
       "title": "Zbuduj spójny zapas i dostawy",
-      "repo": "RetailOps",
+      "repo": "oba",
       "depends_on": [
         "03"
       ],
       "path": "etapy/06-inventory-ledger.md",
-      "status": "planned"
+      "status": "completed",
+      "branch": "ai/06-01-inventory-ledger",
+      "implementation_scope": "06.1–06.6: default source 2.7, qualified labels, snapshot/import/curated 1.1 and historical as-of",
+      "next_scope": "04/05 acceptance on new dataset IDs before 07/08; model 08 separately",
+      "inventory_ready": true,
+      "evidence": "../../evidence/ai/06/final/README.md",
+      "implementation_commit": "f07ba22555a48b6c750f865f609e0893dfc129e0",
+      "verification": "../../evidence/ai/06/final/verification.json",
+      "acceptance_runtime_commit": "f07ba22555a48b6c750f865f609e0893dfc129e0",
+      "source_ready": true,
+      "model_ready": false,
+      "label_qualification": "qualified_for_standard_source_profiles_only",
+      "model08_qualification": "not_evaluated",
+      "consumer_branch": "ai/06-inventory-handoff",
+      "consumer_implementation_commit": "2574c06794b7b4f86393f23db1d9e97c16413706",
+      "accepted_main_commits": {
+        "retailops-cloud-native-platform": "a433553ac015b0afc971c2aa208024fcbd8dbc2e",
+        "retailops-ai-intelligence": "e2a80d2d02d569d658226a0331c857fa3592d97d"
+      },
+      "remote_required_ci": {
+        "status": "success",
+        "producer_pr_run": 36604059175,
+        "consumer_pr_run": 36604053964,
+        "producer_main_push_run": 36607012268,
+        "consumer_main_push_run": 36605934684,
+        "evidence": "../../evidence/ai/06/final/main-publication.json",
+        "linux_acceptance": "../../evidence/ai/06/final/linux-acceptance.json"
+      }
     },
     {
       "id": "07",
@@ -145,7 +190,35 @@
         "06"
       ],
       "path": "etapy/07-anomalie-dq.md",
-      "status": "planned"
+      "status": "completed",
+      "acceptance_date": "2026-10-05",
+      "acceptance_scope": "synthetic_ai_07_portfolio_v4; native producer/DQ, qualified inputs, seasonal residual and Isolation Forest, leakage-safe final quality, lifecycle, atomic batch, scoped HTTP and OCI recovery",
+      "qualification_source_commit": "48439ebd9515dc1c7adc633609bbe33d1657c3df",
+      "actual_fit_commit": "fcd09f68187b8d21e9dff756a24688b790221023",
+      "quality_gates_per_model": {
+        "passed": 56,
+        "total": 56,
+        "waivers": 0
+      },
+      "publication_acceptance": {
+        "producer_pr": 97,
+        "consumer_pr": 24,
+        "ready_when": "both protected PRs merged to main and Required CI succeeds for exact integrated HEAD and both merge commits",
+        "exact_sha_and_run_receipts": "PR97 and PR24 bodies",
+        "status": "success",
+        "accepted_main_commits": {
+          "retailops-ai-intelligence": "18e771f9c2e89e91bf7afeb1744e0cd9112f50b5",
+          "retailops-cloud-native-platform": "1de462729012a1bad458a8da4ad317ec22dbc5b8"
+        },
+        "required_main_ci_runs": {
+          "retailops-ai-intelligence": 37304852763,
+          "retailops-cloud-native-platform": 37305855911
+        }
+      },
+      "consumer_completion_evidence": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-completion.md",
+      "consumer_capsules": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/main/docs/evidence/07-ready/capsules.json",
+      "remaining_transport_and_ui_stage": "10",
+      "ready": true
     },
     {
       "id": "08",
@@ -158,7 +231,30 @@
         "06"
       ],
       "path": "etapy/08-stockout-risk.md",
-      "status": "planned"
+      "status": "completed",
+      "ready": true,
+      "model_ready": true,
+      "evidence": "../../evidence/ai/08/final/README.md",
+      "verification": "../../evidence/ai/08/final/main-publication.json",
+      "implementation_repository": "retailops-ai-intelligence",
+      "implementation_commit": "68a3ede16da4bd8b93609c2489514c08e95a7384",
+      "accepted_main_commits": {
+        "retailops-ai-intelligence": "2565a216fa7807a756387dcbaa408d6ccc07840d",
+        "retailops-cloud-native-platform": "684f18f999ce6bddc5aa83bf6d7fa7aaef9fc832"
+      },
+      "remote_required_ci": {
+        "status": "success",
+        "consumer_pr_run": 37282434148,
+        "consumer_main_push_run": 37288700026,
+        "producer_main_push_run": 37262096351
+      },
+      "quality": {
+        "points": 9296,
+        "passed": 90,
+        "approved_warnings": 3,
+        "blockers": 0
+      },
+      "remaining": []
     },
     {
       "id": "09",
@@ -182,7 +278,10 @@
         "08"
       ],
       "path": "etapy/10-integracja-retailops.md",
-      "status": "planned"
+      "status": "completed",
+      "ready": true,
+      "evidence": "../../evidence/ai/10/README.md",
+      "acceptance_scope": "immutable Source bundle; bounded authenticated REST; daily_demand_versions actual Source SQL TLS SCRAM capture to same broker AI SQL ACK and 4-to-7 correction; original SQL publishers and complete Source SQL TCP API built UI for 40 stockout, 1232 anomaly, 56 forecast; forecast original quality not_ready retained in owner-approved development namespace; explicit human-approved suggestion fixture; no production deployment or general 43-table SQL snapshot claim"
     },
     {
       "id": "11",
@@ -278,6 +377,7 @@
     }
   ],
   "status": "in_progress",
-  "next_stage": "03",
-  "execution_map": "kolejnosc-i-repozytoria.md"
+  "next_stage": "09",
+  "execution_map": "kolejnosc-i-repozytoria.md",
+  "updated_at": "2026-10-07"
 }

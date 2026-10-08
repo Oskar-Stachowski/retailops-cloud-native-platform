@@ -5,6 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from data.generator.commerce_pricing import CommercePricing
 from data.generator.common import DEFAULT_CLOCK, GenerationClock, deterministic_uuid, money
@@ -33,6 +34,9 @@ from data.generator.return_reconciliation import (
 )
 from data.generator.simulation import separate_simulation
 from data.generator.users import generate_users
+
+if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
 
 
 @dataclass(frozen=True)
@@ -141,6 +145,11 @@ def profile_defaults(profile: str) -> SyntheticProfileDefaults:
 
 
 def _rng(seed: int, profile: str) -> random.Random:
+    # Paired scenario: keep catalog/location/price draws identical to ai-dev.
+    if profile == "ai-intermittent-v1":
+        profile = "ai-dev"
+    elif profile == "ai-stockout-stress-v1":
+        profile = "ai-load"
     return random.Random(f"retailops-{profile}-{seed}")  # noqa: S311 - deterministic demo data
 
 
@@ -929,6 +938,9 @@ def build_profile_dataset(
     warehouse_count: int,
     seed: int = 42,
     clock: GenerationClock = DEFAULT_CLOCK,
+    forecast_plan_days: int = 0,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     rng = _rng(seed, profile)
     products = generate_profile_products(product_count, rng)
@@ -949,6 +961,7 @@ def build_profile_dataset(
                 seed=seed,
                 end_date=clock.end_date,
                 max_daily_rows=days * product_count * store_count,
+                forecast_plan_days=forecast_plan_days,
             )
         )
         dimension_tables, products, stores, warehouses = build_dimensions(
@@ -959,7 +972,7 @@ def build_profile_dataset(
     demand_tables = {}
     if pricing_tables is not None:
         sales, orders, order_items, truth, exclusions = generate_demand_commerce(
-            products, stores, dimension_tables, pricing_tables, effective
+            products, stores, dimension_tables, pricing_tables, effective, anomaly_plan=anomaly_plan
         )
         demand_tables = {
             "daily_demand_truth": truth,

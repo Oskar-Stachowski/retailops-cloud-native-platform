@@ -13,6 +13,7 @@ from data.generator.demand_model import daily_demand
 from data.generator.dimensions import DimensionIndex
 
 if TYPE_CHECKING:
+    from data.anomalies.contract import AnomalyPlan
     from data.generator.configuration import ResolvedGenerationConfig
 
 COMPLEMENTARY = {
@@ -107,8 +108,11 @@ def generate_demand_commerce(
     dimensions: dict[str, list[dict[str, str]]],
     plans: dict[str, list[dict[str, str]]],
     config: ResolvedGenerationConfig,
+    *,
+    anomaly_plan: AnomalyPlan | None = None,
 ) -> tuple[list, list, list, list, list]:
     grid, exclusions = demand_grid(dimensions, config)
+    factors = anomaly_plan.factors(dimensions, config) if anomaly_plan is not None else {}
     pricing = CommercePricing(plans, DimensionIndex(dimensions))
     catalog, adapters = {r["id"]: r for r in products}, {r["id"]: r for r in stores}
     budgets, truth = defaultdict(dict), []
@@ -116,7 +120,9 @@ def generate_demand_commerce(
         if flags["location_open"] == "false":
             continue
         store = adapters[flags["legacy_store_id"]]
-        row = daily_demand(catalog[key[1]], store, key, pricing, config)
+        row = daily_demand(
+            catalog[key[1]], store, key, pricing, config, anomaly_factor=factors.get(key, "1")
+        )
         truth.append(row)
         budgets[key[0], flags["legacy_store_id"]][key[1]] = int(row["latent_units"])
     orders, items, sales = [], [], []

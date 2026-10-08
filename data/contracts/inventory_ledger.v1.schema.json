@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "InventoryPosition": {
+      "additionalProperties": false,
+      "properties": {
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "product_id",
+        "stock_location_id"
+      ],
+      "title": "InventoryPosition",
+      "type": "object"
+    },
+    "MovementRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "inventory_event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Inventory Event Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "movement_type": {
+          "enum": [
+            "opening_stock",
+            "replenishment_received",
+            "sale",
+            "return_to_stock",
+            "write_off",
+            "transfer_in",
+            "transfer_out",
+            "inventory_adjustment"
+          ],
+          "title": "Movement Type",
+          "type": "string"
+        },
+        "quantity_delta": {
+          "title": "Quantity Delta",
+          "type": "integer"
+        },
+        "unit_of_measure": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Unit Of Measure",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "ingested_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Ingested At",
+          "type": "string"
+        },
+        "available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Available At",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_process": {
+          "enum": [
+            "opening",
+            "replenishment",
+            "sale",
+            "return",
+            "write_off",
+            "transfer",
+            "adjustment"
+          ],
+          "title": "Source Process",
+          "type": "string"
+        },
+        "source_reference": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Reference",
+          "type": "string"
+        },
+        "transfer_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Transfer Id"
+        },
+        "supplier_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Supplier Id"
+        },
+        "order_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order Id"
+        }
+      },
+      "required": [
+        "inventory_event_id",
+        "product_id",
+        "stock_location_id",
+        "movement_type",
+        "quantity_delta",
+        "unit_of_measure",
+        "occurred_at",
+        "ingested_at",
+        "available_at",
+        "sequence",
+        "source_process",
+        "source_reference",
+        "transfer_id",
+        "supplier_id",
+        "order_id"
+      ],
+      "title": "MovementRecord",
+      "type": "object"
+    },
+    "Product": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "unit_of_measure": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Unit Of Measure",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "unit_of_measure"
+      ],
+      "title": "Product",
+      "type": "object"
+    },
+    "StockLocation": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "location_code": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Location Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "location_code"
+      ],
+      "title": "StockLocation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "inventory-ledger-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "opening_policy": {
+      "const": "single_opening_movement",
+      "title": "Opening Policy",
+      "type": "string"
+    },
+    "reservation_policy": {
+      "const": "none",
+      "title": "Reservation Policy",
+      "type": "string"
+    },
+    "opening_at": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+      "title": "Opening At",
+      "type": "string"
+    },
+    "products": {
+      "items": {
+        "$ref": "#/$defs/Product"
+      },
+      "minItems": 1,
+      "title": "Products",
+      "type": "array"
+    },
+    "stock_locations": {
+      "items": {
+        "$ref": "#/$defs/StockLocation"
+      },
+      "minItems": 1,
+      "title": "Stock Locations",
+      "type": "array"
+    },
+    "inventory_scope": {
+      "items": {
+        "$ref": "#/$defs/InventoryPosition"
+      },
+      "minItems": 1,
+      "title": "Inventory Scope",
+      "type": "array"
+    },
+    "movements": {
+      "items": {
+        "$ref": "#/$defs/MovementRecord"
+      },
+      "minItems": 1,
+      "title": "Movements",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "opening_policy",
+    "reservation_policy",
+    "opening_at",
+    "products",
+    "stock_locations",
+    "inventory_scope",
+    "movements"
+  ],
+  "title": "LedgerPayload",
+  "type": "object"
+}

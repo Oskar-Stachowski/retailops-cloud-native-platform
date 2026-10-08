@@ -1,10 +1,16 @@
-from typing import Any, ClassVar
-from uuid import UUID
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from psycopg.rows import dict_row
 
 from app.db.connection import fetch_all, fetch_one
 from app.domain.models import Product
+
+if TYPE_CHECKING:
+    from uuid import UUID
+
+    from psycopg import Connection
 
 
 class ProductRepository:
@@ -25,7 +31,7 @@ class ProductRepository:
         "updated_at": "updated_at",
     }
 
-    def __init__(self, connection: object | None = None) -> None:
+    def __init__(self, connection: Connection[dict[str, Any]] | None = None) -> None:
         self.connection = connection
 
     def _fetch_all(self, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:

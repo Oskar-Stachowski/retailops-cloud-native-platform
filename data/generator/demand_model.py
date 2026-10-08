@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from data.generator.common import deterministic_uuid
 from data.generator.demand_schema import DEMAND_VERSION
+from data.generator.stockout_stress import anomaly_factor as stockout_anomaly_factor
 
 if TYPE_CHECKING:
     from data.generator.commerce_pricing import CommercePricing
@@ -59,6 +60,8 @@ def daily_demand(
     key: tuple[str, ...],
     pricing: CommercePricing,
     config: ResolvedGenerationConfig,
+    *,
+    anomaly_factor: str = "1",
 ) -> dict[str, str]:
     day = date.fromisoformat(key[0])
     rng = random.Random(f"demand:{config.seed}:{':'.join(key)}")  # noqa: S311 - deterministic simulation
@@ -95,7 +98,12 @@ def daily_demand(
         else Decimal(1)
     )
     factors = {
-        "base_rate": BASE_RATES[product["demand_class"]],
+        # Explicit rare-sales scenario, independent of forecast windows or scores.
+        # The unchanged stochastic rounding produces occasional positive sales;
+        # zero observations still come through baskets, inventory and daily facts.
+        "base_rate": "0.06"
+        if config.profile == "ai-intermittent-v1" and product["demand_class"] == "long_tail"
+        else BASE_RATES[product["demand_class"]],
         "product_factor": product["demand_weight"],
         "location_factor": store["traffic_multiplier"],
         "weekly_factor": str(weekly),
@@ -103,9 +111,21 @@ def daily_demand(
         "lifecycle_factor": str(lifecycle),
         "price_factor": str(price_factor),
         "promotion_factor": str(promotion_factor),
-        "anomaly_factor": "1",
+        "anomaly_factor": str(
+            Decimal(anomaly_factor) * stockout_anomaly_factor(config, product["id"], day)
+        ),
         "noise": str(Decimal(str(rng.uniform(0.78, 1.24)))),
     }
+    if config.profile in {"ai-07-portfolio-v2", "ai-07-portfolio-v3", "ai-07-portfolio-v4"}:
+        # Explicit whole-process demand budget for the smaller benchmark. This
+        # applies before anomaly composition and financial/stock facts, with
+        # no dependence on injection labels, windows or detector scores.
+        factors["base_rate"] = str(
+            Decimal(factors["base_rate"])
+            * Decimal(
+                "0.50" if config.profile in {"ai-07-portfolio-v3", "ai-07-portfolio-v4"} else "0.75"
+            )
+        )
     rate, draw = expected_demand(factors), Decimal(str(rng.random()))
     return {
         "id": deterministic_uuid("demand_truth", ":".join(key)),

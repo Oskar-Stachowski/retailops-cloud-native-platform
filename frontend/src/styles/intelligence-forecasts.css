@@ -1,0 +1,30 @@
+.ai-forecast-panel {
+  background: var(--surface, #fff);
+  border: 1px solid #d4dce7;
+  border-radius: 16px;
+  padding: 24px;
+}
+.ai-forecast-panel form, .ai-forecast-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+}
+.ai-forecast-panel form p { flex-basis: 100%; }
+.ai-forecast-panel input, .ai-forecast-panel select, .ai-forecast-panel button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #9cacc1;
+  font: inherit;
+}
+.ai-forecast-panel button { cursor: pointer; background: #f1f5fa; color: #17365c; }
+.ai-forecast-panel button:disabled { cursor: wait; opacity: .6; }
+.ai-forecast-panel .table-card__scroll { max-height: 32rem; overflow: auto; }
+.ai-forecast-panel thead { position: sticky; top: 0; background: #f1f5fa; z-index: 1; }
+.ai-forecast-panel [role="alert"] { color: #a32121; }
+.ai-forecast-lineage dl { display: grid; gap: 12px; }
+.ai-forecast-lineage dl div { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 3fr); gap: 12px; }
+.ai-forecast-lineage dt { font-weight: 600; }
+.ai-forecast-lineage dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 650px) { .ai-forecast-lineage dl div { grid-template-columns: 1fr; } }

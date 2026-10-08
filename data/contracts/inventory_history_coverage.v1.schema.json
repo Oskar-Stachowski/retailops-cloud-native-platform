@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "HistoryCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "coverage_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Coverage Id",
+          "type": "string"
+        },
+        "product_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "stock_location_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "title": "Stock Location Id",
+          "type": "string"
+        },
+        "covered_from_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Covered From At",
+          "type": "string"
+        },
+        "covered_through_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Covered Through At",
+          "type": "string"
+        },
+        "available_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+          "title": "Available At",
+          "type": "string"
+        },
+        "source_reference": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coverage_id",
+        "product_id",
+        "stock_location_id",
+        "covered_from_at",
+        "covered_through_at",
+        "available_at",
+        "source_reference"
+      ],
+      "title": "HistoryCoverage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "inventory-history-coverage-1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "coverage_basis": {
+      "const": "observed_ledger_stream",
+      "title": "Coverage Basis",
+      "type": "string"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/HistoryCoverage"
+      },
+      "title": "Coverage",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "coverage_basis",
+    "coverage"
+  ],
+  "title": "HistoryCoveragePayload",
+  "type": "object"
+}

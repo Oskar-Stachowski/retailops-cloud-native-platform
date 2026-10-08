@@ -245,7 +245,14 @@ def export_snapshot(
             return {"publication": "published", "path": str(destination), "manifest": verified}
 
 
-def main() -> None:
+def validate_plan_mode(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.forecast_plan_days and (args.source_dir or args.source_version == "2.6"):
+        parser.error(
+            "Forecast plans require generation of source 2.7; existing sources remain immutable."
+        )
+
+
+def main() -> None:  # noqa: PLR0915 - explicit versioned CLI dispatch
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--source-dir", type=Path)
@@ -258,10 +265,16 @@ def main() -> None:
         parser.add_argument("--" + option, type=int)
     parser.add_argument("--output-root", type=Path, default=GENERATED_ROOT / "snapshots")
     parser.add_argument("--include-evaluation-truth", action="store_true")
-    parser.add_argument("--require-use-case", action="append", choices=USE_CASES)
+    parser.add_argument(
+        "--require-use-case", action="append", choices=(*USE_CASES, "inventory_source")
+    )
     parser.add_argument("--chunk-rows", type=int, default=DEFAULT_CHUNK_ROWS)
     parser.add_argument("--partition-min-rows", type=int, default=PARTITION_MIN_ROWS)
+    parser.add_argument("--source-version", choices=("2.6", "2.7"), default=None)
+    parser.add_argument("--qualification-dir", type=Path)
+    parser.add_argument("--forecast-plan-days", type=int, choices=(0, 7, 14), default=0)
     args = parser.parse_args()
+    validate_plan_mode(parser, args)
     options = {
         "include_truth": args.include_evaluation_truth,
         "required_use_cases": tuple(args.require_use_case or ["forecast_source"]),
@@ -283,7 +296,31 @@ def main() -> None:
             )
         ):
             parser.error("Source mode requires --dataset-id and forbids generator configuration.")
-        result = export_snapshot(args.source_dir, args.dataset_id, args.output_root, **options)
+        version = read_json(args.source_dir / MANIFEST_V2_FILENAME)["schema_version"]
+        if args.source_version and not version.startswith(args.source_version + "."):
+            parser.error("Explicit source version differs from source manifest.")
+        if version == "2.7.0":
+            from data.export.inventory_snapshot import (  # noqa: PLC0415 - versioned dispatch avoids dependency cycle
+                export_inventory_snapshot,
+            )
+
+            if args.qualification_dir is None:
+                parser.error("Source 2.7 requires --qualification-dir.")
+            result = export_inventory_snapshot(
+                args.source_dir,
+                args.dataset_id,
+                args.qualification_dir,
+                args.output_root,
+                include_truth=args.include_evaluation_truth,
+                chunk_rows=args.chunk_rows,
+                required_use_cases=tuple(
+                    args.require_use_case or ["forecast_source", "inventory_source"]
+                ),
+            )
+        else:
+            if args.qualification_dir:
+                parser.error("Qualification sidecar is only supported for source 2.7.")
+            result = export_snapshot(args.source_dir, args.dataset_id, args.output_root, **options)
     else:
         if args.dataset_id or args.seed is None or args.end_date is None:
             parser.error(
@@ -302,9 +339,28 @@ def main() -> None:
                     "stores",
                     "warehouses",
                     "max_daily_rows",
+                    "forecast_plan_days",
                 )
             }
         )
+        if args.qualification_dir:
+            parser.error("Generation mode creates its own qualification sidecar.")
+        if args.source_version != "2.6":
+            from data.export.current_source import (  # noqa: PLC0415 - versioned dispatch avoids dependency cycle
+                generate_snapshot,
+            )
+
+            result = generate_snapshot(
+                config,
+                args.output_root,
+                include_truth=args.include_evaluation_truth,
+                chunk_rows=args.chunk_rows,
+                required_use_cases=tuple(
+                    args.require_use_case or ["forecast_source", "inventory_source"]
+                ),
+            )
+            print(json.dumps(result, indent=2))  # noqa: T201 - CLI manifest
+            return
         output_root = generated_target(args.output_root)
         GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="ai03-source-", dir=GENERATED_ROOT) as temporary:

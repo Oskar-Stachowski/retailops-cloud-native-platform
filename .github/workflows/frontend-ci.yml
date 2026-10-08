@@ -15,6 +15,56 @@ env:
   FRONTEND_REPORT_DIR: ci-cd/reports/frontend
 
 jobs:
+  intelligence-ui:
+    name: Personal forecast and suggestion UI with actual PostgreSQL and API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+        env:
+          POSTGRES_USER: retailops
+          POSTGRES_PASSWORD: retailops
+          POSTGRES_DB: retailops_ui_acceptance
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U retailops -d retailops_ui_acceptance"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgresql://retailops:retailops@127.0.0.1:5432/retailops_ui_acceptance
+      RETAILOPS_UI_DISPOSABLE_DB: "1"
+      PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/services/api
+      PLAYWRIGHT_BROWSER_CHANNEL: ""
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Set up Python CI toolchain
+        uses: ./.github/actions/setup-python-ci
+      - name: Set up locked frontend toolchain
+        uses: ./.github/actions/setup-node-ci
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Check UI drill before runtime
+        run: |
+          python -m ruff check scripts/intelligence-ui --config pyproject.toml
+          python -m ruff format --check scripts/intelligence-ui --config pyproject.toml
+          python -m mypy --config-file pyproject.toml scripts/intelligence-ui
+      - name: Require actual scoped UI, lineage, paging and revocation
+        run: python scripts/intelligence-ui/drill.py
+      - name: Upload bounded UI evidence without credentials
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: intelligence-ui-evidence
+          path: ci-cd/reports/intelligence-ui/
+          if-no-files-found: error
+
   frontend-quality-checks:
     name: Frontend tests and lint
     runs-on: ubuntu-latest
@@ -27,7 +77,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -71,7 +121,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
@@ -110,7 +160,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 

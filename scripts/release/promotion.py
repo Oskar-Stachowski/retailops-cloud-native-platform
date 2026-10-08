@@ -1,4 +1,4 @@
-# ruff: noqa: INP001, S603
+# ruff: noqa: INP001
 """Gate a manual main-branch release and publish its verified evidence."""
 
 import argparse

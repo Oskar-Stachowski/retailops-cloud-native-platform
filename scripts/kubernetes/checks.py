@@ -75,19 +75,27 @@ release_checks.api = api
 
 
 def streaming() -> dict:
-    from confluent_kafka import Producer
+    from confluent_kafka import Producer  # noqa: PLC0415 -- optional broker in the isolated checker
 
     event_id = str(uuid4())
     now = datetime.now(UTC).isoformat()
     event = {
         "event_id": event_id,
         "event_type": "sale_completed",
+        "topic": "retailops.sales.v1",
         "schema_version": "1.0",
         "source": "kubernetes-drill",
         "correlation_id": event_id,
         "occurred_at": now,
         "ingested_at": now,
-        "payload": {"quantity": 2, "unit_price": 7, "total_amount": 14},
+        "payload": {
+            "product_id": "kubernetes-drill-product",
+            "store_id": "kubernetes-drill-store",
+            "channel": "online",
+            "quantity": "2",
+            "unit_price": "7",
+            "total_amount": "14",
+        },
     }
     producer = Producer({"bootstrap.servers": "redpanda:9092"})
     errors = []
@@ -145,6 +153,8 @@ if __name__ == "__main__":
     mode = sys.argv[1]
     if mode == "prepare":
         result = recovery.prepare()
+    elif mode == "seed-expansion":
+        result = release_checks.seed_expansion(json.load(sys.stdin))
     elif mode == "validate":
         result = release_checks.validate(json.load(sys.stdin))
     elif mode == "write":

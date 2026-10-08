@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "title": "Id",
+        "type": "string"
+      },
+      "version": {
+        "exclusiveMinimum": 0,
+        "title": "Version",
+        "type": "integer"
+      },
+      "selling_location_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "title": "Selling Location Id",
+        "type": "string"
+      },
+      "channel": {
+        "enum": [
+          "store",
+          "online",
+          "marketplace",
+          "wholesale"
+        ],
+        "title": "Channel",
+        "type": "string"
+      },
+      "stock_location_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "title": "Stock Location Id",
+        "type": "string"
+      },
+      "effective_from": {
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "title": "Effective From",
+        "type": "string"
+      },
+      "effective_to": {
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "title": "Effective To",
+        "type": "string"
+      },
+      "available_at": {
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|\\+00:00)$",
+        "title": "Available At",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "version",
+      "selling_location_id",
+      "channel",
+      "stock_location_id",
+      "effective_from",
+      "effective_to",
+      "available_at"
+    ],
+    "title": "FulfillmentRoute",
+    "type": "object"
+  }
+}

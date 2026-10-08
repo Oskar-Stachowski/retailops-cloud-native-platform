@@ -15,14 +15,14 @@ runs:
   steps:
     - name: Attest build provenance
       id: provenance
-      uses: actions/attest-build-provenance@v3
+      uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
       with:
         subject-name: ${{ inputs.name }}
         subject-digest: ${{ inputs.digest }}
         push-to-registry: true
     - name: Attest SPDX SBOM
       id: sbom
-      uses: actions/attest-sbom@v3
+      uses: actions/attest-sbom@4651f806c01d8637787e274ac3bdf724ef169f34 # v3.0.0
       with:
         subject-name: ${{ inputs.name }}
         subject-digest: ${{ inputs.digest }}

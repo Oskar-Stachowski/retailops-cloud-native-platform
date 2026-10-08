@@ -150,6 +150,29 @@ class PromotionTests(unittest.TestCase):
         altered["releases"]["candidate"]["source_commit"] = "d" * 40
         with self.assertRaisesRegex(RuntimeError, "differs from tested source"):
             publication_contract(altered, report)
+        altered = copy.deepcopy(report)
+        altered["releases"]["candidate"]["images"]["api"]["build_inputs"] = {"materials": []}
+        with self.assertRaisesRegex(RuntimeError, "Build inputs differ"):
+            publication_contract(altered, report)
+
+    @patch("registry.run")
+    @patch("registry.images")
+    def test_unpinned_candidate_or_missing_receipt_blocks_publication(
+        self, image_list: MagicMock, command: MagicMock
+    ) -> None:
+        report = {
+            "status": "passed",
+            "cleanup": "passed",
+            "working_tree_dirty": False,
+            "harness_inputs": {"actions": ["pinned"]},
+            "stages": {"previous": {}, "upgraded": {}, "rolled_back": {}},
+        }
+        release = {"validation": "local_drill_passed"}
+        for image in ({}, {"build_inputs": {"declared_bases": ["python:3.11"]}}):
+            image_list.return_value = iter([("candidate", "api", release, image)])
+            with self.assertRaises(RuntimeError):
+                ready_report(report)
+        command.assert_not_called()
 
     def test_imported_migration_change_is_refused_before_runtime(self) -> None:
         source = {"source_commit": "a" * 40, "version": "0.2.1", "migration": {"head": "abc"}}

@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -129,19 +129,34 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Test path detection matrix
         run: python3 scripts/ci/test_detect_required_ci_changes.py
 
+      - name: Require immutable build inputs
+        run: |
+          python3 scripts/ci/test_immutable_inputs.py
+          python3 scripts/ci/test_intelligence_runtime.py
+          python3 scripts/ci/test_source_observation_ci.py
+          python3 scripts/ci/check_immutable_inputs.py --output ci-cd/reports/immutable-inputs.json
+
+      - name: Preserve build input inventory
+        if: always()
+        uses: ./.github/actions/upload-ci-evidence
+        with:
+          name: immutable-build-inputs
+          path: ci-cd/reports/immutable-inputs.json
+          if-no-files-found: error
+
       - name: Validate GitHub Actions workflows
         run: |
           docker run --rm \
             -v "${GITHUB_WORKSPACE}:/repo" \
             -w /repo \
-            rhysd/actionlint:1.7.7 -color
+            rhysd/actionlint:1.7.7@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9 -color
 
   api-gate:
     needs: detect-changes
