@@ -1,0 +1,93 @@
+{
+  "observed_at_utc": "2026-10-08T07:21:47.277601+00:00",
+  "scope": "Component controls of existing demand and physical Source2.8 plans on already exposed ai-smoke fixtures; not canonical profile or final qualification",
+  "accepted_source_main_integrated": "cd5a9dbb0967cd92b77385b8f3a799b5485207f9",
+  "accepted_queue_event_parent": "ab4d569081c1a427449717e14ef22249b490ee81",
+  "implementation": {
+    "version": "planned-source-cached-execution-1.0.0",
+    "code_sha256": "33d6b7886f91ae613f405f66af6b3170fcc34dedda5f4a2c1a7d096d7465c274",
+    "upstream_sha256": {
+      "inventory/source_cohort_batch_v2.py": "b5716935d97b722fcd704d2dd3bb1984a3e1d2cddca595ad3ec124cb13bd5394",
+      "inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
+      "inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
+      "anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",
+      "anomalies/source_process.py": "f1b9eb27af85ba05de487e93c6efc374a571ead1198f48bba65c940e30e132ba",
+      "anomalies/candidate_io.py": "80bd7af07e107d46b114fdeac3e1e54dca2cf3353648e88fffbfd7805e2ad7e1"
+    },
+    "rng_physical_rules_and_scenario_interventions": "unchanged",
+    "source_validation": "ordinary_source_2_8_writer_reader_and_independent_plan_replay"
+  },
+  "closed_ordinary_files_unchanged_from_current_main": {
+    "data/inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
+    "data/inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
+    "data/anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",
+    "data/anomalies/source_process.py": "f1b9eb27af85ba05de487e93c6efc374a571ead1198f48bba65c940e30e132ba",
+    "data/anomalies/candidate_io.py": "80bd7af07e107d46b114fdeac3e1e54dca2cf3353648e88fffbfd7805e2ad7e1"
+  },
+  "fixture": {
+    "profile": "ai-smoke",
+    "days": 30,
+    "products": 8,
+    "stores": 3,
+    "warehouses": 2,
+    "data_seeds": [
+      42,
+      137,
+      2026
+    ],
+    "forecast_plan_days": 14,
+    "plans": [
+      "original example_plan",
+      "original physical_example_plan"
+    ],
+    "already_exposed_control_only": true
+  },
+  "initial_run": {
+    "command": "PYTHONPATH=. python -m pytest -q data/tests/test_planned_source_cohort.py",
+    "passed": 15,
+    "failed": 6,
+    "seconds": 654.35,
+    "failures": "Only expected quality-check count 36 versus actual 38; all preceding CSV, report, facts_ready and native independent-replay assertions passed in both backends. Forecast-plan context adds two checks."
+  },
+  "corrected_run": {
+    "command": "PYTHONPATH=. python -m pytest -q data/tests/test_planned_source_cohort.py -k 'ordinary_publication'",
+    "passed": 6,
+    "deselected": 15,
+    "seconds": 321.7,
+    "correction": "Expected the complete 38-check forecast-plan report; no production behavior, validation or gate changed."
+  },
+  "distinct_controls_passed_across_runs": 21,
+  "single_full_suite_run_all_green": false,
+  "coverage": {
+    "all_58_tables_and_context_and_canonical_bytes_equal": 6,
+    "ordinary_csv_and_complete_report_bytes_and_independent_plan_replay_equal": 6,
+    "ordinary_quality_checks_per_forecast_planned_report": 38,
+    "native_qualification_and_snapshot_1_2_without_evaluation_truth": 6,
+    "original_extended_schema_bytes_unchanged": true,
+    "input_detachment_and_typed_event_weakref_release": 2,
+    "complete_physical_scenario_including_doubled_sequences_and_all_interventions_retained": true,
+    "unreviewed_upstream_rejected_before_generation": 1
+  },
+  "test_file_sha256": "1d8daa60ed34854f6bdb2e0debcc8090d5563b17465e59207882d40fec38105f",
+  "closed_AI07_AI08_reopened": false,
+  "existing_AI08_memory_controls_reused": [
+    "movement ID index",
+    "cached immutable validation",
+    "only consumed commerce-input copies",
+    "post-write release"
+  ],
+  "ordinary_generator_plans_rules_schemas_writer_reader_independent_replay_changed": false,
+  "full_profile_qualified": false,
+  "whole_generator_rss_or_cpu_improvement_proved": false,
+  "project_journal_initialized": false,
+  "project_fits": 0,
+  "fresh_final_reads": 0,
+  "stage_ready": false,
+  "remaining": [
+    "New exact producer head and resulting whole-main Required CI",
+    "Isolated full canonical planned Source2.8 and ai-training resource qualification",
+    "Complete preregistered Project campaign and scenario portfolio for all three uses",
+    "Final untouched seeds, paired uncertainty, full cost reporting and lifecycle acceptance"
+  ],
+  "publication": "Implementation prepared on an owned branch; no unperformed CI or main publication claimed."
+}
