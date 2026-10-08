@@ -80,8 +80,11 @@ def reconcile_source_commerce(
     )
     _reconcile_sales(inventory, tables, candidate)
     validate_dimensions(tables, generation)
+    items_by_order = defaultdict(list)
+    for item in items.values():
+        items_by_order[item["order_id"]].append(item)
     for order_id, order in orders.items():
-        lines = [item for item in items.values() if item["order_id"] == order_id]
+        lines = items_by_order[order_id]
         require(
             bool(lines)
             and len({item["product_id"] for item in lines}) == len(lines)

@@ -51,8 +51,8 @@ FAST_PATH_VERSION = "inventory-source-indexed-movement-1.0.0"
 UPSTREAM_SHA256 = {
     "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
-    "simulator.py": "f387f5a374f3cc452d16fcf1f8b64919e29087275da33b95f81e594ea03c2fa1",
-    "source_commerce.py": "9322d5240b1762db498929febed872bd207bd683ec3b1785cc0a0674f43e09c7",
+    "simulator.py": "7b10a76f7a4ea93b40557d402a3f6cd5a6400e939e78c3ffa64dadc4b531dcd7",
+    "source_commerce.py": "c53fefae30abfdf5c48d744cc0c903db449edbc970be3523e8a008dbd0ad7991",
 }
 
 

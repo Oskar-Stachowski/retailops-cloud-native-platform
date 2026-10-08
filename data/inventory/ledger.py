@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
@@ -58,6 +58,12 @@ class InventoryMovement:
         return self.occurred_time, self.sequence
 
     def record(self) -> dict[str, Any]:
+        # Valid movements contain immutable CSV scalars. Avoid recursively
+        # deepcopying every scalar on each full-ledger view. Keep asdict's
+        # behavior for malformed/replaced objects until validation rejects them.
+        values = {field.name: getattr(self, field.name) for field in fields(self)}
+        if all(type(value) in (str, int, type(None)) for value in values.values()):
+            return values
         return asdict(self)
 
     @classmethod

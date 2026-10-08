@@ -23,7 +23,7 @@ from data.generator.identity import (
 )
 from data.generator.manifest_v2 import config_from_parameters, requested_parameters, unique_keys
 from data.generator.source_realism import realism_markdown
-from data.inventory.contract import require
+from data.inventory.contract import UTC_TIMESTAMP_PATTERN, require, utc_timestamp
 from data.inventory.source_contract import SourceInventoryConfig
 from data.inventory.source_dataset_contract import (
     FORECAST_GENERATOR_VERSION,
@@ -93,6 +93,36 @@ def table_identity(name: str, rows: list[dict]) -> dict:
         if name in TABLES
         else content_sha256(rows, columns(name)),
     }
+
+
+def verify_normalized_source(tables: dict) -> None:
+    """Check the complete canonical tables without constructing a second dataset."""
+    require(set(tables) == set(SOURCE_TABLES), "Source 2.7 table allowlist differs.")
+    for name, rows in tables.items():
+        definition = TABLES.get(name)
+        schema = None if definition else table_schema(name, "ai-smoke")
+        properties = field_rules(definition.model) if definition else {}
+        keys = definition.grain if definition else grain(name)
+        previous = None
+        for row in rows:
+            if definition:
+                normalized = definition.model.model_validate(row).model_dump()
+                for field, value in normalized.items():
+                    if (
+                        value is not None
+                        and properties[field].get("pattern") == UTC_TIMESTAMP_PATTERN
+                    ):
+                        normalized[field] = utc_timestamp(value).isoformat()
+                require(normalized == row, "Noncanonical source values/grain order.")
+            else:
+                require(
+                    all(isinstance(v, str) for v in row.values()),
+                    "Non-CSV scalar in commerce source.",
+                )
+                typed_row(row, schema)
+            key = tuple(row[field] for field in keys)
+            require(previous is None or previous < key, "Noncanonical source values/grain order.")
+            previous = key
 
 
 def fingerprint() -> dict:
@@ -317,13 +347,13 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
             reader = csv.DictReader(stream)
             require(reader.fieldnames == columns(name), "Source CSV header differs: " + name)
             rows = []
+            rules = field_rules(TABLES[name].model) if name in TABLES else {}
             for csv_row in reader:
                 require(
                     None not in csv_row and all(isinstance(v, str) for v in csv_row.values()),
                     "Malformed source CSV row width.",
                 )
                 if name in TABLES:
-                    rules = field_rules(TABLES[name].model)
                     row = (
                         TABLES[name]
                         .model.model_validate(
@@ -339,7 +369,7 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
             "Source table content/metadata differs: " + name,
         )
         tables[name] = rows
-    require(normalize_source(tables) == tables, "Noncanonical source values/grain order.")
+    verify_normalized_source(tables)
     if scenario is not None:
         from data.anomalies.source_process import scenario_document  # noqa: PLC0415
 
@@ -447,8 +477,13 @@ def write_source_dataset(
     output_root: Path,
     *,
     scenario_plan: dict | None = None,
+    consume_input: bool = False,
 ) -> Path:
-    tables = normalize_source(tables)
+    incoming = tables
+    tables = normalize_source(incoming)
+    if consume_input:
+        incoming.clear()
+    del incoming
     effective = resolve_generation_config(generation)
     provenance = code_provenance(fingerprint())
     desc = descriptor(generation, config, tables, context, provenance)
@@ -506,6 +541,7 @@ def write_source_dataset(
         if scenario is not None:
             payload["scenario"] = artifact(staging / SCENARIO_PATH, staging)
         (staging / MANIFEST_FILENAME).write_bytes(canonical_json(payload) + b"\n")
+        del tables
         read_source_dataset(staging)
         staging.rename(final)
     return final

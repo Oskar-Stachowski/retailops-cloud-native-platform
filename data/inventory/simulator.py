@@ -83,8 +83,14 @@ class ChronologicalSimulator:
         self.orders: list[dict] = []
         self.plans: list[dict] = []
         self.receipts: list[dict] = []
+        self._receipt_ids: set[str] = set()
+        self._receipt_keys: set[tuple[datetime, int]] = set()
+        self._orders_by_id: dict[str, list[dict]] = {}
+        self._plans_by_order: dict[str, list[dict]] = {}
+        self._receipts_by_order: dict[str, list[dict]] = {}
         self.sales: dict[str, dict] = {}
         self.returns: list[dict] = []
+        self._returned_quantities: dict[str, int] = {}
         self.reviews: list[dict] = []
         self.coverage: list[dict] = []
         self.outcomes: list[dict] = []
@@ -339,10 +345,7 @@ class ChronologicalSimulator:
             == (sale["product_id"], sale["stock_location_id"], sale["unit_of_measure"]),
             "Return product, original fulfillment location or unit differs from sale.",
         )
-        total = (
-            sum(r["quantity"] for r in self.returns if r["sale_id"] == sale["sale_id"])
-            + event.returned_quantity
-        )
+        total = self._returned_quantities.get(sale["sale_id"], 0) + event.returned_quantity
         require(
             total <= sale["quantity"], "Cumulative returned quantity exceeds fulfilled purchase."
         )
@@ -390,6 +393,7 @@ class ChronologicalSimulator:
                 "source_reference": event.source_reference,
             }
         )
+        self._returned_quantities[sale["sale_id"]] = total
 
     def _receipt(self, receipt: ReplenishmentReceipt) -> None:
         position = receipt.product_id, receipt.stock_location_id
@@ -401,12 +405,12 @@ class ChronologicalSimulator:
             }
         )
         require(
-            not any(r["receipt_id"] == receipt.receipt_id for r in self.receipts),
+            receipt.receipt_id not in self._receipt_ids,
             "Duplicate replenishment primary key: receipt_id",
         )
         key = utc_timestamp(receipt.received_at), receipt.sequence
         require(
-            not any((utc_timestamp(r["received_at"]), r["sequence"]) == key for r in self.receipts),
+            key not in self._receipt_keys,
             "Duplicate receipt timestamp/sequence.",
         )
         related = receipt.replenishment_order_id
@@ -416,14 +420,10 @@ class ChronologicalSimulator:
         book = ReplenishmentBook.from_payload(
             {
                 **self.supply_base,
-                "replenishment_orders": [
-                    r for r in self.orders if r["replenishment_order_id"] == related
-                ],
-                "delivery_plan_versions": [
-                    r for r in self.plans if r["replenishment_order_id"] == related
-                ],
+                "replenishment_orders": self._orders_by_id.get(related, []),
+                "delivery_plan_versions": self._plans_by_order.get(related, []),
                 "replenishment_receipts": [
-                    *(r for r in self.receipts if r["replenishment_order_id"] == related),
+                    *self._receipts_by_order.get(related, []),
                     record,
                 ],
             }
@@ -432,6 +432,9 @@ class ChronologicalSimulator:
             m for m in book.receipt_movements() if m.source_reference == receipt.receipt_id
         )
         self.receipts.append(record)
+        self._receipt_ids.add(receipt.receipt_id)
+        self._receipt_keys.add(key)
+        self._receipts_by_order.setdefault(related, []).append(record)
         self._apply(movement.record())
 
     def _review(self, stamp: datetime) -> None:
@@ -460,8 +463,14 @@ class ChronologicalSimulator:
         )
         self.coverage.extend(coverage["coverage"])
         self.reviews.append({"origin": stamp.isoformat(), **result.record()})
-        self.orders.extend(o.model_dump() for o in result.orders)
-        self.plans.extend(p.model_dump() for p in result.plans)
+        for order in result.orders:
+            record = order.model_dump()
+            self.orders.append(record)
+            self._orders_by_id.setdefault(order.replenishment_order_id, []).append(record)
+        for plan in result.plans:
+            record = plan.model_dump()
+            self.plans.append(record)
+            self._plans_by_order.setdefault(plan.replenishment_order_id, []).append(record)
         # Validate the complete new batch before any scheduled receipt can execute.
         ReplenishmentBook.from_payload(self._book_payload())
         for order in result.orders:

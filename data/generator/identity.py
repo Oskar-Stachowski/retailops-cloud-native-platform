@@ -10,7 +10,10 @@ import unicodedata
 from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 from data.generator.configuration import (
     CALENDAR_VERSION,
@@ -185,7 +188,32 @@ def canonical_json(value: object) -> bytes:
 
 
 def json_sha256(value: object) -> str:
-    return hashlib.sha256(canonical_json(value)).hexdigest()
+    digest = hashlib.sha256()
+    for chunk in canonical_json_chunks(value):
+        digest.update(chunk)
+    return digest.hexdigest()
+
+
+def canonical_json_chunks(value: object) -> Iterator[bytes]:
+    """Emit the original canonical bytes without materializing an entire table."""
+    if type(value) is not list:
+        yield canonical_json(value)
+        return
+    yield b"["
+    comma = b""
+    for row in value:
+        yield comma
+        yield canonical_json(row)
+        comma = b","
+    yield b"]"
+
+
+def canonical_file_matches(path: Path, value: object) -> bool:
+    """Compare every canonical byte, including the sole terminal newline."""
+    with path.open("rb") as stream:
+        if any(stream.read(len(chunk)) != chunk for chunk in canonical_json_chunks(value)):
+            return False
+        return stream.read(2) == b"\n"
 
 
 def file_sha256(path: Path) -> str:
@@ -242,6 +270,19 @@ def canonical_cell(field: str, value: object) -> object:
 
 
 def content_sha256(rows: list[dict[str, Any]], columns: list[str]) -> str:
+    if len(rows) > 8192:
+        # Imported lazily because the disk hash uses the canonical helpers in
+        # this module. Temporary storage respects the runner's measured TMPDIR.
+        from tempfile import TemporaryDirectory  # noqa: PLC0415
+
+        from data.export.hashing import ContentHash  # noqa: PLC0415
+
+        with (
+            TemporaryDirectory(prefix=".source-content-hash-") as temporary,
+            ContentHash(columns, Path(temporary)) as digest,
+        ):
+            digest.add(rows)
+            return digest.digest()
     # A sorted multiset preserves duplicates and ignores physical row ordering.
     records = sorted(
         canonical_json({k: canonical_cell(k, row.get(k)) for k in columns}) for row in rows

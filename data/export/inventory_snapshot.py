@@ -7,7 +7,7 @@ import json
 import os
 import re
 import shutil
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
@@ -24,7 +24,7 @@ from data.export.policy import ROOT, generated_target
 from data.export.schema import typed_row as commerce_typed
 from data.export.snapshot_contract import MANIFEST_NAME
 from data.export.snapshot_validation import reference, safe_file
-from data.generator.identity import canonical_json, file_sha256, json_sha256
+from data.generator.identity import canonical_file_matches, canonical_json, file_sha256, json_sha256
 from data.inventory.contract import require
 from data.inventory.ledger import InventoryLedger
 from data.inventory.qualification import qualification_report, qualify_windows
@@ -338,7 +338,7 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
                 "Arrow schema declaration differs.",
             )
             namespace = "evaluation_truth" if data_class(name) == "simulation_truth" else "facts"
-            rows = []
+            source_rows = []
             for index, ref in enumerate(table["files"]):
                 field = table["partition_source_field"]
                 match = (
@@ -374,13 +374,20 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
                             and all(r[field].isoformat() == match[1] for r in values),
                             "Inventory partition day differs from row.",
                         )
-                    rows.extend(values)
-            computed = logical(name, rows, schema, grain(name), data_class(name), work)
+                    source_rows.extend(source_row(r, native=name in TABLES) for r in values)
+            convert = typed_row if name in TABLES else commerce_typed
+            computed = logical(
+                name,
+                (convert(r, schema) for r in source_rows),
+                schema,
+                grain(name),
+                data_class(name),
+                work,
+            )
             require(
                 computed == {k: table[k] for k in computed},
                 "Typed inventory content/ranges differ.",
             )
-            source_rows = [source_row(r, native=name in TABLES) for r in rows]
             require(
                 len({tuple(r[k] for k in grain(name)) for r in source_rows}) == len(source_rows),
                 "Duplicate inventory snapshot grain.",
@@ -416,7 +423,7 @@ def verify_inventory_snapshot(  # noqa: PLR0915 - sequential independent validat
             )
             rows = qualify_windows(restored, context)
             require(
-                (qualification_root / QUAL_WINDOWS).read_bytes() == canonical_json(rows) + b"\n",
+                canonical_file_matches(qualification_root / QUAL_WINDOWS, rows),
                 "Evaluation labels differ from physical/lifecycle/coverage qualification.",
             )
             require(
@@ -553,8 +560,15 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
         for name in selected:
             schema = spec.table_schema(name)
             convert = typed_row if name in TABLES else commerce_typed
-            rows = [convert(r, schema) for r in tables[name]]
-            table = logical(name, rows, schema, grain(name), data_class(name), work)
+            rows = tables[name]
+            table = logical(
+                name,
+                (convert(r, schema) for r in rows),
+                schema,
+                grain(name),
+                data_class(name),
+                work,
+            )
             namespace = "evaluation_truth" if data_class(name) == "simulation_truth" else "facts"
             directory = bundle / namespace / name
             directory.mkdir(parents=True, mode=0o700)
@@ -566,12 +580,12 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
             )
             groups = {}
             for row in rows:
-                key = row[field].isoformat() if field else ""
+                key = date.fromisoformat(str(row[field])).isoformat() if field else ""
                 groups.setdefault(key, []).append(row)
             groups = groups or {"": []}
             for day, values in sorted(groups.items()):
                 for offset in range(0, max(len(values), 1), chunk_rows):
-                    chunk = values[offset : offset + chunk_rows]
+                    chunk = [convert(r, schema) for r in values[offset : offset + chunk_rows]]
                     partition = directory / f"business_date={day}" if field else directory
                     partition.mkdir(parents=True, exist_ok=True, mode=0o700)
                     path = partition / f"part-{len(files):06d}.parquet"
@@ -588,6 +602,7 @@ def export_inventory_snapshot(  # noqa: PLR0915 - ordered sealing and atomic pub
             (bundle / "schemas" / (name + ".arrow.json")).write_bytes(
                 canonical_json({"table": name, "schema": spec.columns(name)}) + b"\n"
             )
+        del tables, groups, values, rows, chunk
         metadata = [
             reference(bundle, p)
             for p in sorted(bundle.rglob("*"))

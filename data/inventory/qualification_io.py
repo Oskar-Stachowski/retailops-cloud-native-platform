@@ -5,7 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from data.generator.identity import canonical_json, code_provenance, json_sha256
+from data.generator.identity import (
+    canonical_file_matches,
+    canonical_json,
+    canonical_json_chunks,
+    code_provenance,
+    json_sha256,
+)
 from data.inventory.contract import require
 from data.inventory.qualification import qualification_report, qualify_windows
 from data.inventory.qualification_contract import (
@@ -100,7 +106,7 @@ def read_sealed_qualification(
         target = verify_artifact(directory, manifest[field], path)
         # Exact canonical bytes reject malformed types, duplicate keys and changed ordering too.
         require(
-            target.read_bytes() == canonical_json(expected) + b"\n",
+            canonical_file_matches(target, expected),
             "Qualification artifact differs from recomputation.",
         )
     require(
@@ -124,7 +130,10 @@ def write_qualification(source: Path, output_root: Path) -> Path:
     with TemporaryDirectory(prefix=".inventory-labels-", dir=output_root) as temporary:
         staging = Path(temporary) / "qualification"
         (staging / "simulation_truth").mkdir(parents=True)
-        (staging / WINDOWS).write_bytes(canonical_json(rows) + b"\n")
+        with (staging / WINDOWS).open("xb") as stream:
+            for chunk in canonical_json_chunks(rows):
+                stream.write(chunk)
+            stream.write(b"\n")
         (staging / REPORT).write_bytes(canonical_json(report) + b"\n")
         payload = {
             "schema_version": QUALIFICATION_VERSION,
