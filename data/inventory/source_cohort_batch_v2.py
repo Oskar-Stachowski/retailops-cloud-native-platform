@@ -44,6 +44,7 @@ from data.inventory.legacy import legacy_stock_movements
 from data.inventory.projection import project_inventory
 from data.inventory.projection_contract import ProjectionConfig
 from data.inventory.run_source_dataset import default_inventory_config
+from data.inventory.simulation_contract import ChronologicalScenario
 from data.inventory.snapshots import daily_snapshots
 from data.inventory.source_bridge import COMMERCE_TABLES, _copy_commerce_inputs
 from data.inventory.source_cohort_batch import IndexedSourceCommerceSimulator
@@ -55,7 +56,7 @@ from data.inventory.source_observations import known_commerce_view, rebuild_obse
 from data.inventory.source_reconciliation import reconcile_source_commerce
 from data.inventory.source_tables import TableContext, tables_from_source
 
-FAST_PATH_VERSION = "inventory-source-cached-ledger-2.0.0"
+FAST_PATH_VERSION = "inventory-source-cached-ledger-2.1.0"
 UPSTREAM_SHA256 = {
     "source_cohort_batch.py": "3e3ecafba7298d343a8c9624617bdc6461e0925d5a446aeab9d011acc3909e00",
     "ledger.py": "3e50ac30d3732789680461d96d5855f01619d0978de56e774d11565df884565f",
@@ -81,7 +82,7 @@ def implementation() -> dict[str, Any]:
         "version": FAST_PATH_VERSION,
         "code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "upstream_sha256": verify_upstream_pins(),
-        "optimization": "movement_id_set_and_cached_immutable_record_schema_validation",
+        "optimization": "cached_immutable_records_and_queue_owned_scenario_events",
         "rng_and_chronological_process": "unchanged",
         "source_validation": "ordinary_source_2_7_writer_and_reader_all_gates",
     }
@@ -106,6 +107,24 @@ class CachedLedgerSourceCommerceSimulator(IndexedSourceCommerceSimulator):
         self._validated_objects: dict[int, tuple[InventoryMovement, InventoryMovement]] = {
             id(m): (m, m) for m in self.movements
         }
+        self._release_queued_scenario_events()
+
+    def _release_queued_scenario_events(self) -> None:
+        """Let consumed typed events expire; retain the complete caller-owned scenario.
+
+        The pinned parent constructors have validated every event and put the
+        exact objects into the chronological heap. Execution uses that heap,
+        settings and selling locations, never the original typed event lists.
+        Keeping the lists would retain every processed event until execution
+        ends, alongside the growing output. Serialize only runtime metadata,
+        so releasing the lists does not briefly copy all event payloads.
+        """
+        metadata = self.scenario.model_dump(
+            exclude={"demand_arrivals", "return_events", "inventory_actions"}
+        )
+        self.scenario = ChronologicalScenario.from_payload(
+            {**metadata, "demand_arrivals": [], "return_events": [], "inventory_actions": []}
+        )
 
     def _master_document(self) -> bytes:
         return canonical_json({k: v for k, v in self.inventory_base.items() if k != "movements"})

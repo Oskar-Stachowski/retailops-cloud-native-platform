@@ -45,13 +45,15 @@ def test_unchanged_parent_ids_and_native_claim_tail(source):
     # Actual source identity includes current generator provenance. Adding the
     # separately declared portfolio profiles versions that provenance, while
     # every business field and all 58 table hashes remain frozen. Compare that
-    # complete descriptor using the original dee564e code hash and runtime;
+    # complete descriptor using the original dee564e code/dependency hashes and runtime;
     # retain the original golden IDs instead of replacing them with today's IDs.
     assert manifest["descriptor"]["code_sha256"] == fingerprint()["code_sha256"]
+    assert manifest["descriptor"]["dependency_sha256"] == fingerprint()["dependency_sha256"]
     frozen_runtime = {
         **manifest["descriptor"],
         "python_version": "3.11.15",
         "code_sha256": "37a18d21bd960dfe72793da9f787dbe7172fbb4ab7f87d283090a1037b1d9f33",
+        "dependency_sha256": "f55452e6f30020829f87d8c040440e7b589fd0f431e84c082aff87a9fe8b35f4",
     }
     assert "source-sha256-" + json_sha256(frozen_runtime) in {
         "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
