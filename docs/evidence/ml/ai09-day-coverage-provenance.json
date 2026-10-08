@@ -1,0 +1,79 @@
+{
+  "observed_at_utc": "2026-10-08T08:48:34.644778+00:00",
+  "scope": "Historical descriptor provenance regression only; existing exposed demand/physical ai-smoke fixtures. No production or canonical/final qualification.",
+  "failed_ci": {
+    "run_id": 37743193615,
+    "head_sha": "345a7cf3f8f38e1090917b636a6567605ef15f78",
+    "conclusion": "failure",
+    "total_jobs": 25,
+    "read_jobs": 25,
+    "job_conclusions": {
+      "success": 19,
+      "failure": 2,
+      "skipped": 4
+    },
+    "failed_data_job_id": 113198514393,
+    "failed_pytest_step": {
+      "passed": 1049,
+      "failed": 2,
+      "seconds": 3391.68,
+      "failures": [
+        "test_day_coverage.py::test_unchanged_parent_ids_and_native_claim_tail[demand]",
+        "test_day_coverage.py::test_unchanged_parent_ids_and_native_claim_tail[physical]"
+      ]
+    },
+    "log_sha256": "7e1e9c7245afc61a6908711fe4a0f7a11b991a86878a3a76ce06231d7aa943d3"
+  },
+  "cause": "Historical golden descriptor normalized original code hash and runtime but omitted original dependency hash after accepted main dependency updates. Current dataset identity correctly changed.",
+  "historical_dependency_proof": {
+    "historical_commit": "dee564ef98dd7c0324dd2c88d418dc544e7ecdd6",
+    "dependency_files": {
+      "services/api/requirements.txt": "cb92c29105f31f95b5406ed0992ab2dce30b37a8c22f2a8c7c037065b4e21110",
+      "services/api/requirements-dev.txt": "e8f7e6f546631ecdfea7c2b5783d68a1e1df45047e0f3c8e638bb58f0bbeed63"
+    },
+    "historical_dependency_sha256": "f55452e6f30020829f87d8c040440e7b589fd0f431e84c082aff87a9fe8b35f4",
+    "current_dependency_sha256": "ea389b45f75dec8d4ce476d813ce9cbf8217bb9d5d0bfcfd0cdce5f217975c02",
+    "changed_dependency_files": [
+      "services/api/requirements.txt",
+      "services/api/requirements-dev.txt"
+    ]
+  },
+  "correction": {
+    "current_descriptor_code_matches_current_fingerprint": true,
+    "current_descriptor_dependency_matches_current_fingerprint": true,
+    "historical_comparison_normalizes_original_code_runtime_and_dependencies": true,
+    "original_golden_ids_unchanged": [
+      "source-sha256-3c13e783d52b74bb0955122fd70403eb8f10624acfa11e8b54d587b487cff2fd",
+      "source-sha256-be2db97edbb94dfc52d220cdb49c8de7228027eda927a25d982524a875435a09"
+    ],
+    "business_descriptor_and_all_58_table_hashes_retained": true,
+    "production_code_or_schemas_changed": false,
+    "accepted_dependency_updates_reverted": false,
+    "closed_AI07_AI08_reopened": false
+  },
+  "verification": {
+    "command": "PYTHONPATH=. python -m pytest -q data/tests/test_day_coverage.py --tb=short",
+    "passed": 17,
+    "failed": 0,
+    "seconds": 213.14,
+    "ruff_data_ml": "passed",
+    "git_diff_check": "passed",
+    "test_file_sha256": "5d8882f3c441045101431cf79e8be690944687b702403f4d05e544d8dad0ef47",
+    "optional_forced_excluded_test_lint": {
+      "required_by_repository": false,
+      "reason": "Repository ALL-mode explicitly excludes data/tests; forced lint observes historical test conventions including assert and absent fixture annotations.",
+      "before_diagnostics": 38,
+      "after_diagnostics": 39,
+      "added_diagnostics": {
+        "S101": 1
+      },
+      "production_gate": "Configured ruff check data ml passes."
+    }
+  },
+  "publication": "Prepared follow-up for Source PR 107; fresh exact-head and resulting-main whole Required CI remain mandatory. The failed run is retained and not retried unchanged.",
+  "full_profile_qualified": false,
+  "project_journal_initialized": false,
+  "project_fits": 0,
+  "fresh_final_reads": 0,
+  "stage_ready": false
+}

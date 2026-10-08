@@ -27,6 +27,20 @@ The addon pins all six upstream modules, including cached producer parent
 already includes the new anomaly module; a clean producer commit remains
 required by the campaign wrapper.
 
+The first integrated-head Required CI run
+[37743193615](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37743193615)
+failed in two historical day-coverage identity tests; 1,049 other tests in that
+step passed. The comparison froze the original code hash and Python version,
+but omitted the original dependency hash after main accepted dependency updates.
+[The provenance receipt](ai09-day-coverage-provenance.json) derives that hash
+from the original `dee564ef` dependency files. The corrected comparison keeps
+both original golden IDs and the complete descriptor, including all 58 table
+hashes. It also checks that the actual descriptor carries the current code and
+dependency fingerprints. Production code, schemas and accepted dependency
+updates are unchanged. All 17 tests in the affected module passed in 213.14
+seconds. A fresh whole Required CI run is still required; the failed run remains
+part of the evidence.
+
 This is component evidence. Full canonical planned Source 2.8 and ai-training
 capacity, exact new-head/main CI, Project fits and final evaluation remain open.
 No whole-generator memory or speed improvement, model qualification or AI 09
