@@ -50,16 +50,23 @@ def physical_daily_balances(
     ledger: InventoryLedger, config: ProjectionConfig
 ) -> list[dict[str, Any]]:
     rows = []
-    by_position = defaultdict(list)
-    for movement in ledger.movements:
-        by_position[movement.position].append(movement)
+    by_position = ledger.movements_by_position()
     for midnight, start, end in day_periods(config):
         for product, location in ledger.scope:
-            movements = by_position[product, location]
-            preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
-            included = [m for m in movements if start <= m.occurred_time < end]
-            opening = sum(m.quantity_delta for m in included if m.movement_type == "opening_stock")
-            delta = sum(m.quantity_delta for m in included if m.movement_type != "opening_stock")
+            indexed = ledger.indexed_physical_period((product, location), start, end)
+            if indexed is None:
+                movements = by_position.get((product, location), ())
+                preceding = sum(m.quantity_delta for m in movements if m.occurred_time < start)
+                included = [m for m in movements if start <= m.occurred_time < end]
+                opening = sum(
+                    m.quantity_delta for m in included if m.movement_type == "opening_stock"
+                )
+                delta = sum(
+                    m.quantity_delta for m in included if m.movement_type != "opening_stock"
+                )
+            else:
+                preceding, opening, closing = indexed
+                delta = closing - preceding - opening
             rows.append(
                 {
                     "product_id": product,

@@ -213,6 +213,25 @@ class InventoryLedger:
         return {position: tuple(rows) for position, rows in grouped.items()}
 
     @cached_property
+    def _product_units(self) -> Mapping[str, str]:
+        return MappingProxyType({m.product_id: m.unit_of_measure for m in self.movements})
+
+    def units_by_product(self) -> Mapping[str, str]:
+        """Read units once for validated immutable ledgers."""
+        if getattr(self, "_payload_validated", False):
+            return self._product_units
+        return {m.product_id: m.unit_of_measure for m in self.movements}
+
+    def indexed_physical_period(
+        self, position: Position, start: datetime, end: datetime
+    ) -> tuple[int, int, int] | None:
+        """Return indexed physical sums or request native replay for unvalidated ledgers."""
+        if not getattr(self, "_payload_validated", False):
+            return None
+        index = self._position_index.get(position)
+        return index.physical_period(start, end) if index is not None else (0, 0, 0)
+
+    @cached_property
     def _position_index(self) -> Mapping[Position, PositionIndex]:
         return MappingProxyType(
             {

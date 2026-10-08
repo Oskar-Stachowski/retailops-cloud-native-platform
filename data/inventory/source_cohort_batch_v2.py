@@ -59,10 +59,11 @@ from data.inventory.source_tables import TableContext, tables_from_source
 
 FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.2"
 UPSTREAM_SHA256 = {
+    "snapshots.py": "e705092e4ce5c97a80b2b9760faa1298388a497093eea17a4e4dd162bd48dd65",
     "source_cohort_batch.py": "7459292242696e6e1ea35ab2ea8171b31acab044d879f67168d379941c8dee84",
-    "ledger.py": "93040703e5eaca6d9baf654a15020eb9a86cfe97dd0084a86ba52405abb16cc1",
-    "ledger_index.py": "f955b70544fef6dbd4519691186402138bc93db7fa37c1bd388c9606c1b5e20e",
-    "projection.py": "0194b77f4f125f908422caa427280b34aada17607fdb32e0a2889d6b7e7d2643",
+    "ledger.py": "e4d4974cbfe4c12bab6cbda68cc54190b553d2a3f036ed70ee7c24644b1e0244",
+    "ledger_index.py": "03fc7f949f65556f962b6165453bce1525d82df609127da7320cae9bd575d6a4",
+    "projection.py": "377b66cf4e5db634982edcfb5d68d05e89c84f493d799fba9e4ef2e735c08989",
     "projection_daily_index.py": "dde38576cc37ecf7c13cce8a958baa8a0d05d64510991a16acf9979978d4d52a",
     "stockout.py": "438f04ab76b2881fe983936de5a8b95440d4bba30664275f471794c47ae69f4a",
     "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",

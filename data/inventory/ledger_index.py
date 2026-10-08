@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from bisect import bisect_right
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
 from itertools import pairwise
 from typing import TYPE_CHECKING
@@ -63,3 +63,17 @@ class PositionIndex:
         if self.invalid_from is not None and count >= self.invalid_from:
             return False, None
         return True, self.quantities[count] if count else None
+
+    def physical_period(self, start: datetime, end: datetime) -> tuple[int, int, int] | None:
+        """Return preceding, opening and closing sums for a validated physical prefix."""
+        if not self.physical_ordered or self.invalid_from is not None:
+            return None
+        first = self.movements[0] if self.movements else None
+        opening = (
+            first.quantity_delta if first is not None and start <= first.occurred_time < end else 0
+        )
+        return (
+            self.quantities[bisect_left(self.occurred, start)],
+            opening,
+            self.quantities[bisect_left(self.occurred, end)],
+        )

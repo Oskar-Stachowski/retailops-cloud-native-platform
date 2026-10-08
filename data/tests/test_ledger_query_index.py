@@ -109,6 +109,51 @@ def test_independent_daily_index_matches_literal_movement_sums(inputs, config, a
             )
 
 
+@pytest.mark.parametrize("availability", ["original", "immediate", "late_opening", "late_receipt"])
+def test_physical_periods_match_literal_sums_at_every_boundary(inputs, availability):
+    ledger = InventoryLedger.from_payload(payload_for(inputs, availability))
+    times = sorted(
+        {
+            m.occurred_time + timedelta(microseconds=delta)
+            for m in ledger.movements
+            for delta in (-1, 0, 1)
+        }
+    )
+    for position in ledger.scope:
+        movements = [m for m in ledger.movements if m.position == position]
+        for start in times:
+            for end in (t for t in times if t >= start):
+                assert ledger.indexed_physical_period(position, start, end) == (
+                    sum(m.quantity_delta for m in movements if m.occurred_time < start),
+                    sum(
+                        m.quantity_delta
+                        for m in movements
+                        if m.movement_type == "opening_stock" and start <= m.occurred_time < end
+                    ),
+                    sum(m.quantity_delta for m in movements if m.occurred_time < end),
+                )
+
+
+def test_units_and_groups_keep_native_behavior_for_replaced_mutable_inputs(inputs):
+    from dataclasses import replace
+
+    ledger = InventoryLedger.from_payload(payload_for(inputs, "original"))
+    assert dict(ledger.units_by_product()) == {
+        m.product_id: m.unit_of_measure for m in ledger.movements
+    }
+    with pytest.raises(TypeError):
+        ledger.units_by_product()[ledger.movements[0].product_id] = "invalid unit"
+    changed = replace(ledger, movements=list(ledger.movements))
+    changed.units_by_product()
+    changed.movements_by_position()
+    last = changed.movements[-1]
+    changed.movements[-1] = replace(last, unit_of_measure="invalid unit")
+    assert changed.units_by_product()[last.product_id] == "invalid unit"
+    assert changed.movements_by_position()[last.position][-1].unit_of_measure == "invalid unit"
+    cutoff = last.occurred_time
+    assert changed.indexed_physical_period(last.position, cutoff, cutoff) is None
+
+
 def test_chronological_queries_and_windows_do_not_rescan_whole_ledger(inputs, config, monkeypatch):
     parent = controls.simulate(inputs)
     payload = copy.deepcopy(parent["operational"]["ledger"])
