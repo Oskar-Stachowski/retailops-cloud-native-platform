@@ -7,6 +7,7 @@ workflows.
 
 | Path | Purpose |
 | --- | --- |
+| [ai09-source-cpu-followup.md](ai09-source-cpu-followup.md) | Bounded Arrow conversion plans and validated cached-ledger index activation; native full-output controls and CPU costs, with canonical capacity still open. |
 | [ai09-planned-source-cache.md](ai09-planned-source-cache.md) | Complete original demand/physical-plan parity on three exposed control seeds; full canonical planned capacity remains open. |
 | [ai09-day-coverage-provenance.json](ai09-day-coverage-provenance.json) | Failed integrated-head CI and corrected historical dependency fingerprint comparison, with both original golden IDs retained. |
 | [ai09-queue-event-memory.md](ai09-queue-event-memory.md) | Native full-output parity and measured release of consumed typed events; full canonical capacity remains unqualified. |
