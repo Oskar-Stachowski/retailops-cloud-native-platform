@@ -1,0 +1,367 @@
+{
+  "recorded_at_utc": "2026-10-09T21:48:14.518386+00:00",
+  "scope": "Native scenario planning accepted on complete tiny128x8x3x2 Source, original2.8 writer and independent full reader; Project25/50/100 and whole RequiredCI still pending",
+  "base_source_change": "57a50e263641efd71b8ef8b88eb8aef0e9c96a0f",
+  "base_pr": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/113",
+  "production_sha256": "fdbec7faccb51df43b21c407dc3813edb318d74d8ef4d37ca653ea6ec317c4a7",
+  "unit_validation": {
+    "monitor": {
+      "status": "passed",
+      "reason": null,
+      "exit_code": 0,
+      "wall_seconds": 1.4716384999919683,
+      "sampled_tree_peak_rss_bytes": 114606080,
+      "sampled_worker_cpu_seconds": 1.103688784,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 4424,
+      "sampled_peak_scratch_allocated_bytes": 16384,
+      "minimum_free_disk_bytes": 49430876160,
+      "minimum_available_memory_bytes": 1575960576,
+      "samples": 14,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "tests": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "seconds": 0.758,
+    "junit_sha256": "2724889b08f2ba0c30fabce4f74a62e090549e1f8a393aa753c0af40c8633ae9"
+  },
+  "retained_initial_native_failure": {
+    "monitor": {
+      "status": "failed",
+      "reason": "worker_exit",
+      "exit_code": 1,
+      "wall_seconds": 27.316000333987176,
+      "sampled_tree_peak_rss_bytes": 236093440,
+      "sampled_worker_cpu_seconds": 25.919517668,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 14899,
+      "sampled_peak_scratch_allocated_bytes": 20480,
+      "minimum_free_disk_bytes": 50201751552,
+      "minimum_available_memory_bytes": 1552302080,
+      "samples": 247,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "tests": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0
+    },
+    "seconds": 26.43,
+    "junit_sha256": "47230b0f36d82292bb68c1e1c687e3e442a5b748e61fedfb524676e8ada3c4a9"
+  },
+  "native_failure_correction": "location_open belongs to daily_demand_observations, not daily_demand_truth; eligibility now uses verified native active/open observation keys. Controlled fixtures corrected to match actual table ownership.",
+  "corrected_native_validation": {
+    "monitor": {
+      "status": "passed",
+      "reason": null,
+      "exit_code": 0,
+      "wall_seconds": 443.1307540410198,
+      "sampled_tree_peak_rss_bytes": 373374976,
+      "sampled_worker_cpu_seconds": 440.104701176,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 886,
+      "sampled_peak_scratch_allocated_bytes": 12288,
+      "minimum_free_disk_bytes": 49348755456,
+      "minimum_available_memory_bytes": 1232142336,
+      "samples": 4079,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "tests": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "seconds": 442.536,
+    "junit_sha256": "efb8eb3f53a2a4ed7327df6c32b5a5d0e98df24f301cec257d4ecad41086b45a"
+  },
+  "source_generation_per_invocation": 0,
+  "source_reads_per_successful_invocation": 1,
+  "potential_return_selection": "original generate_return_events on fulfilled ordinary Source purchases; paired physical replay still required",
+  "role_inventory": [
+    "tune",
+    "calibration",
+    "development_evaluation"
+  ],
+  "planned_episodes": {
+    "demand": 9,
+    "physical": 6
+  },
+  "full_profile_generations": 0,
+  "project_fits": 0,
+  "fresh_final_reads": 0,
+  "full_required_ci": false,
+  "on_main": false,
+  "stage_ready": false,
+  "exposed_development_dates": {
+    "start": "2025-08-01",
+    "end": "2026-07-31"
+  },
+  "demand_only_positivity_does_not_restrict_physical_eligibility": true,
+  "superseded_admission": {
+    "recorded_at_utc": "2026-10-09T19:47:10.659033+00:00",
+    "pid": 53899,
+    "create_time": 1791574378.437927,
+    "reason": "review found missing exposed-date guard and demand-only positivity restriction accidentally applied to physical candidate eligibility; change implementation before native control",
+    "native_worker_started": false,
+    "unit_result_retained": true,
+    "same_failure_not_retried_unchanged": true
+  },
+  "native_admission_expired": {
+    "worker_started": false,
+    "elapsed_seconds": 1801.0289344170014,
+    "tree_rss_bytes": 536870912,
+    "minimum_available_memory_bytes": 1073741824,
+    "minimum_free_disk_bytes": 6442450944,
+    "unchanged_retry_started": false
+  },
+  "base_source_merged_main": "95aa6f0e0f87b3eae0875b1fb34b8b951a4cc779",
+  "base_source_head_required_ci": {
+    "run_id": 37978277332,
+    "success": 21,
+    "declared_path_skips": 4,
+    "failed": 0
+  },
+  "previous_unit_validation_before_native_audit": {
+    "monitor": {
+      "status": "passed",
+      "reason": null,
+      "exit_code": 0,
+      "wall_seconds": 1.4414142500027083,
+      "sampled_tree_peak_rss_bytes": 111951872,
+      "sampled_worker_cpu_seconds": 1.038612224,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 4076,
+      "sampled_peak_scratch_allocated_bytes": 12288,
+      "minimum_free_disk_bytes": 50182508544,
+      "minimum_available_memory_bytes": 1263878144,
+      "samples": 14,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "tests": {
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "seconds": 0.755,
+    "junit_sha256": "cbb39cc73593a5a460345f36e7f3deb12901955bbacefca450810fe52bb1466b"
+  },
+  "control_configuration": {
+    "profile": "ai-smoke",
+    "days": 128,
+    "products": 8,
+    "selling_pairs": 3,
+    "stock_locations": 2,
+    "seed": 42,
+    "forecast_plan_days": 14,
+    "complete_source_tables": 58,
+    "families": [
+      "demand",
+      "physical"
+    ],
+    "original_writer_and_independent_reader": true,
+    "project_representativeness_qualified": false
+  },
+  "retained_first_required_ci_failure": {
+    "head": "133e0c57266286244106d22b097e2a8334c64f4a",
+    "pr": 114,
+    "run": 37986959242,
+    "jobs": {
+      "success": 18,
+      "declared_path_skips": 4,
+      "failed": 3
+    },
+    "native_data_job": 114011281581,
+    "data_tests": {
+      "passed": 1156,
+      "errors": 2,
+      "seconds": 3001.33
+    },
+    "data_log_sha256": "47dc6b71e49af8a49966163850d3d93402664c8b40d7b82253e808e2f2e149c6",
+    "native_failure": "No30-day open candidate: two-pair tiny fixture contains only Sunday/holiday-closed stores. Native full5-pair profile also contains online. Keep original native calendars, episode lengths and all-open controls; include online in the tiny control.",
+    "docker_job": 114019214362,
+    "docker_failure": "DockerHub429 unauthenticated pull of unchanged pinned python base before build",
+    "docker_log_sha256": "275bffc1393db2975130cd5e2dffecbfdfca59e05115d584de7bb3d395b3275f",
+    "old_head_retry_started": false
+  },
+  "retained_return_parameter_failure": {
+    "unit": {
+      "monitor": {
+        "status": "passed",
+        "reason": null,
+        "exit_code": 0,
+        "wall_seconds": 1.6820655839983374,
+        "sampled_tree_peak_rss_bytes": 109199360,
+        "sampled_worker_cpu_seconds": 1.092203976,
+        "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+        "sampled_peak_scratch_logical_bytes": 4251,
+        "sampled_peak_scratch_allocated_bytes": 12288,
+        "minimum_free_disk_bytes": 49504428032,
+        "minimum_available_memory_bytes": 1457979392,
+        "samples": 16,
+        "sample_seconds": 0.1,
+        "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+        "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+      },
+      "tests": {
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "seconds": 0.924,
+      "junit_sha256": "52769f8e14bd3d3bb612cd78c13713f61a79df8ad21a079fffa6d2ed666cba18"
+    },
+    "native": {
+      "monitor": {
+        "status": "failed",
+        "reason": "worker_exit",
+        "exit_code": 1,
+        "wall_seconds": 41.42090670799371,
+        "sampled_tree_peak_rss_bytes": 303792128,
+        "sampled_worker_cpu_seconds": 40.598821312,
+        "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+        "sampled_peak_scratch_logical_bytes": 24305,
+        "sampled_peak_scratch_allocated_bytes": 28672,
+        "minimum_free_disk_bytes": 49473437696,
+        "minimum_available_memory_bytes": 1587445760,
+        "samples": 386,
+        "sample_seconds": 0.1,
+        "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+        "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+      },
+      "tests": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 2,
+        "skipped": 0
+      },
+      "seconds": 40.73,
+      "junit_sha256": "b644c33b43c07aedfef5743902cb1a08783ec5d002cce415586079298d8110ef"
+    },
+    "error": "KeyError:return_rate",
+    "correction": "Original simulation_entities restores private product parameters exactly as SourceCommerceSimulator; actual fulfilled purchases and all other tables remain the original reader output."
+  },
+  "retained_cross_product_spillover_failure": {
+    "unit": {
+      "monitor": {
+        "status": "passed",
+        "reason": null,
+        "exit_code": 0,
+        "wall_seconds": 1.4080262089846656,
+        "sampled_tree_peak_rss_bytes": 115130368,
+        "sampled_worker_cpu_seconds": 1.054822016,
+        "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+        "sampled_peak_scratch_logical_bytes": 4251,
+        "sampled_peak_scratch_allocated_bytes": 12288,
+        "minimum_free_disk_bytes": 49475567616,
+        "minimum_available_memory_bytes": 1779564544,
+        "samples": 14,
+        "sample_seconds": 0.1,
+        "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+        "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+      },
+      "tests": {
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "seconds": 0.729,
+      "junit_sha256": "5816758181971b5b0d3502325621c4cda40fe0cfd27e51fb602bc26ea1f1c663"
+    },
+    "native": {
+      "monitor": {
+        "status": "failed",
+        "reason": "worker_exit",
+        "exit_code": 1,
+        "wall_seconds": 293.2974227920058,
+        "sampled_tree_peak_rss_bytes": 386777088,
+        "sampled_worker_cpu_seconds": 291.0593879,
+        "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+        "sampled_peak_scratch_logical_bytes": 5796,
+        "sampled_peak_scratch_allocated_bytes": 12288,
+        "minimum_free_disk_bytes": 49412493312,
+        "minimum_available_memory_bytes": 1422802944,
+        "samples": 2715,
+        "sample_seconds": 0.1,
+        "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+        "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+      },
+      "tests": {
+        "tests": 2,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "seconds": 292.723,
+      "junit_sha256": "88d269d071a6d6b8e164585fc80dc78a1d92f939201afabfb58cf5c6476ac9d5"
+    },
+    "error": "Clean control was affected by inventory spillover",
+    "physical_original_writer_reader_passed": true,
+    "demand_rejected": true
+  },
+  "spillover_diagnosis": {
+    "monitor": {
+      "status": "passed",
+      "reason": null,
+      "exit_code": 0,
+      "wall_seconds": 40.92839483299758,
+      "sampled_tree_peak_rss_bytes": 314736640,
+      "sampled_worker_cpu_seconds": 40.30379910400001,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 3484,
+      "sampled_peak_scratch_allocated_bytes": 8192,
+      "minimum_free_disk_bytes": 49430450176,
+      "minimum_available_memory_bytes": 1460518912,
+      "samples": 370,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "result": "native_replay_failed",
+    "diagnosis_is_not_a_passing_scenario": true,
+    "production_checks_bypassed": false,
+    "clean_windows": 3,
+    "changed_clean_windows": 2,
+    "private_diagnosis_sha256": "37de7be472e0af72a0bb6eecaf6f0e24c48e322752efadc3ea9a2529a95d12c6"
+  },
+  "clean_control_correction": {
+    "demand_controls": 3,
+    "days_per_control": 7,
+    "placement": "before_first_demand_intervention_in_entire_plan",
+    "nine_role_injections_unchanged": true,
+    "different_products_alone_do_not_isolate_basket_and_return_effects": true,
+    "physical_six_controls_unchanged": true,
+    "later_role_clean_coverage_requires_separate_ordinary_source_evaluation": true,
+    "critical_coverage_qualified": false
+  },
+  "base_source_main_required_ci": {
+    "head": "95aa6f0e0f87b3eae0875b1fb34b8b951a4cc779",
+    "run": 37985880874,
+    "success": 21,
+    "declared_path_skips": 4,
+    "failed": 0
+  },
+  "checks": {
+    "ruff_check": true,
+    "ruff_format": true,
+    "code_pins_unchanged_during_final_control": true,
+    "local_full_make_ci": false,
+    "whole_required_ci_for_corrected_head": false
+  }
+}
