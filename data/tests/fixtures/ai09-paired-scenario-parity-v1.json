@@ -1,0 +1,63 @@
+{
+  "accepted_reference_commit": "ff2504a9cf6e4f46040c8327901b7bcb82d115c0",
+  "cases": [
+    {
+      "effects_sha256": "132290e312689eef25594d5f1c13d7a5da7bab6938551f77853b1bbceced33f1",
+      "family": "demand",
+      "full_candidate_sha256": "b273a960c76771391e6ad73a35cc1e20e20a83e07d5142c905f132a340546abb",
+      "old_reference_sha256": "ed67701ae2ea85e4b179ac0620c57dbae986c225b7358e0396a3b8328d316250",
+      "plan_sha256": "17b6a37456496a01b5a4ebe7ee09a0840d2a4221134e00712f74240ffb3b761f",
+      "seed": 42
+    },
+    {
+      "effects_sha256": "e37ce025232643d47231a62b1bb609c886f1815a5792d8d4b34b5ae32734628d",
+      "family": "demand",
+      "full_candidate_sha256": "f6dc8c66d5ded9c2c9f0034380d2ba1ee6361c3074ef3db9a1f4ee270865ffa6",
+      "old_reference_sha256": "ed67701ae2ea85e4b179ac0620c57dbae986c225b7358e0396a3b8328d316250",
+      "plan_sha256": "a481198abcd4bd3917372cfe6c1a8c056516d0275175d3fa7e8a625b39f275ed",
+      "seed": 137
+    },
+    {
+      "effects_sha256": "697eb8a589575989c829ba23156617f15043d0637f076fc6ef1e8f04beae7828",
+      "family": "demand",
+      "full_candidate_sha256": "0723250c7d459d1e98740d4a91fe063ce84ab62995ff3f467c9b2a7859786a65",
+      "old_reference_sha256": "ed67701ae2ea85e4b179ac0620c57dbae986c225b7358e0396a3b8328d316250",
+      "plan_sha256": "e0ef0c270d856ed517c3036b3339e8f5e3b7e41e8f720ee361190fc541745b6b",
+      "seed": 2026
+    },
+    {
+      "effects_sha256": "3c7563edb66664f4f68daeca2700090ed85954b4307a5f6ef5a1c8a1666c704a",
+      "family": "physical",
+      "full_candidate_sha256": "5a775f5c557c984faa6c3d0629cc3eb5a3fdc1b88755b6cef2114e8145a669c7",
+      "old_reference_sha256": "b0e04d07e2518058b06a1d81d01c913af4403a351e86d82488547c6fe11ba49a",
+      "plan_sha256": "f612e0e6acceb2024119b6aefb64517e74e457a4565e24969f436e8d8b515138",
+      "seed": 42
+    },
+    {
+      "effects_sha256": "cd143c8a3b6bc0ffa42e056865036a61b334a6f9ede311a02a73ea49c1f15105",
+      "family": "physical",
+      "full_candidate_sha256": "5d5214a7865da89c952ef90367ed0667d3b9fb1c20f18facf0ad529764c8f86b",
+      "old_reference_sha256": "b0e04d07e2518058b06a1d81d01c913af4403a351e86d82488547c6fe11ba49a",
+      "plan_sha256": "0edae87f4a8a9bac016b3c92c224e694de1566ba23ae994c86b7caa18f5b9d98",
+      "seed": 137
+    },
+    {
+      "effects_sha256": "f0324424c3b43f1704f8a33a54cb3330c05ba686d8093597de3c82e2b1143ac4",
+      "family": "physical",
+      "full_candidate_sha256": "be593e05b1bf36c273d2105b33b672480f6d72bc22e62c034eab7aa618a15247",
+      "old_reference_sha256": "b0e04d07e2518058b06a1d81d01c913af4403a351e86d82488547c6fe11ba49a",
+      "plan_sha256": "15198208c4ac710c5dc729de8b9dbc95c7d9a93ba44a9a65afe8f3970d110e9b",
+      "seed": 2026
+    }
+  ],
+  "configuration": {
+    "days": 30,
+    "forecast_plan_days": 14,
+    "products": 8,
+    "profile": "ai-smoke",
+    "stores": 3,
+    "warehouses": 2
+  },
+  "scope": "Previously exposed native720-grain controls; complete candidate output fingerprints, no full profile qualification",
+  "version": "ai09-paired-scenario-parity-1.0.0"
+}
