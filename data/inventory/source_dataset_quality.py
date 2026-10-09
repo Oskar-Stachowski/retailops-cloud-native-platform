@@ -17,6 +17,7 @@ from data.generator.dimension_schema import CHANNELS
 from data.generator.dimensions import DimensionIndex
 from data.generator.observation_history import build_daily_versions
 from data.generator.pricing_quality import build_pricing_report
+from data.generator.progress import stage
 from data.generator.return_quality import build_return_report
 from data.generator.return_reconciliation import return_boundaries
 from data.generator.simulation import simulation_entities, validate_simulation
@@ -445,7 +446,11 @@ def build_source_report(
     }
     for name, operation in operations.items():
         try:
-            count, status, description = operation(), "passed", "All required records reconcile."
+            count, status, description = (
+                stage("validation/" + name)(operation)(),
+                "passed",
+                "All required records reconcile.",
+            )
         except (ValueError, KeyError, TypeError, ArithmeticError) as error:
             count, status, description = 0, "failed", str(error)
         checks.append(

@@ -91,6 +91,10 @@ naruszenie procesu/integralności daje `failed` bez publikacji katalogu.
 
 ## Uruchomienie
 
+Opcjonalny [postęp operacji i rzeczywiste liczniki](../evidence/ml/ai09-source-live-progress.md)
+można włączyć kontekstem `data.generator.progress.reporting` wokół natywnego
+wywołania. Nie zmienia on semantyki danych ani kontroli walidacji.
+
 Z katalogu głównego RetailOps:
 
 ```bash

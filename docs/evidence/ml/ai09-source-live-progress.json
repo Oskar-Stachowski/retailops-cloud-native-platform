@@ -1,0 +1,122 @@
+{
+  "base_producer_commit": "80293fb582e05f7004cf44c2da1828d1a5e74a97",
+  "code_sha256": {
+    "data/anomalies/source_cohort.py": "d5dc3b485153681fe9a4d353954d896446fe2c3bc67324e308ee4f3ff694bd5e",
+    "data/generator/demand_commerce.py": "52ba6680a9074a2b4c15a9b70d86968c9232fe8be422a09900c779ae0faecb9f",
+    "data/generator/main.py": "143cd439a6e4ff272f4cb40ea6dd91a16ddfb11b0aa6c74642592fcae84195e7",
+    "data/generator/progress.py": "45ad372e3fcfc6b50a4810e2dfe1230ee184f7b42c8c7ba57af79b33d09b52c1",
+    "data/inventory/projection.py": "bdfd693c919088b8aeff11f0a854959342715f2507363d32006f99719129d42b",
+    "data/inventory/qualification.py": "bc1e23200de46eb22a0aa9b459762d1eea066d40a98caba8fb4f3f986ccfbaf4",
+    "data/inventory/simulator.py": "ea9739ebf73c62ea48a076ccf3940c2dbb4f79fdf22049bef97f8e3f2aef3696",
+    "data/inventory/source_cohort_batch.py": "37bc782f06241c53ee43db6666c1e0eedb29bfb3455d4c12d98a2221195b94dd",
+    "data/inventory/source_cohort_batch_v2.py": "b3e73b461b8d2753f286ce84574909061d5e978c4fbe84f3bc646bf360f6425c",
+    "data/inventory/source_dataset_io.py": "dc2bafa85870f9be652f289bb44b043d2dbeb5156baab8b210a4f05f0685dd43",
+    "data/inventory/source_dataset_quality.py": "e1fb7443d1377bf12e151260815f863213a7218b1e393e169c3743938456537e",
+    "data/inventory/source_reconciliation.py": "c0348b68b997c40bfb7bfda5429f8409ef3a74e8aebfd7a025f7806137698e30",
+    "data/tests/test_source_progress.py": "06645ff724ac01b5da7de70783f83ca756b2f05a7914dcdb1c6f1d4e6679d1ab"
+  },
+  "controls": [
+    {
+      "control": "initial",
+      "errors": 0,
+      "failures": 0,
+      "junit_sha256": "0f436083296813866307612af2c58dcda41a2e0b1f8f02858175b641c9d24e61",
+      "skipped": 0,
+      "tests": 7,
+      "wall_seconds": 3.159
+    },
+    {
+      "control": "regression",
+      "errors": 0,
+      "failures": 0,
+      "junit_sha256": "414c4ef81f993ca0b3346cecc553ad8e0040b4d3a13eaa68960e435a9ca98a2d",
+      "skipped": 0,
+      "tests": 56,
+      "wall_seconds": 433.488
+    },
+    {
+      "control": "final",
+      "errors": 0,
+      "failures": 0,
+      "junit_sha256": "4708853350023e26efd114cf68c87fee916bc9f5cc8e7b4eb2997c1cef066b0b",
+      "skipped": 0,
+      "tests": 7,
+      "wall_seconds": 2.574
+    },
+    {
+      "control": "error-order",
+      "errors": 0,
+      "failures": 0,
+      "junit_sha256": "177a221612ac3f2ad7cb7b227d79cd12646a759d5b96ad51f5ae4d3170aefdf2",
+      "skipped": 0,
+      "tests": 9,
+      "wall_seconds": 2.785
+    },
+    {
+      "control": "all-progress",
+      "errors": 0,
+      "failures": 0,
+      "junit_sha256": "a7bbeaf5534c0ab7e3c949ded58740f9253a4f04669e7cc0dd4132f93011c025",
+      "skipped": 0,
+      "tests": 11,
+      "wall_seconds": 11.818
+    }
+  ],
+  "coverage": {
+    "broader_prior_regression": "56 ordinary/cached/planned/export/forecast-plan controls; prior to finer per-validator markers and logging error-order follow-up",
+    "disabled_context_preserves_original_calls": true,
+    "failed_logging_preserves_original_exception": true,
+    "flushed_counts": true,
+    "ordinary": {
+      "days": 10,
+      "full_native_writer_reader": true,
+      "products": 8,
+      "stores": 2,
+      "tables": 58
+    },
+    "partial_iterator_has_no_final_counter": true,
+    "planned": {
+      "days": 30,
+      "full_native_tables_and_context_parity": true,
+      "kinds": [
+        "demand",
+        "physical"
+      ],
+      "products": 8,
+      "seeds": [
+        42
+      ],
+      "stores": 3,
+      "tables": 58,
+      "warehouses": 2
+    },
+    "rng_and_chronology_changed": false
+  },
+  "final_process_measurement": {
+    "maximum_resident_set_bytes": 138051584,
+    "scope": "entire11testprocessincludingnativecomparison;notcanonicalcapacity",
+    "system_cpu_seconds": 0.21,
+    "user_cpu_seconds": 11.59,
+    "wall_seconds": 12.13
+  },
+  "limitations": {
+    "actions_ui_live_verified": false,
+    "canonical_diagnostic_dispatched": false,
+    "fresh_final_reads": 0,
+    "new_project_fits": 0,
+    "project_journal_initialized": false,
+    "protected_head_main_ci_accepted": false,
+    "source_checkpoint_resume_implemented": false,
+    "stage_ready": false
+  },
+  "ordinary_implementation": "inventory-source-cached-ledger-2.2.3",
+  "planned_implementation": "planned-source-cached-execution-1.1.3",
+  "recorded_at_utc": "2026-10-09T10:32:54.499001+00:00",
+  "static_checks": {
+    "format_changed_files": "passed",
+    "git_diff_check": "passed",
+    "ruff_changed_files": "passed"
+  },
+  "telemetry_version": "source-progress-1.0.0",
+  "version": "ai09-source-live-progress-audit-1.0.0"
+}

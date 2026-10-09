@@ -7,6 +7,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
 from data.generator.common import deterministic_uuid
+from data.generator.progress import advance, stage
 from data.inventory.contract import require, utc_timestamp
 from data.inventory.fulfillment_routes import resolve_route, validate_routes
 from data.inventory.ledger import (
@@ -495,7 +496,10 @@ class ChronologicalSimulator:
                 else:
                     self.tail.append(scheduled.model_dump())
 
+    @stage("chronological_simulation")
     def execute(self) -> dict[str, Any]:
+        processed = 0
+        total_days = (self.end.date() - self.start.date()).days
         while self.queue:
             stamp, _phase, _sequence, kind, row = heapq.heappop(self.queue)
             if kind == "review":
@@ -508,6 +512,27 @@ class ChronologicalSimulator:
                 self._receipt(row)
             else:
                 self._apply(row.model_dump())
+            processed += 1
+            if processed == 1 or processed % 1000 == 0:
+                advance(
+                    "chronological_simulation",
+                    processed,
+                    unit="events",
+                    business_date=stamp.date().isoformat(),
+                    completed_business_days=max(0, (stamp.date() - self.start.date()).days),
+                    total_business_days=total_days,
+                    known_queued_remaining=len(self.queue),
+                )
+        advance(
+            "chronological_simulation",
+            processed,
+            unit="events",
+            total=processed,
+            completed_business_days=total_days,
+            total_business_days=total_days,
+            known_queued_remaining=0,
+            final=True,
+        )
         ledger = self._ledger()
         require(
             len(ledger.movements) == len(self.movements),

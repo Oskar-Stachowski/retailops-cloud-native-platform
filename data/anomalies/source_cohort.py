@@ -20,6 +20,7 @@ from data.generator.csv_writer import TABLE_COLUMNS
 from data.generator.demand_quality import validate_demand
 from data.generator.main import build_dataset
 from data.generator.pricing_plans import daily_price_observations
+from data.generator.progress import stage
 from data.generator.simulation_schema import fact_columns
 from data.inventory.contract import require, utc_timestamp
 from data.inventory.ledger import InventoryLedger, InventoryMovement
@@ -49,7 +50,7 @@ if TYPE_CHECKING:
 
 VERSION = "planned-source-cached-execution-1.1.3"
 UPSTREAM_SHA256 = {
-    "inventory/source_cohort_batch_v2.py": "6247af40f56c5d8dd09ae63f7570adde4c3197dd15357a3ddeaacf2b72c0831b",
+    "inventory/source_cohort_batch_v2.py": "b3e73b461b8d2753f286ce84574909061d5e978c4fbe84f3bc646bf360f6425c",
     "inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",
@@ -196,6 +197,7 @@ def simulate_planned_source(
     return output
 
 
+@stage("planned_source_build")
 def build_tables(
     generation: DatasetGenerationConfig,
     payload: dict,

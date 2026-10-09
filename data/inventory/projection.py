@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
 from data.generator.common import deterministic_uuid
+from data.generator.progress import stage
 from data.inventory.contract import require, utc_timestamp
 from data.inventory.ledger import InventoryLedger
 from data.inventory.projection_contract import (
@@ -84,6 +85,7 @@ def physical_daily_balances(
     return rows
 
 
+@stage("inventory_projection")
 def project_inventory(
     operational: dict[str, Any],
     truth: dict[str, Any],

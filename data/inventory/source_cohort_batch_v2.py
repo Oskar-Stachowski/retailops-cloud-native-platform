@@ -32,6 +32,7 @@ from data.generator.demand_quality import validate_demand
 from data.generator.identity import canonical_json
 from data.generator.main import build_dataset
 from data.generator.pricing_plans import daily_price_observations
+from data.generator.progress import stage
 from data.generator.simulation_schema import fact_columns
 from data.inventory.contract import MovementRecord, require, utc_timestamp
 from data.inventory.ledger import (
@@ -60,15 +61,15 @@ from data.inventory.source_tables import TableContext, tables_from_source
 FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.3"
 UPSTREAM_SHA256 = {
     "snapshots.py": "e705092e4ce5c97a80b2b9760faa1298388a497093eea17a4e4dd162bd48dd65",
-    "source_cohort_batch.py": "7459292242696e6e1ea35ab2ea8171b31acab044d879f67168d379941c8dee84",
+    "source_cohort_batch.py": "37bc782f06241c53ee43db6666c1e0eedb29bfb3455d4c12d98a2221195b94dd",
     "ledger.py": "e4d4974cbfe4c12bab6cbda68cc54190b553d2a3f036ed70ee7c24644b1e0244",
     "ledger_index.py": "03fc7f949f65556f962b6165453bce1525d82df609127da7320cae9bd575d6a4",
-    "projection.py": "377b66cf4e5db634982edcfb5d68d05e89c84f493d799fba9e4ef2e735c08989",
+    "projection.py": "bdfd693c919088b8aeff11f0a854959342715f2507363d32006f99719129d42b",
     "projection_daily_index.py": "dde38576cc37ecf7c13cce8a958baa8a0d05d64510991a16acf9979978d4d52a",
     "stockout.py": "438f04ab76b2881fe983936de5a8b95440d4bba30664275f471794c47ae69f4a",
     "source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
-    "simulator.py": "7b10a76f7a4ea93b40557d402a3f6cd5a6400e939e78c3ffa64dadc4b531dcd7",
+    "simulator.py": "ea9739ebf73c62ea48a076ccf3940c2dbb4f79fdf22049bef97f8e3f2aef3696",
     "source_commerce.py": "c53fefae30abfdf5c48d744cc0c903db449edbc970be3523e8a008dbd0ad7991",
 }
 
@@ -235,6 +236,7 @@ class CachedLedgerSourceCommerceSimulator(IndexedSourceCommerceSimulator):
         return result
 
 
+@stage("source_commerce")
 def simulate_source_commerce_fast(
     candidate: dict, generation: ResolvedGenerationConfig, config: SourceInventoryConfig
 ) -> dict[str, Any]:
@@ -304,6 +306,7 @@ def simulate_source_commerce_fast(
     return output
 
 
+@stage("source_build")
 def build_source_dataset_fast(
     generation: DatasetGenerationConfig,
     config: SourceInventoryConfig,

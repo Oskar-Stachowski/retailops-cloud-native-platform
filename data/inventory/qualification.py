@@ -8,6 +8,7 @@ from datetime import UTC, date, datetime, time, timedelta
 from typing import TYPE_CHECKING
 
 from data.generator.dimensions import DimensionIndex, resolve_version
+from data.generator.progress import stage
 from data.inventory.contract import require, utc_timestamp
 from data.inventory.qualification_contract import (
     GRAIN,
@@ -179,6 +180,7 @@ def _qualify(
     return result
 
 
+@stage("label_qualification")
 def qualify_windows(tables: dict, context: TableContext) -> list[dict]:
     """Input must be verified source 2.7; upstream diagnostics prove physical process."""
     eligibility = Eligibility(tables)
