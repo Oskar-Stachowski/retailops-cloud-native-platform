@@ -25,6 +25,7 @@ from data.generator.common import deterministic_uuid
 from data.generator.configuration import resolve_generation_config
 from data.generator.identity import canonical_cell, json_sha256
 from data.generator.return_events import generate_return_events
+from data.generator.simulation import simulation_entities
 from data.inventory.contract import require
 from data.inventory.replenishment_contract import SupplyRecord
 from data.inventory.run_source_dataset import default_inventory_config
@@ -133,6 +134,13 @@ def _demand(tables: dict, recipe: DevelopmentScenarioRecipe, candidates: dict, s
         for row in tables["daily_demand_truth"]
     }
     injections, controls, products = [], [], set()
+    # Changing one product's demand redistributes the whole selling-pair basket.
+    # Other products' sale IDs and later returns can therefore change too. A
+    # different SKU is not sufficient evidence of an untouched later control.
+    # Retain all three seven-day paired reference windows before *any* demand
+    # intervention. Ordinary Source supplies the separate later-role negatives;
+    # this planner does not qualify their evaluation sample or critical coverage.
+    clean = recipe.roles[0]
     for role in recipe.roles:
         # Demand interventions require demand on their own dates. Physical
         # episodes instead require native returns/fulfillment on physical dates;
@@ -142,6 +150,7 @@ def _demand(tables: dict, recipe: DevelopmentScenarioRecipe, candidates: dict, s
                 g
                 for g, _ in candidates[role.role]
                 if g[0] not in products
+                and all((clean.day(i), *g) in open_grains for i in range(7))
                 and all(
                     sum(latent[role.day(i), *g] for i in offsets) > 0
                     for offsets in ((8,), range(15, 18), range(22, 26))
@@ -153,7 +162,13 @@ def _demand(tables: dict, recipe: DevelopmentScenarioRecipe, candidates: dict, s
         products.add(scope[0])
         controls.append(
             {
-                **_window("demand", role.role + "-clean", scope, role.day(0), role.day(6)),
+                **_window(
+                    "demand",
+                    role.role + "-pre-intervention-clean",
+                    scope,
+                    clean.day(0),
+                    clean.day(6),
+                ),
                 "control_type": "clean",
             }
         )
@@ -253,7 +268,14 @@ def _physical(
         for grain, _ in candidates[role.role]
         for i in range(12, 19)
     }
-    potential = generate_return_events(tables, effective, return_factors=factors)
+    # Published Source separates private simulation parameters from products.
+    # Restore them through the same helper as SourceCommerceSimulator; keep
+    # actual fulfilled purchases and every other input table unchanged.
+    potential = generate_return_events(
+        {**tables, "products": simulation_entities(tables, "products")},
+        effective,
+        return_factors=factors,
+    )
     extra: Counter[tuple[str, ...]] = Counter()
     for sign, rows in ((1, potential), (-1, tables["return_events"])):
         for row in rows:

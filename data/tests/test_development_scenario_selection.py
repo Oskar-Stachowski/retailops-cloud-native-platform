@@ -10,6 +10,7 @@ import pytest
 from data.anomalies import development_plan as planner
 from data.generator.configuration import DatasetGenerationConfig, resolve_generation_config
 from data.generator.identity import json_sha256
+from data.generator.simulation import simulation_entities
 from data.inventory.run_source_dataset import default_inventory_config
 
 
@@ -38,6 +39,11 @@ def case():
     observations = [{k: row[k] for k in planner.GRAIN} | {"location_open": row.pop("location_open"), "is_active_assortment": "true"} for row in rows]
     tables = {"daily_demand_truth": rows, "daily_demand_observations": observations,
               "inventory_demand_outcomes": outcomes, "return_events": []}
+    tables["products"] = [{"id": str(UUID(int=i)), "sku": f"TEST-{i}"} for i in range(1, 9)]
+    tables["product_simulation_parameters"] = [
+        {"product_id": p["id"], "demand_class": "long_tail", "demand_weight": "1",
+         "price_elasticity": "1", "seasonal_pattern": "weekly_sensitive", "return_rate": "0.02"}
+        for p in tables["products"]]
     manifest = {"schema_version": "2.7.0", "facts_ready": True,
                 "dataset_id": recipe.source_dataset_id,
                 "descriptor": {"resolved_parameters": effective.parameters(), "tables": {},
@@ -52,7 +58,10 @@ def install(monkeypatch, tables, manifest, *, returns=True):
         calls.append(directory)
         return tables, manifest
     def potential(actual, effective, *, return_factors):
-        assert actual is tables
+        assert actual is not tables
+        assert actual["products"] == simulation_entities(tables, "products")
+        assert all("return_rate" not in row for row in tables["products"])
+        assert all(actual[name] is rows for name, rows in tables.items() if name != "products")
         return [{"returned_at": day + "T12:00:00+00:00", "product_id": product,
                  "selling_location_id": location, "channel": channel, "quantity": "2"}
                 for day, product, location, channel in sorted(return_factors)] if returns else []
@@ -79,6 +88,22 @@ def test_native_plan_shapes_cover_every_role_and_retain_original_complete_input(
                              else {"return_spike", "inventory_censored_episode"})
     assert not result["realized_effects_verified"] and not result["model_fit_authorized"]
     assert not result["critical_coverage_verified"] and not result["final_test_access_authorized"]
+
+
+def test_demand_clean_references_precede_all_interventions_despite_different_products(monkeypatch):
+    generation, recipe, tables, manifest = case()
+    install(monkeypatch, tables, manifest)
+    result = planner.prepare_development_scenarios(Path("/controlled"), generation, recipe)
+    plan = result["plans"]["demand"]
+    controls = [control for control in plan["controls"] if control["control_type"] == "clean"]
+    assert len(controls) == 3
+    assert {control["product_id"] for control in controls} == {i["product_id"] for i in plan["injections"]}
+    for control in controls:
+        assert control["start_date"] == recipe.roles[0].day(0)
+        assert control["end_date"] == recipe.roles[0].day(6)
+        assert control["end_date"] < min(i["start_date"] for i in plan["injections"])
+    # Paired references are not a claim of clean sample coverage in later roles.
+    assert not result["critical_coverage_verified"]
 
 
 def test_selection_is_independent_of_native_row_order(monkeypatch):
@@ -146,6 +171,23 @@ def test_original_reader_failure_is_not_replaced_with_unverified_tables(monkeypa
     monkeypatch.setattr(planner, "read_source_dataset", reject)
     with pytest.raises(ValueError, match="native independent report"):
         planner.prepare_development_scenarios(Path("/controlled"), generation, recipe)
+
+
+def test_weekly_closures_cannot_be_filled_or_shortened_into_continuous_scenario_windows(monkeypatch):
+    generation, recipe, tables, manifest = case()
+    closed = set()
+    for row in tables["daily_demand_observations"]:
+        if date.fromisoformat(row["business_date"]).weekday() == 6:
+            row["location_open"] = "false"
+            closed.add(tuple(row[key] for key in planner.GRAIN))
+    # Native demand truth omits closed dates; observations retain their calendar.
+    tables["daily_demand_truth"] = [row for row in tables["daily_demand_truth"]
+                                   if tuple(row[key] for key in planner.GRAIN) not in closed]
+    before = deepcopy(tables)
+    install(monkeypatch, tables, manifest)
+    with pytest.raises(ValueError, match="Demand roles"):
+        planner.prepare_development_scenarios(Path("/controlled"), generation, recipe)
+    assert tables == before
 
 
 def test_resealed_ai_dev_with_future_dates_cannot_bypass_final_access_guard(monkeypatch):
