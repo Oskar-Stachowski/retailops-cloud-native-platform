@@ -15,6 +15,7 @@ from data.anomalies.candidate_io import parse_candidate_plan
 from data.anomalies.contract import AnomalyPlan
 from data.anomalies.physical_contract import PhysicalAnomalyPlan
 from data.anomalies.physical_process import PhysicalAnomalySimulator
+from data.anomalies.source_scope import require_source_scenario_scope
 from data.generator.configuration import resolve_generation_config
 from data.generator.csv_writer import TABLE_COLUMNS
 from data.generator.demand_quality import validate_demand
@@ -48,13 +49,16 @@ if TYPE_CHECKING:
     from data.inventory.source_contract import SourceInventoryConfig
     from data.inventory.source_tables import TableContext
 
-VERSION = "planned-source-cached-execution-1.1.3"
+VERSION = "planned-source-cached-execution-1.1.4"
 UPSTREAM_SHA256 = {
     "inventory/source_cohort_batch_v2.py": "b3e73b461b8d2753f286ce84574909061d5e978c4fbe84f3bc646bf360f6425c",
     "inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",
-    "anomalies/source_process.py": "f1b9eb27af85ba05de487e93c6efc374a571ead1198f48bba65c940e30e132ba",
+    "anomalies/source_process.py": "6d84e4686c82f9a8db6a9843ab37e6b4fa68ed447175a54de201a0f4fd980b2c",
+    "anomalies/scenarios.py": "6f035821ce37479fba31e6da107791aa30940487d35cda1c381706867e06080c",
+    "anomalies/physical_scenarios.py": "de57f8f66d9533456b743834f81598033087615417977db41d9ee05f56dc5650",
+    "anomalies/source_scope.py": "ef7bcd833ef010653da4136adf18c387669227bd24d451aacd2027cf5356ad1d",
     "anomalies/candidate_io.py": "80bd7af07e107d46b114fdeac3e1e54dca2cf3353648e88fffbfd7805e2ad7e1",
 }
 
@@ -206,6 +210,7 @@ def build_tables(
     evaluated_at: str | None = None,
 ) -> tuple[dict, TableContext]:
     """Build every ordinary Source 2.8 table, without writing or opening truth."""
+    require_source_scenario_scope(generation)
     verify_upstream_pins()
     plan = parse_candidate_plan(payload)
     effective = resolve_generation_config(generation)

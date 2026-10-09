@@ -54,26 +54,56 @@ def build_physical_scenario(
         and effective.days * effective.products * effective.stores <= 5000,
         "Physical candidate is bounded to AI profiles with at most 5000 daily grains.",
     )
+    return _build_physical_scenario(generation, payload, inventory_config)
+
+
+def _build_physical_scenario(
+    generation: DatasetGenerationConfig,
+    payload: dict,
+    inventory_config: SourceInventoryConfig | None = None,
+) -> dict:
+    """Complete physical replay after the caller's explicit native scope guard."""
+    effective = resolve_generation_config(generation)
     plan = PhysicalAnomalyPlan.from_payload(payload)
     original = build_dataset(generation)
     config = inventory_config or default_inventory_config(generation)
     normal = simulate_source_commerce(original, effective, config)
+    normal_commerce_sha256 = json_sha256(normal["commerce"])
+    windows = (*plan.injections, *plan.controls)
+    normal_physical = {
+        window.id: physical_effects(normal, window.daily_keys()) for window in windows
+    }
+    normal_returns = {window.id: return_effects(normal, window.daily_keys()) for window in windows}
+    normal_latent = {
+        row["demand_id"]: row["latent_quantity"]
+        for row in normal["simulation_truth"]["demand_outcomes"]
+    }
+    # Keep every grain for spillover, including grains outside all declared
+    # episode/control windows and channels sharing physical stock.
+    daily: dict[tuple[str, ...], list[int]] = defaultdict(lambda: [0, 0])
+    for row in normal["simulation_truth"]["demand_outcomes"]:
+        key = (
+            row["occurred_at"][:10],
+            row["product_id"],
+            row["selling_location_id"],
+            row["channel"],
+        )
+        daily[key][0] += row["observed_quantity"]
+    del normal
     source = simulate_source_commerce(original, effective, config, physical_plan=plan)
     require(
-        {
-            r["demand_id"]: r["latent_quantity"]
-            for r in normal["simulation_truth"]["demand_outcomes"]
-        }
+        normal_latent
         == {
             r["demand_id"]: r["latent_quantity"]
             for r in source["simulation_truth"]["demand_outcomes"]
         },
         "Physical anomaly changed latent demand.",
     )
+    del normal_latent
     episodes = []
     for injection in plan.injections:
         keys = injection.daily_keys()
-        before, after = physical_effects(normal, keys), physical_effects(source, keys)
+        before, after = normal_physical[injection.id], physical_effects(source, keys)
         entry = {
             **injection.model_dump(),
             "data_class": "simulation_truth",
@@ -82,7 +112,7 @@ def build_physical_scenario(
             "injected_inventory_outcome": after,
         }
         if isinstance(injection, ReturnInjection):
-            a, b = return_effects(normal, keys), return_effects(source, keys)
+            a, b = normal_returns[injection.id], return_effects(source, keys)
             require(
                 b["returned_units"] > a["returned_units"],
                 "Return injection has no actual returned-unit increase.",
@@ -117,11 +147,11 @@ def build_physical_scenario(
     controls = []
     for control in plan.controls:
         a, b = (
-            physical_effects(normal, control.daily_keys()),
+            normal_physical[control.id],
             physical_effects(source, control.daily_keys()),
         )
         ar, br = (
-            return_effects(normal, control.daily_keys()),
+            normal_returns[control.id],
             return_effects(source, control.daily_keys()),
         )
         require(
@@ -140,16 +170,14 @@ def build_physical_scenario(
         )
     # Account for effects at every selling grain, including channels sharing stock
     # and later dates affected by replenishment or restocks. Do not hide spillover.
-    daily: dict[tuple[str, ...], list[int]] = defaultdict(lambda: [0, 0])
-    for index, run in enumerate((normal, source)):
-        for row in run["simulation_truth"]["demand_outcomes"]:
-            key = (
-                row["occurred_at"][:10],
-                row["product_id"],
-                row["selling_location_id"],
-                row["channel"],
-            )
-            daily[key][index] += row["observed_quantity"]
+    for row in source["simulation_truth"]["demand_outcomes"]:
+        key = (
+            row["occurred_at"][:10],
+            row["product_id"],
+            row["selling_location_id"],
+            row["channel"],
+        )
+        daily[key][1] += row["observed_quantity"]
     spillover = [
         dict(
             zip(GRAIN, key, strict=True),
@@ -167,7 +195,7 @@ def build_physical_scenario(
         "plan": plan.model_dump(),
         "inventory_configuration": config.model_dump(),
         "normal_candidate_sha256": json_sha256(original),
-        "normal_commerce_sha256": json_sha256(normal["commerce"]),
+        "normal_commerce_sha256": normal_commerce_sha256,
         "commerce": source["commerce"],
         "inventory": source["inventory"],
         "simulation_truth": {

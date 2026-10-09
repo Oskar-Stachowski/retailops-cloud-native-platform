@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING
 from data.anomalies.candidate_io import candidate_plan_schema, parse_candidate_plan
 from data.anomalies.contract import AnomalyPlan
 from data.anomalies.physical_contract import PhysicalAnomalyPlan
-from data.anomalies.physical_scenarios import build_physical_scenario
-from data.anomalies.scenarios import build_scenario
+from data.anomalies.physical_scenarios import _build_physical_scenario
+from data.anomalies.scenarios import _build_scenario
 from data.anomalies.source_contract import POLICY, VERSION
+from data.anomalies.source_scope import require_source_scenario_scope
 from data.generator.identity import json_sha256
 from data.inventory.contract import require
 from data.inventory.run_source_dataset import build_source_dataset
@@ -46,6 +47,7 @@ def build_tables(
     *,
     evaluated_at: str | None = None,
 ) -> tuple[dict, TableContext]:
+    require_source_scenario_scope(generation)
     plan = parse_candidate_plan(payload)
     return build_source_dataset(
         generation,
@@ -63,10 +65,15 @@ def scenario_document(
     config: SourceInventoryConfig,
     payload: dict,
 ) -> dict:
+    require_source_scenario_scope(generation)
     plan = parse_candidate_plan(payload)
-    candidate = (build_scenario if isinstance(plan, AnomalyPlan) else build_physical_scenario)(
+    candidate = (_build_scenario if isinstance(plan, AnomalyPlan) else _build_physical_scenario)(
         generation, plan.model_dump(), config
     )
+    effects = candidate["effects"]
+    # The Source document contains only effects. Release the candidate's full
+    # inventory/commerce/truth before independently replaying all Source tables.
+    del candidate
     expected, expected_context = build_tables(
         generation, plan.model_dump(), config, evaluated_at=context.evaluated_at
     )
@@ -77,5 +84,5 @@ def scenario_document(
     return {
         "data_class": "simulation_truth",
         "plan": plan.model_dump(),
-        "effects": candidate["effects"],
+        "effects": effects,
     }

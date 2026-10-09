@@ -130,6 +130,16 @@ def build_scenario(
         and effective.days * effective.products * effective.stores <= 5000,
         "This candidate runner is bounded to AI profiles with at most 5000 daily grains.",
     )
+    return _build_scenario(generation, payload, inventory_config)
+
+
+def _build_scenario(
+    generation: DatasetGenerationConfig,
+    payload: dict,
+    inventory_config: SourceInventoryConfig | None = None,
+) -> dict:
+    """Original complete paired replay; the public entry point owns its scope guard."""
+    effective = resolve_generation_config(generation)
     plan = AnomalyPlan.from_payload(payload)
     normal = build_dataset(generation)
     injected = build_dataset(generation, anomaly_plan=plan)
@@ -137,12 +147,20 @@ def build_scenario(
     validate_demand(injected, effective, anomaly_plan=plan)
     effects = evaluate_effects(normal, injected, plan)
     config = inventory_config or default_inventory_config(generation)
+    normal_candidate_sha256 = json_sha256(normal)
     normal_source = simulate_source_commerce(normal, effective, config)
-    source = simulate_source_commerce(injected, effective, config, anomaly_plan=plan)
+    normal_commerce_sha256 = json_sha256(normal_source["commerce"])
+    # Retain the complete paired measurements, not two simultaneous inventory
+    # worlds. Every episode and control keeps the same original native reduction.
     for episode, injection in zip(effects["episodes"], plan.injections, strict=True):
         episode["normal_inventory_outcome"] = physical_effects(
             normal_source, injection.daily_keys()
         )
+    for control, window in zip(effects["controls"], plan.controls, strict=True):
+        control["normal_inventory_outcome"] = physical_effects(normal_source, window.daily_keys())
+    del normal_source, normal
+    source = simulate_source_commerce(injected, effective, config, anomaly_plan=plan)
+    for episode, injection in zip(effects["episodes"], plan.injections, strict=True):
         episode["injected_inventory_outcome"] = physical_effects(source, injection.daily_keys())
         require(
             episode["injected_inventory_outcome"]["latent_quantity"]
@@ -150,7 +168,6 @@ def build_scenario(
             "Injection was not consumed by the actual chronological process.",
         )
     for control, window in zip(effects["controls"], plan.controls, strict=True):
-        control["normal_inventory_outcome"] = physical_effects(normal_source, window.daily_keys())
         control["injected_inventory_outcome"] = physical_effects(source, window.daily_keys())
         control["inventory_outcome_unchanged"] = (
             control["normal_inventory_outcome"] == control["injected_inventory_outcome"]
@@ -167,8 +184,8 @@ def build_scenario(
         "requested_generation": requested_parameters(generation),
         "plan": plan.model_dump(),
         "inventory_configuration": config.model_dump(),
-        "normal_candidate_sha256": json_sha256(normal),
-        "normal_commerce_sha256": json_sha256(normal_source["commerce"]),
+        "normal_candidate_sha256": normal_candidate_sha256,
+        "normal_commerce_sha256": normal_commerce_sha256,
         "commerce": source["commerce"],
         "inventory": source["inventory"],
         "simulation_truth": {
