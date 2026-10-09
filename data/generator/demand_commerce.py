@@ -11,6 +11,7 @@ from data.generator.common import deterministic_uuid, money
 from data.generator.demand_grid import demand_grid
 from data.generator.demand_model import daily_demand
 from data.generator.dimensions import DimensionIndex
+from data.generator.progress import counted, stage
 
 if TYPE_CHECKING:
     from data.anomalies.contract import AnomalyPlan
@@ -102,6 +103,7 @@ def _order_lines(
     return items, sales
 
 
+@stage("demand_commerce_build")
 def generate_demand_commerce(
     products: list[dict[str, str]],
     stores: list[dict[str, str]],
@@ -116,7 +118,7 @@ def generate_demand_commerce(
     pricing = CommercePricing(plans, DimensionIndex(dimensions))
     catalog, adapters = {r["id"]: r for r in products}, {r["id"]: r for r in stores}
     budgets, truth = defaultdict(dict), []
-    for key, flags in sorted(grid.items()):
+    for key, flags in counted("candidate_demand_grid", sorted(grid.items()), total=len(grid)):
         if flags["location_open"] == "false":
             continue
         store = adapters[flags["legacy_store_id"]]
@@ -127,7 +129,12 @@ def generate_demand_commerce(
         budgets[key[0], flags["legacy_store_id"]][key[1]] = int(row["latent_units"])
     orders, items, sales = [], [], []
     categories = {key: row["category"] for key, row in catalog.items()}
-    for (day, adapter), quantities in sorted(budgets.items()):
+    for (day, adapter), quantities in counted(
+        "candidate_commerce",
+        sorted(budgets.items()),
+        total=len(budgets),
+        unit="day_location_groups",
+    ):
         store = adapters[adapter]
         rng = random.Random(f"basket:{config.seed}:{day}:{adapter}")  # noqa: S311 - deterministic simulation
         baskets = allocate_baskets(quantities, categories, store["channel"], rng)

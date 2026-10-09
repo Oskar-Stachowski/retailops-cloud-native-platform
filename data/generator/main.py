@@ -38,6 +38,7 @@ from data.generator.pricing_quality import validate_pricing, write_pricing_repor
 from data.generator.pricing_schema import uses_pricing
 from data.generator.products import generate_products
 from data.generator.profile_engine import build_profile_dataset
+from data.generator.progress import stage
 from data.generator.quality import write_quality_report
 from data.generator.realism_report import write_realism_report
 from data.generator.return_quality import validate_returns, write_returns_report
@@ -134,6 +135,7 @@ def warn_if_demo_ignores_sizing_options(config: DatasetGenerationConfig) -> None
     )
 
 
+@stage("candidate_build")
 def build_dataset(
     config: DatasetGenerationConfig | None = None,
     *,

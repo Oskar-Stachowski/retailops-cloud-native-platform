@@ -19,6 +19,7 @@ from data.generator.observation_history import (
     validate_daily_versions,
 )
 from data.generator.pricing_quality import validate_pricing
+from data.generator.progress import stage
 from data.generator.return_quality import build_return_report
 from data.generator.return_reconciliation import return_boundaries
 from data.inventory.contract import require, utc_timestamp
@@ -37,6 +38,7 @@ if TYPE_CHECKING:
     from data.generator.configuration import ResolvedGenerationConfig
 
 
+@stage("source_reconciliation")
 def reconcile_source_commerce(
     candidate: dict, output: dict, generation: ResolvedGenerationConfig, scenario: dict
 ) -> dict[str, Any]:

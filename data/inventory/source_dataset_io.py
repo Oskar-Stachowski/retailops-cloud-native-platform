@@ -22,6 +22,7 @@ from data.generator.identity import (
     json_sha256,
 )
 from data.generator.manifest_v2 import config_from_parameters, requested_parameters, unique_keys
+from data.generator.progress import counted, stage
 from data.generator.source_realism import realism_markdown
 from data.inventory.contract import UTC_TIMESTAMP_PATTERN, require, utc_timestamp
 from data.inventory.source_contract import SourceInventoryConfig
@@ -62,6 +63,7 @@ REPORT_NAMES = (
 )
 
 
+@stage("source_normalization")
 def normalize_source(tables: dict) -> dict:
     require(set(tables) == set(SOURCE_TABLES), "Source 2.7 table allowlist differs.")
     native = normalize_tables({n: tables[n] for n in TABLES})
@@ -228,6 +230,7 @@ def verify_artifact(
     return path
 
 
+@stage("source_read")
 def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[dict, dict]:  # noqa: PLR0912, PLR0915 - ordered source integrity and replay gates
     require(
         not directory.is_symlink() and not any(p.is_symlink() for p in directory.rglob("*")),
@@ -348,7 +351,9 @@ def read_source_dataset(directory: Path, payload: dict | None = None) -> tuple[d
             require(reader.fieldnames == columns(name), "Source CSV header differs: " + name)
             rows = []
             rules = field_rules(TABLES[name].model) if name in TABLES else {}
-            for csv_row in reader:
+            for csv_row in counted(
+                "source_read/" + name, reader, total=desc["tables"][name]["row_count"]
+            ):
                 require(
                     None not in csv_row and all(isinstance(v, str) for v in csv_row.values()),
                     "Malformed source CSV row width.",
@@ -416,6 +421,7 @@ def load_report(reports: dict[str, bytes]) -> dict:
     return json.loads(reports["source_report.json"])
 
 
+@stage("source_validation")
 def build_reports(
     tables: dict,
     context: TableContext,
@@ -469,6 +475,7 @@ def build_reports(
     }
 
 
+@stage("source_write")
 def write_source_dataset(
     tables: dict,
     context: TableContext,
@@ -515,7 +522,10 @@ def write_source_dataset(
             with path.open("w", encoding="utf-8", newline="") as stream:
                 writer = csv.DictWriter(stream, fieldnames=columns(name), lineterminator="\n")
                 writer.writeheader()
-                writer.writerows({k: _csv_value(v) for k, v in r.items()} for r in tables[name])
+                writer.writerows(
+                    {k: _csv_value(v) for k, v in r.items()}
+                    for r in counted("source_write/" + name, tables[name], total=len(tables[name]))
+                )
         (staging / CONFIG_PATH).write_bytes(canonical_json(config.model_dump()) + b"\n")
         if scenario is not None:
             (staging / SCENARIO_PATH).write_bytes(canonical_json(scenario) + b"\n")
