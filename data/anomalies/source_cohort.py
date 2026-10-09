@@ -47,9 +47,9 @@ if TYPE_CHECKING:
     from data.inventory.source_contract import SourceInventoryConfig
     from data.inventory.source_tables import TableContext
 
-VERSION = "planned-source-cached-execution-1.1.2"
+VERSION = "planned-source-cached-execution-1.1.3"
 UPSTREAM_SHA256 = {
-    "inventory/source_cohort_batch_v2.py": "ecbe27a7fd0186237dc44dba0d3a1a63c7ac81b2d1d8c972421f4af434beb3b1",
+    "inventory/source_cohort_batch_v2.py": "6247af40f56c5d8dd09ae63f7570adde4c3197dd15357a3ddeaacf2b72c0831b",
     "inventory/source_bridge.py": "f1030980fa2cfd297ee1ec5e62434cd1fa56480cf59f7a605783b1ff7e25f61d",
     "inventory/run_source_dataset.py": "3c3194a6d197ced1e6c19e93268ef5bac97ae8c01073b05f17e67d9d0027d6bf",
     "anomalies/physical_process.py": "e8290df0c179b2796c339c0ee3268369b0fd67687c52f8355e23202cd38de93c",

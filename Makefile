@@ -319,6 +319,8 @@ api-test: api-install
 api-coverage: api-install ensure-reports-dir
 	cd "$(API_DIR)" && PYTHONPATH=.:$(ROOT_DIR) DATABASE_URL="$(DATABASE_URL)" .venv/bin/python -m pytest \
 		--cov=app \
+		--cov-branch \
+		--cov-config="$(ROOT_DIR)/pyproject.toml" \
 		--cov-report=term-missing \
 		--cov-report=xml:"$(ROOT_DIR)/$(API_COVERAGE_XML)"
 

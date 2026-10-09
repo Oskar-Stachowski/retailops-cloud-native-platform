@@ -11,10 +11,13 @@ pełne CI nowego head i chronionego main pozostaje wymagane.
 
 # Aktualny status RetailOps
 
-**2026-10-07: AI 09 pozostaje in_progress.**
-[Odbiór komponentów producenta](evidence/ai/09/source-preparation/README.md)
-opisuje ograniczenie kopii wejść oraz dziennego replayu inventory:
-456 testów regresji i zgodne dane kontrolne. Pomiar pełnego profilu,
+**2026-10-09: AI 09 pozostaje in_progress.**
+[Audyt CPU producenta](evidence/ml/ai09-source-cpu-followup.md) opisuje
+ograniczony cache konwersji Arrow, aktywację istniejącego indeksu po pełnej
+walidacji cached księgi i zgodny tryb lokalnego branch coverage. 72 kontrole
+końcowego kodu przeszły; małe porównania zachowują wszystkie tabele i raporty.
+Odbiór pełnego CI pozostaje wymagany. Dziewiąta diagnostyka
+z limitem RAM 12 GiB zakończyła się na limicie czasu. Pomiar pełnego profilu,
 rzeczywista kampania i końcowa ocena pozostają wymagane. AI 07–08 są zamknięte.
 
 **2026-10-07 — AI 10: READY, pełny odbiór integracji.**

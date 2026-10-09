@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from datetime import date, datetime
 from decimal import Decimal
+from functools import lru_cache
 
 import pyarrow as pa
 
@@ -106,28 +107,59 @@ def table_schema(table: str, profile: str) -> pa.Schema:
     )
 
 
+@lru_cache(maxsize=128)
+def _conversion_plan(schema: pa.Schema) -> tuple:
+    """Immutable Arrow schemas share an immutable, bounded conversion plan."""
+    return tuple(
+        (
+            field.name,
+            field.nullable,
+            pa.types.is_decimal(field.type),
+            pa.types.is_date(field.type),
+            pa.types.is_timestamp(field.type),
+        )
+        for field in schema
+    )
+
+
 def typed_row(row: dict, schema: pa.Schema) -> dict:
     if set(row) != set(schema.names):
         msg = "CSV record width/columns disagree with the explicit schema."
         raise ValueError(msg)
     result = {}
-    for field in schema:
-        if pa.types.is_timestamp(field.type) and re.search(r"\.\d{7,}", str(row[field.name])):
+    # Exact built-in schemas are immutable. Keep unhashable/custom inputs on
+    # the original uncached path, after the same record-width validation.
+    plan = (
+        _conversion_plan(schema)
+        if type(schema) is pa.Schema
+        else (
+            (
+                field.name,
+                field.nullable,
+                pa.types.is_decimal(field.type),
+                pa.types.is_date(field.type),
+                pa.types.is_timestamp(field.type),
+            )
+            for field in schema
+        )
+    )
+    for name, nullable, decimal, day, timestamp in plan:
+        if timestamp and re.search(r"\.\d{7,}", str(row[name])):
             msg = "Timestamp exceeds the declared microsecond precision."
             raise ValueError(msg)
-        value = canonical_cell(field.name, row[field.name])
+        value = canonical_cell(name, row[name])
         if value is None:
-            if not field.nullable:
-                msg = "Forbidden null: " + field.name
+            if not nullable:
+                msg = "Forbidden null: " + name
                 raise ValueError(msg)
-        elif pa.types.is_decimal(field.type):
+        elif decimal:
             value = Decimal(value)
-            if value != Decimal(row[field.name]):
+            if value != Decimal(row[name]):
                 msg = "Numeric value exceeds the source canonicalization precision."
                 raise ValueError(msg)
-        elif pa.types.is_date(field.type):
+        elif day:
             value = date.fromisoformat(value)
-        elif pa.types.is_timestamp(field.type):
+        elif timestamp:
             value = datetime.fromisoformat(value)
-        result[field.name] = value
+        result[name] = value
     return result

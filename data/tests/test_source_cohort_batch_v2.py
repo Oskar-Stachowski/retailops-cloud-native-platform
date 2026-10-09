@@ -299,3 +299,20 @@ def test_cached_master_change_is_rejected(simulators):
     cached.inventory_base["stock_locations"][0]["location_code"] = "changed"
     with pytest.raises(ValueError, match="master context changed"):
         cached._ledger()
+
+
+def test_cached_validated_ledger_index_matches_original_at_all_initial_boundaries(simulators):
+    ordinary, cached = (simulator._ledger() for simulator in simulators)
+    assert getattr(cached, "_payload_validated", False)
+    times = {
+        utc_timestamp(value) + timedelta(microseconds=delta)
+        for movement in ordinary.movements
+        for value in (movement.occurred_at, movement.available_at)
+        for delta in (-1, 0, 1)
+    }
+    for happened in sorted(times):
+        for known in (None, *sorted(times)):
+            cutoff = known.isoformat() if known is not None else None
+            assert cached.balances_at(happened.isoformat(), known_at=cutoff) == ordinary.balances_at(
+                happened.isoformat(), known_at=cutoff
+            )

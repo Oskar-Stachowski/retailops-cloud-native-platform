@@ -57,7 +57,7 @@ from data.inventory.source_observations import known_commerce_view, rebuild_obse
 from data.inventory.source_reconciliation import reconcile_source_commerce
 from data.inventory.source_tables import TableContext, tables_from_source
 
-FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.2"
+FAST_PATH_VERSION = "inventory-source-cached-ledger-2.2.3"
 UPSTREAM_SHA256 = {
     "snapshots.py": "e705092e4ce5c97a80b2b9760faa1298388a497093eea17a4e4dd162bd48dd65",
     "source_cohort_batch.py": "7459292242696e6e1ea35ab2ea8171b31acab044d879f67168d379941c8dee84",
@@ -228,6 +228,10 @@ class CachedLedgerSourceCommerceSimulator(IndexedSourceCommerceSimulator):
             transfer_pairs(ordered),
         )
         result._balances(ordered)  # noqa: SLF001 - retain the ordinary full-ledger validation
+        # Every immutable movement and full-ledger invariant above has passed,
+        # as in ordinary from_payload. Enable its existing indexed query path;
+        # irregular availability still falls back to the original replay.
+        object.__setattr__(result, "_payload_validated", True)
         return result
 
 
