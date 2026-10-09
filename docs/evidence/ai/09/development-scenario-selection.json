@@ -1,0 +1,110 @@
+{
+  "recorded_at_utc": "2026-10-09T20:23:43.862877+00:00",
+  "scope": "Native Source scenario selection from one independently verified ordinary parent; controlled binding tests accepted, corrected native outcome validation pending",
+  "base_source_change": "57a50e263641efd71b8ef8b88eb8aef0e9c96a0f",
+  "base_pr": "https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/pull/113",
+  "production_sha256": "c8003d007ecfe7577d117db9329aef674c469264f66e8f38099e055847a84834",
+  "unit_validation": {
+    "monitor": {
+      "status": "passed",
+      "reason": null,
+      "exit_code": 0,
+      "wall_seconds": 1.4414142500027083,
+      "sampled_tree_peak_rss_bytes": 111951872,
+      "sampled_worker_cpu_seconds": 1.038612224,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 4076,
+      "sampled_peak_scratch_allocated_bytes": 12288,
+      "minimum_free_disk_bytes": 50182508544,
+      "minimum_available_memory_bytes": 1263878144,
+      "samples": 14,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "tests": {
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "seconds": 0.755,
+    "junit_sha256": "cbb39cc73593a5a460345f36e7f3deb12901955bbacefca450810fe52bb1466b"
+  },
+  "retained_initial_native_failure": {
+    "monitor": {
+      "status": "failed",
+      "reason": "worker_exit",
+      "exit_code": 1,
+      "wall_seconds": 27.316000333987176,
+      "sampled_tree_peak_rss_bytes": 236093440,
+      "sampled_worker_cpu_seconds": 25.919517668,
+      "cpu_measurement": "sampled_worker_tree_lower_bound_excludes_supervisor_and_unsampled_children",
+      "sampled_peak_scratch_logical_bytes": 14899,
+      "sampled_peak_scratch_allocated_bytes": 20480,
+      "minimum_free_disk_bytes": 50201751552,
+      "minimum_available_memory_bytes": 1552302080,
+      "samples": 247,
+      "sample_seconds": 0.1,
+      "memory_measurement": "sampled_supervisor_plus_worker_tree_not_continuous_peak",
+      "scratch_measurement": "logs only, pytest temporary files excluded; global6GiB disk reserve retained"
+    },
+    "tests": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0
+    },
+    "seconds": 26.43,
+    "junit_sha256": "47230b0f36d82292bb68c1e1c687e3e442a5b748e61fedfb524676e8ada3c4a9"
+  },
+  "native_failure_correction": "location_open belongs to daily_demand_observations, not daily_demand_truth; eligibility now uses verified native active/open observation keys. Controlled fixtures corrected to match actual table ownership.",
+  "corrected_native_validation": "not_started_local_memory_admission_expired_after_30_minutes",
+  "source_generation_per_invocation": 0,
+  "source_reads_per_successful_invocation": 1,
+  "potential_return_selection": "original generate_return_events on fulfilled ordinary Source purchases; paired physical replay still required",
+  "role_inventory": [
+    "tune",
+    "calibration",
+    "development_evaluation"
+  ],
+  "planned_episodes": {
+    "demand": 9,
+    "physical": 6
+  },
+  "full_profile_generations": 0,
+  "project_fits": 0,
+  "fresh_final_reads": 0,
+  "full_required_ci": false,
+  "on_main": false,
+  "stage_ready": false,
+  "exposed_development_dates": {
+    "start": "2025-08-01",
+    "end": "2026-07-31"
+  },
+  "demand_only_positivity_does_not_restrict_physical_eligibility": true,
+  "superseded_admission": {
+    "recorded_at_utc": "2026-10-09T19:47:10.659033+00:00",
+    "pid": 53899,
+    "create_time": 1791574378.437927,
+    "reason": "review found missing exposed-date guard and demand-only positivity restriction accidentally applied to physical candidate eligibility; change implementation before native control",
+    "native_worker_started": false,
+    "unit_result_retained": true,
+    "same_failure_not_retried_unchanged": true
+  },
+  "native_admission_expired": {
+    "worker_started": false,
+    "elapsed_seconds": 1801.0289344170014,
+    "tree_rss_bytes": 536870912,
+    "minimum_available_memory_bytes": 1073741824,
+    "minimum_free_disk_bytes": 6442450944,
+    "unchanged_retry_started": false
+  },
+  "base_source_merged_main": "95aa6f0e0f87b3eae0875b1fb34b8b951a4cc779",
+  "base_source_head_required_ci": {
+    "run_id": 37978277332,
+    "success": 21,
+    "declared_path_skips": 4,
+    "failed": 0
+  }
+}
