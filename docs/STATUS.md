@@ -1,22 +1,17 @@
-AI09 follow-up: source2.8+knownplans jest przygotowany z osobnymi wariantami
-schematów, pełnym process replay oraz testami native; nie jest odbiorem etapu.
-[Evidence](evidence/ai/09/planned-anomaly-preparation.md) zachowuje też pojedynczy
-Kafka coordinator read failure exact maincbcac6eb/CI37629010997 i ograniczoną
-poprawkę helpera. PR #103 na `16d34887` zaliczył pełny Required CI
-[37637743439](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37637743439):
-19 success, 4 celowe skipped, z zielonym required-result. Integracja nowszego
-main `467f9903` zachowuje wspólny helper Kafka i wszystkie przyrosty AI 10.
-18 testów offsetów, configured Ruff/format oraz mypy 43 źródeł są zaliczone;
-pełne CI nowego head i chronionego main pozostaje wymagane.
-
 # Aktualny status RetailOps
 
-**2026-10-13: AI 09 — zatwierdzony wariant TensorFlow i konsolidacja portfolio.**
-[Aktualny plan](plans/ai/etapy/09-tensorflow-robustness.md) zachowuje zamknięte
-AI 07–08 i wymaga nowego rzeczywistego porównania forecastingu na mniejszym
-jawnym profilu, trzech seedach, z jakością, odtworzeniem modelu i kosztami.
-Warianty 2–3 są wyłącznie możliwymi dalszymi ulepszeniami. Status **not_ready**
-do zakończenia wykonania i odbioru; sama zmiana zakresu nie jest wynikiem.
+**2026-10-13: AI 09 — READY: TensorFlow i konsolidacja portfolio.**
+[Końcowy odbiór](evidence/ai/09/portfolio-ready.md) wiąże rzeczywisty TF,
+kalibrację, trzy seedy 42/137/2026 i sprawdzone historyczne portfolio AI 07–08.
+Każdy seed ma 19443 wspólne klucze i 17437 kwalifikowanych etykiet;
+niezależny replay dokładnie odtwarza metryki, a pełne archiwa są zweryfikowane.
+Decyzja: **TF odrzucony do nowej promocji, zachować dotychczasowe portfolio**.
+AI PR #70 i wynikowy main mają pełny Required CI 17/17. Status READY
+tej aktualizacji obowiązuje po odbiorze zgodnego Source PR/main zgodnie
+z warunkiem publikacji w raporcie; nie na roboczym branchu.
+[Aktualny plan](plans/ai/etapy/09-tensorflow-robustness.md) zachowuje warianty
+2–3 jako przyszłe ulepszenia, bez ich wdrażania. Poniższe wpisy AI 09 są historią
+wcześniejszych protokołów i nie rozszerzają zatwierdzonego zakresu zamknięcia.
 
 **2026-10-09: AI 09 pozostaje in_progress.**
 [Audyt CPU producenta](evidence/ml/ai09-source-cpu-followup.md) opisuje
@@ -183,3 +178,16 @@ Nie pozostały otwarte warunki Etapu 11. Agent, groundedness odpowiedzi
 oraz wykonanie narzędzi należą do AI 12; pełny agent wymaga również AI 10.
 Nie jest to wdrożenie AWS/EKS. Zmiana dokumentacji nie aktualizuje samoczynnie
 zatwierdzonego indeksu — wymaga nowego snapshotu i oceny.
+
+## Historyczny follow-up przygotowania AI 09
+
+AI09 follow-up: source2.8+knownplans jest przygotowany z osobnymi wariantami
+schematów, pełnym process replay oraz testami native; nie jest odbiorem etapu.
+[Evidence](evidence/ai/09/planned-anomaly-preparation.md) zachowuje też pojedynczy
+Kafka coordinator read failure exact maincbcac6eb/CI37629010997 i ograniczoną
+poprawkę helpera. PR #103 na `16d34887` zaliczył pełny Required CI
+[37637743439](https://github.com/Oskar-Stachowski/retailops-cloud-native-platform/actions/runs/37637743439):
+19 success, 4 celowe skipped, z zielonym required-result. Integracja nowszego
+main `467f9903` zachowuje wspólny helper Kafka i wszystkie przyrosty AI 10.
+18 testów offsetów, configured Ruff/format oraz mypy 43 źródeł są zaliczone;
+pełne CI nowego head i chronionego main pozostaje wymagane.

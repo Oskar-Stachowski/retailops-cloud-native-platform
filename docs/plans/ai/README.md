@@ -1,5 +1,14 @@
 # Plan rozbudowy RetailOps AI
 
+**2026-10-13 — AI 09: READY, TensorFlow i konsolidacja portfolio.**
+[Raport odbioru](../../evidence/ai/09/portfolio-ready.md) wiąże trzy końcowe
+seedy, rzeczywisty model TF, odtworzenie i koszty oraz historyczne AI 07–08.
+Decyzja odrzuca TF do nowej promocji. [Plan etapu](etapy/09-tensorflow-robustness.md)
+przypina zatwierdzony zakres i odkłada warianty 2–3. Dawne otwarte zadania
+szerszej kampanii nie są dodatkowymi warunkami tego odbioru. AI PR/main mają
+pełny Required CI 17/17; status obowiązuje na odebranym main Source, zgodnie
+z warunkiem publikacji opisanym w raporcie.
+
 **Status: AI 07 i AI 08 są READY na zaakceptowanych main; AI 05/06 mają odbiór.
 AI 10 jest w końcowej integracji. Aktualizacja: 07.10.2026.**
 [Końcowy stan AI 07](etapy/07-anomalie-dq.md) oraz
@@ -90,7 +99,7 @@ Efektem końcowym będzie system, który prognozuje sprzedaż, wykrywa anomalie,
 | [06](etapy/06-inventory-ledger.md) | Zbuduj spójny model zapasu, dostaw i realizacji sprzedaży. | Ledger uzgadnialny ze sprzedażą i dostawami oraz wiarygodne epizody stockout. | RetailOps |
 | [07](etapy/07-anomalie-dq.md) | Dodaj kontrolowane anomalie i błędy danych oraz ich detekcję. | Oddzielne etykiety, oczyszczanie danych, baseline i oceniony detektor anomalii. | Oba repo |
 | [08](etapy/08-stockout-risk.md) | Zbuduj model ryzyka braku zapasu. | Skalibrowane prawdopodobieństwa, uzasadnione progi i bezpieczne czasowo cechy. | AI |
-| [09](etapy/09-tensorflow-robustness.md) | Dodaj TensorFlow challenger i zakończ porównanie modeli. | Rzetelna ewaluacja trzech zastosowań, odporności i ograniczeń modeli. | AI |
+| [09](etapy/09-tensorflow-robustness.md) | Porównaj TensorFlow i skonsoliduj odebrane portfolio. | Nowe porównanie forecastingu na trzech seedach oraz historyczne odbiory anomaly/stockout, z jawnymi ograniczeniami zatwierdzonego wariantu 1. | AI |
 | [10](etapy/10-integracja-retailops.md) | Uzgodnij REST i zdarzenia, a następnie pokaż wyniki AI w RetailOps. | Kontrakty, trwałe przetwarzanie, deduplikacja oraz rzeczywiste wyniki dostępne w API/UI. | Oba repo |
 | [11](etapy/11-rag.md) | Przygotuj zatwierdzony korpus wiedzy i RAG. | Wersjonowany indeks pgvector, cytowania i oceniona jakość wyszukiwania. | AI |
 | [12](etapy/12-agent-bedrock.md) | Zbuduj agenta read-only z LangGraph i Amazon Bedrock. | Odpowiedzi oparte na narzędziach i dokumentach, z limitami, świeżością danych i oceną jakości. | AI |

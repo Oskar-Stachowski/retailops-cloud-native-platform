@@ -8,6 +8,11 @@ Ten historyczny wariant forecast source nie obejmował inventory; aktualny odbi�
 Ten plik zawiera wyłącznie otwartą pracę; [audyt](../../audits/open-findings.md)
 opisuje potwierdzone problemy i kryteria ich zamknięcia.
 
+AI 09 w zatwierdzonym wariancie 1 nie ma otwartych warunków wykonania.
+[Końcowy odbiór](../../evidence/ai/09/portfolio-ready.md) zamyka etap na
+odebranym main Source po jego Required CI. Warianty 2–3 pozostają możliwymi
+przyszłymi ulepszeniami, poza bieżącą pracą.
+
 ## Następny zakres — AI 04
 
 **Repo:** AI-intelligence. **Wejście:** odebrany source 2.7 oraz snapshot/curated 1.1 z [karty danych AI 06](../../evidence/ai/06/final/dataset-card.md).
@@ -43,7 +48,6 @@ Pełne przypisanie repozytoriów i kolejność: [pisemna mapa etapów](kolejnosc
 | **05 — MLflow i serving** | Zachować rejected/failed i pełną lineage. Własny batch worker, atomic complete output, API z właściwym grain, test crash/retry/rollback; obecny RF `rejected` nie jest championem. |
 | **07 — anomaly/DQ** | Raw faults oraz nowy snapshot/handoff i offline curation. Po zgodnych 04/05: PIT expected/residual, baseline/IF, porównanie i lifecycle. Lokalny producent pięciu typów scenariuszy biznesowych nie odbiera tych warunków. |
 | **08 — stockout** | Odebrany ledger 06 + poprawne upstream forecast lineage. Przyszły epizod oddzielony od aktualnego braku; labels po oknie, kalibracja i progi, jawne insufficient/stale. |
-| **09 — TensorFlow** | [Wariant 1 zatwierdzony 2026-10-13](etapy/09-tensorflow-robustness.md): nowe porównanie baseline/RF/HGB/TF na mniejszym jawnym profilu i trzech seedach oraz konsolidacja historycznych odbiorów AI 07–08. TF nie musi wygrać. Nowa wspólna kampania trzech zastosowań pozostaje przyszłym ulepszeniem. |
 | **10 — integracja** | Legacy v1 ma kontrakt oraz [trwałe ACK/kwarantannę live metrics](../../reference/events.md). Rozszerzyć je na nowe intelligence.v2, domenowe inbox/outbox, wersje faktów i snapshot/replay. Domenowe projekcje wyników, zgodne API/UI i rzeczywiste auth/scope. Testy z brokerem i awariami wymagane przed odbiorem. |
 | **12 — agent** | Po 10/11: narzędzia read-only z auth, limitami, freshness i audytem; bez domyślnego demo-admin i mutacji operacyjnych. |
 | **13 — monitoring/security** | Własne SLO AI, performance drift z dojrzałymi etykietami, telemetry, incident/security gates; lokalne testy 00 ich nie odbierają. |
