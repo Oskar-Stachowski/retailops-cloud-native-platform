@@ -11,6 +11,13 @@ pełne CI nowego head i chronionego main pozostaje wymagane.
 
 # Aktualny status RetailOps
 
+**2026-10-13: AI 09 — zatwierdzony wariant TensorFlow i konsolidacja portfolio.**
+[Aktualny plan](plans/ai/etapy/09-tensorflow-robustness.md) zachowuje zamknięte
+AI 07–08 i wymaga nowego rzeczywistego porównania forecastingu na mniejszym
+jawnym profilu, trzech seedach, z jakością, odtworzeniem modelu i kosztami.
+Warianty 2–3 są wyłącznie możliwymi dalszymi ulepszeniami. Status **not_ready**
+do zakończenia wykonania i odbioru; sama zmiana zakresu nie jest wynikiem.
+
 **2026-10-09: AI 09 pozostaje in_progress.**
 [Audyt CPU producenta](evidence/ml/ai09-source-cpu-followup.md) opisuje
 ograniczony cache konwersji Arrow, aktywację istniejącego indeksu po pełnej
