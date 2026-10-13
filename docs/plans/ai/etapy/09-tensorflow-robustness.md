@@ -1,5 +1,56 @@
 # 09 — Porównaj TensorFlow i zamknij ewaluację ML
 
+## Aktualny zakres zatwierdzony 2026-10-13
+
+Użytkownik wybrał **wariant 1: TensorFlow i konsolidacja portfolio**.
+Ta decyzja zastępuje wymaganie nowej wspólnej kampanii trzech zastosowań
+w poniższym pierwotnym planie. AI 07–08 pozostają ready; AI 09 jest obecnie
+`in_progress / not_ready`, do uzyskania dowodów opisanych poniżej.
+
+Warunki ready:
+
+1. Rzeczywiste porównanie baseline/RF/HGB/kompaktowego TF z jedną zamrożoną
+   konfiguracją rodziny, równymi ocenianymi kluczami i uczciwym skończonym
+   budżetem; horyzonty 1–14, train-only preprocessing, chronologia i osobna
+   kalibracja. TF może zostać odrzucony, bez nowej promocji championa.
+2. Jawnie nazwany mniejszy profil zgodny z możliwością opisaną w
+   [kontrakcie](../kontrakty/profile-i-bramki.md), jedna skala development,
+   oryginalny Source → snapshot → curated → features i niepuste role.
+   Daty, wielkość, segmenty, minimalne liczności, polityki i budżety ustalone
+   przed odpowiednimi operacjami. Źródła final dopiero po zamrożeniu wyboru.
+3. Trzy końcowe seedy danych **42, 137, 2026**; sprawdzona historia ekspozycji,
+   metryki per seed i łączne z ustalonymi wagami, bias, coverage przedziałów,
+   segmenty, różnice na wspólnych kluczach i zmienność między seedami.
+   Bootstrap przedziałów delty metryk odłożony; brak wymaganych próbek nie
+   jest zaliczeniem. Nie zmieniamy zasad po zobaczeniu wyników final.
+4. TF faktycznie trenowany, zapisany w formacie MLflow i odtworzony na CPU
+   w świeżym procesie; run, artefakt, preprocessing, lineage i pomiary
+   czasu/RAM/rozmiaru oraz raport jakości/kosztu. Zachowane wszystkie próby.
+5. Portfolio przypina odebrane raporty, karty, modele, polityki, ograniczenia
+   i lifecycle AI 07–08 jako historyczne wyniki na ich własnych danych.
+   Nie traktuje ich jako świeżej wspólnej kampanii ani nowej zgody na promocję.
+6. Raport końcowy i karta forecastu z decyzją retain/reject, konsolidacja
+   pozostałych kart, kontrole zmienionych zachowań i wymagany odbiór dokładnego
+   PR oraz wynikowego main. Dla AI lokalne kontrole dotyczą zmian; pełny Linux
+   Required CI zastępuje dodatkowy obowiązkowy pełny przebieg na Macu z 8 GiB.
+
+Pełny canonical development capacity diagnostic poprzedniego profilu nie jest
+bramką tego wariantu. Zasoby są mierzone w rzeczywistym nowym przebiegu;
+limit drzewa do **12 GiB**, rezerwa hosta **1 GiB**. Optymalizacje tylko na
+podstawie wykazanej blokady tego eksperymentu. Szczegółowa lista R1–R8:
+`retailops-ai-intelligence/docs/ai09-portfolio-ready.md`.
+
+### Możliwe dalsze ulepszenia — nie wdrażać w tym zadaniu
+
+- **Wariant 2:** nowa wspólna ocena forecastingu/anomaly/stockout na mniejszym
+  profilu; uzupełnienie natywnych weryfikatorów anomaly/stockout, zgodnych ról,
+  wyboru, kalibracji, progów i integracji. Osobny przyszły zakres i budżet.
+- **Wariant 3:** pełny wcześniejszy zakres poniżej wraz z dużymi profilami,
+  portfolio ordinary/demand/physical, rozszerzonymi próbami i wspólną końcową
+  kwalifikacją. Osobna demonstracja pojemności, zakres i budżet.
+
+## Pierwotny szerszy plan — zachowany jako odniesienie
+
 **Repo:** AI. **Zależności:** 07 i 08 (pośrednio 04/05/06). **Wynik:** końcowa, porównywalna ocena wszystkich trzech zastosowań i rzeczywisty TensorFlow challenger dla forecastingu. Challenger jest wymagany w pełnym lokalnym portfolio; jego promocja na championa nie jest wymagana.
 
 ## Przed rozpoczęciem kampanii
