@@ -1,11 +1,42 @@
 # 09 — Porównaj TensorFlow i zamknij ewaluację ML
 
+**Status: READY w zatwierdzonym wariancie 1 na odebranym main Source.**
+Warunek odbioru publikacji jest opisany poniżej.
+
 ## Aktualny zakres zatwierdzony 2026-10-13
 
 Użytkownik wybrał **wariant 1: TensorFlow i konsolidacja portfolio**.
 Ta decyzja zastępuje wymaganie nowej wspólnej kampanii trzech zastosowań
-w poniższym pierwotnym planie. AI 07–08 pozostają ready; AI 09 jest obecnie
-`in_progress / not_ready`, do uzyskania dowodów opisanych poniżej.
+w poniższym pierwotnym planie. AI 07–08 pozostają ready. Nowe porównanie
+forecastingu jest wykonane: trzy seedy końcowe **42/137/2026**, każdy z 19443
+wspólnymi kluczami i 17437 kwalifikowanymi etykietami. Metryki odtworzono
+dokładnie z oryginalnych predykcji i etykiet, bez nowych fitów lub kalibracji.
+Końcowy odbiór publikacji i dokładne rewizje dokumentuje
+[raport odbioru](../../../evidence/ai/09/portfolio-ready.md).
+
+Decyzja zamrożonej reguły: **odrzucić TF do nowej promocji, zachować
+dotychczasowe portfolio**. Bias średniej TF od −23,06% do −42,74% narusza limit
+10%; historyczne grupy wolumenu zero/high nie mają próbek i pozostają
+`not_ready`. Odrzucenie kandydata jest poprawnym zamknięciem porównania.
+Nie zmieniono championa, zasad AI 07–08 ani runtime.
+
+[Raport końcowy AI](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72244a7f0f3f9377d28e61f138d161f7b9776241/docs/ai09-forecast-portfolio-report.md),
+[karta TF](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72244a7f0f3f9377d28e61f138d161f7b9776241/docs/cards/tensorflow-portfolio.md),
+[portfolio historyczne](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72244a7f0f3f9377d28e61f138d161f7b9776241/docs/ai09-consolidated-portfolio.md)
+i [checklista R1–R8](https://github.com/Oskar-Stachowski/retailops-ai-intelligence/blob/72244a7f0f3f9377d28e61f138d161f7b9776241/docs/ai09-portfolio-ready.md)
+zastępują dawne listy otwartej kampanii w zakresie tego odbioru.
+
+### Odbiór publikacji
+
+Wykonanie danych używało Source `d2363a5c78e0b190132e5e3d804da73b3136487d`.
+Ta aktualizacja planu nie zmienia generatora ani danych eksperymentu.
+AI PR #70 oraz wynikowy main `72244a7f0f3f9377d28e61f138d161f7b9776241`
+mają pełny Required CI **17/17**, odpowiednio `38404677738` i `38417346019`.
+[Zapis odbioru](../../../evidence/ai/09/ai-publication.json) zachowuje dokładne
+jobs oraz pełne pokrycie testów. Run eksperymentalny `38387579572` odrębnie
+zaliczył wszystkie trzy seedy. Status READY obowiązuje po odebraniu tej
+aktualizacji przez dokładny Source PR i wynikowy main z jego Required CI.
+To zamyka R1–R8 wariantu 1; nie wymaga nowego treningu ani promocji.
 
 Warunki ready:
 

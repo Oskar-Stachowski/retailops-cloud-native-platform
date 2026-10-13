@@ -1,0 +1,314 @@
+{
+  "version": "ai09-portfolio-ai-publication-1.0.0",
+  "checked_at": "2026-10-13T16:26:44.225343+00:00",
+  "scope": "AI repository publication of approved TensorFlow and historical portfolio variant1; Source publication accepted separately",
+  "pr": {
+    "number": 70,
+    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/pull/70",
+    "head": "23bb028312457ca569f2655e75d791b7adf86003",
+    "merged": true,
+    "base_before_merge": "e544c78b757be1524915184155a2ff1b098b4325",
+    "merge_commit": "72244a7f0f3f9377d28e61f138d161f7b9776241",
+    "head_and_merge_trees_identical": true
+  },
+  "pull_request_ci": {
+    "run_id": 38404677738,
+    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/38404677738",
+    "head": "23bb028312457ca569f2655e75d791b7adf86003",
+    "event": "pull_request",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "checks",
+        "id": 115321068041,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "secrets",
+        "id": 115321068746,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "anomaly-oci",
+        "id": 115321451434,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "persistence",
+        "id": 115321451512,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "persistence-forecast",
+        "id": 115321451554,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (2)",
+        "id": 115321451560,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "observation-replay",
+        "id": 115321451668,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-forecast)",
+        "id": 115321451671,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "TensorFlow CPU training, artifact and reload",
+        "id": 115321451708,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (3)",
+        "id": 115321451718,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (1)",
+        "id": 115321451847,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (0)",
+        "id": 115321451874,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "observation-broker",
+        "id": 115321451879,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-qualified-inputs)",
+        "id": 115321451881,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-detectors)",
+        "id": 115321452066,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-source-inputs)",
+        "id": 115321452386,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "required-result",
+        "id": 115364621390,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "complete_collection": {
+      "checked_at": "2026-10-13T14:57:45.527826+00:00",
+      "run_id": 38404677738,
+      "head": "23bb028312457ca569f2655e75d791b7adf86003",
+      "complete_disjoint_collection_verified": true,
+      "collection_sha256": "d144588cc3f4c196ec6d790546c1eb85457874cfa4f0b6f486dcff544cdf1f11",
+      "counts": {
+        "tests": 6062,
+        "skipped": 49,
+        "failures": 0,
+        "errors": 0,
+        "passed": 6013
+      },
+      "shards": [
+        {
+          "shard": 0,
+          "selected": 1391,
+          "seconds": 3840.858
+        },
+        {
+          "shard": 1,
+          "selected": 1700,
+          "seconds": 5243.54
+        },
+        {
+          "shard": 2,
+          "selected": 1357,
+          "seconds": 2359.448
+        },
+        {
+          "shard": 3,
+          "selected": 1614,
+          "seconds": 3449.233
+        }
+      ]
+    }
+  },
+  "main_ci": {
+    "run_id": 38417346019,
+    "url": "https://github.com/Oskar-Stachowski/retailops-ai-intelligence/actions/runs/38417346019",
+    "head": "72244a7f0f3f9377d28e61f138d161f7b9776241",
+    "event": "push",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "secrets",
+        "id": 115365192437,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "checks",
+        "id": 115365193137,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "persistence-forecast",
+        "id": 115365814216,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (2)",
+        "id": 115365814354,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-forecast)",
+        "id": 115365814412,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (3)",
+        "id": 115365814424,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "observation-replay",
+        "id": 115365814499,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "TensorFlow CPU training, artifact and reload",
+        "id": 115365814508,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "anomaly-oci",
+        "id": 115365814512,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (1)",
+        "id": 115365814522,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "tests (0)",
+        "id": 115365814535,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-source-inputs)",
+        "id": 115365814590,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-detectors)",
+        "id": 115365814606,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "persistence",
+        "id": 115365814645,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "observation-broker",
+        "id": 115365814670,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "acceptance (ci-qualified-inputs)",
+        "id": 115365814816,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "required-result",
+        "id": 115409905579,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "complete_collection": {
+      "checked_at": "2026-10-13T16:26:44.222859+00:00",
+      "run_id": 38417346019,
+      "head": "72244a7f0f3f9377d28e61f138d161f7b9776241",
+      "complete_disjoint_collection_verified": true,
+      "collection_sha256": "d144588cc3f4c196ec6d790546c1eb85457874cfa4f0b6f486dcff544cdf1f11",
+      "counts": {
+        "tests": 6062,
+        "skipped": 49,
+        "failures": 0,
+        "errors": 0,
+        "passed": 6013
+      },
+      "shards": [
+        {
+          "shard": 0,
+          "selected": 1391,
+          "seconds": 3319.259
+        },
+        {
+          "shard": 1,
+          "selected": 1700,
+          "seconds": 5295.707
+        },
+        {
+          "shard": 2,
+          "selected": 1357,
+          "seconds": 3246.725
+        },
+        {
+          "shard": 3,
+          "selected": 1614,
+          "seconds": 4514.344
+        }
+      ]
+    }
+  },
+  "ai_publication_accepted": true,
+  "source_publication_requirement": "This receipt and the matching Source plan must be accepted by Source PR/main Required CI; this file does not grant its own publication acceptance."
+}

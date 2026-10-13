@@ -21,7 +21,7 @@ Repo AI nie przejmuje generatora, frontendu ani dostępu do domenowej bazy Retai
 | [06 — inventory](etapy/06-inventory-ledger.md) | **Cloud-native**: ledger, dostawy, źródłowe bramki i nowa wersja danych. AI odbiera nowy eksport przez mechanizmy 03 i ponawia zależne oceny 04/05. | 03 |
 | [07 — anomalie/DQ](etapy/07-anomalie-dq.md) | **Oba**: cloud-native — scenariusze i oddzielne truth/raw faults; AI-intelligence — curation, detekcja, ocena i lifecycle modelu. | 04, 05 i 06 |
 | [08 — stockout](etapy/08-stockout-risk.md) | **AI-intelligence**: labels, cechy, model ryzyka, kalibracja i API na poprawnych danych inventory. | 04, 05 i 06 |
-| [09 — TensorFlow/robustness](etapy/09-tensorflow-robustness.md) | **AI-intelligence**: challengery i porównanie trzech zastosowań. | 07 i 08 |
+| [09 — TensorFlow/robustness](etapy/09-tensorflow-robustness.md) | **AI-intelligence**: nowe porównanie forecastingu oraz konsolidacja historycznych odbiorów 07–08 zgodnie z zatwierdzonym wariantem 1. | 07 i 08 |
 | [10 — integracja](etapy/10-integracja-retailops.md) | **Oba**: AI — wyniki/outbox/publisher; cloud-native — kontrakty, consumer, projekcje/read API/UI; wspólnie auth, replay i E2E. | 07 i 08 |
 | [11 — RAG](etapy/11-rag.md) | **AI-intelligence**: korpus obu repo, indeks, retrieval, jakość i administracja. Cloud-native utrzymuje aktualne źródła dokumentacyjne i status. | 01 |
 | [12 — agent](etapy/12-agent-bedrock.md) | **AI-intelligence**: narzędzia read-only, graf, Bedrock, odpowiedzi i sugestie. Odbiór obejmuje również dostarczenie sugestii do projekcji/UI RetailOps z 10. | 10 i 11 do pełnego zamknięcia |
