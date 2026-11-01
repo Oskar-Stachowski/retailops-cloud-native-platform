@@ -1,5 +1,5 @@
 # Multi-platform base digests are updated through reviewed dependency PRs.
-FROM python:3.11-slim@sha256:e41613d42d4891e4930f79523f93f81bbc7632584ec65e36ab055f41a800b41e
+FROM python:3.11-slim@sha256:673719e071ecf27434fd2635bbd8d00f49f4fdd81f243143438a42ced8bedf60
 
 LABEL org.opencontainers.image.title="RetailOps API"
 LABEL org.opencontainers.image.description="FastAPI backend for the RetailOps local runtime"
